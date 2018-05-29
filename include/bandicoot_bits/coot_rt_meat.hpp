@@ -215,6 +215,10 @@ coot_rt_t::internal_init(const bool manual_selection, const uword wanted_platfor
   // TODO: if 64 bit floats are supported, initialise double kernels
   
   
+  // TODO: refactor to allow use the choice of clBLAS or clBLast backends
+  // TODO: refactor to allow use of cuBLAS backened (lots of work!)
+  
+  
   // setup clBLAS
   
   

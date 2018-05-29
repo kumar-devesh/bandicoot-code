@@ -52,7 +52,7 @@ class Mat : public Base< eT, Mat<eT> >
   
   inline cl_mem get_dev_mem(const bool sync = true) const;
   
-  inline void  copy_from_dev_mem(      eT* dest_cpu_mem, const uword N) const;
+  inline void  copy_from_dev_mem(      eT* dest_cpu_mem, const uword N) const;  // TODO: rename to copy_into_cpu_mem()
   inline void  copy_into_dev_mem(const eT*  src_cpu_mem, const uword N);
   
   inline                  Mat(const arma::Mat<eT>& X);
