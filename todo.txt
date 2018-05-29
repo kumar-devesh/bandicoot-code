@@ -1,1 +1,0 @@
-implement float chol() and do timing comparisons
