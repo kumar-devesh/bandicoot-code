@@ -1,9 +1,16 @@
 
+refactor to use axpy() calls for matrix addition
+- this will only work for float, double ?
+- cx_float, cx_double ?
+- int, long ? use old method?
+
+expand to handle cubes (aka "3d matrices", 3rd order tensors)
+
+
 refactor to have an abstraction for various GPU BLAS backends,
-so we are not directly tied to OpenCL
+so we are not directly tied to OpenCL;
+follow similar approach as MAGMA ?
  - clBLAS  - opencl
  - clBlast - opencl
  - cuBLAS  - nvidia
  
-follow similar approach as MAGMA ?
-
