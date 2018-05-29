@@ -1,0 +1,9 @@
+
+refactor to have an abstraction for various GPU BLAS backends,
+so we are not directly tied to OpenCL
+ - clBLAS  - opencl
+ - clBlast - opencl
+ - cuBLAS  - nvidia
+ 
+follow similar approach as MAGMA ?
+
