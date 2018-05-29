@@ -1,8 +1,8 @@
 **About**
-* Bandicoot aims:
+* Bandicoot has 2 main aims:
+   * streamlined stand-alone linear algebra library for GPUs, providing a subset of Armadillo functionality
    * GPU accelerator add-on for the [Armadillo](http://arma.sourceforge.net) C++ linear algebra library,
      ie. subset of functions (such as matrix decompositions) which process Armadillo matrices on GPUs
-   * stand-alone linear algebra library for computing on GPUs, providing a subset of Armadillo functionality
 * Bandicoot is currently a **work-in-progress** and hence currently only for experimental use
 <br>
 <br>
