@@ -190,7 +190,7 @@ inline
 void
 magma_getdevice(magma_device_t* dev)
   {
-  (*dev) = coot_rt.get_device();
+  (*dev) = coot_rt.cl_rt.get_device();
   }
 
 
@@ -221,7 +221,7 @@ magma_queue_create(magma_device_t dev, magma_queue_t* queue)
   {
   (void)dev;  // ignore the variable
   
-  coot_rt.create_extra_cq(*queue);
+  coot_rt.cl_rt.create_extra_cq(*queue);
   }
 
 
@@ -230,7 +230,7 @@ inline
 void
 magma_queue_destroy(magma_queue_t queue)
   {
-  coot_rt.delete_extra_cq(queue);
+  coot_rt.cl_rt.delete_extra_cq(queue);
   }
 
 

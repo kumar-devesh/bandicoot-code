@@ -31,27 +31,23 @@ class arrayops
   
   template<typename eT>
   inline static void
-  inplace_op_scalar(cl_mem dest, const eT val, const uword n_elem, cl_kernel kernel);
+  inplace_set_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem);
   
   template<typename eT>
   inline static void
-  inplace_set_scalar(cl_mem dest, const eT val, const uword n_elem);
+  inplace_plus_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem);
   
   template<typename eT>
   inline static void
-  inplace_plus_scalar(cl_mem dest, const eT val, const uword n_elem);
+  inplace_minus_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem);
   
   template<typename eT>
   inline static void
-  inplace_minus_scalar(cl_mem dest, const eT val, const uword n_elem);
+  inplace_mul_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem);
   
   template<typename eT>
   inline static void
-  inplace_mul_scalar(cl_mem dest, const eT val, const uword n_elem);
-  
-  template<typename eT>
-  inline static void
-  inplace_div_scalar(cl_mem dest, const eT val, const uword n_elem);
+  inplace_div_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem);
   
   
   // 

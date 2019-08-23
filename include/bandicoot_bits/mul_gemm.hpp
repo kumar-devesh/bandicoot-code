@@ -47,35 +47,45 @@ class gemm
     )
     {
     coot_extra_debug_sigprint();
-    
-    // coot_debug_assert_blas_size(A,B);  // TODO: adapt this assert for size_t
-    
-    const clblasTranspose transA = (do_trans_A) ? clblasTrans : clblasNoTrans;
-    const clblasTranspose transB = (do_trans_B) ? clblasTrans : clblasNoTrans;
-    
-    const size_t M = size_t(C.n_rows);
-    const size_t N = size_t(C.n_cols);
-    const size_t K = (do_trans_A) ? size_t(A.n_rows) : size_t(A.n_cols);
-    
-    const size_t lda = (do_trans_A) ? K : M;
-    const size_t ldb = (do_trans_B) ? N : K;
-    const size_t ldc = size_t(C.n_rows);
-    
+
     const float local_alpha = (use_alpha) ? alpha : float(1);
     const float local_beta  = (use_beta)  ? beta  : float(0);
+
+    if (coot_rt.backend == CUDA_BACKEND)
+      {
+      cuda_wrapper::gemm<float, do_trans_A, do_trans_B>(C, A, B, local_alpha, local_beta);
+      }
+    else
+      {
+
+      // RC-TODO: refactor CL backend to somewhere else
     
-    cl_mem A_mem = A.get_dev_mem(false);
-    cl_mem B_mem = B.get_dev_mem(false);
-    cl_mem C_mem = C.get_dev_mem(false);
+      // coot_debug_assert_blas_size(A,B);  // TODO: adapt this assert for size_t
     
-    cl_command_queue queue = coot_rt.get_cq();
+      const clblasTranspose transA = (do_trans_A) ? clblasTrans : clblasNoTrans;
+      const clblasTranspose transB = (do_trans_B) ? clblasTrans : clblasNoTrans;
     
-    cl_int status = 0;
+      const size_t M = size_t(C.n_rows);
+      const size_t N = size_t(C.n_cols);
+      const size_t K = (do_trans_A) ? size_t(A.n_rows) : size_t(A.n_cols);
     
-    status |= clblasSgemm(clblasColumnMajor, transA, transB, M, N, K, local_alpha, A_mem, 0, lda, B_mem, 0, ldb, local_beta, C_mem, 0, ldc, 1, &queue, 0, NULL, NULL);
-    status |= clFlush(queue);
+      const size_t lda = (do_trans_A) ? K : M;
+      const size_t ldb = (do_trans_B) ? N : K;
+      const size_t ldc = size_t(C.n_rows);
     
-    coot_check_cl_error(status, "gemm::apply(): eT = float");
+      cl_mem A_mem = A.get_dev_mem(false).cl_mem_ptr;
+      cl_mem B_mem = B.get_dev_mem(false).cl_mem_ptr;
+      cl_mem C_mem = C.get_dev_mem(false).cl_mem_ptr;
+    
+      cl_command_queue queue = coot_rt.cl_rt.get_cq();
+    
+      cl_int status = 0;
+    
+      status |= clblasSgemm(clblasColumnMajor, transA, transB, M, N, K, local_alpha, A_mem, 0, lda, B_mem, 0, ldb, local_beta, C_mem, 0, ldc, 1, &queue, 0, NULL, NULL);
+      status |= clFlush(queue);
+    
+      coot_check_cl_error(status, "gemm::apply(): eT = float");
+      }
     }
   
   
@@ -93,36 +103,42 @@ class gemm
     )
     {
     coot_extra_debug_sigprint();
+
+    const double local_alpha = (use_alpha) ? alpha : double(1);
+    const double local_beta  = (use_beta)  ? beta  : double(0);
     
     // coot_debug_assert_blas_size(A,B);  // TODO: adapt this assert for size_t
+    if (coot_rt.backend == CUDA_BACKEND)
+      {
+      cuda_wrapper::gemm<double, do_trans_A, do_trans_B>(C, A, B, local_alpha, local_beta);
+      }
+    else
+      {
+      const clblasTranspose transA = (do_trans_A) ? clblasTrans : clblasNoTrans;
+      const clblasTranspose transB = (do_trans_B) ? clblasTrans : clblasNoTrans;
     
-    const clblasTranspose transA = (do_trans_A) ? clblasTrans : clblasNoTrans;
-    const clblasTranspose transB = (do_trans_B) ? clblasTrans : clblasNoTrans;
+      const size_t M = size_t(C.n_rows);
+      const size_t N = size_t(C.n_cols);
+      const size_t K = (do_trans_A) ? size_t(A.n_rows) : size_t(A.n_cols);
     
-    const size_t M = size_t(C.n_rows);
-    const size_t N = size_t(C.n_cols);
-    const size_t K = (do_trans_A) ? size_t(A.n_rows) : size_t(A.n_cols);
+      const size_t lda = (do_trans_A) ? K : M;
+      const size_t ldb = (do_trans_B) ? N : K;
+      const size_t ldc = size_t(C.n_rows);
     
-    const size_t lda = (do_trans_A) ? K : M;
-    const size_t ldb = (do_trans_B) ? N : K;
-    const size_t ldc = size_t(C.n_rows);
+      cl_mem A_mem = A.get_dev_mem(false).cl_mem_ptr;
+      cl_mem B_mem = B.get_dev_mem(false).cl_mem_ptr;
+      cl_mem C_mem = C.get_dev_mem(false).cl_mem_ptr;
     
-    const double local_alpha = (use_alpha) ? alpha : float(1);
-    const double local_beta  = (use_beta)  ? beta  : float(0);
+      cl_command_queue queue = coot_rt.cl_rt.get_cq();
     
-    cl_mem A_mem = A.get_dev_mem(false);
-    cl_mem B_mem = B.get_dev_mem(false);
-    cl_mem C_mem = C.get_dev_mem(false);
+      cl_int status = 0;
     
-    cl_command_queue queue = coot_rt.get_cq();
+      status |= clblasDgemm(clblasColumnMajor, transA, transB, M, N, K, local_alpha, A_mem, 0, lda, B_mem, 0, ldb, local_beta, C_mem, 0, ldc, 1, &queue, 0, NULL, NULL);
+      status |= clFlush(queue);
     
-    cl_int status = 0;
-    
-    status |= clblasDgemm(clblasColumnMajor, transA, transB, M, N, K, local_alpha, A_mem, 0, lda, B_mem, 0, ldb, local_beta, C_mem, 0, ldc, 1, &queue, 0, NULL, NULL);
-    status |= clFlush(queue);
-    
-    coot_check_cl_error(status, "gemm::apply(): eT = double");
+      coot_check_cl_error(status, "gemm::apply(): eT = double");
     }
+  }
   
   
   

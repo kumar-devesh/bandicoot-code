@@ -60,6 +60,16 @@
   #include <mutex>
 #endif
 
+
+// Import CUDA headers if needed.
+#ifdef COOT_USE_CUDA
+  #include <cuda.h>
+  #include <cuda_runtime_api.h>
+  #include <cuda_runtime.h>
+  #include <cublas_v2.h>
+  #include <nvrtc.h>
+#endif
+
 // TODO: include any stuff here that is not meant to be in the coot namespace
 
 
@@ -89,7 +99,20 @@ namespace coot
   // runtime
   
   #include "bandicoot_bits/kernel_id.hpp"
-  #include "bandicoot_bits/kernel_src.hpp"
+  #include "bandicoot_bits/cuda_bones.hpp"
+
+  namespace opencl
+    {
+    #include "bandicoot_bits/opencl/runtime_bones.hpp"
+    #include "bandicoot_bits/opencl/kernel_src.hpp"
+    }
+
+  namespace cuda
+    {
+    #include "bandicoot_bits/cuda/runtime_bones.hpp"
+    #include "bandicoot_bits/cuda/kernel_src.hpp"
+    }
+
   #include "bandicoot_bits/coot_rt_bones.hpp"
   
   //
@@ -139,7 +162,19 @@ namespace coot
   // runtime
   
   #include "bandicoot_bits/coot_rt_meat.hpp"
-  
+  #include "bandicoot_bits/cuda_meat.hpp"
+
+  namespace opencl
+    {
+    #include "bandicoot_bits/opencl/runtime_meat.hpp"
+    #include "bandicoot_bits/opencl/inplace_op.hpp"
+    }
+
+  namespace cuda
+    {
+    #include "bandicoot_bits/cuda/runtime_meat.hpp"
+    #include "bandicoot_bits/cuda/inplace_op.hpp"
+    }
   
   //
   // classes that underlay metaprogramming 

@@ -12,7 +12,8 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-
+// RC-TODO: temporary
+#define COOT_USE_CUDA
 
 #if !defined(COOT_USE_LAPACK)
 #define COOT_USE_LAPACK

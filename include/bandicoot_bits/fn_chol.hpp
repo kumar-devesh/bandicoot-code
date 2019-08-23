@@ -28,7 +28,7 @@ chol(Mat<typename T1::elem_type>& out, const Base<typename T1::elem_type, T1>& X
   
   typedef typename T1::elem_type eT;
   
-  coot_debug_check( (coot_rt.is_valid() == false), "coot_rt not valid" );
+  coot_debug_check( (coot_rt.cl_rt.is_valid() == false), "coot_cl_rt not valid" );
   
   out = X.get_ref();
   
@@ -61,7 +61,7 @@ chol(Mat<typename T1::elem_type>& out, const Base<typename T1::elem_type, T1>& X
   
   
   //// using MAGMA 1.3
-  //status = magma_dpotrf_gpu(MagmaUpper, out.n_rows, out.get_dev_mem(), 0, out.n_rows, coot_rt.get_cq(), &info);
+  //status = magma_dpotrf_gpu(MagmaUpper, out.n_rows, out.get_dev_mem(), 0, out.n_rows, coot_rt.cl_rt.get_cq(), &info);
   
   
 
