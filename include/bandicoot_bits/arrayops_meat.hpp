@@ -138,27 +138,18 @@ arrayops::inplace_div_scalar(dev_mem_t<eT> dest, const eT val, const uword n_ele
 template<typename eT>
 inline
 void
-arrayops::inplace_op_array(cl_mem dest, cl_mem src, const uword n_elem, cl_kernel kernel)
+arrayops::inplace_plus_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem)
   {
   coot_extra_debug_sigprint();
-  
-  opencl::runtime_t::cq_guard guard;
-  
-  opencl::runtime_t::adapt_uword N(n_elem);
-  
-  cl_int status = 0;
-  
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &dest  );
-  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &src   );
-  status |= clSetKernelArg(kernel, 2, N.size,          N.addr);
-  
-  const size_t global_work_size[1] = { size_t(n_elem) };
-  
-  coot_extra_debug_print("clEnqueueNDRangeKernel()");
-  
-  status |= clEnqueueNDRangeKernel(coot_rt.cl_rt.get_cq(), kernel, 1, NULL, global_work_size, NULL, 0, NULL, NULL);
-  
-  coot_check_runtime_error( (status != 0), "arrayops::inplace_op_array(): couldn't execute kernel" );
+
+  if (coot_rt.backend == CUDA_BACKEND)
+    {
+    cuda::inplace_op_array(dest, src, n_elem, kernel_id::inplace_plus_array);
+    }
+  else
+    {
+    opencl::inplace_op_array(dest, src, n_elem, kernel_id::inplace_plus_array);
+    }
   }
 
 
@@ -166,13 +157,18 @@ arrayops::inplace_op_array(cl_mem dest, cl_mem src, const uword n_elem, cl_kerne
 template<typename eT>
 inline
 void
-arrayops::inplace_plus_array(cl_mem dest, cl_mem src, const uword n_elem)
+arrayops::inplace_minus_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem)
   {
   coot_extra_debug_sigprint();
-  
-  cl_kernel kernel = coot_rt.cl_rt.get_kernel<eT>(kernel_id::inplace_plus_array);
-  
-  arrayops::inplace_op_array<eT>(dest, src, n_elem, kernel);
+
+  if (coot_rt.backend == CUDA_BACKEND)
+    {
+    cuda::inplace_op_array(dest, src, n_elem, kernel_id::inplace_minus_array);
+    }
+  else
+    {
+    opencl::inplace_op_array(dest, src, n_elem, kernel_id::inplace_minus_array);
+    }
   }
 
 
@@ -180,13 +176,18 @@ arrayops::inplace_plus_array(cl_mem dest, cl_mem src, const uword n_elem)
 template<typename eT>
 inline
 void
-arrayops::inplace_minus_array(cl_mem dest, cl_mem src, const uword n_elem)
+arrayops::inplace_mul_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem)
   {
   coot_extra_debug_sigprint();
-  
-  cl_kernel kernel = coot_rt.cl_rt.get_kernel<eT>(kernel_id::inplace_minus_array);
-  
-  arrayops::inplace_op_array<eT>(dest, src, n_elem, kernel);
+
+  if (coot_rt.backend == CUDA_BACKEND)
+    {
+    cuda::inplace_op_array(dest, src, n_elem, kernel_id::inplace_mul_array);
+    }
+  else
+    {
+    opencl::inplace_op_array(dest, src, n_elem, kernel_id::inplace_mul_array);
+    }
   }
 
 
@@ -194,27 +195,18 @@ arrayops::inplace_minus_array(cl_mem dest, cl_mem src, const uword n_elem)
 template<typename eT>
 inline
 void
-arrayops::inplace_mul_array(cl_mem dest, cl_mem src, const uword n_elem)
+arrayops::inplace_div_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem)
   {
   coot_extra_debug_sigprint();
-  
-  cl_kernel kernel = coot_rt.cl_rt.get_kernel<eT>(kernel_id::inplace_mul_array);
-  
-  arrayops::inplace_op_array<eT>(dest, src, n_elem, kernel);
-  }
 
-
-
-template<typename eT>
-inline
-void
-arrayops::inplace_div_array(cl_mem dest, cl_mem src, const uword n_elem)
-  {
-  coot_extra_debug_sigprint();
-  
-  cl_kernel kernel = coot_rt.cl_rt.get_kernel<eT>(kernel_id::inplace_div_array);
-  
-  arrayops::inplace_op_array<eT>(dest, src, n_elem, kernel);
+  if (coot_rt.backend == CUDA_BACKEND)
+    {
+    cuda::inplace_op_array(dest, src, n_elem, kernel_id::inplace_div_array);
+    }
+  else
+    {
+    opencl::inplace_op_array(dest, src, n_elem, kernel_id::inplace_div_array);
+    }
   }
 
 

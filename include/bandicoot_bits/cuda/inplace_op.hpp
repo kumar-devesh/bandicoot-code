@@ -43,7 +43,41 @@ inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, kernel_i
       (void**) args, // arguments
       0);
 
-  coot_check_runtime_error( (result2 != CUDA_SUCCESS), "cuda::inplace_op_scalar(): cuLaunchKernel() failed!");
+  coot_check_runtime_error( (result2 != CUDA_SUCCESS), "cuda::inplace_op_scalar(): cuLaunchKernel() failed");
+
+  cuCtxSynchronize();
+  }
+
+
+
+/**
+ * Run a CUDA array-wise kernel.
+ */
+template<typename eT>
+inline
+void
+inplace_op_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem, kernel_id::enum_id num)
+  {
+  coot_extra_debug_sigprint();
+
+  // Get kernel.
+  CUfunction kernel = coot_rt.cuda_rt.get_kernel<eT>(num);
+
+  cudaDeviceProp dev_prop;
+  cudaError_t result = cudaGetDeviceProperties(&dev_prop, 0);
+  coot_check_runtime_error( (result != cudaSuccess), "cuda::inplace_op_array(): couldn't get device properties");
+
+  const void* args[] = { &(dest.cuda_mem_ptr), &(src.cuda_mem_ptr), (size_t*) &n_elem };
+
+  CUresult result2 = cuLaunchKernel(
+      kernel,
+      dev_prop.maxThreadsPerBlock, 1, 1, // grid dims
+      std::ceil((double) n_elem / (double) dev_prop.maxThreadsPerBlock), 1, 1, // block dims
+      0, NULL, // shared mem and stream
+      (void**) args, // arguments
+      0);
+
+  coot_check_runtime_error( (result2 != CUDA_SUCCESS), "cuda::inplace_op_array(): cuLaunchKernel() failed");
 
   cuCtxSynchronize();
   }

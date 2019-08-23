@@ -55,23 +55,19 @@ class arrayops
   
   template<typename eT>
   inline static void
-  inplace_op_array(cl_mem dest, cl_mem src, const uword n_elem, cl_kernel kernel);
+  inplace_plus_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem);
   
   template<typename eT>
   inline static void
-  inplace_plus_array(cl_mem dest, cl_mem src, const uword n_elem);
+  inplace_minus_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem);
   
   template<typename eT>
   inline static void
-  inplace_minus_array(cl_mem dest, cl_mem src, const uword n_elem);
-  
-  template<typename eT>
-  inline static void
-  inplace_mul_array(cl_mem dest, cl_mem src, const uword n_elem);
+  inplace_mul_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem);
    
   template<typename eT>
   inline static void
-  inplace_div_array(cl_mem dest, cl_mem src, const uword n_elem);
+  inplace_div_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem);
   
   
   // 

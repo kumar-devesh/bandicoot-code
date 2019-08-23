@@ -48,4 +48,40 @@ inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, kernel_i
   coot_check_runtime_error( (status != 0), "opencl::inplace_op_scalar(): couldn't execute kernel" );
   }
 
+
+
+/**
+ * Run an OpenCL array-wise kernel.
+ */
+template<typename eT>
+inline
+void
+inplace_op_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem, kernel_id::enum_id num)
+  {
+  coot_extra_debug_sigprint();
+
+  // Get kernel.
+  cl_kernel kernel = coot_rt.cl_rt.get_kernel<eT>(num);
+
+  opencl::runtime_t::cq_guard guard;
+
+  opencl::runtime_t::adapt_uword N(n_elem);
+
+  cl_int status = 0;
+
+  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &(dest.cl_mem_ptr)  );
+  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &(src.cl_mem_ptr)   );
+  status |= clSetKernelArg(kernel, 2, N.size,         N.addr              );
+
+  const size_t global_work_size[1] = { size_t(n_elem) };
+
+  coot_extra_debug_print("clEnqueueNDRangeKernel()");
+
+  status |= clEnqueueNDRangeKernel(coot_rt.cl_rt.get_cq(), kernel, 1, NULL, global_work_size, NULL, 0, NULL, NULL);
+
+  coot_check_runtime_error( (status != 0), "opencl::inplace_op_array(): couldn't execute kernel");
+  }
+
+
+
 //! @}

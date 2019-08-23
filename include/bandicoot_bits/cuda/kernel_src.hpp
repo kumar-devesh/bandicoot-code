@@ -28,6 +28,17 @@ get_cuda_kernel_names()
   names.push_back("inplace_mul_scalar");
   names.push_back("inplace_div_scalar");
 
+  names.push_back("submat_inplace_set_scalar");
+  names.push_back("submat_inplace_plus_scalar");
+  names.push_back("submat_inplace_minus_scalar");
+  names.push_back("submat_inplace_mul_scalar");
+  names.push_back("submat_inplace_div_scalar");
+
+  names.push_back("inplace_plus_array");
+  names.push_back("inplace_minus_array");
+  names.push_back("inplace_mul_array");
+  names.push_back("inplace_div_array");
+
   return names;
   }
 
@@ -47,32 +58,96 @@ get_cuda_kernel_src()
   "\n"
   "__global__ void COOT_FN(PREFIX,inplace_set_scalar)(eT* out, const eT val, const UWORD N) \n"
   "  { \n"
-  "  const size_t i = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
   "  if(i < N)  { out[i] = val; } \n"
   "  } \n"
   "\n"
   "__global__ void COOT_FN(PREFIX,inplace_plus_scalar)(eT* out, const eT val, const UWORD N) \n"
   "  { \n"
-  "  const size_t i = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
   "  if(i < N)  { out[i] += val; } \n"
   "  } \n"
   "\n"
   "__global__ void COOT_FN(PREFIX,inplace_minus_scalar)(eT* out, const eT val, const UWORD N) \n"
   "  { \n"
-  "  const size_t i = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
   "  if(i < N)  { out[i] -= val; } \n"
   "  } \n"
   "\n"
   "__global__ void COOT_FN(PREFIX,inplace_mul_scalar)(eT* out, const eT val, const UWORD N) \n"
   "  { \n"
-  "  const size_t i = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
   "  if(i < N)  { out[i] *= val; } \n"
   "  } \n"
   "\n"
   "__global__ void COOT_FN(PREFIX,inplace_div_scalar)(eT* out, const eT val, const UWORD N) \n"
   "  { \n"
-  "  const size_t i = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
   "  if(i < N)  { out[i] /= val; } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,submat_inplace_set_scalar)(eT* out, const eT val, const UWORD end_row, const UWORD end_col, const UWORD n_rows) \n"
+  "  { \n"
+  "  const UWORD row = blockIdx.x; \n" // TODO: check this isn't backwards
+  "  const UWORD col = threadIdx.x; \n"
+  "  if ((row <= end_row) && (col <= end_col)) \n"
+  "    { out[row + col * n_rows] = val; } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,submat_inplace_plus_scalar)(eT* out, const eT val, const UWORD end_row, const UWORD end_col, const UWORD n_rows) \n"
+  "  { \n"
+  "  const UWORD row = blockIdx.x; \n" // TODO: check this isn't backwards
+  "  const UWORD col = threadIdx.x; \n"
+  "  if ((row <= end_row) && (col <= end_col)) \n"
+  "    { out[row + col * n_rows] += val; } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,submat_inplace_minus_scalar)(eT* out, const eT val, const UWORD end_row, const UWORD end_col, const UWORD n_rows) \n"
+  "  { \n"
+  "  const UWORD row = blockIdx.x; \n" // TODO: check this isn't backwards
+  "  const UWORD col = threadIdx.x; \n"
+  "  if ((row <= end_row) && (col <= end_col)) \n"
+  "    { out[row + col * n_rows] -= val; } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,submat_inplace_mul_scalar)(eT* out, const eT val, const UWORD end_row, const UWORD end_col, const UWORD n_rows) \n"
+  "  { \n"
+  "  const UWORD row = blockIdx.x; \n" // TODO: check this isn't backwards
+  "  const UWORD col = threadIdx.x; \n"
+  "  if ((row <= end_row) && (col <= end_col)) \n"
+  "    { out[row + col * n_rows] *= val; } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,submat_inplace_div_scalar)(eT* out, const eT val, const UWORD end_row, const UWORD end_col, const UWORD n_rows) \n"
+  "  { \n"
+  "  const UWORD row = blockIdx.x; \n" // TODO: check this isn't backwards
+  "  const UWORD col = threadIdx.x; \n"
+  "  if ((row <= end_row) && (col <= end_col)) \n"
+  "    { out[row + col * n_rows] /= val; } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,inplace_plus_array)(eT* out, const eT* A, const UWORD N) \n"
+  "  { \n"
+  "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  if (i < N) { out[i] += A[i]; } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,inplace_minus_array)(eT* out, const eT* A, const UWORD N) \n"
+  "  { \n"
+  "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  if (i < N) { out[i] -= A[i]; } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,inplace_mul_array)(eT* out, const eT* A, const UWORD N) \n"
+  "  { \n"
+  "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  if (i < N) { out[i] *= A[i]; } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,inplace_div_array)(eT* out, const eT* A, const UWORD N) \n"
+  "  { \n"
+  "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  if (i < N) { out[i] /= A[i]; } \n"
   "  } \n"
   "\n"
   "}\n";
