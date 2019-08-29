@@ -17,17 +17,48 @@
 
 using namespace coot;
 
-TEST_CASE("fill_1")
+template<typename eT>
+void test_fill()
   {
-  mat x(5, 5);
+  Mat<eT> x(5, 5);
 
-  x.fill(0.0);
+  x.fill(eT(0));
 
   for (uword c = 0; c < 5; ++c)
     {
     for (uword r = 0; r < 5; ++r)
       {
-      REQUIRE( x(r, c) == Approx(0.0) );
+      REQUIRE( eT(x(r, c)) == Approx(eT(0)) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("fill_1")
+  {
+  test_fill<float>();
+  test_fill<double>();
+  test_fill<u32>();
+  test_fill<s32>();
+  test_fill<u64>();
+  test_fill<s64>();
+  }
+
+
+
+template<typename eT>
+void test_fill_2()
+  {
+  Mat<eT> x(5, 5);
+
+  x.fill(eT(50));;
+
+  for (uword c = 0; c < 5; ++c)
+    {
+    for (uword r = 0; r < 5; ++r)
+      {
+      REQUIRE( eT(x(r, c)) == Approx(eT(50)) );
       }
     }
   }
@@ -36,15 +67,29 @@ TEST_CASE("fill_1")
 
 TEST_CASE("fill_2")
   {
-  mat x(5, 5);
+  test_fill_2<float>();
+  test_fill_2<double>();
+  test_fill_2<u32>();
+  test_fill_2<s32>();
+  test_fill_2<u64>();
+  test_fill_2<s64>();
+  }
 
-  x.fill(50.0);
+
+
+template<typename eT>
+void test_scalar_plus()
+  {
+  Mat<eT> x(5, 5);
+  x.fill(eT(0));
+
+  x += eT(1);
 
   for (uword c = 0; c < 5; ++c)
     {
     for (uword r = 0; r < 5; ++r)
       {
-      REQUIRE( x(r, c) == Approx(50.0) );
+      REQUIRE( eT(x(r, c)) == Approx(eT(1)) );
       }
     }
   }
@@ -53,16 +98,29 @@ TEST_CASE("fill_2")
 
 TEST_CASE("scalar_plus")
   {
-  mat x(5, 5);
-  x.fill(0.0);
+  test_scalar_plus<float>();
+  test_scalar_plus<double>();
+  test_scalar_plus<u32>();
+  test_scalar_plus<s32>();
+  test_scalar_plus<u64>();
+  test_scalar_plus<s64>();
+  }
 
-  x += 1.5;
+
+
+template<typename eT>
+void test_scalar_minus()
+  {
+  Mat<eT> x(5, 5);
+  x.fill(eT(10));
+
+  x -= eT(5);
 
   for (uword c = 0; c < 5; ++c)
     {
     for (uword r = 0; r < 5; ++r)
       {
-      REQUIRE( x(r, c) == Approx(1.5) );
+      REQUIRE( eT(x(r, c)) == Approx(eT(5)) );
       }
     }
   }
@@ -71,16 +129,29 @@ TEST_CASE("scalar_plus")
 
 TEST_CASE("scalar_minus")
   {
-  mat x(5, 5);
-  x.fill(0.0);
+  test_scalar_minus<float>();
+  test_scalar_minus<double>();
+  test_scalar_minus<u32>();
+  test_scalar_minus<s32>();
+  test_scalar_minus<u64>();
+  test_scalar_minus<s64>();
+  }
 
-  x -= 1.5;
+
+
+template<typename eT>
+void test_scalar_mul()
+  {
+  Mat<eT> x(5, 5);
+  x.fill(eT(1));
+
+  x *= eT(10);
 
   for (uword c = 0; c < 5; ++c)
     {
     for (uword r = 0; r < 5; ++r)
       {
-      REQUIRE( x(r, c) == Approx(-1.5) );
+      REQUIRE( eT(x(r, c)) == Approx(eT(10)) );
       }
     }
   }
@@ -89,16 +160,29 @@ TEST_CASE("scalar_minus")
 
 TEST_CASE("scalar_mul")
   {
-  mat x(5, 5);
-  x.fill(1.0);
+  test_scalar_mul<float>();
+  test_scalar_mul<double>();
+  test_scalar_mul<u32>();
+  test_scalar_mul<s32>();
+  test_scalar_mul<u64>();
+  test_scalar_mul<s64>();
+  }
 
-  x *= 1.5;
+
+
+template<typename eT>
+void test_scalar_div()
+  {
+  Mat<eT> x(5, 5);
+  x.fill(eT(10));
+
+  x /= eT(2);
 
   for (uword c = 0; c < 5; ++c)
     {
     for (uword r = 0; r < 5; ++r)
       {
-      REQUIRE( x(r, c) == Approx(1.5) );
+      REQUIRE( eT(x(r, c)) == Approx(eT(5)) );
       }
     }
   }
@@ -107,16 +191,10 @@ TEST_CASE("scalar_mul")
 
 TEST_CASE("scalar_div")
   {
-  mat x(5, 5);
-  x.fill(1.0);
-
-  x /= 2.0;
-
-  for (uword c = 0; c < 5; ++c)
-    {
-    for (uword r = 0; r < 5; ++r)
-      {
-      REQUIRE( x(r, c) == Approx(0.5) );
-      }
-    }
+  test_scalar_div<float>();
+  test_scalar_div<double>();
+  test_scalar_div<u32>();
+  test_scalar_div<s32>();
+  test_scalar_div<u64>();
+  test_scalar_div<s64>();
   }

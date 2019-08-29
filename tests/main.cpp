@@ -24,16 +24,16 @@
 int
 main(int argc, char** argv)
   {
-  std::cout << "Bandicoot version: " << coot::arma_version::as_string() << '\n';
+  std::cout << "Bandicoot version: " << coot::coot_version::as_string() << '\n';
 
   std::cout << "Run with OpenCL backend:\n";
 
-  coot::coot_rt.backend = CL_BACKEND;
+  coot::coot_rt.backend = coot::CL_BACKEND;
   Catch::Session().run(argc, argv);
 
   std::cout << "Run with CUDA backend:\n";
 
-  coot::coot_rt.backend = CUDA_BACKEND;
+  coot::coot_rt.backend = coot::CUDA_BACKEND;
   Catch::Session().run(argc, argv);
   }
 
