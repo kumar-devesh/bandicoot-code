@@ -43,46 +43,14 @@ inline
 eT
 MatValProxy<eT>::get_val(const Mat<eT>& M, const uword index)
   {
-  coot_extra_debug_sigprint();
-  
-  opencl::runtime_t::cq_guard guard;
-  
-  coot_aligned cl_int status = 0;
-  
-  coot_aligned void* mapped_ptr = clEnqueueMapBuffer(get_rt().cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, CL_TRUE, CL_MAP_READ, sizeof(eT)*index, sizeof(eT)*1, 0, NULL, NULL, &status);
-  
-  eT val = eT(0);
-  
-  if( (status == CL_SUCCESS) && (mapped_ptr != NULL) )
+  if (get_rt().backend == CL_BACKEND)
     {
-    val = *((eT*)(mapped_ptr));
-    
-    status = clEnqueueUnmapMemObject(get_rt().cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, mapped_ptr, 0, NULL, NULL);
+    return opencl::get_val(M.dev_mem, index);
     }
-  
-  coot_check_runtime_error( (status != CL_SUCCESS), "MatValProxy: couldn't access device memory" );
-  
-  return val;
-  
-  
-  // coot_aligned eT               val;
-  // coot_aligned cl_buffer_region region;
-  // 
-  // region.origin = sizeof(eT)*ii; 
-  // region.size   = sizeof(eT)*1;
-  // 
-  // cl_int status = 0;
-  // // NOTE: the origin must be a multiple of alignment: see coot_cl_rt_meat how to get the alignment
-  // cl_mem sub_mem = clCreateSubBuffer(dev_mem, CL_MEM_READ_WRITE, CL_BUFFER_CREATE_TYPE_REGION, &region, &status);
-  // 
-  // coot_check_runtime_error( (status != CL_SUCCESS), "Mat::operator(): couldn't create subbuffer" );
-  // 
-  // status |= clEnqueueReadBuffer(get_rt().cl_rt.get_cq(), sub_mem, CL_TRUE, 0, sizeof(eT)*1, &val, 0, NULL, NULL);
-  // status |= clFinish(get_rt().cl_rt.get_cq());
-  // 
-  // coot_check_runtime_error( (status != CL_SUCCESS), "Mat::operator(): couldn't read from device memory" );
-  // 
-  // return val;
+  else
+    {
+    return cuda::get_val(M.dev_mem, index);
+    }
   }
 
 
