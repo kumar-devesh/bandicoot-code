@@ -38,7 +38,7 @@ trace(const Base<typename T1::elem_type, T1>& X)
   
   opencl::runtime_t::cq_guard guard;
   
-  cl_kernel kernel = coot_rt.cl_rt.get_kernel<eT>(kernel_id::trace);
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(kernel_id::trace);
   
   cl_mem tmp_mem = tmp.get_dev_mem(false);
   cl_mem   A_mem =   A.get_dev_mem(false);
@@ -56,7 +56,7 @@ trace(const Base<typename T1::elem_type, T1>& X)
   const size_t global_work_size[1] = { size_t(1) };
   
   coot_extra_debug_print("clEnqueueNDRangeKernel()");
-  status |= clEnqueueNDRangeKernel(coot_rt.cl_rt.get_cq(), kernel, 1, NULL, global_work_size, NULL, 0, NULL, NULL);
+  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, global_work_size, NULL, 0, NULL, NULL);
   
   coot_check_runtime_error( (status != 0), "trace(): couldn't execute kernel" );
   

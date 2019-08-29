@@ -65,7 +65,7 @@ class gemv
     cl_mem x_mem = x.get_dev_mem(false);
     cl_mem y_mem = y.get_dev_mem(false);
     
-    cl_command_queue queue = coot_rt.cl_rt.get_cq();
+    cl_command_queue queue = get_rt().cl_rt.get_cq();
     
     cl_int status = 0;
     

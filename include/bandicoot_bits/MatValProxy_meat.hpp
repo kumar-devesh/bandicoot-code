@@ -49,7 +49,7 @@ MatValProxy<eT>::get_val(const Mat<eT>& M, const uword index)
   
   coot_aligned cl_int status = 0;
   
-  coot_aligned void* mapped_ptr = clEnqueueMapBuffer(coot_rt.cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, CL_TRUE, CL_MAP_READ, sizeof(eT)*index, sizeof(eT)*1, 0, NULL, NULL, &status);
+  coot_aligned void* mapped_ptr = clEnqueueMapBuffer(get_rt().cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, CL_TRUE, CL_MAP_READ, sizeof(eT)*index, sizeof(eT)*1, 0, NULL, NULL, &status);
   
   eT val = eT(0);
   
@@ -57,7 +57,7 @@ MatValProxy<eT>::get_val(const Mat<eT>& M, const uword index)
     {
     val = *((eT*)(mapped_ptr));
     
-    status = clEnqueueUnmapMemObject(coot_rt.cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, mapped_ptr, 0, NULL, NULL);
+    status = clEnqueueUnmapMemObject(get_rt().cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, mapped_ptr, 0, NULL, NULL);
     }
   
   coot_check_runtime_error( (status != CL_SUCCESS), "MatValProxy: couldn't access device memory" );
@@ -77,8 +77,8 @@ MatValProxy<eT>::get_val(const Mat<eT>& M, const uword index)
   // 
   // coot_check_runtime_error( (status != CL_SUCCESS), "Mat::operator(): couldn't create subbuffer" );
   // 
-  // status |= clEnqueueReadBuffer(coot_rt.cl_rt.get_cq(), sub_mem, CL_TRUE, 0, sizeof(eT)*1, &val, 0, NULL, NULL);
-  // status |= clFinish(coot_rt.cl_rt.get_cq());
+  // status |= clEnqueueReadBuffer(get_rt().cl_rt.get_cq(), sub_mem, CL_TRUE, 0, sizeof(eT)*1, &val, 0, NULL, NULL);
+  // status |= clFinish(get_rt().cl_rt.get_cq());
   // 
   // coot_check_runtime_error( (status != CL_SUCCESS), "Mat::operator(): couldn't read from device memory" );
   // 
@@ -98,13 +98,13 @@ MatValProxy<eT>::operator=(const eT in_val)
   
   coot_aligned cl_int status = 0;
   
-  coot_aligned void* mapped_ptr = clEnqueueMapBuffer(coot_rt.cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, CL_TRUE, CL_MAP_WRITE, sizeof(eT)*index, sizeof(eT)*1, 0, NULL, NULL, &status);
+  coot_aligned void* mapped_ptr = clEnqueueMapBuffer(get_rt().cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, CL_TRUE, CL_MAP_WRITE, sizeof(eT)*index, sizeof(eT)*1, 0, NULL, NULL, &status);
   
   if( (status == CL_SUCCESS) && (mapped_ptr != NULL) )
     {
     *((eT*)(mapped_ptr)) = in_val;
     
-    status = clEnqueueUnmapMemObject(coot_rt.cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, mapped_ptr, 0, NULL, NULL);  
+    status = clEnqueueUnmapMemObject(get_rt().cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, mapped_ptr, 0, NULL, NULL);  
     }
   
   coot_check_runtime_error( (status != CL_SUCCESS), "MatValProxy: couldn't access device memory" );
@@ -123,13 +123,13 @@ MatValProxy<eT>::operator+=(const eT in_val)
   
   coot_aligned cl_int status = 0;
   
-  coot_aligned void* mapped_ptr = clEnqueueMapBuffer(coot_rt.cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, CL_TRUE, (CL_MAP_READ | CL_MAP_WRITE), sizeof(eT)*index, sizeof(eT)*1, 0, NULL, NULL, &status);
+  coot_aligned void* mapped_ptr = clEnqueueMapBuffer(get_rt().cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, CL_TRUE, (CL_MAP_READ | CL_MAP_WRITE), sizeof(eT)*index, sizeof(eT)*1, 0, NULL, NULL, &status);
   
   if( (status == CL_SUCCESS) && (mapped_ptr != NULL) )
     {
     *((eT*)(mapped_ptr)) += in_val;
     
-    status = clEnqueueUnmapMemObject(coot_rt.cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, mapped_ptr, 0, NULL, NULL);  
+    status = clEnqueueUnmapMemObject(get_rt().cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, mapped_ptr, 0, NULL, NULL);  
     }
   
   coot_check_runtime_error( (status != CL_SUCCESS), "MatValProxy: couldn't access device memory" );
@@ -148,13 +148,13 @@ MatValProxy<eT>::operator-=(const eT in_val)
   
   coot_aligned cl_int status = 0;
   
-  coot_aligned void* mapped_ptr = clEnqueueMapBuffer(coot_rt.cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, CL_TRUE, (CL_MAP_READ | CL_MAP_WRITE), sizeof(eT)*index, sizeof(eT)*1, 0, NULL, NULL, &status);
+  coot_aligned void* mapped_ptr = clEnqueueMapBuffer(get_rt().cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, CL_TRUE, (CL_MAP_READ | CL_MAP_WRITE), sizeof(eT)*index, sizeof(eT)*1, 0, NULL, NULL, &status);
   
   if( (status == CL_SUCCESS) && (mapped_ptr != NULL) )
     {
     *((eT*)(mapped_ptr)) -= in_val;
     
-    status = clEnqueueUnmapMemObject(coot_rt.cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, mapped_ptr, 0, NULL, NULL);  
+    status = clEnqueueUnmapMemObject(get_rt().cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, mapped_ptr, 0, NULL, NULL);  
     }
   
   coot_check_runtime_error( (status != CL_SUCCESS), "MatValProxy: couldn't access device memory" );
@@ -173,13 +173,13 @@ MatValProxy<eT>::operator*=(const eT in_val)
   
   coot_aligned cl_int status = 0;
   
-  coot_aligned void* mapped_ptr = clEnqueueMapBuffer(coot_rt.cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, CL_TRUE, (CL_MAP_READ | CL_MAP_WRITE), sizeof(eT)*index, sizeof(eT)*1, 0, NULL, NULL, &status);
+  coot_aligned void* mapped_ptr = clEnqueueMapBuffer(get_rt().cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, CL_TRUE, (CL_MAP_READ | CL_MAP_WRITE), sizeof(eT)*index, sizeof(eT)*1, 0, NULL, NULL, &status);
   
   if( (status == CL_SUCCESS) && (mapped_ptr != NULL) )
     {
     *((eT*)(mapped_ptr)) *= in_val;
     
-    status = clEnqueueUnmapMemObject(coot_rt.cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, mapped_ptr, 0, NULL, NULL);  
+    status = clEnqueueUnmapMemObject(get_rt().cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, mapped_ptr, 0, NULL, NULL);  
     }
   
   coot_check_runtime_error( (status != CL_SUCCESS), "MatValProxy: couldn't access device memory" );
@@ -198,13 +198,13 @@ MatValProxy<eT>::operator/=(const eT in_val)
   
   coot_aligned cl_int status = 0;
   
-  coot_aligned void* mapped_ptr = clEnqueueMapBuffer(coot_rt.cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, CL_TRUE, (CL_MAP_READ | CL_MAP_WRITE), sizeof(eT)*index, sizeof(eT)*1, 0, NULL, NULL, &status);
+  coot_aligned void* mapped_ptr = clEnqueueMapBuffer(get_rt().cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, CL_TRUE, (CL_MAP_READ | CL_MAP_WRITE), sizeof(eT)*index, sizeof(eT)*1, 0, NULL, NULL, &status);
   
   if( (status == CL_SUCCESS) && (mapped_ptr != NULL) )
     {
     *((eT*)(mapped_ptr)) /= in_val;
     
-    status = clEnqueueUnmapMemObject(coot_rt.cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, mapped_ptr, 0, NULL, NULL);  
+    status = clEnqueueUnmapMemObject(get_rt().cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, mapped_ptr, 0, NULL, NULL);  
     }
   
   coot_check_runtime_error( (status != CL_SUCCESS), "MatValProxy: couldn't access device memory" );

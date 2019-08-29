@@ -43,10 +43,10 @@ eglue_core<eglue_type>::apply(Mat<typename T1::elem_type>& out, const eGlue<T1, 
   
   cl_kernel kernel;
   
-       if(is_same_type<eglue_type, eglue_plus >::yes)  { kernel = coot_rt.cl_rt.get_kernel<eT>(kernel_id::equ_array_plus_array ); }
-  else if(is_same_type<eglue_type, eglue_minus>::yes)  { kernel = coot_rt.cl_rt.get_kernel<eT>(kernel_id::equ_array_minus_array); }
-  else if(is_same_type<eglue_type, eglue_div  >::yes)  { kernel = coot_rt.cl_rt.get_kernel<eT>(kernel_id::equ_array_div_array  ); }
-  else if(is_same_type<eglue_type, eglue_schur>::yes)  { kernel = coot_rt.cl_rt.get_kernel<eT>(kernel_id::equ_array_mul_array  ); }
+       if(is_same_type<eglue_type, eglue_plus >::yes)  { kernel = get_rt().cl_rt.get_kernel<eT>(kernel_id::equ_array_plus_array ); }
+  else if(is_same_type<eglue_type, eglue_minus>::yes)  { kernel = get_rt().cl_rt.get_kernel<eT>(kernel_id::equ_array_minus_array); }
+  else if(is_same_type<eglue_type, eglue_div  >::yes)  { kernel = get_rt().cl_rt.get_kernel<eT>(kernel_id::equ_array_div_array  ); }
+  else if(is_same_type<eglue_type, eglue_schur>::yes)  { kernel = get_rt().cl_rt.get_kernel<eT>(kernel_id::equ_array_mul_array  ); }
   
   cl_mem out_dev_mem = out.get_dev_mem(false);
   cl_mem   A_dev_mem =   A.get_dev_mem(false);
@@ -65,7 +65,7 @@ eglue_core<eglue_type>::apply(Mat<typename T1::elem_type>& out, const eGlue<T1, 
   
   size_t global_work_size = size_t(n_elem);
   
-  status |= clEnqueueNDRangeKernel(coot_rt.cl_rt.get_cq(), kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
+  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
   
   coot_check_runtime_error( (status != CL_SUCCESS), "eglue_core: couldn't execute kernel" );
   }

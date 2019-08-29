@@ -88,7 +88,7 @@ Mat<eT>::get_dev_mem(const bool sync) const
   coot_extra_debug_sigprint();
   
   // RC-TODO: handle CUDA case correctly?
-  if(sync)  { clFinish(coot_rt.cl_rt.get_cq()); } // force synchronisation
+  if(sync)  { clFinish(get_rt().cl_rt.get_cq()); } // force synchronisation
   
   return dev_mem;
   }
@@ -107,7 +107,7 @@ Mat<eT>::copy_from_dev_mem(eT* dest_cpu_memptr, const uword N) const
   const uword n_elem_mod = (std::min)(n_elem, N);
 
   // RC-TODO: handle CUDA case
-  if (coot_rt.backend == CUDA_BACKEND)
+  if (get_rt().backend == CUDA_BACKEND)
     {
     cudaError_t error = cudaMemcpy(dest_cpu_memptr, dev_mem.cuda_mem_ptr, n_elem_mod * sizeof(eT), cudaMemcpyDeviceToHost);
     if (error != cudaSuccess)
@@ -118,7 +118,7 @@ Mat<eT>::copy_from_dev_mem(eT* dest_cpu_memptr, const uword N) const
     opencl::runtime_t::cq_guard guard;
 
     // use a blocking call
-    const cl_int status = clEnqueueReadBuffer(coot_rt.cl_rt.get_cq(), dev_mem.cl_mem_ptr, CL_TRUE, 0, sizeof(eT)*n_elem_mod, dest_cpu_memptr, 0, NULL, NULL);
+    const cl_int status = clEnqueueReadBuffer(get_rt().cl_rt.get_cq(), dev_mem.cl_mem_ptr, CL_TRUE, 0, sizeof(eT)*n_elem_mod, dest_cpu_memptr, 0, NULL, NULL);
 
     coot_check_runtime_error( (status != CL_SUCCESS), "Mat::copy_from_dev_mem(): couldn't access device memory" );
     }
@@ -142,7 +142,7 @@ Mat<eT>::copy_into_dev_mem(const eT* src_cpu_memptr, const uword N)
   const uword n_elem_mod = (std::min)(n_elem, N);
   
   // use a blocking call
-  cl_int status = clEnqueueWriteBuffer(coot_rt.cl_rt.get_cq(), dev_mem.cl_mem_ptr, CL_TRUE, 0, sizeof(eT)*n_elem_mod, src_cpu_memptr, 0, NULL, NULL);
+  cl_int status = clEnqueueWriteBuffer(get_rt().cl_rt.get_cq(), dev_mem.cl_mem_ptr, CL_TRUE, 0, sizeof(eT)*n_elem_mod, src_cpu_memptr, 0, NULL, NULL);
   
   coot_check_runtime_error( (status != CL_SUCCESS), "Mat::write_dev_mem(): couldn't access device memory" );
   }
@@ -205,7 +205,7 @@ Mat<eT>::cleanup()
   
   if((dev_mem.cl_mem_ptr != NULL) && (mem_state == 0) && (n_elem > 0))
     {
-    coot_rt.release_memory(dev_mem);
+    get_rt().release_memory(dev_mem);
     }
   
   dev_mem.cl_mem_ptr = NULL;  // for paranoia
@@ -257,7 +257,7 @@ Mat<eT>::init(const uword new_n_rows, const uword new_n_cols)
         }
       
       coot_extra_debug_print("Mat::init(): acquiring memory");
-      dev_mem = coot_rt.acquire_memory<eT>(new_n_elem);
+      dev_mem = get_rt().acquire_memory<eT>(new_n_elem);
       }
     
     access::rw(n_rows) = new_n_rows;
@@ -1261,7 +1261,7 @@ Mat<eT>::eye()
   opencl::runtime_t::adapt_uword local_n_rows(n_rows);
   opencl::runtime_t::adapt_uword local_n_cols(n_cols);
   
-  cl_kernel kernel = coot_rt.cl_rt.get_kernel<eT>(kernel_id::inplace_set_eye);
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(kernel_id::inplace_set_eye);
   
   cl_int status = 0;
   
@@ -1271,7 +1271,7 @@ Mat<eT>::eye()
   
   const size_t global_work_size[2] = { size_t(n_rows), size_t(n_cols) };
   
-  status |= clEnqueueNDRangeKernel(coot_rt.cl_rt.get_cq(), kernel, 2, NULL, global_work_size, NULL, 0, NULL, NULL);
+  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 2, NULL, global_work_size, NULL, 0, NULL, NULL);
   
   coot_check_runtime_error( (status != 0), "Mat::eye(): couldn't execute kernel" );
   

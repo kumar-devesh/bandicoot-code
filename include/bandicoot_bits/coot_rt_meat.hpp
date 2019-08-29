@@ -83,10 +83,3 @@ coot_rt_t::release_memory(dev_mem_t<eT> dev_mem)
     cuda_rt.release_memory(dev_mem.cuda_mem_ptr);
     }
   }
-
-
-
-// TODO: should this be in the run-time library, to ensure only one copy of the runtime is active?
-// TODO: don't instantiate coot_rt_t if COOT_USE_WRAPPER is enabled?
-// TODO: put instantiation in an anonymous namespace to avoid linking conflicts?
-coot_rt_t coot_rt;

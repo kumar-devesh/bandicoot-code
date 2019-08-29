@@ -113,7 +113,7 @@ magma_dpotrf_gpu(magma_uplo_t uplo, magma_int_t n, magmaDouble_ptr dA, size_t dA
     // TODO: otherwise it only makes sense if using bandicoot as a stand-alone library
     
     // use unblocked code
-    magma_dgetmatrix( n, n, dA, dA_offset, ldda, work, n, queue );  // internally writes to g_event
+    magma_dgetmatrix( n, n, dA, dA_offset, ldda, work, n, queue );  // internally writes to get_g_event()
     
     // TODO: replace with corresponding wrapper function from Armadillo
     // TODO: need to copy LAPACK wrappers from Armadillo to allow bandicoot work in stand-alone mode
@@ -121,7 +121,7 @@ magma_dpotrf_gpu(magma_uplo_t uplo, magma_int_t n, magmaDouble_ptr dA, size_t dA
     //lapackf77_dpotrf( lapack_uplo_const(uplo), &n, work, &n, info );
     arma::lapack::potrf<double>( (char*)lapack_uplo_const(uplo), &n, work, &n, info );  // TODO: when adapting LAPACK wrappers, change the proto to use const char* instead of char*
     
-    magma_dsetmatrix( n, n, work, n, dA, dA_offset, ldda, queue );  // internally uses g_event
+    magma_dsetmatrix( n, n, work, n, dA, dA_offset, ldda, queue );  // internally uses get_g_event()
     }
   else
     {
@@ -138,7 +138,7 @@ magma_dpotrf_gpu(magma_uplo_t uplo, magma_int_t n, magmaDouble_ptr dA, size_t dA
         jb = std::min( nb, n-j );
         if ( j > 0 )
           {
-          magma_dsyrk( MagmaUpper, MagmaConjTrans, jb, j, m_one, dA(0,j), ldda, one, dA(j,j), ldda, queue ); // internally uses g_event
+          magma_dsyrk( MagmaUpper, MagmaConjTrans, jb, j, m_one, dA(0,j), ldda, one, dA(j,j), ldda, queue ); // internally uses get_g_event()
           }
         
         // start asynchronous data transfer
@@ -147,7 +147,7 @@ magma_dpotrf_gpu(magma_uplo_t uplo, magma_int_t n, magmaDouble_ptr dA, size_t dA
         // apply all previous updates to block row right of diagonal block
         if ( j+jb < n )
           {
-          magma_dgemm( MagmaConjTrans, MagmaNoTrans, jb, n-j-jb, j, mz_one, dA(0, j   ), ldda, dA(0, j+jb), ldda, z_one,  dA(j, j+jb), ldda, queue );   // internally uses g_event
+          magma_dgemm( MagmaConjTrans, MagmaNoTrans, jb, n-j-jb, j, mz_one, dA(0, j   ), ldda, dA(0, j+jb), ldda, z_one,  dA(j, j+jb), ldda, queue );   // internally uses get_g_event()
           }
         
         // simultaneous with above dgemm, transfer data, factor diagonal block on CPU, and test for positive definiteness
@@ -170,7 +170,7 @@ magma_dpotrf_gpu(magma_uplo_t uplo, magma_int_t n, magmaDouble_ptr dA, size_t dA
         if ( j+jb < n )
           {
           magma_event_sync( event );
-          magma_dtrsm( MagmaLeft, MagmaUpper, MagmaConjTrans, MagmaNonUnit, jb, n-j-jb, z_one, dA(j, j),  ldda, dA(j, j+jb), ldda, queue );    // internally uses g_event
+          magma_dtrsm( MagmaLeft, MagmaUpper, MagmaConjTrans, MagmaNonUnit, jb, n-j-jb, z_one, dA(j, j),  ldda, dA(j, j+jb), ldda, queue );    // internally uses get_g_event()
           }
         }
       }
@@ -194,7 +194,7 @@ magma_dpotrf_gpu(magma_uplo_t uplo, magma_int_t n, magmaDouble_ptr dA, size_t dA
         // apply all previous updates to block column below diagonal block
         if ( j+jb < n )
           {
-          magma_dgemm( MagmaNoTrans, MagmaConjTrans, n-j-jb, jb, j, mz_one, dA(j+jb, 0), ldda, dA(j,  0), ldda, z_one,  dA(j+jb, j), ldda, queue );  // internally uses g_event
+          magma_dgemm( MagmaNoTrans, MagmaConjTrans, n-j-jb, jb, j, mz_one, dA(j+jb, 0), ldda, dA(j,  0), ldda, z_one,  dA(j+jb, j), ldda, queue );  // internally uses get_g_event()
           }
         
         // simultaneous with above dgemm, transfer data, factor diagonal block on CPU, and test for positive definiteness
@@ -216,7 +216,7 @@ magma_dpotrf_gpu(magma_uplo_t uplo, magma_int_t n, magmaDouble_ptr dA, size_t dA
         if ( j+jb < n )
           {
           magma_event_sync( event );
-          magma_dtrsm( MagmaRight, MagmaLower, MagmaConjTrans, MagmaNonUnit, n-j-jb, jb, z_one, dA(j, j), ldda, dA(j+jb, j), ldda, queue );  // internally uses g_event
+          magma_dtrsm( MagmaRight, MagmaLower, MagmaConjTrans, MagmaNonUnit, n-j-jb, jb, z_one, dA(j, j), ldda, dA(j+jb, j), ldda, queue );  // internally uses get_g_event()
           }
         }
       }

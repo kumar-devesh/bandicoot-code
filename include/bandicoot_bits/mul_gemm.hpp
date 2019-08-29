@@ -51,7 +51,7 @@ class gemm
     const float local_alpha = (use_alpha) ? alpha : float(1);
     const float local_beta  = (use_beta)  ? beta  : float(0);
 
-    if (coot_rt.backend == CUDA_BACKEND)
+    if (get_rt().backend == CUDA_BACKEND)
       {
       cuda_wrapper::gemm<float, do_trans_A, do_trans_B>(C, A, B, local_alpha, local_beta);
       }
@@ -77,7 +77,7 @@ class gemm
       cl_mem B_mem = B.get_dev_mem(false).cl_mem_ptr;
       cl_mem C_mem = C.get_dev_mem(false).cl_mem_ptr;
     
-      cl_command_queue queue = coot_rt.cl_rt.get_cq();
+      cl_command_queue queue = get_rt().cl_rt.get_cq();
     
       cl_int status = 0;
     
@@ -108,7 +108,7 @@ class gemm
     const double local_beta  = (use_beta)  ? beta  : double(0);
     
     // coot_debug_assert_blas_size(A,B);  // TODO: adapt this assert for size_t
-    if (coot_rt.backend == CUDA_BACKEND)
+    if (get_rt().backend == CUDA_BACKEND)
       {
       cuda_wrapper::gemm<double, do_trans_A, do_trans_B>(C, A, B, local_alpha, local_beta);
       }
@@ -129,7 +129,7 @@ class gemm
       cl_mem B_mem = B.get_dev_mem(false).cl_mem_ptr;
       cl_mem C_mem = C.get_dev_mem(false).cl_mem_ptr;
     
-      cl_command_queue queue = coot_rt.cl_rt.get_cq();
+      cl_command_queue queue = get_rt().cl_rt.get_cq();
     
       cl_int status = 0;
     

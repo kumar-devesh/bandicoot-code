@@ -83,7 +83,7 @@ op_sum::apply_noalias(Mat<eT>& out, const Mat<eT>& A, const uword dim)
   {
   coot_extra_debug_sigprint();
   
-  coot_debug_check( (coot_rt.cl_rt.is_valid() == false), "coot_cl_rt not valid" );
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot_cl_rt not valid" );
   
   if(dim == 0)
     {
@@ -106,7 +106,7 @@ op_sum::apply_noalias(Mat<eT>& out, const Mat<eT>& A, const uword dim)
   
   if(dim == 0)
     {
-    cl_kernel k1 = coot_rt.cl_rt.get_kernel<eT>(kernel_id::sum_colwise);
+    cl_kernel k1 = get_rt().cl_rt.get_kernel<eT>(kernel_id::sum_colwise);
     
     cl_int status = 0;
     
@@ -125,14 +125,14 @@ op_sum::apply_noalias(Mat<eT>& out, const Mat<eT>& A, const uword dim)
     const size_t k1_work_offset[1] = { 0                };
     const size_t k1_work_size[1]   = { size_t(A.n_cols) };
     
-    status |= clEnqueueNDRangeKernel(coot_rt.cl_rt.get_cq(), k1, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+    status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), k1, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
     
     coot_check_cl_error(status, "sum()");
     }
   else
   if(dim == 1)
     {
-    cl_kernel k1 = coot_rt.cl_rt.get_kernel<eT>(kernel_id::sum_rowwise);
+    cl_kernel k1 = get_rt().cl_rt.get_kernel<eT>(kernel_id::sum_rowwise);
     
     cl_int status = 0;
     
@@ -151,7 +151,7 @@ op_sum::apply_noalias(Mat<eT>& out, const Mat<eT>& A, const uword dim)
     const size_t k1_work_offset[1] = { 0                };
     const size_t k1_work_size[1]   = { size_t(A.n_rows) };
     
-    status |= clEnqueueNDRangeKernel(coot_rt.cl_rt.get_cq(), k1, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+    status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), k1, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
     
     coot_check_cl_error(status, "sum()");
     }
@@ -166,7 +166,7 @@ op_sum::apply_noalias(Mat<eT>& out, const subview<eT>& sv, const uword dim)
   {
   coot_extra_debug_sigprint();
   
-  coot_debug_check( (coot_rt.cl_rt.is_valid() == false), "coot_cl_rt not valid" );
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot_cl_rt not valid" );
   
   if(dim == 0)
     {
@@ -189,7 +189,7 @@ op_sum::apply_noalias(Mat<eT>& out, const subview<eT>& sv, const uword dim)
   
   if(dim == 0)
     {
-    cl_kernel k1 = coot_rt.cl_rt.get_kernel<eT>(kernel_id::submat_sum_colwise);
+    cl_kernel k1 = get_rt().cl_rt.get_kernel<eT>(kernel_id::submat_sum_colwise);
     
     cl_int status = 0;
     
@@ -216,14 +216,14 @@ op_sum::apply_noalias(Mat<eT>& out, const subview<eT>& sv, const uword dim)
     const size_t k1_work_offset[1] = { 0                 };
     const size_t k1_work_size[1]   = { size_t(sv.n_cols) };
     
-    status |= clEnqueueNDRangeKernel(coot_rt.cl_rt.get_cq(), k1, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+    status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), k1, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
     
     coot_check_cl_error(status, "sum()");
     }
   else
   if(dim == 1)
     {
-    cl_kernel k1 = coot_rt.cl_rt.get_kernel<eT>(kernel_id::submat_sum_rowwise);
+    cl_kernel k1 = get_rt().cl_rt.get_kernel<eT>(kernel_id::submat_sum_rowwise);
     
     cl_int status = 0;
     
@@ -250,7 +250,7 @@ op_sum::apply_noalias(Mat<eT>& out, const subview<eT>& sv, const uword dim)
     const size_t k1_work_offset[1] = { 0                 };
     const size_t k1_work_size[1]   = { size_t(sv.n_rows) };
     
-    status |= clEnqueueNDRangeKernel(coot_rt.cl_rt.get_cq(), k1, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+    status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), k1, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
     
     coot_check_cl_error(status, "sum()");
     }

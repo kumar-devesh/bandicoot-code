@@ -27,7 +27,7 @@ inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, kernel_i
   coot_extra_debug_sigprint();
 
   // Get kernel.
-  cl_kernel kernel = coot_rt.cl_rt.get_kernel<eT>(num);
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(num);
 
   runtime_t::cq_guard guard;
 
@@ -43,7 +43,7 @@ inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, kernel_i
 
   coot_extra_debug_print("clEnqueueNDRangeKernel()");
 
-  status |= clEnqueueNDRangeKernel(coot_rt.cl_rt.get_cq(), kernel, 1, NULL, global_work_size, NULL, 0, NULL, NULL);
+  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, global_work_size, NULL, 0, NULL, NULL);
 
   coot_check_runtime_error( (status != 0), "opencl::inplace_op_scalar(): couldn't execute kernel" );
   }
@@ -61,7 +61,7 @@ inplace_op_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem, kern
   coot_extra_debug_sigprint();
 
   // Get kernel.
-  cl_kernel kernel = coot_rt.cl_rt.get_kernel<eT>(num);
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(num);
 
   opencl::runtime_t::cq_guard guard;
 
@@ -77,7 +77,7 @@ inplace_op_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem, kern
 
   coot_extra_debug_print("clEnqueueNDRangeKernel()");
 
-  status |= clEnqueueNDRangeKernel(coot_rt.cl_rt.get_cq(), kernel, 1, NULL, global_work_size, NULL, 0, NULL, NULL);
+  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, global_work_size, NULL, 0, NULL, NULL);
 
   coot_check_runtime_error( (status != 0), "opencl::inplace_op_array(): couldn't execute kernel");
   }
@@ -105,7 +105,7 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const size_t aux_row1, cons
   runtime_t::adapt_uword m_end_col(end_col);
   runtime_t::adapt_uword m_n_rows_a(m_n_rows);
 
-  cl_kernel kernel = coot_rt.cl_rt.get_kernel<eT>(num);
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(num);
 
   cl_int status = 0;
 
@@ -119,7 +119,7 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const size_t aux_row1, cons
   size_t global_work_size[2]   = { size_t(n_rows),   size_t(n_cols)   }; // size of submatrix
 
   // NOTE: Clover / Mesa 13.0.4 can't handle offsets
-  status |= clEnqueueNDRangeKernel(coot_rt.cl_rt.get_cq(), kernel, 2, global_work_offset, global_work_size, NULL, 0, NULL, NULL);
+  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 2, global_work_offset, global_work_size, NULL, 0, NULL, NULL);
 
   coot_check_runtime_error( (status != 0), "opencl::inplace_op_subview(): couldn't execute kernel" );
   }

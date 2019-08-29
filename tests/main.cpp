@@ -28,12 +28,14 @@ main(int argc, char** argv)
 
   std::cout << "Run with OpenCL backend:\n";
 
-  coot::coot_rt.backend = coot::CL_BACKEND;
+  coot::get_rt().backend = coot::CL_BACKEND;
+  coot::get_rt().cl_rt.init(true);
   Catch::Session().run(argc, argv);
 
   std::cout << "Run with CUDA backend:\n";
 
-  coot::coot_rt.backend = coot::CUDA_BACKEND;
+  coot::get_rt().backend = coot::CUDA_BACKEND;
+  coot::get_rt().cuda_rt.init();
   Catch::Session().run(argc, argv);
   }
 

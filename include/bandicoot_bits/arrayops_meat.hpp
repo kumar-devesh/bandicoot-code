@@ -30,7 +30,7 @@ arrayops::copy(cl_mem dest, cl_mem src, const uword n_elem)
   
   coot_extra_debug_print("clEnqueueCopyBuffer()");
   
-  cl_int status = clEnqueueCopyBuffer(coot_rt.cl_rt.get_cq(), src, dest, size_t(0), size_t(0), sizeof(eT)*size_t(n_elem), cl_uint(0), NULL, NULL);
+  cl_int status = clEnqueueCopyBuffer(get_rt().cl_rt.get_cq(), src, dest, size_t(0), size_t(0), sizeof(eT)*size_t(n_elem), cl_uint(0), NULL, NULL);
   
   coot_check_runtime_error( (status != 0), "arrayops::copy(): couldn't copy buffer" );
   }
@@ -44,7 +44,7 @@ arrayops::inplace_set_scalar(dev_mem_t<eT> dest, const eT val, const uword n_ele
   {
   coot_extra_debug_sigprint();
 
-  if (coot_rt.backend == CUDA_BACKEND)
+  if (get_rt().backend == CUDA_BACKEND)
     {
     cuda::inplace_op_scalar(dest, val, n_elem, kernel_id::inplace_set_scalar);
     }
@@ -63,7 +63,7 @@ arrayops::inplace_plus_scalar(dev_mem_t<eT> dest, const eT val, const uword n_el
   {
   coot_extra_debug_sigprint();
 
-  if (coot_rt.backend == CUDA_BACKEND)
+  if (get_rt().backend == CUDA_BACKEND)
     {
     cuda::inplace_op_scalar(dest, val, n_elem, kernel_id::inplace_plus_scalar);
     }
@@ -83,7 +83,7 @@ arrayops::inplace_minus_scalar(dev_mem_t<eT> dest, const eT val, const uword n_e
   {
   coot_extra_debug_sigprint();
 
-  if (coot_rt.backend == CUDA_BACKEND)
+  if (get_rt().backend == CUDA_BACKEND)
     {
     cuda::inplace_op_scalar(dest, val, n_elem, kernel_id::inplace_minus_scalar);
     }
@@ -103,7 +103,7 @@ arrayops::inplace_mul_scalar(dev_mem_t<eT> dest, const eT val, const uword n_ele
   {
   coot_extra_debug_sigprint();
 
-  if (coot_rt.backend == CUDA_BACKEND)
+  if (get_rt().backend == CUDA_BACKEND)
     {
     cuda::inplace_op_scalar(dest, val, n_elem, kernel_id::inplace_mul_scalar);
     }
@@ -123,7 +123,7 @@ arrayops::inplace_div_scalar(dev_mem_t<eT> dest, const eT val, const uword n_ele
   {
   coot_extra_debug_sigprint();
 
-  if (coot_rt.backend == CUDA_BACKEND)
+  if (get_rt().backend == CUDA_BACKEND)
     {
     cuda::inplace_op_scalar(dest, val, n_elem, kernel_id::inplace_div_scalar);
     }
@@ -142,7 +142,7 @@ arrayops::inplace_plus_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword 
   {
   coot_extra_debug_sigprint();
 
-  if (coot_rt.backend == CUDA_BACKEND)
+  if (get_rt().backend == CUDA_BACKEND)
     {
     cuda::inplace_op_array(dest, src, n_elem, kernel_id::inplace_plus_array);
     }
@@ -161,7 +161,7 @@ arrayops::inplace_minus_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword
   {
   coot_extra_debug_sigprint();
 
-  if (coot_rt.backend == CUDA_BACKEND)
+  if (get_rt().backend == CUDA_BACKEND)
     {
     cuda::inplace_op_array(dest, src, n_elem, kernel_id::inplace_minus_array);
     }
@@ -180,7 +180,7 @@ arrayops::inplace_mul_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n
   {
   coot_extra_debug_sigprint();
 
-  if (coot_rt.backend == CUDA_BACKEND)
+  if (get_rt().backend == CUDA_BACKEND)
     {
     cuda::inplace_op_array(dest, src, n_elem, kernel_id::inplace_mul_array);
     }
@@ -199,7 +199,7 @@ arrayops::inplace_div_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n
   {
   coot_extra_debug_sigprint();
 
-  if (coot_rt.backend == CUDA_BACKEND)
+  if (get_rt().backend == CUDA_BACKEND)
     {
     cuda::inplace_op_array(dest, src, n_elem, kernel_id::inplace_div_array);
     }

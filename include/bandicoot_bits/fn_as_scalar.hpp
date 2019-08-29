@@ -25,7 +25,7 @@ as_scalar(const Base<typename T1::elem_type, T1>& X)
   {
   coot_extra_debug_sigprint();
   
-  coot_debug_check( (coot_rt.cl_rt.is_valid() == false), "coot_cl_rt not valid" );
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot_cl_rt not valid" );
   
   typedef typename T1::elem_type eT;
   

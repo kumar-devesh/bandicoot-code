@@ -38,10 +38,10 @@ class coot_rt_t
   // RC-TODO: what if the CL headers are not available?
   opencl::runtime_t cl_rt;
   cuda::runtime_t cuda_rt;
-  
+
   inline ~coot_rt_t();
   inline  coot_rt_t();
-  
+
   // RC-TODO: unified constructors?
   /*
   inline bool init(const bool print_info = false);
@@ -63,3 +63,10 @@ class coot_rt_t
 
   // RC-TODO: unified interface for some other operations?
   };
+
+// Store coot_rt_t as a singleton.
+inline coot_rt_t& get_rt()
+  {
+  static coot_rt_t rt;
+  return rt;
+  }

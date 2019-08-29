@@ -969,15 +969,15 @@ runtime_t::cq_guard::cq_guard()
   {
   coot_extra_debug_sigprint();
   
-  coot_rt.cl_rt.lock();
+  get_rt().cl_rt.lock();
   
-  if(coot_rt.cl_rt.is_valid())
+  if(get_rt().cl_rt.is_valid())
     {
     coot_extra_debug_print("calling clFinish()");
-    clFinish(coot_rt.cl_rt.get_cq());  // force synchronisation
+    clFinish(get_rt().cl_rt.get_cq());  // force synchronisation
     
     //coot_extra_debug_print("calling clFlush()");
-    //clFlush(coot_rt.cl_rt.get_cq());  // submit all enqueued commands
+    //clFlush(get_rt().cl_rt.get_cq());  // submit all enqueued commands
     }
   }
 
@@ -988,13 +988,13 @@ runtime_t::cq_guard::~cq_guard()
   {
   coot_extra_debug_sigprint();
   
-  if(coot_rt.cl_rt.is_valid())
+  if(get_rt().cl_rt.is_valid())
     {
     coot_extra_debug_print("calling clFlush()");
-    clFlush(coot_rt.cl_rt.get_cq());  // submit all enqueued commands
+    clFlush(get_rt().cl_rt.get_cq());  // submit all enqueued commands
     }
   
-  coot_rt.cl_rt.unlock();
+  get_rt().cl_rt.unlock();
   }
 
 
@@ -1006,7 +1006,7 @@ runtime_t::cq_guard::~cq_guard()
 inline
 runtime_t::adapt_uword::adapt_uword(const uword val)
   {
-  if((sizeof(uword) >= 8) && coot_rt.cl_rt.has_sizet64())
+  if((sizeof(uword) >= 8) && get_rt().cl_rt.has_sizet64())
     {
     size  = sizeof(u64);
     addr  = (void*)(&val64);

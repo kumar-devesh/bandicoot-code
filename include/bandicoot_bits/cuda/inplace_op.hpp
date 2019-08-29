@@ -27,7 +27,7 @@ inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, kernel_i
   coot_extra_debug_sigprint();
 
   // Get kernel.
-  CUfunction kernel = coot_rt.cuda_rt.get_kernel<eT>(num);
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(num);
 
   cudaDeviceProp dev_prop;
   cudaError_t result = cudaGetDeviceProperties(&dev_prop, 0);
@@ -61,7 +61,7 @@ inplace_op_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem, kern
   coot_extra_debug_sigprint();
 
   // Get kernel.
-  CUfunction kernel = coot_rt.cuda_rt.get_kernel<eT>(num);
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(num);
 
   cudaDeviceProp dev_prop;
   cudaError_t result = cudaGetDeviceProperties(&dev_prop, 0);
@@ -101,7 +101,7 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const size_t aux_row1, cons
   const uword n_elem = n_rows * n_cols; // TODO: maybe pass this?
 
   // Get kernel.
-  CUfunction kernel = coot_rt.cuda_rt.get_kernel<eT>(num);
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(num);
 
   cudaDeviceProp dev_prop;
   cudaError_t result = cudaGetDeviceProperties(&dev_prop, 0);
