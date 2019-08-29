@@ -142,8 +142,8 @@ runtime_t::init_kernels(std::vector<CUfunction>& kernels, const std::string& sou
   if (result != NVRTC_SUCCESS)
     {
     std::cout << "nvrtcGetProgramLog() failed with error " << result << "\n";
+    std::cout << log << '\n';
     }
-  std::cout << log << '\n';
 
   // Obtain PTX from the program.
   size_t ptxSize;
@@ -157,8 +157,8 @@ runtime_t::init_kernels(std::vector<CUfunction>& kernels, const std::string& sou
   if (result != NVRTC_SUCCESS)
     {
     std::cout << "nvrtcGetPTX() failed with error " << result << "\n";
+    std::cout << "ptx is " << ptx << "\n";
     }
-  std::cout << "ptx is " << ptx << "\n";
 
   // This really needs to be in some other init function.  Probbly a lot of stuf
   // fneeds to be saved somewhere.
