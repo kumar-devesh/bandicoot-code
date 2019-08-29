@@ -26,16 +26,20 @@ main(int argc, char** argv)
   {
   std::cout << "Bandicoot version: " << coot::coot_version::as_string() << '\n';
 
-  std::cout << "Run with OpenCL backend:\n";
+  #if defined(USE_CL_BACKEND)
+    std::cout << "Run with OpenCL backend:\n";
 
-  coot::get_rt().backend = coot::CL_BACKEND;
-  coot::get_rt().cl_rt.init(true);
-  Catch::Session().run(argc, argv);
+    coot::get_rt().backend = coot::CL_BACKEND;
+    coot::get_rt().cl_rt.init(true);
+  #elif defined(USE_CUDA_BACKEND)
+    std::cout << "Run with CUDA backend:\n";
 
-  std::cout << "Run with CUDA backend:\n";
+    coot::get_rt().backend = coot::CUDA_BACKEND;
+    coot::get_rt().cuda_rt.init();
+  #else
+    #error "No backend!  Define USE_CL_BACKEND or USE_CUDA_BACKEND during compilation."
+  #endif
 
-  coot::get_rt().backend = coot::CUDA_BACKEND;
-  coot::get_rt().cuda_rt.init();
   Catch::Session().run(argc, argv);
   }
 
