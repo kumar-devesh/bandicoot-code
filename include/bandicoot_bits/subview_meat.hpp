@@ -106,6 +106,7 @@ void
 subview<eT>::inplace_op(const eT val, cl_kernel kernel)
   {
   coot_extra_debug_sigprint();
+
   
   if(n_elem == 0)  { return; }
   
@@ -165,10 +166,15 @@ void
 subview<eT>::operator+= (const eT val)
   {
   coot_extra_debug_sigprint();
-  
-  cl_kernel kernel = coot_rt.cl_rt.get_kernel<eT>(kernel_id::submat_inplace_plus_scalar);
-  
-  (*this).inplace_op(val, kernel);
+
+  if (coot_rt.backend == CUDA_BACKEND)
+    {
+    cuda::inplace_op_subview(m.dev_mem, val, aux_row1, aux_col1, n_rows, n_cols, m.n_rows, kernel_id::submat_inplace_plus_scalar);
+    }
+  else
+    {
+    opencl::inplace_op_subview(m.dev_mem, val, aux_row1, aux_col1, n_rows, n_cols, m.n_rows, kernel_id::submat_inplace_plus_scalar);
+    }
   }
 
 
@@ -179,10 +185,15 @@ void
 subview<eT>::operator-= (const eT val)
   {
   coot_extra_debug_sigprint();
-  
-  cl_kernel kernel = coot_rt.cl_rt.get_kernel<eT>(kernel_id::submat_inplace_minus_scalar);
-  
-  (*this).inplace_op(val, kernel);
+
+  if (coot_rt.backend == CUDA_BACKEND)
+    {
+    cuda::inplace_op_subview(m.dev_mem, val, aux_row1, aux_col1, n_rows, n_cols, m.n_rows, kernel_id::submat_inplace_minus_scalar);
+    }
+  else
+    {
+    opencl::inplace_op_subview(m.dev_mem, val, aux_row1, aux_col1, n_rows, n_cols, m.n_rows, kernel_id::submat_inplace_minus_scalar);
+    }
   }
 
 
@@ -193,10 +204,15 @@ void
 subview<eT>::operator*= (const eT val)
   {
   coot_extra_debug_sigprint();
-  
-  cl_kernel kernel = coot_rt.cl_rt.get_kernel<eT>(kernel_id::submat_inplace_mul_scalar);
-  
-  (*this).inplace_op(val, kernel);
+
+  if (coot_rt.backend == CUDA_BACKEND)
+    {
+    cuda::inplace_op_subview(m.dev_mem, val, aux_row1, aux_col1, n_rows, n_cols, m.n_rows, kernel_id::submat_inplace_mul_scalar);
+    }
+  else
+    {
+    opencl::inplace_op_subview(m.dev_mem, val, aux_row1, aux_col1, n_rows, n_cols, m.n_rows, kernel_id::submat_inplace_mul_scalar);
+    }
   }
 
 
@@ -207,10 +223,15 @@ void
 subview<eT>::operator/= (const eT val)
   {
   coot_extra_debug_sigprint();
-  
-  cl_kernel kernel = coot_rt.cl_rt.get_kernel<eT>(kernel_id::submat_inplace_div_scalar);
-  
-  (*this).inplace_op(val, kernel);
+
+  if (coot_rt.backend == CUDA_BACKEND)
+    {
+    cuda::inplace_op_subview(m.dev_mem, val, aux_row1, aux_col1, n_rows, n_cols, m.n_rows, kernel_id::submat_inplace_div_scalar);
+    }
+  else
+    {
+    opencl::inplace_op_subview(m.dev_mem, val, aux_row1, aux_col1, n_rows, n_cols, m.n_rows, kernel_id::submat_inplace_div_scalar);
+    }
   }
 
 
@@ -222,16 +243,16 @@ void
 subview<eT>::inplace_op(const Base<eT,T1>& in, cl_kernel kernel, const char* identifier)
   {
   coot_extra_debug_sigprint();
-  
+
   const unwrap<T1>   U(in.get_ref());
   const Mat<eT>& X = U.M;
-  
+
   coot_assert_same_size(n_rows, n_cols, X.n_rows, X.n_cols, identifier);
-  
+
   if(n_elem == 0)  { return; }
-  
+
   opencl::runtime_t::cq_guard guard;
-  
+
   opencl::runtime_t::adapt_uword start_row(aux_row1);
   opencl::runtime_t::adapt_uword start_col(aux_col1);
   
