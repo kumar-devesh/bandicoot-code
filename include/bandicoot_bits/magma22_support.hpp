@@ -558,7 +558,7 @@ magma_queue_sync( magma_queue_t queue )
 // TODO: what a horror
 inline const char** get_magma2lapack_constants()
   {
-  const char *magma2lapack_constants[] =
+  static const char *magma2lapack_constants[] =
     {
     "No",                                    //  0: MagmaFalse
     "Yes",                                   //  1: MagmaTrue (zlatrs)
