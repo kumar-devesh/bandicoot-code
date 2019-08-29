@@ -416,6 +416,34 @@ coot_check_clblas_error(const cl_int error_code, const T1& x)
 
 
 
+template<typename T1>
+coot_hot
+inline
+void
+coot_check_cuda_error(const cudaError_t error_code, const T1& x)
+  {
+  if (error_code != cudaSuccess)
+    {
+    coot_stop_runtime_error( x, cuda::error_as_string(error_code) );
+    }
+  }
+
+
+
+template<typename T1>
+coot_hot
+inline
+void
+coot_check_cuda_error(const CUresult error_code, const T1& x)
+  {
+  if (error_code != CUDA_SUCCESS)
+    {
+    coot_stop_runtime_error( x, cuda::error_as_string(error_code) );
+    }
+  }
+
+
+
 //
 // functions for generating strings indicating size errors
 

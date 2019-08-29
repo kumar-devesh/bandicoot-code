@@ -31,7 +31,7 @@ inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, kernel_i
 
   cudaDeviceProp dev_prop;
   cudaError_t result = cudaGetDeviceProperties(&dev_prop, 0);
-  coot_check_runtime_error( (result != cudaSuccess), "cuda::inplace_op_scalar(): couldn't get device properties");
+  coot_check_cuda_error(result, "cuda::inplace_op_scalar(): couldn't get device properties");
 
   const void* args[] = { &(dest.cuda_mem_ptr), &val, (size_t*) &n_elem };
 
@@ -43,7 +43,7 @@ inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, kernel_i
       (void**) args, // arguments
       0);
 
-  coot_check_runtime_error( (result2 != CUDA_SUCCESS), "cuda::inplace_op_scalar(): cuLaunchKernel() failed");
+  coot_check_cuda_error( result2, "cuda::inplace_op_scalar(): cuLaunchKernel() failed" );
 
   cuCtxSynchronize();
   }
@@ -65,7 +65,7 @@ inplace_op_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem, kern
 
   cudaDeviceProp dev_prop;
   cudaError_t result = cudaGetDeviceProperties(&dev_prop, 0);
-  coot_check_runtime_error( (result != cudaSuccess), "cuda::inplace_op_array(): couldn't get device properties");
+  coot_check_cuda_error(result, "cuda::inplace_op_array(): couldn't get device properties");
 
   const void* args[] = { &(dest.cuda_mem_ptr), &(src.cuda_mem_ptr), (size_t*) &n_elem };
 
@@ -77,7 +77,7 @@ inplace_op_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem, kern
       (void**) args, // arguments
       0);
 
-  coot_check_runtime_error( (result2 != CUDA_SUCCESS), "cuda::inplace_op_array(): cuLaunchKernel() failed");
+  coot_check_cuda_error( result2, "cuda::inplace_op_array(): cuLaunchKernel() failed" );
 
   cuCtxSynchronize();
   }
@@ -105,7 +105,7 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const size_t aux_row1, cons
 
   cudaDeviceProp dev_prop;
   cudaError_t result = cudaGetDeviceProperties(&dev_prop, 0);
-  coot_check_runtime_error( (result != cudaSuccess), "cuda::inplace_op_subview(): couldn't get device properties" );
+  coot_check_cuda_error(result, "cuda::inplace_op_subview(): couldn't get device properties");
 
   const void* args[] = {
       &(dest.cuda_mem_ptr),
@@ -123,7 +123,7 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const size_t aux_row1, cons
       (void**) args,
       0);
 
-  coot_check_runtime_error( (result2 != CUDA_SUCCESS), "cuda::inplace_op_subview(): cuLaunchKernel() failed");
+  coot_check_cuda_error( result2, "cuda::inplace_op_subview(): cuLaunchKernel() failed");
 
   cuCtxSynchronize();
   }

@@ -166,25 +166,16 @@ runtime_t::init_kernels(std::vector<CUfunction>& kernels, const std::string& sou
   CUcontext context;
   CUmodule module;
   CUresult result2 = cuInit(0);
-  if (result2 != CUDA_SUCCESS)
-    {
-    std::cout << "cuInit() failed with code " << result2 << "\n";
-    }
+  coot_check_cuda_error(result2, "cuda::runtime_t::init(): cuInit() failed");
+
   result2 = cuDeviceGet(&cuDevice, 0);
-  if (result2 != CUDA_SUCCESS)
-    {
-    std::cout << "cuDeviceGet() failed with code " << result2 << "\n";
-    }
+  coot_check_cuda_error(result2, "cuda::runtime_t::init(): cuDeviceGet() failed");
+
   result2 = cuCtxCreate(&context, 0, cuDevice);
-  if (result2 != CUDA_SUCCESS)
-    {
-    std::cout << "cuCtxCreate() failed with code " << result2 << "\n";
-    }
+  coot_check_cuda_error(result2, "cuda::runtime_t::init(): cuCtxCreate() failed");
+
   result2 = cuModuleLoadDataEx(&module, ptx, 0, 0, 0);
-  if (result2 != CUDA_SUCCESS)
-    {
-    std::cout << "cuModuleLoadDataEx() failed with code " << result2 << "\n";
-    }
+  coot_check_cuda_error(result2, "cuda::runtime_t::init(): cuModuleLoadDataEx() failed");
 
   // Now that everything is compiled, unpack the results into individual kernels
   // that we can access.
@@ -196,10 +187,7 @@ runtime_t::init_kernels(std::vector<CUfunction>& kernels, const std::string& sou
     {
     const std::string name = prefix + names.at(i);
     result2 = cuModuleGetFunction(&kernels.at(i), module, name.c_str());
-    if (result2 != CUDA_SUCCESS)
-      {
-      std::cout << "cuModuleGetFunction() failed with code " << result2 << " for function " << name.c_str() << "\n";
-      }
+    coot_check_cuda_error(result2, "cuda::runtime_t::init(): cuModuleGetFunction() failed for function " + name);
     }
 
   return true;
@@ -235,12 +223,7 @@ runtime_t::acquire_memory(const uword n_elem)
   void* result;
   cudaError_t error = cudaMalloc(&result, sizeof(eT) * n_elem);
 
-  // Attempt to do some error handling.
-  if (error)
-    {
-    // RC-TODO: maybe this isn't releasable...
-    throw std::runtime_error("you're screwed and I don't care about you!");
-    }
+  coot_check_cuda_error(error, "cuda::acquire_memory(): couldn't allocate memory");
 
   return (eT*) result;
   }
@@ -254,10 +237,6 @@ runtime_t::release_memory(eT* cuda_mem)
     {
     cudaError_t error = cudaFree(cuda_mem);
 
-    if (error)
-      {
-      // RC-TODO: yeah...
-      throw std::runtime_error("you're screwed and I don't care about you!");
-      }
+    coot_check_cuda_error(error, "cuda::release_memory(): couldn't free memory");
     }
   }
