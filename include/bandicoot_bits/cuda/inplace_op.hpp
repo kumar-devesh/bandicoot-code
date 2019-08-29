@@ -98,6 +98,7 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const size_t aux_row1, cons
 
   const uword end_row = aux_row1 + n_rows - 1;
   const uword end_col = aux_col1 + n_cols - 1;
+  const uword n_elem = n_rows * n_cols; // TODO: maybe pass this?
 
   // Get kernel.
   CUfunction kernel = coot_rt.cuda_rt.get_kernel<eT>(num);
@@ -117,7 +118,7 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const size_t aux_row1, cons
   CUresult result2 = cuLaunchKernel(
       kernel,
       dev_prop.maxThreadsPerBlock, 1, 1, // grid dims TODO: fix
-      std::ceil((double) n_elem / (double) dev_prop.maxThreadsPerBlock), 1, 1 // block dims
+      std::ceil((double) n_elem / (double) dev_prop.maxThreadsPerBlock), 1, 1, // block dims
       0, NULL, // shared mem and stream
       (void**) args,
       0);
