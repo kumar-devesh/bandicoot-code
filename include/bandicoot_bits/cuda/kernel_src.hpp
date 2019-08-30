@@ -39,6 +39,29 @@ get_cuda_kernel_names()
   names.push_back("inplace_mul_array");
   names.push_back("inplace_div_array");
 
+  names.push_back("submat_inplace_set_mat");
+  names.push_back("submat_inplace_plus_mat");
+  names.push_back("submat_inplace_minus_mat");
+  names.push_back("submat_inplace_schur_mat");
+  names.push_back("submat_inplace_div_mat");
+
+  names.push_back("equ_array_plus_scalar");
+  names.push_back("equ_array_neg");
+  names.push_back("equ_array_minus_scalar_pre");
+  names.push_back("equ_array_minus_scalar_post");
+  names.push_back("equ_array_mul_scalar");
+  names.push_back("equ_array_div_scalar_pre");
+  names.push_back("equ_array_div_scalar_post");
+  names.push_back("equ_array_square");
+  names.push_back("equ_array_sqrt");
+  names.push_back("equ_array_exp");
+  names.push_back("equ_array_log");
+
+  names.push_back("equ_array_plus_array");
+  names.push_back("equ_array_minus_array");
+  names.push_back("equ_array_mul_array");
+  names.push_back("equ_array_div_array");
+
   return names;
   }
 
@@ -148,6 +171,161 @@ get_cuda_kernel_src()
   "  { \n"
   "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
   "  if (i < N) { out[i] /= A[i]; } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,submat_inplace_set_mat)(eT* out, const eT* A, const UWORD out_start_row, const UWORD out_start_col, const UWORD out_n_rows, const UWORD A_n_rows, const UWORD A_n_cols) \n"
+  "  { \n"
+  "  const UWORD row = blockIdx.x; \n"  // row in source matrix
+  "  const UWORD col = threadIdx.x; \n"  // col in source matrix
+  "  if( (row <= A_n_rows) && (col <= A_n_cols) ) \n"
+  "    { \n"
+  "    const UWORD out_index = (out_start_row + row) + ((out_start_col + col) * out_n_rows); \n"
+  "    const UWORD   A_index = row + col*A_n_rows; \n"
+  "    out[out_index] = A[A_index]; \n"
+  "    } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,submat_inplace_plus_mat)(eT* out, const eT* A, const UWORD out_start_row, const UWORD out_start_col, const UWORD out_n_rows, const UWORD A_n_rows, const UWORD A_n_cols) \n"
+  "  { \n"
+  "  const UWORD row = blockIdx.x; \n"  // row in source matrix
+  "  const UWORD col = threadIdx.x; \n"  // col in source matrix
+  "  if( (row <= A_n_rows) && (col <= A_n_cols) ) \n"
+  "    { \n"
+  "    const UWORD out_index = (out_start_row + row) + ((out_start_col + col) * out_n_rows); \n"
+  "    const UWORD   A_index = row + col*A_n_rows; \n"
+  "    out[out_index] += A[A_index]; \n"
+  "    } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,submat_inplace_minus_mat)(eT* out, const eT* A, const UWORD out_start_row, const UWORD out_start_col, const UWORD out_n_rows, const UWORD A_n_rows, const UWORD A_n_cols) \n"
+  "  { \n"
+  "  const UWORD row = blockIdx.x; \n"  // row in source matrix
+  "  const UWORD col = threadIdx.x; \n"  // col in source matrix
+  "  if( (row <= A_n_rows) && (col <= A_n_cols) ) \n"
+  "    { \n"
+  "    const UWORD out_index = (out_start_row + row) + ((out_start_col + col) * out_n_rows); \n"
+  "    const UWORD   A_index = row + col*A_n_rows; \n"
+  "    out[out_index] -= A[A_index]; \n"
+  "    } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,submat_inplace_schur_mat)(eT* out, const eT* A, const UWORD out_start_row, const UWORD out_start_col, const UWORD out_n_rows, const UWORD A_n_rows, const UWORD A_n_cols) \n"
+  "  { \n"
+  "  const UWORD row = blockIdx.x; \n"  // row in source matrix
+  "  const UWORD col = threadIdx.x; \n"  // col in source matrix
+  "  if( (row <= A_n_rows) && (col <= A_n_cols) ) \n"
+  "    { \n"
+  "    const UWORD out_index = (out_start_row + row) + ((out_start_col + col) * out_n_rows); \n"
+  "    const UWORD   A_index = row + col*A_n_rows; \n"
+  "    out[out_index] *= A[A_index]; \n"
+  "    } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,submat_inplace_div_mat)(eT* out, const eT* A, const UWORD out_start_row, const UWORD out_start_col, const UWORD out_n_rows, const UWORD A_n_rows, const UWORD A_n_cols) \n"
+  "  { \n"
+  "  const UWORD row = blockIdx.x; \n"  // row in source matrix
+  "  const UWORD col = threadIdx.x; \n"  // col in source matrix
+  "  if( (row <= A_n_rows) && (col <= A_n_cols) ) \n"
+  "    { \n"
+  "    const UWORD out_index = (out_start_row + row) + ((out_start_col + col) * out_n_rows); \n"
+  "    const UWORD   A_index = row + col*A_n_rows; \n"
+  "    out[out_index] /= A[A_index]; \n"
+  "    } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,equ_array_plus_scalar)(eT* out, const eT* A, const eT val, const UWORD N) \n"
+  "  { \n"
+  "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  if(i < N)  { out[i] = A[i] + val; } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,equ_array_neg)(eT* out, const eT* A, const eT val, const UWORD N) \n"
+  "  { \n"
+  "  (void)(val); \n"
+  "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  if(i < N)  { out[i] = -(A[i]); } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,equ_array_minus_scalar_pre)(eT* out, const eT* A, const eT val, const UWORD N) \n"
+  "  { \n"
+  "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  if(i < N)  { out[i] = val - A[i]; } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,equ_array_minus_scalar_post)(eT* out, const eT* A, const eT val, const UWORD N) \n"
+  "  { \n"
+  "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  if(i < N)  { out[i] = A[i] - val; } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,equ_array_mul_scalar)(eT* out, const eT* A, const eT val, const UWORD N) \n"
+  "  { \n"
+  "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  if(i < N)  { out[i] = A[i] * val; } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,equ_array_div_scalar_pre)(eT* out, const eT* A, const eT val, const UWORD N) \n"
+  "  { \n"
+  "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  if(i < N)  { out[i] = val / A[i]; } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,equ_array_div_scalar_post)(eT* out, const eT* A, const eT val, const UWORD N) \n"
+  "  { \n"
+  "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  if(i < N)  { out[i] = A[i] / val; } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,equ_array_square)(eT* out, const eT* A, const eT val, const UWORD N) \n"
+  "  { \n"
+  "  (void)(val); \n"
+  "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  if(i < N)  { const eT Ai = A[i]; out[i] = Ai * Ai; } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,equ_array_sqrt)(eT* out, const eT* A, const eT val, const UWORD N) \n"
+  "  { \n"
+  "  (void)(val); \n"
+  "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  if(i < N)  { out[i] = (eT)sqrt( (promoted_eT)(A[i]) ); } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,equ_array_exp)(eT* out, const eT* A, const eT val, const UWORD N) \n"
+  "  { \n"
+  "  (void)(val); \n"
+  "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  if(i < N)  { out[i] = (eT)exp( (promoted_eT)(A[i]) ); } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,equ_array_log)(eT* out, const eT* A, const eT val, const UWORD N) \n"
+  "  { \n"
+  "  (void)(val); \n"
+  "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  if(i < N)  { out[i] = (eT)log( (promoted_eT)(A[i]) ); } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,equ_array_plus_array)(eT* out, const eT* A, const eT* B, const UWORD N) \n"
+  "  { \n"
+  "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  if(i < N)  { out[i] = A[i] + B[i]; } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,equ_array_minus_array)(eT* out, const eT* A, const eT* B, const UWORD N) \n"
+  "  { \n"
+  "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  if(i < N)  { out[i] = A[i] - B[i]; } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,equ_array_mul_array)(eT* out, const eT* A, const eT* B, const UWORD N) \n"
+  "  { \n"
+  "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  if(i < N)  { out[i] = A[i] * B[i]; } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,equ_array_div_array)(eT* out, const eT* A, const eT* B, const UWORD N) \n"
+  "  { \n"
+  "  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  if(i < N)  { out[i] = A[i] / B[i]; } \n"
   "  } \n"
   "\n"
   "}\n";

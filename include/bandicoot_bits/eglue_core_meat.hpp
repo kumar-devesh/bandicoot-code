@@ -43,31 +43,50 @@ eglue_core<eglue_type>::apply(Mat<typename T1::elem_type>& out, const eGlue<T1, 
   
   cl_kernel kernel;
   
-       if(is_same_type<eglue_type, eglue_plus >::yes)  { kernel = get_rt().cl_rt.get_kernel<eT>(kernel_id::equ_array_plus_array ); }
-  else if(is_same_type<eglue_type, eglue_minus>::yes)  { kernel = get_rt().cl_rt.get_kernel<eT>(kernel_id::equ_array_minus_array); }
-  else if(is_same_type<eglue_type, eglue_div  >::yes)  { kernel = get_rt().cl_rt.get_kernel<eT>(kernel_id::equ_array_div_array  ); }
-  else if(is_same_type<eglue_type, eglue_schur>::yes)  { kernel = get_rt().cl_rt.get_kernel<eT>(kernel_id::equ_array_mul_array  ); }
-  
-  cl_mem out_dev_mem = out.get_dev_mem(false);
-  cl_mem   A_dev_mem =   A.get_dev_mem(false);
-  cl_mem   B_dev_mem =   B.get_dev_mem(false);
-  
-  uword n_elem = out.get_n_elem();
-  
-  opencl::runtime_t::adapt_uword N(n_elem);
-  
-  cl_int status = 0;
-  
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &out_dev_mem);
-  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &  A_dev_mem);
-  status |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &  B_dev_mem);
-  status |= clSetKernelArg(kernel, 3, N.size,         N.addr      );
-  
-  size_t global_work_size = size_t(n_elem);
-  
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
-  
-  coot_check_runtime_error( (status != CL_SUCCESS), "eglue_core: couldn't execute kernel" );
+  if(is_same_type<eglue_type, eglue_plus >::yes)
+    {
+    if(get_rt().backend == CL_BACKEND)
+      {
+      opencl::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), kernel_id::equ_array_plus_array);
+      }
+    else
+      {
+      cuda::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), kernel_id::equ_array_plus_array);
+      }
+    }
+  else if(is_same_type<eglue_type, eglue_minus>::yes)
+    {
+    if(get_rt().backend == CL_BACKEND)
+      {
+      opencl::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), kernel_id::equ_array_minus_array);
+      }
+    else
+      {
+      cuda::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), kernel_id::equ_array_minus_array);
+      }
+    }
+  else if(is_same_type<eglue_type, eglue_div  >::yes)
+    {
+    if(get_rt().backend == CL_BACKEND)
+      {
+      opencl::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), kernel_id::equ_array_div_array);
+      }
+    else
+      {
+      cuda::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), kernel_id::equ_array_div_array);
+      }
+    }
+  else if(is_same_type<eglue_type, eglue_schur>::yes)
+    {
+    if(get_rt().backend == CL_BACKEND)
+      {
+      opencl::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), kernel_id::equ_array_mul_array);
+      }
+    else
+      {
+      cuda::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), kernel_id::equ_array_mul_array);
+      }
+    }
   }
 
 
