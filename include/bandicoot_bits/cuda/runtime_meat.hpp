@@ -46,11 +46,11 @@ runtime_t::internal_init()
   status = init_kernels<s64>(s64_kernels, get_cuda_kernel_src(), get_cuda_kernel_names());
   if (status == false) { coot_debug_warn("coot_cuda_rt: couldn't set up CUDA s64 kernels"); }
 
-  status = init_kernels<double>(d_kernels, get_cuda_kernel_src(), get_cuda_kernel_names());
-  if (status == false) { coot_debug_warn("coot_cuda_rt: couldn't set up CUDA double kernels"); }
-
   status = init_kernels<float>(f_kernels, get_cuda_kernel_src(), get_cuda_kernel_names());
   if (status == false) { coot_debug_warn("coot_cuda_rt: couldn't set up CUDA float kernels"); }
+
+  status = init_kernels<double>(d_kernels, get_cuda_kernel_src(), get_cuda_kernel_names());
+  if (status == false) { coot_debug_warn("coot_cuda_rt: couldn't set up CUDA double kernels"); }
 
   valid = true;
 
