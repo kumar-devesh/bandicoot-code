@@ -37,17 +37,11 @@ void test_fill()
 
 TEST_CASE("fill_1")
   {
-  printf("double\n");
   test_fill<double>();
-  printf("float\n");
   test_fill<float>();
-  printf("u32\n");
   test_fill<u32>();
-  printf("s32\n");
   test_fill<s32>();
-  printf("u64\n");
   test_fill<u64>();
-  printf("s64\n");
   test_fill<s64>();
   }
 
