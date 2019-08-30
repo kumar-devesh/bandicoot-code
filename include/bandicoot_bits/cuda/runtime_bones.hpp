@@ -47,4 +47,7 @@ struct runtime_t
   coot_aligned std::vector<CUfunction>  s64_kernels;
   coot_aligned std::vector<CUfunction>    f_kernels;
   coot_aligned std::vector<CUfunction>    d_kernels;
+
+  CUdevice cuDevice;
+  CUcontext context;
   };

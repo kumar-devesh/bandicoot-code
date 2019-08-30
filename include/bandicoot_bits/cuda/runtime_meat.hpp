@@ -23,6 +23,14 @@ runtime_t::internal_init()
   valid = false;
 
   // TODO: device configuration and setup here
+  CUresult result = cuInit(0);
+  coot_check_cuda_error(result, "cuda::runtime_t::init(): cuInit() failed");
+
+  result = cuDeviceGet(&cuDevice, 0);
+  coot_check_cuda_error(result, "cuda::runtime_t::init(): cuDeviceGet() failed");
+
+  result = cuCtxCreate(&context, 0, cuDevice);
+  coot_check_cuda_error(result, "cuda::runtime_t::init(): cuCtxCreate() failed");
 
   bool status = false;
 
@@ -38,11 +46,11 @@ runtime_t::internal_init()
   status = init_kernels<s64>(s64_kernels, get_cuda_kernel_src(), get_cuda_kernel_names());
   if (status == false) { coot_debug_warn("coot_cuda_rt: couldn't set up CUDA s64 kernels"); }
 
-  status = init_kernels<float>(f_kernels, get_cuda_kernel_src(), get_cuda_kernel_names());
-  if (status == false) { coot_debug_warn("coot_cuda_rt: couldn't set up CUDA float kernels"); }
-
   status = init_kernels<double>(d_kernels, get_cuda_kernel_src(), get_cuda_kernel_names());
   if (status == false) { coot_debug_warn("coot_cuda_rt: couldn't set up CUDA double kernels"); }
+
+  status = init_kernels<float>(f_kernels, get_cuda_kernel_src(), get_cuda_kernel_names());
+  if (status == false) { coot_debug_warn("coot_cuda_rt: couldn't set up CUDA float kernels"); }
 
   valid = true;
 
@@ -160,20 +168,8 @@ runtime_t::init_kernels(std::vector<CUfunction>& kernels, const std::string& sou
     std::cout << "ptx is " << ptx << "\n";
     }
 
-  // This really needs to be in some other init function.  Probbly a lot of stuf
-  // fneeds to be saved somewhere.
-  CUdevice cuDevice;
-  CUcontext context;
-  CUmodule module;
   CUresult result2 = cuInit(0);
-  coot_check_cuda_error(result2, "cuda::runtime_t::init(): cuInit() failed");
-
-  result2 = cuDeviceGet(&cuDevice, 0);
-  coot_check_cuda_error(result2, "cuda::runtime_t::init(): cuDeviceGet() failed");
-
-  result2 = cuCtxCreate(&context, 0, cuDevice);
-  coot_check_cuda_error(result2, "cuda::runtime_t::init(): cuCtxCreate() failed");
-
+  CUmodule module;
   result2 = cuModuleLoadDataEx(&module, ptx, 0, 0, 0);
   coot_check_cuda_error(result2, "cuda::runtime_t::init(): cuModuleLoadDataEx() failed");
 
