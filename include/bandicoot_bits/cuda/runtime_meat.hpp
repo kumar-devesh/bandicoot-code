@@ -35,22 +35,22 @@ runtime_t::internal_init()
   bool status = false;
 
   status = init_kernels<u32>(u32_kernels, get_cuda_kernel_src(), get_cuda_kernel_names());
-  if (status == false) { coot_debug_warn("coot_cuda_rt: couldn't set up CUDA u32 kernels"); }
+  if (status == false) { coot_debug_warn("cuda::runtime_t::init(): couldn't set up CUDA u32 kernels"); }
 
   status = init_kernels<s32>(s32_kernels, get_cuda_kernel_src(), get_cuda_kernel_names());
-  if (status == false) { coot_debug_warn("coot_cuda_rt: couldn't set up CUDA s32 kernels"); }
+  if (status == false) { coot_debug_warn("cuda::runtime_t::init(): couldn't set up CUDA s32 kernels"); }
 
   status = init_kernels<u64>(u64_kernels, get_cuda_kernel_src(), get_cuda_kernel_names());
-  if (status == false) { coot_debug_warn("coot_cuda_rt: couldn't set up CUDA u64 kernels"); }
+  if (status == false) { coot_debug_warn("cuda::runtime_t::init(): couldn't set up CUDA u64 kernels"); }
 
   status = init_kernels<s64>(s64_kernels, get_cuda_kernel_src(), get_cuda_kernel_names());
-  if (status == false) { coot_debug_warn("coot_cuda_rt: couldn't set up CUDA s64 kernels"); }
+  if (status == false) { coot_debug_warn("cuda::runtime_t::init(): couldn't set up CUDA s64 kernels"); }
 
   status = init_kernels<float>(f_kernels, get_cuda_kernel_src(), get_cuda_kernel_names());
-  if (status == false) { coot_debug_warn("coot_cuda_rt: couldn't set up CUDA float kernels"); }
+  if (status == false) { coot_debug_warn("cuda::runtime_t::init(): couldn't set up CUDA float kernels"); }
 
   status = init_kernels<double>(d_kernels, get_cuda_kernel_src(), get_cuda_kernel_names());
-  if (status == false) { coot_debug_warn("coot_cuda_rt: couldn't set up CUDA double kernels"); }
+  if (status == false) { coot_debug_warn("cuda::runtime_t::init(): couldn't set up CUDA double kernels"); }
 
   valid = true;
 
@@ -72,11 +72,7 @@ runtime_t::init_kernels(std::vector<CUfunction>& kernels, const std::string& sou
       0,              // numHeaders
       NULL,           // headers
       NULL);          // includeNames
-
-  if (result != NVRTC_SUCCESS)
-    {
-    std::cout << "nvrtcCreateProgram() failed with error " << result << "\n";
-    }
+  coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcCreateProgram() failed");
 
   // Construct the macros that we need.
   std::string prefix;
@@ -133,45 +129,29 @@ runtime_t::init_kernels(std::vector<CUfunction>& kernels, const std::string& sou
   result  = nvrtcCompileProgram(prog,  // prog
                                 6,     // numOptions
                                 opts); // options
-  if (result != NVRTC_SUCCESS)
-    {
-    std::cout << "nvrtcCompileProgram() failed with error " << result << "\n";
-    }
+  coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcCompileProgram() failed");
 
   size_t logSize;
   result = (nvrtcGetProgramLogSize(prog, &logSize));
-  if (result != NVRTC_SUCCESS)
-    {
-    std::cout << "nvrtcGetProgramLogSize() failed with error " << result <<
-"\n";
-    }
+  coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcGetProgramLogSize() failed");
+
   char *log = new char[logSize];
   result = (nvrtcGetProgramLog(prog, log));
-  if (result != NVRTC_SUCCESS)
-    {
-    std::cout << "nvrtcGetProgramLog() failed with error " << result << "\n";
-    std::cout << log << '\n';
-    }
+  coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcGetProgramLog() failed; log:\n\n" + std::string(log));
 
   // Obtain PTX from the program.
   size_t ptxSize;
   result = nvrtcGetPTXSize(prog, &ptxSize);
-  if (result != NVRTC_SUCCESS)
-    {
-    std::cout << "nvrtcGetPTXSize() failed with error " << result << "\n";
-    }
+  coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcGetPTXSize() failed");
+
   char *ptx = new char[ptxSize];
   result = nvrtcGetPTX(prog, ptx);
-  if (result != NVRTC_SUCCESS)
-    {
-    std::cout << "nvrtcGetPTX() failed with error " << result << "\n";
-    std::cout << "ptx is " << ptx << "\n";
-    }
+  coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcGetPTX() failed");
 
   CUresult result2 = cuInit(0);
   CUmodule module;
   result2 = cuModuleLoadDataEx(&module, ptx, 0, 0, 0);
-  coot_check_cuda_error(result2, "cuda::runtime_t::init(): cuModuleLoadDataEx() failed");
+  coot_check_cuda_error(result2, "cuda::runtime_t::init_kernels(): cuModuleLoadDataEx() failed");
 
   // Now that everything is compiled, unpack the results into individual kernels
   // that we can access.
@@ -183,7 +163,7 @@ runtime_t::init_kernels(std::vector<CUfunction>& kernels, const std::string& sou
     {
     const std::string name = prefix + names.at(i);
     result2 = cuModuleGetFunction(&kernels.at(i), module, name.c_str());
-    coot_check_cuda_error(result2, "cuda::runtime_t::init(): cuModuleGetFunction() failed for function " + name);
+    coot_check_cuda_error(result2, "cuda::runtime_t::init_kernels(): cuModuleGetFunction() failed for function " + name);
     }
 
   return true;
@@ -198,7 +178,7 @@ runtime_t::get_kernel(const kernel_id::enum_id num)
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (valid == false), "coot_cuda_rt not valid" );
+  coot_debug_check( (valid == false), "cuda::runtime_t not valid" );
 
        if(is_same_type<eT,u32   >::yes)  { return u32_kernels.at(num); }
   else if(is_same_type<eT,s32   >::yes)  { return s32_kernels.at(num); }

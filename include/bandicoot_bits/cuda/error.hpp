@@ -14,7 +14,7 @@
 //! \addtogroup cuda
 //! @{
 
-inline std::string error_as_string(cudaError_t error_code)
+inline std::string error_as_string(const cudaError_t error_code)
   {
   switch (error_code)
     {
@@ -133,7 +133,7 @@ inline std::string error_as_string(cudaError_t error_code)
 
 
 
-inline std::string error_as_string(CUresult error_code)
+inline std::string error_as_string(const CUresult error_code)
   {
   switch (error_code)
     {
@@ -212,6 +212,28 @@ inline std::string error_as_string(CUresult error_code)
 //    case CUDA_ERROR_STREAM_CAPTURE_WRONG_THREAD:        return "CUDA_ERROR_STREAM_CAPTURE_WRONG_THREAD";
     case CUDA_ERROR_UNKNOWN:                            return "CUDA_ERROR_UNKNOWN";
     default:                                            return "unknown error code";
+    }
+  }
+
+
+
+inline std::string error_as_string(const nvrtcResult error_code)
+  {
+  switch(error_code)
+    {
+    case NVRTC_SUCCESS:                                       return "NVRTC_SUCCESS";
+    case NVRTC_ERROR_OUT_OF_MEMORY:                           return "NVRTC_ERROR_OUT_OF_MEMORY";
+    case NVRTC_ERROR_PROGRAM_CREATION_FAILURE:                return "NVRTC_ERROR_PROGRAM_CREATION_FAILURE";
+    case NVRTC_ERROR_INVALID_INPUT:                           return "NVRTC_ERROR_INVALID_INPUT";
+    case NVRTC_ERROR_INVALID_PROGRAM:                         return "NVRTC_ERROR_INVALID_PROGRAM";
+    case NVRTC_ERROR_INVALID_OPTION:                          return "NVRTC_ERROR_INVALID_OPTION";
+    case NVRTC_ERROR_COMPILATION:                             return "NVRTC_ERROR_COMPILATION";
+    case NVRTC_ERROR_BUILTIN_OPERATION_FAILURE:               return "NVRTC_ERROR_BUILTIN_OPERATION_FAILURE";
+    case NVRTC_ERROR_NO_NAME_EXPRESSIONS_AFTER_COMPILATION:   return "NVRTC_ERROR_NO_NAME_EXPRESSIONS_AFTER_COMPILATION";
+    case NVRTC_ERROR_NO_LOWERED_NAMES_BEFORE_COMPILATION:     return "NVRTC_ERROR_NO_LOWERED_NAMES_BEFORE_COMPILATION";
+    case NVRTC_ERROR_NAME_EXPRESSION_NOT_VALID:               return "NVRTC_ERROR_NAME_EXPRESSION_NOT_VALID";
+    case NVRTC_ERROR_INTERNAL_ERROR:                          return "NVRTC_ERROR_INTERNAL_ERROR";
+    default:                                                  return "unknown error code";
     }
   }
 
