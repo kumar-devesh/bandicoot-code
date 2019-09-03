@@ -37,8 +37,8 @@ inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, kernel_i
 
   CUresult result2 = cuLaunchKernel(
       kernel,
-      dev_prop.maxThreadsPerBlock, 1, 1, // grid dims
-      std::ceil((double) n_elem / (double) dev_prop.maxThreadsPerBlock), 1, 1, // block dims
+      std::ceil((double) n_elem / (double) dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
+      dev_prop.maxThreadsPerBlock, 1, 1, // block dims
       0, NULL, // shared mem and stream
       (void**) args, // arguments
       0);
@@ -71,8 +71,8 @@ inplace_op_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem, kern
 
   CUresult result2 = cuLaunchKernel(
       kernel,
-      dev_prop.maxThreadsPerBlock, 1, 1, // grid dims
-      std::ceil((double) n_elem / (double) dev_prop.maxThreadsPerBlock), 1, 1, // block dims
+      std::ceil((double) n_elem / (double) dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
+      dev_prop.maxThreadsPerBlock, 1, 1, // block dims
       0, NULL, // shared mem and stream
       (void**) args, // arguments
       0);
@@ -127,23 +127,23 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const size_t aux_row1, cons
   //      and a grid size of [ceil(n_rows / mtpb), n_cols, 1].
   //
   // TODO: move this to some auxiliary code because it will surely be useful elsewhere
-  size_t gridSize[2] = { n_rows, n_cols };
-  size_t blockSize[2] = { 1, 1 };
+  size_t blockSize[2] = { n_rows, n_cols };
+  size_t gridSize[2] = { 1, 1 };
 
   if (n_rows > dev_prop.maxThreadsPerBlock)
     {
-    gridSize[0] = dev_prop.maxThreadsPerBlock;
-    gridSize[1] = 1;
+    blockSize[0] = dev_prop.maxThreadsPerBlock;
+    blockSize[1] = 1;
 
-    blockSize[0] = std::ceil((double) n_rows / (double) dev_prop.maxThreadsPerBlock);
-    blockSize[1] = n_cols;
+    gridSize[0] = std::ceil((double) n_rows / (double) dev_prop.maxThreadsPerBlock);
+    gridSize[1] = n_cols;
     }
   else if (n_elem > dev_prop.maxThreadsPerBlock)
     {
-    gridSize[0] = n_rows;
-    gridSize[1] = std::floor((double) dev_prop.maxThreadsPerBlock / (double) n_rows);
+    blockSize[0] = n_rows;
+    blockSize[1] = std::floor((double) dev_prop.maxThreadsPerBlock / (double) n_rows);
 
-    blockSize[1] = std::ceil((double) n_cols / (double) gridSize[2]);
+    gridSize[1] = std::ceil((double) n_cols / (double) gridSize[2]);
     }
 
   CUresult result2 = cuLaunchKernel(

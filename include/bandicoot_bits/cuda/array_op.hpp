@@ -39,8 +39,8 @@ array_op(dev_mem_t<eT> out, const uword n_elem, dev_mem_t<eT> in_a, dev_mem_t<eT
 
   CUresult result2 = cuLaunchKernel(
       kernel,
-      dev_prop.maxThreadsPerBlock, 1, 1, // grid dims
-      std::ceil((double) n_elem / (double) dev_prop.maxThreadsPerBlock), 1, 1, // block dims
+      std::ceil((double) n_elem / (double) dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
+      dev_prop.maxThreadsPerBlock, 1, 1, // block dims
       0, NULL, // shared mem and stream
       (void**) args, // arguments
       0);
