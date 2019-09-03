@@ -2,10 +2,11 @@
  * Benchmark comparison of matrix multiplication between CUDA and OpenCL backends.
  */
 #include <bandicoot>
+#include <armadillo>
 
 using namespace coot;
 
-template<typename eT>
+template<typename MatType>
 double benchmark_square(const uword size, const bool trans_a, const bool trans_b, const bool opencl)
   {
   if (opencl)
@@ -17,13 +18,13 @@ double benchmark_square(const uword size, const bool trans_a, const bool trans_b
     coot::get_rt().backend = CUDA_BACKEND;
     }
 
-  Mat<eT> x(size, size);
-  Mat<eT> y(size, size);
+  MatType x(size, size);
+  MatType y(size, size);
 
-  x.fill(eT(1));
-  y.fill(eT(2));
+  x.fill(typename MatType::elem_type(1));
+  y.fill(typename MatType::elem_type(2));
 
-  Mat<eT> z(size, size);
+  MatType z(size, size);
 
   // Try to catch outliers: return the min of 3 trials.
   // TODO: seems like that always gives garbage for CUDA... is it caching results or something?
@@ -67,7 +68,7 @@ double benchmark_square(const uword size, const bool trans_a, const bool trans_b
   return best_t;
   }
 
-template<typename eT>
+template<typename MatType>
 double benchmark_low_rank(const uword size, const uword rank, const bool opencl)
   {
   if (opencl)
@@ -79,13 +80,13 @@ double benchmark_low_rank(const uword size, const uword rank, const bool opencl)
     coot::get_rt().backend = CUDA_BACKEND;
     }
 
-  Mat<eT> x(rank, size);
-  Mat<eT> y(size, rank);
+  MatType x(rank, size);
+  MatType y(size, rank);
 
-  x.fill(eT(1));
-  y.fill(eT(2));
+  x.fill(typename MatType::elem_type(1));
+  y.fill(typename MatType::elem_type(2));
 
-  Mat<eT> z(rank, rank);
+  MatType z(rank, rank);
 
   wall_clock c;
   double best_t = std::numeric_limits<double>::max();
@@ -112,6 +113,7 @@ int main()
 
   std::cout << "matmul: Matrix multiplication benchmark comparison\n";
   std::cout << "  bandicoot version " << coot::coot_version::as_string() << '\n';
+  std::cout << "  armadillo version " << arma::arma_version::as_string() << '\n';
   std::cout << '\n';
 
   // Time initialization of each.
@@ -130,6 +132,7 @@ int main()
   std::cout << "\n";
 
   const double pow_max = 4.0;
+  const double pow_lr_max = 6.5;
   const double pow_min = 2.0;
   const double pow_step = 0.25;
 
@@ -139,8 +142,9 @@ int main()
 
     std::cout << "x * y, eT = float, square matrices, dim = " << size << ": ";
 
-    std::cout << "OpenCL: " << benchmark_square<float>(size, false, false, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_square<float>(size, false, false, CUDA_BACKEND) << "s\n";
+    std::cout << "arma: " << benchmark_square<arma::fmat>(size, false, false, CL_BACKEND) << "s, ";
+    std::cout << "OpenCL: " << benchmark_square<fmat>(size, false, false, CL_BACKEND) << "s, ";
+    std::cout << "CUDA: " << benchmark_square<fmat>(size, false, false, CUDA_BACKEND) << "s\n";
     }
 
   std::cout << "\n";
@@ -151,8 +155,9 @@ int main()
 
     std::cout << "x * y, eT = double, square matrices, dim = " << size << ": ";
 
-    std::cout << "OpenCL: " << benchmark_square<double>(size, false, false, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_square<double>(size, false, false, CUDA_BACKEND) << "s\n";
+    std::cout << "arma: " << benchmark_square<arma::mat>(size, false, false, CL_BACKEND) << "s, ";
+    std::cout << "OpenCL: " << benchmark_square<mat>(size, false, false, CL_BACKEND) << "s, ";
+    std::cout << "CUDA: " << benchmark_square<mat>(size, false, false, CUDA_BACKEND) << "s\n";
     }
 
   std::cout << "\n";
@@ -163,8 +168,9 @@ int main()
 
     std::cout << "x * y.t(), eT = float, square matrices, dim = " << size << ": ";
 
-    std::cout << "OpenCL: " << benchmark_square<float>(size, true, false, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_square<float>(size, true, false, CUDA_BACKEND) << "s\n";
+    std::cout << "arma: " << benchmark_square<arma::fmat>(size, false, true, CL_BACKEND) << "s, ";
+    std::cout << "OpenCL: " << benchmark_square<fmat>(size, false, true, CL_BACKEND) << "s, ";
+    std::cout << "CUDA: " << benchmark_square<fmat>(size, false, true, CUDA_BACKEND) << "s\n";
     }
 
   std::cout << "\n";
@@ -174,8 +180,10 @@ int main()
     const uword size = uword(std::pow(10.0, d));
 
     std::cout << "x * y.t(), eT = double, square matrices, dim = " << size << ": ";
-    std::cout << "OpenCL: " << benchmark_square<double>(size, false, true, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_square<double>(size, false, true, CUDA_BACKEND) << "s\n";
+
+    std::cout << "arma: " << benchmark_square<arma::mat>(size, false, true, CL_BACKEND) << "s, ";
+    std::cout << "OpenCL: " << benchmark_square<mat>(size, false, true, CL_BACKEND) << "s, ";
+    std::cout << "CUDA: " << benchmark_square<mat>(size, false, true, CUDA_BACKEND) << "s\n";
 
     }
 
@@ -187,6 +195,9 @@ int main()
 
     std::cout << "x.t() * y, eT = float, square matrices, dim = " << size << ": ";
 
+    std::cout << "arma: " << benchmark_square<arma::fmat>(size, true, false, CL_BACKEND) << "s, ";
+    std::cout << "OpenCL: " << benchmark_square<fmat>(size, true, false, CL_BACKEND) << "s, ";
+    std::cout << "CUDA: " << benchmark_square<fmat>(size, true, false, CUDA_BACKEND) << "s\n";
     }
 
   std::cout << "\n";
@@ -196,8 +207,10 @@ int main()
     const uword size = uword(std::pow(10.0, d));
 
     std::cout << "x.t() * y, eT = double, square matrices, dim = " << size << ": ";
-    std::cout << "OpenCL: " << benchmark_square<float>(size, true, true, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_square<float>(size, true, true, CUDA_BACKEND) << "s\n";
+
+    std::cout << "arma: " << benchmark_square<arma::mat>(size, true, false, CL_BACKEND) << "s, ";
+    std::cout << "OpenCL: " << benchmark_square<mat>(size, true, false, CL_BACKEND) << "s, ";
+    std::cout << "CUDA: " << benchmark_square<mat>(size, true, false, CUDA_BACKEND) << "s\n";
 
     }
 
@@ -209,9 +222,9 @@ int main()
 
     std::cout << "x.t() * y.t(), eT = float, square matrices, dim = " << size << ": ";
 
-    std::cout << "OpenCL: " << benchmark_square<double>(size, true, true, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_square<double>(size, true, true, CUDA_BACKEND) << "s\n";
-
+    std::cout << "arma: " << benchmark_square<arma::fmat>(size, true, true, CL_BACKEND) << "s, ";
+    std::cout << "OpenCL: " << benchmark_square<fmat>(size, true, true, CL_BACKEND) << "s, ";
+    std::cout << "CUDA: " << benchmark_square<fmat>(size, true, true, CUDA_BACKEND) << "s\n";
     }
 
   std::cout << "\n";
@@ -222,75 +235,84 @@ int main()
 
     std::cout << "x.t() * y, eT = double, square matrices, dim = " << size << ": ";
 
+    std::cout << "arma: " << benchmark_square<arma::mat>(size, true, true, CL_BACKEND) << "s, ";
+    std::cout << "OpenCL: " << benchmark_square<mat>(size, true, true, CL_BACKEND) << "s, ";
+    std::cout << "CUDA: " << benchmark_square<mat>(size, true, true, CUDA_BACKEND) << "s\n";
     }*/
 
-  for (double d = pow_min; d <= 1.5 * pow_max; d += 2.0 * pow_step)
+  for (double d = pow_min; d <= pow_lr_max; d += 2.0 * pow_step)
     {
     const uword size = uword(std::pow(10.0, d));
 
     std::cout << "x * y, eT = float, dim = [" << size << " x 10]: ";
 
-    std::cout << "OpenCL: " << benchmark_low_rank<float>(size, 10, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_low_rank<float>(size, 10, CUDA_BACKEND) << "s\n";
+    std::cout << "arma: " << benchmark_low_rank<arma::fmat>(size, 10, CL_BACKEND) << "s, ";
+    std::cout << "OpenCL: " << benchmark_low_rank<fmat>(size, 10, CL_BACKEND) << "s, ";
+    std::cout << "CUDA: " << benchmark_low_rank<fmat>(size, 10, CUDA_BACKEND) << "s\n";
     }
 
   std::cout << "\n";
 
-  for (double d = pow_min; d <= 1.5 * pow_max; d += 2.0 * pow_step)
+  for (double d = pow_min; d <= pow_lr_max; d += 2.0 * pow_step)
     {
     const uword size = uword(std::pow(10.0, d));
 
     std::cout << "x * y, eT = double, dim = [" << size << " x 10]: ";
 
-    std::cout << "OpenCL: " << benchmark_low_rank<double>(size, 10, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_low_rank<double>(size, 10, CUDA_BACKEND) << "s\n";
+    std::cout << "arma: " << benchmark_low_rank<arma::mat>(size, 10, CL_BACKEND) << "s, ";
+    std::cout << "OpenCL: " << benchmark_low_rank<mat>(size, 10, CL_BACKEND) << "s, ";
+    std::cout << "CUDA: " << benchmark_low_rank<mat>(size, 10, CUDA_BACKEND) << "s\n";
     }
 
   std::cout << "\n";
 
-  for (double d = pow_min; d <= 1.5 * pow_max; d += 2.0 * pow_step)
+  for (double d = pow_min; d <= pow_lr_max; d += 2.0 * pow_step)
     {
     const uword size = uword(std::pow(10.0, d));
 
     std::cout << "x * y, eT = float, dim = [" << size << " x 50]: ";
 
-    std::cout << "OpenCL: " << benchmark_low_rank<float>(size, 50, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_low_rank<float>(size, 50, CUDA_BACKEND) << "s\n";
+    std::cout << "arma: " << benchmark_low_rank<arma::fmat>(size, 50, CL_BACKEND) << "s, ";
+    std::cout << "OpenCL: " << benchmark_low_rank<fmat>(size, 50, CL_BACKEND) << "s, ";
+    std::cout << "CUDA: " << benchmark_low_rank<fmat>(size, 50, CUDA_BACKEND) << "s\n";
     }
 
   std::cout << "\n";
 
-  for (double d = pow_min; d <= 1.5 * pow_max; d += 2.0 * pow_step)
+  for (double d = pow_min; d <= pow_lr_max; d += 2.0 * pow_step)
     {
     const uword size = uword(std::pow(10.0, d));
 
     std::cout << "x * y, eT = double, dim = [" << size << " x 50]: ";
 
-    std::cout << "OpenCL: " << benchmark_low_rank<double>(size, 50, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_low_rank<double>(size, 50, CUDA_BACKEND) << "s\n";
+    std::cout << "arma: " << benchmark_low_rank<arma::mat>(size, 50, CL_BACKEND) << "s, ";
+    std::cout << "OpenCL: " << benchmark_low_rank<mat>(size, 50, CL_BACKEND) << "s, ";
+    std::cout << "CUDA: " << benchmark_low_rank<mat>(size, 50, CUDA_BACKEND) << "s\n";
     }
 
   std::cout << "\n";
 
-  for (double d = pow_min; d <= 1.5 * pow_max; d += 2.0 * pow_step)
+  for (double d = pow_min; d <= pow_lr_max; d += 2.0 * pow_step)
     {
     const uword size = uword(std::pow(10.0, d));
 
     std::cout << "x * y, eT = float, dim = [" << size << " x 100]: ";
 
-    std::cout << "OpenCL: " << benchmark_low_rank<float>(size, 100, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_low_rank<float>(size, 100, CUDA_BACKEND) << "s\n";
+    std::cout << "arma: " << benchmark_low_rank<arma::fmat>(size, 100, CL_BACKEND) << "s, ";
+    std::cout << "OpenCL: " << benchmark_low_rank<fmat>(size, 100, CL_BACKEND) << "s, ";
+    std::cout << "CUDA: " << benchmark_low_rank<fmat>(size, 100, CUDA_BACKEND) << "s\n";
     }
 
   std::cout << "\n";
 
-  for (double d = pow_min; d <= 1.5 * pow_max; d += 2.0 * pow_step)
+  for (double d = pow_min; d <= pow_lr_max; d += 2.0 * pow_step)
     {
     const uword size = uword(std::pow(10.0, d));
 
     std::cout << "x * y, eT = double, dim = [" << size << " x 100]: ";
 
-    std::cout << "OpenCL: " << benchmark_low_rank<double>(size, 100, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_low_rank<double>(size, 100, CUDA_BACKEND) << "s\n";
+    std::cout << "arma: " << benchmark_low_rank<arma::mat>(size, 100, CL_BACKEND) << "s, ";
+    std::cout << "OpenCL: " << benchmark_low_rank<mat>(size, 100, CL_BACKEND) << "s, ";
+    std::cout << "CUDA: " << benchmark_low_rank<mat>(size, 100, CUDA_BACKEND) << "s\n";
     }
   }
