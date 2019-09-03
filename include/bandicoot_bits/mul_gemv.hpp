@@ -61,9 +61,9 @@ class gemv
     const size_t lda = size_t(A.n_rows);
     const size_t inc = size_t(1);
     
-    cl_mem A_mem = A.get_dev_mem(false);
-    cl_mem x_mem = x.get_dev_mem(false);
-    cl_mem y_mem = y.get_dev_mem(false);
+    cl_mem A_mem = A.get_dev_mem(false).cl_mem_ptr;
+    cl_mem x_mem = x.get_dev_mem(false).cl_mem_ptr;
+    cl_mem y_mem = y.get_dev_mem(false).cl_mem_ptr;
     
     cl_command_queue queue = get_rt().cl_rt.get_cq();
     

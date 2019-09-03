@@ -61,21 +61,15 @@ void
 MatValProxy<eT>::operator=(const eT in_val)
   {
   coot_extra_debug_sigprint();
-  
-  opencl::runtime_t::cq_guard guard;
-  
-  coot_aligned cl_int status = 0;
-  
-  coot_aligned void* mapped_ptr = clEnqueueMapBuffer(get_rt().cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, CL_TRUE, CL_MAP_WRITE, sizeof(eT)*index, sizeof(eT)*1, 0, NULL, NULL, &status);
-  
-  if( (status == CL_SUCCESS) && (mapped_ptr != NULL) )
+
+  if (get_rt().backend == CL_BACKEND)
     {
-    *((eT*)(mapped_ptr)) = in_val;
-    
-    status = clEnqueueUnmapMemObject(get_rt().cl_rt.get_cq(), M.dev_mem.cl_mem_ptr, mapped_ptr, 0, NULL, NULL);  
+    opencl::set_val(M.dev_mem, index, in_val);
     }
-  
-  coot_check_runtime_error( (status != CL_SUCCESS), "MatValProxy: couldn't access device memory" );
+  else
+    {
+    cuda::set_val(M.dev_mem, index, in_val);
+    }
   }
 
 

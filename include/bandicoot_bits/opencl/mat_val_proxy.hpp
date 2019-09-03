@@ -80,4 +80,31 @@ get_val(const dev_mem_t<eT> mem, const uword index)
   // return val;
   }
 
+
+
+template<typename eT>
+inline
+void
+set_val(const dev_mem_t<eT> mem, const uword index, const eT in_val)
+  {
+  coot_extra_debug_sigprint();
+
+  runtime_t::cq_guard guard;
+
+  coot_aligned cl_int status = 0;
+
+  coot_aligned void* mapped_ptr = clEnqueueMapBuffer(get_rt().cl_rt.get_cq(), mem.cl_mem_ptr, CL_TRUE, CL_MAP_WRITE, sizeof(eT) * index, sizeof(eT) * 1, 0, NULL, NULL, &status);
+
+  if( (status == CL_SUCCESS) && (mapped_ptr != NULL) )
+    {
+    *((eT*)(mapped_ptr)) = in_val;
+
+    status = clEnqueueUnmapMemObject(get_rt().cl_rt.get_cq(), mem.cl_mem_ptr, mapped_ptr, 0, NULL, NULL);
+    }
+
+  coot_check_runtime_error( (status != CL_SUCCESS), "opencl::set_val(): couldn't access device memory" );
+  }
+
+
+
 //! @}

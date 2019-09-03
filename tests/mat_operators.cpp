@@ -158,3 +158,102 @@ TEST_CASE("two_mat_div")
   test_div<u64>();
   test_div<s64>();
   }
+
+
+
+template<typename eT>
+void test_simple_mul()
+  {
+  Mat<eT> x(3, 3);
+  Mat<eT> y(3, 3);
+
+  x(0, 0) = eT(1);
+  x(1, 0) = eT(2);
+  x(2, 0) = eT(3);
+  x(0, 1) = eT(5);
+; x(1, 1) = eT(6);
+  x(2, 1) = eT(7);
+  x(0, 2) = eT(9);
+  x(1, 2) = eT(11);
+  x(2, 2) = eT(13);
+
+  y(0, 0) = eT(10);
+  y(1, 0) = eT(11);
+  y(2, 0) = eT(12);
+  y(0, 1) = eT(13);
+  y(1, 1) = eT(14);
+  y(2, 1) = eT(15);
+  y(0, 2) = eT(16);
+  y(1, 2) = eT(17);
+  y(2, 2) = eT(18);
+
+  Mat<eT> z1 = x * y;
+  Mat<eT> z2 = x * y.t();
+  Mat<eT> z3 = x.t() * y;
+  Mat<eT> z4 = x.t() * y.t();
+
+  y *= x;
+
+  // Check against hand-computed results.
+  REQUIRE( eT(z1(0, 0)) == Approx(eT(173)) );
+  REQUIRE( eT(z1(1, 0)) == Approx(eT(218)) );
+  REQUIRE( eT(z1(2, 0)) == Approx(eT(263)) );
+  REQUIRE( eT(z1(0, 1)) == Approx(eT(218)) );
+  REQUIRE( eT(z1(1, 1)) == Approx(eT(275)) );
+  REQUIRE( eT(z1(2, 1)) == Approx(eT(332)) );
+  REQUIRE( eT(z1(0, 2)) == Approx(eT(263)) );
+  REQUIRE( eT(z1(1, 2)) == Approx(eT(332)) );
+  REQUIRE( eT(z1(2, 2)) == Approx(eT(401)) );
+
+  REQUIRE( eT(z2(0, 0)) == Approx(eT(219)) );
+  REQUIRE( eT(z2(1, 0)) == Approx(eT(274)) );
+  REQUIRE( eT(z2(2, 0)) == Approx(eT(329)) );
+  REQUIRE( eT(z2(0, 1)) == Approx(eT(234)) );
+  REQUIRE( eT(z2(1, 1)) == Approx(eT(293)) );
+  REQUIRE( eT(z2(2, 1)) == Approx(eT(352)) );
+  REQUIRE( eT(z2(0, 2)) == Approx(eT(249)) );
+  REQUIRE( eT(z2(1, 2)) == Approx(eT(312)) );
+  REQUIRE( eT(z2(2, 2)) == Approx(eT(375)) );
+
+  REQUIRE( eT(z3(0, 0)) == Approx(eT(68)) );
+  REQUIRE( eT(z3(1, 0)) == Approx(eT(200)) );
+  REQUIRE( eT(z3(2, 0)) == Approx(eT(367)) );
+  REQUIRE( eT(z3(0, 1)) == Approx(eT(86)) );
+  REQUIRE( eT(z3(1, 1)) == Approx(eT(254)) );
+  REQUIRE( eT(z3(2, 1)) == Approx(eT(466)) );
+  REQUIRE( eT(z3(0, 2)) == Approx(eT(104)) );
+  REQUIRE( eT(z3(1, 2)) == Approx(eT(308)) );
+  REQUIRE( eT(z3(2, 2)) == Approx(eT(565)) );
+
+  REQUIRE( eT(z4(0, 0)) == Approx(eT(84)) );
+  REQUIRE( eT(z4(1, 0)) == Approx(eT(240)) );
+  REQUIRE( eT(z4(2, 0)) == Approx(eT(441)) );
+  REQUIRE( eT(z4(0, 1)) == Approx(eT(90)) );
+  REQUIRE( eT(z4(1, 1)) == Approx(eT(258)) );
+  REQUIRE( eT(z4(2, 1)) == Approx(eT(474)) );
+  REQUIRE( eT(z4(0, 2)) == Approx(eT(96)) );
+  REQUIRE( eT(z4(1, 2)) == Approx(eT(276)) );
+  REQUIRE( eT(z4(2, 2)) == Approx(eT(507)) );
+
+  REQUIRE( eT(y(0, 0)) == Approx(eT(84)) );
+  REQUIRE( eT(y(1, 0)) == Approx(eT(90)) );
+  REQUIRE( eT(y(2, 0)) == Approx(eT(96)) );
+  REQUIRE( eT(y(0, 1)) == Approx(eT(240)) );
+  REQUIRE( eT(y(1, 1)) == Approx(eT(258)) );
+  REQUIRE( eT(y(2, 1)) == Approx(eT(276)) );
+  REQUIRE( eT(y(0, 2)) == Approx(eT(441)) );
+  REQUIRE( eT(y(1, 2)) == Approx(eT(474)) );
+  REQUIRE( eT(y(2, 2)) == Approx(eT(507)) );
+  }
+
+
+
+TEST_CASE("simple_mat_mul")
+  {
+  test_simple_mul<float>();
+  test_simple_mul<double>();
+//  test_simple_mul<u32>();
+//  test_simple_mul<s32>();
+//  test_simple_mul<u64>();
+//  test_simple_mul<s64>();
+  }

@@ -41,4 +41,27 @@ get_val(const dev_mem_t<eT> mem, const uword index)
   return val;
   }
 
+
+
+template<typename eT>
+inline
+void
+set_val(const dev_mem_t<eT> mem, const uword index, const eT in_val)
+  {
+  coot_extra_debug_sigprint();
+
+  // We'll just use cudaMemcpy() to copy over the single value.
+
+  cudaError_t status = cudaMemcpy((void*) (mem.cuda_mem_ptr + index),
+                                  (void*) &in_val,
+                                  sizeof(eT),
+                                  cudaMemcpyHostToDevice);
+
+  coot_check_cuda_error(status, "cuda::set_val(): couldn't access device memory");
+
+  cuCtxSynchronize();
+  }
+
+
+
 //! @}
