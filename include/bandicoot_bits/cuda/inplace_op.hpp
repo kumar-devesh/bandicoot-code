@@ -112,13 +112,44 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const size_t aux_row1, cons
       &val,
       (size_t*) &end_row,
       (size_t*) &end_col,
-      (size_t*) &m_n_rows };
+      (size_t*) &m_n_rows,
+      (size_t*) &aux_row1,
+      (size_t*) &aux_col1 };
 
-  // TODO: what grid dims?
+  // grid dimensions:
+  //   ideally, we want to use [n_rows, n_cols, 1]; but we have limits.  so   //   we might need to block it up a bit.  so, if n_rows * n_cols < maxThreadsPerBlock,
+  //   we can use [n_rows, n_cols, 1]; otherwise, if n_rows < maxThreadsPerBlock,
+  //      we can use [n_rows, maxThreadsPerBlock / n_rows, 1];
+  //      and in this case we'll need a grid size of [1, ceil(n_cols / (mtpb / n_rows)), 1];
+  //
+  //   and if n_rows > mtpb,
+  //      we can use [mtpb, 1, 1]
+  //      and a grid size of [ceil(n_rows / mtpb), n_cols, 1].
+  //
+  // TODO: move this to some auxiliary code because it will surely be useful elsewhere
+  size_t gridSize[2] = { n_rows, n_cols };
+  size_t blockSize[2] = { 1, 1 };
+
+  if (n_rows > dev_prop.maxThreadsPerBlock)
+    {
+    gridSize[0] = dev_prop.maxThreadsPerBlock;
+    gridSize[1] = 1;
+
+    blockSize[0] = std::ceil((double) n_rows / (double) dev_prop.maxThreadsPerBlock);
+    blockSize[1] = n_cols;
+    }
+  else if (n_elem > dev_prop.maxThreadsPerBlock)
+    {
+    gridSize[0] = n_rows;
+    gridSize[1] = std::floor((double) dev_prop.maxThreadsPerBlock / (double) n_rows);
+
+    blockSize[1] = std::ceil((double) n_cols / (double) gridSize[2]);
+    }
+
   CUresult result2 = cuLaunchKernel(
       kernel,
-      dev_prop.maxThreadsPerBlock, 1, 1, // grid dims TODO: fix
-      std::ceil((double) n_elem / (double) dev_prop.maxThreadsPerBlock), 1, 1, // block dims
+      gridSize[0], gridSize[1], 1,
+      blockSize[0], blockSize[1], 1,
       0, NULL, // shared mem and stream
       (void**) args,
       0);

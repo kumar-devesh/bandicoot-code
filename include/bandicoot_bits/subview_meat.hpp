@@ -103,38 +103,20 @@ subview<eT>::operator= (const subview<eT>& x)
 template<typename eT>
 inline
 void
-subview<eT>::inplace_op(const eT val, cl_kernel kernel)
+subview<eT>::inplace_op(const eT val, kernel_id::enum_id kernel)
   {
   coot_extra_debug_sigprint();
 
-  
   if(n_elem == 0)  { return; }
-  
-  opencl::runtime_t::cq_guard guard;
-  
-  const uword end_row = aux_row1 + n_rows - 1;
-  const uword end_col = aux_col1 + n_cols - 1;
-  
-  opencl::runtime_t::adapt_uword m_end_row(end_row);
-  opencl::runtime_t::adapt_uword m_end_col(end_col);
-  
-  opencl::runtime_t::adapt_uword m_n_rows(m.n_rows);
-  
-  cl_int status = 0;
-  
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem),    &m.dev_mem );
-  status |= clSetKernelArg(kernel, 1, sizeof(eT),        &val          );
-  status |= clSetKernelArg(kernel, 2, m_end_row.size,    m_end_row.addr);
-  status |= clSetKernelArg(kernel, 3, m_end_col.size,    m_end_col.addr);
-  status |= clSetKernelArg(kernel, 4,  m_n_rows.size,     m_n_rows.addr);
-  
-  size_t global_work_offset[2] = { size_t(aux_row1), size_t(aux_col1) };  // starting point in parent matrix
-  size_t global_work_size[2]   = { size_t(n_rows),   size_t(n_cols)   };  // size of submatrix
-  
-  // NOTE: Clover / Mesa 13.0.4 can't handle offsets
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 2, global_work_offset, global_work_size, NULL, 0, NULL, NULL);
-  
-  coot_check_runtime_error( (status != 0), "subview::inplace_op(): couldn't execute kernel" );
+
+  if(get_rt().backend == CL_BACKEND)
+    {
+    opencl::inplace_op_subview(m.dev_mem, val, aux_row1, aux_col1, n_rows, n_cols, m.n_rows, kernel);
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    cuda::inplace_op_subview(m.dev_mem, val, aux_row1, aux_col1, n_rows, n_cols, m.n_rows, kernel);
+    }
   }
 
 
@@ -167,14 +149,7 @@ subview<eT>::operator+= (const eT val)
   {
   coot_extra_debug_sigprint();
 
-  if (get_rt().backend == CUDA_BACKEND)
-    {
-    cuda::inplace_op_subview(m.dev_mem, val, aux_row1, aux_col1, n_rows, n_cols, m.n_rows, kernel_id::submat_inplace_plus_scalar);
-    }
-  else
-    {
-    opencl::inplace_op_subview(m.dev_mem, val, aux_row1, aux_col1, n_rows, n_cols, m.n_rows, kernel_id::submat_inplace_plus_scalar);
-    }
+  inplace_op(val, kernel_id::submat_inplace_plus_scalar);
   }
 
 
@@ -186,14 +161,7 @@ subview<eT>::operator-= (const eT val)
   {
   coot_extra_debug_sigprint();
 
-  if (get_rt().backend == CUDA_BACKEND)
-    {
-    cuda::inplace_op_subview(m.dev_mem, val, aux_row1, aux_col1, n_rows, n_cols, m.n_rows, kernel_id::submat_inplace_minus_scalar);
-    }
-  else
-    {
-    opencl::inplace_op_subview(m.dev_mem, val, aux_row1, aux_col1, n_rows, n_cols, m.n_rows, kernel_id::submat_inplace_minus_scalar);
-    }
+  inplace_op(val, kernel_id::submat_inplace_minus_scalar);
   }
 
 
@@ -205,14 +173,7 @@ subview<eT>::operator*= (const eT val)
   {
   coot_extra_debug_sigprint();
 
-  if (get_rt().backend == CUDA_BACKEND)
-    {
-    cuda::inplace_op_subview(m.dev_mem, val, aux_row1, aux_col1, n_rows, n_cols, m.n_rows, kernel_id::submat_inplace_mul_scalar);
-    }
-  else
-    {
-    opencl::inplace_op_subview(m.dev_mem, val, aux_row1, aux_col1, n_rows, n_cols, m.n_rows, kernel_id::submat_inplace_mul_scalar);
-    }
+  inplace_op(val, kernel_id::submat_inplace_mul_scalar);
   }
 
 
@@ -224,14 +185,7 @@ subview<eT>::operator/= (const eT val)
   {
   coot_extra_debug_sigprint();
 
-  if (get_rt().backend == CUDA_BACKEND)
-    {
-    cuda::inplace_op_subview(m.dev_mem, val, aux_row1, aux_col1, n_rows, n_cols, m.n_rows, kernel_id::submat_inplace_div_scalar);
-    }
-  else
-    {
-    opencl::inplace_op_subview(m.dev_mem, val, aux_row1, aux_col1, n_rows, n_cols, m.n_rows, kernel_id::submat_inplace_div_scalar);
-    }
+  inplace_op(val, kernel_id::submat_inplace_div_scalar);
   }
 
 
@@ -398,9 +352,7 @@ subview<eT>::fill(const eT val)
   {
   coot_extra_debug_sigprint();
   
-  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(kernel_id::submat_inplace_set_scalar);
-  
-  (*this).inplace_op(val, kernel);
+  (*this).inplace_op(val, kernel_id::submat_inplace_set_scalar);
   }
 
 
