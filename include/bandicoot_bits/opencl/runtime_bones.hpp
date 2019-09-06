@@ -64,7 +64,7 @@ class runtime_t
   coot_aligned std::vector<cl_kernel>    d_kernels;
   coot_aligned std::vector<cl_kernel> cx_f_kernels;
   coot_aligned std::vector<cl_kernel> cx_d_kernels;
-  
+
   #if defined(COOT_USE_CXX11)
   coot_aligned std::recursive_mutex mutex;
   #endif

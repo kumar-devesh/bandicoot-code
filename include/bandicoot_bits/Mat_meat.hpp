@@ -1222,6 +1222,90 @@ Mat<eT>::ones()
 template<typename eT>
 inline
 const Mat<eT>&
+Mat<eT>::randu()
+  {
+  coot_extra_debug_sigprint();
+
+  coot_rng::fill_randu(dev_mem, n_elem);
+
+  return *this;
+  }
+
+
+
+template<typename eT>
+inline
+const Mat<eT>&
+Mat<eT>::randu(const uword new_n_elem)
+  {
+  coot_extra_debug_sigprint();
+
+  set_size(new_n_elem);
+
+  return (*this).randu();
+  }
+
+
+
+template<typename eT>
+inline
+const Mat<eT>&
+Mat<eT>::randu(const uword new_n_rows, const uword new_n_cols)
+  {
+  coot_extra_debug_sigprint();
+
+  set_size(new_n_rows, new_n_cols);
+
+  return (*this).randu();
+  }
+
+
+
+template<typename eT>
+inline
+const Mat<eT>&
+Mat<eT>::randn()
+  {
+  coot_extra_debug_sigprint();
+
+  coot_rng::fill_randn(dev_mem, n_elem);
+
+  return *this;
+  }
+
+
+
+template<typename eT>
+inline
+const Mat<eT>&
+Mat<eT>::randn(const uword new_n_elem)
+  {
+  coot_extra_debug_sigprint();
+
+  set_size(new_n_elem);
+
+  return (*this).randn();
+  }
+
+
+
+template<typename eT>
+inline
+const Mat<eT>&
+Mat<eT>::randn(const uword new_n_rows, const uword new_n_cols)
+  {
+  coot_extra_debug_sigprint();
+
+  set_size(new_n_rows, new_n_cols);
+
+  return (*this).randn();
+  }
+
+
+
+template<typename eT>
+inline
+const Mat<eT>&
 Mat<eT>::ones(const uword new_n_elem)
   {
   coot_extra_debug_sigprint();

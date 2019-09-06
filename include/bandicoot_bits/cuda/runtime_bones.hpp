@@ -37,6 +37,8 @@ struct runtime_t
   template<typename eT>
   inline void release_memory(eT* cuda_mem);
 
+  curandGenerator_t randGen;
+
   private:
 
   coot_aligned bool                     valid;

@@ -68,6 +68,7 @@
   #include <cuda_runtime.h>
   #include <cublas_v2.h>
   #include <nvrtc.h>
+  #include <curand.h>
 #endif
 
 // TODO: include any stuff here that is not meant to be in the coot namespace
@@ -135,6 +136,7 @@ namespace coot
   #include "bandicoot_bits/eglue_core_bones.hpp"
   #include "bandicoot_bits/Op_bones.hpp"
   #include "bandicoot_bits/Glue_bones.hpp"
+  #include "bandicoot_bits/coot_rng_bones.hpp"
   
   #include "bandicoot_bits/op_sum_bones.hpp"
   #include "bandicoot_bits/op_htrans_bones.hpp"
@@ -171,6 +173,7 @@ namespace coot
     #include "bandicoot_bits/opencl/inplace_op.hpp"
     #include "bandicoot_bits/opencl/array_op.hpp"
     #include "bandicoot_bits/opencl/mat_val_proxy.hpp"
+    #include "bandicoot_bits/opencl/random_meat.hpp"
     }
 
   namespace cuda
@@ -179,6 +182,7 @@ namespace coot
     #include "bandicoot_bits/cuda/inplace_op.hpp"
     #include "bandicoot_bits/cuda/array_op.hpp"
     #include "bandicoot_bits/cuda/mat_val_proxy.hpp"
+    #include "bandicoot_bits/cuda/random_meat.hpp"
     }
   
   //
@@ -252,6 +256,7 @@ namespace coot
   #include "bandicoot_bits/eglue_core_meat.hpp"
   #include "bandicoot_bits/Op_meat.hpp"
   #include "bandicoot_bits/Glue_meat.hpp"
+  #include "bandicoot_bits/coot_rng_meat.hpp"
   
   #include "bandicoot_bits/op_sum_meat.hpp"
   #include "bandicoot_bits/op_htrans_meat.hpp"

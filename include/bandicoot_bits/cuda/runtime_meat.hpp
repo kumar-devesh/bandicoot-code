@@ -52,6 +52,9 @@ runtime_t::internal_init()
   status = init_kernels<double>(d_kernels, get_cuda_kernel_src(), get_cuda_kernel_names());
   if (status == false) { coot_debug_warn("cuda::runtime_t::init(): couldn't set up CUDA double kernels"); }
 
+  // Initialize RNG struct.
+  curandCreateGenerator(&randGen, CURAND_RNG_PSEUDO_DEFAULT);
+
   valid = true;
 
   return true;

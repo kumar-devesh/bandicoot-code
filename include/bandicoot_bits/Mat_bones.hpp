@@ -130,6 +130,14 @@ class Mat : public Base< eT, Mat<eT> >
   inline const Mat& ones();
   inline const Mat& ones(const uword new_n_elem);
   inline const Mat& ones(const uword new_n_rows, const uword new_n_cols);
+
+  inline const Mat& randu();
+  inline const Mat& randu(const uword new_n_elem);
+  inline const Mat& randu(const uword new_n_elem, const uword new_n_cols);
+
+  inline const Mat& randn();
+  inline const Mat& randn(const uword new_n_elem);
+  inline const Mat& randn(const uword new_n_elem, const uword new_n_cols);
   
   inline const Mat& eye();
   inline const Mat& eye(const uword new_n_rows, const uword new_n_cols);
