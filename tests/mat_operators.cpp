@@ -257,3 +257,48 @@ TEST_CASE("simple_mat_mul")
 //  test_simple_mul<u64>();
 //  test_simple_mul<s64>();
   }
+
+
+
+template<typename eT>
+void test_copy()
+{
+  Mat<eT> x(10, 10);
+  x.randu();
+
+  Mat<eT> y(10, 10);
+  y.randu();
+
+  Mat<eT> z;
+
+  y = x;
+  z = x;
+
+  REQUIRE( x.n_rows == y.n_rows );
+  REQUIRE( x.n_cols == y.n_cols );
+  REQUIRE( y.n_rows == z.n_rows );
+  REQUIRE( y.n_cols == z.n_cols );
+
+  for (size_t c = 0; c < 10; ++c)
+    {
+    for (size_t r = 0; r < 10; ++r)
+      {
+      REQUIRE( eT(x(r, c)) == eT(y(r, c)) );
+      REQUIRE( eT(x(r, c)) == eT(z(r, c)) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("mat_copy")
+  {
+  test_copy<float>();
+  test_copy<double>();
+//  test_copy<u32>();
+//  test_copy<s32>();
+//  test_copy<u64>();
+//  test_copy<s64>();
+  }
+
+

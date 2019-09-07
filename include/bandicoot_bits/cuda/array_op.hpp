@@ -52,4 +52,21 @@ array_op(dev_mem_t<eT> out, const uword n_elem, dev_mem_t<eT> in_a, dev_mem_t<eT
 
 
 
+/**
+ * Use CUDA to copy the source memory to the destination.
+ */
+template<typename eT>
+inline
+void
+copy_array(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword n_elem)
+  {
+  coot_extra_debug_sigprint();
+
+  cudaError_t result = cudaMemcpy(dest.cuda_mem_ptr, src.cuda_mem_ptr, sizeof(eT) * size_t(n_elem), cudaMemcpyDeviceToDevice);
+
+  coot_check_cuda_error(result, "cuda::copy_array(): couldn't copy buffer" );
+  }
+
+
+
 //! @}

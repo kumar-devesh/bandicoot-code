@@ -23,7 +23,7 @@ class arrayops
   
   template<typename eT>
   inline static void
-  copy(cl_mem dest, cl_mem src, const uword n_elem);
+  copy(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword n_elem);
   
   
   // 

@@ -21,18 +21,18 @@
 template<typename eT>
 inline
 void
-arrayops::copy(cl_mem dest, cl_mem src, const uword n_elem)
+arrayops::copy(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem)
   {
-  // TODO: make work for CUDA
   coot_extra_debug_sigprint();
-  
-  opencl::runtime_t::cq_guard guard;
-  
-  coot_extra_debug_print("clEnqueueCopyBuffer()");
-  
-  cl_int status = clEnqueueCopyBuffer(get_rt().cl_rt.get_cq(), src, dest, size_t(0), size_t(0), sizeof(eT)*size_t(n_elem), cl_uint(0), NULL, NULL);
-  
-  coot_check_runtime_error( (status != 0), "arrayops::copy(): couldn't copy buffer" );
+
+  if (get_rt().backend == CUDA_BACKEND)
+    {
+    cuda::copy_array(dest, src, n_elem);
+    }
+  else
+    {
+    opencl::copy_array(dest, src, n_elem);
+    }
   }
 
 

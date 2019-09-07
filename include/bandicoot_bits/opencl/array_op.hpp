@@ -53,4 +53,25 @@ array_op(dev_mem_t<eT> out, const uword n_elem, dev_mem_t<eT> in_a, dev_mem_t<eT
 
 
 
+/**
+ * Use OpenCL to copy the source memory to the destination.
+ */
+template<typename eT>
+inline
+void
+copy_array(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword n_elem)
+  {
+  coot_extra_debug_sigprint();
+
+  runtime_t::cq_guard guard;
+
+  coot_extra_debug_print("clEnqueueCopyBuffer()");
+
+  cl_int status = clEnqueueCopyBuffer(get_rt().cl_rt.get_cq(), src.cl_mem_ptr, dest.cl_mem_ptr, size_t(0), size_t(0), sizeof(eT) * size_t(n_elem), cl_uint(0), NULL, NULL);
+
+  coot_check_runtime_error( (status != 0), "opencl::copy_array(): couldn't copy buffer" );
+  }
+
+
+
 //! @}
