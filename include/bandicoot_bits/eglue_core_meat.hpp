@@ -39,10 +39,6 @@ eglue_core<eglue_type>::apply(Mat<typename T1::elem_type>& out, const eGlue<T1, 
   const Mat<eT>& A = UA.M;
   const Mat<eT>& B = UB.M;
   
-  opencl::runtime_t::cq_guard guard;
-  
-  cl_kernel kernel;
-  
   if(is_same_type<eglue_type, eglue_plus >::yes)
     {
     if(get_rt().backend == CL_BACKEND)

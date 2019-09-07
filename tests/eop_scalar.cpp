@@ -431,3 +431,342 @@ TEST_CASE("submat_huge_scalar_fill")
   test_huge_submat_fill<s64>();
   }
 */
+
+
+
+template<typename eT>
+void test_eop_scalar_plus()
+  {
+  Mat<eT> x(5, 5);
+  x.fill(eT(3));
+
+  Mat<eT> y = x + eT(1);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(x(r, c)) + eT(1)) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_scalar_plus_1")
+  {
+  test_eop_scalar_plus<float>();
+  test_eop_scalar_plus<double>();
+  test_eop_scalar_plus<u32>();
+  test_eop_scalar_plus<s32>();
+  test_eop_scalar_plus<u64>();
+  test_eop_scalar_plus<s64>();
+  }
+
+
+
+template<typename eT>
+void test_eop_neg()
+  {
+  Mat<eT> x(5, 5);
+  x.fill(eT(3));
+
+  Mat<eT> y = -x;
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(-eT(x(r, c))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_neg_1")
+  {
+  test_eop_neg<float>();
+  test_eop_neg<double>();
+  test_eop_neg<s32>();
+  test_eop_neg<s64>();
+  }
+
+
+
+template<typename eT>
+void test_eop_scalar_minus_pre()
+  {
+  Mat<eT> x(5, 5);
+  x.fill(eT(3));
+
+  Mat<eT> y = eT(5) - x;
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(5) - eT(x(r, c))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_scalar_minus_pre")
+  {
+  test_eop_scalar_minus_pre<float>();
+  test_eop_scalar_minus_pre<double>();
+  test_eop_scalar_minus_pre<u32>();
+  test_eop_scalar_minus_pre<s32>();
+  test_eop_scalar_minus_pre<u64>();
+  test_eop_scalar_minus_pre<s64>();
+  }
+
+
+
+template<typename eT>
+void test_eop_scalar_minus_post()
+  {
+  Mat<eT> x(5, 5);
+  x.fill(eT(3));
+
+  Mat<eT> y = x - eT(1);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(2)) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_scalar_minus_post")
+  {
+  test_eop_scalar_minus_post<float>();
+  test_eop_scalar_minus_post<double>();
+  test_eop_scalar_minus_post<u32>();
+  test_eop_scalar_minus_post<s32>();
+  test_eop_scalar_minus_post<u64>();
+  test_eop_scalar_minus_post<s64>();
+  }
+
+
+
+template<typename eT>
+void test_eop_scalar_times()
+  {
+  Mat<eT> x(5, 5);
+  x.fill(eT(3));
+
+  Mat<eT> y = eT(2) * x;
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx( eT(2) * eT(x(r, c))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_scalar_times")
+  {
+  test_eop_scalar_times<float>();
+  test_eop_scalar_times<double>();
+  test_eop_scalar_times<u32>();
+  test_eop_scalar_times<s32>();
+  test_eop_scalar_times<u64>();
+  test_eop_scalar_times<s64>();
+  }
+
+
+
+template<typename eT>
+void test_eop_scalar_div_pre()
+  {
+  Mat<eT> x(5, 5);
+  x.fill(eT(3));
+
+  Mat<eT> y = eT(9) / x;
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(9) / eT(x(r, c))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_scalar_div_pre")
+  {
+  test_eop_scalar_div_pre<float>();
+  test_eop_scalar_div_pre<double>();
+  test_eop_scalar_div_pre<u32>();
+  test_eop_scalar_div_pre<s32>();
+  test_eop_scalar_div_pre<u64>();
+  test_eop_scalar_div_pre<s64>();
+  }
+
+
+
+template<typename eT>
+void test_eop_scalar_div_post()
+  {
+  Mat<eT> x(5, 5);
+  x.fill(eT(4));
+
+  Mat<eT> y = x / eT(2);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(x(r, c)) / eT(2)) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_scalar_div_post")
+  {
+  test_eop_scalar_div_post<float>();
+  test_eop_scalar_div_post<double>();
+  test_eop_scalar_div_post<u32>();
+  test_eop_scalar_div_post<s32>();
+  test_eop_scalar_div_post<u64>();
+  test_eop_scalar_div_post<s64>();
+  }
+
+
+
+template<typename eT>
+void test_eop_square()
+  {
+  Mat<eT> x(5, 5);
+  x.fill(eT(3));
+
+  Mat<eT> y = square(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(x(r, c)) * eT(x(r, c))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_square")
+  {
+  test_eop_square<float>();
+  test_eop_square<double>();
+  test_eop_square<u32>();
+  test_eop_square<s32>();
+  test_eop_square<u64>();
+  test_eop_square<s64>();
+  }
+
+
+
+template<typename eT>
+void test_eop_sqrt()
+  {
+  Mat<eT> x(5, 5);
+  x.fill(eT(9));
+
+  Mat<eT> y = sqrt(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(x(r, c)) == Approx( eT(y(r, c)) * eT(y(r, c)) ) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_sqrt")
+  {
+  test_eop_sqrt<float>();
+  test_eop_sqrt<double>();
+  test_eop_sqrt<u32>();
+  test_eop_sqrt<s32>();
+  test_eop_sqrt<u64>();
+  test_eop_sqrt<s64>();
+  }
+
+
+
+template<typename eT>
+void test_eop_log()
+  {
+  Mat<eT> x(5, 5);
+  x.fill(eT(10));
+
+  Mat<eT> y = log(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(std::log(eT(x(r, c))))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_log")
+  {
+  test_eop_log<float>();
+  test_eop_log<double>();
+  test_eop_log<u32>();
+  test_eop_log<s32>();
+  test_eop_log<u64>();
+  test_eop_log<s64>();
+  }
+
+
+
+template<typename eT>
+void test_eop_exp()
+  {
+  Mat<eT> x(5, 5);
+  x.fill(eT(3));
+
+  Mat<eT> y = exp(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(std::exp(eT(x(r, c))))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_exp")
+  {
+  test_eop_exp<float>();
+  test_eop_exp<double>();
+  test_eop_exp<u32>();
+  test_eop_exp<s32>();
+  test_eop_exp<u64>();
+  test_eop_exp<s64>();
+  }
