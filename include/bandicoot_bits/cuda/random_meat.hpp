@@ -19,7 +19,42 @@ inline
 void
 fill_randu(dev_mem_t<eT> dest, const uword n)
   {
-  // TODO: this only works for floats
+  coot_extra_debug_sigprint();
+
+  if (n == 0) { return; }
+
+  // This generic implementation for any type is a joke!
+  // TODO: replace it with something that doesn't suck
+
+  // Generate n random numbers.
+  eT* cpu_rand = new eT[n];
+
+  std::mt19937 gen;
+  std::uniform_real_distribution<eT> u_distr;
+  for (uword i = 0; i < n; ++i)
+    {
+    cpu_rand[i] = u_distr(gen);
+    }
+
+  // Now push it to the device.
+  cudaError_t result = cudaMemcpy(dest.cuda_mem_ptr, cpu_rand, n, cudaMemcpyHostToDevice);
+
+  coot_check_cuda_error(result, "cuda::fill_randu(): couldn't access device memory");
+
+  delete cpu_rand;
+  }
+
+
+
+template<>
+inline
+void
+fill_randu(dev_mem_t<float> dest, const uword n)
+  {
+  coot_extra_debug_sigprint();
+
+  if (n == 0) { return; }
+
   curandGenerateUniform(get_rt().cuda_rt.randGen, dest.cuda_mem_ptr, n);
   }
 
@@ -30,7 +65,42 @@ inline
 void
 fill_randn(dev_mem_t<eT> dest, const uword n)
   {
-  // TODO: this only works for floats
+  coot_extra_debug_sigprint();
+
+  if (n == 0) { return; }
+
+  // This generic implementation for any type is a joke!
+  // TODO: replace it with something that doesn't suck
+
+  // Generate n random numbers.
+  eT* cpu_rand = new eT[n];
+
+  std::mt19937 gen;
+  std::normal_distribution<eT> n_distr;
+  for (uword i = 0; i < n; ++i)
+    {
+    cpu_rand[i] = n_distr(gen);
+    }
+
+  // Now push it to the device.
+  cudaError_t result = cudaMemcpy(dest.cuda_mem_ptr, cpu_rand, n, cudaMemcpyHostToDevice);
+
+  coot_check_cuda_error(result, "cuda::fill_randu(): couldn't access device memory");
+
+  delete cpu_rand;
+  }
+
+
+
+template<>
+inline
+void
+fill_randn(dev_mem_t<float> dest, const uword n)
+  {
+  coot_extra_debug_sigprint();
+
+  if (n == 0) { return; }
+
   curandGenerateNormal(get_rt().cuda_rt.randGen, dest.cuda_mem_ptr, n, 0.0, 1.0);
   }
 
