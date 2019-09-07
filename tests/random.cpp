@@ -81,5 +81,5 @@ void test_randn()
 TEST_CASE("randn_1")
   {
   test_randn<float>();
-//  test_randn<double>();
+  test_randn<double>();
   }
