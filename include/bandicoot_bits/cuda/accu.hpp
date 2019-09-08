@@ -91,8 +91,7 @@ accu_chunked(dev_mem_t<eT> mem, const uword n_elem)
 
   coot_check_cuda_error(result2, "cuda::accu_chunked(): cuLaunchKernel() failed");
 
-  return tmp(0);
-
+  return eT(tmp(0));
   }
 
 
@@ -130,7 +129,7 @@ accu_simple(dev_mem_t<eT> mem, const uword n_elem)
 
   coot_check_cuda_error(result2, "cuda::accu_simple(): cuLaunchKernel() failed");
 
-  return tmp(0);
+  return eT(tmp(0));
   }
 
 
