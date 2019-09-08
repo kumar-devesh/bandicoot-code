@@ -38,12 +38,12 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
 
   if(is_float<eT>::value)
     {
-    std::cout << "using float" << std::endl;
+//    std::cout << "using float" << std::endl;
     status = magma_spotrf_gpu(MagmaUpper, n_rows, mem.cl_mem_ptr, n_rows, &info);
     }
   else if(is_double<eT>::value)
     {
-    std::cout << "using double" << std::endl;
+//    std::cout << "using double" << std::endl;
     status = magma_dpotrf_gpu(MagmaUpper, n_rows, mem.cl_mem_ptr, n_rows, &info);
     }
   else
