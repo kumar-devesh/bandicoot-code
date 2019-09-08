@@ -83,3 +83,19 @@ coot_rt_t::release_memory(dev_mem_t<eT> dev_mem)
     cuda_rt.release_memory(dev_mem.cuda_mem_ptr);
     }
   }
+
+
+
+inline
+void
+coot_rt_t::synchronize()
+  {
+  if (backend == CL_BACKEND)
+    {
+    cl_rt.synchronize();
+    }
+  else
+    {
+    cuda_rt.synchronize();
+    }
+  }

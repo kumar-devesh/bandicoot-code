@@ -111,6 +111,8 @@ class runtime_t
   inline cl_mem acquire_memory(const uword n_elem);
   
   inline void release_memory(cl_mem dev_mem);
+
+  inline void synchronize();
   
   inline cl_device_id     get_device();
   inline cl_context       get_context();

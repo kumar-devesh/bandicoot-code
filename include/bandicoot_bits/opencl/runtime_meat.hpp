@@ -841,6 +841,15 @@ runtime_t::release_memory(cl_mem dev_mem)
 
 
 inline
+void
+runtime_t::synchronize()
+  {
+  clFinish(get_cq());
+  }
+
+
+
+inline
 cl_device_id
 runtime_t::get_device()
   {

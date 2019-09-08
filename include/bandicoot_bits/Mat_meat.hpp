@@ -86,9 +86,8 @@ dev_mem_t<eT>
 Mat<eT>::get_dev_mem(const bool sync) const
   {
   coot_extra_debug_sigprint();
-  
-  // RC-TODO: handle CUDA case correctly?
-  if(sync && get_rt().backend == CL_BACKEND)  { clFinish(get_rt().cl_rt.get_cq()); } // force synchronisation
+
+  if (sync) { get_rt().synchronize(); }
   
   return dev_mem;
   }

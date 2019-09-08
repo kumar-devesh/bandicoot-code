@@ -61,6 +61,8 @@ class coot_rt_t
   template<typename eT>
   inline void release_memory(dev_mem_t<eT> dev_mem);
 
+  inline void synchronize();
+
   // RC-TODO: unified interface for some other operations?
   };
 

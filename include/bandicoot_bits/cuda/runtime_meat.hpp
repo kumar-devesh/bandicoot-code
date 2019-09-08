@@ -219,3 +219,12 @@ runtime_t::release_memory(eT* cuda_mem)
     coot_check_cuda_error(error, "cuda::release_memory(): couldn't free memory");
     }
   }
+
+
+
+inline
+void
+runtime_t::synchronize()
+  {
+  cuCtxSynchronize();
+  }
