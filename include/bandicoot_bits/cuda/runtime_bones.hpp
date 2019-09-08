@@ -39,6 +39,8 @@ struct runtime_t
 
   curandGenerator_t randGen;
 
+  inline bool is_valid() const { return valid; }
+
   private:
 
   coot_aligned bool                     valid;
