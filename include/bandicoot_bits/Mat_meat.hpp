@@ -105,12 +105,11 @@ Mat<eT>::copy_from_dev_mem(eT* dest_cpu_memptr, const uword N) const
 
   const uword n_elem_mod = (std::min)(n_elem, N);
 
-  // RC-TODO: handle CUDA case
   if (get_rt().backend == CUDA_BACKEND)
     {
     cudaError_t error = cudaMemcpy(dest_cpu_memptr, dev_mem.cuda_mem_ptr, n_elem_mod * sizeof(eT), cudaMemcpyDeviceToHost);
-    if (error != cudaSuccess)
-      std::cout << "cudaMemcpy() failed with error code " << error << "\n";
+
+    coot_check_cuda_error(error, "Mat::copy_from_dev_mem(): couldn't access device memory");
     }
   else
     {
@@ -131,19 +130,25 @@ void
 Mat<eT>::copy_into_dev_mem(const eT* src_cpu_memptr, const uword N)
   {
   coot_extra_debug_sigprint();
-  
-  // RC-TODO: handle CUDA case
 
   if( (n_elem == 0) || (N == 0) )  { return; }
-  
-  opencl::runtime_t::cq_guard guard;
-  
+
   const uword n_elem_mod = (std::min)(n_elem, N);
-  
-  // use a blocking call
-  cl_int status = clEnqueueWriteBuffer(get_rt().cl_rt.get_cq(), dev_mem.cl_mem_ptr, CL_TRUE, 0, sizeof(eT)*n_elem_mod, src_cpu_memptr, 0, NULL, NULL);
-  
-  coot_check_runtime_error( (status != CL_SUCCESS), "Mat::write_dev_mem(): couldn't access device memory" );
+
+  if (get_rt().backend == CUDA_BACKEND)
+    {
+    cudaError_t error = cudaMemcpy(dev_mem.cuda_mem_ptr, src_cpu_memptr, n_elem_mod * sizeof(eT), cudaMemcpyHostToDevice);
+
+    coot_check_cuda_error(error, "Mat::copy_into_dev_mem(): couldn't access device memory");
+    }
+  else
+    {
+    opencl::runtime_t::cq_guard guard;
+    // use a blocking call
+    cl_int status = clEnqueueWriteBuffer(get_rt().cl_rt.get_cq(), dev_mem.cl_mem_ptr, CL_TRUE, 0, sizeof(eT)*n_elem_mod, src_cpu_memptr, 0, NULL, NULL);
+
+    coot_check_runtime_error( (status != CL_SUCCESS), "Mat::write_dev_mem(): couldn't access device memory" );
+    }
   }
 
 

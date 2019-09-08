@@ -302,3 +302,70 @@ TEST_CASE("mat_copy")
   }
 
 
+template<typename eT>
+void test_copy_from_dev_mem()
+  {
+  Mat<eT> x(5, 5);
+  for (uword i = 0; i < 25; ++i)
+    {
+    x(i) = i;
+    }
+
+  eT* cpu_mem = new eT[25];
+
+  x.copy_from_dev_mem(cpu_mem, 25);
+
+  for (uword i = 0; i < 25; ++i)
+    {
+    REQUIRE( cpu_mem[i] == Approx(eT(i)) );
+    }
+
+  delete cpu_mem;
+  }
+
+
+
+TEST_CASE("mat_copy_from_dev_mem")
+  {
+  test_copy_from_dev_mem<float>();
+  test_copy_from_dev_mem<double>();
+  test_copy_from_dev_mem<u32>();
+  test_copy_from_dev_mem<s32>();
+  test_copy_from_dev_mem<u64>();
+  test_copy_from_dev_mem<s64>();
+  }
+
+
+
+template<typename eT>
+void test_copy_into_dev_mem()
+  {
+  eT* cpu_mem = new eT[25];
+
+  for (uword i = 0; i < 25; ++i)
+    {
+    cpu_mem[i] = eT(i);
+    }
+
+  Mat<eT> x(5, 5);
+  x.copy_into_dev_mem(cpu_mem, 25);
+
+  for (uword i = 0; i < 25; ++i)
+    {
+    REQUIRE( eT(x(i)) == Approx(eT(i)) );
+    }
+
+  delete cpu_mem;
+  }
+
+
+
+TEST_CASE("mat_copy_to_dev_mem")
+  {
+  test_copy_into_dev_mem<float>();
+  test_copy_into_dev_mem<double>();
+  test_copy_into_dev_mem<u32>();
+  test_copy_into_dev_mem<s32>();
+  test_copy_into_dev_mem<u64>();
+  test_copy_into_dev_mem<s64>();
+  }
