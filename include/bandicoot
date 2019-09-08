@@ -184,6 +184,7 @@ namespace coot
     #include "bandicoot_bits/opencl/eop_core_meat.hpp"
     #include "bandicoot_bits/opencl/accu.hpp"
     #include "bandicoot_bits/opencl/chol.hpp"
+    #include "bandicoot_bits/opencl/trace.hpp"
     }
 
   namespace cuda
@@ -196,6 +197,7 @@ namespace coot
     #include "bandicoot_bits/cuda/eop_core_meat.hpp"
     #include "bandicoot_bits/cuda/accu.hpp"
     #include "bandicoot_bits/cuda/chol.hpp"
+    #include "bandicoot_bits/cuda/trace.hpp"
     }
   
   //
