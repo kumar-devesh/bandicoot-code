@@ -452,7 +452,35 @@ coot_check_nvrtc_error(const nvrtcResult error_code, const T1& x)
   {
   if (error_code != NVRTC_SUCCESS)
     {
-    coot_stop_runtime_error( x, cuda::error_as_string(error_code));
+    coot_stop_runtime_error( x, cuda::error_as_string(error_code) );
+    }
+  }
+
+
+
+template<typename T1>
+coot_hot
+inline
+void
+coot_check_magma_error(const magma_int_t error_code, const T1& x)
+  {
+  if (error_code != 0)
+    {
+    coot_stop_runtime_error( x, magma::error_as_string(error_code) );
+    }
+  }
+
+
+
+template<typename T1>
+coot_hot
+inline
+void
+coot_check_cusolver_error(const cusolverStatus_t error_code, const T1& x)
+  {
+  if (error_code != CUSOLVER_STATUS_SUCCESS)
+    {
+    coot_stop_runtime_error( x, cuda::error_as_string(error_code) );
     }
   }
 

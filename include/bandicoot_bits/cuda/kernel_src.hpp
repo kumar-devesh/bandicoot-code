@@ -76,6 +76,8 @@ get_cuda_kernel_names()
   names.push_back("submat_sum_colwise");
   names.push_back("submat_sum_rowwise");
 
+  names.push_back("ltri_set_zero");
+
   return names;
   }
 
@@ -189,8 +191,8 @@ get_cuda_kernel_src()
   "\n"
   "__global__ void COOT_FN(PREFIX,submat_inplace_set_mat)(eT* out, const eT* A, const UWORD out_start_row, const UWORD out_start_col, const UWORD out_n_rows, const UWORD A_n_rows, const UWORD A_n_cols) \n"
   "  { \n"
-  "  const UWORD row = blockIdx.x; \n"  // row in source matrix
-  "  const UWORD col = threadIdx.x; \n"  // col in source matrix
+  "  const UWORD row = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  const UWORD col = blockIdx.y * blockDim.y + threadIdx.y; \n"
   "  if( (row <= A_n_rows) && (col <= A_n_cols) ) \n"
   "    { \n"
   "    const UWORD out_index = (out_start_row + row) + ((out_start_col + col) * out_n_rows); \n"
@@ -201,8 +203,8 @@ get_cuda_kernel_src()
   "\n"
   "__global__ void COOT_FN(PREFIX,submat_inplace_plus_mat)(eT* out, const eT* A, const UWORD out_start_row, const UWORD out_start_col, const UWORD out_n_rows, const UWORD A_n_rows, const UWORD A_n_cols) \n"
   "  { \n"
-  "  const UWORD row = blockIdx.x; \n"  // row in source matrix
-  "  const UWORD col = threadIdx.x; \n"  // col in source matrix
+  "  const UWORD row = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  const UWORD col = blockIdx.y * blockDim.y + threadIdx.y; \n"
   "  if( (row <= A_n_rows) && (col <= A_n_cols) ) \n"
   "    { \n"
   "    const UWORD out_index = (out_start_row + row) + ((out_start_col + col) * out_n_rows); \n"
@@ -213,8 +215,8 @@ get_cuda_kernel_src()
   "\n"
   "__global__ void COOT_FN(PREFIX,submat_inplace_minus_mat)(eT* out, const eT* A, const UWORD out_start_row, const UWORD out_start_col, const UWORD out_n_rows, const UWORD A_n_rows, const UWORD A_n_cols) \n"
   "  { \n"
-  "  const UWORD row = blockIdx.x; \n"  // row in source matrix
-  "  const UWORD col = threadIdx.x; \n"  // col in source matrix
+  "  const UWORD row = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  const UWORD col = blockIdx.y * blockDim.y + threadIdx.y; \n"
   "  if( (row <= A_n_rows) && (col <= A_n_cols) ) \n"
   "    { \n"
   "    const UWORD out_index = (out_start_row + row) + ((out_start_col + col) * out_n_rows); \n"
@@ -225,8 +227,8 @@ get_cuda_kernel_src()
   "\n"
   "__global__ void COOT_FN(PREFIX,submat_inplace_schur_mat)(eT* out, const eT* A, const UWORD out_start_row, const UWORD out_start_col, const UWORD out_n_rows, const UWORD A_n_rows, const UWORD A_n_cols) \n"
   "  { \n"
-  "  const UWORD row = blockIdx.x; \n"  // row in source matrix
-  "  const UWORD col = threadIdx.x; \n"  // col in source matrix
+  "  const UWORD row = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  const UWORD col = blockIdx.y * blockDim.y + threadIdx.y; \n"
   "  if( (row <= A_n_rows) && (col <= A_n_cols) ) \n"
   "    { \n"
   "    const UWORD out_index = (out_start_row + row) + ((out_start_col + col) * out_n_rows); \n"
@@ -237,8 +239,8 @@ get_cuda_kernel_src()
   "\n"
   "__global__ void COOT_FN(PREFIX,submat_inplace_div_mat)(eT* out, const eT* A, const UWORD out_start_row, const UWORD out_start_col, const UWORD out_n_rows, const UWORD A_n_rows, const UWORD A_n_cols) \n"
   "  { \n"
-  "  const UWORD row = blockIdx.x; \n"  // row in source matrix
-  "  const UWORD col = threadIdx.x; \n"  // col in source matrix
+  "  const UWORD row = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  const UWORD col = blockIdx.y * blockDim.y + threadIdx.y; \n"
   "  if( (row <= A_n_rows) && (col <= A_n_cols) ) \n"
   "    { \n"
   "    const UWORD out_index = (out_start_row + row) + ((out_start_col + col) * out_n_rows); \n"
@@ -344,8 +346,8 @@ get_cuda_kernel_src()
   "\n"
   "__global__ void COOT_FN(PREFIX,inplace_set_eye)(eT* out, const UWORD n_rows, const UWORD n_cols) \n"
   "  { \n"
-  "  const UWORD row = blockIdx.x; \n" // TODO: is this right?
-  "  const UWORD col = threadIdx.x; \n"
+  "  const UWORD row = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  const UWORD col = blockIdx.y * blockDim.y + threadIdx.y; \n"
   "  if( (row < n_rows) && (col < n_cols) ) \n"
   "    { \n"
   "    const UWORD offset = row + col*n_rows; \n"
@@ -466,6 +468,17 @@ get_cuda_kernel_src()
   "    for(UWORD i=0; i < sub_n_cols; ++i) \n"
   "      { acc += A[(i+start_col)*A_n_rows + (row+start_row)]; } \n"
   "    out[row] = acc; \n"
+  "    } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,ltri_set_zero)(eT* out, const UWORD n_rows, const UWORD n_cols) \n"
+  "  { \n"
+  "  const UWORD row = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  const UWORD col = blockIdx.y * blockDim.y + threadIdx.y; \n"
+  "  const UWORD index = col * n_rows + row; \n"
+  "  if ( (row < n_rows) && (col < n_cols) && (row > col) ) \n"
+  "    { \n"
+  "    out[index] = (eT)(0); \n"
   "    } \n"
   "  } \n"
   "\n"

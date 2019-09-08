@@ -69,6 +69,7 @@
   #include <cublas_v2.h>
   #include <nvrtc.h>
   #include <curand.h>
+  #include <cusolverDn.h>
 #endif
 
 // TODO: include any stuff here that is not meant to be in the coot namespace
@@ -95,6 +96,7 @@ namespace coot
   #include "bandicoot_bits/access.hpp"
   #include "bandicoot_bits/span.hpp"
   #include "bandicoot_bits/constants.hpp"
+  #include "bandicoot_bits/magma_bones.hpp"
   
   //
   // runtime
@@ -113,6 +115,11 @@ namespace coot
     #include "bandicoot_bits/cuda/runtime_bones.hpp"
     #include "bandicoot_bits/cuda/kernel_src.hpp"
     #include "bandicoot_bits/cuda/error.hpp"
+    }
+
+  namespace magma
+    {
+    #include "bandicoot_bits/magma.hpp"
     }
 
   #include "bandicoot_bits/coot_rt_bones.hpp"
@@ -176,6 +183,7 @@ namespace coot
     #include "bandicoot_bits/opencl/random_meat.hpp"
     #include "bandicoot_bits/opencl/eop_core_meat.hpp"
     #include "bandicoot_bits/opencl/accu.hpp"
+    #include "bandicoot_bits/opencl/chol.hpp"
     }
 
   namespace cuda
@@ -187,6 +195,7 @@ namespace coot
     #include "bandicoot_bits/cuda/random_meat.hpp"
     #include "bandicoot_bits/cuda/eop_core_meat.hpp"
     #include "bandicoot_bits/cuda/accu.hpp"
+    #include "bandicoot_bits/cuda/chol.hpp"
     }
   
   //

@@ -450,6 +450,16 @@ kernel_src::init_source()
   "    } \n"
   "  } \n"
   "\n"
+  "__kernel void COOT_FN(PREFIX,ltri_set_zero)(__global eT* out, const UWORD n_rows, const UWORD n_cols)\n"
+  "  { \n"
+  "  const UWORD row = get_global_id(0); \n"
+  "  const UWORD col = get_global_id(1); \n"
+  "  const UWORD index = row + n_rows * col; \n"
+  "  if( (row < n_rows) && (col < n_cols) && (row > col) ) \n"
+  "    { \n"
+  "    out[index] = (eT)(0); \n"
+  "    } \n"
+  "  }\n"
   ;
   
   return source;

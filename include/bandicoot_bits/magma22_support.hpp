@@ -57,109 +57,14 @@ check_error(const cl_int error_code)
   }
 
 
-
-// -----------------------------------------------------------------------------
-// Return codes
-// LAPACK argument errors are < 0 but > MAGMA_ERR.
-// MAGMA errors are < MAGMA_ERR.
-
-#define MAGMA_SUCCESS               0       ///< operation was successful
-#define MAGMA_ERR                  -100     ///< unspecified error
-#define MAGMA_ERR_NOT_INITIALIZED  -101     ///< magma_init() was not called
-#define MAGMA_ERR_REINITIALIZED    -102     // unused
-#define MAGMA_ERR_NOT_SUPPORTED    -103     ///< not supported on this GPU
-#define MAGMA_ERR_ILLEGAL_VALUE    -104     // unused
-#define MAGMA_ERR_NOT_FOUND        -105     ///< file not found
-#define MAGMA_ERR_ALLOCATION       -106     // unused
-#define MAGMA_ERR_INTERNAL_LIMIT   -107     // unused
-#define MAGMA_ERR_UNALLOCATED      -108     // unused
-#define MAGMA_ERR_FILESYSTEM       -109     // unused
-#define MAGMA_ERR_UNEXPECTED       -110     // unused
-#define MAGMA_ERR_SEQUENCE_FLUSHED -111     // unused
-#define MAGMA_ERR_HOST_ALLOC       -112     ///< could not malloc CPU host memory
-#define MAGMA_ERR_DEVICE_ALLOC     -113     ///< could not malloc GPU device memory
-#define MAGMA_ERR_CUDASTREAM       -114     // unused
-#define MAGMA_ERR_INVALID_PTR      -115     ///< can't free invalid pointer
-#define MAGMA_ERR_UNKNOWN          -116     ///< unspecified error
-#define MAGMA_ERR_NOT_IMPLEMENTED  -117     ///< not implemented yet
-#define MAGMA_ERR_NAN              -118     ///< NaN (not-a-number) detected
-
-
-#define MagmaUpperStr         "Upper"
-#define MagmaLowerStr         "Lower"
-#define MagmaFullStr          "Full"
-
-#define MagmaNonUnitStr       "NonUnit"
-#define MagmaUnitStr          "Unit"
-
-#define MagmaForwardStr       "Forward"
-#define MagmaBackwardStr      "Backward"
-
-#define MagmaColumnwiseStr    "Columnwise"
-#define MagmaRowwiseStr       "Rowwise"
-
-typedef enum {
-    MagmaUpper         = 121,
-    MagmaLower         = 122,
-    MagmaFull          = 123,  /* lascl, laset */
-    MagmaHessenberg    = 124   /* lascl */
-} magma_uplo_t;
-
-
-typedef enum {
-    MagmaLeft          = 141,
-    MagmaRight         = 142,
-    MagmaBothSides     = 143   /* trevc */
-} magma_side_t;
-
-
-typedef enum {
-    MagmaNoTrans       = 111,
-    MagmaTrans         = 112,
-    MagmaConjTrans     = 113,
-    Magma_ConjTrans    = MagmaConjTrans
-} magma_trans_t;
-
-typedef enum {
-    MagmaNonUnit       = 131,
-    MagmaUnit          = 132
-} magma_diag_t;
-
-typedef enum {
-    MagmaForward       = 391,  /* larfb */
-    MagmaBackward      = 392
-} magma_direct_t;
-
-typedef enum {
-    MagmaColumnwise    = 401,  /* larfb */
-    MagmaRowwise       = 402
-} magma_storev_t;
-
-typedef int magma_int_t;
-
-typedef cl_mem magma_ptr;
-typedef cl_mem magmaInt_ptr;
-typedef cl_mem magmaIndex_ptr;
-typedef cl_mem magmaFloat_ptr;
-typedef cl_mem magmaDouble_ptr;
-typedef cl_mem magmaFloatComplex_ptr;
-typedef cl_mem magmaDoubleComplex_ptr;
-
-typedef cl_mem magma_const_ptr;
-typedef cl_mem magmaInt_const_ptr;
-typedef cl_mem magmaIndex_const_ptr;
-typedef cl_mem magmaFloat_const_ptr;
-typedef cl_mem magmaDouble_const_ptr;
-typedef cl_mem magmaFloatComplex_const_ptr;
-typedef cl_mem magmaDoubleComplex_const_ptr;
-
-typedef cl_command_queue  magma_queue_t;
-typedef cl_event          magma_event_t;
-typedef cl_device_id      magma_device_t;
-
 // TODO: refactor code to avoid using the following global variable
 // TODO: the code below seems to only write to get_g_event(); it's never read, meaning it's not used for waiting
-magma_event_t  *get_g_event();
+// This is stuffed into a singleton for now to avoid linking issues.
+inline magma_event_t* get_g_event()
+  {
+  static magma_event_t* g_event;
+  return g_event;
+  }
 
 
 /////////////////////

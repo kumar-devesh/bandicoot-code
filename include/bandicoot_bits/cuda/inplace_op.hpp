@@ -143,7 +143,7 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const size_t aux_row1, cons
     blockSize[0] = n_rows;
     blockSize[1] = std::floor((double) dev_prop.maxThreadsPerBlock / (double) n_rows);
 
-    gridSize[1] = std::ceil((double) n_cols / (double) gridSize[2]);
+    gridSize[1] = std::ceil((double) n_rows / (double) blockSize[1]);
     }
 
   CUresult result2 = cuLaunchKernel(

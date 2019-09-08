@@ -126,10 +126,10 @@ typedef cl_event          magma_event_t;
 // TODO: refactor code to avoid using the following global variable
 // TODO: the code below seems to only write to get_g_event(); it's never read, meaning it's not used for waiting
 // This is stuffed into a singleton for now to avoid linking issues.
-inline magma_event_t* get_get_g_event()()
+inline magma_event_t* get_g_event()
   {
   static magma_event_t* g_event;
-  return get_g_event();
+  return g_event;
   }
 
 

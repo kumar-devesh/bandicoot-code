@@ -25,51 +25,19 @@ bool
 chol(Mat<typename T1::elem_type>& out, const Base<typename T1::elem_type, T1>& X)
   {
   coot_extra_debug_sigprint();
-  
-  typedef typename T1::elem_type eT;
-  
-  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot_cl_rt not valid" );
-  
+
   out = X.get_ref();
-  
-  // TODO: check whether given matrix is square
-  
-  magma_int_t info   = 0;
-  magma_int_t status = 0;
-  
-  // using MAGMA 2.2
-  
-  // OpenCL uses opaque memory pointers which hide the underlying type,
-  // so we don't need to do template tricks or casting
-  
-  if(is_float<eT>::value)
+
+  if (get_rt().backend == CL_BACKEND)
     {
-    //std::cout << "using float" << std::endl;
-    status = magma_spotrf_gpu(MagmaUpper, out.n_rows, out.get_dev_mem(), out.n_rows, &info);
-    }
-  else if(is_double<eT>::value)
-    {
-    //std::cout << "using double" << std::endl;
-    status = magma_dpotrf_gpu(MagmaUpper, out.n_rows, out.get_dev_mem(), out.n_rows, &info);
+    return opencl::chol(out.get_dev_mem(), out.n_rows);
     }
   else
     {
-    coot_debug_check( true, "chol(): not implemented for given type" );
+    return cuda::chol(out.get_dev_mem(), out.n_rows);
     }
-  
-  
-  
-  
-  //// using MAGMA 1.3
-  //status = magma_dpotrf_gpu(MagmaUpper, out.n_rows, out.get_dev_mem(), 0, out.n_rows, get_rt().cl_rt.get_cq(), &info);
-  
-  
 
-  // TODO: check status
-  
-  // TODO: need to set the lower/upper triangular part (excluding the diagonal) to zero
-  
-  return true;
+  return false;
   }
 
 
