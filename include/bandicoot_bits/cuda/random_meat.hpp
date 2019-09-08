@@ -30,14 +30,14 @@ fill_randu(dev_mem_t<eT> dest, const uword n)
   eT* cpu_rand = new eT[n];
 
   std::mt19937 gen;
-  std::uniform_real_distribution<eT> u_distr;
+  std::uniform_real_distribution<eT> u_distr(eT(0), eT(1));
   for (uword i = 0; i < n; ++i)
     {
     cpu_rand[i] = u_distr(gen);
     }
 
   // Now push it to the device.
-  cudaError_t result = cudaMemcpy(dest.cuda_mem_ptr, cpu_rand, n, cudaMemcpyHostToDevice);
+  cudaError_t result = cudaMemcpy(dest.cuda_mem_ptr, cpu_rand, n * sizeof(eT), cudaMemcpyHostToDevice);
 
   coot_check_cuda_error(result, "cuda::fill_randu(): couldn't access device memory");
 
@@ -83,7 +83,7 @@ fill_randn(dev_mem_t<eT> dest, const uword n)
     }
 
   // Now push it to the device.
-  cudaError_t result = cudaMemcpy(dest.cuda_mem_ptr, cpu_rand, n, cudaMemcpyHostToDevice);
+  cudaError_t result = cudaMemcpy(dest.cuda_mem_ptr, cpu_rand, n * sizeof(eT), cudaMemcpyHostToDevice);
 
   coot_check_cuda_error(result, "cuda::fill_randu(): couldn't access device memory");
 
