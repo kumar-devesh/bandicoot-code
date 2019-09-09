@@ -1343,26 +1343,21 @@ const Mat<eT>&
 Mat<eT>::eye()
   {
   coot_extra_debug_sigprint();
-  
-  opencl::runtime_t::cq_guard guard;
-  
-  opencl::runtime_t::adapt_uword local_n_rows(n_rows);
-  opencl::runtime_t::adapt_uword local_n_cols(n_cols);
-  
-  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(kernel_id::inplace_set_eye);
-  
-  cl_int status = 0;
-  
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem),    &dev_mem.cl_mem_ptr      );
-  status |= clSetKernelArg(kernel, 1, local_n_rows.size, local_n_rows.addr);
-  status |= clSetKernelArg(kernel, 2, local_n_cols.size, local_n_cols.addr);
-  
-  const size_t global_work_size[2] = { size_t(n_rows), size_t(n_cols) };
-  
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 2, NULL, global_work_size, NULL, 0, NULL, NULL);
-  
-  coot_check_runtime_error( (status != 0), "Mat::eye(): couldn't execute kernel" );
-  
+
+  if (n_elem == 0)
+    {
+    return *this;
+    }
+
+  if (get_rt().backend == CUDA_BACKEND)
+    {
+    cuda::eye(dev_mem, n_rows, n_cols);
+    }
+  else
+    {
+    opencl::eye(dev_mem, n_rows, n_cols);
+    }
+
   return *this;
   }
 
