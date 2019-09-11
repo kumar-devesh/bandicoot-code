@@ -369,3 +369,71 @@ TEST_CASE("mat_copy_to_dev_mem")
   test_copy_into_dev_mem<u64>();
   test_copy_into_dev_mem<s64>();
   }
+
+
+
+template<typename eT>
+void test_val_proxy_ops()
+  {
+  Mat<eT> x(8, 8);
+  x.zeros();
+
+  x(1, 1) = eT(3);
+  x(1) = eT(2);
+
+  x(2, 2) += eT(5);
+  x(2) += eT(3);
+
+  x(3, 3) += eT(10);
+  x(3, 3) -= eT(5);
+  x(3) += eT(10);
+  x(3) -= eT(5);
+
+  x(4, 4) = eT(3);
+  x(4, 4) *= eT(2);
+  x(4) = eT(3);
+  x(4) *= eT(2);
+
+  x(5, 5) = eT(10);
+  x(5, 5) /= eT(2);
+  x(5) = eT(10);
+  x(5) /= eT(2);
+
+  REQUIRE( eT(x(1, 1)) == Approx(eT(3)) );
+  REQUIRE( eT(x(1)   ) == Approx(eT(2)) );
+  REQUIRE( eT(x(2, 2)) == Approx(eT(5)) );
+  REQUIRE( eT(x(2)   ) == Approx(eT(3)) );
+  REQUIRE( eT(x(3, 3)) == Approx(eT(5)) );
+  REQUIRE( eT(x(3)   ) == Approx(eT(5)) );
+  REQUIRE( eT(x(4, 4)) == Approx(eT(6)) );
+  REQUIRE( eT(x(4)   ) == Approx(eT(6)) );
+  REQUIRE( eT(x(5, 5)) == Approx(eT(5)) );
+  REQUIRE( eT(x(5)   ) == Approx(eT(5)) );
+
+  REQUIRE( eT(x(0)   ) == eT(0) );
+  REQUIRE( eT(x(6)   ) == eT(0) );
+  REQUIRE( eT(x(7)   ) == eT(0) );
+
+  for (uword c = 1; c < 8; ++c)
+    {
+    for (uword r = 0; r < 8; ++r)
+      {
+      if (r != c)
+        {
+        REQUIRE( eT(x(r, c)) == eT(0) );
+        }
+      }
+    }
+  }
+
+
+
+TEST_CASE("mat_val_proxy_ops_1")
+  {
+  test_val_proxy_ops<double>();
+  test_val_proxy_ops<float>();
+  test_val_proxy_ops<u32>();
+  test_val_proxy_ops<s32>();
+  test_val_proxy_ops<u64>();
+  test_val_proxy_ops<s64>();
+  }

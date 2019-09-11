@@ -46,7 +46,7 @@ get_val(const dev_mem_t<eT> mem, const uword index)
 template<typename eT>
 inline
 void
-set_val(const dev_mem_t<eT> mem, const uword index, const eT in_val)
+set_val(dev_mem_t<eT> mem, const uword index, const eT in_val)
   {
   coot_extra_debug_sigprint();
 
@@ -60,6 +60,66 @@ set_val(const dev_mem_t<eT> mem, const uword index, const eT in_val)
   coot_check_cuda_error(status, "cuda::set_val(): couldn't access device memory");
 
   cuCtxSynchronize();
+  }
+
+
+
+template<typename eT>
+inline
+void
+val_add_inplace(dev_mem_t<eT> mem, const uword index, const eT val)
+  {
+  coot_extra_debug_sigprint();
+
+  // We'll run a kernel with only one worker to update the index.
+  dev_mem_t<eT> tmp_mem;
+  tmp_mem.cuda_mem_ptr = mem.cuda_mem_ptr + index;
+  inplace_op_scalar(tmp_mem, val, 1, kernel_id::inplace_plus_scalar);
+  }
+
+
+
+template<typename eT>
+inline
+void
+val_minus_inplace(dev_mem_t<eT> mem, const uword index, const eT val)
+  {
+  coot_extra_debug_sigprint();
+
+  // We'll run a kernel with only one worker to update the index.
+  dev_mem_t<eT> tmp_mem;
+  tmp_mem.cuda_mem_ptr = mem.cuda_mem_ptr + index;
+  inplace_op_scalar(tmp_mem, val, 1, kernel_id::inplace_minus_scalar);
+  }
+
+
+
+template<typename eT>
+inline
+void
+val_mul_inplace(dev_mem_t<eT> mem, const uword index, const eT val)
+  {
+  coot_extra_debug_sigprint();
+
+  // We'll run a kernel with only one worker to update the index.
+  dev_mem_t<eT> tmp_mem;
+  tmp_mem.cuda_mem_ptr = mem.cuda_mem_ptr + index;
+  inplace_op_scalar(tmp_mem, val, 1, kernel_id::inplace_mul_scalar);
+  }
+
+
+
+template<typename eT>
+inline
+void
+val_div_inplace(dev_mem_t<eT> mem, const uword index, const eT val)
+  {
+  coot_extra_debug_sigprint();
+
+  // We'll run a kernel with only one worker to update the index.
+  dev_mem_t<eT> tmp_mem;
+  tmp_mem.cuda_mem_ptr = mem.cuda_mem_ptr + index;
+  inplace_op_scalar(tmp_mem, val, 1, kernel_id::inplace_div_scalar);
   }
 
 
