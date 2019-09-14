@@ -25,8 +25,5 @@ struct cuda_wrapper
 
   static void release_memory(void* memory);
 
-  template<typename eT, bool do_trans_A = false, bool do_trans_B = false>
-  static void gemm(Mat<eT>& C, const Mat<eT>& A, const Mat<eT>& B, eT alpha = eT(1.0), eT beta = eT(0.0));
-
   static void throw_unsupported();
   };

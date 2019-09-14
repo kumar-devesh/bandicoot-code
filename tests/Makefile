@@ -1,7 +1,7 @@
 
 #LIB_FLAGS = -lbandicoot
 #LIB_FLAGS = -lbandicoot -lOpenCL -lclBLAS -lnvrtc -lcudart -lcublas -lcuda
-LIB_FLAGS = -lOpenCL -lclBLAS -lnvrtc -lcudart -lcublas -lcuda -lcurand -lcusolver -llapack
+LIB_FLAGS = -lOpenCL -lclBLAS -lnvrtc -lcudart -lcublas -lcuda -lcurand -lcusolver -llapack -larmadillo
 
 CXX_FLAGS = -std=c++11 -Wshadow -Wall -pedantic -O0 -I../include/ -g
 #BACKEND = USE_CL_BACKEND
