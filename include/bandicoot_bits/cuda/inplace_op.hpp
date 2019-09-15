@@ -90,7 +90,7 @@ inplace_op_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem, kern
 template<typename eT>
 inline
 void
-inplace_op_subview(dev_mem_t<eT> dest, const eT val, const size_t aux_row1, const size_t aux_col1, const uword n_rows, const uword n_cols, const uword m_n_rows, kernel_id::enum_id num)
+inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const uword m_n_rows, kernel_id::enum_id num)
   {
   coot_extra_debug_sigprint();
 
@@ -158,5 +158,110 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const size_t aux_row1, cons
 
   cuCtxSynchronize();
   }
+
+
+
+/**
+ * Run a CUDA kernel on a subview where the operation involves another matrix.
+ */
+template<typename eT>
+inline
+void
+inplace_op_subview(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword M_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, kernel_id::enum_id num, const char* identifier)
+  {
+  coot_extra_debug_sigprint();
+
+  // Get kernel.
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(num);
+
+  cudaDeviceProp dev_prop;
+  cudaError_t result = cudaGetDeviceProperties(&dev_prop, 0);
+  coot_check_cuda_error(result, "cuda::inplace_op_subview(): couldn't get device properties");
+
+  const void* args[] = {
+      &(dest.cuda_mem_ptr),
+      &(src.cuda_mem_ptr),
+      (size_t*) &aux_row1,
+      (size_t*) &aux_col1,
+      (size_t*) &M_n_rows,
+      (size_t*) &n_rows,
+      (size_t*) &n_cols };
+
+  // Compute grid dimensions like the previous bit of code.
+  size_t blockSize[2] = { n_rows, n_cols };
+  size_t gridSize[2] = { 1, 1 };
+
+  const uword n_elem = n_rows * n_cols;
+
+  if (n_rows > dev_prop.maxThreadsPerBlock)
+    {
+    blockSize[0] = dev_prop.maxThreadsPerBlock;
+    blockSize[1] = 1;
+
+    gridSize[0] = std::ceil((double) n_rows / (double) dev_prop.maxThreadsPerBlock);
+    gridSize[1] = n_cols;
+    }
+  else if (n_elem > dev_prop.maxThreadsPerBlock)
+    {
+    blockSize[0] = n_rows;
+    blockSize[1] = std::floor((double) dev_prop.maxThreadsPerBlock / (double) n_rows);
+
+    gridSize[1] = std::ceil((double) n_rows / (double) blockSize[1]);
+    }
+
+  CUresult result2 = cuLaunchKernel(
+      kernel,
+      gridSize[0], gridSize[1], 1,
+      blockSize[0], blockSize[1], 1,
+      0, NULL,
+      (void**) args,
+      0);
+
+  coot_check_cuda_error(result2, std::string(identifier) + ": cuLaunchKernel() failed");
+
+  cuCtxSynchronize();
+  }
+
+
+
+/**
+ * Use CUDA to extract a subview into the place of a matrix.
+ */
+template<typename eT>
+inline
+void
+extract_subview(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword M_n_rows, const uword /* M_n_cols */, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols)
+  {
+  coot_extra_debug_sigprint();
+
+  // The width is in bytes, but the height is in number of columns.
+  // Note that the terminology here is transposed---"height" refers to columns and "width" refers to rows...
+  const size_t height = n_cols;
+  const size_t width = n_rows * sizeof(eT);
+
+  // wOffset is in bytes, but hOffset is number of columns.
+  const size_t h_offset = aux_col1;
+  const size_t w_offset = aux_row1 * sizeof(eT);
+
+  // s_pitch and d_pitch refer to the width in bytes of each column of the matrix.
+  const size_t s_pitch = M_n_rows * sizeof(eT);
+  const size_t d_pitch = n_rows * sizeof(eT);
+
+  // TODO: check that d_pitch or s_pitch isn't too big?
+  // TODO: check that memory does not overlap?
+
+  cudaError_t result = cudaMemcpy2D(
+      dest.cuda_mem_ptr,
+      d_pitch,
+      src.cuda_mem_ptr + aux_col1 * M_n_rows + aux_row1, // offset to right place
+      s_pitch,
+      width,
+      height,
+      cudaMemcpyDeviceToDevice);
+
+  coot_check_cuda_error(result, "subview::extract(): couldn't copy buffer");
+  }
+
+
 
 //! @}

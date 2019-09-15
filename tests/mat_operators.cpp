@@ -13,6 +13,7 @@
 // ------------------------------------------------------------------------
 
 #include <bandicoot>
+#include <armadillo>
 #include "catch.hpp"
 
 using namespace coot;
@@ -436,4 +437,253 @@ TEST_CASE("mat_val_proxy_ops_1")
   test_val_proxy_ops<s32>();
   test_val_proxy_ops<u64>();
   test_val_proxy_ops<s64>();
+  }
+
+
+
+template<typename eT>
+void test_submat_insertion()
+  {
+  arma::Mat<eT> cpu_x = arma::randi<arma::Mat<eT>>(25, 30, arma::distr_param(1, 100));
+  arma::Mat<eT> cpu_y = arma::randi<arma::Mat<eT>>(10, 15, arma::distr_param(100, 200));
+
+  Mat<eT> x(cpu_x);
+  Mat<eT> y(cpu_y);
+
+  cpu_x.submat(5, 5, 14, 19) = cpu_y;
+  x.submat(5, 5, 14, 19) = y;
+
+  for (uword c = 0; c < 30; ++c)
+    {
+    for (uword r = 0; r < 25; ++r)
+      {
+      REQUIRE( eT(x(r, c)) == Approx(eT(cpu_x(r, c))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("submat_insertion_1")
+  {
+  test_submat_insertion<float>();
+  test_submat_insertion<double>();
+  test_submat_insertion<u32>();
+  test_submat_insertion<s32>();
+  test_submat_insertion<u64>();
+  test_submat_insertion<s64>();
+  }
+
+
+
+template<typename eT>
+void test_submat_add()
+  {
+  arma::Mat<eT> cpu_x = arma::randi<arma::Mat<eT>>(25, 30, arma::distr_param(1, 100));
+  arma::Mat<eT> cpu_y = arma::randi<arma::Mat<eT>>(10, 15, arma::distr_param(100, 200));
+
+  Mat<eT> x(cpu_x);
+  Mat<eT> y(cpu_y);
+
+  cpu_x.submat(5, 5, 14, 19) += cpu_y;
+  x.submat(5, 5, 14, 19) += y;
+
+  for (uword c = 0; c < 30; ++c)
+    {
+    for (uword r = 0; r < 25; ++r)
+      {
+      REQUIRE( eT(x(r, c)) == Approx(eT(cpu_x(r, c))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("submat_add_1")
+  {
+  test_submat_add<float>();
+  test_submat_add<double>();
+  test_submat_add<u32>();
+  test_submat_add<s32>();
+  test_submat_add<u64>();
+  test_submat_add<s64>();
+  }
+
+
+
+template<typename eT>
+void test_submat_minus()
+  {
+  arma::Mat<eT> cpu_x = arma::randi<arma::Mat<eT>>(25, 30, arma::distr_param(1, 100));
+  arma::Mat<eT> cpu_y = arma::randi<arma::Mat<eT>>(10, 15, arma::distr_param(100, 200));
+
+  Mat<eT> x(cpu_x);
+  Mat<eT> y(cpu_y);
+
+  cpu_x.submat(5, 5, 14, 19) -= cpu_y;
+  x.submat(5, 5, 14, 19) -= y;
+
+  for (uword c = 0; c < 30; ++c)
+    {
+    for (uword r = 0; r < 25; ++r)
+      {
+      REQUIRE( eT(x(r, c)) == Approx(eT(cpu_x(r, c))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("submat_minus_1")
+  {
+  test_submat_minus<float>();
+  test_submat_minus<double>();
+  test_submat_minus<u32>();
+  test_submat_minus<s32>();
+  test_submat_minus<u64>();
+  test_submat_minus<s64>();
+  }
+
+
+
+template<typename eT>
+void test_submat_schur()
+  {
+  arma::Mat<eT> cpu_x = arma::randi<arma::Mat<eT>>(25, 30, arma::distr_param(1, 100));
+  arma::Mat<eT> cpu_y = arma::randi<arma::Mat<eT>>(10, 15, arma::distr_param(100, 200));
+
+  Mat<eT> x(cpu_x);
+  Mat<eT> y(cpu_y);
+
+  cpu_x.submat(5, 5, 14, 19) %= cpu_y;
+  x.submat(5, 5, 14, 19) %= y;
+
+  for (uword c = 0; c < 30; ++c)
+    {
+    for (uword r = 0; r < 25; ++r)
+      {
+      REQUIRE( eT(x(r, c)) == Approx(eT(cpu_x(r, c))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("submat_schur_1")
+  {
+  test_submat_schur<float>();
+  test_submat_schur<double>();
+  test_submat_schur<u32>();
+  test_submat_schur<s32>();
+  test_submat_schur<u64>();
+  test_submat_schur<s64>();
+  }
+
+
+
+template<typename eT>
+void test_submat_div()
+  {
+  arma::Mat<eT> cpu_x = arma::randi<arma::Mat<eT>>(25, 30, arma::distr_param(1000, 2000));
+  arma::Mat<eT> cpu_y = arma::randi<arma::Mat<eT>>(10, 15, arma::distr_param(10, 20));
+
+  Mat<eT> x(cpu_x);
+  Mat<eT> y(cpu_y);
+
+  cpu_x.submat(5, 5, 14, 19) /= cpu_y;
+  x.submat(5, 5, 14, 19) /= y;
+
+  for (uword c = 0; c < 30; ++c)
+    {
+    for (uword r = 0; r < 25; ++r)
+      {
+      REQUIRE( eT(x(r, c)) == Approx(eT(cpu_x(r, c))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("submat_div_1")
+  {
+  test_submat_div<float>();
+  test_submat_div<double>();
+  test_submat_div<u32>();
+  test_submat_div<s32>();
+  test_submat_div<u64>();
+  test_submat_div<s64>();
+  }
+
+
+
+template<typename eT>
+void test_submat_extract()
+  {
+  arma::Mat<eT> cpu_x = arma::randi<arma::Mat<eT>>(25, 30, arma::distr_param(1, 100));
+  arma::Mat<eT> cpu_y = arma::randi<arma::Mat<eT>>(10, 15, arma::distr_param(100, 200));
+
+  Mat<eT> x(cpu_x);
+  Mat<eT> y(cpu_y);
+
+  cpu_y = cpu_x.submat(5, 5, 14, 19);
+  y = x.submat(5, 5, 14, 19);
+
+  for (uword c = 0; c < 15; ++c)
+    {
+    for (uword r = 0; r < 10; ++r)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(cpu_y(r, c))) );
+      REQUIRE( eT(y(r, c)) == Approx(eT(x(r + 5, c + 5))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("submat_extract_1")
+  {
+  test_submat_extract<float>();
+  test_submat_extract<double>();
+  test_submat_extract<u32>();
+  test_submat_extract<s32>();
+  test_submat_extract<u64>();
+  test_submat_extract<s64>();
+  }
+
+
+
+template<typename eT>
+void test_submat_fill()
+  {
+  arma::Mat<eT> x(20, 20);
+  x.fill(eT(10));
+
+  x.submat(5, 6, 14, 15).fill(eT(2));
+
+  for (uword r = 0; r < 20; ++r)
+    {
+    for (uword c = 0; c < 20; ++c)
+      {
+      if (r >= 5 && r <= 14 && c >= 6 && c <= 15)
+        {
+        REQUIRE( eT(x(r, c)) == Approx(eT(2)) );
+        }
+      else
+        {
+        REQUIRE( eT(x(r, c)) == Approx(eT(10)) );
+        }
+      }
+    }
+  }
+
+
+
+TEST_CASE("submat_fill_1")
+  {
+  test_submat_fill<float>();
+  test_submat_fill<double>();
+  test_submat_fill<u32>();
+  test_submat_fill<s32>();
+  test_submat_fill<u64>();
+  test_submat_fill<s64>();
   }
