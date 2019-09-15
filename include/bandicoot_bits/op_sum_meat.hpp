@@ -151,8 +151,6 @@ op_sum::apply_noalias(Mat<eT>& out, const subview<eT>& sv, const uword dim)
     }
   
   
-  opencl::runtime_t::cq_guard guard;
-  
   if(dim == 0)
     {
     if (get_rt().backend == CL_BACKEND)
