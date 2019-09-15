@@ -112,7 +112,7 @@ class runtime_t
   
   inline void release_memory(cl_mem dev_mem);
 
-  inline void synchronize();
+  inline void synchronise();
   
   inline cl_device_id     get_device();
   inline cl_context       get_context();

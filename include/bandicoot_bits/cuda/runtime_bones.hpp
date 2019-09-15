@@ -37,7 +37,7 @@ struct runtime_t
   template<typename eT>
   inline void release_memory(eT* cuda_mem);
 
-  inline void synchronize();
+  inline void synchronise();
 
   curandGenerator_t randGen;
 

@@ -23,8 +23,8 @@ Mat<eT>::~Mat()
   {
   coot_extra_debug_sigprint_this(this);
   
-  opencl::runtime_t::cq_guard guard;  // force synchronisation, in case there are any pending commands
-  
+  coot_rt_t::synchronise();
+
   cleanup();
   
   coot_type_check(( is_supported_elem_type<eT>::value == false ));
@@ -87,7 +87,7 @@ Mat<eT>::get_dev_mem(const bool sync) const
   {
   coot_extra_debug_sigprint();
 
-  if (sync) { get_rt().synchronize(); }
+  if (sync) { get_rt().synchronise(); }
   
   return dev_mem;
   }
@@ -105,21 +105,7 @@ Mat<eT>::copy_from_dev_mem(eT* dest_cpu_memptr, const uword N) const
 
   const uword n_elem_mod = (std::min)(n_elem, N);
 
-  if (get_rt().backend == CUDA_BACKEND)
-    {
-    cudaError_t error = cudaMemcpy(dest_cpu_memptr, dev_mem.cuda_mem_ptr, n_elem_mod * sizeof(eT), cudaMemcpyDeviceToHost);
-
-    coot_check_cuda_error(error, "Mat::copy_from_dev_mem(): couldn't access device memory");
-    }
-  else
-    {
-    opencl::runtime_t::cq_guard guard;
-
-    // use a blocking call
-    const cl_int status = clEnqueueReadBuffer(get_rt().cl_rt.get_cq(), dev_mem.cl_mem_ptr, CL_TRUE, 0, sizeof(eT)*n_elem_mod, dest_cpu_memptr, 0, NULL, NULL);
-
-    coot_check_runtime_error( (status != CL_SUCCESS), "Mat::copy_from_dev_mem(): couldn't access device memory" );
-    }
+  coot_rt_t::copy_from_dev_mem(dest_cpu_memptr, dev_mem, n_elem_mod);
   }
 
 
@@ -135,20 +121,7 @@ Mat<eT>::copy_into_dev_mem(const eT* src_cpu_memptr, const uword N)
 
   const uword n_elem_mod = (std::min)(n_elem, N);
 
-  if (get_rt().backend == CUDA_BACKEND)
-    {
-    cudaError_t error = cudaMemcpy(dev_mem.cuda_mem_ptr, src_cpu_memptr, n_elem_mod * sizeof(eT), cudaMemcpyHostToDevice);
-
-    coot_check_cuda_error(error, "Mat::copy_into_dev_mem(): couldn't access device memory");
-    }
-  else
-    {
-    opencl::runtime_t::cq_guard guard;
-    // use a blocking call
-    cl_int status = clEnqueueWriteBuffer(get_rt().cl_rt.get_cq(), dev_mem.cl_mem_ptr, CL_TRUE, 0, sizeof(eT)*n_elem_mod, src_cpu_memptr, 0, NULL, NULL);
-
-    coot_check_runtime_error( (status != CL_SUCCESS), "Mat::write_dev_mem(): couldn't access device memory" );
-    }
+  coot_rt_t::copy_into_dev_mem(dev_mem, src_cpu_memptr, n_elem_mod);
   }
 
 
@@ -1349,14 +1322,7 @@ Mat<eT>::eye()
     return *this;
     }
 
-  if (get_rt().backend == CUDA_BACKEND)
-    {
-    cuda::eye(dev_mem, n_rows, n_cols);
-    }
-  else
-    {
-    opencl::eye(dev_mem, n_rows, n_cols);
-    }
+  coot_rt_t::eye(dev_mem, n_rows, n_cols);
 
   return *this;
   }

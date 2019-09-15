@@ -25,7 +25,7 @@ struct gemv
   static
   inline
   void
-  apply(Mat<eT>& y, const Mat<eT>& A, const Mat<eT>& x, const eT alpha = eT(1.0), const eT beta = eT(1.0))
+  apply(dev_mem_t<eT> y, const dev_mem_t<eT> A, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<eT> x, const eT alpha, const eT beta)
     {
     coot_extra_debug_sigprint();
 
@@ -37,7 +37,7 @@ struct gemv
   static
   inline
   void
-  apply(Mat<float>& y, const Mat<float>& A, const Mat<float>& x, const float alpha = 1.0f, const float beta = 1.0f)
+  apply(dev_mem_t<float> y, const dev_mem_t<float> A, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<float> x, const float alpha, const float beta)
     {
     coot_extra_debug_sigprint();
 
@@ -45,21 +45,17 @@ struct gemv
 
     const clblasTranspose transA = (do_trans_A) ? clblasTrans : clblasNoTrans;
 
-    const size_t M = size_t(A.n_rows);
-    const size_t N = size_t(A.n_cols);
+    const size_t M = size_t(A_n_rows);
+    const size_t N = size_t(A_n_cols);
 
-    const size_t lda = size_t(A.n_rows);
+    const size_t lda = size_t(A_n_rows);
     const size_t inc = size_t(1);
-
-    cl_mem A_mem = A.get_dev_mem(false).cl_mem_ptr;
-    cl_mem x_mem = x.get_dev_mem(false).cl_mem_ptr;
-    cl_mem y_mem = y.get_dev_mem(false).cl_mem_ptr;
 
     cl_command_queue queue = get_rt().cl_rt.get_cq();
 
     cl_int status = 0;
 
-    status |= clblasSgemv(clblasColumnMajor, transA, M, N, alpha, A_mem, 0, lda, x_mem, 0, inc, beta, y_mem, 0, inc, 1, &queue, 0, NULL, NULL);
+    status |= clblasSgemv(clblasColumnMajor, transA, M, N, alpha, A.cl_mem_ptr, 0, lda, x.cl_mem_ptr, 0, inc, beta, y.cl_mem_ptr, 0, inc, 1, &queue, 0, NULL, NULL);
     status |= clFlush(queue);
 
     coot_check_cl_error(status, "opencl::gemv(): eT = float");
@@ -70,7 +66,7 @@ struct gemv
   static
   inline
   void
-  apply(Mat<double>& y, const Mat<double>& A, const Mat<double>& x, const double alpha = 1.0, const double beta = 1.0)
+  apply(dev_mem_t<double> y, const dev_mem_t<double> A, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<double> x, const double alpha, const double beta)
     {
     coot_extra_debug_sigprint();
 
@@ -78,21 +74,17 @@ struct gemv
 
     const clblasTranspose transA = (do_trans_A) ? clblasTrans : clblasNoTrans;
 
-    const size_t M = size_t(A.n_rows);
-    const size_t N = size_t(A.n_cols);
+    const size_t M = size_t(A_n_rows);
+    const size_t N = size_t(A_n_cols);
 
-    const size_t lda = size_t(A.n_rows);
+    const size_t lda = size_t(A_n_rows);
     const size_t inc = size_t(1);
-
-    cl_mem A_mem = A.get_dev_mem(false).cl_mem_ptr;
-    cl_mem x_mem = x.get_dev_mem(false).cl_mem_ptr;
-    cl_mem y_mem = y.get_dev_mem(false).cl_mem_ptr;
 
     cl_command_queue queue = get_rt().cl_rt.get_cq();
 
     cl_int status = 0;
 
-    status |= clblasDgemv(clblasColumnMajor, transA, M, N, alpha, A_mem, 0, lda, x_mem, 0, inc, beta, y_mem, 0, inc, 1, &queue, 0, NULL, NULL);
+    status |= clblasDgemv(clblasColumnMajor, transA, M, N, alpha, A.cl_mem_ptr, 0, lda, x.cl_mem_ptr, 0, inc, beta, y.cl_mem_ptr, 0, inc, 1, &queue, 0, NULL, NULL);
     status |= clFlush(queue);
 
     coot_check_cl_error(status, "opencl::gemv(): eT = double");

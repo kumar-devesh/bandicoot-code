@@ -41,47 +41,19 @@ eglue_core<eglue_type>::apply(Mat<typename T1::elem_type>& out, const eGlue<T1, 
   
   if(is_same_type<eglue_type, eglue_plus >::yes)
     {
-    if(get_rt().backend == CL_BACKEND)
-      {
-      opencl::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), kernel_id::equ_array_plus_array);
-      }
-    else
-      {
-      cuda::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), kernel_id::equ_array_plus_array);
-      }
+    coot_rt_t::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), kernel_id::equ_array_plus_array);
     }
   else if(is_same_type<eglue_type, eglue_minus>::yes)
     {
-    if(get_rt().backend == CL_BACKEND)
-      {
-      opencl::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), kernel_id::equ_array_minus_array);
-      }
-    else
-      {
-      cuda::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), kernel_id::equ_array_minus_array);
-      }
+    coot_rt_t::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), kernel_id::equ_array_minus_array);
     }
   else if(is_same_type<eglue_type, eglue_div  >::yes)
     {
-    if(get_rt().backend == CL_BACKEND)
-      {
-      opencl::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), kernel_id::equ_array_div_array);
-      }
-    else
-      {
-      cuda::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), kernel_id::equ_array_div_array);
-      }
+    coot_rt_t::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), kernel_id::equ_array_div_array);
     }
   else if(is_same_type<eglue_type, eglue_schur>::yes)
     {
-    if(get_rt().backend == CL_BACKEND)
-      {
-      opencl::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), kernel_id::equ_array_mul_array);
-      }
-    else
-      {
-      cuda::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), kernel_id::equ_array_mul_array);
-      }
+    coot_rt_t::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), kernel_id::equ_array_mul_array);
     }
   }
 

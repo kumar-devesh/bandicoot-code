@@ -22,7 +22,7 @@ struct gemm
   static
   inline
   void
-  apply(Mat<eT>& C, const Mat<eT>& A, const Mat<eT>& B, eT alpha = eT(1.0), eT beta = eT(0.0))
+  apply(dev_mem_t<eT> C_mem, const uword C_n_rows, const uword C_n_cols, const dev_mem_t<eT> A_mem, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<eT> B_mem, eT alpha, eT beta)
     {
     coot_extra_debug_sigprint();
 
@@ -34,17 +34,13 @@ struct gemm
     cublasOperation_t trans_a = (do_trans_A) ? CUBLAS_OP_T : CUBLAS_OP_N;
     cublasOperation_t trans_b = (do_trans_B) ? CUBLAS_OP_T : CUBLAS_OP_N;
 
-    const int M = int(C.n_rows);
-    const int N = int(C.n_cols);
-    const int K = (do_trans_A) ? int(A.n_rows) : int(A.n_cols);
+    const int M = int(C_n_rows);
+    const int N = int(C_n_cols);
+    const int K = (do_trans_A) ? int(A_n_rows) : int(A_n_cols);
 
     const int lda = (do_trans_A) ? K : M;
     const int ldb = (do_trans_B) ? N : K;
-    const int ldc = int(C.n_rows);
-
-    const eT* A_mem = A.get_dev_mem(false).cuda_mem_ptr;
-    const eT* B_mem = B.get_dev_mem(false).cuda_mem_ptr;
-    eT* C_mem = C.get_dev_mem(false).cuda_mem_ptr;
+    const int ldc = int(C_n_rows);
 
     cublasStatus_t result;
 
@@ -57,12 +53,12 @@ struct gemm
                            N,
                            K,
                            (const float*) &alpha,
-                           (const float*) A_mem,
+                           (const float*) A_mem.cuda_mem_ptr,
                            lda,
-                           (const float*) B_mem,
+                           (const float*) B_mem.cuda_mem_ptr,
                            ldb,
                            (const float*) &beta,
-                           (float*) C_mem,
+                           (float*) C_mem.cuda_mem_ptr,
                            ldc);
       }
     else if (std::is_same<eT, double>::value)
@@ -74,12 +70,12 @@ struct gemm
                            N,
                            K,
                            (const double*) &alpha,
-                           (const double*) A_mem,
+                           (const double*) A_mem.cuda_mem_ptr,
                            lda,
-                           (const double*) B_mem,
+                           (const double*) B_mem.cuda_mem_ptr,
                            ldb,
                            (const double*) &beta,
-                           (double*) C_mem,
+                           (double*) C_mem.cuda_mem_ptr,
                            ldc);
       }
     else if (std::is_same<eT, std::complex<float>>::value)

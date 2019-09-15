@@ -169,8 +169,6 @@ namespace coot
   
   //
   // runtime
-  
-  #include "bandicoot_bits/coot_rt_meat.hpp"
 
   namespace opencl
     {
@@ -182,6 +180,7 @@ namespace coot
     #include "bandicoot_bits/opencl/eop_core_meat.hpp"
     #include "bandicoot_bits/opencl/accu.hpp"
     #include "bandicoot_bits/opencl/chol.hpp"
+    #include "bandicoot_bits/opencl/copy.hpp"
     #include "bandicoot_bits/opencl/trace.hpp"
     #include "bandicoot_bits/opencl/eye.hpp"
     #include "bandicoot_bits/opencl/gemm.hpp"
@@ -199,12 +198,15 @@ namespace coot
     #include "bandicoot_bits/cuda/eop_core_meat.hpp"
     #include "bandicoot_bits/cuda/accu.hpp"
     #include "bandicoot_bits/cuda/chol.hpp"
+    #include "bandicoot_bits/cuda/copy.hpp"
     #include "bandicoot_bits/cuda/trace.hpp"
     #include "bandicoot_bits/cuda/eye.hpp"
     #include "bandicoot_bits/cuda/gemm.hpp"
     #include "bandicoot_bits/cuda/gemv.hpp"
     #include "bandicoot_bits/cuda/sum.hpp"
     }
+
+  #include "bandicoot_bits/coot_rt_meat.hpp"
   
   //
   // classes that underlay metaprogramming 

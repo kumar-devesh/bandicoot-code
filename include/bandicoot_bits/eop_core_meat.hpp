@@ -53,14 +53,7 @@ eop_core<eop_type>::apply(Mat<typename T1::elem_type>& out, const eOp<T1, eop_ty
   dev_mem_t<eT> out_dev_mem = out.get_dev_mem(false);
   dev_mem_t<eT>   A_dev_mem =   A.get_dev_mem(false);
 
-  if (get_rt().backend == CUDA_BACKEND)
-    {
-    cuda::eop_scalar(out_dev_mem, A_dev_mem, out.get_n_elem(), x.aux, kernel_num);
-    }
-  else
-    {
-    opencl::eop_scalar(out_dev_mem, A_dev_mem, out.get_n_elem(), x.aux, kernel_num);
-    }
+  coot_rt_t::eop_scalar(out_dev_mem, A_dev_mem, out.get_n_elem(), x.aux, kernel_num);
   }
 
 

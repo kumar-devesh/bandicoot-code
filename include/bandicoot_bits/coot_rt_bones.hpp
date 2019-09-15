@@ -55,13 +55,100 @@ class coot_rt_t
   coot_rt_t&       operator=(const coot_rt_t&) = delete;
   #endif
 
-  template<typename eT>
-  inline dev_mem_t<eT> acquire_memory(const uword n_elem);
-  
-  template<typename eT>
-  inline void release_memory(dev_mem_t<eT> dev_mem);
+  /**
+   * all of the functions below here are redirected to the current backend that is in use
+   */
 
-  inline void synchronize();
+  template<typename eT>
+  static inline dev_mem_t<eT> acquire_memory(const uword n_elem);
+
+  template<typename eT>
+  static inline void release_memory(dev_mem_t<eT> dev_mem);
+
+  template<typename eT>
+  static inline void copy_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem);
+
+  template<typename eT>
+  static inline void inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, const kernel_id::enum_id num);
+
+  template<typename eT>
+  static inline void inplace_op_array(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword n_elem, const kernel_id::enum_id num);
+
+  template<typename eT>
+  static inline void inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const uword M_n_rows, const kernel_id::enum_id num);
+
+  template<typename eT>
+  static inline void inplace_op_subview(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword M_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const kernel_id::enum_id num, const char* identifier);
+
+  template<typename eT>
+  static inline void fill_randu(dev_mem_t<eT> dest, const uword n);
+
+  template<typename eT>
+  static inline void fill_randn(dev_mem_t<eT> dest, const uword n);
+
+  template<typename eT>
+  static inline void array_op(dev_mem_t<eT> dest, const uword n_elem, const dev_mem_t<eT> A_mem, const dev_mem_t<eT> B_mem, const kernel_id::enum_id num);
+
+  template<typename eT>
+  static inline void eop_scalar(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword n_elem, const eT aux_val, const kernel_id::enum_id num);
+
+  template<typename eT>
+  static inline eT accu_chunked(const dev_mem_t<eT> mem, const uword n_elem);
+
+  template<typename eT>
+  static inline eT accu_simple(const dev_mem_t<eT> mem, const uword n_elem);
+
+  template<typename eT>
+  static inline eT accu_subview(const dev_mem_t<eT> mem, const uword M_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols);
+
+  template<typename eT>
+  static inline bool chol(dev_mem_t<eT> out, const uword n_rows);
+
+  template<typename eT>
+  static inline void copy_from_dev_mem(eT* dest, const dev_mem_t<eT> src, const uword N);
+
+  template<typename eT>
+  static inline void copy_into_dev_mem(dev_mem_t<eT> dest, const eT* src, const uword N);
+
+  template<typename eT>
+  static inline void extract_subview(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword M_n_rows, const uword M_n_cols, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols);
+
+  template<typename eT>
+  static inline void eye(dev_mem_t<eT> out, const uword n_rows, const uword n_cols);
+
+  template<typename eT>
+  static inline eT get_val(const dev_mem_t<eT> mem, const uword index);
+
+  template<typename eT>
+  static inline void set_val(dev_mem_t<eT> mem, const uword index, const eT val);
+
+  template<typename eT> static inline void   val_add_inplace(dev_mem_t<eT> mem, const uword index, const eT val);
+  template<typename eT> static inline void val_minus_inplace(dev_mem_t<eT> mem, const uword index, const eT val);
+  template<typename eT> static inline void   val_mul_inplace(dev_mem_t<eT> mem, const uword index, const eT val);
+  template<typename eT> static inline void   val_div_inplace(dev_mem_t<eT> mem, const uword index, const eT val);
+
+  template<typename eT, const bool do_trans_A, const bool do_trans_B>
+  static inline void gemm(dev_mem_t<eT> C_mem, const uword C_n_rows, const uword C_n_cols, const dev_mem_t<eT> A_mem, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<eT> B_mem, const eT alpha, const eT beta);
+
+  template<typename eT, const bool do_trans_A>
+  static inline void gemv(dev_mem_t<eT> y_mem, const dev_mem_t<eT> A_mem, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<eT> x_mem, const eT alpha, const eT beta);
+
+  template<typename eT>
+  static inline void sum_colwise(dev_mem_t<eT> out_mem, const dev_mem_t<eT> A_mem, const uword n_rows, const uword n_cols);
+
+  template<typename eT>
+  static inline void sum_rowwise(dev_mem_t<eT> out_mem, const dev_mem_t<eT> A_mem, const uword n_rows, const uword n_cols);
+
+  template<typename eT>
+  static inline void sum_colwise_subview(dev_mem_t<eT> out_mem, const dev_mem_t<eT> A_mem, const uword A_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols);
+
+  template<typename eT>
+  static inline void sum_rowwise_subview(dev_mem_t<eT> out_mem, const dev_mem_t<eT> A_mem, const uword A_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols);
+
+  template<typename eT>
+  static inline eT trace(const dev_mem_t<eT> mem, const uword n_rows, const uword n_cols);
+
+  static inline void synchronise();
 
   // RC-TODO: unified interface for some other operations?
   };

@@ -102,26 +102,12 @@ op_sum::apply_noalias(Mat<eT>& out, const Mat<eT>& A, const uword dim)
   
   if(dim == 0)
     {
-    if (get_rt().backend == CL_BACKEND)
-      {
-      opencl::sum_colwise(out.get_dev_mem(false), A.get_dev_mem(false), A.n_rows, A.n_cols);
-      }
-    else
-      {
-      cuda::sum_colwise(out.get_dev_mem(false), A.get_dev_mem(false), A.n_rows, A.n_cols);
-      }
+    coot_rt_t::sum_colwise(out.get_dev_mem(false), A.get_dev_mem(false), A.n_rows, A.n_cols);
     }
   else
   if(dim == 1)
     {
-    if (get_rt().backend == CL_BACKEND)
-      {
-      opencl::sum_rowwise(out.get_dev_mem(false), A.get_dev_mem(false), A.n_rows, A.n_cols);
-      }
-    else
-      {
-      cuda::sum_rowwise(out.get_dev_mem(false), A.get_dev_mem(false), A.n_rows, A.n_cols);
-      }
+    coot_rt_t::sum_rowwise(out.get_dev_mem(false), A.get_dev_mem(false), A.n_rows, A.n_cols);
     }
   }
 
@@ -153,26 +139,12 @@ op_sum::apply_noalias(Mat<eT>& out, const subview<eT>& sv, const uword dim)
   
   if(dim == 0)
     {
-    if (get_rt().backend == CL_BACKEND)
-      {
-      opencl::sum_colwise_subview(out.get_dev_mem(false), sv.m.get_dev_mem(false), sv.m.n_rows, sv.aux_row1, sv.aux_col1, sv.n_rows, sv.n_cols);
-      }
-    else
-      {
-      cuda::sum_colwise_subview(out.get_dev_mem(false), sv.m.get_dev_mem(false), sv.m.n_rows, sv.aux_row1, sv.aux_col1, sv.n_rows, sv.n_cols);
-      }
+    coot_rt_t::sum_colwise_subview(out.get_dev_mem(false), sv.m.get_dev_mem(false), sv.m.n_rows, sv.aux_row1, sv.aux_col1, sv.n_rows, sv.n_cols);
     }
   else
   if(dim == 1)
     {
-    if (get_rt().backend == CL_BACKEND)
-      {
-      opencl::sum_rowwise_subview(out.get_dev_mem(false), sv.m.get_dev_mem(false), sv.m.n_rows, sv.aux_row1, sv.aux_col1, sv.n_rows, sv.n_cols);
-      }
-    else
-      {
-      cuda::sum_rowwise_subview(out.get_dev_mem(false), sv.m.get_dev_mem(false), sv.m.n_rows, sv.aux_row1, sv.aux_col1, sv.n_rows, sv.n_cols);
-      }
+    coot_rt_t::sum_rowwise_subview(out.get_dev_mem(false), sv.m.get_dev_mem(false), sv.m.n_rows, sv.aux_row1, sv.aux_col1, sv.n_rows, sv.n_cols);
     }
   }
 

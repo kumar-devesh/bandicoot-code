@@ -43,14 +43,9 @@ inline
 eT
 MatValProxy<eT>::get_val(const Mat<eT>& M, const uword index)
   {
-  if (get_rt().backend == CL_BACKEND)
-    {
-    return opencl::get_val(M.dev_mem, index);
-    }
-  else
-    {
-    return cuda::get_val(M.dev_mem, index);
-    }
+  coot_extra_debug_sigprint();
+
+  return coot_rt_t::get_val(M.dev_mem, index);
   }
 
 
@@ -62,14 +57,7 @@ MatValProxy<eT>::operator=(const eT in_val)
   {
   coot_extra_debug_sigprint();
 
-  if (get_rt().backend == CL_BACKEND)
-    {
-    opencl::set_val(M.dev_mem, index, in_val);
-    }
-  else
-    {
-    cuda::set_val(M.dev_mem, index, in_val);
-    }
+  coot_rt_t::set_val(M.dev_mem, index, in_val);
   }
 
 
@@ -81,14 +69,7 @@ MatValProxy<eT>::operator+=(const eT in_val)
   {
   coot_extra_debug_sigprint();
 
-  if (get_rt().backend == CL_BACKEND)
-    {
-    opencl::val_add_inplace(M.dev_mem, index, in_val);
-    }
-  else
-    {
-    cuda::val_add_inplace(M.dev_mem, index, in_val);
-    }
+  coot_rt_t::val_add_inplace(M.dev_mem, index, in_val);
   }
 
 
@@ -100,14 +81,7 @@ MatValProxy<eT>::operator-=(const eT in_val)
   {
   coot_extra_debug_sigprint();
 
-  if (get_rt().backend == CL_BACKEND)
-    {
-    opencl::val_minus_inplace(M.dev_mem, index, in_val);
-    }
-  else
-    {
-    cuda::val_minus_inplace(M.dev_mem, index, in_val);
-    }
+  coot_rt_t::val_minus_inplace(M.dev_mem, index, in_val);
   }
 
 
@@ -119,14 +93,7 @@ MatValProxy<eT>::operator*=(const eT in_val)
   {
   coot_extra_debug_sigprint();
 
-  if (get_rt().backend == CL_BACKEND)
-    {
-    opencl::val_mul_inplace(M.dev_mem, index, in_val);
-    }
-  else
-    {
-    cuda::val_mul_inplace(M.dev_mem, index, in_val);
-    }
+  coot_rt_t::val_mul_inplace(M.dev_mem, index, in_val);
   }
 
 
@@ -138,14 +105,7 @@ MatValProxy<eT>::operator/=(const eT in_val)
   {
   coot_extra_debug_sigprint();
 
-  if (get_rt().backend == CL_BACKEND)
-    {
-    opencl::val_div_inplace(M.dev_mem, index, in_val);
-    }
-  else
-    {
-    cuda::val_div_inplace(M.dev_mem, index, in_val);
-    }
+  coot_rt_t::val_div_inplace(M.dev_mem, index, in_val);
   }
 
 

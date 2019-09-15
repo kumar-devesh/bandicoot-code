@@ -12,9 +12,6 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-// RC-TODO: temporary
-#define COOT_USE_CUDA
-
 #if !defined(COOT_USE_LAPACK)
 #define COOT_USE_LAPACK
 //// Comment out the above line if you don't have LAPACK or a high-speed replacement for LAPACK,
@@ -64,6 +61,12 @@
 // #define COOT_EXTRA_DEBUG
 //// Uncomment the above line if you want to see the function traces of how Bandicoot evaluates expressions.
 //// This is mainly useful for debugging of the library.
+
+#if !defined(COOT_USE_CUDA)
+#define COOT_USE_CUDA
+//// Uncomment the above line if you have CUDA available on your system.
+//// Bandicoot requires CUDA, CUDART, cuBLAS, cuRAND, cuSolver, and NVRTC.
+#endif
 
 
 #if !defined(COOT_COUT_STREAM)

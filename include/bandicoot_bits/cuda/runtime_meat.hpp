@@ -224,7 +224,7 @@ runtime_t::release_memory(eT* cuda_mem)
 
 inline
 void
-runtime_t::synchronize()
+runtime_t::synchronise()
   {
   cuCtxSynchronize();
   }

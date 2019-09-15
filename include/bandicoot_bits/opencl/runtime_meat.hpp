@@ -842,7 +842,7 @@ runtime_t::release_memory(cl_mem dev_mem)
 
 inline
 void
-runtime_t::synchronize()
+runtime_t::synchronise()
   {
   clFinish(get_cq());
   }

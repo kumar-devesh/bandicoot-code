@@ -1,4 +1,4 @@
-// Copyright 2019 Ryan Curtin <ryan@ratml.org>
+// Copyright 2019 Ryan Curtin (http://www.ratml.org)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,19 +13,37 @@
 // ------------------------------------------------------------------------
 
 
-template<typename eT>
-inline void coot_rng::fill_randu(dev_mem_t<eT> dest, const uword n)
-  {
-  coot_extra_debug_sigprint();
+//! \addtogroup opencl
+//! @{
 
-  coot_rt_t::fill_randu(dest, n);
-  }
 
 
 template<typename eT>
-inline void coot_rng::fill_randn(dev_mem_t<eT> dest, const uword n)
+inline
+void
+copy_from_dev_mem(eT* dest, const dev_mem_t<eT> src, const uword N)
   {
   coot_extra_debug_sigprint();
 
-  coot_rt_t::fill_randn(dest, n);
+  cudaError_t error = cudaMemcpy(dest, src.cuda_mem_ptr, N * sizeof(eT), cudaMemcpyDeviceToHost);
+
+  coot_check_cuda_error(error, "Mat::copy_from_dev_mem(): couldn't access device memory");
   }
+
+
+
+template<typename eT>
+inline
+void
+copy_into_dev_mem(dev_mem_t<eT> dest, const eT* src, const uword N)
+  {
+  coot_extra_debug_sigprint();
+
+  cudaError_t error = cudaMemcpy(dest.cuda_mem_ptr, src, N * sizeof(eT), cudaMemcpyHostToDevice);
+
+  coot_check_cuda_error(error, "Mat::copy_into_dev_mem(): couldn't access device memory");
+  }
+
+
+
+//! @}

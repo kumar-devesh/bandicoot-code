@@ -32,14 +32,7 @@ accu(const Base<typename T1::elem_type, T1>& X)
 
   if(A.n_elem == 0)  { return eT(0); }
 
-  if (get_rt().backend == CUDA_BACKEND)
-    {
-    return cuda::accu_chunked(A.get_dev_mem(false), A.n_elem);
-    }
-  else
-    {
-    return opencl::accu_chunked(A.get_dev_mem(false), A.n_elem);
-    }
+  return coot_rt_t::accu_chunked(A.get_dev_mem(false), A.n_elem);
   }
 
 
@@ -59,14 +52,7 @@ accu_simple(const Base<typename T1::elem_type, T1>& X)
   
   if(A.n_elem == 0)  { return eT(0); }
 
-  if (get_rt().backend == CUDA_BACKEND)
-    {
-    return cuda::accu_simple(A.get_dev_mem(false), A.n_elem);
-    }
-  else
-    {
-    return cuda::accu_simple(A.get_dev_mem(false), A.n_elem);
-    }
+  return coot_rt_t::accu_simple(A.get_dev_mem(false), A.n_elem);
   }
 
 
@@ -81,14 +67,7 @@ accu(const subview<eT>& S)
 
   if(S.n_elem == 0)  { return eT(0); }
 
-  if (get_rt().backend == CUDA_BACKEND)
-    {
-    return cuda::accu_subview(S.m.get_dev_mem(false), S.m.n_rows, S.aux_row1, S.aux_col1, S.n_rows, S.n_cols);
-    }
-  else
-    {
-    return opencl::accu_subview(S.m.get_dev_mem(false), S.m.n_rows, S.aux_row1, S.aux_col1, S.n_rows, S.n_cols);
-    }
+  return coot_rt_t::accu_subview(S.m.get_dev_mem(false), S.m.n_rows, S.aux_row1, S.aux_col1, S.n_rows, S.n_cols);
   }
 
 

@@ -25,7 +25,7 @@ struct gemv
   static
   inline
   void
-  apply(Mat<eT>& y, const Mat<eT>& A, const Mat<eT>& x, const eT alpha = eT(1.0), const eT beta = eT(1.0))
+  apply(dev_mem_t<eT> y, const dev_mem_t<eT> A, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<eT> x, const eT alpha, const eT beta)
     {
     coot_extra_debug_sigprint();
 
@@ -37,7 +37,7 @@ struct gemv
   static
   inline
   void
-  apply(Mat<float>& y, const Mat<float>& A, const Mat<float>& x, const float alpha = 1.0f, const float beta = 1.0f)
+  apply(dev_mem_t<float> y, const dev_mem_t<float> A, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<float> x, const float alpha, const float beta)
     {
     coot_extra_debug_sigprint();
 
@@ -48,20 +48,16 @@ struct gemv
 
     cublasOperation_t trans_a = (do_trans_A) ? CUBLAS_OP_T : CUBLAS_OP_N;
 
-    const int M = int(A.n_rows);
-    const int N = int(A.n_cols);
+    const int M = int(A_n_rows);
+    const int N = int(A_n_cols);
 
     const int lda = M;
     const int incx = 1;
     const int incy = 1;
 
-    const float* A_mem = A.get_dev_mem(false).cuda_mem_ptr;
-    const float* x_mem = x.get_dev_mem(false).cuda_mem_ptr;
-    float* y_mem = y.get_dev_mem(false).cuda_mem_ptr;
-
     cublasStatus_t result;
 
-    result = cublasSgemv(handle, trans_a, M, N, (float*) &alpha, A_mem, lda, x_mem, incx, (float*) &beta, y_mem, incy);
+    result = cublasSgemv(handle, trans_a, M, N, (float*) &alpha, A.cuda_mem_ptr, lda, x.cuda_mem_ptr, incx, (float*) &beta, y.cuda_mem_ptr, incy);
 
     coot_check_cublas_error( result, "cuda::gemv::apply(): call to cublasSgemv() failed" );
 
@@ -73,7 +69,7 @@ struct gemv
   static
   inline
   void
-  apply(Mat<double>& y, const Mat<double>& A, const Mat<double>& x, const double alpha = 1.0, const double beta = 1.0)
+  apply(dev_mem_t<double> y, const dev_mem_t<double> A, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<double> x, const double alpha, const double beta)
     {
     coot_extra_debug_sigprint();
 
@@ -84,20 +80,16 @@ struct gemv
 
     cublasOperation_t trans_a = (do_trans_A) ? CUBLAS_OP_T : CUBLAS_OP_N;
 
-    const int M = int(A.n_rows);
-    const int N = int(A.n_cols);
+    const int M = int(A_n_rows);
+    const int N = int(A_n_cols);
 
     const int lda = M;
     const int incx = 1;
     const int incy = 1;
 
-    const double* A_mem = A.get_dev_mem(false).cuda_mem_ptr;
-    const double* x_mem = x.get_dev_mem(false).cuda_mem_ptr;
-    double* y_mem = y.get_dev_mem(false).cuda_mem_ptr;
-
     cublasStatus_t result;
 
-    result = cublasDgemv(handle, trans_a, M, N, (double*) &alpha, A_mem, lda, x_mem, incx, (double*) &beta, y_mem, incy);
+    result = cublasDgemv(handle, trans_a, M, N, (double*) &alpha, A.cuda_mem_ptr, lda, x.cuda_mem_ptr, incx, (double*) &beta, y.cuda_mem_ptr, incy);
 
     coot_check_cublas_error( result, "cuda::gemv::apply(): call to cublasSgemv() failed" );
 

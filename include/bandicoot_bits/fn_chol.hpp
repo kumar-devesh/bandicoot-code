@@ -28,16 +28,7 @@ chol(Mat<typename T1::elem_type>& out, const Base<typename T1::elem_type, T1>& X
 
   out = X.get_ref();
 
-  if (get_rt().backend == CL_BACKEND)
-    {
-    return opencl::chol(out.get_dev_mem(), out.n_rows);
-    }
-  else
-    {
-    return cuda::chol(out.get_dev_mem(), out.n_rows);
-    }
-
-  return false;
+  return coot_rt_t::chol(out.get_dev_mem(), out.n_rows);
   }
 
 
