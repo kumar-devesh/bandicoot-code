@@ -486,6 +486,20 @@ coot_check_cusolver_error(const cusolverStatus_t error_code, const T1& x)
 
 
 
+template<typename T1>
+coot_hot
+inline
+void
+coot_check_cublas_error(const cublasStatus_t error_code, const T1& x)
+  {
+  if (error_code != CUBLAS_STATUS_SUCCESS)
+    {
+    coot_stop_runtime_error( x, cuda::error_as_string(error_code) );
+    }
+  }
+
+
+
 //
 // functions for generating strings indicating size errors
 

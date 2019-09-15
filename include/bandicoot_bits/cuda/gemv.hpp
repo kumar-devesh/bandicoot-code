@@ -50,7 +50,6 @@ struct gemv
 
     const int M = int(A.n_rows);
     const int N = int(A.n_cols);
-    const int K = (do_trans_A) ? int(A.n_rows) : int(A.n_cols);
 
     const int lda = M;
     const int incx = 1;
@@ -64,7 +63,7 @@ struct gemv
 
     result = cublasSgemv(handle, trans_a, M, N, (float*) &alpha, A_mem, lda, x_mem, incx, (float*) &beta, y_mem, incy);
 
-    // TODO: handle errors
+    coot_check_cublas_error( result, "cuda::gemv::apply(): call to cublasSgemv() failed" );
 
     cublasDestroy(handle);
     }
@@ -87,7 +86,6 @@ struct gemv
 
     const int M = int(A.n_rows);
     const int N = int(A.n_cols);
-    const int K = (do_trans_A) ? int(A.n_rows) : int(A.n_cols);
 
     const int lda = M;
     const int incx = 1;
@@ -101,7 +99,7 @@ struct gemv
 
     result = cublasDgemv(handle, trans_a, M, N, (double*) &alpha, A_mem, lda, x_mem, incx, (double*) &beta, y_mem, incy);
 
-    // TODO: handle errors
+    coot_check_cublas_error( result, "cuda::gemv::apply(): call to cublasSgemv() failed" );
 
     cublasDestroy(handle);
     }

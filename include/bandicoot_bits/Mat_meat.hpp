@@ -40,7 +40,7 @@ Mat<eT>::Mat()
   , n_elem    (0)
   , vec_state (0)
   , mem_state (0)
-  , dev_mem({ .cl_mem_ptr = NULL })
+  , dev_mem({ NULL })
   {
   coot_extra_debug_sigprint_this(this);
   }
@@ -56,7 +56,7 @@ Mat<eT>::Mat(const uword in_n_rows, const uword in_n_cols)
   , n_elem    (0)
   , vec_state (0)
   , mem_state (0)
-  , dev_mem({ .cl_mem_ptr = NULL})
+  , dev_mem({ NULL })
   {
   coot_extra_debug_sigprint_this(this);
   

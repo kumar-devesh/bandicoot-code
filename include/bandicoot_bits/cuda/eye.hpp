@@ -41,7 +41,7 @@ eye(dev_mem_t<eT> dest, const uword n_rows, const uword n_cols)
 
   const uword n_elem = n_rows * n_cols;
 
-  if (n_rows > dev_prop.maxThreadsPerBlock)
+  if (int(n_rows) > dev_prop.maxThreadsPerBlock)
     {
     blockSize[0] = dev_prop.maxThreadsPerBlock;
     blockSize[1] = 1;
@@ -49,7 +49,7 @@ eye(dev_mem_t<eT> dest, const uword n_rows, const uword n_cols)
     gridSize[0] = std::ceil((double) n_rows / (double) dev_prop.maxThreadsPerBlock);
     gridSize[1] = n_cols;
     }
-  else if (n_elem > dev_prop.maxThreadsPerBlock)
+  else if (int(n_elem) > dev_prop.maxThreadsPerBlock)
     {
     blockSize[0] = n_rows;
     blockSize[1] = std::floor((double) dev_prop.maxThreadsPerBlock / (double) n_rows);

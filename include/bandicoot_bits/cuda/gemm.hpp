@@ -100,7 +100,7 @@ struct gemm
       throw std::invalid_argument("cannot multiply with this eT");
       }
 
-    // RC-TODO: handle errors
+    coot_check_cublas_error( result, "cuda::gemm::apply(): call to cublas?gemm() failed" );
 
     cublasDestroy(handle);
     #else

@@ -151,7 +151,7 @@ magma_dgetmatrix(magma_int_t m, magma_int_t n, magmaDouble_const_ptr dA_src, siz
 
   size_t buffer_origin[3] = { dA_offset*sizeof(double), 0, 0 };
   size_t host_orig[3]     = { 0, 0, 0 };
-  size_t region[3]        = { m*sizeof(double), n, 1 };
+  size_t region[3]        = { m*sizeof(double), size_t(n), 1 };
   
   cl_int err = clEnqueueReadBufferRect(
       queue, dA_src, CL_TRUE,  // blocking
@@ -182,7 +182,7 @@ magma_dsetmatrix(magma_int_t m, magma_int_t n, double const* hA_src, magma_int_t
 
   size_t buffer_origin[3] = { dB_offset*sizeof(double), 0, 0 };
   size_t host_orig[3]     = { 0, 0, 0 };
-  size_t region[3]        = { m*sizeof(double), n, 1 };
+  size_t region[3]        = { m*sizeof(double), size_t(n), 1 };
   
   cl_int err = clEnqueueWriteBufferRect(
       queue, dB_dst, CL_TRUE,  // blocking
@@ -221,7 +221,7 @@ magma_sgetmatrix(
 
     size_t buffer_origin[3] = { dA_offset*sizeof(float), 0, 0 };
     size_t host_orig[3]     = { 0, 0, 0 };
-    size_t region[3]        = { m*sizeof(float), n, 1 };
+    size_t region[3]        = { m*sizeof(float), size_t(n), 1 };
     cl_int err = clEnqueueReadBufferRect(
         queue, dA_src, CL_TRUE,  // blocking
         buffer_origin, host_orig, region,
@@ -246,7 +246,7 @@ magma_ssetmatrix(
 
     size_t buffer_origin[3] = { dB_offset*sizeof(float), 0, 0 };
     size_t host_orig[3]     = { 0, 0, 0 };
-    size_t region[3]        = { m*sizeof(float), n, 1 };
+    size_t region[3]        = { m*sizeof(float), size_t(n), 1 };
     cl_int err = clEnqueueWriteBufferRect(
         queue, dB_dst, CL_TRUE,  // blocking
         buffer_origin, host_orig, region,
@@ -269,7 +269,7 @@ magma_dgetmatrix_async(magma_int_t m, magma_int_t n, magmaDouble_const_ptr dA_sr
 
   size_t buffer_origin[3] = { dA_offset*sizeof(double), 0, 0 };
   size_t host_orig[3]     = { 0, 0, 0 };
-  size_t region[3]        = { m*sizeof(double), n, 1 };
+  size_t region[3]        = { m*sizeof(double), size_t(n), 1 };
   
   cl_int err = clEnqueueReadBufferRect(
       queue, dA_src, CL_FALSE,  // non-blocking
@@ -291,7 +291,7 @@ magma_dgetmatrix_async(magma_int_t m, magma_int_t n, magmaDouble_const_ptr dA_sr
 
   size_t buffer_origin[3] = { dA_offset*sizeof(double), 0, 0 };
   size_t host_orig[3]     = { 0, 0, 0 };
-  size_t region[3]        = { m*sizeof(double), n, 1 };
+  size_t region[3]        = { m*sizeof(double), size_t(n), 1 };
   
   cl_int err = clEnqueueReadBufferRect(
       queue, dA_src, CL_FALSE,  // non-blocking
@@ -313,7 +313,7 @@ magma_dsetmatrix_async(magma_int_t m, magma_int_t n, double const* hA_src, magma
 
   size_t buffer_origin[3] = { dB_offset*sizeof(double), 0, 0 };
   size_t host_orig[3]     = { 0, 0, 0 };
-  size_t region[3]        = { m*sizeof(double), n, 1 };
+  size_t region[3]        = { m*sizeof(double), size_t(n), 1 };
   
   cl_int err = clEnqueueWriteBufferRect(
       queue, dB_dst, CL_FALSE,  // non-blocking
@@ -335,7 +335,7 @@ magma_dsetmatrix_async(magma_int_t m, magma_int_t n, double const* hA_src, magma
 
   size_t buffer_origin[3] = { dB_offset*sizeof(double), 0, 0 };
   size_t host_orig[3]     = { 0, 0, 0 };
-  size_t region[3]        = { m*sizeof(double), n, 1 };
+  size_t region[3]        = { m*sizeof(double), size_t(n), 1 };
   
   cl_int err = clEnqueueWriteBufferRect(
       queue, dB_dst, CL_FALSE,  // non-blocking
@@ -362,7 +362,7 @@ magma_sgetmatrix_async(magma_int_t m, magma_int_t n, magmaFloat_const_ptr dA_src
 
   size_t buffer_origin[3] = { dA_offset*sizeof(float), 0, 0 };
   size_t host_orig[3]     = { 0, 0, 0 };
-  size_t region[3]        = { m*sizeof(float), n, 1 };
+  size_t region[3]        = { m*sizeof(float), size_t(n), 1 };
   
   cl_int err = clEnqueueReadBufferRect(
       queue, dA_src, CL_FALSE,  // non-blocking
@@ -384,7 +384,7 @@ magma_sgetmatrix_async(magma_int_t m, magma_int_t n, magmaFloat_const_ptr dA_src
 
   size_t buffer_origin[3] = { dA_offset*sizeof(float), 0, 0 };
   size_t host_orig[3]     = { 0, 0, 0 };
-  size_t region[3]        = { m*sizeof(float), n, 1 };
+  size_t region[3]        = { m*sizeof(float), size_t(n), 1 };
   
   cl_int err = clEnqueueReadBufferRect(
       queue, dA_src, CL_FALSE,  // non-blocking
@@ -406,7 +406,7 @@ magma_ssetmatrix_async(magma_int_t m, magma_int_t n, float const* hA_src, magma_
 
   size_t buffer_origin[3] = { dB_offset*sizeof(float), 0, 0 };
   size_t host_orig[3]     = { 0, 0, 0 };
-  size_t region[3]        = { m*sizeof(float), n, 1 };
+  size_t region[3]        = { m*sizeof(float), size_t(n), 1 };
   
   cl_int err = clEnqueueWriteBufferRect(
       queue, dB_dst, CL_FALSE,  // non-blocking
@@ -428,7 +428,7 @@ magma_ssetmatrix_async(magma_int_t m, magma_int_t n, float const* hA_src, magma_
 
   size_t buffer_origin[3] = { dB_offset*sizeof(float), 0, 0 };
   size_t host_orig[3]     = { 0, 0, 0 };
-  size_t region[3]        = { m*sizeof(float), n, 1 };
+  size_t region[3]        = { m*sizeof(float), size_t(n), 1 };
   
   cl_int err = clEnqueueWriteBufferRect(
       queue, dB_dst, CL_FALSE,  // non-blocking

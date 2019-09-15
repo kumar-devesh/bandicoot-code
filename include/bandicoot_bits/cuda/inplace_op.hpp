@@ -130,7 +130,7 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_row1, const
   size_t blockSize[2] = { n_rows, n_cols };
   size_t gridSize[2] = { 1, 1 };
 
-  if (n_rows > dev_prop.maxThreadsPerBlock)
+  if (int(n_rows) > dev_prop.maxThreadsPerBlock)
     {
     blockSize[0] = dev_prop.maxThreadsPerBlock;
     blockSize[1] = 1;
@@ -138,7 +138,7 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_row1, const
     gridSize[0] = std::ceil((double) n_rows / (double) dev_prop.maxThreadsPerBlock);
     gridSize[1] = n_cols;
     }
-  else if (n_elem > dev_prop.maxThreadsPerBlock)
+  else if (int(n_elem) > dev_prop.maxThreadsPerBlock)
     {
     blockSize[0] = n_rows;
     blockSize[1] = std::floor((double) dev_prop.maxThreadsPerBlock / (double) n_rows);
@@ -193,7 +193,7 @@ inplace_op_subview(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword M_n_
 
   const uword n_elem = n_rows * n_cols;
 
-  if (n_rows > dev_prop.maxThreadsPerBlock)
+  if (int(n_rows) > dev_prop.maxThreadsPerBlock)
     {
     blockSize[0] = dev_prop.maxThreadsPerBlock;
     blockSize[1] = 1;
@@ -201,7 +201,7 @@ inplace_op_subview(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword M_n_
     gridSize[0] = std::ceil((double) n_rows / (double) dev_prop.maxThreadsPerBlock);
     gridSize[1] = n_cols;
     }
-  else if (n_elem > dev_prop.maxThreadsPerBlock)
+  else if (int(n_elem) > dev_prop.maxThreadsPerBlock)
     {
     blockSize[0] = n_rows;
     blockSize[1] = std::floor((double) dev_prop.maxThreadsPerBlock / (double) n_rows);
@@ -238,10 +238,6 @@ extract_subview(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword M_n_row
   // Note that the terminology here is transposed---"height" refers to columns and "width" refers to rows...
   const size_t height = n_cols;
   const size_t width = n_rows * sizeof(eT);
-
-  // wOffset is in bytes, but hOffset is number of columns.
-  const size_t h_offset = aux_col1;
-  const size_t w_offset = aux_row1 * sizeof(eT);
 
   // s_pitch and d_pitch refer to the width in bytes of each column of the matrix.
   const size_t s_pitch = M_n_rows * sizeof(eT);

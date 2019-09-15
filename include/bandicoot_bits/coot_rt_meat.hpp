@@ -40,7 +40,7 @@ coot_rt_t::acquire_memory(const uword n_elem)
   
 //  coot_check_runtime_error( (valid == false), "coot_rt::acquire_memory(): runtime not valid" );
   
-  if(n_elem == 0)  { return dev_mem_t<eT>({ .cl_mem_ptr = NULL }); }
+  if(n_elem == 0)  { return dev_mem_t<eT>({ NULL }); }
   
   coot_debug_check
    (

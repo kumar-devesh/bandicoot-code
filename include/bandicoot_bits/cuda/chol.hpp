@@ -147,7 +147,7 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
   size_t blockSize[2] = { n_rows, n_rows };
   size_t gridSize[2] = { 1, 1 };
 
-  if (n_rows > dev_prop.maxThreadsPerBlock)
+  if (int(n_rows) > dev_prop.maxThreadsPerBlock)
     {
     blockSize[0] = dev_prop.maxThreadsPerBlock;
     blockSize[1] = 1;
@@ -155,7 +155,7 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
     gridSize[0] = std::ceil((double) n_rows / (double) dev_prop.maxThreadsPerBlock);
     gridSize[1] = n_rows;
     }
-  else if (n_elem > dev_prop.maxThreadsPerBlock)
+  else if (int(n_elem) > dev_prop.maxThreadsPerBlock)
     {
     blockSize[0] = n_rows;
     blockSize[1] = std::floor((double) dev_prop.maxThreadsPerBlock / (double) n_rows);
