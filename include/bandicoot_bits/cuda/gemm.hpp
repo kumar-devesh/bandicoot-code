@@ -104,7 +104,7 @@ struct gemm
 
     cublasDestroy(handle);
     #else
-    cuda_wrapper::throw_unsupported();
+    throw std::invalid_argument("cuda backend not enabled");
     #endif
     }
   };

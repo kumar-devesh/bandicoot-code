@@ -102,7 +102,6 @@ namespace coot
   // runtime
   
   #include "bandicoot_bits/kernel_id.hpp"
-  #include "bandicoot_bits/cuda_bones.hpp"
 
   namespace opencl
     {
@@ -172,7 +171,6 @@ namespace coot
   // runtime
   
   #include "bandicoot_bits/coot_rt_meat.hpp"
-  #include "bandicoot_bits/cuda_meat.hpp"
 
   namespace opencl
     {
