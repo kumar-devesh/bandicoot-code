@@ -12,6 +12,18 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
+#if !defined(COOT_USE_OPENCL)
+#define COOT_USE_OPENCL
+//// Uncomment the above line if you have OpenCL available on your system.
+//// Bandicoot requires OpenCL and clBLAS to be available.
+#endif
+
+#if !defined(COOT_USE_CUDA)
+#define COOT_USE_CUDA
+//// Uncomment the above line if you have CUDA available on your system.
+//// Bandicoot requires CUDA, CUDART, cuBLAS, cuRAND, cuSolver, and NVRTC.
+#endif
+
 #if !defined(COOT_USE_LAPACK)
 #define COOT_USE_LAPACK
 //// Comment out the above line if you don't have LAPACK or a high-speed replacement for LAPACK,
@@ -62,10 +74,16 @@
 //// Uncomment the above line if you want to see the function traces of how Bandicoot evaluates expressions.
 //// This is mainly useful for debugging of the library.
 
-#if !defined(COOT_USE_CUDA)
-#define COOT_USE_CUDA
-//// Uncomment the above line if you have CUDA available on your system.
-//// Bandicoot requires CUDA, CUDART, cuBLAS, cuRAND, cuSolver, and NVRTC.
+#if !defined(COOT_DEFAULT_BACKEND)
+  #if defined(COOT_USE_OPENCL)
+    #define COOT_DEFAULT_BACKEND CL_BACKEND
+  #elif defined(COOT_USE_CUDA)
+    #define COOT_DEFAULT_BACKEND CUDA_BACKEND
+  #else
+    #error "One of COOT_USE_OPENCL or COOT_USE_CUDA must be defined!"
+  #endif
+#else
+  // TODO: ensure that the backend is valid
 #endif
 
 

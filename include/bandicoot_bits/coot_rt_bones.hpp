@@ -25,7 +25,7 @@ union dev_mem_t
 enum coot_backend_t
   {
   CL_BACKEND = 0,
-  CUDA_BACKEND 
+  CUDA_BACKEND
   };
 
 // TODO: if this is placed into a run-time library and executed there, what happens when two programs use the run-time library at the same time?
@@ -35,9 +35,13 @@ class coot_rt_t
 
   coot_backend_t backend;
 
-  // RC-TODO: what if the CL headers are not available?
+  #if defined(COOT_USE_OPENCL)
   opencl::runtime_t cl_rt;
+  #endif
+
+  #if defined(COOT_USE_CUDA)
   cuda::runtime_t cuda_rt;
+  #endif
 
   inline ~coot_rt_t();
   inline  coot_rt_t();
