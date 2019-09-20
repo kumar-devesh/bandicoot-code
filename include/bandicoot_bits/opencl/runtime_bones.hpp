@@ -73,7 +73,6 @@ class runtime_t
   inline void unlock();  //! NOTE: do not call this function directly; it's automatically called when an instance of cq_guard goes out of scope
   
   inline void internal_cleanup();
-  inline bool internal_init(const bool manual_selection, const uword wanted_platform, const uword wanted_device, const bool print_info);
   
   inline bool search_devices(cl_platform_id& out_plat_id, cl_device_id& out_dev_id, const bool manual_selection, const uword wanted_platform, const uword wanted_device, const bool print_info) const;
   
@@ -91,10 +90,7 @@ class runtime_t
   inline ~runtime_t();
   inline  runtime_t();
   
-  inline bool init(const bool print_info = false);
-  inline bool init(const char*       filename, const bool print_info = false);
-  inline bool init(const std::string filename, const bool print_info = false);
-  inline bool init(const uword wanted_platform, const uword wanted_device, const bool print_info = false);
+  inline bool init(const bool manual_selection, const uword wanted_platform, const uword wanted_device, const bool print_info);
   
   #if defined(COOT_USE_CXX11)
                    runtime_t(const runtime_t&) = delete;

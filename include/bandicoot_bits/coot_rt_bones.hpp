@@ -46,13 +46,10 @@ class coot_rt_t
   inline ~coot_rt_t();
   inline  coot_rt_t();
 
-  // RC-TODO: unified constructors?
-  /*
   inline bool init(const bool print_info = false);
   inline bool init(const char*       filename, const bool print_info = false);
   inline bool init(const std::string filename, const bool print_info = false);
   inline bool init(const uword wanted_platform, const uword wanted_device, const bool print_info = false);
-  */
 
   #if defined(COOT_USE_CXX11)
                    coot_rt_t(const coot_rt_t&) = delete;

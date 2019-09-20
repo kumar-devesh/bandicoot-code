@@ -30,34 +30,33 @@ eye(dev_mem_t<eT> dest, const uword n_rows, const uword n_cols)
 
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(kernel_id::inplace_set_eye);
 
-  cudaDeviceProp dev_prop;
-  cudaError_t result = cudaGetDeviceProperties(&dev_prop, 0);
-  coot_check_cuda_error(result, "cuda::inplace_op_scalar(): couldn't get device properties");
-
-  const void* args[] = { &(dest.cuda_mem_ptr), (size_t*) &n_rows, (size_t*) &n_cols };
+  const void* args[] = {
+      &(dest.cuda_mem_ptr),
+      (uword*) &n_rows,
+      (uword*) &n_cols };
 
   size_t blockSize[2] = { n_rows, n_cols };
   size_t gridSize[2] = { 1, 1 };
 
   const uword n_elem = n_rows * n_cols;
 
-  if (int(n_rows) > dev_prop.maxThreadsPerBlock)
+  if (int(n_rows) > get_rt().cuda_rt.dev_prop.maxThreadsPerBlock)
     {
-    blockSize[0] = dev_prop.maxThreadsPerBlock;
+    blockSize[0] = get_rt().cuda_rt.dev_prop.maxThreadsPerBlock;
     blockSize[1] = 1;
 
-    gridSize[0] = std::ceil((double) n_rows / (double) dev_prop.maxThreadsPerBlock);
+    gridSize[0] = std::ceil((double) n_rows / (double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock);
     gridSize[1] = n_cols;
     }
-  else if (int(n_elem) > dev_prop.maxThreadsPerBlock)
+  else if (int(n_elem) > get_rt().cuda_rt.dev_prop.maxThreadsPerBlock)
     {
     blockSize[0] = n_rows;
-    blockSize[1] = std::floor((double) dev_prop.maxThreadsPerBlock / (double) n_rows);
+    blockSize[1] = std::floor((double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock / (double) n_rows);
 
     gridSize[1] = std::ceil((double) n_rows / (double) blockSize[1]);
     }
 
-  CUresult result2 = cuLaunchKernel(
+  CUresult result = cuLaunchKernel(
       kernel,
       gridSize[0], gridSize[1], 1,
       blockSize[0], blockSize[1], 1,
@@ -65,5 +64,9 @@ eye(dev_mem_t<eT> dest, const uword n_rows, const uword n_cols)
       (void**) args,
       0);
 
-  coot_check_cuda_error(result2, "cuda::eye(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "cuda::eye(): cuLaunchKernel() failed");
   }
+
+
+
+//! @}

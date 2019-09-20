@@ -39,8 +39,8 @@ trace(dev_mem_t<eT> mem, const uword n_rows, const uword n_cols)
   void* args[] = {
       &(tmp_mem.cuda_mem_ptr),
       &(mem.cuda_mem_ptr),
-      (size_t*) &n_rows,
-      (size_t*) &diag_len };
+      (uword*) &n_rows,
+      (uword*) &diag_len };
 
   CUresult result = cuLaunchKernel(
       kernel,

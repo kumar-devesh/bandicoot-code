@@ -29,19 +29,13 @@ main(int argc, char** argv)
   if (coot::get_rt().backend == coot::CL_BACKEND)
     {
     std::cout << "Run with OpenCL backend:\n";
-
-    #if defined(COOT_USE_OPENCL)
-    coot::get_rt().cl_rt.init(true);
-    #endif
     }
   else if (coot::get_rt().backend == coot::CUDA_BACKEND)
     {
     std::cout << "Run with CUDA backend:\n";
-
-    #if defined(COOT_USE_CUDA)
-    coot::get_rt().cuda_rt.init();
-    #endif
     }
+
+  coot::get_rt().init(true);
 
   Catch::Session().run(argc, argv);
   }

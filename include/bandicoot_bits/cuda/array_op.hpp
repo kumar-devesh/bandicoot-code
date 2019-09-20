@@ -31,21 +31,21 @@ array_op(dev_mem_t<eT> out, const uword n_elem, dev_mem_t<eT> in_a, dev_mem_t<eT
   // Get kernel.
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(num);
 
-  cudaDeviceProp dev_prop;
-  cudaError_t result = cudaGetDeviceProperties(&dev_prop, 0);
-  coot_check_cuda_error(result, "cuda::array_op(): couldn't get device properties");
+  const void* args[] = {
+      &(out.cuda_mem_ptr),
+      &(in_a.cuda_mem_ptr),
+      &(in_b.cuda_mem_ptr),
+      (uword*) &n_elem };
 
-  const void* args[] = { &(out.cuda_mem_ptr), &(in_a.cuda_mem_ptr), &(in_b.cuda_mem_ptr), (size_t*) &n_elem };
-
-  CUresult result2 = cuLaunchKernel(
+  CUresult result = cuLaunchKernel(
       kernel,
-      std::ceil((double) n_elem / (double) dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
-      dev_prop.maxThreadsPerBlock, 1, 1, // block dims
+      std::ceil((double) n_elem / (double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
+      get_rt().cuda_rt.dev_prop.maxThreadsPerBlock, 1, 1, // block dims
       0, NULL, // shared mem and stream
       (void**) args, // arguments
       0);
 
-  coot_check_cuda_error( result2, "cuda::array_op(): cuLaunchKernel() failed" );
+  coot_check_cuda_error( result, "cuda::array_op(): cuLaunchKernel() failed" );
 
   cuCtxSynchronize();
   }

@@ -123,14 +123,10 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
   // Now we need to set the lower triangular part of the matrix to zeros.
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(kernel_id::ltri_set_zero);
 
-  cudaDeviceProp dev_prop;
-  cudaError_t result = cudaGetDeviceProperties(&dev_prop, 0);
-  coot_check_cuda_error(result, "cuda::chol(): couldn't get device properties");
-
   const void* args[] = {
       &(mem.cuda_mem_ptr),
-      (size_t*) &n_rows,
-      (size_t*) &n_rows };
+      (uword*) &n_rows,
+      (uword*) &n_rows };
 
   // grid dimensions:
   //   ideally, we want to use [n_rows, n_cols, 1]; but we have limits.  so   //   we might need to block it up a bit.  so, if n_rows * n_cols < maxThreadsPerBlock,
@@ -147,23 +143,23 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
   size_t blockSize[2] = { n_rows, n_rows };
   size_t gridSize[2] = { 1, 1 };
 
-  if (int(n_rows) > dev_prop.maxThreadsPerBlock)
+  if (int(n_rows) > get_rt().cuda_rt.dev_prop.maxThreadsPerBlock)
     {
-    blockSize[0] = dev_prop.maxThreadsPerBlock;
+    blockSize[0] = get_rt().cuda_rt.dev_prop.maxThreadsPerBlock;
     blockSize[1] = 1;
 
-    gridSize[0] = std::ceil((double) n_rows / (double) dev_prop.maxThreadsPerBlock);
+    gridSize[0] = std::ceil((double) n_rows / (double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock);
     gridSize[1] = n_rows;
     }
-  else if (int(n_elem) > dev_prop.maxThreadsPerBlock)
+  else if (int(n_elem) > get_rt().cuda_rt.dev_prop.maxThreadsPerBlock)
     {
     blockSize[0] = n_rows;
-    blockSize[1] = std::floor((double) dev_prop.maxThreadsPerBlock / (double) n_rows);
+    blockSize[1] = std::floor((double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock / (double) n_rows);
 
     gridSize[1] = std::ceil((double) n_rows / (double) blockSize[1]);
     }
 
-  CUresult result2 = cuLaunchKernel(
+  CUresult result = cuLaunchKernel(
       kernel,
       gridSize[0], gridSize[1], 1, // grid dims
       blockSize[0], blockSize[1], 1, // block dims
@@ -171,7 +167,7 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
       (void**) args,
       0);
 
-  coot_check_cuda_error(result2, "cuda::chol(): cuLaunchKernel() failed for kernel ltri_set_zero");
+  coot_check_cuda_error(result, "cuda::chol(): cuLaunchKernel() failed for kernel ltri_set_zero");
 
   cuCtxSynchronize();
 
@@ -179,6 +175,7 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
 
   return true;
   }
+
 
 
 //! @}

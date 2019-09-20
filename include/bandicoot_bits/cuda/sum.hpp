@@ -27,25 +27,21 @@ sum_colwise(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword n_rows, const 
 
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(kernel_id::sum_colwise);
 
-  cudaDeviceProp dev_prop;
-  cudaError_t result = cudaGetDeviceProperties(&dev_prop, 0);
-  coot_check_cuda_error(result, "cuda::sum_colwise(): couldn't get device properties");
-
   const void* args[] = {
       &(out.cuda_mem_ptr),
       &(A.cuda_mem_ptr),
-      (size_t*) &n_rows,
-      (size_t*) &n_cols };
+      (uword*) &n_rows,
+      (uword*) &n_cols };
 
-  CUresult result2 = cuLaunchKernel(
+  CUresult result = cuLaunchKernel(
       kernel,
-      std::ceil((double) n_cols / (double) dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
-      dev_prop.maxThreadsPerBlock, 1, 1, // block dims
+      std::ceil((double) n_cols / (double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
+      get_rt().cuda_rt.dev_prop.maxThreadsPerBlock, 1, 1, // block dims
       0, NULL,
       (void**) args,
       0);
 
-  coot_check_cuda_error(result2, "cuda::sum_colwise(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "cuda::sum_colwise(): cuLaunchKernel() failed");
 
   cuCtxSynchronize();
   }
@@ -61,25 +57,21 @@ sum_rowwise(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword n_rows, const 
 
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(kernel_id::sum_rowwise);
 
-  cudaDeviceProp dev_prop;
-  cudaError_t result = cudaGetDeviceProperties(&dev_prop, 0);
-  coot_check_cuda_error(result, "cuda::sum_rowwise(): couldn't get device properties");
-
   const void* args[] = {
       &(out.cuda_mem_ptr),
       &(A.cuda_mem_ptr),
-      (size_t*) &n_rows,
-      (size_t*) &n_cols };
+      (uword*) &n_rows,
+      (uword*) &n_cols };
 
-  CUresult result2 = cuLaunchKernel(
+  CUresult result = cuLaunchKernel(
       kernel,
-      std::ceil((double) n_rows / (double) dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
-      dev_prop.maxThreadsPerBlock, 1, 1, // block dims
+      std::ceil((double) n_rows / (double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
+      get_rt().cuda_rt.dev_prop.maxThreadsPerBlock, 1, 1, // block dims
       0, NULL,
       (void**) args,
       0);
 
-  coot_check_cuda_error(result2, "cuda::sum_rowwise(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "cuda::sum_rowwise(): cuLaunchKernel() failed");
 
   cuCtxSynchronize();
   }
@@ -95,28 +87,24 @@ sum_colwise_subview(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword M_n_ro
 
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(kernel_id::submat_sum_colwise);
 
-  cudaDeviceProp dev_prop;
-  cudaError_t result = cudaGetDeviceProperties(&dev_prop, 0);
-  coot_check_cuda_error(result, "cuda::sum_colwise_subview(): couldn't get device properties");
-
   const void* args[] = {
       &(out.cuda_mem_ptr),
       &(A.cuda_mem_ptr),
-      (size_t*) &M_n_rows,
-      (size_t*) &start_row,
-      (size_t*) &start_col,
-      (size_t*) &n_rows,
-      (size_t*) &n_cols };
+      (uword*) &M_n_rows,
+      (uword*) &start_row,
+      (uword*) &start_col,
+      (uword*) &n_rows,
+      (uword*) &n_cols };
 
-  CUresult result2 = cuLaunchKernel(
+  CUresult result = cuLaunchKernel(
       kernel,
-      std::ceil((double) n_cols / (double) dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
-      dev_prop.maxThreadsPerBlock, 1, 1, // block dims
+      std::ceil((double) n_cols / (double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
+      get_rt().cuda_rt.dev_prop.maxThreadsPerBlock, 1, 1, // block dims
       0, NULL,
       (void**) args,
       0);
 
-  coot_check_cuda_error(result2, "cuda::sum_colwise_subview(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "cuda::sum_colwise_subview(): cuLaunchKernel() failed");
 
   cuCtxSynchronize();
   }
@@ -132,28 +120,28 @@ sum_rowwise_subview(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword M_n_ro
 
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(kernel_id::submat_sum_rowwise);
 
-  cudaDeviceProp dev_prop;
-  cudaError_t result = cudaGetDeviceProperties(&dev_prop, 0);
-  coot_check_cuda_error(result, "cuda::sum_rowwise_subview(): couldn't get device properties");
-
   const void* args[] = {
       &(out.cuda_mem_ptr),
       &(A.cuda_mem_ptr),
-      (size_t*) &M_n_rows,
-      (size_t*) &start_row,
-      (size_t*) &start_col,
-      (size_t*) &n_rows,
-      (size_t*) &n_cols };
+      (uword*) &M_n_rows,
+      (uword*) &start_row,
+      (uword*) &start_col,
+      (uword*) &n_rows,
+      (uword*) &n_cols };
 
-  CUresult result2 = cuLaunchKernel(
+  CUresult result = cuLaunchKernel(
       kernel,
-      std::ceil((double) n_rows / (double) dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
-      dev_prop.maxThreadsPerBlock, 1, 1, // block dims
+      std::ceil((double) n_rows / (double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
+      get_rt().cuda_rt.dev_prop.maxThreadsPerBlock, 1, 1, // block dims
       0, NULL,
       (void**) args,
       0);
 
-  coot_check_cuda_error(result2, "cuda::sum_rowwise_subview(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "cuda::sum_rowwise_subview(): cuLaunchKernel() failed");
 
   cuCtxSynchronize();
   }
+
+
+
+//! @}

@@ -31,6 +31,148 @@ coot_rt_t::coot_rt_t()
 
 
 
+inline
+bool
+coot_rt_t::init(const bool print_info)
+  {
+  coot_extra_debug_sigprint();
+
+  // TODO: investigate reading a config file by default; if a config file exist, use the specifed platform and device within the config file
+  // TODO: config file may exist in several places: (1) globally accessible, such as /etc/bandicoot_config, or locally, such as ~/.config/bandicoot_config
+  // TODO: use case: user puts code on a server which has a different configuration than the user's workstation
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return get_rt().cl_rt.init(false, 0, 0, print_info);
+    #else
+    coot_stop_runtime_error("coot_rt::init(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return get_rt().cuda_rt.init(false, 0, 0, print_info);
+    #else
+    coot_stop_runtime_error("coot_rt::init(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::init(): unknown backend");
+    }
+
+  return false;
+  }
+
+
+
+inline
+bool
+coot_rt_t::init(const char* filename, const bool print_info)
+  {
+  coot_extra_debug_sigprint();
+
+  return coot_rt_t::init(std::string(filename), print_info);
+  }
+
+
+
+inline
+bool
+coot_rt_t::init(const std::string filename, const bool print_info)
+  {
+  coot_extra_debug_sigprint();
+
+  // TODO: handling of config files is currently rudimentary
+
+  if(print_info)  {std::cout << "coot::opencl::runtime_t::init(): reading " << filename << std::endl; }
+
+  uword wanted_platform = 0;
+  uword wanted_device   = 0;
+
+  std::ifstream f;
+  f.open(filename.c_str(), std::fstream::binary);
+
+  if(f.is_open() == false)
+    {
+    std::cout << "coot::opencl::runtime_t::init(): couldn't read " << filename << std::endl;
+    return false;
+    }
+
+  f >> wanted_platform;
+  f >> wanted_device;
+
+  if(f.good() == false)
+    {
+    wanted_platform = 0;
+    wanted_device   = 0;
+
+    std::cout << "coot::opencl::runtime_t::init(): couldn't read " << filename << std::endl;
+    return false;
+    }
+  else
+    {
+    if(print_info)  { std::cout << "coot::opencl::runtime::init(): wanted_platform = " << wanted_platform << "   wanted_device = " << wanted_device << std::endl; }
+    }
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return get_rt().cl_rt.init(true, wanted_platform, wanted_device, print_info);
+    #else
+    coot_stop_runtime_error("coot_rt::init(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return get_rt().cuda_rt.init(true, wanted_platform, wanted_device, print_info);
+    #else
+    coot_stop_runtime_error("coot_rt::init(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::init(): unknown backend");
+    }
+
+  return false;
+  }
+
+
+
+inline
+bool
+coot_rt_t::init(const uword wanted_platform, const uword wanted_device, const bool print_info)
+  {
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return get_rt().cl_rt.init(true, wanted_platform, wanted_device, print_info);
+    #else
+    coot_stop_runtime_error("coot_rt::init(): OpenCL backend not enabled");
+
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return get_rt().cuda_rt.init(true, wanted_platform, wanted_device, print_info);
+    #else
+    coot_stop_runtime_error("coot_rt::init(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::init(): unknown backend");
+    }
+
+  return false;
+  }
+
+
+
 template<typename eT>
 inline
 dev_mem_t<eT>

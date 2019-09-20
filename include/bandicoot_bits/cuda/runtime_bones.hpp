@@ -18,12 +18,7 @@ struct runtime_t
   {
   public:
 
-  inline void init()
-    {
-    internal_init();
-    }
-
-  inline bool internal_init();
+  inline bool init(const bool manual_selection, const uword wanted_platform, const uword wanted_device, const bool print_info);
 
   template<typename eT>
   inline bool init_kernels(std::vector<CUfunction>& kernels, const std::string& source, const std::vector<std::string>& names);
@@ -39,9 +34,11 @@ struct runtime_t
 
   inline void synchronise();
 
-  curandGenerator_t randGen;
-
   inline bool is_valid() const { return valid; }
+
+  coot_aligned curandGenerator_t randGen;
+
+  coot_aligned cudaDeviceProp   dev_prop;
 
   private:
 
@@ -54,6 +51,6 @@ struct runtime_t
   coot_aligned std::vector<CUfunction>    f_kernels;
   coot_aligned std::vector<CUfunction>    d_kernels;
 
-  CUdevice cuDevice;
-  CUcontext context;
+  coot_aligned CUdevice cuDevice;
+  coot_aligned CUcontext context;
   };

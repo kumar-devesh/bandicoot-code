@@ -42,141 +42,7 @@ runtime_t::runtime_t()
 
 inline
 bool
-runtime_t::init(const bool print_info)
-  {
-  coot_extra_debug_sigprint();
-  
-  // TODO: investigate reading a config file by default; if a config file exist, use the specifed platform and device within the config file
-  // TODO: config file may exist in several places: (1) globally accessible, such as /etc/bandicoot_config, or locally, such as ~/.config/bandicoot_config
-  // TODO: use case: user puts code on a server which has a different configuration than the user's workstation
-  
-  return internal_init(false, 0, 0, print_info);
-  }
-
-
-
-inline
-bool
-runtime_t::init(const char* filename, const bool print_info)
-  {
-  coot_extra_debug_sigprint();
-  
-  return (*this).init(std::string(filename), print_info);
-  }
-
-
-
-inline
-bool
-runtime_t::init(const std::string filename, const bool print_info)
-  {
-  coot_extra_debug_sigprint();
-  
-  // TODO: handling of config files is currently rudimentary
-  
-  if(print_info)  {std::cout << "coot::opencl::runtime_t::init(): reading " << filename << std::endl; }
-  
-  uword wanted_platform = 0;
-  uword wanted_device   = 0;
-  
-  std::ifstream f;
-  f.open(filename.c_str(), std::fstream::binary);
-  
-  if(f.is_open() == false)
-    {
-    std::cout << "coot::opencl::runtime_t::init(): couldn't read " << filename << std::endl;
-    return false;
-    }
-  
-  f >> wanted_platform;
-  f >> wanted_device;
-  
-  if(f.good() == false)
-    {
-    wanted_platform = 0;
-    wanted_device   = 0;
-    
-    std::cout << "coot::opencl::runtime_t::init(): couldn't read " << filename << std::endl;
-    return false;
-    }
-  else
-    {
-    if(print_info)  { std::cout << "coot::opencl::runtime::init(): wanted_platform = " << wanted_platform << "   wanted_device = " << wanted_device << std::endl; }
-    }
-  
-  return internal_init(true, wanted_platform, wanted_device, print_info);
-  }
-
-
-
-inline
-bool
-runtime_t::init(const uword wanted_platform, const uword wanted_device, const bool print_info)
-  {
-  coot_extra_debug_sigprint();
-  
-  return internal_init(true, wanted_platform, wanted_device, print_info);
-  }
-
-
-
-inline
-void
-runtime_t::lock()
-  {
-  coot_extra_debug_sigprint();
-  
-  #if defined(COOT_USE_CXX11)
-    {
-    coot_extra_debug_print("calling mutex.lock()");
-    mutex.lock();
-    }
-  #endif
-  }
-
-
-
-inline
-void
-runtime_t::unlock()
-  {
-  coot_extra_debug_sigprint();
-  
-  #if defined(COOT_USE_CXX11)
-    {
-    coot_extra_debug_print("calling mutex.unlock()");
-    mutex.unlock();
-    }
-  #endif
-  }
-
-
-
-inline
-void
-runtime_t::internal_cleanup()
-  {
-  coot_extra_debug_sigprint();
-  
-  if(cq != NULL)  { clFinish(cq); }
-  
-  clblasTeardown();
-  
-  // TODO: go through each kernel vector
-  
-  const uword f_kernels_size = f_kernels.size();
-  
-  for(uword i=0; i<f_kernels_size; ++i)  { if(f_kernels.at(i) != NULL)  { clReleaseKernel(f_kernels.at(i)); } }
-  
-  if(cq   != NULL)  { clReleaseCommandQueue(cq); cq   = NULL; }
-  if(ctxt != NULL)  { clReleaseContext(ctxt);    ctxt = NULL; }
-  }
-
-
-
-inline
-bool
-runtime_t::internal_init(const bool manual_selection, const uword wanted_platform, const uword wanted_device, const bool print_info)
+runtime_t::init(const bool manual_selection, const uword wanted_platform, const uword wanted_device, const bool print_info)
   {
   coot_extra_debug_sigprint();
   
@@ -245,6 +111,60 @@ runtime_t::internal_init(const bool manual_selection, const uword wanted_platfor
   valid = true;
   
   return true;
+  }
+
+
+
+inline
+void
+runtime_t::lock()
+  {
+  coot_extra_debug_sigprint();
+  
+  #if defined(COOT_USE_CXX11)
+    {
+    coot_extra_debug_print("calling mutex.lock()");
+    mutex.lock();
+    }
+  #endif
+  }
+
+
+
+inline
+void
+runtime_t::unlock()
+  {
+  coot_extra_debug_sigprint();
+  
+  #if defined(COOT_USE_CXX11)
+    {
+    coot_extra_debug_print("calling mutex.unlock()");
+    mutex.unlock();
+    }
+  #endif
+  }
+
+
+
+inline
+void
+runtime_t::internal_cleanup()
+  {
+  coot_extra_debug_sigprint();
+  
+  if(cq != NULL)  { clFinish(cq); }
+  
+  clblasTeardown();
+  
+  // TODO: go through each kernel vector
+  
+  const uword f_kernels_size = f_kernels.size();
+  
+  for(uword i=0; i<f_kernels_size; ++i)  { if(f_kernels.at(i) != NULL)  { clReleaseKernel(f_kernels.at(i)); } }
+  
+  if(cq   != NULL)  { clReleaseCommandQueue(cq); cq   = NULL; }
+  if(ctxt != NULL)  { clReleaseContext(ctxt);    ctxt = NULL; }
   }
 
 

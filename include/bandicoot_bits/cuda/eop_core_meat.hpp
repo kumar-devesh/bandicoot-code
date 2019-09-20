@@ -29,21 +29,21 @@ eop_scalar(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword n_elem, cons
   // Get kernel.
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(num);
 
-  cudaDeviceProp dev_prop;
-  cudaError_t result = cudaGetDeviceProperties(&dev_prop, 0);
-  coot_check_cuda_error(result, "cuda::eop_scalar(): couldn't get device properties");
+  const void* args[] = {
+      &(dest.cuda_mem_ptr),
+      &(src.cuda_mem_ptr),
+      &aux_val,
+      (uword*) &n_elem };
 
-  const void* args[] = { &(dest.cuda_mem_ptr), &(src.cuda_mem_ptr), &aux_val, (size_t*) &n_elem };
-
-  CUresult result2 = cuLaunchKernel(
+  CUresult result = cuLaunchKernel(
       kernel,
-      std::ceil((double) n_elem / (double) dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
-      dev_prop.maxThreadsPerBlock, 1, 1, // block dims
+      std::ceil((double) n_elem / (double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
+      get_rt().cuda_rt.dev_prop.maxThreadsPerBlock, 1, 1, // block dims
       0, NULL, // shared mem and stream
       (void**) args, // arguments
       0);
 
-  coot_check_cuda_error(result2, "cuda::eop_scalar(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "cuda::eop_scalar(): cuLaunchKernel() failed");
 
   cuCtxSynchronize();
   }

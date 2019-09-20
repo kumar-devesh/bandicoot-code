@@ -85,3 +85,7 @@ coot_check_cublas_error(const cublasStatus_t error_code, const T1& x)
     coot_stop_runtime_error( x, cuda::error_as_string(error_code) );
     }
   }
+
+
+
+//! @}

@@ -16,21 +16,38 @@
 
 inline
 bool
-runtime_t::internal_init()
+runtime_t::init(const bool manual_selection, const uword wanted_platform, const uword wanted_device, const bool print_info)
   {
   coot_extra_debug_sigprint();
 
+  coot_debug_check( (wanted_platform != 0), "cuda::runtime_t::init(): wanted_platform must be 0 for the CUDA backend" );
+
   valid = false;
 
-  // TODO: device configuration and setup here
   CUresult result = cuInit(0);
   coot_check_cuda_error(result, "cuda::runtime_t::init(): cuInit() failed");
 
-  result = cuDeviceGet(&cuDevice, 0);
+  int device_count = 0;
+  result = cuDeviceGetCount(&device_count);
+  coot_check_cuda_error(result, "cuda::runtime_t::init(): cuDeviceGetCount() failed");
+
+  // Ensure that the desired device is within the range of devices we have.
+  // TODO: better error message?
+  coot_debug_check( ((int) wanted_device >= device_count), "cuda::runtime_t::init(): invalid wanted_device" );
+
+  result = cuDeviceGet(&cuDevice, wanted_device);
   coot_check_cuda_error(result, "cuda::runtime_t::init(): cuDeviceGet() failed");
 
   result = cuCtxCreate(&context, 0, cuDevice);
   coot_check_cuda_error(result, "cuda::runtime_t::init(): cuCtxCreate() failed");
+
+  // NOTE: it seems size_t will have the same size on the device and host;
+  // given the definition of uword, we will assume uword on the host is equivalent
+  // to size_t on the device.
+  //
+  // NOTE: float will also have the same size as the host (generally 32 bits)
+  cudaError_t result2 = cudaGetDeviceProperties(&dev_prop, wanted_device);
+  coot_check_cuda_error(result2, "cuda::runtime_t::init(): couldn't get device properties");
 
   bool status = false;
 
@@ -58,6 +75,8 @@ runtime_t::internal_init()
   valid = true;
 
   return true;
+
+  // TODO: destroy context in destructor
   }
 
 template<typename eT>

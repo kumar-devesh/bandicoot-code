@@ -31,11 +31,7 @@ accu_chunked(dev_mem_t<eT> mem, const uword n_elem)
   // work out number of chunks
   // make sure there are at least 4 elements per compunit
 
-  cudaDeviceProp dev_prop;
-  cudaError_t result = cudaGetDeviceProperties(&dev_prop, 0);
-  coot_check_cuda_error(result, "cuda::accu_chunked(): couldn't get device properties");
-
-  uword n_chunks = dev_prop.multiProcessorCount;
+  uword n_chunks = get_rt().cuda_rt.dev_prop.multiProcessorCount;
 
   while(n_chunks >= 1)
     {
@@ -57,18 +53,18 @@ accu_chunked(dev_mem_t<eT> mem, const uword n_elem)
   const void* args[] = {
       &(tmp_mem.cuda_mem_ptr),
       &(mem.cuda_mem_ptr),
-      (size_t*) &chunk_size,
-      (size_t*) &n_chunks };
+      (uword*) &chunk_size,
+      (uword*) &n_chunks };
 
-  CUresult result2 = cuLaunchKernel(
+  CUresult result = cuLaunchKernel(
       k1,
-      std::ceil((double) n_chunks / (double) dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
-      dev_prop.maxThreadsPerBlock, 1, 1, // block dims
+      std::ceil((double) n_chunks / (double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
+      get_rt().cuda_rt.dev_prop.maxThreadsPerBlock, 1, 1, // block dims
       0, NULL, // shared mem and stream
       (void**) args,
       0);
 
-  coot_check_cuda_error(result2, "cuda::accu_chunked(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "cuda::accu_chunked(): cuLaunchKernel() failed");
 
   CUfunction k2 = get_rt().cuda_rt.get_kernel<eT>(kernel_id::accu_twostage);
 
@@ -76,12 +72,12 @@ accu_chunked(dev_mem_t<eT> mem, const uword n_elem)
 
   const void* args2[] = {
       &(tmp_mem.cuda_mem_ptr),
-      (size_t*) &tmp.n_elem,
+      (uword*) &tmp.n_elem,
       &(mem.cuda_mem_ptr),
-      (size_t*) &A_start,
-      (size_t*) &n_elem };
+      (uword*) &A_start,
+      (uword*) &n_elem };
 
-  result2 = cuLaunchKernel(
+  result = cuLaunchKernel(
       k2,
       1, 1, 1, // grid dims
       1, 1, 1, // block dims
@@ -89,7 +85,7 @@ accu_chunked(dev_mem_t<eT> mem, const uword n_elem)
       (void**) args2,
       0);
 
-  coot_check_cuda_error(result2, "cuda::accu_chunked(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "cuda::accu_chunked(): cuLaunchKernel() failed");
 
   return eT(tmp(0));
   }
@@ -117,9 +113,9 @@ accu_simple(dev_mem_t<eT> mem, const uword n_elem)
   const void* args[] = {
       &(tmp_mem.cuda_mem_ptr),
       &(mem.cuda_mem_ptr),
-      (size_t*) &n_elem };
+      (uword*) &n_elem };
 
-  CUresult result2 = cuLaunchKernel(
+  CUresult result = cuLaunchKernel(
       k1,
       1, 1, 1, // grid dims
       1, 1, 1, // block dims
@@ -127,7 +123,7 @@ accu_simple(dev_mem_t<eT> mem, const uword n_elem)
       (void**) args,
       0);
 
-  coot_check_cuda_error(result2, "cuda::accu_simple(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "cuda::accu_simple(): cuLaunchKernel() failed");
 
   return eT(tmp(0));
   }
@@ -148,30 +144,27 @@ accu_subview(dev_mem_t<eT> mem, const uword m_n_rows, const uword aux_row1, cons
   Mat<eT> tmp(1, n_cols);
 
   CUfunction k1 = get_rt().cuda_rt.get_kernel<eT>(kernel_id::submat_sum_colwise);
-  cudaDeviceProp dev_prop;
-  cudaError_t result = cudaGetDeviceProperties(&dev_prop, 0);
-  coot_check_cuda_error(result, "cuda::accu_chunked(): couldn't get device properties");
 
   dev_mem_t<eT> tmp_mem = tmp.get_dev_mem(false);
 
   const void* args[] = {
       &(tmp_mem.cuda_mem_ptr),
       &(mem.cuda_mem_ptr),
-      (size_t*) &m_n_rows,
-      (size_t*) &aux_row1,
-      (size_t*) &aux_col1,
-      (size_t*) &n_rows,
-      (size_t*) &n_cols };
+      (uword*) &m_n_rows,
+      (uword*) &aux_row1,
+      (uword*) &aux_col1,
+      (uword*) &n_rows,
+      (uword*) &n_cols };
 
-  CUresult result2 = cuLaunchKernel(
+  CUresult result = cuLaunchKernel(
       k1,
-      std::ceil((double) n_cols / (double) dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
-      dev_prop.maxThreadsPerBlock, 1, 1, // block dims
+      std::ceil((double) n_cols / (double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
+      get_rt().cuda_rt.dev_prop.maxThreadsPerBlock, 1, 1, // block dims
       0, NULL,
       (void**) args,
       0);
 
-  coot_check_cuda_error(result2, "cuda::accu_subview(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "cuda::accu_subview(): cuLaunchKernel() failed");
 
   // combine the column sums
 
@@ -180,9 +173,9 @@ accu_subview(dev_mem_t<eT> mem, const uword m_n_rows, const uword aux_row1, cons
   const void* args2[] = {
       &(tmp_mem.cuda_mem_ptr),
       &(tmp_mem.cuda_mem_ptr),
-      (size_t*) &n_cols };
+      (uword*) &n_cols };
 
-  result2 = cuLaunchKernel(
+  result = cuLaunchKernel(
       k2,
       1, 1, 1, // grid dims
       1, 1, 1, // block dims
@@ -190,7 +183,7 @@ accu_subview(dev_mem_t<eT> mem, const uword m_n_rows, const uword aux_row1, cons
       (void**) args2,
       0);
 
-  coot_check_cuda_error(result2, "cuda::accu_subview(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "cuda::accu_subview(): cuLaunchKernel() failed");
 
   return tmp(0);
   }

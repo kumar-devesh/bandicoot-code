@@ -29,21 +29,20 @@ inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, kernel_i
   // Get kernel.
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(num);
 
-  cudaDeviceProp dev_prop;
-  cudaError_t result = cudaGetDeviceProperties(&dev_prop, 0);
-  coot_check_cuda_error(result, "cuda::inplace_op_scalar(): couldn't get device properties");
+  const void* args[] = {
+      &(dest.cuda_mem_ptr),
+      &val,
+      (uword*) &n_elem };
 
-  const void* args[] = { &(dest.cuda_mem_ptr), &val, (size_t*) &n_elem };
-
-  CUresult result2 = cuLaunchKernel(
+  CUresult result = cuLaunchKernel(
       kernel,
-      std::ceil((double) n_elem / (double) dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
-      dev_prop.maxThreadsPerBlock, 1, 1, // block dims
+      std::ceil((double) n_elem / (double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
+      get_rt().cuda_rt.dev_prop.maxThreadsPerBlock, 1, 1, // block dims
       0, NULL, // shared mem and stream
       (void**) args, // arguments
       0);
 
-  coot_check_cuda_error( result2, "cuda::inplace_op_scalar(): cuLaunchKernel() failed" );
+  coot_check_cuda_error( result, "cuda::inplace_op_scalar(): cuLaunchKernel() failed" );
 
   cuCtxSynchronize();
   }
@@ -63,21 +62,20 @@ inplace_op_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem, kern
   // Get kernel.
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(num);
 
-  cudaDeviceProp dev_prop;
-  cudaError_t result = cudaGetDeviceProperties(&dev_prop, 0);
-  coot_check_cuda_error(result, "cuda::inplace_op_array(): couldn't get device properties");
+  const void* args[] = {
+      &(dest.cuda_mem_ptr),
+      &(src.cuda_mem_ptr),
+      (uword*) &n_elem };
 
-  const void* args[] = { &(dest.cuda_mem_ptr), &(src.cuda_mem_ptr), (size_t*) &n_elem };
-
-  CUresult result2 = cuLaunchKernel(
+  CUresult result = cuLaunchKernel(
       kernel,
-      std::ceil((double) n_elem / (double) dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
-      dev_prop.maxThreadsPerBlock, 1, 1, // block dims
+      std::ceil((double) n_elem / (double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
+      get_rt().cuda_rt.dev_prop.maxThreadsPerBlock, 1, 1, // block dims
       0, NULL, // shared mem and stream
       (void**) args, // arguments
       0);
 
-  coot_check_cuda_error( result2, "cuda::inplace_op_array(): cuLaunchKernel() failed" );
+  coot_check_cuda_error( result, "cuda::inplace_op_array(): cuLaunchKernel() failed" );
 
   cuCtxSynchronize();
   }
@@ -103,18 +101,14 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_row1, const
   // Get kernel.
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(num);
 
-  cudaDeviceProp dev_prop;
-  cudaError_t result = cudaGetDeviceProperties(&dev_prop, 0);
-  coot_check_cuda_error(result, "cuda::inplace_op_subview(): couldn't get device properties");
-
   const void* args[] = {
       &(dest.cuda_mem_ptr),
       &val,
-      (size_t*) &end_row,
-      (size_t*) &end_col,
-      (size_t*) &m_n_rows,
-      (size_t*) &aux_row1,
-      (size_t*) &aux_col1 };
+      (uword*) &end_row,
+      (uword*) &end_col,
+      (uword*) &m_n_rows,
+      (uword*) &aux_row1,
+      (uword*) &aux_col1 };
 
   // grid dimensions:
   //   ideally, we want to use [n_rows, n_cols, 1]; but we have limits.  so   //   we might need to block it up a bit.  so, if n_rows * n_cols < maxThreadsPerBlock,
@@ -130,23 +124,23 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_row1, const
   size_t blockSize[2] = { n_rows, n_cols };
   size_t gridSize[2] = { 1, 1 };
 
-  if (int(n_rows) > dev_prop.maxThreadsPerBlock)
+  if (int(n_rows) > get_rt().cuda_rt.dev_prop.maxThreadsPerBlock)
     {
-    blockSize[0] = dev_prop.maxThreadsPerBlock;
+    blockSize[0] = get_rt().cuda_rt.dev_prop.maxThreadsPerBlock;
     blockSize[1] = 1;
 
-    gridSize[0] = std::ceil((double) n_rows / (double) dev_prop.maxThreadsPerBlock);
+    gridSize[0] = std::ceil((double) n_rows / (double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock);
     gridSize[1] = n_cols;
     }
-  else if (int(n_elem) > dev_prop.maxThreadsPerBlock)
+  else if (int(n_elem) > get_rt().cuda_rt.dev_prop.maxThreadsPerBlock)
     {
     blockSize[0] = n_rows;
-    blockSize[1] = std::floor((double) dev_prop.maxThreadsPerBlock / (double) n_rows);
+    blockSize[1] = std::floor((double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock / (double) n_rows);
 
     gridSize[1] = std::ceil((double) n_rows / (double) blockSize[1]);
     }
 
-  CUresult result2 = cuLaunchKernel(
+  CUresult result = cuLaunchKernel(
       kernel,
       gridSize[0], gridSize[1], 1,
       blockSize[0], blockSize[1], 1,
@@ -154,7 +148,7 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_row1, const
       (void**) args,
       0);
 
-  coot_check_cuda_error( result2, "cuda::inplace_op_subview(): cuLaunchKernel() failed");
+  coot_check_cuda_error( result, "cuda::inplace_op_subview(): cuLaunchKernel() failed");
 
   cuCtxSynchronize();
   }
@@ -174,18 +168,14 @@ inplace_op_subview(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword M_n_
   // Get kernel.
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(num);
 
-  cudaDeviceProp dev_prop;
-  cudaError_t result = cudaGetDeviceProperties(&dev_prop, 0);
-  coot_check_cuda_error(result, "cuda::inplace_op_subview(): couldn't get device properties");
-
   const void* args[] = {
       &(dest.cuda_mem_ptr),
       &(src.cuda_mem_ptr),
-      (size_t*) &aux_row1,
-      (size_t*) &aux_col1,
-      (size_t*) &M_n_rows,
-      (size_t*) &n_rows,
-      (size_t*) &n_cols };
+      (uword*) &aux_row1,
+      (uword*) &aux_col1,
+      (uword*) &M_n_rows,
+      (uword*) &n_rows,
+      (uword*) &n_cols };
 
   // Compute grid dimensions like the previous bit of code.
   size_t blockSize[2] = { n_rows, n_cols };
@@ -193,23 +183,23 @@ inplace_op_subview(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword M_n_
 
   const uword n_elem = n_rows * n_cols;
 
-  if (int(n_rows) > dev_prop.maxThreadsPerBlock)
+  if (int(n_rows) > get_rt().cuda_rt.dev_prop.maxThreadsPerBlock)
     {
-    blockSize[0] = dev_prop.maxThreadsPerBlock;
+    blockSize[0] = get_rt().cuda_rt.dev_prop.maxThreadsPerBlock;
     blockSize[1] = 1;
 
-    gridSize[0] = std::ceil((double) n_rows / (double) dev_prop.maxThreadsPerBlock);
+    gridSize[0] = std::ceil((double) n_rows / (double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock);
     gridSize[1] = n_cols;
     }
-  else if (int(n_elem) > dev_prop.maxThreadsPerBlock)
+  else if (int(n_elem) > get_rt().cuda_rt.dev_prop.maxThreadsPerBlock)
     {
     blockSize[0] = n_rows;
-    blockSize[1] = std::floor((double) dev_prop.maxThreadsPerBlock / (double) n_rows);
+    blockSize[1] = std::floor((double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock / (double) n_rows);
 
     gridSize[1] = std::ceil((double) n_rows / (double) blockSize[1]);
     }
 
-  CUresult result2 = cuLaunchKernel(
+  CUresult result = cuLaunchKernel(
       kernel,
       gridSize[0], gridSize[1], 1,
       blockSize[0], blockSize[1], 1,
@@ -217,7 +207,7 @@ inplace_op_subview(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword M_n_
       (void**) args,
       0);
 
-  coot_check_cuda_error(result2, std::string(identifier) + ": cuLaunchKernel() failed");
+  coot_check_cuda_error(result, std::string(identifier) + ": cuLaunchKernel() failed");
 
   cuCtxSynchronize();
   }
