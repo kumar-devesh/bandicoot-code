@@ -56,10 +56,12 @@ accu_chunked(dev_mem_t<eT> mem, const uword n_elem)
       (uword*) &chunk_size,
       (uword*) &n_chunks };
 
+  const kernel_dims dims = one_dimensional_grid_dims(n_chunks);
+
   CUresult result = cuLaunchKernel(
       k1,
-      std::ceil((double) n_chunks / (double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
-      get_rt().cuda_rt.dev_prop.maxThreadsPerBlock, 1, 1, // block dims
+      dims.d[0], dims.d[1], dims.d[2],
+      dims.d[3], dims.d[4], dims.d[5],
       0, NULL, // shared mem and stream
       (void**) args,
       0);
@@ -117,8 +119,8 @@ accu_simple(dev_mem_t<eT> mem, const uword n_elem)
 
   CUresult result = cuLaunchKernel(
       k1,
-      1, 1, 1, // grid dims
       1, 1, 1, // block dims
+      1, 1, 1, // grid dims
       0, NULL,
       (void**) args,
       0);
@@ -156,10 +158,12 @@ accu_subview(dev_mem_t<eT> mem, const uword m_n_rows, const uword aux_row1, cons
       (uword*) &n_rows,
       (uword*) &n_cols };
 
+  const kernel_dims dims = one_dimensional_grid_dims(n_cols);
+
   CUresult result = cuLaunchKernel(
       k1,
-      std::ceil((double) n_cols / (double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
-      get_rt().cuda_rt.dev_prop.maxThreadsPerBlock, 1, 1, // block dims
+      dims.d[0], dims.d[1], dims.d[2], // grid dims
+      dims.d[3], dims.d[4], dims.d[5], // block dims
       0, NULL,
       (void**) args,
       0);

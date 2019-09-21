@@ -206,6 +206,7 @@ namespace coot
   namespace cuda
     {
     #include "bandicoot_bits/cuda/debug.hpp"
+    #include "bandicoot_bits/cuda/kernel_misc.hpp"
     #include "bandicoot_bits/cuda/runtime_meat.hpp"
     #include "bandicoot_bits/cuda/inplace_op.hpp"
     #include "bandicoot_bits/cuda/array_op.hpp"

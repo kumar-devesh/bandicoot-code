@@ -128,41 +128,12 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
       (uword*) &n_rows,
       (uword*) &n_rows };
 
-  // grid dimensions:
-  //   ideally, we want to use [n_rows, n_cols, 1]; but we have limits.  so   //   we might need to block it up a bit.  so, if n_rows * n_cols < maxThreadsPerBlock,
-  //   we can use [n_rows, n_cols, 1]; otherwise, if n_rows < maxThreadsPerBlock,
-  //      we can use [n_rows, maxThreadsPerBlock / n_rows, 1];
-  //      and in this case we'll need a grid size of [1, ceil(n_cols / (mtpb / n_rows)), 1];
-  //
-  //   and if n_rows > mtpb,
-  //      we can use [mtpb, 1, 1]
-  //      and a grid size of [ceil(n_rows / mtpb), n_cols, 1].
-  //
-  // TODO: move this to some auxiliary code because it will surely be useful elsewhere
-  const uword n_elem = n_rows * n_rows;
-  size_t blockSize[2] = { n_rows, n_rows };
-  size_t gridSize[2] = { 1, 1 };
-
-  if (int(n_rows) > get_rt().cuda_rt.dev_prop.maxThreadsPerBlock)
-    {
-    blockSize[0] = get_rt().cuda_rt.dev_prop.maxThreadsPerBlock;
-    blockSize[1] = 1;
-
-    gridSize[0] = std::ceil((double) n_rows / (double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock);
-    gridSize[1] = n_rows;
-    }
-  else if (int(n_elem) > get_rt().cuda_rt.dev_prop.maxThreadsPerBlock)
-    {
-    blockSize[0] = n_rows;
-    blockSize[1] = std::floor((double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock / (double) n_rows);
-
-    gridSize[1] = std::ceil((double) n_rows / (double) blockSize[1]);
-    }
+  const kernel_dims dims = two_dimensional_grid_dims(n_rows, n_rows);
 
   CUresult result = cuLaunchKernel(
       kernel,
-      gridSize[0], gridSize[1], 1, // grid dims
-      blockSize[0], blockSize[1], 1, // block dims
+      dims.d[0], dims.d[1], dims.d[2],
+      dims.d[3], dims.d[4], dims.d[5],
       0, NULL,
       (void**) args,
       0);

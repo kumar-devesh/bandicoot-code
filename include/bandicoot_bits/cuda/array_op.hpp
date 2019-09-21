@@ -37,10 +37,12 @@ array_op(dev_mem_t<eT> out, const uword n_elem, dev_mem_t<eT> in_a, dev_mem_t<eT
       &(in_b.cuda_mem_ptr),
       (uword*) &n_elem };
 
+  const kernel_dims dims = one_dimensional_grid_dims(n_elem);
+
   CUresult result = cuLaunchKernel(
       kernel,
-      std::ceil((double) n_elem / (double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
-      get_rt().cuda_rt.dev_prop.maxThreadsPerBlock, 1, 1, // block dims
+      dims.d[0], dims.d[1], dims.d[2],
+      dims.d[3], dims.d[4], dims.d[5],
       0, NULL, // shared mem and stream
       (void**) args, // arguments
       0);

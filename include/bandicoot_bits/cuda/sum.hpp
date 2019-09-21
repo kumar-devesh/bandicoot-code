@@ -33,10 +33,12 @@ sum_colwise(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword n_rows, const 
       (uword*) &n_rows,
       (uword*) &n_cols };
 
+  const kernel_dims dims = one_dimensional_grid_dims(n_cols);
+
   CUresult result = cuLaunchKernel(
       kernel,
-      std::ceil((double) n_cols / (double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
-      get_rt().cuda_rt.dev_prop.maxThreadsPerBlock, 1, 1, // block dims
+      dims.d[0], dims.d[1], dims.d[2],
+      dims.d[3], dims.d[4], dims.d[5],
       0, NULL,
       (void**) args,
       0);
@@ -63,10 +65,12 @@ sum_rowwise(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword n_rows, const 
       (uword*) &n_rows,
       (uword*) &n_cols };
 
+  const kernel_dims dims = one_dimensional_grid_dims(n_rows);
+
   CUresult result = cuLaunchKernel(
       kernel,
-      std::ceil((double) n_rows / (double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
-      get_rt().cuda_rt.dev_prop.maxThreadsPerBlock, 1, 1, // block dims
+      dims.d[0], dims.d[1], dims.d[2],
+      dims.d[3], dims.d[4], dims.d[5],
       0, NULL,
       (void**) args,
       0);
@@ -96,10 +100,12 @@ sum_colwise_subview(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword M_n_ro
       (uword*) &n_rows,
       (uword*) &n_cols };
 
+  const kernel_dims dims = one_dimensional_grid_dims(n_cols);
+
   CUresult result = cuLaunchKernel(
       kernel,
-      std::ceil((double) n_cols / (double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
-      get_rt().cuda_rt.dev_prop.maxThreadsPerBlock, 1, 1, // block dims
+      dims.d[0], dims.d[1], dims.d[2],
+      dims.d[3], dims.d[4], dims.d[5],
       0, NULL,
       (void**) args,
       0);
@@ -129,10 +135,12 @@ sum_rowwise_subview(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword M_n_ro
       (uword*) &n_rows,
       (uword*) &n_cols };
 
+  const kernel_dims dims = one_dimensional_grid_dims(n_rows);
+
   CUresult result = cuLaunchKernel(
       kernel,
-      std::ceil((double) n_rows / (double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
-      get_rt().cuda_rt.dev_prop.maxThreadsPerBlock, 1, 1, // block dims
+      dims.d[0], dims.d[1], dims.d[2],
+      dims.d[3], dims.d[4], dims.d[5],
       0, NULL,
       (void**) args,
       0);

@@ -35,31 +35,12 @@ eye(dev_mem_t<eT> dest, const uword n_rows, const uword n_cols)
       (uword*) &n_rows,
       (uword*) &n_cols };
 
-  size_t blockSize[2] = { n_rows, n_cols };
-  size_t gridSize[2] = { 1, 1 };
-
-  const uword n_elem = n_rows * n_cols;
-
-  if (int(n_rows) > get_rt().cuda_rt.dev_prop.maxThreadsPerBlock)
-    {
-    blockSize[0] = get_rt().cuda_rt.dev_prop.maxThreadsPerBlock;
-    blockSize[1] = 1;
-
-    gridSize[0] = std::ceil((double) n_rows / (double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock);
-    gridSize[1] = n_cols;
-    }
-  else if (int(n_elem) > get_rt().cuda_rt.dev_prop.maxThreadsPerBlock)
-    {
-    blockSize[0] = n_rows;
-    blockSize[1] = std::floor((double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock / (double) n_rows);
-
-    gridSize[1] = std::ceil((double) n_rows / (double) blockSize[1]);
-    }
+  const kernel_dims dims = two_dimensional_grid_dims(n_rows, n_cols);
 
   CUresult result = cuLaunchKernel(
       kernel,
-      gridSize[0], gridSize[1], 1,
-      blockSize[0], blockSize[1], 1,
+      dims.d[0], dims.d[1], dims.d[2],
+      dims.d[3], dims.d[4], dims.d[5],
       0, NULL,
       (void**) args,
       0);

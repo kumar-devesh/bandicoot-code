@@ -35,10 +35,12 @@ eop_scalar(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword n_elem, cons
       &aux_val,
       (uword*) &n_elem };
 
+  const kernel_dims dims = one_dimensional_grid_dims(n_elem);
+
   CUresult result = cuLaunchKernel(
       kernel,
-      std::ceil((double) n_elem / (double) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock), 1, 1, // grid dims
-      get_rt().cuda_rt.dev_prop.maxThreadsPerBlock, 1, 1, // block dims
+      dims.d[0], dims.d[1], dims.d[2],
+      dims.d[3], dims.d[4], dims.d[5],
       0, NULL, // shared mem and stream
       (void**) args, // arguments
       0);
