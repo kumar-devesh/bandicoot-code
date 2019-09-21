@@ -34,7 +34,7 @@ class gemv
     const float local_alpha = (use_alpha) ? alpha : float(1);
     const float local_beta  = (use_beta)  ? beta  : float(0);
 
-    coot_rt_t::gemv<eT, do_trans_A>(y.get_dev_mem(false), A.get_dev_mem(false), A.n_rows, A.n_cols, x.get_dev_mem(false), local_alpha, local_beta);
+    coot_rt_t::gemv<eT, do_trans_A>(y.get_dev_mem(true), A.get_dev_mem(true), A.n_rows, A.n_cols, x.get_dev_mem(true), local_alpha, local_beta);
     }
   };
 

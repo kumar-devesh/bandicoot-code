@@ -36,8 +36,6 @@ get_val(const dev_mem_t<eT> mem, const uword index)
 
   coot_check_cuda_error(status, "cuda::get_val(): couldn't access device memory");
 
-  cuCtxSynchronize(); // TODO: is this needed for all CUDA operations?
-
   return val;
   }
 
@@ -58,8 +56,6 @@ set_val(dev_mem_t<eT> mem, const uword index, const eT in_val)
                                   cudaMemcpyHostToDevice);
 
   coot_check_cuda_error(status, "cuda::set_val(): couldn't access device memory");
-
-  cuCtxSynchronize();
   }
 
 

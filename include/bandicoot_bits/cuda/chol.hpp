@@ -140,8 +140,6 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
 
   coot_check_cuda_error(result, "cuda::chol(): cuLaunchKernel() failed for kernel ltri_set_zero");
 
-  cuCtxSynchronize();
-
   cusolverDnDestroy(handle);
 
   return true;

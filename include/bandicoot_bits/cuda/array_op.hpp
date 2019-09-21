@@ -48,8 +48,6 @@ array_op(dev_mem_t<eT> out, const uword n_elem, dev_mem_t<eT> in_a, dev_mem_t<eT
       0);
 
   coot_check_cuda_error( result, "cuda::array_op(): cuLaunchKernel() failed" );
-
-  cuCtxSynchronize();
   }
 
 

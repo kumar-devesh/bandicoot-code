@@ -28,7 +28,7 @@ chol(Mat<typename T1::elem_type>& out, const Base<typename T1::elem_type, T1>& X
 
   out = X.get_ref();
 
-  return coot_rt_t::chol(out.get_dev_mem(), out.n_rows);
+  return coot_rt_t::chol(out.get_dev_mem(true), out.n_rows);
   }
 
 

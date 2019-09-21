@@ -40,6 +40,9 @@ struct runtime_t
 
   coot_aligned cudaDeviceProp   dev_prop;
 
+  // TODO: is it necessary to have a lock() and unlock()?
+  // since all CUdevice and CUcontext are are pointers, I don't think we need to specifically lock them
+
   private:
 
   coot_aligned bool                     valid;
