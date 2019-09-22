@@ -44,8 +44,8 @@ inline kernel_dims one_dimensional_grid_dims(const uword n_elem)
   const size_t mtpb = (size_t) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock;
 
   kernel_dims result = create_kernel_dims();
-  result.d[0] = (std::min)(mtpb, n_elem);
-  result.d[3] = (n_elem + mtpb - 1) / mtpb;
+  result.d[3] = (std::min)(mtpb, n_elem);
+  result.d[0] = (n_elem + mtpb - 1) / mtpb;
 
   return result;
   }
@@ -68,25 +68,25 @@ inline kernel_dims two_dimensional_grid_dims(const uword n_rows, const uword n_c
   kernel_dims result = create_kernel_dims();
 
   // Ideally, we'd like to fit everything into one block, but that may not be possible.
-  result.d[0] = rows;
-  result.d[1] = cols;
+  result.d[3] = rows;
+  result.d[4] = cols;
 
   if (rows > mtpb)
     {
     // If the number of rows is greater than the maximum threads per block, we can handle one column at a time in each block.
-    result.d[0] = mtpb; // blockSize[0]
-    result.d[1] = 1;    // blockSize[1]
-    result.d[3] = (rows + mtpb - 1) / mtpb; // gridSize[0]
-    result.d[4] = cols; // gridSize[1]
+    result.d[3] = mtpb; // blockSize[0]
+    result.d[4] = 1;    // blockSize[1]
+    result.d[0] = (rows + mtpb - 1) / mtpb; // gridSize[0]
+    result.d[1] = cols; // gridSize[1]
 
     // TODO: what if this is greater than the maximum grid size?  (seems very unlikely)
     }
   else if (elem > mtpb)
     {
     // We can't fit everything in a single block, so we'll process multiple columns in each block.
-    result.d[0] = rows;           // blockSize[0]
-    result.d[1] = mtpb / rows;  // blockSize[1]
-    result.d[4] = (cols + result.d[1] - 1) / result.d[1]; // gridSize[1]
+    result.d[3] = rows;           // blockSize[0]
+    result.d[4] = mtpb / rows;  // blockSize[1]
+    result.d[1] = (cols + result.d[1] - 1) / result.d[1]; // gridSize[1]
     }
 
   return result;
