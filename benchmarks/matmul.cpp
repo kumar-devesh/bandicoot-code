@@ -6,109 +6,196 @@
 
 using namespace coot;
 
+
+
 template<typename MatType>
-double benchmark_square(const uword size, const bool trans_a, const bool trans_b, const bool opencl)
+void fill_randu(MatType& x, MatType& y)
   {
-  if (opencl)
-    {
-    coot::get_rt().backend = CL_BACKEND;
-    }
-  else
-    {
-    coot::get_rt().backend = CUDA_BACKEND;
-    }
+  arma::Mat<typename MatType::elem_type> cpu_x, cpu_y, cpu_z;
+  cpu_x.set_size(x.n_rows, x.n_cols);
+  cpu_y.set_size(y.n_rows, y.n_cols);
 
-  MatType x(size, size);
-  MatType y(size, size);
+  cpu_x.randu();
+  cpu_y.randu();
 
-  x.fill(typename MatType::elem_type(1));
-  y.fill(typename MatType::elem_type(2));
-
-  MatType z(size, size);
-
-  // Try to catch outliers: return the min of 3 trials.
-  // TODO: seems like that always gives garbage for CUDA... is it caching results or something?
-
-  wall_clock c;
-  double best_t = std::numeric_limits<double>::max();
-  for (size_t trial = 0; trial < 1; ++trial)
-    {
-    double t = 0.0;
-    if (trans_a && trans_b)
-      {
-      c.tic();
-      z = x.t() * y.t();
-      t = c.toc();
-      }
-    else if (trans_a)
-      {
-      c.tic();
-      z = x.t() * y;
-      t = c.toc();
-      }
-    else if (trans_b)
-      {
-      c.tic();
-      z = x * y.t();
-      t = c.toc();
-      }
-    else
-      {
-      c.tic();
-      z = x * y;
-      t = c.toc();
-      }
-
-    if (t < best_t)
-      {
-      best_t = t;
-      }
-    }
-
-  return best_t;
+  x.copy_into_dev_mem(cpu_x.memptr(), x.n_elem);
+  y.copy_into_dev_mem(cpu_y.memptr(), y.n_elem);
   }
 
-template<typename MatType>
-double benchmark_low_rank(const uword size, const uword rank, const bool opencl)
+
+
+template<>
+void fill_randu(arma::fmat& x, arma::fmat& y)
   {
-  if (opencl)
+  x.randu();
+  y.randu();
+  }
+
+
+
+template<>
+void fill_randu(arma::mat& x, arma::mat& y)
+  {
+  x.randu();
+  y.randu();
+  }
+
+
+
+template<typename MatType>
+void check_matmul(MatType& x, MatType& y, MatType& z, const bool trans_a, const bool trans_b)
+  {
+  arma::Mat<typename MatType::elem_type> cpu_x, cpu_y, cpu_zz, cpu_z;
+  cpu_x.set_size(x.n_rows, x.n_cols);
+  cpu_y.set_size(y.n_rows, y.n_cols);
+  cpu_z.set_size(z.n_rows, z.n_cols);
+
+  x.copy_from_dev_mem(cpu_x.memptr(), x.n_elem);
+  y.copy_from_dev_mem(cpu_y.memptr(), y.n_elem);
+  z.copy_from_dev_mem(cpu_z.memptr(), z.n_elem);
+
+  if (!trans_a && !trans_b)
+    cpu_zz = cpu_x * cpu_y;
+  else if (trans_a && !trans_b)
+    cpu_zz = cpu_x.t() * cpu_y;
+  else if (!trans_a && trans_b)
+    cpu_zz = cpu_x * cpu_y.t();
+  else
+    cpu_zz = cpu_x.t() * cpu_y.t();
+
+  const double diff = arma::norm(cpu_z - cpu_zz, 2) / cpu_z.n_elem;
+  if (diff > 1e-7)
     {
-    coot::get_rt().backend = CL_BACKEND;
+    std::cerr << "failed diff check! " << diff << "\n";
+    }
+  }
+
+
+
+template<>
+void check_matmul(arma::fmat& x, arma::fmat& y, arma::fmat& z, const bool trans_a, const bool trans_b)
+  {
+  // nothing to do
+  }
+
+
+
+template<>
+void check_matmul(arma::mat& x, arma::mat& y, arma::mat& z, const bool trans_a, const bool trans_b)
+  {
+  // nothing to do
+  }
+
+
+
+template<typename MatType>
+double run_benchmark(const uword rows, const uword cols, const bool trans_a, const bool trans_b, const bool cuda)
+  {
+  // set the correct backend
+  if (cuda)
+    get_rt().backend = CUDA_BACKEND;
+  else
+    get_rt().backend = CL_BACKEND;
+
+  MatType x;
+  if (trans_a)
+    x.set_size(cols, rows);
+  else
+    x.set_size(rows, cols);
+
+  MatType y;
+  if (trans_b)
+    y.set_size(rows, cols);
+  else
+    y.set_size(cols, rows);
+
+  fill_randu(x, y);
+
+  MatType z(rows, rows);
+
+  // finish all delayed operations
+  get_rt().synchronise();
+
+  wall_clock c;
+  double t;
+  if (trans_a && trans_b)
+    {
+    c.tic();
+    z = x.t() * y.t();
+    get_rt().synchronise();
+    t = c.toc();
+    }
+  else if (trans_a)
+    {
+    c.tic();
+    z = x.t() * y;
+    get_rt().synchronise();
+    t = c.toc();
+    }
+  else if (trans_b)
+    {
+    c.tic();
+    z = x * y.t();
+    get_rt().synchronise();
+    t = c.toc();
     }
   else
     {
-    coot::get_rt().backend = CUDA_BACKEND;
-    }
-
-  MatType x(rank, size);
-  MatType y(size, rank);
-
-  x.fill(typename MatType::elem_type(1));
-  y.fill(typename MatType::elem_type(2));
-
-  MatType z(rank, rank);
-
-  wall_clock c;
-  double best_t = std::numeric_limits<double>::max();
-  for (size_t trial = 0; trial < 1; ++trial)
-    {
-    double t = 0.0;
-
     c.tic();
     z = x * y;
+    get_rt().synchronise();
     t = c.toc();
-
-    if (t < best_t)
-      {
-      best_t = t;
-      }
     }
 
-  return best_t;
+  // sanity check on backend
+  //if (!std::is_same<MatType, arma::fmat>::value && !std::is_same<MatType, arma::mat>::value)
+  //  {
+  //  check_matmul<MatType>(x, y, z, trans_a, trans_b);
+  //  }
+
+  return t;
   }
 
-int main()
+
+
+template<typename MatType>
+void run_benchmarks(const uword rows,
+                    const uword cols,
+                    const bool trans_a,
+                    const bool trans_b,
+                    const bool cuda_backend,
+                    const size_t trials,
+                    const char* task_name,
+                    const char* device_name,
+                    const char* backend_name,
+                    const char* elem_type,
+                    std::ofstream& out)
   {
+  for (size_t trial = 0; trial < trials; ++trial)
+    {
+    const double t = run_benchmark<MatType>(rows, cols, trans_a, trans_b, cuda_backend);
+
+    out << task_name << ", " << device_name << ", " << backend_name << ", " << elem_type << ", "
+        << rows << ", " << cols << ", " << trial << ", " << t << "\n";
+    std::cout << task_name << ", " << device_name << ", " << backend_name << ", " << elem_type << ", "
+        << rows << ", " << cols << ", " << trial << ", " << t << "\n";
+    }
+  }
+
+int main(int argc, char** argv)
+  {
+  if (argc != 6)
+    {
+    std::cerr << "Usage: " << argv[0] << " device_name trials rows cols out_csv" << std::endl;
+    exit(1);
+    }
+
+  const char* device_name = argv[1];
+  const size_t trials = (size_t) atoi(argv[2]);
+  const uword rows = (uword) atoi(argv[3]);
+  const uword cols = (uword) atoi(argv[4]);
+  const char* out_csv = argv[5];
+
   wall_clock c;
 
   std::cout << "matmul: Matrix multiplication benchmark comparison\n";
@@ -116,203 +203,50 @@ int main()
   std::cout << "  armadillo version " << arma::arma_version::as_string() << '\n';
   std::cout << '\n';
 
-  // Time initialization of each.
+  // Time initialization.
   c.tic();
-  coot::get_rt().cl_rt.init(true);
+  coot::get_rt().init(true);
+  coot::get_rt().cuda_rt.init(false, 0, 0, true);
   double time = c.toc();
-  std::cout << "OpenCL initialization time: " << time << "s\n";
+  std::cout << "bandicoot initialization time: " << time << "s\n";
 
-  c.tic();
-  coot::get_rt().cuda_rt.init();
-  time = c.toc();
-
-  coot::get_rt().backend = CUDA_BACKEND;
-
-  std::cout << "CUDA initialization time: " << time << "s\n";
-  std::cout << "\n";
-
-  const double pow_max = 4.0;
-  const double pow_lr_max = 6.5;
-  const double pow_min = 2.0;
-  const double pow_step = 0.25;
-
-  for (double d = pow_min; d <= 4.0; d += pow_step)
+  std::ofstream out_file(out_csv, std::ios_base::app);
+  if (!out_file.is_open())
     {
-    const uword size = uword(std::pow(10.0, d));
-
-    std::cout << "x * y, eT = float, square matrices, dim = " << size << ": ";
-
-    std::cout << "arma: " << benchmark_square<arma::fmat>(size, false, false, CL_BACKEND) << "s, ";
-    std::cout << "OpenCL: " << benchmark_square<fmat>(size, false, false, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_square<fmat>(size, false, false, CUDA_BACKEND) << "s\n";
+    std::cerr << "failed to open " << out_csv << "!\n";
+    exit(1);
     }
 
-  std::cout << "\n";
+  // Run benchmarks for all four combinations of transposition and all the backends.
+  run_benchmarks<arma::fmat>(rows, cols, false, false, false, trials, "matmul", device_name, "cpu", "float", out_file);
+  run_benchmarks<coot::fmat>(rows, cols, false, false, false, trials, "matmul", device_name, "opencl", "float", out_file);
+  run_benchmarks<coot::fmat>(rows, cols, false, false, true, trials, "matmul", device_name, "cuda", "float", out_file);
 
-  for (double d = pow_min; d <= pow_max; d += pow_step)
-    {
-    const uword size = uword(std::pow(10.0, d));
+  run_benchmarks<arma::fmat>(rows, cols, true, false, false, trials, "matmul-at", device_name, "cpu", "float", out_file);
+  run_benchmarks<coot::fmat>(rows, cols, true, false, false, trials, "matmul-at", device_name, "opencl", "float", out_file);
+  run_benchmarks<coot::fmat>(rows, cols, true, false, true, trials, "matmul-at", device_name, "cuda", "float", out_file);
 
-    std::cout << "x * y, eT = double, square matrices, dim = " << size << ": ";
+  run_benchmarks<arma::fmat>(rows, cols, false, true, false, trials, "matmul-bt", device_name, "cpu", "float", out_file);
+  run_benchmarks<coot::fmat>(rows, cols, false, true, false, trials, "matmul-bt", device_name, "opencl", "float", out_file);
+  run_benchmarks<coot::fmat>(rows, cols, false, true, true, trials, "matmul-bt", device_name, "cuda", "float", out_file);
 
-    std::cout << "arma: " << benchmark_square<arma::mat>(size, false, false, CL_BACKEND) << "s, ";
-    std::cout << "OpenCL: " << benchmark_square<mat>(size, false, false, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_square<mat>(size, false, false, CUDA_BACKEND) << "s\n";
-    }
+  run_benchmarks<arma::fmat>(rows, cols, true, true, false, trials, "matmul-botht", device_name, "cpu", "float", out_file);
+  run_benchmarks<coot::fmat>(rows, cols, true, true, false, trials, "matmul-botht", device_name, "opencl", "float", out_file);
+  run_benchmarks<coot::fmat>(rows, cols, true, true, true, trials, "matmul-botht", device_name, "cuda", "float", out_file);
 
-  std::cout << "\n";
-/*
-  for (double d = pow_min; d <= pow_max; d += pow_step)
-    {
-    const uword size = uword(std::pow(10.0, d));
+  run_benchmarks<arma::mat>(rows, cols, false, false, false, trials, "matmul", device_name, "cpu", "double", out_file);
+  run_benchmarks<coot::mat>(rows, cols, false, false, false, trials, "matmul", device_name, "opencl", "double", out_file);
+  run_benchmarks<coot::mat>(rows, cols, false, false, true, trials, "matmul", device_name, "cuda", "double", out_file);
 
-    std::cout << "x * y.t(), eT = float, square matrices, dim = " << size << ": ";
+  run_benchmarks<arma::mat>(rows, cols, true, false, false, trials, "matmul-at", device_name, "cpu", "double", out_file);
+  run_benchmarks<coot::mat>(rows, cols, true, false, false, trials, "matmul-at", device_name, "opencl", "double", out_file);
+  run_benchmarks<coot::mat>(rows, cols, true, false, true, trials, "matmul-at", device_name, "cuda", "double", out_file);
 
-    std::cout << "arma: " << benchmark_square<arma::fmat>(size, false, true, CL_BACKEND) << "s, ";
-    std::cout << "OpenCL: " << benchmark_square<fmat>(size, false, true, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_square<fmat>(size, false, true, CUDA_BACKEND) << "s\n";
-    }
+  run_benchmarks<arma::mat>(rows, cols, false, true, false, trials, "matmul-bt", device_name, "cpu", "double", out_file);
+  run_benchmarks<coot::mat>(rows, cols, false, true, false, trials, "matmul-bt", device_name, "opencl", "double", out_file);
+  run_benchmarks<coot::mat>(rows, cols, false, true, true, trials, "matmul-bt", device_name, "cuda", "double", out_file);
 
-  std::cout << "\n";
-
-  for (double d = pow_min; d <= pow_max; d += pow_step)
-    {
-    const uword size = uword(std::pow(10.0, d));
-
-    std::cout << "x * y.t(), eT = double, square matrices, dim = " << size << ": ";
-
-    std::cout << "arma: " << benchmark_square<arma::mat>(size, false, true, CL_BACKEND) << "s, ";
-    std::cout << "OpenCL: " << benchmark_square<mat>(size, false, true, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_square<mat>(size, false, true, CUDA_BACKEND) << "s\n";
-
-    }
-
-  std::cout << "\n";
-
-  for (double d = pow_min; d <= pow_max; d += pow_step)
-    {
-    const uword size = uword(std::pow(10.0, d));
-
-    std::cout << "x.t() * y, eT = float, square matrices, dim = " << size << ": ";
-
-    std::cout << "arma: " << benchmark_square<arma::fmat>(size, true, false, CL_BACKEND) << "s, ";
-    std::cout << "OpenCL: " << benchmark_square<fmat>(size, true, false, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_square<fmat>(size, true, false, CUDA_BACKEND) << "s\n";
-    }
-
-  std::cout << "\n";
-
-  for (double d = pow_min; d <= pow_max; d += pow_step)
-    {
-    const uword size = uword(std::pow(10.0, d));
-
-    std::cout << "x.t() * y, eT = double, square matrices, dim = " << size << ": ";
-
-    std::cout << "arma: " << benchmark_square<arma::mat>(size, true, false, CL_BACKEND) << "s, ";
-    std::cout << "OpenCL: " << benchmark_square<mat>(size, true, false, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_square<mat>(size, true, false, CUDA_BACKEND) << "s\n";
-
-    }
-
-  std::cout << "\n";
-
-  for (double d = pow_min; d <= pow_max; d += pow_step)
-    {
-    const uword size = uword(std::pow(10.0, d));
-
-    std::cout << "x.t() * y.t(), eT = float, square matrices, dim = " << size << ": ";
-
-    std::cout << "arma: " << benchmark_square<arma::fmat>(size, true, true, CL_BACKEND) << "s, ";
-    std::cout << "OpenCL: " << benchmark_square<fmat>(size, true, true, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_square<fmat>(size, true, true, CUDA_BACKEND) << "s\n";
-    }
-
-  std::cout << "\n";
-
-  for (double d = pow_min; d <= pow_max; d += pow_step)
-    {
-    const uword size = uword(std::pow(10.0, d));
-
-    std::cout << "x.t() * y, eT = double, square matrices, dim = " << size << ": ";
-
-    std::cout << "arma: " << benchmark_square<arma::mat>(size, true, true, CL_BACKEND) << "s, ";
-    std::cout << "OpenCL: " << benchmark_square<mat>(size, true, true, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_square<mat>(size, true, true, CUDA_BACKEND) << "s\n";
-    }*/
-
-  for (double d = pow_min; d <= pow_lr_max; d += 2.0 * pow_step)
-    {
-    const uword size = uword(std::pow(10.0, d));
-
-    std::cout << "x * y, eT = float, dim = [" << size << " x 10]: ";
-
-    std::cout << "arma: " << benchmark_low_rank<arma::fmat>(size, 10, CL_BACKEND) << "s, ";
-    std::cout << "OpenCL: " << benchmark_low_rank<fmat>(size, 10, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_low_rank<fmat>(size, 10, CUDA_BACKEND) << "s\n";
-    }
-
-  std::cout << "\n";
-
-  for (double d = pow_min; d <= pow_lr_max; d += 2.0 * pow_step)
-    {
-    const uword size = uword(std::pow(10.0, d));
-
-    std::cout << "x * y, eT = double, dim = [" << size << " x 10]: ";
-
-    std::cout << "arma: " << benchmark_low_rank<arma::mat>(size, 10, CL_BACKEND) << "s, ";
-    std::cout << "OpenCL: " << benchmark_low_rank<mat>(size, 10, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_low_rank<mat>(size, 10, CUDA_BACKEND) << "s\n";
-    }
-
-  std::cout << "\n";
-
-  for (double d = pow_min; d <= pow_lr_max; d += 2.0 * pow_step)
-    {
-    const uword size = uword(std::pow(10.0, d));
-
-    std::cout << "x * y, eT = float, dim = [" << size << " x 50]: ";
-
-    std::cout << "arma: " << benchmark_low_rank<arma::fmat>(size, 50, CL_BACKEND) << "s, ";
-    std::cout << "OpenCL: " << benchmark_low_rank<fmat>(size, 50, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_low_rank<fmat>(size, 50, CUDA_BACKEND) << "s\n";
-    }
-
-  std::cout << "\n";
-
-  for (double d = pow_min; d <= pow_lr_max; d += 2.0 * pow_step)
-    {
-    const uword size = uword(std::pow(10.0, d));
-
-    std::cout << "x * y, eT = double, dim = [" << size << " x 50]: ";
-
-    std::cout << "arma: " << benchmark_low_rank<arma::mat>(size, 50, CL_BACKEND) << "s, ";
-    std::cout << "OpenCL: " << benchmark_low_rank<mat>(size, 50, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_low_rank<mat>(size, 50, CUDA_BACKEND) << "s\n";
-    }
-
-  std::cout << "\n";
-
-  for (double d = pow_min; d <= pow_lr_max; d += 2.0 * pow_step)
-    {
-    const uword size = uword(std::pow(10.0, d));
-
-    std::cout << "x * y, eT = float, dim = [" << size << " x 100]: ";
-
-    std::cout << "arma: " << benchmark_low_rank<arma::fmat>(size, 100, CL_BACKEND) << "s, ";
-    std::cout << "OpenCL: " << benchmark_low_rank<fmat>(size, 100, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_low_rank<fmat>(size, 100, CUDA_BACKEND) << "s\n";
-    }
-
-  std::cout << "\n";
-
-  for (double d = pow_min; d <= pow_lr_max; d += 2.0 * pow_step)
-    {
-    const uword size = uword(std::pow(10.0, d));
-
-    std::cout << "x * y, eT = double, dim = [" << size << " x 100]: ";
-
-    std::cout << "arma: " << benchmark_low_rank<arma::mat>(size, 100, CL_BACKEND) << "s, ";
-    std::cout << "OpenCL: " << benchmark_low_rank<mat>(size, 100, CL_BACKEND) << "s, ";
-    std::cout << "CUDA: " << benchmark_low_rank<mat>(size, 100, CUDA_BACKEND) << "s\n";
-    }
+  run_benchmarks<arma::mat>(rows, cols, true, true, false, trials, "matmul-botht", device_name, "cpu", "double", out_file);
+  run_benchmarks<coot::mat>(rows, cols, true, true, false, trials, "matmul-botht", device_name, "opencl", "double", out_file);
+  run_benchmarks<coot::mat>(rows, cols, true, true, true, trials, "matmul-botht", device_name, "cuda", "double", out_file);
   }
