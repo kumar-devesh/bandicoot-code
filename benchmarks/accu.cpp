@@ -83,8 +83,8 @@ void run_benchmarks(const uword elem,
     {
     const double t = run_benchmark<MatType>(elem, cuda);
 
-    out << task_name << ", " << device_name << ", " << backend_name << ", " << elem_type << ", "
-        << elem << ", 1, " << trial << ", " << t << "\n";
+    out << task_name << "," << device_name << "," << backend_name << "," << elem_type << ","
+        << elem << ",1," << trial << "," << t << "\n";
     std::cout << task_name << ", " << device_name << ", " << backend_name << ", " << elem_type << ", "
         << elem << ", 1, " << trial << ", " << t << "\n";
     }

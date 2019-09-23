@@ -10,7 +10,7 @@
 device="rtx2080ti"
 trials=5;
 
-echo "task, device, backend, elem_type, rows, cols, trial, time" > results.csv;
+echo "task,device,backend,elem_type,rows,cols,trial,time" > results.csv;
 
 # square benchmarks
 for r in 100 300 1000 3000 10000 30000

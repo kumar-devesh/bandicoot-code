@@ -175,8 +175,8 @@ void run_benchmarks(const uword rows,
     {
     const double t = run_benchmark<MatType>(rows, cols, trans_a, trans_b, cuda_backend);
 
-    out << task_name << ", " << device_name << ", " << backend_name << ", " << elem_type << ", "
-        << rows << ", " << cols << ", " << trial << ", " << t << "\n";
+    out << task_name << "," << device_name << "," << backend_name << "," << elem_type << ","
+        << rows << "," << cols << "," << trial << "," << t << "\n";
     std::cout << task_name << ", " << device_name << ", " << backend_name << ", " << elem_type << ", "
         << rows << ", " << cols << ", " << trial << ", " << t << "\n";
     }
