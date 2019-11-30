@@ -103,37 +103,13 @@ subview<eT>::operator= (const subview<eT>& x)
 template<typename eT>
 inline
 void
-subview<eT>::inplace_op(const eT val, cl_kernel kernel)
+subview<eT>::inplace_op(const eT val, kernel_id::enum_id kernel)
   {
   coot_extra_debug_sigprint();
-  
+
   if(n_elem == 0)  { return; }
-  
-  coot_rt_t::cq_guard guard;
-  
-  const uword end_row = aux_row1 + n_rows - 1;
-  const uword end_col = aux_col1 + n_cols - 1;
-  
-  coot_rt_t::adapt_uword m_end_row(end_row);
-  coot_rt_t::adapt_uword m_end_col(end_col);
-  
-  coot_rt_t::adapt_uword m_n_rows(m.n_rows);
-  
-  cl_int status = 0;
-  
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem),    &m.dev_mem );
-  status |= clSetKernelArg(kernel, 1, sizeof(eT),        &val          );
-  status |= clSetKernelArg(kernel, 2, m_end_row.size,    m_end_row.addr);
-  status |= clSetKernelArg(kernel, 3, m_end_col.size,    m_end_col.addr);
-  status |= clSetKernelArg(kernel, 4,  m_n_rows.size,     m_n_rows.addr);
-  
-  size_t global_work_offset[2] = { size_t(aux_row1), size_t(aux_col1) };  // starting point in parent matrix
-  size_t global_work_size[2]   = { size_t(n_rows),   size_t(n_cols)   };  // size of submatrix
-  
-  // NOTE: Clover / Mesa 13.0.4 can't handle offsets
-  status |= clEnqueueNDRangeKernel(coot_rt.get_cq(), kernel, 2, global_work_offset, global_work_size, NULL, 0, NULL, NULL);
-  
-  coot_check_runtime_error( (status != 0), "subview::inplace_op(): couldn't execute kernel" );
+
+  coot_rt_t::inplace_op_subview(m.dev_mem, val, aux_row1, aux_col1, n_rows, n_cols, m.n_rows, kernel);
   }
 
 
@@ -165,10 +141,8 @@ void
 subview<eT>::operator+= (const eT val)
   {
   coot_extra_debug_sigprint();
-  
-  cl_kernel kernel = coot_rt.get_kernel<eT>(kernel_id::submat_inplace_plus_scalar);
-  
-  (*this).inplace_op(val, kernel);
+
+  inplace_op(val, kernel_id::submat_inplace_plus_scalar);
   }
 
 
@@ -179,10 +153,8 @@ void
 subview<eT>::operator-= (const eT val)
   {
   coot_extra_debug_sigprint();
-  
-  cl_kernel kernel = coot_rt.get_kernel<eT>(kernel_id::submat_inplace_minus_scalar);
-  
-  (*this).inplace_op(val, kernel);
+
+  inplace_op(val, kernel_id::submat_inplace_minus_scalar);
   }
 
 
@@ -193,10 +165,8 @@ void
 subview<eT>::operator*= (const eT val)
   {
   coot_extra_debug_sigprint();
-  
-  cl_kernel kernel = coot_rt.get_kernel<eT>(kernel_id::submat_inplace_mul_scalar);
-  
-  (*this).inplace_op(val, kernel);
+
+  inplace_op(val, kernel_id::submat_inplace_mul_scalar);
   }
 
 
@@ -207,10 +177,8 @@ void
 subview<eT>::operator/= (const eT val)
   {
   coot_extra_debug_sigprint();
-  
-  cl_kernel kernel = coot_rt.get_kernel<eT>(kernel_id::submat_inplace_div_scalar);
-  
-  (*this).inplace_op(val, kernel);
+
+  inplace_op(val, kernel_id::submat_inplace_div_scalar);
   }
 
 
@@ -219,42 +187,18 @@ template<typename eT>
 template<typename T1>
 inline
 void
-subview<eT>::inplace_op(const Base<eT,T1>& in, cl_kernel kernel, const char* identifier)
+subview<eT>::inplace_op(const Base<eT,T1>& in, kernel_id::enum_id num, const char* identifier)
   {
   coot_extra_debug_sigprint();
-  
+
   const unwrap<T1>   U(in.get_ref());
   const Mat<eT>& X = U.M;
-  
+
   coot_assert_same_size(n_rows, n_cols, X.n_rows, X.n_cols, identifier);
-  
+
   if(n_elem == 0)  { return; }
-  
-  coot_rt_t::cq_guard guard;
-  
-  coot_rt_t::adapt_uword start_row(aux_row1);
-  coot_rt_t::adapt_uword start_col(aux_col1);
-  
-  coot_rt_t::adapt_uword m_n_rows(m.n_rows);
-  
-  coot_rt_t::adapt_uword X_n_rows(X.n_rows);
-  coot_rt_t::adapt_uword X_n_cols(X.n_cols);
-  
-  cl_int status = 0;
-  
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &m.dev_mem    );
-  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &X.dev_mem    );
-  status |= clSetKernelArg(kernel, 2, start_row.size, start_row.addr);
-  status |= clSetKernelArg(kernel, 3, start_col.size, start_col.addr);
-  status |= clSetKernelArg(kernel, 4,  m_n_rows.size,  m_n_rows.addr);
-  status |= clSetKernelArg(kernel, 5,  X_n_rows.size,  X_n_rows.addr);
-  status |= clSetKernelArg(kernel, 6,  X_n_cols.size,  X_n_cols.addr);
-  
-  size_t global_work_size[2] = { size_t(X.n_rows), size_t(X.n_cols) };
-  
-  status |= clEnqueueNDRangeKernel(coot_rt.get_cq(), kernel, 2, NULL, global_work_size, NULL, 0, NULL, NULL);
-  
-  coot_check_runtime_error( (status != 0), "subview::inplace_op(): couldn't execute kernel" );
+
+  coot_rt_t::inplace_op_subview(m.get_dev_mem(false), X.get_dev_mem(false), m.n_rows, aux_row1, aux_col1, X.n_rows, X.n_cols, num, identifier);
   }
 
 
@@ -266,46 +210,41 @@ void
 subview<eT>::operator= (const Base<eT,T1>& in)
   {
   coot_extra_debug_sigprint();
-  
-  // TODO: determine which is generally faster on various platforms and GPUs
-  
-  if(true)
+
+  // TODO: the code below uses the submat_inplace_set_mat kernel, but it may be faster to use the commented-out code with clEnqueueCopyBufferRect() with the OpenCL backend
+
+  inplace_op(in, kernel_id::submat_inplace_set_mat, "subview::operator=()");
+    
+  /*
+  const unwrap<T1>   U(in.get_ref());
+  const Mat<eT>& X = U.M;
+    
+  coot_assert_same_size(n_rows, n_cols, X.n_rows, X.n_cols, "subview::operator=");
+    
+  // if the entire range is selected, use simple copy
+  // (beignet 1.3 crashes if clEnqueueCopyBufferRect() is used on entire range)
+  if( (n_rows == m.n_rows) && (n_cols == m.n_cols) )
     {
-    cl_kernel kernel = coot_rt.get_kernel<eT>(kernel_id::submat_inplace_set_mat);
-    
-    inplace_op(in, kernel, "subview::operator=");
+    Mat<eT>& mm = const_cast< Mat<eT>& >(m);
+    m = in.get_ref();
+    return;
     }
-  else
-    {
-    const unwrap<T1>   U(in.get_ref());
-    const Mat<eT>& X = U.M;
     
-    coot_assert_same_size(n_rows, n_cols, X.n_rows, X.n_cols, "subview::operator=");
+  size_t src_origin[3] = { 0, 0, 0 };
+  size_t dst_origin[3] = { aux_row1*sizeof(eT), aux_col1, 0 };
     
-    // if the entire range is selected, use simple copy
-    // (beignet 1.3 crashes if clEnqueueCopyBufferRect() is used on entire range)
-    if( (n_rows == m.n_rows) && (n_cols == m.n_cols) )
-      {
-      Mat<eT>& mm = const_cast< Mat<eT>& >(m);
-      m = in.get_ref();
-      return;
-      }
+  size_t region[3] = { n_rows*sizeof(eT), n_cols, 1 };
     
-    size_t src_origin[3] = { 0, 0, 0 };
-    size_t dst_origin[3] = { aux_row1*sizeof(eT), aux_col1, 0 };
+  size_t src_row_pitch   = 0;
+  size_t src_slice_pitch = 0;
     
-    size_t region[3] = { n_rows*sizeof(eT), n_cols, 1 };
+  size_t dst_row_pitch   = sizeof(eT) * m.n_rows;
+  size_t dst_slice_pitch = sizeof(eT) * m.n_cols * m.n_rows;
     
-    size_t src_row_pitch   = 0;
-    size_t src_slice_pitch = 0;
+  cl_int status = clEnqueueCopyBufferRect(get_rt().cl_rt.get_cq(), X.dev_mem, m.dev_mem, src_origin, dst_origin, region, src_row_pitch, src_slice_pitch, dst_row_pitch, dst_slice_pitch, 0, NULL, NULL);
     
-    size_t dst_row_pitch   = sizeof(eT) * m.n_rows;
-    size_t dst_slice_pitch = sizeof(eT) * m.n_cols * m.n_rows;
-    
-    cl_int status = clEnqueueCopyBufferRect(coot_rt.get_cq(), X.dev_mem, m.dev_mem, src_origin, dst_origin, region, src_row_pitch, src_slice_pitch, dst_row_pitch, dst_slice_pitch, 0, NULL, NULL);
-    
-    coot_check_runtime_error( (status != 0), "subview::extract: couldn't copy buffer" );
-    }
+  coot_check_runtime_error( (status != 0), "subview::extract: couldn't copy buffer" );
+  */
   }
 
 
@@ -318,9 +257,7 @@ subview<eT>::operator+= (const Base<eT,T1>& in)
   {
   coot_extra_debug_sigprint();
   
-  cl_kernel kernel = coot_rt.get_kernel<eT>(kernel_id::submat_inplace_plus_mat);
-  
-  inplace_op(in, kernel, "subview::operator+=");
+  inplace_op(in, kernel_id::submat_inplace_plus_mat, "subview::operator+=()");
   }
 
 
@@ -333,9 +270,7 @@ subview<eT>::operator-= (const Base<eT,T1>& in)
   {
   coot_extra_debug_sigprint();
   
-  cl_kernel kernel = coot_rt.get_kernel<eT>(kernel_id::submat_inplace_minus_mat);
-  
-  inplace_op(in, kernel, "subview::operator-=");
+  inplace_op(in, kernel_id::submat_inplace_minus_mat, "subview::operator-=()");
   }
 
 
@@ -348,9 +283,7 @@ subview<eT>::operator%= (const Base<eT,T1>& in)
   {
   coot_extra_debug_sigprint();
   
-  cl_kernel kernel = coot_rt.get_kernel<eT>(kernel_id::submat_inplace_schur_mat);
-  
-  inplace_op(in, kernel, "subview::operator%=");
+  inplace_op(in, kernel_id::submat_inplace_schur_mat, "subview::operator%=()");
   }
 
 
@@ -363,9 +296,7 @@ subview<eT>::operator/= (const Base<eT,T1>& in)
   {
   coot_extra_debug_sigprint();
   
-  cl_kernel kernel = coot_rt.get_kernel<eT>(kernel_id::submat_inplace_div_mat);
-  
-  inplace_op(in, kernel, "subview::operator/=");
+  inplace_op(in, kernel_id::submat_inplace_div_mat, "subview::operator/=()");
   }
 
 
@@ -377,9 +308,7 @@ subview<eT>::fill(const eT val)
   {
   coot_extra_debug_sigprint();
   
-  cl_kernel kernel = coot_rt.get_kernel<eT>(kernel_id::submat_inplace_set_scalar);
-  
-  (*this).inplace_op(val, kernel);
+  (*this).inplace_op(val, kernel_id::submat_inplace_set_scalar);
   }
 
 
@@ -545,33 +474,23 @@ subview<eT>::extract(Mat<eT>& out, const subview<eT>& in)
     out = in.m;
     return;
     }
+
+  coot_rt_t::extract_subview(out.get_dev_mem(false), in.m.get_dev_mem(false), in.m.n_rows, in.m.n_cols, in.aux_row1, in.aux_col1, in.n_rows, in.n_cols);
   
-  coot_rt_t::cq_guard guard;
+//  size_t src_origin[3] = { in.aux_row1*sizeof(eT), in.aux_col1, 0 };
+//  size_t dst_origin[3] = { 0, 0, 0 };
   
-  // treat the matrix as an image rotated 90 degrees
-  // width  of img = number of rows
-  // height of img = number of cols
+//  size_t region[3] = { in.n_rows*sizeof(eT), in.n_cols, 1 };
   
-  // whoever designed the API for clEnqueueCopyBufferRect() should be permanently removed from the gene pool;
-  // the starting row needs to be multiplied by the element size,
-  // because it was too logical to add a separate "size of element" argument
+//  size_t src_row_pitch   = sizeof(eT) * in.m.n_rows;
+//  size_t src_slice_pitch = sizeof(eT) * in.m.n_cols * in.m.n_rows;
   
-  // TODO: is using clEnqueueCopyBufferRect actually faster than using a dedicated kernel?
+//  size_t dst_row_pitch   = 0;
+//  size_t dst_slice_pitch = 0;
   
-  size_t src_origin[3] = { in.aux_row1*sizeof(eT), in.aux_col1, 0 };
-  size_t dst_origin[3] = { 0, 0, 0 };
+//  cl_int status = clEnqueueCopyBufferRect(get_rt().cl_rt.get_cq(), in.m.dev_mem, out.dev_mem, src_origin, dst_origin, region, src_row_pitch, src_slice_pitch, dst_row_pitch, dst_slice_pitch, 0, NULL, NULL);
   
-  size_t region[3] = { in.n_rows*sizeof(eT), in.n_cols, 1 };
-  
-  size_t src_row_pitch   = sizeof(eT) * in.m.n_rows;
-  size_t src_slice_pitch = sizeof(eT) * in.m.n_cols * in.m.n_rows;
-  
-  size_t dst_row_pitch   = 0;
-  size_t dst_slice_pitch = 0;
-  
-  cl_int status = clEnqueueCopyBufferRect(coot_rt.get_cq(), in.m.dev_mem, out.dev_mem, src_origin, dst_origin, region, src_row_pitch, src_slice_pitch, dst_row_pitch, dst_slice_pitch, 0, NULL, NULL);
-  
-  coot_check_runtime_error( (status != 0), "subview::extract: couldn't copy buffer" );
+//  coot_check_runtime_error( (status != 0), "subview::extract: couldn't copy buffer" );
   }
 
 

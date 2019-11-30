@@ -14,165 +14,149 @@
 
 
 
-struct coot_rt_dev_info
+// this can hold either CUDA memory or CL memory
+template<typename eT>
+union dev_mem_t
   {
-  public:
-  
-  coot_aligned bool  is_gpu;
-  coot_aligned bool  has_float64;
-  coot_aligned bool  has_sizet64;
-  coot_aligned uword ptr_width;
-  coot_aligned uword n_units;
-  coot_aligned uword opencl_ver;
-  
-  inline
-  void
-  reset()
-    {
-    is_gpu      = false;
-    has_float64 = false;
-    has_sizet64 = false;
-    n_units     = 0;
-    ptr_width   = 0;
-    opencl_ver  = 0;
-    }
-  
-  inline coot_rt_dev_info()  { reset(); }
+  cl_mem cl_mem_ptr;
+  eT* cuda_mem_ptr;
   };
 
-
+enum coot_backend_t
+  {
+  CL_BACKEND = 0,
+  CUDA_BACKEND
+  };
 
 // TODO: if this is placed into a run-time library and executed there, what happens when two programs use the run-time library at the same time?
 class coot_rt_t
   {
-  private:
-  
-  coot_aligned bool             valid;
-  
-  coot_aligned cl_platform_id   plt_id;
-  coot_aligned cl_device_id     dev_id;
-  coot_aligned cl_context       ctxt;
-  coot_aligned cl_command_queue cq;
-  
-  coot_aligned coot_rt_dev_info dev_info;
-  
-  coot_aligned std::vector<cl_kernel>  u32_kernels;
-  coot_aligned std::vector<cl_kernel>  s32_kernels;
-  coot_aligned std::vector<cl_kernel>  u64_kernels;
-  coot_aligned std::vector<cl_kernel>  s64_kernels;
-  coot_aligned std::vector<cl_kernel>    f_kernels;
-  coot_aligned std::vector<cl_kernel>    d_kernels;
-  coot_aligned std::vector<cl_kernel> cx_f_kernels;
-  coot_aligned std::vector<cl_kernel> cx_d_kernels;
-  
-  #if defined(COOT_USE_CXX11)
-  coot_aligned std::recursive_mutex mutex;
-  #endif
-  
-  inline void   lock();  //! NOTE: do not call this function directly; instead instantiate the cq_guard class inside a relevant scope
-  inline void unlock();  //! NOTE: do not call this function directly; it's automatically called when an instance of cq_guard goes out of scope
-  
-  inline void internal_cleanup();
-  inline bool internal_init(const bool manual_selection, const uword wanted_platform, const uword wanted_device, const bool print_info);
-  
-  inline bool search_devices(cl_platform_id& out_plat_id, cl_device_id& out_dev_id, const bool manual_selection, const uword wanted_platform, const uword wanted_device, const bool print_info) const;
-  
-  inline bool interrogate_device(coot_rt_dev_info& out_info, cl_platform_id in_plat_id, cl_device_id in_dev_id, const bool print_info) const;
-  
-  inline bool setup_queue(cl_context& out_context, cl_command_queue& out_queue, cl_platform_id in_plat_id, cl_device_id in_dev_id) const;
-  
-  template<typename eT>
-  inline bool init_kernels(std::vector<cl_kernel>& kernels, const std::string& source, const std::vector<std::string>& names);
-  
-  
-  
   public:
-  
+
+  coot_backend_t backend;
+
+  #if defined(COOT_USE_OPENCL)
+  opencl::runtime_t cl_rt;
+  #endif
+
+  #if defined(COOT_USE_CUDA)
+  cuda::runtime_t cuda_rt;
+  #endif
+
   inline ~coot_rt_t();
   inline  coot_rt_t();
-  
+
   inline bool init(const bool print_info = false);
   inline bool init(const char*       filename, const bool print_info = false);
   inline bool init(const std::string filename, const bool print_info = false);
   inline bool init(const uword wanted_platform, const uword wanted_device, const bool print_info = false);
-  
+
   #if defined(COOT_USE_CXX11)
                    coot_rt_t(const coot_rt_t&) = delete;
   coot_rt_t&       operator=(const coot_rt_t&) = delete;
   #endif
-  
-  inline uword get_n_units() const;
-  
-  inline bool is_valid()    const;
-  inline bool has_sizet64() const;
-  inline bool has_float64() const;
-  
+
+  /**
+   * all of the functions below here are redirected to the current backend that is in use
+   */
+
   template<typename eT>
-  inline cl_mem acquire_memory(const uword n_elem);
-  
-  inline void release_memory(cl_mem dev_mem);
-  
-  inline cl_device_id     get_device();
-  inline cl_context       get_context();
-  inline cl_command_queue get_cq();
-  
-  inline bool create_extra_cq(cl_command_queue& out_queue);
-  inline void delete_extra_cq(cl_command_queue&  in_queue);
-  
-  // TODO: add function to return info about device as a string
-  
-  template<typename eT> inline cl_kernel get_kernel(const kernel_id::enum_id num);
-  
-  class program_wrapper;
-  class cq_guard;
-  class adapt_uword;
-  
-  friend class cq_guard;  // explicitly allows cq_guard to call lock() and unlock()
+  static inline dev_mem_t<eT> acquire_memory(const uword n_elem);
+
+  template<typename eT>
+  static inline void release_memory(dev_mem_t<eT> dev_mem);
+
+  template<typename eT>
+  static inline void copy_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem);
+
+  template<typename eT>
+  static inline void inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, const kernel_id::enum_id num);
+
+  template<typename eT>
+  static inline void inplace_op_array(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword n_elem, const kernel_id::enum_id num);
+
+  template<typename eT>
+  static inline void inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const uword M_n_rows, const kernel_id::enum_id num);
+
+  template<typename eT>
+  static inline void inplace_op_subview(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword M_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const kernel_id::enum_id num, const char* identifier);
+
+  template<typename eT>
+  static inline void fill_randu(dev_mem_t<eT> dest, const uword n);
+
+  template<typename eT>
+  static inline void fill_randn(dev_mem_t<eT> dest, const uword n);
+
+  template<typename eT>
+  static inline void array_op(dev_mem_t<eT> dest, const uword n_elem, const dev_mem_t<eT> A_mem, const dev_mem_t<eT> B_mem, const kernel_id::enum_id num);
+
+  template<typename eT>
+  static inline void eop_scalar(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword n_elem, const eT aux_val, const kernel_id::enum_id num);
+
+  template<typename eT>
+  static inline eT accu_chunked(const dev_mem_t<eT> mem, const uword n_elem);
+
+  template<typename eT>
+  static inline eT accu_simple(const dev_mem_t<eT> mem, const uword n_elem);
+
+  template<typename eT>
+  static inline eT accu_subview(const dev_mem_t<eT> mem, const uword M_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols);
+
+  template<typename eT>
+  static inline bool chol(dev_mem_t<eT> out, const uword n_rows);
+
+  template<typename eT>
+  static inline void copy_from_dev_mem(eT* dest, const dev_mem_t<eT> src, const uword N);
+
+  template<typename eT>
+  static inline void copy_into_dev_mem(dev_mem_t<eT> dest, const eT* src, const uword N);
+
+  template<typename eT>
+  static inline void extract_subview(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword M_n_rows, const uword M_n_cols, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols);
+
+  template<typename eT>
+  static inline void eye(dev_mem_t<eT> out, const uword n_rows, const uword n_cols);
+
+  template<typename eT>
+  static inline eT get_val(const dev_mem_t<eT> mem, const uword index);
+
+  template<typename eT>
+  static inline void set_val(dev_mem_t<eT> mem, const uword index, const eT val);
+
+  template<typename eT> static inline void   val_add_inplace(dev_mem_t<eT> mem, const uword index, const eT val);
+  template<typename eT> static inline void val_minus_inplace(dev_mem_t<eT> mem, const uword index, const eT val);
+  template<typename eT> static inline void   val_mul_inplace(dev_mem_t<eT> mem, const uword index, const eT val);
+  template<typename eT> static inline void   val_div_inplace(dev_mem_t<eT> mem, const uword index, const eT val);
+
+  template<typename eT, const bool do_trans_A, const bool do_trans_B>
+  static inline void gemm(dev_mem_t<eT> C_mem, const uword C_n_rows, const uword C_n_cols, const dev_mem_t<eT> A_mem, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<eT> B_mem, const eT alpha, const eT beta);
+
+  template<typename eT, const bool do_trans_A>
+  static inline void gemv(dev_mem_t<eT> y_mem, const dev_mem_t<eT> A_mem, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<eT> x_mem, const eT alpha, const eT beta);
+
+  template<typename eT>
+  static inline void sum_colwise(dev_mem_t<eT> out_mem, const dev_mem_t<eT> A_mem, const uword n_rows, const uword n_cols);
+
+  template<typename eT>
+  static inline void sum_rowwise(dev_mem_t<eT> out_mem, const dev_mem_t<eT> A_mem, const uword n_rows, const uword n_cols);
+
+  template<typename eT>
+  static inline void sum_colwise_subview(dev_mem_t<eT> out_mem, const dev_mem_t<eT> A_mem, const uword A_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols);
+
+  template<typename eT>
+  static inline void sum_rowwise_subview(dev_mem_t<eT> out_mem, const dev_mem_t<eT> A_mem, const uword A_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols);
+
+  template<typename eT>
+  static inline eT trace(const dev_mem_t<eT> mem, const uword n_rows, const uword n_cols);
+
+  static inline void synchronise();
+
+  // RC-TODO: unified interface for some other operations?
   };
 
-
-
-class coot_rt_t::program_wrapper
+// Store coot_rt_t as a singleton.
+inline coot_rt_t& get_rt()
   {
-  public:
-  
-  coot_aligned cl_program prog;  // cl_program is typedef for struct _cl_program*
-  
-  inline  program_wrapper();
-  inline ~program_wrapper();
-  
-  #if defined(COOT_USE_CXX11)
-                   program_wrapper(const program_wrapper&) = delete;
-  program_wrapper&       operator=(const program_wrapper&) = delete;
-  #endif
-  };
-
-
-class coot_rt_t::cq_guard
-  {
-  public:
-  
-  inline  cq_guard();
-  inline ~cq_guard();
-  
-  #if defined(COOT_USE_CXX11)
-             cq_guard(const cq_guard&) = delete;
-  cq_guard& operator=(const cq_guard&) = delete;
-  #endif
-  };
-
-
-
-class coot_rt_t::adapt_uword
-  {
-  public:
-  
-  coot_aligned size_t size;
-  coot_aligned void*  addr;
-  coot_aligned u64    val64;
-  coot_aligned u32    val32;
-  
-  inline adapt_uword(const uword val);
-  };
-
-
+  static coot_rt_t rt;
+  return rt;
+  }

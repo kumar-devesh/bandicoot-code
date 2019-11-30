@@ -23,8 +23,8 @@ Mat<eT>::~Mat()
   {
   coot_extra_debug_sigprint_this(this);
   
-  coot_rt_t::cq_guard guard;  // force synchronisation, in case there are any pending commands
-  
+  coot_rt_t::synchronise();
+
   cleanup();
   
   coot_type_check(( is_supported_elem_type<eT>::value == false ));
@@ -40,7 +40,7 @@ Mat<eT>::Mat()
   , n_elem    (0)
   , vec_state (0)
   , mem_state (0)
-  , dev_mem(NULL)
+  , dev_mem({ NULL })
   {
   coot_extra_debug_sigprint_this(this);
   }
@@ -56,7 +56,7 @@ Mat<eT>::Mat(const uword in_n_rows, const uword in_n_cols)
   , n_elem    (0)
   , vec_state (0)
   , mem_state (0)
-  , dev_mem(NULL)
+  , dev_mem({ NULL })
   {
   coot_extra_debug_sigprint_this(this);
   
@@ -67,7 +67,7 @@ Mat<eT>::Mat(const uword in_n_rows, const uword in_n_cols)
 
 template<typename eT>
 inline
-Mat<eT>::Mat(cl_mem aux_dev_mem, const uword in_n_rows, const uword in_n_cols)
+Mat<eT>::Mat(dev_mem_t<eT> aux_dev_mem, const uword in_n_rows, const uword in_n_cols)
   : n_rows    (in_n_rows)
   , n_cols    (in_n_cols)
   , n_elem    (in_n_rows*in_n_cols)  // TODO: need to check whether the result fits
@@ -82,12 +82,12 @@ Mat<eT>::Mat(cl_mem aux_dev_mem, const uword in_n_rows, const uword in_n_cols)
 
 template<typename eT>
 inline
-cl_mem
+dev_mem_t<eT>
 Mat<eT>::get_dev_mem(const bool sync) const
   {
   coot_extra_debug_sigprint();
-  
-  if(sync)  { clFinish(coot_rt.get_cq()); } // force synchronisation
+
+  if (sync) { get_rt().synchronise(); }
   
   return dev_mem;
   }
@@ -100,17 +100,12 @@ void
 Mat<eT>::copy_from_dev_mem(eT* dest_cpu_memptr, const uword N) const
   {
   coot_extra_debug_sigprint();
-  
+
   if( (n_elem == 0) || (N == 0) )  { return; }
-  
-  coot_rt_t::cq_guard guard;
-  
+
   const uword n_elem_mod = (std::min)(n_elem, N);
-  
-  // use a blocking call
-  const cl_int status = clEnqueueReadBuffer(coot_rt.get_cq(), dev_mem, CL_TRUE, 0, sizeof(eT)*n_elem_mod, dest_cpu_memptr, 0, NULL, NULL);
-  
-  coot_check_runtime_error( (status != CL_SUCCESS), "Mat::copy_from_dev_mem(): couldn't access device memory" );
+
+  coot_rt_t::copy_from_dev_mem(dest_cpu_memptr, dev_mem, n_elem_mod);
   }
 
 
@@ -121,17 +116,12 @@ void
 Mat<eT>::copy_into_dev_mem(const eT* src_cpu_memptr, const uword N)
   {
   coot_extra_debug_sigprint();
-  
+
   if( (n_elem == 0) || (N == 0) )  { return; }
-  
-  coot_rt_t::cq_guard guard;
-  
+
   const uword n_elem_mod = (std::min)(n_elem, N);
-  
-  // use a blocking call
-  cl_int status = clEnqueueWriteBuffer(coot_rt.get_cq(), dev_mem, CL_TRUE, 0, sizeof(eT)*n_elem_mod, src_cpu_memptr, 0, NULL, NULL);
-  
-  coot_check_runtime_error( (status != CL_SUCCESS), "Mat::write_dev_mem(): couldn't access device memory" );
+
+  coot_rt_t::copy_into_dev_mem(dev_mem, src_cpu_memptr, n_elem_mod);
   }
 
 
@@ -190,12 +180,12 @@ Mat<eT>::cleanup()
   {
   coot_extra_debug_sigprint();
   
-  if((dev_mem != NULL) && (mem_state == 0) && (n_elem > 0))
+  if((dev_mem.cl_mem_ptr != NULL) && (mem_state == 0) && (n_elem > 0))
     {
-    coot_rt.release_memory(dev_mem);
+    get_rt().release_memory(dev_mem);
     }
   
-  dev_mem = NULL;  // for paranoia
+  dev_mem.cl_mem_ptr = NULL;  // for paranoia
   }
 
 
@@ -244,7 +234,7 @@ Mat<eT>::init(const uword new_n_rows, const uword new_n_cols)
         }
       
       coot_extra_debug_print("Mat::init(): acquiring memory");
-      dev_mem = coot_rt.acquire_memory<eT>(new_n_elem);
+      dev_mem = get_rt().acquire_memory<eT>(new_n_elem);
       }
     
     access::rw(n_rows) = new_n_rows;
@@ -492,12 +482,12 @@ Mat<eT>::steal_mem(Mat<eT>& X)
     access::rw(mem_state) = X.mem_state;
     access::rw(dev_mem)   = X.dev_mem;
     
-    access::rw(X.n_rows)    = 0;
-    access::rw(X.n_cols)    = 0;
-    access::rw(X.n_elem)    = 0;
-    access::rw(X.vec_state) = 0;
-    access::rw(X.mem_state) = 0;
-    access::rw(X.dev_mem)   = NULL;
+    access::rw(X.n_rows)             = 0;
+    access::rw(X.n_cols)             = 0;
+    access::rw(X.n_elem)             = 0;
+    access::rw(X.vec_state)          = 0;
+    access::rw(X.mem_state)          = 0;
+    access::rw(X.dev_mem.cl_mem_ptr) = NULL;
     }
   }
 
@@ -1209,6 +1199,90 @@ Mat<eT>::ones()
 template<typename eT>
 inline
 const Mat<eT>&
+Mat<eT>::randu()
+  {
+  coot_extra_debug_sigprint();
+
+  coot_rng::fill_randu(dev_mem, n_elem);
+
+  return *this;
+  }
+
+
+
+template<typename eT>
+inline
+const Mat<eT>&
+Mat<eT>::randu(const uword new_n_elem)
+  {
+  coot_extra_debug_sigprint();
+
+  set_size(new_n_elem);
+
+  return (*this).randu();
+  }
+
+
+
+template<typename eT>
+inline
+const Mat<eT>&
+Mat<eT>::randu(const uword new_n_rows, const uword new_n_cols)
+  {
+  coot_extra_debug_sigprint();
+
+  set_size(new_n_rows, new_n_cols);
+
+  return (*this).randu();
+  }
+
+
+
+template<typename eT>
+inline
+const Mat<eT>&
+Mat<eT>::randn()
+  {
+  coot_extra_debug_sigprint();
+
+  coot_rng::fill_randn(dev_mem, n_elem);
+
+  return *this;
+  }
+
+
+
+template<typename eT>
+inline
+const Mat<eT>&
+Mat<eT>::randn(const uword new_n_elem)
+  {
+  coot_extra_debug_sigprint();
+
+  set_size(new_n_elem);
+
+  return (*this).randn();
+  }
+
+
+
+template<typename eT>
+inline
+const Mat<eT>&
+Mat<eT>::randn(const uword new_n_rows, const uword new_n_cols)
+  {
+  coot_extra_debug_sigprint();
+
+  set_size(new_n_rows, new_n_cols);
+
+  return (*this).randn();
+  }
+
+
+
+template<typename eT>
+inline
+const Mat<eT>&
 Mat<eT>::ones(const uword new_n_elem)
   {
   coot_extra_debug_sigprint();
@@ -1242,26 +1316,14 @@ const Mat<eT>&
 Mat<eT>::eye()
   {
   coot_extra_debug_sigprint();
-  
-  coot_rt_t::cq_guard guard;
-  
-  coot_rt_t::adapt_uword local_n_rows(n_rows);
-  coot_rt_t::adapt_uword local_n_cols(n_cols);
-  
-  cl_kernel kernel = coot_rt.get_kernel<eT>(kernel_id::inplace_set_eye);
-  
-  cl_int status = 0;
-  
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem),    &dev_mem      );
-  status |= clSetKernelArg(kernel, 1, local_n_rows.size, local_n_rows.addr);
-  status |= clSetKernelArg(kernel, 2, local_n_cols.size, local_n_cols.addr);
-  
-  const size_t global_work_size[2] = { size_t(n_rows), size_t(n_cols) };
-  
-  status |= clEnqueueNDRangeKernel(coot_rt.get_cq(), kernel, 2, NULL, global_work_size, NULL, 0, NULL, NULL);
-  
-  coot_check_runtime_error( (status != 0), "Mat::eye(): couldn't execute kernel" );
-  
+
+  if (n_elem == 0)
+    {
+    return *this;
+    }
+
+  coot_rt_t::eye(dev_mem, n_rows, n_cols);
+
   return *this;
   }
 

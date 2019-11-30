@@ -33,16 +33,6 @@
 #undef  CL_USE_DEPRECATED_OPENCL_1_2_APIS
 #define CL_USE_DEPRECATED_OPENCL_1_2_APIS
 
-#if defined(__APPLE__)
-  #include <OpenCL/opencl.h>
-#else
-  #include <CL/opencl.h>
-#endif
-
-
-// TODO: make this conditional on clBLAS being present
-#include <clBLAS.h>
-
 
 #if defined(ARMA_USE_CXX11)
   #undef  COOT_USE_CXX11
@@ -56,8 +46,33 @@
 #include "bandicoot_bits/compiler_setup.hpp"
 
 
+#if defined(COOT_USE_OPENCL)
+  #if defined(__APPLE__)
+    #include <OpenCL/opencl.h>
+  #else
+    #include <CL/opencl.h>
+  #endif
+
+
+  // TODO: make this conditional on clBLAS being present
+  #include <clBLAS.h>
+#endif
+
+
 #if defined(COOT_USE_CXX11)
   #include <mutex>
+#endif
+
+
+// Import CUDA headers if needed.
+#if defined(COOT_USE_CUDA)
+  #include <cuda.h>
+  #include <cuda_runtime_api.h>
+  #include <cuda_runtime.h>
+  #include <cublas_v2.h>
+  #include <nvrtc.h>
+  #include <curand.h>
+  #include <cusolverDn.h>
 #endif
 
 // TODO: include any stuff here that is not meant to be in the coot namespace
@@ -69,6 +84,7 @@ namespace coot
   
   // preliminaries
   
+  #include "bandicoot_bits/typedef_missing.hpp"
   #include "bandicoot_bits/coot_forward.hpp"
   #include "bandicoot_bits/coot_static_check.hpp"
   #include "bandicoot_bits/typedef_elem.hpp"
@@ -76,7 +92,6 @@ namespace coot
   #include "bandicoot_bits/coot_str.hpp"
   #include "bandicoot_bits/coot_version.hpp"
   #include "bandicoot_bits/coot_config.hpp"
-  #include "bandicoot_bits/coot_cl_error.hpp"
   #include "bandicoot_bits/traits.hpp"
   #include "bandicoot_bits/promote_type.hpp"
   #include "bandicoot_bits/upgrade_val.hpp"
@@ -89,7 +104,34 @@ namespace coot
   // runtime
   
   #include "bandicoot_bits/kernel_id.hpp"
-  #include "bandicoot_bits/kernel_src.hpp"
+
+  #if defined(COOT_USE_OPENCL)
+  namespace opencl
+    {
+    #include "bandicoot_bits/opencl/runtime_bones.hpp"
+    #include "bandicoot_bits/opencl/kernel_src.hpp"
+    #include "bandicoot_bits/opencl/error.hpp"
+    }
+
+  #include "bandicoot_bits/opencl/magma_bones.hpp"
+  #endif
+
+  #if defined(COOT_USE_CUDA)
+  namespace cuda
+    {
+    #include "bandicoot_bits/cuda/runtime_bones.hpp"
+    #include "bandicoot_bits/cuda/kernel_src.hpp"
+    #include "bandicoot_bits/cuda/error.hpp"
+    }
+  #endif
+
+  #if defined(COOT_USE_OPENCL)
+  namespace magma
+    {
+    #include "bandicoot_bits/opencl/magma.hpp"
+    }
+  #endif
+
   #include "bandicoot_bits/coot_rt_bones.hpp"
   
   //
@@ -111,6 +153,7 @@ namespace coot
   #include "bandicoot_bits/eglue_core_bones.hpp"
   #include "bandicoot_bits/Op_bones.hpp"
   #include "bandicoot_bits/Glue_bones.hpp"
+  #include "bandicoot_bits/coot_rng_bones.hpp"
   
   #include "bandicoot_bits/op_sum_bones.hpp"
   #include "bandicoot_bits/op_htrans_bones.hpp"
@@ -137,9 +180,51 @@ namespace coot
   
   //
   // runtime
-  
+
+  #if defined(COOT_USE_OPENCL)
+  namespace opencl
+    {
+    #include "bandicoot_bits/opencl/debug.hpp"
+    #include "bandicoot_bits/opencl/runtime_meat.hpp"
+    #include "bandicoot_bits/opencl/inplace_op.hpp"
+    #include "bandicoot_bits/opencl/array_op.hpp"
+    #include "bandicoot_bits/opencl/mat_val_proxy.hpp"
+    #include "bandicoot_bits/opencl/random_meat.hpp"
+    #include "bandicoot_bits/opencl/eop_core_meat.hpp"
+    #include "bandicoot_bits/opencl/accu.hpp"
+    #include "bandicoot_bits/opencl/chol.hpp"
+    #include "bandicoot_bits/opencl/copy.hpp"
+    #include "bandicoot_bits/opencl/trace.hpp"
+    #include "bandicoot_bits/opencl/eye.hpp"
+    #include "bandicoot_bits/opencl/gemm.hpp"
+    #include "bandicoot_bits/opencl/gemv.hpp"
+    #include "bandicoot_bits/opencl/sum.hpp"
+    }
+  #endif
+
+  #if defined(COOT_USE_CUDA)
+  namespace cuda
+    {
+    #include "bandicoot_bits/cuda/debug.hpp"
+    #include "bandicoot_bits/cuda/kernel_misc.hpp"
+    #include "bandicoot_bits/cuda/runtime_meat.hpp"
+    #include "bandicoot_bits/cuda/inplace_op.hpp"
+    #include "bandicoot_bits/cuda/array_op.hpp"
+    #include "bandicoot_bits/cuda/mat_val_proxy.hpp"
+    #include "bandicoot_bits/cuda/random_meat.hpp"
+    #include "bandicoot_bits/cuda/eop_core_meat.hpp"
+    #include "bandicoot_bits/cuda/accu.hpp"
+    #include "bandicoot_bits/cuda/chol.hpp"
+    #include "bandicoot_bits/cuda/copy.hpp"
+    #include "bandicoot_bits/cuda/trace.hpp"
+    #include "bandicoot_bits/cuda/eye.hpp"
+    #include "bandicoot_bits/cuda/gemm.hpp"
+    #include "bandicoot_bits/cuda/gemv.hpp"
+    #include "bandicoot_bits/cuda/sum.hpp"
+    }
+  #endif
+
   #include "bandicoot_bits/coot_rt_meat.hpp"
-  
   
   //
   // classes that underlay metaprogramming 
@@ -162,17 +247,18 @@ namespace coot
   // magma related
   // NOTE: magma uses rather dubious coding techniques
   
-  //#include "bandicoot_bits/magma13_support.hpp"
-  //#include "bandicoot_bits/magma13_dpotrf.hpp"
+  #if defined(COOT_USE_OPENCL)
+    //#include "bandicoot_bits/opencl/magma13_support.hpp"
+    //#include "bandicoot_bits/opencl/magma13_dpotrf.hpp"
   
-  #include "bandicoot_bits/magma22_support.hpp"
+    #include "bandicoot_bits/opencl/magma22_support.hpp"
   
-  #include "bandicoot_bits/magma22_dlarfb.hpp"
-  #include "bandicoot_bits/magma22_dgeqrf.hpp"
-  
-  
-  #include "bandicoot_bits/magma22_spotrf.hpp"
-  #include "bandicoot_bits/magma22_dpotrf.hpp"
+    #include "bandicoot_bits/opencl/magma22_dlarfb.hpp"
+    #include "bandicoot_bits/opencl/magma22_dgeqrf.hpp"
+    
+    #include "bandicoot_bits/opencl/magma22_spotrf.hpp"
+    #include "bandicoot_bits/opencl/magma22_dpotrf.hpp"
+  #endif
   
   //
   // user accessible functions
@@ -212,6 +298,7 @@ namespace coot
   #include "bandicoot_bits/eglue_core_meat.hpp"
   #include "bandicoot_bits/Op_meat.hpp"
   #include "bandicoot_bits/Glue_meat.hpp"
+  #include "bandicoot_bits/coot_rng_meat.hpp"
   
   #include "bandicoot_bits/op_sum_meat.hpp"
   #include "bandicoot_bits/op_htrans_meat.hpp"

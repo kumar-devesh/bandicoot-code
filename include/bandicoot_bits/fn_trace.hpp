@@ -31,39 +31,8 @@ trace(const Base<typename T1::elem_type, T1>& X)
   const Mat<eT>& A = U.M;
   
   if(A.n_elem == 0)  { return eT(0); }
-  
-  const uword diag_len = (std::min)(A.n_rows, A.n_cols);
-  
-  Mat<eT> tmp(1,1);
-  
-  coot_rt_t::cq_guard guard;
-  
-  cl_kernel kernel = coot_rt.get_kernel<eT>(kernel_id::trace);
-  
-  cl_mem tmp_mem = tmp.get_dev_mem(false);
-  cl_mem   A_mem =   A.get_dev_mem(false);
-  
-  coot_rt_t::adapt_uword n_rows(A.n_rows);
-  coot_rt_t::adapt_uword      N(diag_len);
-  
-  cl_int status = 0;
-  
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem),  &tmp_mem   );
-  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem),  &A_mem     );
-  status |= clSetKernelArg(kernel, 2, n_rows.size,     n_rows.addr);
-  status |= clSetKernelArg(kernel, 3, N.size,          N.addr     );
-  
-  const size_t global_work_size[1] = { size_t(1) };
-  
-  coot_extra_debug_print("clEnqueueNDRangeKernel()");
-  status |= clEnqueueNDRangeKernel(coot_rt.get_cq(), kernel, 1, NULL, global_work_size, NULL, 0, NULL, NULL);
-  
-  coot_check_runtime_error( (status != 0), "trace(): couldn't execute kernel" );
-  
-  const Mat<eT>& tmp2 = tmp;
-  const eT val = tmp2(0);
-  
-  return val;
+
+  return coot_rt_t::trace(A.get_dev_mem(false), A.n_rows, A.n_cols);
   }
 
 

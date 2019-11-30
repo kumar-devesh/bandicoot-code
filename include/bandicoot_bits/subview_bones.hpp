@@ -53,7 +53,7 @@ class subview : public Base<eT, subview<eT> >
   
   inline void operator= (const subview<eT>& x);
   
-  inline void inplace_op(const eT val, cl_kernel kernel);
+  inline void inplace_op(const eT val, kernel_id::enum_id kernel);
   
   inline void operator=  (const eT val);
   inline void operator+= (const eT val);
@@ -62,7 +62,7 @@ class subview : public Base<eT, subview<eT> >
   inline void operator/= (const eT val);
   
   
-  template<typename T1> inline void inplace_op(const Base<eT,T1>& x, cl_kernel kernel, const char* identifier);
+  template<typename T1> inline void inplace_op(const Base<eT,T1>& x, kernel_id::enum_id kernel, const char* identifier);
   
   template<typename T1> inline void operator= (const Base<eT,T1>& x);
   template<typename T1> inline void operator+=(const Base<eT,T1>& x);

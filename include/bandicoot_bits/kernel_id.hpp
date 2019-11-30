@@ -71,6 +71,8 @@ struct kernel_id
     sum_rowwise,
     submat_sum_colwise,
     submat_sum_rowwise,
+    //
+    ltri_set_zero,
     invalid_kernel
     };
   
@@ -137,6 +139,8 @@ struct kernel_id
     names.push_back("sum_rowwise");
     names.push_back("submat_sum_colwise");
     names.push_back("submat_sum_rowwise");
+
+    names.push_back("ltri_set_zero");
     
     return names;
     }

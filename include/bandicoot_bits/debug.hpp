@@ -388,34 +388,6 @@ coot_check_runtime_error(const bool state, const T1& x)
 
 
 
-template<typename T1>
-coot_hot
-inline
-void
-coot_check_cl_error(const cl_int error_code, const T1& x)
-  {
-  if(error_code != CL_SUCCESS)
-    {
-    coot_stop_runtime_error( x, coot_cl_error::as_string(error_code) );
-    }
-  }
-
-
-
-template<typename T1>
-coot_hot
-inline
-void
-coot_check_clblas_error(const cl_int error_code, const T1& x)
-  {
-  if(error_code != CL_SUCCESS)
-    {
-    coot_stop_runtime_error( x, coot_clblas_error::as_string(error_code) );
-    }
-  }
-
-
-
 //
 // functions for generating strings indicating size errors
 

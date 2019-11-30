@@ -53,113 +53,18 @@ inline
 void
 check_error(const cl_int error_code)
   {
-  coot_check_cl_error(error_code, "magma_function");
+  opencl::coot_check_cl_error(error_code, "magma_function");
   }
 
 
-
-// -----------------------------------------------------------------------------
-// Return codes
-// LAPACK argument errors are < 0 but > MAGMA_ERR.
-// MAGMA errors are < MAGMA_ERR.
-
-#define MAGMA_SUCCESS               0       ///< operation was successful
-#define MAGMA_ERR                  -100     ///< unspecified error
-#define MAGMA_ERR_NOT_INITIALIZED  -101     ///< magma_init() was not called
-#define MAGMA_ERR_REINITIALIZED    -102     // unused
-#define MAGMA_ERR_NOT_SUPPORTED    -103     ///< not supported on this GPU
-#define MAGMA_ERR_ILLEGAL_VALUE    -104     // unused
-#define MAGMA_ERR_NOT_FOUND        -105     ///< file not found
-#define MAGMA_ERR_ALLOCATION       -106     // unused
-#define MAGMA_ERR_INTERNAL_LIMIT   -107     // unused
-#define MAGMA_ERR_UNALLOCATED      -108     // unused
-#define MAGMA_ERR_FILESYSTEM       -109     // unused
-#define MAGMA_ERR_UNEXPECTED       -110     // unused
-#define MAGMA_ERR_SEQUENCE_FLUSHED -111     // unused
-#define MAGMA_ERR_HOST_ALLOC       -112     ///< could not malloc CPU host memory
-#define MAGMA_ERR_DEVICE_ALLOC     -113     ///< could not malloc GPU device memory
-#define MAGMA_ERR_CUDASTREAM       -114     // unused
-#define MAGMA_ERR_INVALID_PTR      -115     ///< can't free invalid pointer
-#define MAGMA_ERR_UNKNOWN          -116     ///< unspecified error
-#define MAGMA_ERR_NOT_IMPLEMENTED  -117     ///< not implemented yet
-#define MAGMA_ERR_NAN              -118     ///< NaN (not-a-number) detected
-
-
-#define MagmaUpperStr         "Upper"
-#define MagmaLowerStr         "Lower"
-#define MagmaFullStr          "Full"
-
-#define MagmaNonUnitStr       "NonUnit"
-#define MagmaUnitStr          "Unit"
-
-#define MagmaForwardStr       "Forward"
-#define MagmaBackwardStr      "Backward"
-
-#define MagmaColumnwiseStr    "Columnwise"
-#define MagmaRowwiseStr       "Rowwise"
-
-typedef enum {
-    MagmaUpper         = 121,
-    MagmaLower         = 122,
-    MagmaFull          = 123,  /* lascl, laset */
-    MagmaHessenberg    = 124   /* lascl */
-} magma_uplo_t;
-
-
-typedef enum {
-    MagmaLeft          = 141,
-    MagmaRight         = 142,
-    MagmaBothSides     = 143   /* trevc */
-} magma_side_t;
-
-
-typedef enum {
-    MagmaNoTrans       = 111,
-    MagmaTrans         = 112,
-    MagmaConjTrans     = 113,
-    Magma_ConjTrans    = MagmaConjTrans
-} magma_trans_t;
-
-typedef enum {
-    MagmaNonUnit       = 131,
-    MagmaUnit          = 132
-} magma_diag_t;
-
-typedef enum {
-    MagmaForward       = 391,  /* larfb */
-    MagmaBackward      = 392
-} magma_direct_t;
-
-typedef enum {
-    MagmaColumnwise    = 401,  /* larfb */
-    MagmaRowwise       = 402
-} magma_storev_t;
-
-typedef int magma_int_t;
-
-typedef cl_mem magma_ptr;
-typedef cl_mem magmaInt_ptr;
-typedef cl_mem magmaIndex_ptr;
-typedef cl_mem magmaFloat_ptr;
-typedef cl_mem magmaDouble_ptr;
-typedef cl_mem magmaFloatComplex_ptr;
-typedef cl_mem magmaDoubleComplex_ptr;
-
-typedef cl_mem magma_const_ptr;
-typedef cl_mem magmaInt_const_ptr;
-typedef cl_mem magmaIndex_const_ptr;
-typedef cl_mem magmaFloat_const_ptr;
-typedef cl_mem magmaDouble_const_ptr;
-typedef cl_mem magmaFloatComplex_const_ptr;
-typedef cl_mem magmaDoubleComplex_const_ptr;
-
-typedef cl_command_queue  magma_queue_t;
-typedef cl_event          magma_event_t;
-typedef cl_device_id      magma_device_t;
-
 // TODO: refactor code to avoid using the following global variable
-// TODO: the code below seems to only write to g_event; it's never read, meaning it's not used for waiting
-magma_event_t  *g_event;
+// TODO: the code below seems to only write to get_g_event(); it's never read, meaning it's not used for waiting
+// This is stuffed into a singleton for now to avoid linking issues.
+inline magma_event_t* get_g_event()
+  {
+  static magma_event_t* g_event;
+  return g_event;
+  }
 
 
 /////////////////////
@@ -190,7 +95,7 @@ inline
 void
 magma_getdevice(magma_device_t* dev)
   {
-  (*dev) = coot_rt.get_device();
+  (*dev) = get_rt().cl_rt.get_device();
   }
 
 
@@ -221,7 +126,7 @@ magma_queue_create(magma_device_t dev, magma_queue_t* queue)
   {
   (void)dev;  // ignore the variable
   
-  coot_rt.create_extra_cq(*queue);
+  get_rt().cl_rt.create_extra_cq(*queue);
   }
 
 
@@ -230,7 +135,7 @@ inline
 void
 magma_queue_destroy(magma_queue_t queue)
   {
-  coot_rt.delete_extra_cq(queue);
+  get_rt().cl_rt.delete_extra_cq(queue);
   }
 
 
@@ -246,17 +151,17 @@ magma_dgetmatrix(magma_int_t m, magma_int_t n, magmaDouble_const_ptr dA_src, siz
 
   size_t buffer_origin[3] = { dA_offset*sizeof(double), 0, 0 };
   size_t host_orig[3]     = { 0, 0, 0 };
-  size_t region[3]        = { m*sizeof(double), n, 1 };
+  size_t region[3]        = { m*sizeof(double), size_t(n), 1 };
   
   cl_int err = clEnqueueReadBufferRect(
       queue, dA_src, CL_TRUE,  // blocking
       buffer_origin, host_orig, region,
       ldda*sizeof(double), 0,
       ldhb*sizeof(double), 0,
-      hB_dst, 0, NULL, g_event );
+      hB_dst, 0, NULL, get_g_event() );
   
-  // TODO: g_event can probably be replaced with NULL; check if any other function required by magma_dpotrf_gpu accesses g_event
-  // TODO: as the call is blocking, why use g_event in the first place?
+  // TODO: get_g_event() can probably be replaced with NULL; check if any other function required by magma_dpotrf_gpu accesses get_g_event()
+  // TODO: as the call is blocking, why use get_g_event() in the first place?
   
   // OpenCL 1.2 docs for clEnqueueReadBufferRect()
   // event
@@ -277,17 +182,17 @@ magma_dsetmatrix(magma_int_t m, magma_int_t n, double const* hA_src, magma_int_t
 
   size_t buffer_origin[3] = { dB_offset*sizeof(double), 0, 0 };
   size_t host_orig[3]     = { 0, 0, 0 };
-  size_t region[3]        = { m*sizeof(double), n, 1 };
+  size_t region[3]        = { m*sizeof(double), size_t(n), 1 };
   
   cl_int err = clEnqueueWriteBufferRect(
       queue, dB_dst, CL_TRUE,  // blocking
       buffer_origin, host_orig, region,
       lddb*sizeof(double), 0,
       ldha*sizeof(double), 0,
-      hA_src, 0, NULL, g_event );
+      hA_src, 0, NULL, get_g_event() );
   
-  // TODO: g_event can probably be replaced with NULL; see note above
-  // TODO: as the call is blocking, why use g_event in the first place?
+  // TODO: get_g_event() can probably be replaced with NULL; see note above
+  // TODO: as the call is blocking, why use get_g_event() in the first place?
   
   // OpenCL 1.2 docs for clEnqueueWriteBufferRect()
   // event
@@ -316,13 +221,13 @@ magma_sgetmatrix(
 
     size_t buffer_origin[3] = { dA_offset*sizeof(float), 0, 0 };
     size_t host_orig[3]     = { 0, 0, 0 };
-    size_t region[3]        = { m*sizeof(float), n, 1 };
+    size_t region[3]        = { m*sizeof(float), size_t(n), 1 };
     cl_int err = clEnqueueReadBufferRect(
         queue, dA_src, CL_TRUE,  // blocking
         buffer_origin, host_orig, region,
         ldda*sizeof(float), 0,
         ldhb*sizeof(float), 0,
-        hB_dst, 0, NULL, g_event );
+        hB_dst, 0, NULL, get_g_event() );
     check_error( err );
 }
 
@@ -341,13 +246,13 @@ magma_ssetmatrix(
 
     size_t buffer_origin[3] = { dB_offset*sizeof(float), 0, 0 };
     size_t host_orig[3]     = { 0, 0, 0 };
-    size_t region[3]        = { m*sizeof(float), n, 1 };
+    size_t region[3]        = { m*sizeof(float), size_t(n), 1 };
     cl_int err = clEnqueueWriteBufferRect(
         queue, dB_dst, CL_TRUE,  // blocking
         buffer_origin, host_orig, region,
         lddb*sizeof(float), 0,
         ldha*sizeof(float), 0,
-        hA_src, 0, NULL, g_event );
+        hA_src, 0, NULL, get_g_event() );
     check_error( err );
 }
 
@@ -364,7 +269,7 @@ magma_dgetmatrix_async(magma_int_t m, magma_int_t n, magmaDouble_const_ptr dA_sr
 
   size_t buffer_origin[3] = { dA_offset*sizeof(double), 0, 0 };
   size_t host_orig[3]     = { 0, 0, 0 };
-  size_t region[3]        = { m*sizeof(double), n, 1 };
+  size_t region[3]        = { m*sizeof(double), size_t(n), 1 };
   
   cl_int err = clEnqueueReadBufferRect(
       queue, dA_src, CL_FALSE,  // non-blocking
@@ -386,7 +291,7 @@ magma_dgetmatrix_async(magma_int_t m, magma_int_t n, magmaDouble_const_ptr dA_sr
 
   size_t buffer_origin[3] = { dA_offset*sizeof(double), 0, 0 };
   size_t host_orig[3]     = { 0, 0, 0 };
-  size_t region[3]        = { m*sizeof(double), n, 1 };
+  size_t region[3]        = { m*sizeof(double), size_t(n), 1 };
   
   cl_int err = clEnqueueReadBufferRect(
       queue, dA_src, CL_FALSE,  // non-blocking
@@ -408,7 +313,7 @@ magma_dsetmatrix_async(magma_int_t m, magma_int_t n, double const* hA_src, magma
 
   size_t buffer_origin[3] = { dB_offset*sizeof(double), 0, 0 };
   size_t host_orig[3]     = { 0, 0, 0 };
-  size_t region[3]        = { m*sizeof(double), n, 1 };
+  size_t region[3]        = { m*sizeof(double), size_t(n), 1 };
   
   cl_int err = clEnqueueWriteBufferRect(
       queue, dB_dst, CL_FALSE,  // non-blocking
@@ -430,7 +335,7 @@ magma_dsetmatrix_async(magma_int_t m, magma_int_t n, double const* hA_src, magma
 
   size_t buffer_origin[3] = { dB_offset*sizeof(double), 0, 0 };
   size_t host_orig[3]     = { 0, 0, 0 };
-  size_t region[3]        = { m*sizeof(double), n, 1 };
+  size_t region[3]        = { m*sizeof(double), size_t(n), 1 };
   
   cl_int err = clEnqueueWriteBufferRect(
       queue, dB_dst, CL_FALSE,  // non-blocking
@@ -457,7 +362,7 @@ magma_sgetmatrix_async(magma_int_t m, magma_int_t n, magmaFloat_const_ptr dA_src
 
   size_t buffer_origin[3] = { dA_offset*sizeof(float), 0, 0 };
   size_t host_orig[3]     = { 0, 0, 0 };
-  size_t region[3]        = { m*sizeof(float), n, 1 };
+  size_t region[3]        = { m*sizeof(float), size_t(n), 1 };
   
   cl_int err = clEnqueueReadBufferRect(
       queue, dA_src, CL_FALSE,  // non-blocking
@@ -479,7 +384,7 @@ magma_sgetmatrix_async(magma_int_t m, magma_int_t n, magmaFloat_const_ptr dA_src
 
   size_t buffer_origin[3] = { dA_offset*sizeof(float), 0, 0 };
   size_t host_orig[3]     = { 0, 0, 0 };
-  size_t region[3]        = { m*sizeof(float), n, 1 };
+  size_t region[3]        = { m*sizeof(float), size_t(n), 1 };
   
   cl_int err = clEnqueueReadBufferRect(
       queue, dA_src, CL_FALSE,  // non-blocking
@@ -501,7 +406,7 @@ magma_ssetmatrix_async(magma_int_t m, magma_int_t n, float const* hA_src, magma_
 
   size_t buffer_origin[3] = { dB_offset*sizeof(float), 0, 0 };
   size_t host_orig[3]     = { 0, 0, 0 };
-  size_t region[3]        = { m*sizeof(float), n, 1 };
+  size_t region[3]        = { m*sizeof(float), size_t(n), 1 };
   
   cl_int err = clEnqueueWriteBufferRect(
       queue, dB_dst, CL_FALSE,  // non-blocking
@@ -523,7 +428,7 @@ magma_ssetmatrix_async(magma_int_t m, magma_int_t n, float const* hA_src, magma_
 
   size_t buffer_origin[3] = { dB_offset*sizeof(float), 0, 0 };
   size_t host_orig[3]     = { 0, 0, 0 };
-  size_t region[3]        = { m*sizeof(float), n, 1 };
+  size_t region[3]        = { m*sizeof(float), size_t(n), 1 };
   
   cl_int err = clEnqueueWriteBufferRect(
       queue, dB_dst, CL_FALSE,  // non-blocking
@@ -556,8 +461,10 @@ magma_queue_sync( magma_queue_t queue )
 // LAPACK interface related
 
 // TODO: what a horror
-const char *magma2lapack_constants[] =
-{
+inline const char** get_magma2lapack_constants()
+  {
+  static const char *magma2lapack_constants[] =
+    {
     "No",                                    //  0: MagmaFalse
     "Yes",                                   //  1: MagmaTrue (zlatrs)
     "", "", "", "", "", "", "", "", "",      //  2-10
@@ -654,7 +561,10 @@ const char *magma2lapack_constants[] =
     "Rowwise",                               // 402: MagmaRowwise
     "", "", "", "", "", "", "", ""           // 403-410
     // Remember to add a comma!
-};
+    };
+
+  return magma2lapack_constants;
+  }
 
 
 inline
@@ -662,7 +572,7 @@ const char* lapack_trans_const( magma_trans_t magma_const )
 {
     assert( magma_const >= MagmaNoTrans   );
     assert( magma_const <= MagmaConjTrans );
-    return magma2lapack_constants[ magma_const ];
+    return get_magma2lapack_constants()[ magma_const ];
 }
 
 inline
@@ -670,7 +580,7 @@ const char* lapack_uplo_const ( magma_uplo_t magma_const )
 {
     assert( magma_const >= MagmaUpper );
     assert( magma_const <= MagmaFull  );
-    return magma2lapack_constants[ magma_const ];
+    return get_magma2lapack_constants()[ magma_const ];
 }
 
 inline
@@ -678,7 +588,7 @@ const char* lapack_diag_const ( magma_diag_t magma_const )
 {
     assert( magma_const >= MagmaNonUnit );
     assert( magma_const <= MagmaUnit    );
-    return magma2lapack_constants[ magma_const ];
+    return get_magma2lapack_constants()[ magma_const ];
 }
 
 
@@ -687,7 +597,7 @@ const char* lapack_side_const ( magma_side_t magma_const )
 {
     assert( magma_const >= MagmaLeft  );
     assert( magma_const <= MagmaBothSides );
-    return magma2lapack_constants[ magma_const ];
+    return get_magma2lapack_constants()[ magma_const ];
 }
 
 
@@ -799,7 +709,7 @@ magma_dgemm
       alpha, dA, dA_offset, ldda,
              dB, dB_offset, lddb,
       beta,  dC, dC_offset, lddc,
-      1, &queue, 0, NULL, g_event );
+      1, &queue, 0, NULL, get_g_event() );
   
   clFlush(queue);
   
@@ -830,7 +740,7 @@ magma_sgemm(
         alpha, dA, dA_offset, ldda,
                dB, dB_offset, lddb,
         beta,  dC, dC_offset, lddc,
-        1, &queue, 0, NULL, g_event );
+        1, &queue, 0, NULL, get_g_event() );
     clFlush(queue);
     check_error( err );
 }
@@ -862,9 +772,9 @@ magma_dsyrk
     dA, dA_offset, ldda,
     beta,
     dC, dC_offset, lddc,
-    1, &queue, 0, NULL, g_event );
+    1, &queue, 0, NULL, get_g_event() );
   
-  coot_check_clblas_error(err, "magma_dsyrk()");
+  opencl::coot_check_clblas_error(err, "magma_dsyrk()");
   }
 
 
@@ -886,7 +796,7 @@ magma_ssyrk(
         n, k,
         alpha, dA, dA_offset, ldda,
         beta,  dC, dC_offset, lddc,
-        1, &queue, 0, NULL, g_event );
+        1, &queue, 0, NULL, get_g_event() );
     check_error( err );
 }
 
@@ -919,7 +829,7 @@ magma_dtrsm
       m, n,
       alpha, dA, dA_offset, ldda,
              dB, dB_offset, lddb,
-      1, &queue, 0, NULL, g_event );
+      1, &queue, 0, NULL, get_g_event() );
   
   clFlush(queue);
   
@@ -949,7 +859,7 @@ magma_strsm(
         m, n,
         alpha, dA, dA_offset, ldda,
                dB, dB_offset, lddb,
-        1, &queue, 0, NULL, g_event );
+        1, &queue, 0, NULL, get_g_event() );
     clFlush(queue);
     check_error( err );
 }
@@ -980,7 +890,7 @@ magma_dtrmm(
         m, n,
         alpha, dA, dA_offset, ldda,
                dB, dB_offset, lddb,
-        1, &queue, 0, NULL, g_event );
+        1, &queue, 0, NULL, get_g_event() );
     clFlush(queue);
     check_error( err );
 }
@@ -1009,7 +919,7 @@ magma_strmm(
         m, n,
         alpha, dA, dA_offset, ldda,
                dB, dB_offset, lddb,
-        1, &queue, 0, NULL, g_event );
+        1, &queue, 0, NULL, get_g_event() );
     clFlush(queue);
     check_error( err );
 }
