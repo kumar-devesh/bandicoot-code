@@ -225,7 +225,7 @@ class Mat : public Base< eT, Mat<eT> >
   inline const subview<eT> tail_cols(const uword N) const;
   
   
-  private:
+  protected:
   
   inline void cleanup();
   inline void init(const uword new_n_rows, const uword new_n_cols);
