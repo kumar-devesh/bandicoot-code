@@ -472,7 +472,7 @@ void
 Mat<eT>::steal_mem(Mat<eT>& X)
   {
   coot_extra_debug_sigprint();
-  
+
   if(this != &X)
     {
     access::rw(n_rows)    = X.n_rows;
@@ -481,7 +481,7 @@ Mat<eT>::steal_mem(Mat<eT>& X)
     access::rw(vec_state) = X.vec_state;
     access::rw(mem_state) = X.mem_state;
     access::rw(dev_mem)   = X.dev_mem;
-    
+
     access::rw(X.n_rows)             = 0;
     access::rw(X.n_cols)             = 0;
     access::rw(X.n_elem)             = 0;
