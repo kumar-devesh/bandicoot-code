@@ -1221,3 +1221,33 @@ coot_rt_t::trace(const dev_mem_t<eT> mem, const uword n_rows, const uword n_cols
 
 
 
+template<typename eT>
+inline
+eT
+coot_rt_t::dot(const dev_mem_t<eT> mem1, const dev_mem_t<eT> mem2, const uword n_elem)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::dot(mem1, mem2, n_elem);
+    #else
+    coot_stop_runtime_error("coot_rt::dot(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::dot(mem1, mem2, n_elem);
+    #else
+    coot_stop_runtime_error("coot_rt::dot(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::dot(): unknown backend");
+    }
+
+  return eT(0); // fix warning
+  }

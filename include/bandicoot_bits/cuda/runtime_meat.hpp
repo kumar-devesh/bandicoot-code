@@ -151,6 +151,7 @@ runtime_t::init_kernels(std::vector<CUfunction>& kernels, const std::string& sou
   result  = nvrtcCompileProgram(prog,  // prog
                                 6,     // numOptions
                                 opts); // options
+  // TODO: this should display the log instead of just failing
   coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcCompileProgram() failed");
 
   size_t logSize;

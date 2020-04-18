@@ -149,6 +149,9 @@ class coot_rt_t
   template<typename eT>
   static inline eT trace(const dev_mem_t<eT> mem, const uword n_rows, const uword n_cols);
 
+  template<typename eT>
+  static inline eT dot(const dev_mem_t<eT> mem1, const dev_mem_t<eT> mem2, const uword n_elem);
+
   static inline void synchronise();
 
   // RC-TODO: unified interface for some other operations?

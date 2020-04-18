@@ -1,10 +1,10 @@
 // Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -63,6 +63,9 @@ struct kernel_id
     get_diag,
     trace,
     //
+    dot_chunked,
+    dot_twostage,
+    //
     accu_simple,
     accu_chunked,
     accu_twostage,
@@ -75,40 +78,40 @@ struct kernel_id
     ltri_set_zero,
     invalid_kernel
     };
-  
-  
+
+
   static
   inline
   std::vector<std::string>
   init_names()
     {
     // NOTE: the order and names of kernels in "names" must match the order and names in the kernel_id enum
-    
+
     std::vector<std::string> names;
-    
+
     names.push_back("inplace_set_scalar");
     names.push_back("inplace_plus_scalar");
     names.push_back("inplace_minus_scalar");
     names.push_back("inplace_mul_scalar");
     names.push_back("inplace_div_scalar");
-    
+
     names.push_back("submat_inplace_set_scalar");
     names.push_back("submat_inplace_plus_scalar");
     names.push_back("submat_inplace_minus_scalar");
     names.push_back("submat_inplace_mul_scalar");
     names.push_back("submat_inplace_div_scalar");
-    
+
     names.push_back("inplace_plus_array");
     names.push_back("inplace_minus_array");
     names.push_back("inplace_mul_array");
     names.push_back("inplace_div_array");
-    
+
     names.push_back("submat_inplace_set_mat");
     names.push_back("submat_inplace_plus_mat");
     names.push_back("submat_inplace_minus_mat");
     names.push_back("submat_inplace_schur_mat");
     names.push_back("submat_inplace_div_mat");
-    
+
     names.push_back("equ_array_plus_scalar");
     names.push_back("equ_array_neg");
     names.push_back("equ_array_minus_scalar_pre");
@@ -120,39 +123,42 @@ struct kernel_id
     names.push_back("equ_array_sqrt");
     names.push_back("equ_array_exp");
     names.push_back("equ_array_log");
-    
+
     names.push_back("equ_array_plus_array");
     names.push_back("equ_array_minus_array");
     names.push_back("equ_array_mul_array");
     names.push_back("equ_array_div_array");
-    
+
     names.push_back("inplace_set_eye");
-    
+
     names.push_back("get_diag");
     names.push_back("trace");
-    
+
+    names.push_back("dot_chunked");
+    names.push_back("dot_twostage");
+
     names.push_back("accu_simple");
     names.push_back("accu_chunked");
     names.push_back("accu_twostage");
-    
+
     names.push_back("sum_colwise");
     names.push_back("sum_rowwise");
     names.push_back("submat_sum_colwise");
     names.push_back("submat_sum_rowwise");
 
     names.push_back("ltri_set_zero");
-    
+
     return names;
     }
-  
-  
+
+
   static
   inline
   const std::vector<std::string>&
   get_names()
     {
     static const std::vector<std::string> names = init_names();
-    
+
     return names;
     }
   };
