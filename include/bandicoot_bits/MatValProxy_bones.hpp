@@ -32,6 +32,12 @@ class MatValProxy
   coot_inline operator eT();
   
   static inline eT get_val(const Mat<eT>& in_M, const uword in_index);
+
+  inline void operator= (const MatValProxy<eT>& in_val);
+  inline void operator+=(const MatValProxy<eT>& in_val);
+  inline void operator-=(const MatValProxy<eT>& in_val);
+  inline void operator*=(const MatValProxy<eT>& in_val);
+  inline void operator/=(const MatValProxy<eT>& in_val);
   
   inline void operator= (const eT in_val);
   inline void operator+=(const eT in_val);
