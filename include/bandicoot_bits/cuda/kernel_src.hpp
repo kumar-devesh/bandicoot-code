@@ -67,6 +67,9 @@ get_cuda_kernel_names()
   names.push_back("get_diag");
   names.push_back("trace");
 
+  names.push_back("dot_chunked");
+  names.push_back("dot_twostage");
+
   names.push_back("accu_simple");
   names.push_back("accu_chunked");
   names.push_back("accu_twostage");
@@ -376,6 +379,37 @@ get_cuda_kernel_src()
   "      acc += A[i + i*n_rows];  \n"
   "      } \n"
   "    out[0] = acc; \n"
+  "    } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,dot_chunked)(eT* out, const eT* A, const eT* B, const UWORD chunk_size, const UWORD n_chunks) \n"
+  "  { \n" // use a chunked approach like accu_chunked
+  "  const UWORD chunk_id = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  if(chunk_id < n_chunks) \n"
+  "    { \n"
+  "    const eT* ptrA = &(A[ chunk_id * chunk_size ]); \n"
+  "    const eT* ptrB = &(B[ chunk_id * chunk_size ]); \n"
+  "    eT acc = (eT)(0); \n"
+  "    for (UWORD i = 0; i < chunk_size; ++i) \n"
+  "      { acc += ptrA[i] * ptrB[i]; } \n"
+  "    out[chunk_id] = acc; \n"
+  "    } \n"
+  "  } \n"
+  "\n"
+  "__global__ void COOT_FN(PREFIX,dot_twostage)(eT* out, const UWORD out_len, const eT* A, const eT* B, const UWORD A_start, const UWORD A_len) \n"
+  "  { \n"
+  "  const UWORD id = blockIdx.x * blockDim.x + threadIdx.x; \n"
+  "  if(id == 0) \n"
+  "    { \n"
+  "    eT dot1 = (eT)(0); \n"
+  "    for(UWORD i = A_start; i < A_len; ++i) \n"
+  "      { dot1 += A[i] * B[i]; } \n"
+  "    \n"
+  "    eT dot2 = (eT)(0); \n"
+  "    for (UWORD i = 0; i < out_len; ++i) \n"
+  "      { dot2 += out[i]; } \n"
+  "    \n"
+  "    out[0] = dot1 + dot2; \n"
   "    } \n"
   "  } \n"
   "\n"

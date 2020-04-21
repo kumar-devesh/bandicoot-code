@@ -88,7 +88,7 @@ Mat<eT>::get_dev_mem(const bool sync) const
   coot_extra_debug_sigprint();
 
   if (sync) { get_rt().synchronise(); }
-  
+
   return dev_mem;
   }
 

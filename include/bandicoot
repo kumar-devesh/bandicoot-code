@@ -201,6 +201,7 @@ namespace coot
     #include "bandicoot_bits/opencl/gemm.hpp"
     #include "bandicoot_bits/opencl/gemv.hpp"
     #include "bandicoot_bits/opencl/sum.hpp"
+    #include "bandicoot_bits/opencl/dot.hpp"
     }
   #endif
 
@@ -223,6 +224,7 @@ namespace coot
     #include "bandicoot_bits/cuda/gemm.hpp"
     #include "bandicoot_bits/cuda/gemv.hpp"
     #include "bandicoot_bits/cuda/sum.hpp"
+    #include "bandicoot_bits/cuda/dot.hpp"
     }
   #endif
 
@@ -276,6 +278,7 @@ namespace coot
   #include "bandicoot_bits/fn_trans.hpp"
   #include "bandicoot_bits/fn_strans.hpp"
   #include "bandicoot_bits/fn_chol.hpp"
+  #include "bandicoot_bits/fn_dot.hpp"
   
   
   //
