@@ -53,6 +53,56 @@ MatValProxy<eT>::get_val(const Mat<eT>& M, const uword index)
 template<typename eT>
 inline
 void
+MatValProxy<eT>::operator=(const MatValProxy<eT>& in_val)
+  {
+  *this = eT(in_val);
+  }
+
+
+
+template<typename eT>
+inline
+void
+MatValProxy<eT>::operator+=(const MatValProxy<eT>& in_val)
+  {
+  *this += eT(in_val);
+  }
+
+
+
+template<typename eT>
+inline
+void
+MatValProxy<eT>::operator-=(const MatValProxy<eT>& in_val)
+  {
+  *this = eT(in_val);
+  }
+
+
+
+template<typename eT>
+inline
+void
+MatValProxy<eT>::operator*=(const MatValProxy<eT>& in_val)
+  {
+  *this = eT(in_val);
+  }
+
+
+
+template<typename eT>
+inline
+void
+MatValProxy<eT>::operator/=(const MatValProxy<eT>& in_val)
+  {
+  *this = eT(in_val);
+  }
+
+
+
+template<typename eT>
+inline
+void
 MatValProxy<eT>::operator=(const eT in_val)
   {
   coot_extra_debug_sigprint();
