@@ -17,19 +17,14 @@
 //! @{
 
 
-template<typename eT, typename T1, typename T2>
+template<typename eT1, typename eT2, typename T1, typename T2>
 coot_warn_unused
 inline
-typename
-enable_if2
-  <
-  is_same_type<typename T1::elem_type, typename T2::elem_type>::yes,
-  typename T1::elem_type
-  >::result
+typename promote_type<eT1, eT2>::result
 dot
   (
-  const Base<eT, T1>& A,
-  const Base<eT, T2>& B
+  const Base<eT1, T1>& A,
+  const Base<eT2, T2>& B
   )
   {
   coot_extra_debug_sigprint();
@@ -37,8 +32,8 @@ dot
   const unwrap<T1>    U(A.get_ref());
   const unwrap<T2>    V(B.get_ref());
 
-  const Mat<eT>& X = U.M;
-  const Mat<eT>& Y = V.M;
+  const Mat<eT1>& X = U.M;
+  const Mat<eT2>& Y = V.M;
 
   // check same size
 

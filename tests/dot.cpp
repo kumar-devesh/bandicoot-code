@@ -22,7 +22,6 @@ void test_dot_1()
   {
   Row<eT> x(10);
   Row<eT> y(10);
-
   for (uword i = 0; i < 10; ++i)
     {
     x[i] = i + 1;
@@ -140,4 +139,108 @@ TEST_CASE("expr_dot")
   test_expr_dot<s32>();
   test_expr_dot<u64>();
   test_expr_dot<s64>();
+  }
+
+
+
+template<typename eT1, typename eT2>
+void test_different_eT_dot()
+  {
+  Col<eT1> x(10);
+  Col<eT2> y(10);
+
+  for (uword i = 0; i < 10; ++i)
+    {
+    x[i] = i + 1;
+    y[i] = 10 - i;
+    }
+
+  typedef typename promote_type<eT1, eT2>::result promoted_eT;
+  promoted_eT result = dot(x, y);
+
+  REQUIRE(result == Approx(promoted_eT(220)));
+  }
+
+
+
+TEST_CASE("different_eT_dot")
+  {
+  test_different_eT_dot<u32, u32>();
+  test_different_eT_dot<u32, s32>();
+  test_different_eT_dot<u32, u64>();
+  test_different_eT_dot<u32, s64>();
+  test_different_eT_dot<u32, float>();
+  test_different_eT_dot<u32, double>();
+  test_different_eT_dot<s32, u32>();
+  test_different_eT_dot<s32, s32>();
+  test_different_eT_dot<s32, u64>();
+  test_different_eT_dot<s32, s64>();
+  test_different_eT_dot<s32, float>();
+  test_different_eT_dot<s32, double>();
+  test_different_eT_dot<u64, u32>();
+  test_different_eT_dot<u64, s32>();
+  test_different_eT_dot<u64, u64>();
+  test_different_eT_dot<u64, s64>();
+  test_different_eT_dot<u64, float>();
+  test_different_eT_dot<u64, double>();
+  test_different_eT_dot<s64, u32>();
+  test_different_eT_dot<s64, s32>();
+  test_different_eT_dot<s64, u64>();
+  test_different_eT_dot<s64, s64>();
+  test_different_eT_dot<s64, float>();
+  test_different_eT_dot<s64, double>();
+  test_different_eT_dot<float, u32>();
+  test_different_eT_dot<float, s32>();
+  test_different_eT_dot<float, u64>();
+  test_different_eT_dot<float, s64>();
+  test_different_eT_dot<float, float>();
+  test_different_eT_dot<float, double>();
+  test_different_eT_dot<double, u32>();
+  test_different_eT_dot<double, s32>();
+  test_different_eT_dot<double, u64>();
+  test_different_eT_dot<double, s64>();
+  test_different_eT_dot<double, float>();
+  test_different_eT_dot<double, double>();
+  test_different_eT_dot<u32, u32>();
+  test_different_eT_dot<u32, s32>();
+  test_different_eT_dot<u32, u64>();
+  test_different_eT_dot<u32, s64>();
+  test_different_eT_dot<u32, float>();
+  test_different_eT_dot<u32, double>();
+  }
+
+
+
+// Make sure that dot() returns the expected results when one type is signed
+// and the other is unsigned.
+template<typename ueT1, typename seT2>
+void test_signed_unsigned_dot()
+  {
+  Col<ueT1> x(10);
+  Col<seT2> y(10);
+
+  for (uword i = 0; i < 10; ++i)
+    {
+    x[i] = i + 1;
+    y[i] = -(seT2(i) + 1);
+    }
+
+  // This should type-promote to seT1 or similar.
+  typedef typename promote_type<ueT1, seT2>::result out_eT;
+  out_eT result = dot(x, y);
+
+  REQUIRE(result == Approx(out_eT(-385)));
+  }
+
+
+TEST_CASE("signed_unsigned_dot")
+  {
+  test_signed_unsigned_dot<u32, s32>();
+  test_signed_unsigned_dot<u32, s64>();
+  test_signed_unsigned_dot<u32, float>();
+  test_signed_unsigned_dot<u32, double>();
+  test_signed_unsigned_dot<u64, s32>();
+  test_signed_unsigned_dot<u64, s64>();
+  test_signed_unsigned_dot<u64, float>();
+  test_signed_unsigned_dot<u64, double>();
   }
