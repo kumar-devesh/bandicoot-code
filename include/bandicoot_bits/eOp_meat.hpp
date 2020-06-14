@@ -18,9 +18,9 @@
 
 
 
-template<typename T1, typename eop_type>
+template<typename out_eT, typename T1, typename eop_type>
 inline
-eOp<T1, eop_type>::eOp(const T1& in_m)
+eOp<out_eT, T1, eop_type>::eOp(const T1& in_m)
   : m(in_m)
   {
   coot_extra_debug_sigprint();
@@ -28,21 +28,46 @@ eOp<T1, eop_type>::eOp(const T1& in_m)
 
 
 
-template<typename T1, typename eop_type>
+template<typename out_eT, typename T1, typename eop_type>
 inline
-eOp<T1, eop_type>::eOp(const T1& in_m, const typename T1::elem_type in_aux)
+eOp<out_eT, T1, eop_type>::eOp(const T1& in_m, const typename T1::elem_type in_aux_in)
   : m(in_m)
-  , aux(in_aux)
+  , aux_in(in_aux_in)
+  , use_aux_in(true)
+  , aux_out(out_eT(0))
+  , use_aux_out(false)
+  , aux_uword_a(uword(0))
+  , aux_uword_b(uword(0))
   {
   coot_extra_debug_sigprint();
   }
 
 
 
-template<typename T1, typename eop_type>
+template<typename out_eT, typename T1, typename eop_type>
 inline
-eOp<T1, eop_type>::eOp(const T1& in_m, const uword in_aux_uword_a, const uword in_aux_uword_b)
+eOp<out_eT, T1, eop_type>::eOp(const T1& in_m, const typename T1::elem_type in_aux_in, const bool in_use_aux_in, const out_eT in_aux_out, const bool in_use_aux_out)
   : m(in_m)
+  , aux_in(in_aux_in)
+  , use_aux_in(in_use_aux_in)
+  , aux_out(in_aux_out)
+  , use_aux_out(in_use_aux_out)
+  , aux_uword_a(uword(0))
+  , aux_uword_b(uword(0))
+  {
+  coot_extra_debug_sigprint();
+  }
+
+
+
+template<typename out_eT, typename T1, typename eop_type>
+inline
+eOp<out_eT, T1, eop_type>::eOp(const T1& in_m, const uword in_aux_uword_a, const uword in_aux_uword_b)
+  : m(in_m)
+  , aux_in(typename T1::elem_type(0))
+  , use_aux_in(false)
+  , aux_out(out_eT(0))
+  , use_aux_out(false)
   , aux_uword_a(in_aux_uword_a)
   , aux_uword_b(in_aux_uword_b)
   {
@@ -51,11 +76,14 @@ eOp<T1, eop_type>::eOp(const T1& in_m, const uword in_aux_uword_a, const uword i
 
 
 
-template<typename T1, typename eop_type>
+template<typename out_eT, typename T1, typename eop_type>
 inline
-eOp<T1, eop_type>::eOp(const T1& in_m, const typename T1::elem_type in_aux, const uword in_aux_uword_a, const uword in_aux_uword_b)
+eOp<out_eT, T1, eop_type>::eOp(const T1& in_m, const typename T1::elem_type in_aux_in, const bool in_use_aux_in, const out_eT in_aux_out, const bool in_use_aux_out, const uword in_aux_uword_a, const uword in_aux_uword_b)
   : m(in_m)
-  , aux(in_aux)
+  , aux_in(in_aux_in)
+  , use_aux_in(in_use_aux_in)
+  , aux_out(in_aux_out)
+  , use_aux_out(in_use_aux_out)
   , aux_uword_a(in_aux_uword_a)
   , aux_uword_b(in_aux_uword_b)
   {
@@ -64,39 +92,75 @@ eOp<T1, eop_type>::eOp(const T1& in_m, const typename T1::elem_type in_aux, cons
 
 
 
-template<typename T1, typename eop_type>
+template<typename out_eT, typename T1, typename eop_type>
 inline
-eOp<T1, eop_type>::~eOp()
+eOp<out_eT, T1, eop_type>::~eOp()
   {
   coot_extra_debug_sigprint();
   }
 
-  
 
-template<typename T1, typename eop_type>
+
+// note that in.aux_out is ignored!
+template<typename out_eT, typename T1, typename eop_type>
+template<typename in_eT>
+inline
+eOp<out_eT, T1, eop_type>::eOp(const eOp<in_eT, T1, eop_type>& in)
+  : m(in.m)
+  , aux_in(in.aux_in)
+  , use_aux_in(in.use_aux_in)
+  , aux_out(out_eT(0))
+  , use_aux_out(false)
+  , aux_uword_a(in.aux_uword_a)
+  , aux_uword_b(in.aux_uword_b)
+  {
+  coot_extra_debug_sigprint();
+  }
+
+
+
+// note that in.aux_out is ignored!
+template<typename out_eT, typename T1, typename eop_type>
+template<typename in_eT>
+inline
+eOp<out_eT, T1, eop_type>::eOp(const eOp<in_eT, T1, eop_type>& in, const bool in_use_aux_in, const out_eT in_aux_out, const bool in_use_aux_out)
+  : m(in.m)
+  , aux_in(in.aux_in)
+  , use_aux_in(in_use_aux_in)
+  , aux_out(in_aux_out)
+  , use_aux_out(in_use_aux_out)
+  , aux_uword_a(in.aux_uword_a)
+  , aux_uword_b(in.aux_uword_b)
+  {
+  coot_extra_debug_sigprint();
+  }
+
+
+
+template<typename out_eT, typename T1, typename eop_type>
 coot_inline
 uword
-eOp<T1, eop_type>::get_n_rows() const
+eOp<out_eT, T1, eop_type>::get_n_rows() const
   {
   return is_row ? 1 : m.get_n_rows();
   }
   
 
 
-template<typename T1, typename eop_type>
+template<typename out_eT, typename T1, typename eop_type>
 coot_inline
 uword
-eOp<T1, eop_type>::get_n_cols() const
+eOp<out_eT, T1, eop_type>::get_n_cols() const
   {
   return is_col ? 1 : m.get_n_cols();
   }
 
 
 
-template<typename T1, typename eop_type>
+template<typename out_eT, typename T1, typename eop_type>
 coot_inline
 uword
-eOp<T1, eop_type>::get_n_elem() const
+eOp<out_eT, T1, eop_type>::get_n_elem() const
   {
   return m.get_n_elem();
   }

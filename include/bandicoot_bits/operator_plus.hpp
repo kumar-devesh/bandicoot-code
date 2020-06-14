@@ -35,13 +35,13 @@ operator+
 //! Base + scalar
 template<typename T1>
 coot_inline
-typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_scalar_plus> >::result
+typename enable_if2< is_coot_type<T1>::value, const eOp<typename T1::elem_type, T1, eop_scalar_plus> >::result
 operator+
 (const T1& X, const typename T1::elem_type k)
   {
   coot_extra_debug_sigprint();
   
-  return eOp<T1, eop_scalar_plus>(X, k);
+  return eOp<typename T1::elem_type, T1, eop_scalar_plus>(X, k);
   }
 
 
@@ -49,13 +49,13 @@ operator+
 //! scalar + Base
 template<typename T1>
 coot_inline
-typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_scalar_plus> >::result
+typename enable_if2< is_coot_type<T1>::value, const eOp<typename T1::elem_type, T1, eop_scalar_plus> >::result
 operator+
 (const typename T1::elem_type k, const T1& X)
   {
   coot_extra_debug_sigprint();
   
-  return eOp<T1, eop_scalar_plus>(X, k);  // NOTE: order is swapped
+  return eOp<typename T1::elem_type, T1, eop_scalar_plus>(X, k); // NOTE: order is swapped
   }
 
 
@@ -67,7 +67,7 @@ typename
 enable_if2
   <
   is_coot_type<T1>::value && is_coot_type<T2>::value && is_same_type<typename T1::elem_type, typename T2::elem_type>::value,
-  const eGlue<T1, T2, eglue_plus>
+  const eGlue<typename T1::elem_type, T1, T2, eglue_plus>
   >::result
 operator+
   (
@@ -77,7 +77,7 @@ operator+
   {
   coot_extra_debug_sigprint();
   
-  return eGlue<T1, T2, eglue_plus>(X, Y);
+  return eGlue<typename T1::elem_type, T1, T2, eglue_plus>(X, Y);
   }
 
 
@@ -89,7 +89,7 @@ typename
 enable_if2
   <
   (is_coot_type<T1>::value && is_coot_type<T2>::value && (is_same_type<typename T1::elem_type, typename T2::elem_type>::no)),
-  const mtGlue<typename promote_type<typename T1::elem_type, typename T2::elem_type>::result, T1, T2, glue_mixed_plus>
+  const eGlue<typename promote_type<typename T1::elem_type, typename T2::elem_type>::result, T1, T2, glue_mixed_plus>
   >::result
 operator+
   (
@@ -106,7 +106,7 @@ operator+
   
   promote_type<eT1,eT2>::check();
   
-  return mtGlue<out_eT, T1, T2, glue_mixed_plus>( X, Y );
+  return eGlue<out_eT, T1, T2, glue_mixed_plus>( X, Y );
   }
 
 

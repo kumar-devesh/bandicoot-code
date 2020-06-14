@@ -34,7 +34,7 @@ trace(dev_mem_t<eT> mem, const uword n_rows, const uword n_cols)
 
   runtime_t::cq_guard guard;
 
-  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(kernel_id::trace);
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::trace);
 
   dev_mem_t<eT> tmp_mem = tmp.get_dev_mem(false);
 

@@ -27,7 +27,7 @@ typename
 enable_if2
   <
   is_coot_type<T1>::value && is_coot_type<T2>::value && is_same_type<typename T1::elem_type, typename T2::elem_type>::value,
-  const eGlue<T1, T2, eglue_schur>
+  const eGlue<typename T1::elem_type, T1, T2, eglue_schur>
   >::result
 operator%
   (
@@ -37,7 +37,7 @@ operator%
   {
   coot_extra_debug_sigprint();
   
-  return eGlue<T1, T2, eglue_schur>(X, Y);
+  return eGlue<typename T1::elem_type, T1, T2, eglue_schur>(X, Y);
   }
 
 
@@ -49,7 +49,7 @@ typename
 enable_if2
   <
   (is_coot_type<T1>::value && is_coot_type<T2>::value && (is_same_type<typename T1::elem_type, typename T2::elem_type>::no)),
-  const mtGlue<typename promote_type<typename T1::elem_type, typename T2::elem_type>::result, T1, T2, glue_mixed_schur>
+  const eGlue<typename promote_type<typename T1::elem_type, typename T2::elem_type>::result, T1, T2, glue_mixed_schur>
   >::result
 operator%
   (
@@ -66,7 +66,7 @@ operator%
   
   promote_type<eT1,eT2>::check();
   
-  return mtGlue<out_eT, T1, T2, glue_mixed_schur>( X, Y );
+  return eGlue<out_eT, T1, T2, glue_mixed_schur>( X, Y );
   }
 
 

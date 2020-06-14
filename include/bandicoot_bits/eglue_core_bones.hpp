@@ -24,11 +24,11 @@ struct eglue_core
   
   // matrices
   
-  template<typename T1, typename T2> inline static void apply              (Mat<typename T1::elem_type>& out, const eGlue<T1, T2, eglue_type>& x);
-  template<typename T1, typename T2> inline static void apply_inplace_plus (Mat<typename T1::elem_type>& out, const eGlue<T1, T2, eglue_type>& x);
-  template<typename T1, typename T2> inline static void apply_inplace_minus(Mat<typename T1::elem_type>& out, const eGlue<T1, T2, eglue_type>& x);
-  template<typename T1, typename T2> inline static void apply_inplace_schur(Mat<typename T1::elem_type>& out, const eGlue<T1, T2, eglue_type>& x);
-  template<typename T1, typename T2> inline static void apply_inplace_div  (Mat<typename T1::elem_type>& out, const eGlue<T1, T2, eglue_type>& x);
+  template<typename eT3, typename T1, typename T2> inline static void apply              (Mat<eT3>& out, const eGlue<eT3, T1, T2, eglue_type>& x);
+  template<typename eT3, typename T1, typename T2> inline static void apply_inplace_plus (Mat<eT3>& out, const eGlue<eT3, T1, T2, eglue_type>& x);
+  template<typename eT3, typename T1, typename T2> inline static void apply_inplace_minus(Mat<eT3>& out, const eGlue<eT3, T1, T2, eglue_type>& x);
+  template<typename eT3, typename T1, typename T2> inline static void apply_inplace_schur(Mat<eT3>& out, const eGlue<eT3, T1, T2, eglue_type>& x);
+  template<typename eT3, typename T1, typename T2> inline static void apply_inplace_div  (Mat<eT3>& out, const eGlue<eT3, T1, T2, eglue_type>& x);
   };
 
 

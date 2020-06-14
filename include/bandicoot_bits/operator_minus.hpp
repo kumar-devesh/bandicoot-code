@@ -22,13 +22,13 @@
 template<typename T1>
 coot_inline
 typename
-enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_neg> >::result
+enable_if2< is_coot_type<T1>::value, const eOp<typename T1::elem_type, T1, eop_neg> >::result
 operator-
 (const T1& X)
   {
   coot_extra_debug_sigprint();
   
-  return eOp<T1,eop_neg>(X);
+  return eOp<typename T1::elem_type, T1, eop_neg>(X);
   }
 
 
@@ -37,7 +37,7 @@ operator-
 template<typename T1>
 coot_inline
 typename
-enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_scalar_minus_pre> >::result
+enable_if2< is_coot_type<T1>::value, const eOp<typename T1::elem_type, T1, eop_scalar_minus_pre> >::result
 operator-
   (
   const typename T1::elem_type k,
@@ -46,7 +46,7 @@ operator-
   {
   coot_extra_debug_sigprint();
   
-  return eOp<T1, eop_scalar_minus_pre>(X, k);
+  return eOp<typename T1::elem_type, T1, eop_scalar_minus_pre>(X, k);
   }
 
 
@@ -55,7 +55,7 @@ operator-
 template<typename T1>
 coot_inline
 typename
-enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_scalar_minus_post> >::result
+enable_if2< is_coot_type<T1>::value, const eOp<typename T1::elem_type, T1, eop_scalar_minus_post> >::result
 operator-
   (
   const T1&                    X,
@@ -64,7 +64,7 @@ operator-
   {
   coot_extra_debug_sigprint();
   
-  return eOp<T1, eop_scalar_minus_post>(X, k);
+  return eOp<typename T1::elem_type, T1, eop_scalar_minus_post>(X, k);
   }
 
 
@@ -76,7 +76,7 @@ typename
 enable_if2
   <
   is_coot_type<T1>::value && is_coot_type<T2>::value && is_same_type<typename T1::elem_type, typename T2::elem_type>::value,
-  const eGlue<T1, T2, eglue_minus>
+  const eGlue<typename T1::elem_type, T1, T2, eglue_minus>
   >::result
 operator-
   (
@@ -86,7 +86,7 @@ operator-
   {
   coot_extra_debug_sigprint();
   
-  return eGlue<T1, T2, eglue_minus>(X, Y);
+  return eGlue<typename T1::elem_type, T1, T2, eglue_minus>(X, Y);
   }
 
 
@@ -98,7 +98,7 @@ typename
 enable_if2
   <
   (is_coot_type<T1>::value && is_coot_type<T2>::value && (is_same_type<typename T1::elem_type, typename T2::elem_type>::no)),
-  const mtGlue<typename promote_type<typename T1::elem_type, typename T2::elem_type>::result, T1, T2, glue_mixed_minus>
+  const eGlue<typename promote_type<typename T1::elem_type, typename T2::elem_type>::result, T1, T2, glue_mixed_minus>
   >::result
 operator-
   (
@@ -115,7 +115,7 @@ operator-
   
   promote_type<eT1,eT2>::check();
   
-  return mtGlue<out_eT, T1, T2, glue_mixed_minus>( X, Y );
+  return eGlue<out_eT, T1, T2, glue_mixed_minus>( X, Y );
   }
 
 

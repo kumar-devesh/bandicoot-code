@@ -20,7 +20,7 @@
 template<typename T1>
 coot_warn_unused
 coot_inline
-const Op<T1, op_sum>
+const Op<typename T1::elem_type, T1, op_sum>
 sum
   (
   const T1& X,
@@ -33,7 +33,7 @@ sum
   coot_ignore(junk1);
   coot_ignore(junk2);
   
-  return Op<T1, op_sum>(X, dim, 0);
+  return Op<typename T1::elem_type, T1, op_sum>(X, dim, 0);
   }
 
 
@@ -41,7 +41,7 @@ sum
 template<typename T1>
 coot_warn_unused
 coot_inline
-const Op<T1, op_sum>
+const Op<typename T1::elem_type, T1, op_sum>
 sum
   (
   const T1& X,
@@ -52,7 +52,7 @@ sum
   coot_extra_debug_sigprint();
   coot_ignore(junk);
   
-  return Op<T1, op_sum>(X, dim, 0);
+  return Op<typename T1::elem_type, T1, op_sum>(X, dim, 0);
   }
 
 
@@ -81,7 +81,7 @@ template<typename T1>
 coot_warn_unused
 inline
 typename T1::elem_type
-sum(const Op<T1, op_sum>& in)
+sum(const Op<typename T1::elem_type, T1, op_sum>& in)
   {
   coot_extra_debug_sigprint();
   coot_extra_debug_print("sum(): two consecutive sum() calls detected");
@@ -94,12 +94,12 @@ sum(const Op<T1, op_sum>& in)
 template<typename T1>
 coot_warn_unused
 coot_inline
-const Op<Op<T1, op_sum>, op_sum>
-sum(const Op<T1, op_sum>& in, const uword dim)
+const Op<typename T1::elem_type, Op<typename T1::elem_type, T1, op_sum>, op_sum>
+sum(const Op<typename T1::elem_type, T1, op_sum>& in, const uword dim)
   {
   coot_extra_debug_sigprint();
   
-  return Op<Op<T1, op_sum>, op_sum>(in, dim, 0);
+  return Op<typename T1::elem_type, Op<typename T1::elem_type, T1, op_sum>, op_sum>(in, dim, 0);
   }
 
 

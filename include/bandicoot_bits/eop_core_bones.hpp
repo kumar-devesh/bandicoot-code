@@ -25,11 +25,11 @@ class eop_core
   
   // matrices
   
-  template<typename T1> inline static void apply              (Mat<typename T1::elem_type>& out, const eOp<T1, eop_type>& x);
-  template<typename T1> inline static void apply_inplace_plus (Mat<typename T1::elem_type>& out, const eOp<T1, eop_type>& x);
-  template<typename T1> inline static void apply_inplace_minus(Mat<typename T1::elem_type>& out, const eOp<T1, eop_type>& x);
-  template<typename T1> inline static void apply_inplace_schur(Mat<typename T1::elem_type>& out, const eOp<T1, eop_type>& x);
-  template<typename T1> inline static void apply_inplace_div  (Mat<typename T1::elem_type>& out, const eOp<T1, eop_type>& x);
+  template<typename eT2, typename T1> inline static void apply              (Mat<eT2>& out, const eOp<eT2, T1, eop_type>& x);
+  template<typename eT2, typename T1> inline static void apply_inplace_plus (Mat<eT2>& out, const eOp<eT2, T1, eop_type>& x);
+  template<typename eT2, typename T1> inline static void apply_inplace_minus(Mat<eT2>& out, const eOp<eT2, T1, eop_type>& x);
+  template<typename eT2, typename T1> inline static void apply_inplace_schur(Mat<eT2>& out, const eOp<eT2, T1, eop_type>& x);
+  template<typename eT2, typename T1> inline static void apply_inplace_div  (Mat<eT2>& out, const eOp<eT2, T1, eop_type>& x);
   
   
   // cubes
@@ -83,6 +83,14 @@ class eop_exp               : public eop_core<eop_exp>               {};
 // class eop_erfc              : public eop_core<eop_erfc>              {};
 // class eop_lgamma            : public eop_core<eop_lgamma>            {};
 
+template<typename eop_type>
+struct get_default { template<typename eT> static inline eT val() { return eT(0); } };
+
+template<>
+struct get_default<eop_scalar_times> { template<typename eT> static inline eT val() { return eT(1); } };
+
+template<>
+struct get_default<eop_scalar_div_post> { template<typename eT> static inline eT val() { return eT(1); } };
 
 
 //! @}

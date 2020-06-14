@@ -53,7 +53,7 @@ class subview : public Base<eT, subview<eT> >
   
   inline void operator= (const subview<eT>& x);
   
-  inline void inplace_op(const eT val, kernel_id::enum_id kernel);
+  inline void inplace_op(const eT val, oneway_kernel_id::enum_id kernel);
   
   inline void operator=  (const eT val);
   inline void operator+= (const eT val);
@@ -62,20 +62,27 @@ class subview : public Base<eT, subview<eT> >
   inline void operator/= (const eT val);
   
   
-  template<typename T1> inline void inplace_op(const Base<eT,T1>& x, kernel_id::enum_id kernel, const char* identifier);
+  template<typename T1> inline void inplace_op(const Base<eT, T1>& x, twoway_kernel_id::enum_id kernel, const char* identifier);
   
-  template<typename T1> inline void operator= (const Base<eT,T1>& x);
-  template<typename T1> inline void operator+=(const Base<eT,T1>& x);
-  template<typename T1> inline void operator-=(const Base<eT,T1>& x);
-  template<typename T1> inline void operator%=(const Base<eT,T1>& x);
-  template<typename T1> inline void operator/=(const Base<eT,T1>& x);
-  
-  
-  inline static void       extract(Mat<eT>& out, const subview& in);
-  inline static void  plus_inplace(Mat<eT>& out, const subview& in);
-  inline static void minus_inplace(Mat<eT>& out, const subview& in);
-  inline static void schur_inplace(Mat<eT>& out, const subview& in);
-  inline static void   div_inplace(Mat<eT>& out, const subview& in);
+  template<typename T1> inline void operator= (const Base<eT, T1>& x);
+  template<typename T1> inline void operator+=(const Base<eT, T1>& x);
+  template<typename T1> inline void operator-=(const Base<eT, T1>& x);
+  template<typename T1> inline void operator%=(const Base<eT, T1>& x);
+  template<typename T1> inline void operator/=(const Base<eT, T1>& x);
+
+  template<typename T1> inline void inplace_op(const Op<eT, T1, op_conv_to>& x, twoway_kernel_id::enum_id kernel, const char* identifier);
+
+  template<typename T1> inline void operator= (const Op<eT, T1, op_conv_to>& x);
+  template<typename T1> inline void operator+=(const Op<eT, T1, op_conv_to>& x);
+  template<typename T1> inline void operator-=(const Op<eT, T1, op_conv_to>& x);
+  template<typename T1> inline void operator%=(const Op<eT, T1, op_conv_to>& x);
+  template<typename T1> inline void operator/=(const Op<eT, T1, op_conv_to>& x);
+
+  template<typename eT1> inline static void       extract(Mat<eT1>& out, const subview& in);
+  template<typename eT1> inline static void  plus_inplace(Mat<eT1>& out, const subview& in);
+  template<typename eT1> inline static void minus_inplace(Mat<eT1>& out, const subview& in);
+  template<typename eT1> inline static void schur_inplace(Mat<eT1>& out, const subview& in);
+  template<typename eT1> inline static void   div_inplace(Mat<eT1>& out, const subview& in);
   
   inline void fill(const eT val);
   inline void zeros();
@@ -156,9 +163,9 @@ class subview_row : public subview<eT>
   template<typename T1>
   inline void operator= (const Base<eT,T1>& x);
   
-  coot_inline const Op<subview_row<eT>,op_htrans>  t() const;
-  coot_inline const Op<subview_row<eT>,op_htrans> ht() const;
-  coot_inline const Op<subview_row<eT>,op_strans> st() const;
+  coot_inline const Op<eT, subview_row<eT>, op_htrans>  t() const;
+  coot_inline const Op<eT, subview_row<eT>, op_htrans> ht() const;
+  coot_inline const Op<eT, subview_row<eT>, op_strans> st() const;
   
   
   protected:

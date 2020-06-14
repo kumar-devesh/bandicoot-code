@@ -1,10 +1,10 @@
-// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
-// 
+// Copyright 2019 Ryan Curtin (http://www.ratml.org/)
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,36 +12,15 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
+// utility structure to hold kernels (or hold structures that hold other kernels)
 
-//! \addtogroup fn_trans
-//! @{
-
-
-
-template<typename T1>
-coot_warn_unused
-coot_inline
-const Op<typename T1::elem_type, T1, op_htrans>
-trans(const Base<typename T1::elem_type,T1>& X)
+template<typename HeldType>
+struct kernels_t
   {
-  coot_extra_debug_sigprint();
-  
-  return Op<typename T1::elem_type, T1, op_htrans>(X.get_ref());
-  }
-
-
-
-template<typename T1>
-coot_warn_unused
-coot_inline
-const Op<typename T1::elem_type, T1, op_htrans>
-htrans(const Base<typename T1::elem_type,T1>& X)
-  {
-  coot_extra_debug_sigprint();
-  
-  return Op<typename T1::elem_type, T1, op_htrans>(X.get_ref());
-  }
-
-
-
-//! @}
+  HeldType   u32_kernels;
+  HeldType   s32_kernels;
+  HeldType   u64_kernels;
+  HeldType   s64_kernels;
+  HeldType     f_kernels;
+  HeldType     d_kernels;
+  };

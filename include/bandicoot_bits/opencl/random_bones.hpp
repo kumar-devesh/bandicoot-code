@@ -1,4 +1,4 @@
-// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2019 Ryan Curtin (http://www.ratml.org/)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,36 +12,13 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
+// Utility functions for generating random numbers via OpenCL.
+// TODO: these currently generate random numbers on the CPU and then send them to the GPU.  That's awful!
 
-//! \addtogroup fn_trans
-//! @{
+template<typename eT>
+inline void fill_randu(dev_mem_t<eT> dest, const uword n);
 
+template<typename eT>
+inline void fill_randn(dev_mem_t<eT> dest, const uword n);
 
-
-template<typename T1>
-coot_warn_unused
-coot_inline
-const Op<typename T1::elem_type, T1, op_htrans>
-trans(const Base<typename T1::elem_type,T1>& X)
-  {
-  coot_extra_debug_sigprint();
-  
-  return Op<typename T1::elem_type, T1, op_htrans>(X.get_ref());
-  }
-
-
-
-template<typename T1>
-coot_warn_unused
-coot_inline
-const Op<typename T1::elem_type, T1, op_htrans>
-htrans(const Base<typename T1::elem_type,T1>& X)
-  {
-  coot_extra_debug_sigprint();
-  
-  return Op<typename T1::elem_type, T1, op_htrans>(X.get_ref());
-  }
-
-
-
-//! @}
+// TODO: fill_randi, etc...

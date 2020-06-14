@@ -105,12 +105,19 @@ namespace coot
   
   #include "bandicoot_bits/kernel_id.hpp"
 
+  namespace rt_common
+    {
+    #include "bandicoot_bits/rt_common/kernels_t.hpp"
+    #include "bandicoot_bits/rt_common/kernel_utils_bones.hpp"
+    }
+
   #if defined(COOT_USE_OPENCL)
   namespace opencl
     {
     #include "bandicoot_bits/opencl/runtime_bones.hpp"
     #include "bandicoot_bits/opencl/kernel_src.hpp"
     #include "bandicoot_bits/opencl/error.hpp"
+    #include "bandicoot_bits/opencl/type_to_dev_string.hpp"
     }
 
   #include "bandicoot_bits/opencl/magma_bones.hpp"
@@ -122,6 +129,7 @@ namespace coot
     #include "bandicoot_bits/cuda/runtime_bones.hpp"
     #include "bandicoot_bits/cuda/kernel_src.hpp"
     #include "bandicoot_bits/cuda/error.hpp"
+    #include "bandicoot_bits/cuda/type_to_dev_string.hpp"
     }
   #endif
 
@@ -183,6 +191,11 @@ namespace coot
   //
   // runtime
 
+  namespace rt_common
+    {
+    #include "bandicoot_bits/rt_common/kernel_utils_meat.hpp"
+    }
+
   #if defined(COOT_USE_OPENCL)
   namespace opencl
     {
@@ -234,6 +247,7 @@ namespace coot
   // classes that underlay metaprogramming 
   
   #include "bandicoot_bits/unwrap.hpp"
+  #include "bandicoot_bits/SizeProxy.hpp"
   
   
   
@@ -279,6 +293,7 @@ namespace coot
   #include "bandicoot_bits/fn_strans.hpp"
   #include "bandicoot_bits/fn_chol.hpp"
   #include "bandicoot_bits/fn_dot.hpp"
+  #include "bandicoot_bits/fn_conv_to.hpp"
   
   
   //

@@ -33,7 +33,7 @@ eye(dev_mem_t<eT> dest, const uword n_rows, const uword n_cols)
   runtime_t::adapt_uword local_n_rows(n_rows);
   runtime_t::adapt_uword local_n_cols(n_cols);
 
-  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(kernel_id::inplace_set_eye);
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::inplace_set_eye);
 
   cl_int status = 0;
 

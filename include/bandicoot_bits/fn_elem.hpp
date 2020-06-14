@@ -23,12 +23,12 @@
 template<typename T1>
 coot_warn_unused
 coot_inline
-typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_square> >::result
+typename enable_if2< is_coot_type<T1>::value, const eOp<typename T1::elem_type, T1, eop_square> >::result
 square(const T1& A)
   {
   coot_extra_debug_sigprint();
   
-  return eOp<T1, eop_square>(A);
+  return eOp<typename T1::elem_type, T1, eop_square>(A);
   }
 
 
@@ -39,12 +39,12 @@ square(const T1& A)
 template<typename T1>
 coot_warn_unused
 coot_inline
-typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_sqrt> >::result
+typename enable_if2< is_coot_type<T1>::value, const eOp<typename T1::elem_type, T1, eop_sqrt> >::result
 sqrt(const T1& A)
   {
   coot_extra_debug_sigprint();
   
-  return eOp<T1, eop_sqrt>(A);
+  return eOp<typename T1::elem_type, T1, eop_sqrt>(A);
   }
 
 
@@ -54,12 +54,12 @@ sqrt(const T1& A)
 template<typename T1>
 coot_warn_unused
 coot_inline
-typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_exp> >::result
+typename enable_if2< is_coot_type<T1>::value, const eOp<typename T1::elem_type, T1, eop_exp> >::result
 exp(const T1& A)
   {
   coot_extra_debug_sigprint();
   
-  return eOp<T1, eop_exp>(A);
+  return eOp<typename T1::elem_type, T1, eop_exp>(A);
   }
 
 
@@ -69,12 +69,12 @@ exp(const T1& A)
 template<typename T1>
 coot_warn_unused
 coot_inline
-typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_log> >::result
+typename enable_if2< is_coot_type<T1>::value, const eOp<typename T1::elem_type, T1, eop_log> >::result
 log(const T1& A)
   {
   coot_extra_debug_sigprint();
   
-  return eOp<T1, eop_log>(A);
+  return eOp<typename T1::elem_type, T1, eop_log>(A);
   }
 
 

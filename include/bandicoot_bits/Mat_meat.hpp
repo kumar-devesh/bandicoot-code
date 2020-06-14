@@ -361,7 +361,7 @@ Mat<eT>::operator+=(const Mat<eT>& X)
   
   coot_assert_same_size((*this), X, "Mat::operator+=" );
   
-  arrayops::inplace_plus_array<eT>(dev_mem, X.dev_mem, n_elem);
+  arrayops::inplace_plus_array(dev_mem, X.dev_mem, n_elem);
   
   return *this;
   }
@@ -377,7 +377,7 @@ Mat<eT>::operator-=(const Mat<eT>& X)
   
   coot_assert_same_size((*this), X, "Mat::operator-=" );
   
-  arrayops::inplace_minus_array<eT>(dev_mem, X.dev_mem, n_elem);
+  arrayops::inplace_minus_array(dev_mem, X.dev_mem, n_elem);
   
   return *this;
   }
@@ -409,7 +409,7 @@ Mat<eT>::operator%=(const Mat<eT>& X)
   
   coot_assert_same_size((*this), X, "Mat::operator%=" );
   
-  arrayops::inplace_mul_array<eT>(dev_mem, X.dev_mem, n_elem);
+  arrayops::inplace_mul_array(dev_mem, X.dev_mem, n_elem);
   
   return *this;
   }
@@ -425,7 +425,7 @@ Mat<eT>::operator/=(const Mat<eT>& X)
   
   coot_assert_same_size((*this), X, "Mat::operator/=" );
   
-  arrayops::inplace_div_array<eT>(dev_mem, X.dev_mem, n_elem);
+  arrayops::inplace_div_array(dev_mem, X.dev_mem, n_elem);
   
   return *this;
   }
@@ -615,7 +615,7 @@ Mat<eT>::operator/=(const subview<eT>& X)
 template<typename eT>
 template<typename T1, typename eop_type>
 inline
-Mat<eT>::Mat(const eOp<T1, eop_type>& X)
+Mat<eT>::Mat(const eOp<eT, T1, eop_type>& X)
   : n_rows   (0)
   , n_cols   (0)
   , n_elem   (0)
@@ -633,11 +633,9 @@ template<typename eT>
 template<typename T1, typename eop_type>
 inline
 const Mat<eT>&
-Mat<eT>::operator=(const eOp<T1, eop_type>& X)
+Mat<eT>::operator=(const eOp<eT, T1, eop_type>& X)
   {
   coot_extra_debug_sigprint();
-  
-  coot_type_check(( is_same_type< eT, typename T1::elem_type >::no ));
   
   // eop_core currently forcefully unwraps submatrices to matrices,
   // so currently there can't be dangerous aliasing with the out matrix
@@ -655,11 +653,9 @@ template<typename eT>
 template<typename T1, typename eop_type>
 inline
 const Mat<eT>&
-Mat<eT>::operator+=(const eOp<T1, eop_type>& X)
+Mat<eT>::operator+=(const eOp<eT, T1, eop_type>& X)
   {
   coot_extra_debug_sigprint();
-  
-  coot_type_check(( is_same_type< eT, typename T1::elem_type >::no ));
   
   coot_assert_same_size(n_rows, n_cols, X.get_n_rows(), X.get_n_cols(), "Mat::operator+=");
   
@@ -674,11 +670,9 @@ template<typename eT>
 template<typename T1, typename eop_type>
 inline
 const Mat<eT>&
-Mat<eT>::operator-=(const eOp<T1, eop_type>& X)
+Mat<eT>::operator-=(const eOp<eT, T1, eop_type>& X)
   {
   coot_extra_debug_sigprint();
-  
-  coot_type_check(( is_same_type< eT, typename T1::elem_type >::no ));
   
   coot_assert_same_size(n_rows, n_cols, X.get_n_rows(), X.get_n_cols(), "Mat::operator-=");
   
@@ -693,7 +687,7 @@ template<typename eT>
 template<typename T1, typename eop_type>
 inline
 const Mat<eT>&
-Mat<eT>::operator*=(const eOp<T1, eop_type>& X)
+Mat<eT>::operator*=(const eOp<eT, T1, eop_type>& X)
   {
   coot_extra_debug_sigprint();
   
@@ -710,11 +704,9 @@ template<typename eT>
 template<typename T1, typename eop_type>
 inline
 const Mat<eT>&
-Mat<eT>::operator%=(const eOp<T1, eop_type>& X)
+Mat<eT>::operator%=(const eOp<eT, T1, eop_type>& X)
   {
   coot_extra_debug_sigprint();
-  
-  coot_type_check(( is_same_type< eT, typename T1::elem_type >::no ));
   
   coot_assert_same_size(n_rows, n_cols, X.get_n_rows(), X.get_n_cols(), "Mat::operator%=");
   
@@ -729,11 +721,9 @@ template<typename eT>
 template<typename T1, typename eop_type>
 inline
 const Mat<eT>&
-Mat<eT>::operator/=(const eOp<T1, eop_type>& X)
+Mat<eT>::operator/=(const eOp<eT, T1, eop_type>& X)
   {
   coot_extra_debug_sigprint();
-  
-  coot_type_check(( is_same_type< eT, typename T1::elem_type >::no ));
   
   coot_assert_same_size(n_rows, n_cols, X.get_n_rows(), X.get_n_cols(), "Mat::operator/=");
   
@@ -747,7 +737,7 @@ Mat<eT>::operator/=(const eOp<T1, eop_type>& X)
 template<typename eT>
 template<typename T1, typename T2, typename eglue_type>
 inline
-Mat<eT>::Mat(const eGlue<T1, T2, eglue_type>& X)
+Mat<eT>::Mat(const eGlue<eT, T1, T2, eglue_type>& X)
   : n_rows   (0)
   , n_cols   (0)
   , n_elem   (0)
@@ -765,12 +755,9 @@ template<typename eT>
 template<typename T1, typename T2, typename eglue_type>
 inline
 const Mat<eT>&
-Mat<eT>::operator=(const eGlue<T1, T2, eglue_type>& X)
+Mat<eT>::operator=(const eGlue<eT, T1, T2, eglue_type>& X)
   {
   coot_extra_debug_sigprint();
-  
-  coot_type_check(( is_same_type< eT, typename T1::elem_type >::no ));
-  coot_type_check(( is_same_type< eT, typename T2::elem_type >::no ));
   
   // eglue_core currently forcefully unwraps submatrices to matrices,
   // so currently there can't be dangerous aliasing with the out matrix
@@ -788,12 +775,9 @@ template<typename eT>
 template<typename T1, typename T2, typename eglue_type>
 inline
 const Mat<eT>&
-Mat<eT>::operator+=(const eGlue<T1, T2, eglue_type>& X)
+Mat<eT>::operator+=(const eGlue<eT, T1, T2, eglue_type>& X)
   {
   coot_extra_debug_sigprint();
-  
-  coot_type_check(( is_same_type< eT, typename T1::elem_type >::no ));
-  coot_type_check(( is_same_type< eT, typename T2::elem_type >::no ));
   
   coot_assert_same_size(n_rows, n_cols, X.get_n_rows(), X.get_n_cols(), "Mat::operator+=");
   
@@ -808,12 +792,9 @@ template<typename eT>
 template<typename T1, typename T2, typename eglue_type>
 inline
 const Mat<eT>&
-Mat<eT>::operator-=(const eGlue<T1, T2, eglue_type>& X)
+Mat<eT>::operator-=(const eGlue<eT, T1, T2, eglue_type>& X)
   {
   coot_extra_debug_sigprint();
-  
-  coot_type_check(( is_same_type< eT, typename T1::elem_type >::no ));
-  coot_type_check(( is_same_type< eT, typename T2::elem_type >::no ));
   
   coot_assert_same_size(n_rows, n_cols, X.get_n_rows(), X.get_n_cols(), "Mat::operator-=");
   
@@ -828,7 +809,7 @@ template<typename eT>
 template<typename T1, typename T2, typename eglue_type>
 inline
 const Mat<eT>&
-Mat<eT>::operator*=(const eGlue<T1, T2, eglue_type>& X)
+Mat<eT>::operator*=(const eGlue<eT, T1, T2, eglue_type>& X)
   {
   coot_extra_debug_sigprint();
   
@@ -845,12 +826,9 @@ template<typename eT>
 template<typename T1, typename T2, typename eglue_type>
 inline
 const Mat<eT>&
-Mat<eT>::operator%=(const eGlue<T1, T2, eglue_type>& X)
+Mat<eT>::operator%=(const eGlue<eT, T1, T2, eglue_type>& X)
   {
   coot_extra_debug_sigprint();
-  
-  coot_type_check(( is_same_type< eT, typename T1::elem_type >::no ));
-  coot_type_check(( is_same_type< eT, typename T2::elem_type >::no ));
   
   coot_assert_same_size(n_rows, n_cols, X.get_n_rows(), X.get_n_cols(), "Mat::operator%=");
   
@@ -865,12 +843,9 @@ template<typename eT>
 template<typename T1, typename T2, typename eglue_type>
 inline
 const Mat<eT>&
-Mat<eT>::operator/=(const eGlue<T1, T2, eglue_type>& X)
+Mat<eT>::operator/=(const eGlue<eT, T1, T2, eglue_type>& X)
   {
   coot_extra_debug_sigprint();
-  
-  coot_type_check(( is_same_type< eT, typename T1::elem_type >::no ));
-  coot_type_check(( is_same_type< eT, typename T2::elem_type >::no ));
   
   coot_assert_same_size(n_rows, n_cols, X.get_n_rows(), X.get_n_cols(), "Mat::operator/=");
   
@@ -884,7 +859,7 @@ Mat<eT>::operator/=(const eGlue<T1, T2, eglue_type>& X)
 template<typename eT>
 template<typename T1, typename op_type>
 inline
-Mat<eT>::Mat(const Op<T1, op_type>& X)
+Mat<eT>::Mat(const Op<eT, T1, op_type>& X)
   : n_rows   (0)
   , n_cols   (0)
   , n_elem   (0)
@@ -902,11 +877,9 @@ template<typename eT>
 template<typename T1, typename op_type>
 inline
 const Mat<eT>&
-Mat<eT>::operator=(const Op<T1, op_type>& X)
+Mat<eT>::operator=(const Op<eT, T1, op_type>& X)
   {
   coot_extra_debug_sigprint();
-  
-  coot_type_check(( is_same_type< eT, typename T1::elem_type >::no ));
   
   op_type::apply(*this, X);
   
@@ -919,15 +892,25 @@ template<typename eT>
 template<typename T1, typename op_type>
 inline
 const Mat<eT>&
-Mat<eT>::operator+=(const Op<T1, op_type>& X)
+Mat<eT>::operator+=(const Op<eT, T1, op_type>& X)
   {
   coot_extra_debug_sigprint();
   
-  coot_type_check(( is_same_type< eT, typename T1::elem_type >::no ));
+  // Special handling for op_conv_to.  TODO: move elsewhere?
+  if (is_same_type<op_type, op_conv_to>::value)
+    {
+    const unwrap<T1> U(X.m);
+
+    arrayops::inplace_plus_array(dev_mem, U.M.get_dev_mem(), n_elem);
+
+    return *this;
+    }
+  else
+    {
+    const unwrap<Op<eT, T1, op_type>> U(X);
   
-  const Mat<eT> m(X);
-  
-  return (*this).operator+=(m);
+    return (*this).operator+=(U.M);
+    }
   }
 
 
@@ -936,15 +919,25 @@ template<typename eT>
 template<typename T1, typename op_type>
 inline
 const Mat<eT>&
-Mat<eT>::operator-=(const Op<T1, op_type>& X)
+Mat<eT>::operator-=(const Op<eT, T1, op_type>& X)
   {
   coot_extra_debug_sigprint();
   
-  coot_type_check(( is_same_type< eT, typename T1::elem_type >::no ));
+  // Special handling for op_conv_to.  TODO: move elsewhere?
+  if (is_same_type<op_type, op_conv_to>::value)
+    {
+    const unwrap<T1> U(X.m);
+
+    arrayops::inplace_minus_array(dev_mem, U.M.get_dev_mem(), n_elem);
+
+    return *this;
+    }
+  else
+    {
+    const unwrap<Op<eT, T1, op_type>> U(X);
   
-  const Mat<eT> m(X);
-  
-  return (*this).operator-=(m);
+    return (*this).operator-=(U.M);
+    }
   }
 
 
@@ -953,7 +946,7 @@ template<typename eT>
 template<typename T1, typename op_type>
 inline
 const Mat<eT>&
-Mat<eT>::operator*=(const Op<T1, op_type>& X)
+Mat<eT>::operator*=(const Op<eT, T1, op_type>& X)
   {
   coot_extra_debug_sigprint();
   
@@ -970,15 +963,25 @@ template<typename eT>
 template<typename T1, typename op_type>
 inline
 const Mat<eT>&
-Mat<eT>::operator%=(const Op<T1, op_type>& X)
+Mat<eT>::operator%=(const Op<eT, T1, op_type>& X)
   {
   coot_extra_debug_sigprint();
   
-  coot_type_check(( is_same_type< eT, typename T1::elem_type >::no ));
+  // Special handling for op_conv_to.  TODO: move elsewhere?
+  if (is_same_type<op_type, op_conv_to>::value)
+    {
+    const unwrap<T1> U(X.m);
+
+    arrayops::inplace_mul_array(dev_mem, U.M.get_dev_mem(), n_elem);
+
+    return *this;
+    }
+  else
+    {
+    const unwrap<Op<eT, T1, op_type>> U(X);
   
-  const Mat<eT> m(X);
-  
-  return (*this).operator%=(m);
+    return (*this).operator*=(U.M);
+    }
   }
 
 
@@ -987,15 +990,69 @@ template<typename eT>
 template<typename T1, typename op_type>
 inline
 const Mat<eT>&
-Mat<eT>::operator/=(const Op<T1, op_type>& X)
+Mat<eT>::operator/=(const Op<eT, T1, op_type>& X)
   {
   coot_extra_debug_sigprint();
   
-  coot_type_check(( is_same_type< eT, typename T1::elem_type >::no ));
+  // Special handling for op_conv_to.  TODO: move elsewhere?
+  if (is_same_type<op_type, op_conv_to>::value)
+    {
+    const unwrap<T1> U(X.m);
+
+    arrayops::inplace_div_array(dev_mem, U.M.get_dev_mem(), n_elem);
+
+    return *this;
+    }
+  else
+    {
+    const unwrap<Op<eT, T1, op_type>> U(X);
   
-  const Mat<eT> m(X);
-  
-  return (*this).operator/=(m);
+    return (*this).operator/=(U.M);
+    }
+  }
+
+
+
+template<typename eT>
+template<typename T1>
+inline
+Mat<eT>::Mat(const Op<eT, T1, op_conv_to>& X)
+  : n_rows   (0)
+  , n_cols   (0)
+  , n_elem   (0)
+  , vec_state(0)
+  , mem_state(0)
+  {
+  coot_extra_debug_sigprint();
+
+  // TODO: maybe can we get the size without an unwrap?
+  const unwrap<T1> U(X.m);
+  const Mat<typename T1::elem_type>& in(U.M);
+
+  init(in.n_rows, in.n_cols);
+
+  coot_rt_t::copy_array(dev_mem, in.get_dev_mem(), n_elem);
+  }
+
+
+
+template<typename eT>
+template<typename T1>
+inline
+const Mat<eT>&
+Mat<eT>::operator=(const Op<eT, T1, op_conv_to>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  // TODO: maybe we can get the size without an unwrap?
+  const unwrap<T1> U(X.m);
+  const Mat<typename T1::elem_type>& in(U.M);
+
+  init(in.n_rows, in.n_cols);
+
+  coot_rt_t::copy_array(dev_mem, in.get_dev_mem(), n_elem);
+
+  return *this;
   }
 
 
@@ -1003,7 +1060,7 @@ Mat<eT>::operator/=(const Op<T1, op_type>& X)
 template<typename eT>
 template<typename T1, typename T2, typename glue_type>
 inline
-Mat<eT>::Mat(const Glue<T1, T2, glue_type>& X)
+Mat<eT>::Mat(const Glue<eT, T1, T2, glue_type>& X)
   : n_rows   (0)
   , n_cols   (0)
   , n_elem   (0)
@@ -1021,12 +1078,9 @@ template<typename eT>
 template<typename T1, typename T2, typename glue_type>
 inline
 const Mat<eT>&
-Mat<eT>::operator=(const Glue<T1, T2, glue_type>& X)
+Mat<eT>::operator=(const Glue<eT, T1, T2, glue_type>& X)
   {
   coot_extra_debug_sigprint();
-  
-  coot_type_check(( is_same_type< eT, typename T1::elem_type >::no ));
-  coot_type_check(( is_same_type< eT, typename T2::elem_type >::no ));
   
   glue_type::apply(*this, X);
   
@@ -1039,12 +1093,9 @@ template<typename eT>
 template<typename T1, typename T2, typename glue_type>
 inline
 const Mat<eT>&
-Mat<eT>::operator+=(const Glue<T1, T2, glue_type>& X)
+Mat<eT>::operator+=(const Glue<eT, T1, T2, glue_type>& X)
   {
   coot_extra_debug_sigprint();
-  
-  coot_type_check(( is_same_type< eT, typename T1::elem_type >::no ));
-  coot_type_check(( is_same_type< eT, typename T2::elem_type >::no ));
   
   const Mat<eT> m(X);
   
@@ -1057,12 +1108,9 @@ template<typename eT>
 template<typename T1, typename T2, typename glue_type>
 inline
 const Mat<eT>&
-Mat<eT>::operator-=(const Glue<T1, T2, glue_type>& X)
+Mat<eT>::operator-=(const Glue<eT, T1, T2, glue_type>& X)
   {
   coot_extra_debug_sigprint();
-  
-  coot_type_check(( is_same_type< eT, typename T1::elem_type >::no ));
-  coot_type_check(( is_same_type< eT, typename T2::elem_type >::no ));
   
   const Mat<eT> m(X);
   
@@ -1075,7 +1123,7 @@ template<typename eT>
 template<typename T1, typename T2, typename glue_type>
 inline
 const Mat<eT>&
-Mat<eT>::operator*=(const Glue<T1, T2, glue_type>& X)
+Mat<eT>::operator*=(const Glue<eT, T1, T2, glue_type>& X)
   {
   coot_extra_debug_sigprint();
   
@@ -1092,12 +1140,9 @@ template<typename eT>
 template<typename T1, typename T2, typename glue_type>
 inline
 const Mat<eT>&
-Mat<eT>::operator%=(const Glue<T1, T2, glue_type>& X)
+Mat<eT>::operator%=(const Glue<eT, T1, T2, glue_type>& X)
   {
   coot_extra_debug_sigprint();
-  
-  coot_type_check(( is_same_type< eT, typename T1::elem_type >::no ));
-  coot_type_check(( is_same_type< eT, typename T2::elem_type >::no ));
   
   const Mat<eT> m(X);
   
@@ -1110,12 +1155,9 @@ template<typename eT>
 template<typename T1, typename T2, typename glue_type>
 inline
 const Mat<eT>&
-Mat<eT>::operator/=(const Glue<T1, T2, glue_type>& X)
+Mat<eT>::operator/=(const Glue<eT, T1, T2, glue_type>& X)
   {
   coot_extra_debug_sigprint();
-  
-  coot_type_check(( is_same_type< eT, typename T1::elem_type >::no ));
-  coot_type_check(( is_same_type< eT, typename T2::elem_type >::no ));
   
   const Mat<eT> m(X);
   

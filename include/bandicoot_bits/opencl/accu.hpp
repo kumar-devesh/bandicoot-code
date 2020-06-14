@@ -50,7 +50,7 @@ accu_chunked(dev_mem_t<eT> mem, const uword n_elem)
 
   cl_int status = 0;
 
-  cl_kernel k1 = get_rt().cl_rt.get_kernel<eT>(kernel_id::accu_chunked);
+  cl_kernel k1 = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu_chunked);
 
   dev_mem_t<eT> tmp_mem = tmp.get_dev_mem(false);
 
@@ -72,7 +72,7 @@ accu_chunked(dev_mem_t<eT> mem, const uword n_elem)
 
   clFlush(get_rt().cl_rt.get_cq());
 
-  cl_kernel k2 = get_rt().cl_rt.get_kernel<eT>(kernel_id::accu_twostage);
+  cl_kernel k2 = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu_twostage);
 
   runtime_t::adapt_uword dev_out_len(tmp.n_elem);
   runtime_t::adapt_uword dev_A_start(n_chunks*chunk_size);
@@ -116,7 +116,7 @@ accu_simple(dev_mem_t<eT> mem, const uword n_elem)
 
   cl_int status = 0;
 
-  cl_kernel k1 = get_rt().cl_rt.get_kernel<eT>(kernel_id::accu_simple);
+  cl_kernel k1 = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu_simple);
 
   dev_mem_t<eT> tmp_mem = tmp.get_dev_mem(false);
 
@@ -154,7 +154,7 @@ accu_subview(dev_mem_t<eT> mem, const uword m_n_rows, const uword aux_row1, cons
 
   runtime_t::cq_guard guard;
 
-  cl_kernel k1 = get_rt().cl_rt.get_kernel<eT>(kernel_id::submat_sum_colwise);
+  cl_kernel k1 = get_rt().cl_rt.get_kernel<eT, eT>(twoway_kernel_id::submat_sum_colwise_conv_pre);
 
   cl_int status = 0;
 
@@ -186,7 +186,7 @@ accu_subview(dev_mem_t<eT> mem, const uword m_n_rows, const uword aux_row1, cons
 
   // combine the column sums
 
-  cl_kernel k2 = get_rt().cl_rt.get_kernel<eT>(kernel_id::accu_simple);
+  cl_kernel k2 = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu_simple);
 
   status |= clSetKernelArg(k2, 0, sizeof(cl_mem), &(tmp_mem.cl_mem_ptr));
   status |= clSetKernelArg(k2, 1, sizeof(cl_mem), &(tmp_mem.cl_mem_ptr));

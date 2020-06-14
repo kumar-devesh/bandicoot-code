@@ -22,7 +22,7 @@
 template<typename eT>
 inline
 void
-inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, kernel_id::enum_id num)
+inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, oneway_kernel_id::enum_id num)
   {
   coot_extra_debug_sigprint();
 
@@ -53,15 +53,15 @@ inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, kernel_i
 /**
  * Run an OpenCL array-wise kernel.
  */
-template<typename eT>
+template<typename eT1, typename eT2>
 inline
 void
-inplace_op_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem, kernel_id::enum_id num)
+inplace_op_array(dev_mem_t<eT2> dest, dev_mem_t<eT1> src, const uword n_elem, twoway_kernel_id::enum_id num)
   {
   coot_extra_debug_sigprint();
 
   // Get kernel.
-  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(num);
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT2, eT1>(num);
 
   opencl::runtime_t::cq_guard guard;
 
@@ -90,7 +90,7 @@ inplace_op_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem, kern
 template<typename eT>
 inline
 void
-inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const uword m_n_rows, kernel_id::enum_id num)
+inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const uword m_n_rows, oneway_kernel_id::enum_id num)
   {
   coot_extra_debug_sigprint();
 
@@ -129,16 +129,16 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_row1, const
 /**
  * Run an OpenCL kernel on a subview where the operation involves another matrix.
  */
-template<typename eT>
+template<typename eT1, typename eT2>
 inline
 void
-inplace_op_subview(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword M_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, kernel_id::enum_id num, const char* identifier)
+inplace_op_subview(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword M_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, twoway_kernel_id::enum_id num, const char* identifier)
   {
   coot_extra_debug_sigprint();
 
   runtime_t::cq_guard guard;
 
-  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(num);
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT2, eT1>(num);
 
   runtime_t::adapt_uword start_row(aux_row1);
   runtime_t::adapt_uword start_col(aux_col1);

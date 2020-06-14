@@ -18,20 +18,18 @@
 
 
 
-template<typename T1>
+template<typename out_eT, typename T1>
 inline 
 void
-op_strans::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_strans>& in)
+op_strans::apply(Mat<out_eT>& out, const Op<out_eT, T1, op_strans>& in)
   {
   coot_extra_debug_sigprint();
-  
-  typedef typename T1::elem_type eT;
   
   const unwrap<T1> U(in.m);
   
   if(U.is_alias(out))
     {
-    Mat<eT> tmp;
+    Mat<out_eT> tmp;
     
     op_strans::apply_noalias(tmp, U.M);
     
@@ -45,10 +43,10 @@ op_strans::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_strans>& in)
 
 
 
-template<typename eT>
+template<typename out_eT, typename in_eT>
 inline
 void
-op_strans::apply_noalias(Mat<eT>& out, const Mat<eT>& A)
+op_strans::apply_noalias(Mat<out_eT>& out, const Mat<in_eT>& A)
   {
   coot_extra_debug_sigprint();
   

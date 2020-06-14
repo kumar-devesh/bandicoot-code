@@ -18,18 +18,18 @@
 
 
 
-template<typename T1, typename T2, typename eglue_type>
+template<typename out_eT, typename T1, typename T2, typename eglue_type>
 coot_inline
-eGlue<T1,T2,eglue_type>::~eGlue()
+eGlue<out_eT, T1, T2, eglue_type>::~eGlue()
   {
   coot_extra_debug_sigprint();
   }
 
 
 
-template<typename T1, typename T2, typename eglue_type>
+template<typename out_eT, typename T1, typename T2, typename eglue_type>
 coot_inline
-eGlue<T1,T2,eglue_type>::eGlue(const T1& in_A, const T2& in_B)
+eGlue<out_eT, T1, T2, eglue_type>::eGlue(const T1& in_A, const T2& in_B)
   : A(in_A)
   , B(in_B)
   {
@@ -45,30 +45,42 @@ eGlue<T1,T2,eglue_type>::eGlue(const T1& in_A, const T2& in_B)
 
 
 
-template<typename T1, typename T2, typename eglue_type>
+template<typename out_eT, typename T1, typename T2, typename eglue_type>
+template<typename in_eT>
+inline
+eGlue<out_eT, T1, T2, eglue_type>::eGlue(eGlue<in_eT, T1, T2, eglue_type>& in)
+  : A(in.A)
+  , B(in.B)
+  {
+  coot_extra_debug_sigprint();
+  }
+
+
+
+template<typename out_eT, typename T1, typename T2, typename eglue_type>
 coot_inline
 uword
-eGlue<T1,T2,eglue_type>::get_n_rows() const
+eGlue<out_eT, T1, T2, eglue_type>::get_n_rows() const
   {
   return is_row ? 1 : A.get_n_rows();
   }
 
 
 
-template<typename T1, typename T2, typename eglue_type>
+template<typename out_eT, typename T1, typename T2, typename eglue_type>
 coot_inline
 uword
-eGlue<T1,T2,eglue_type>::get_n_cols() const
+eGlue<out_eT, T1, T2, eglue_type>::get_n_cols() const
   {
   return is_col ? 1 : A.get_n_cols();
   }
 
 
 
-template<typename T1, typename T2, typename eglue_type>
+template<typename out_eT, typename T1, typename T2, typename eglue_type>
 coot_inline
 uword
-eGlue<T1,T2,eglue_type>::get_n_elem() const
+eGlue<out_eT, T1, T2, eglue_type>::get_n_elem() const
   {
   return A.get_n_elem();
   }

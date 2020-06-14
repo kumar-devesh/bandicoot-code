@@ -21,9 +21,9 @@ class arrayops
   {
   public:
   
-  template<typename eT>
+  template<typename out_eT, typename in_eT>
   inline static void
-  copy(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword n_elem);
+  copy(dev_mem_t<out_eT> dest, const dev_mem_t<in_eT> src, const uword n_elem);
   
   
   // 
@@ -53,21 +53,21 @@ class arrayops
   // 
   // array op= array
   
-  template<typename eT>
+  template<typename eT1, typename eT2>
   inline static void
-  inplace_plus_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem);
+  inplace_plus_array(dev_mem_t<eT2> dest, dev_mem_t<eT1> src, const uword n_elem);
   
-  template<typename eT>
+  template<typename eT1, typename eT2>
   inline static void
-  inplace_minus_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem);
+  inplace_minus_array(dev_mem_t<eT2> dest, dev_mem_t<eT1> src, const uword n_elem);
   
-  template<typename eT>
+  template<typename eT1, typename eT2>
   inline static void
-  inplace_mul_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem);
+  inplace_mul_array(dev_mem_t<eT2> dest, dev_mem_t<eT1> src, const uword n_elem);
    
-  template<typename eT>
+  template<typename eT1, typename eT2>
   inline static void
-  inplace_div_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem);
+  inplace_div_array(dev_mem_t<eT2> dest, dev_mem_t<eT1> src, const uword n_elem);
   
   
   // 

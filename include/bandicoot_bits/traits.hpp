@@ -167,12 +167,12 @@ template<typename T>
 struct is_Op
   { static const bool value = false; };
  
-template<typename T1, typename op_type>
-struct is_Op< Op<T1,op_type> >
+template<typename eT, typename T1, typename op_type>
+struct is_Op< Op<eT, T1, op_type> >
   { static const bool value = true; };
  
-template<typename T1, typename op_type>
-struct is_Op< const Op<T1,op_type> >
+template<typename eT, typename T1, typename op_type>
+struct is_Op< const Op<eT, T1, op_type> >
   { static const bool value = true; };
 
 
@@ -180,12 +180,12 @@ template<typename T>
 struct is_eOp
   { static const bool value = false; };
  
-template<typename T1, typename eop_type>
-struct is_eOp< eOp<T1,eop_type> >
+template<typename eT, typename T1, typename eop_type>
+struct is_eOp< eOp<eT, T1, eop_type> >
   { static const bool value = true; };
  
-template<typename T1, typename eop_type>
-struct is_eOp< const eOp<T1,eop_type> >
+template<typename eT, typename T1, typename eop_type>
+struct is_eOp< const eOp<eT, T1, eop_type> >
   { static const bool value = true; };
 
 
@@ -206,12 +206,12 @@ template<typename T>
 struct is_Glue
   { static const bool value = false; };
  
-template<typename T1, typename T2, typename glue_type>
-struct is_Glue< Glue<T1,T2,glue_type> >
+template<typename eT, typename T1, typename T2, typename glue_type>
+struct is_Glue< Glue<eT, T1, T2, glue_type> >
   { static const bool value = true; };
 
-template<typename T1, typename T2, typename glue_type>
-struct is_Glue< const Glue<T1,T2,glue_type> >
+template<typename eT, typename T1, typename T2, typename glue_type>
+struct is_Glue< const Glue<eT, T1, T2, glue_type> >
   { static const bool value = true; };
 
 
@@ -219,12 +219,12 @@ template<typename T>
 struct is_eGlue
   { static const bool value = false; };
  
-template<typename T1, typename T2, typename eglue_type>
-struct is_eGlue< eGlue<T1,T2,eglue_type> >
+template<typename eT, typename T1, typename T2, typename eglue_type>
+struct is_eGlue< eGlue<eT, T1, T2, eglue_type> >
   { static const bool value = true; };
 
-template<typename T1, typename T2, typename eglue_type>
-struct is_eGlue< const eGlue<T1,T2,eglue_type> >
+template<typename eT, typename T1, typename T2, typename eglue_type>
+struct is_eGlue< const eGlue<eT, T1, T2, eglue_type> >
   { static const bool value = true; };
 
 

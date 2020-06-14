@@ -46,12 +46,12 @@ template<const bool, const bool, const bool>             class gemv;
 
 template<                 typename eT, typename gen_type> class  Gen; 
 
-template<                 typename T1, typename  op_type> class   Op; 
-template<                 typename T1, typename eop_type> class  eOp;
+template<typename out_eT, typename T1, typename  op_type> class   Op; 
+template<typename out_eT, typename T1, typename eop_type> class  eOp;
 template<typename out_eT, typename T1, typename  op_type> class mtOp;
 
-template<                 typename T1, typename T2, typename  glue_type> class   Glue;
-template<                 typename T1, typename T2, typename eglue_type> class  eGlue;
+template<typename out_eT, typename T1, typename T2, typename  glue_type> class   Glue;
+template<typename out_eT, typename T1, typename T2, typename eglue_type> class  eGlue;
 template<typename out_eT, typename T1, typename T2, typename  glue_type> class mtGlue;
 
 
@@ -66,15 +66,19 @@ template<                 typename T1, typename T2, typename  glue_type> class  
 template<                 typename T1, typename T2, typename eglue_type> class  eGlueCube;
 template<typename out_eT, typename T1, typename T2, typename  glue_type> class mtGlueCube;
 
+template<typename T1> class SizeProxy;
+
 
 struct coot_vec_indicator {};
 
+template<typename eT> struct conv_to;
 
 class op_sum;
 class op_inv;
 class op_strans;
 class op_htrans;
 class op_htrans2;
+class op_conv_to;
 
 class eop_scalar_plus;
 class eop_neg;

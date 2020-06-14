@@ -32,7 +32,7 @@ trace(dev_mem_t<eT> mem, const uword n_rows, const uword n_cols)
 
   Mat<eT> tmp(1, 1);
 
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(kernel_id::trace);
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::trace);
 
   dev_mem_t<eT> tmp_mem = tmp.get_dev_mem(false);
 

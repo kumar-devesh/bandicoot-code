@@ -18,9 +18,9 @@
 
 
 
-template<typename T1, typename T2, typename glue_type>
+template<typename out_eT, typename T1, typename T2, typename glue_type>
 inline
-Glue<T1,T2,glue_type>::Glue(const T1& in_A, const T2& in_B)
+Glue<out_eT, T1, T2, glue_type>::Glue(const T1& in_A, const T2& in_B)
   : A(in_A)
   , B(in_B)
   {
@@ -29,9 +29,9 @@ Glue<T1,T2,glue_type>::Glue(const T1& in_A, const T2& in_B)
 
 
 
-template<typename T1, typename T2, typename glue_type>
+template<typename out_eT, typename T1, typename T2, typename glue_type>
 inline
-Glue<T1,T2,glue_type>::Glue(const T1& in_A, const T2& in_B, const uword in_aux_uword)
+Glue<out_eT, T1, T2, glue_type>::Glue(const T1& in_A, const T2& in_B, const uword in_aux_uword)
   : A(in_A)
   , B(in_B)
   , aux_uword(in_aux_uword)
@@ -41,9 +41,22 @@ Glue<T1,T2,glue_type>::Glue(const T1& in_A, const T2& in_B, const uword in_aux_u
 
 
 
-template<typename T1, typename T2, typename glue_type>
+template<typename out_eT, typename T1, typename T2, typename glue_type>
 inline
-Glue<T1,T2,glue_type>::~Glue()
+Glue<out_eT, T1, T2, glue_type>::~Glue()
+  {
+  coot_extra_debug_sigprint();
+  }
+
+
+
+template<typename out_eT, typename T1, typename T2, typename glue_type>
+template<typename in_eT>
+inline
+Glue<out_eT, T1, T2, glue_type>::Glue(const Glue<in_eT, T1, T2, glue_type>& in)
+  : A(in.A)
+  , B(in.B)
+  , aux_uword(in.aux_uword)
   {
   coot_extra_debug_sigprint();
   }

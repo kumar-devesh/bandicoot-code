@@ -46,9 +46,9 @@ class Col : public Mat<eT>
 
   inline explicit operator arma::Col<eT> () const;
 
-  coot_inline const Op<Col<eT>, op_htrans>  t() const;
-  coot_inline const Op<Col<eT>, op_htrans> ht() const;
-  coot_inline const Op<Col<eT>, op_strans> st() const;
+  coot_inline const Op<eT, Col<eT>, op_htrans>  t() const;
+  coot_inline const Op<eT, Col<eT>, op_htrans> ht() const;
+  coot_inline const Op<eT, Col<eT>, op_strans> st() const;
 
   using Mat<eT>::rows;
   using Mat<eT>::operator();

@@ -14,7 +14,7 @@
 
 
 
-struct kernel_id
+struct oneway_kernel_id
   {
   enum enum_id
     {
@@ -30,50 +30,13 @@ struct kernel_id
     submat_inplace_mul_scalar,
     submat_inplace_div_scalar,
     //
-    inplace_plus_array,
-    inplace_minus_array,
-    inplace_mul_array,
-    inplace_div_array,
-    //
-    submat_inplace_set_mat,
-    submat_inplace_plus_mat,
-    submat_inplace_minus_mat,
-    submat_inplace_schur_mat,
-    submat_inplace_div_mat,
-    //
-    equ_array_plus_scalar,
-    equ_array_neg,
-    equ_array_minus_scalar_pre,
-    equ_array_minus_scalar_post,
-    equ_array_mul_scalar,
-    equ_array_div_scalar_pre,
-    equ_array_div_scalar_post,
-    equ_array_square,
-    equ_array_sqrt,
-    equ_array_exp,
-    equ_array_log,
-    //
-    equ_array_plus_array,
-    equ_array_minus_array,
-    equ_array_mul_array,
-    equ_array_div_array,
-    //
     inplace_set_eye,
-    //
-    get_diag,
-    trace,
-    //
-    dot_chunked,
-    dot_twostage,
     //
     accu_simple,
     accu_chunked,
     accu_twostage,
     //
-    sum_colwise,
-    sum_rowwise,
-    submat_sum_colwise,
-    submat_sum_rowwise,
+    trace,
     //
     ltri_set_zero,
     invalid_kernel
@@ -101,16 +64,99 @@ struct kernel_id
     names.push_back("submat_inplace_mul_scalar");
     names.push_back("submat_inplace_div_scalar");
 
-    names.push_back("inplace_plus_array");
-    names.push_back("inplace_minus_array");
-    names.push_back("inplace_mul_array");
-    names.push_back("inplace_div_array");
+    names.push_back("inplace_set_eye");
+
+    names.push_back("accu_simple");
+    names.push_back("accu_chunked");
+    names.push_back("accu_twostage");
+
+    names.push_back("trace");
+
+    names.push_back("ltri_set_zero");
+
+    return names;
+    }
+
+
+
+  static
+  inline
+  const std::vector<std::string>&
+  get_names()
+    {
+    static const std::vector<std::string> names = init_names();
+
+    return names;
+    }
+  };
+
+
+
+struct twoway_kernel_id
+  {
+  enum enum_id
+    {
+    submat_inplace_set_mat = 0,
+    submat_inplace_plus_mat,
+    submat_inplace_minus_mat,
+    submat_inplace_schur_mat,
+    submat_inplace_div_mat,
+    //
+    inplace_plus_array,
+    inplace_minus_array,
+    inplace_mul_array,
+    inplace_div_array,
+    //
+    equ_array_plus_scalar,
+    equ_array_neg,
+    equ_array_minus_scalar_pre,
+    equ_array_minus_scalar_post,
+    equ_array_mul_scalar,
+    equ_array_div_scalar_pre,
+    equ_array_div_scalar_post,
+    equ_array_square,
+    equ_array_sqrt,
+    equ_array_exp,
+    equ_array_log,
+    //
+    get_diag,
+    //
+    sum_colwise_conv_pre,
+    sum_rowwise_conv_pre,
+    sum_colwise_conv_post,
+    sum_rowwise_conv_post,
+    submat_sum_colwise_conv_pre,
+    submat_sum_rowwise_conv_pre,
+    submat_sum_colwise_conv_post,
+    submat_sum_rowwise_conv_post,
+    //
+    dot_chunked,
+    dot_twostage,
+    //
+    convert_type,
+    //
+    invalid_kernel
+    };
+
+
+
+  static
+  inline
+  std::vector<std::string>
+  init_names()
+    {
+    std::vector<std::string> names;
 
     names.push_back("submat_inplace_set_mat");
     names.push_back("submat_inplace_plus_mat");
     names.push_back("submat_inplace_minus_mat");
     names.push_back("submat_inplace_schur_mat");
     names.push_back("submat_inplace_div_mat");
+
+    names.push_back("inplace_plus_array");
+    names.push_back("inplace_minus_array");
+    names.push_back("inplace_mul_array");
+    names.push_back("inplace_div_array");
 
     names.push_back("equ_array_plus_scalar");
     names.push_back("equ_array_neg");
@@ -124,32 +170,69 @@ struct kernel_id
     names.push_back("equ_array_exp");
     names.push_back("equ_array_log");
 
+    names.push_back("get_diag");
+
+    names.push_back("sum_colwise_conv_pre");
+    names.push_back("sum_rowwise_conv_pre");
+    names.push_back("sum_colwise_conv_post");
+    names.push_back("sum_rowwise_conv_post");
+    names.push_back("submat_sum_colwise_conv_pre");
+    names.push_back("submat_sum_rowwise_conv_pre");
+    names.push_back("submat_sum_colwise_conv_post");
+    names.push_back("submat_sum_rowwise_conv_post");
+
+    names.push_back("dot_chunked");
+    names.push_back("dot_twostage");
+
+    names.push_back("convert_type");
+
+    return names;
+    }
+
+
+
+  static
+  inline
+  const std::vector<std::string>&
+  get_names()
+    {
+    static const std::vector<std::string> names = init_names();
+
+    return names;
+    }
+  };
+
+
+
+struct threeway_kernel_id
+  {
+  enum enum_id
+    {
+    equ_array_plus_array = 0,
+    equ_array_minus_array,
+    equ_array_mul_array,
+    equ_array_div_array,
+    //
+    invalid_kernel
+    };
+
+
+
+  static
+  inline
+  std::vector<std::string>
+  init_names()
+    {
+    std::vector<std::string> names;
+
     names.push_back("equ_array_plus_array");
     names.push_back("equ_array_minus_array");
     names.push_back("equ_array_mul_array");
     names.push_back("equ_array_div_array");
 
-    names.push_back("inplace_set_eye");
-
-    names.push_back("get_diag");
-    names.push_back("trace");
-
-    names.push_back("dot_chunked");
-    names.push_back("dot_twostage");
-
-    names.push_back("accu_simple");
-    names.push_back("accu_chunked");
-    names.push_back("accu_twostage");
-
-    names.push_back("sum_colwise");
-    names.push_back("sum_rowwise");
-    names.push_back("submat_sum_colwise");
-    names.push_back("submat_sum_rowwise");
-
-    names.push_back("ltri_set_zero");
-
     return names;
     }
+
 
 
   static

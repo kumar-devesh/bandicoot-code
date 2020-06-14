@@ -21,13 +21,13 @@
 //! Base * scalar
 template<typename T1>
 coot_inline
-typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_scalar_times> >::result
+typename enable_if2< is_coot_type<T1>::value, const eOp<typename T1::elem_type, T1, eop_scalar_times> >::result
 operator*
 (const T1& X, const typename T1::elem_type k)
   {
   coot_extra_debug_sigprint();
   
-  return eOp<T1, eop_scalar_times>(X,k);
+  return eOp<typename T1::elem_type, T1, eop_scalar_times>(X, k);
   }
 
 
@@ -35,13 +35,13 @@ operator*
 //! scalar * Base
 template<typename T1>
 coot_inline
-typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_scalar_times> >::result
+typename enable_if2< is_coot_type<T1>::value, const eOp<typename T1::elem_type, T1, eop_scalar_times> >::result
 operator*
 (const typename T1::elem_type k, const T1& X)
   {
   coot_extra_debug_sigprint();
   
-  return eOp<T1, eop_scalar_times>(X,k);  // NOTE: order is swapped
+  return eOp<typename T1::elem_type, T1, eop_scalar_times>(X, k);  // NOTE: order is swapped
   }
 
 
@@ -49,13 +49,13 @@ operator*
 //! scalar * trans(T1)
 template<typename T1>
 coot_inline
-const Op<T1, op_htrans2>
+const Op<typename T1::elem_type, T1, op_htrans2>
 operator*
-(const typename T1::elem_type k, const Op<T1, op_htrans>& X)
+(const typename T1::elem_type k, const Op<typename T1::elem_type, T1, op_htrans>& X)
   {
   coot_extra_debug_sigprint();
   
-  return Op<T1, op_htrans2>(X.m, k);
+  return Op<typename T1::elem_type, T1, op_htrans2>(X.m, k);
   }
 
 
@@ -63,13 +63,13 @@ operator*
 //! trans(T1) * scalar
 template<typename T1>
 coot_inline
-const Op<T1, op_htrans2>
+const Op<typename T1::elem_type, T1, op_htrans2>
 operator*
-(const Op<T1, op_htrans>& X, const typename T1::elem_type k)
+(const Op<typename T1::elem_type, T1, op_htrans>& X, const typename T1::elem_type k)
   {
   coot_extra_debug_sigprint();
   
-  return Op<T1, op_htrans2>(X.m, k);
+  return Op<typename T1::elem_type, T1, op_htrans2>(X.m, k);
   }
 
 
@@ -81,14 +81,14 @@ typename
 enable_if2
   <
   is_coot_type<T1>::value && is_coot_type<T2>::value && is_same_type<typename T1::elem_type, typename T2::elem_type>::value,
-  const Glue<T1, T2, glue_times>
+  const Glue<typename T1::elem_type, T1, T2, glue_times>
   >::result
 operator*
 (const T1& X, const T2& Y)
   {
   coot_extra_debug_sigprint();
   
-  return Glue<T1, T2, glue_times>(X, Y);
+  return Glue<typename T1::elem_type, T1, T2, glue_times>(X, Y);
   }
 
 
@@ -100,7 +100,7 @@ typename
 enable_if2
   <
   (is_coot_type<T1>::value && is_coot_type<T2>::value && (is_same_type<typename T1::elem_type, typename T2::elem_type>::no)),
-  const mtGlue< typename promote_type<typename T1::elem_type, typename T2::elem_type>::result, T1, T2, glue_mixed_times >
+  const Glue< typename promote_type<typename T1::elem_type, typename T2::elem_type>::result, T1, T2, glue_mixed_times >
   >::result
 operator*
   (
@@ -117,7 +117,7 @@ operator*
   
   promote_type<eT1,eT2>::check();
   
-  return mtGlue<out_eT, T1, T2, glue_mixed_times>( X, Y );
+  return Glue<out_eT, T1, T2, glue_mixed_times>( X, Y );
   }
 
 
