@@ -48,11 +48,9 @@ template<                 typename eT, typename gen_type> class  Gen;
 
 template<typename out_eT, typename T1, typename  op_type> class   Op; 
 template<typename out_eT, typename T1, typename eop_type> class  eOp;
-template<typename out_eT, typename T1, typename  op_type> class mtOp;
 
 template<typename out_eT, typename T1, typename T2, typename  glue_type> class   Glue;
 template<typename out_eT, typename T1, typename T2, typename eglue_type> class  eGlue;
-template<typename out_eT, typename T1, typename T2, typename  glue_type> class mtGlue;
 
 
 
@@ -60,11 +58,9 @@ template<                 typename eT, typename gen_type> class  GenCube;
 
 template<                 typename T1, typename  op_type> class   OpCube; 
 template<                 typename T1, typename eop_type> class  eOpCube; 
-template<typename out_eT, typename T1, typename  op_type> class mtOpCube;
 
 template<                 typename T1, typename T2, typename  glue_type> class   GlueCube;
 template<                 typename T1, typename T2, typename eglue_type> class  eGlueCube;
-template<typename out_eT, typename T1, typename T2, typename  glue_type> class mtGlueCube;
 
 template<typename T1> class SizeProxy;
 

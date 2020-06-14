@@ -190,19 +190,6 @@ struct is_eOp< const eOp<eT, T1, eop_type> >
 
 
 template<typename T>
-struct is_mtOp
-  { static const bool value = false; };
- 
-template<typename eT, typename T1, typename op_type>
-struct is_mtOp< mtOp<eT, T1, op_type> >
-  { static const bool value = true; };
- 
-template<typename eT, typename T1, typename op_type>
-struct is_mtOp< const mtOp<eT, T1, op_type> >
-  { static const bool value = true; };
-
-
-template<typename T>
 struct is_Glue
   { static const bool value = false; };
  
@@ -227,18 +214,6 @@ template<typename eT, typename T1, typename T2, typename eglue_type>
 struct is_eGlue< const eGlue<eT, T1, T2, eglue_type> >
   { static const bool value = true; };
 
-
-template<typename T>
-struct is_mtGlue
-  { static const bool value = false; };
- 
-template<typename eT, typename T1, typename T2, typename glue_type>
-struct is_mtGlue< mtGlue<eT, T1, T2, glue_type> >
-  { static const bool value = true; };
-
-template<typename eT, typename T1, typename T2, typename glue_type>
-struct is_mtGlue< const mtGlue<eT, T1, T2, glue_type> >
-  { static const bool value = true; };
 
 
 //
@@ -290,15 +265,6 @@ struct is_eOpCube< eOpCube<T1,eop_type> >
  
 
 template<typename T>
-struct is_mtOpCube
-  { static const bool value = false; };
- 
-template<typename eT, typename T1, typename op_type>
-struct is_mtOpCube< mtOpCube<eT, T1, op_type> >
-  { static const bool value = true; };
- 
-
-template<typename T>
 struct is_GlueCube
   { static const bool value = false; };
  
@@ -315,14 +281,6 @@ template<typename T1, typename T2, typename eglue_type>
 struct is_eGlueCube< eGlueCube<T1,T2,eglue_type> >
   { static const bool value = true; };
 
-
-template<typename T>
-struct is_mtGlueCube
-  { static const bool value = false; };
- 
-template<typename eT, typename T1, typename T2, typename glue_type>
-struct is_mtGlueCube< mtGlueCube<eT, T1, T2, glue_type> >
-  { static const bool value = true; };
 
 
 //
@@ -341,8 +299,6 @@ struct is_coot_type
   || is_Glue<T1>::value
   || is_eOp<T1>::value
   || is_eGlue<T1>::value
-  || is_mtOp<T1>::value
-  || is_mtGlue<T1>::value
   || is_subview<T1>::value
   ;
   };
@@ -357,10 +313,8 @@ struct is_coot_cube_type
   || is_GenCube<T1>::value
   || is_OpCube<T1>::value
   || is_eOpCube<T1>::value
-  || is_mtOpCube<T1>::value
   || is_GlueCube<T1>::value
   || is_eGlueCube<T1>::value
-  || is_mtGlueCube<T1>::value
   // TODO: subview_cube
   ;
   };
