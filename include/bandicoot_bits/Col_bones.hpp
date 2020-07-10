@@ -44,8 +44,8 @@ class Col : public Mat<eT>
   template<typename T1> inline            Col(const Base<eT, T1>& X);
   template<typename T1> inline Col& operator=(const Base<eT, T1>& X);
 
-  inline                  Row(const arma::Row<eT>& X);
-  inline const Row& operator=(const arma::Row<eT>& X);
+  inline                  Col(const arma::Col<eT>& X);
+  inline const Col& operator=(const arma::Col<eT>& X);
 
   inline explicit operator arma::Col<eT> () const;
 
