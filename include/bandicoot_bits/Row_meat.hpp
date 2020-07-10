@@ -149,6 +149,32 @@ Row<eT>::operator=(const Base<eT, T1>& X)
 
 template<typename eT>
 inline
+Row<eT>::Row(const arma::Row<eT>& X)
+  : Mat<eT>((const arma::Mat<eT>&) X)
+  {
+  coot_extra_debug_sigprint_this(this);
+  }
+
+
+
+template<typename eT>
+inline
+const Row<eT>&
+Row<eT>::operator=(const arma::Row<eT>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  (*this).set_size(X.n_rows, X.n_cols);
+
+  (*this).copy_into_dev_mem(X.memptr(), (*this).n_elem);
+
+  return *this;
+  }
+
+
+
+template<typename eT>
+inline
 Row<eT>::operator arma::Row<eT>() const
   {
   coot_extra_debug_sigprint();
