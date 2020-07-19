@@ -27,8 +27,6 @@ struct gemm
     coot_extra_debug_sigprint();
 
     #ifdef COOT_USE_CUDA // should we also have a COOT_USE_CUBLAS?  I don't think it's needed
-    cublasHandle_t handle;
-    cublasCreate(&handle);
 
     // RC-TODO: handle complex?
     cublasOperation_t trans_a = (do_trans_A) ? CUBLAS_OP_T : CUBLAS_OP_N;
@@ -46,7 +44,7 @@ struct gemm
 
     if (std::is_same<eT, float>::value)
       {
-      result = cublasSgemm(handle,
+      result = cublasSgemm(get_rt().cuda_rt.cublas_handle,
                            trans_a,
                            trans_b,
                            M,
@@ -63,7 +61,7 @@ struct gemm
       }
     else if (std::is_same<eT, double>::value)
       {
-      result = cublasDgemm(handle,
+      result = cublasDgemm(get_rt().cuda_rt.cublas_handle,
                            trans_a,
                            trans_b,
                            M,
@@ -92,13 +90,11 @@ struct gemm
       {
       // RC-TODO: what about __half from cuBLAS?
       // RC-TODO: actual error message
-      cublasDestroy(handle);
       throw std::invalid_argument("cannot multiply with this eT");
       }
 
     coot_check_cublas_error( result, "cuda::gemm::apply(): call to cublas?gemm() failed" );
 
-    cublasDestroy(handle);
     #else
     throw std::invalid_argument("cuda backend not enabled");
     #endif

@@ -43,9 +43,6 @@ struct gemv
 
     // coot_debug_assert_blas_size(A);  // TODO: adapt this assert for size_t
 
-    cublasHandle_t handle;
-    cublasCreate(&handle);
-
     cublasOperation_t trans_a = (do_trans_A) ? CUBLAS_OP_T : CUBLAS_OP_N;
 
     const int M = int(A_n_rows);
@@ -57,11 +54,9 @@ struct gemv
 
     cublasStatus_t result;
 
-    result = cublasSgemv(handle, trans_a, M, N, (float*) &alpha, A.cuda_mem_ptr, lda, x.cuda_mem_ptr, incx, (float*) &beta, y.cuda_mem_ptr, incy);
+    result = cublasSgemv(get_rt().cuda_rt.cublas_handle, trans_a, M, N, (float*) &alpha, A.cuda_mem_ptr, lda, x.cuda_mem_ptr, incx, (float*) &beta, y.cuda_mem_ptr, incy);
 
     coot_check_cublas_error( result, "cuda::gemv::apply(): call to cublasSgemv() failed" );
-
-    cublasDestroy(handle);
     }
 
 
@@ -75,9 +70,6 @@ struct gemv
 
     // coot_debug_assert_blas_size(A); // TODO: adapt this assert for size_t
 
-    cublasHandle_t handle;
-    cublasCreate(&handle);
-
     cublasOperation_t trans_a = (do_trans_A) ? CUBLAS_OP_T : CUBLAS_OP_N;
 
     const int M = int(A_n_rows);
@@ -89,11 +81,9 @@ struct gemv
 
     cublasStatus_t result;
 
-    result = cublasDgemv(handle, trans_a, M, N, (double*) &alpha, A.cuda_mem_ptr, lda, x.cuda_mem_ptr, incx, (double*) &beta, y.cuda_mem_ptr, incy);
+    result = cublasDgemv(get_rt().cuda_rt.cublas_handle, trans_a, M, N, (double*) &alpha, A.cuda_mem_ptr, lda, x.cuda_mem_ptr, incx, (double*) &beta, y.cuda_mem_ptr, incy);
 
     coot_check_cublas_error( result, "cuda::gemv::apply(): call to cublasSgemv() failed" );
-
-    cublasDestroy(handle);
     }
   };
 
