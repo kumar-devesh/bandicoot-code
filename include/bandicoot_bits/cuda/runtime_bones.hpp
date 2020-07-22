@@ -20,6 +20,8 @@ struct runtime_t
 
   inline bool init(const bool manual_selection, const uword wanted_platform, const uword wanted_device, const bool print_info);
 
+  inline ~runtime_t();
+
   template<typename eT, typename higher_eT1, typename higher_eT2>
   inline std::string substitute_types(const std::string& source, const std::string& prefix);
 
@@ -47,7 +49,9 @@ struct runtime_t
 
   coot_aligned curandGenerator_t randGen;
 
-  coot_aligned cudaDeviceProp   dev_prop;
+  coot_aligned cudaDeviceProp    dev_prop;
+
+  coot_aligned cublasHandle_t    cublas_handle;
 
   // TODO: is it necessary to have a lock() and unlock()?
   // since all CUdevice and CUcontext are are pointers, I don't think we need to specifically lock them
