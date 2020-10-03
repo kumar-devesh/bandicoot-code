@@ -33,8 +33,8 @@ struct oneway_kernel_id
     inplace_set_eye,
     //
     accu_simple,
-    accu_chunked,
-    accu_twostage,
+    accu,
+    accu_small,
     //
     trace,
     //
@@ -67,8 +67,8 @@ struct oneway_kernel_id
     names.push_back("inplace_set_eye");
 
     names.push_back("accu_simple");
-    names.push_back("accu_chunked");
-    names.push_back("accu_twostage");
+    names.push_back("accu");
+    names.push_back("accu_small");
 
     names.push_back("trace");
 
