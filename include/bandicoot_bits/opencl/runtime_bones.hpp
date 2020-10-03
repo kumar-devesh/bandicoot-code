@@ -24,17 +24,21 @@ struct runtime_dev_info
   coot_aligned uword ptr_width;
   coot_aligned uword n_units;
   coot_aligned uword opencl_ver;
+  coot_aligned uword max_wg;
+  coot_aligned uword wavefront_size;
   
   inline
   void
   reset()
     {
-    is_gpu      = false;
-    has_float64 = false;
-    has_sizet64 = false;
-    n_units     = 0;
-    ptr_width   = 0;
-    opencl_ver  = 0;
+    is_gpu         = false;
+    has_float64    = false;
+    has_sizet64    = false;
+    n_units        = 0;
+    ptr_width      = 0;
+    opencl_ver     = 0;
+    max_wg         = 0;
+    wavefront_size = 0;
     }
   
   inline runtime_dev_info()  { reset(); }
@@ -104,6 +108,8 @@ class runtime_t
   #endif
   
   inline uword get_n_units() const;
+  inline uword get_max_wg() const;
+  inline uword get_wavefront_size() const;
   
   inline bool is_valid()    const;
   inline bool has_sizet64() const;
