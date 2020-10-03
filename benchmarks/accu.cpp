@@ -13,7 +13,7 @@ void fill_randu(MatType& x)
   {
   arma::Mat<typename MatType::elem_type> cpu_x(x.n_rows, x.n_cols);
 
-  cpu_x.randu();
+  fill_randu(cpu_x);
 
   x.copy_into_dev_mem(cpu_x.memptr(), x.n_elem);
   }
@@ -32,6 +32,22 @@ template<>
 void fill_randu(arma::mat& x)
   {
   x.randu();
+  }
+
+
+
+template<>
+void fill_randu(arma::Mat<s32>& x)
+  {
+  x = arma::randi<arma::Mat<s32>>(x.n_rows, x.n_cols, arma::distr_param(0, 10));
+  }
+
+
+
+template<>
+void fill_randu(arma::Mat<s64>& x)
+  {
+  x = arma::randi<arma::Mat<s64>>(x.n_rows, x.n_cols, arma::distr_param(0, 10));
   }
 
 
@@ -125,6 +141,14 @@ int main(int argc, char** argv)
     std::cerr << "failed to open " << out_csv << "!\n";
     exit(1);
     }
+
+  run_benchmarks<arma::Mat<s32>>(elem, false, trials, "accu", device_name, "cpu", "int32", out_file);
+  run_benchmarks<coot::Mat<s32>>(elem, false, trials, "accu", device_name, "opencl", "int32", out_file);
+  run_benchmarks<coot::Mat<s32>>(elem, true, trials, "accu", device_name, "cuda", "int32", out_file);
+
+  run_benchmarks<arma::Mat<s64>>(elem, false, trials, "accu", device_name, "cpu", "int64", out_file);
+  run_benchmarks<coot::Mat<s64>>(elem, false, trials, "accu", device_name, "opencl", "int64", out_file);
+  run_benchmarks<coot::Mat<s64>>(elem, true, trials, "accu", device_name, "cuda", "int64", out_file);
 
   run_benchmarks<arma::fmat>(elem, false, trials, "accu", device_name, "cpu", "float", out_file);
   run_benchmarks<coot::fmat>(elem, false, trials, "accu", device_name, "opencl", "float", out_file);
