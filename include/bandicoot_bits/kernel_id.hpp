@@ -130,8 +130,8 @@ struct twoway_kernel_id
     submat_sum_colwise_conv_post,
     submat_sum_rowwise_conv_post,
     //
-    dot_chunked,
-    dot_twostage,
+    dot,
+    dot_small,
     //
     convert_type,
     //
@@ -181,8 +181,8 @@ struct twoway_kernel_id
     names.push_back("submat_sum_colwise_conv_post");
     names.push_back("submat_sum_rowwise_conv_post");
 
-    names.push_back("dot_chunked");
-    names.push_back("dot_twostage");
+    names.push_back("dot");
+    names.push_back("dot_small");
 
     names.push_back("convert_type");
 

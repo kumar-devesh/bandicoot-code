@@ -28,74 +28,63 @@ dot(dev_mem_t<eT1> mem1, dev_mem_t<eT2> mem2, const uword n_elem)
 
   coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot_cl_rt not valid" );
 
+  // We could use clblasSdot() and clblasDdot(), but the slowness of the sasum() and dasum() implementations
+  // makes me think we're better off using our own kernel here.
+
   typedef typename promote_type<eT1, eT2>::result promoted_eT;
-
-  // work out the number of chunks, ensuring that there are at least 4 elements per compunit
-
-  uword n_chunks = get_rt().cl_rt.get_n_units();
-
-  while(n_chunks >= 1)
-    {
-    if( (n_elem / n_chunks) >= uword(4) ) { break; }
-
-    n_chunks /= uword(2);
-    }
-
-  n_chunks = (std::max)(uword(1), n_chunks);
-
-  const uword chunk_size = n_elem / n_chunks;
-
-  Mat<promoted_eT> tmp(n_chunks, 1);
-
-  runtime_t::cq_guard guard;
 
   cl_int status = 0;
 
-  cl_kernel k1 = get_rt().cl_rt.get_kernel<eT2, eT1>(twoway_kernel_id::dot_chunked);
+  cl_kernel k = get_rt().cl_rt.get_kernel<eT2, eT1>(twoway_kernel_id::dot);
+  cl_kernel k_small = get_rt().cl_rt.get_kernel<eT2, eT1>(twoway_kernel_id::dot_small);
 
-  dev_mem_t<promoted_eT> tmp_mem = tmp.get_dev_mem(false);
-
-  runtime_t::adapt_uword dev_chunk_size(chunk_size);
-  runtime_t::adapt_uword dev_n_chunks  (n_chunks  );
-
-  status |= clSetKernelArg(k1, 0, sizeof(cl_mem),      &(tmp_mem.cl_mem_ptr)           );
-  status |= clSetKernelArg(k1, 1, sizeof(cl_mem),      &(mem1.cl_mem_ptr)              );
-  status |= clSetKernelArg(k1, 2, sizeof(cl_mem),      &(mem2.cl_mem_ptr)              );
-  status |= clSetKernelArg(k1, 3, dev_chunk_size.size, dev_chunk_size.addr             );
-  status |= clSetKernelArg(k1, 4, dev_n_chunks.size,   dev_n_chunks.addr               );
+  // Compute workgroup sizes.  We use CL_KERNEL_WORK_GROUP_SIZE as an upper bound, which
+  // depends on the compiled kernel.  I assume that the results for k will be identical to k_small.
+  size_t kernel_wg_size;
+  status = clGetKernelWorkGroupInfo(k, get_rt().cl_rt.get_device(), CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &kernel_wg_size, NULL);
+  coot_check_cl_error(status, "dot()");
 
   const size_t k1_work_dim       = 1;
-  const size_t k1_work_offset[1] = { 0        };
-  const size_t k1_work_size[1]   = { n_chunks };
+  const size_t k1_work_offset    = 0;
+  const uword wavefront_size = get_rt().cl_rt.get_wavefront_size();
 
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), k1, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+  uword total_num_threads = n_elem / (2 * std::ceil(std::log2(n_elem)));
+  uword local_group_size = std::min(kernel_wg_size, total_num_threads);
+
+  // Create auxiliary memory.
+  const uword aux_size = (total_num_threads + (local_group_size - 1)) / local_group_size;
+  Mat<promoted_eT> aux(aux_size, 1);
+  aux.zeros();
+  dev_mem_t<promoted_eT> aux_mem = aux.get_dev_mem(false);
+
+  // We'll only run once with the dot kernel, and if this still needs further reduction, we can use accu().
+  runtime_t::cq_guard guard;
+
+  runtime_t::adapt_uword dev_n_elem(n_elem);
+
+  // We need to round total_num_threads up to the next power of 2.  (The kernel assumes this.)
+  const uword pow2_group_size = (uword) std::pow(2.0f, std::ceil(std::log2((float) local_group_size)));
+  const uword pow2_total_num_threads = (total_num_threads % pow2_group_size == 0) ? total_num_threads : ((total_num_threads / pow2_group_size) + 1) * pow2_group_size;
+
+  // If the number of threads is less than the wavefront size, we need to use the small kernel.
+  cl_kernel* k_use = (pow2_group_size < wavefront_size) ? &k_small : &k;
+
+  status |= clSetKernelArg(*k_use, 0, sizeof(cl_mem),                        &(aux_mem.cl_mem_ptr));
+  status |= clSetKernelArg(*k_use, 1, sizeof(cl_mem),                        &(mem1.cl_mem_ptr));
+  status |= clSetKernelArg(*k_use, 2, sizeof(cl_mem),                        &(mem2.cl_mem_ptr));
+  status |= clSetKernelArg(*k_use, 3, dev_n_elem.size,                       dev_n_elem.addr);
+  status |= clSetKernelArg(*k_use, 4, sizeof(promoted_eT) * pow2_group_size, NULL);
+
+  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), *k_use, k1_work_dim, &k1_work_offset, &pow2_total_num_threads, &pow2_group_size, 0, NULL, NULL);
 
   coot_check_cl_error(status, "dot()");
 
-  clFlush(get_rt().cl_rt.get_cq());
-
-  cl_kernel k2 = get_rt().cl_rt.get_kernel<eT2, eT1>(twoway_kernel_id::dot_twostage);
-
-  runtime_t::adapt_uword dev_out_len(tmp.n_elem);
-  runtime_t::adapt_uword dev_A_start(n_chunks * chunk_size);
-  runtime_t::adapt_uword dev_A_len(n_elem);
-
-  status |= clSetKernelArg(k2, 0, sizeof(cl_mem),   &(tmp_mem.cl_mem_ptr)       );
-  status |= clSetKernelArg(k2, 1, dev_out_len.size, dev_out_len.addr            );
-  status |= clSetKernelArg(k2, 2, sizeof(cl_mem),   &(mem1.cl_mem_ptr)          );
-  status |= clSetKernelArg(k2, 3, sizeof(cl_mem),   &(mem2.cl_mem_ptr)          );
-  status |= clSetKernelArg(k2, 4, dev_A_start.size, dev_A_start.addr            );
-  status |= clSetKernelArg(k2, 5, dev_A_len.size,   dev_A_len.addr              );
-
-  const size_t k2_work_dim       = 1;
-  const size_t k2_work_offset[1] = { 0 };
-  const size_t k2_work_size[1]   = { 1 };
-
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), k2, k2_work_dim, k2_work_offset, k2_work_size, NULL, 0, NULL, NULL);
-
-  coot_check_cl_error(status, "dot()");
-
-  clFlush(get_rt().cl_rt.get_cq());
-
-  return promoted_eT(tmp(0));
+  if (aux.n_elem == 1)
+    {
+    return promoted_eT(aux[0]);
+    }
+  else
+    {
+    return accu(aux_mem, aux.n_elem);
+    }
   }
