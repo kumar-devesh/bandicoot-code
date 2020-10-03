@@ -98,11 +98,12 @@ void run_benchmarks(const uword elem,
   for (size_t trial = 0; trial < trials; ++trial)
     {
     const double t = run_benchmark<MatType>(elem, cuda);
+    const double bw = (elem * sizeof(typename MatType::elem_type) / t) / std::pow(2.0, 30.0);
 
     out << task_name << "," << device_name << "," << backend_name << "," << elem_type << ","
-        << elem << ",1," << trial << "," << t << "\n";
+        << elem << ",1," << trial << "," << t << "," << bw << "\n";
     std::cout << task_name << ", " << device_name << ", " << backend_name << ", " << elem_type << ", "
-        << elem << ", 1, " << trial << ", " << t << "\n";
+        << elem << ", 1, " << trial << ", " << t << ", " << bw << "\n";
     }
   }
 
