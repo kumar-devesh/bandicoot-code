@@ -17,124 +17,105 @@
 //! @{
 
 /**
- * Accumulate all the elements in the device memory in a chunked fashion.
+ * Accumulate all elements in `mem`.
  */
 template<typename eT>
 inline
 eT
-accu_chunked(dev_mem_t<eT> mem, const uword n_elem)
+accu(dev_mem_t<eT> mem, const uword n_elem)
   {
   coot_extra_debug_sigprint();
 
   coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot_cl_rt not valid" );
 
-  // work out number of chunks
-  // make sure there are at least 4 elements per compunit
+  cl_int status = 0;
 
-  uword n_chunks = get_rt().cl_rt.get_n_units();
+  // Note that CLBLAS does provide the sasum() and dasum() functions, but these seem
+  // to be slower than the handwritten kernels (fairly significantly!).
 
-  while(n_chunks >= 1)
+  cl_kernel k = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu);
+  cl_kernel k_small = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu_small);
+
+  // Compute workgroup sizes.  We use CL_KERNEL_WORK_GROUP_SIZE as an upper bound, which
+  // depends on the compiled kernel.  I assume that the results for k will be identical to k_small.
+  size_t kernel_wg_size;
+  status = clGetKernelWorkGroupInfo(k, get_rt().cl_rt.get_device(), CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &kernel_wg_size, NULL);
+  coot_check_cl_error(status, "accu()");
+
+  const size_t k1_work_dim       = 1;
+  const size_t k1_work_offset    = 0;
+  const uword wavefront_size = get_rt().cl_rt.get_wavefront_size();
+
+  uword total_num_threads = n_elem / (2 * std::ceil(std::log2(n_elem)));
+  uword local_group_size = std::min(kernel_wg_size, total_num_threads);
+
+  // Create auxiliary memory.
+  const uword aux_size = (total_num_threads + (local_group_size - 1)) / local_group_size;
+  Mat<eT> aux(aux_size, 1);
+  aux.zeros();
+  Mat<eT> aux2;
+  if (aux_size > 1)
     {
-    if( (n_elem / n_chunks) >= uword(4) )  { break; }
-
-    n_chunks /= uword(2);
+    const uword aux2_size = (aux_size + (local_group_size - 1)) / local_group_size;
+    aux2.zeros(aux2_size, 1);
     }
 
-  n_chunks = (std::max)(uword(1), n_chunks);
-
-  const uword chunk_size = n_elem / n_chunks;
-
-  Mat<eT> tmp(n_chunks, 1);
-
   runtime_t::cq_guard guard;
 
-  cl_int status = 0;
+  dev_mem_t<eT> aux_mem = aux.get_dev_mem(false);
+  dev_mem_t<eT> aux_mem2 = aux2.get_dev_mem(false);
 
-  cl_kernel k1 = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu_chunked);
+  uword in_n_elem = n_elem;
+  Mat<eT>* out = &aux;
 
-  dev_mem_t<eT> tmp_mem = tmp.get_dev_mem(false);
+  dev_mem_t<eT>* in_mem = &mem;
+  dev_mem_t<eT>* out_mem = &aux_mem;
 
-  runtime_t::adapt_uword dev_chunk_size(chunk_size);
-  runtime_t::adapt_uword dev_n_chunks  (n_chunks  );
+  do
+    {
+    runtime_t::adapt_uword dev_n_elem(in_n_elem);
 
-  status = clSetKernelArg(k1, 0, sizeof(cl_mem),      &(tmp_mem.cl_mem_ptr)           );
-  status = clSetKernelArg(k1, 1, sizeof(cl_mem),      &(mem.cl_mem_ptr)               );
-  status = clSetKernelArg(k1, 2, dev_chunk_size.size, dev_chunk_size.addr);
-  status = clSetKernelArg(k1, 3, dev_n_chunks.size,   dev_n_chunks.addr  );
+    // We need to round total_num_threads up to the next power of 2.  (The kernel assumes this.)
+    const uword pow2_group_size = (uword) std::pow(2.0f, std::ceil(std::log2((float) local_group_size)));
+    const uword pow2_total_num_threads = (total_num_threads % pow2_group_size == 0) ? total_num_threads : ((total_num_threads / pow2_group_size) + 1) * pow2_group_size;
 
-  const size_t k1_work_dim       = 1;
-  const size_t k1_work_offset[1] = { 0        };
-  const size_t k1_work_size[1]   = { n_chunks };
+    // If the number of threads is less than the wavefront size, we need to use the small kernel.
+    cl_kernel* k_use = (pow2_group_size < wavefront_size) ? &k_small : &k;
 
-  status = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), k1, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+    status |= clSetKernelArg(*k_use, 0, sizeof(cl_mem),               &(in_mem->cl_mem_ptr));
+    status |= clSetKernelArg(*k_use, 1, dev_n_elem.size,              dev_n_elem.addr);
+    status |= clSetKernelArg(*k_use, 2, sizeof(cl_mem),               &(out_mem->cl_mem_ptr));
+    status |= clSetKernelArg(*k_use, 3, sizeof(eT) * pow2_group_size, NULL);
 
-  coot_check_cl_error(status, "accu()");
+    status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), *k_use, k1_work_dim, &k1_work_offset, &pow2_total_num_threads, &pow2_group_size, 0, NULL, NULL);
 
-  clFlush(get_rt().cl_rt.get_cq());
+    coot_check_cl_error(status, "accu()");
 
-  cl_kernel k2 = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu_twostage);
+    if (total_num_threads <= local_group_size)
+      {
+      break;
+      }
 
-  runtime_t::adapt_uword dev_out_len(tmp.n_elem);
-  runtime_t::adapt_uword dev_A_start(n_chunks*chunk_size);
-  runtime_t::adapt_uword dev_A_len  (n_elem);
+    // Set the input, number of elements, and auxiliary memory correctly for subsequent runs.
+    in_n_elem = out->n_elem;
+    if (in_mem == &mem)
+      {
+      in_mem = &aux_mem;
+      out_mem = &aux_mem2;
+      }
+    else
+      {
+      std::swap(in_mem, out_mem);
+      out = (out == &aux) ? &aux2 : &aux;
+      }
 
-  status = clSetKernelArg(k2, 0, sizeof(cl_mem),   &(tmp_mem.cl_mem_ptr)        );
-  status = clSetKernelArg(k2, 1, dev_out_len.size, dev_out_len.addr);
-  status = clSetKernelArg(k2, 2, sizeof(cl_mem),   &(mem.cl_mem_ptr)            );
-  status = clSetKernelArg(k2, 3, dev_A_start.size, dev_A_start.addr);
-  status = clSetKernelArg(k2, 4, dev_A_len.size,   dev_A_len.addr  );
+    // Now, compute sizes for the next iteration.
+    total_num_threads = in_n_elem / (2 * std::ceil(std::log2(in_n_elem)));
+    local_group_size = std::min(kernel_wg_size, total_num_threads);
 
-  const size_t k2_work_dim       = 1;
-  const size_t k2_work_offset[1] = { 0 };
-  const size_t k2_work_size[1]   = { 1 };
+    } while (true); // The loop terminates in the middle.
 
-  status = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), k2, k2_work_dim, k2_work_offset, k2_work_size, NULL, 0, NULL, NULL);
-
-  coot_check_cl_error(status, "accu()");
-
-  return tmp(0);
-
-  }
-
-
-
-/**
- * Accumulate all the elements in the device memory, but using a simple one-pass strategy.
- */
-template<typename eT>
-inline
-eT
-accu_simple(dev_mem_t<eT> mem, const uword n_elem)
-  {
-  coot_extra_debug_sigprint();
-
-  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot_cl_rt not valid" );
-
-  Mat<eT> tmp(1, 1);
-
-  runtime_t::cq_guard guard;
-
-  cl_int status = 0;
-
-  cl_kernel k1 = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu_simple);
-
-  dev_mem_t<eT> tmp_mem = tmp.get_dev_mem(false);
-
-  runtime_t::adapt_uword dev_A_len(n_elem);
-
-  status = clSetKernelArg(k1, 0, sizeof(cl_mem), &(tmp_mem.cl_mem_ptr));
-  status = clSetKernelArg(k1, 1, sizeof(cl_mem), &(mem.cl_mem_ptr)    );
-  status = clSetKernelArg(k1, 2, dev_A_len.size, dev_A_len.addr       );
-
-  const size_t k1_work_dim       = 1;
-  const size_t k1_work_offset[1] = { 0 };
-  const size_t k1_work_size[1]   = { 1 };
-
-  status = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), k1, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
-
-  coot_check_cl_error(status, "accu()");
-
-  return tmp(0);
+  return eT((*out)[0]);
   }
 
 

@@ -94,10 +94,7 @@ class coot_rt_t
   static inline void eop_scalar(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword n_elem, const eT1 aux_val_pre, const eT2 aux_val_post, const twoway_kernel_id::enum_id num);
 
   template<typename eT>
-  static inline eT accu_chunked(const dev_mem_t<eT> mem, const uword n_elem);
-
-  template<typename eT>
-  static inline eT accu_simple(const dev_mem_t<eT> mem, const uword n_elem);
+  static inline eT accu(const dev_mem_t<eT> mem, const uword n_elem);
 
   template<typename eT>
   static inline eT accu_subview(const dev_mem_t<eT> mem, const uword M_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols);
