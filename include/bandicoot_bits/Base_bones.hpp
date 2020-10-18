@@ -18,27 +18,27 @@
 
 
 
-template<typename eT, typename derived>
+template<typename derived>
 struct Base_inv_yes
   {
   coot_inline const Op<derived, op_inv> i() const;   //!< matrix inverse
   };
 
 
-template<typename eT, typename derived>
+template<typename derived>
 struct Base_inv_no
   {
   };
 
 
-template<typename eT, typename derived, bool condition>
+template<typename derived, bool condition>
 struct Base_inv {};
 
-template<typename eT, typename derived>
-struct Base_inv<eT, derived, true>  { typedef Base_inv_yes<eT, derived> result; };
+template<typename derived>
+struct Base_inv<derived, true>  { typedef Base_inv_yes<derived> result; };
 
-template<typename eT, typename derived>
-struct Base_inv<eT, derived, false> { typedef Base_inv_no<eT, derived>  result; };
+template<typename derived>
+struct Base_inv<derived, false> { typedef Base_inv_no<derived>  result; };
 
 
 
@@ -67,7 +67,7 @@ struct Base_eval<elem_type, derived, false> { typedef Base_eval_expr<elem_type, 
 
 
 
-template<typename eT, typename derived>
+template<typename derived>
 struct Base_trans_cx
   {
   coot_inline const Op<derived, op_htrans>  t() const;
@@ -76,7 +76,7 @@ struct Base_trans_cx
   };
 
 
-template<typename eT, typename derived>
+template<typename derived>
 struct Base_trans_default
   {
   coot_inline const Op<derived, op_htrans>  t() const;
@@ -85,22 +85,22 @@ struct Base_trans_default
   };
 
 
-template<typename eT, typename derived, bool condition>
+template<typename derived, bool condition>
 struct Base_trans {};
 
-template<typename eT, typename derived>
-struct Base_trans<eT, derived, true>  { typedef Base_trans_cx<eT, derived>      result; };
+template<typename derived>
+struct Base_trans<derived, true>  { typedef Base_trans_cx<derived>      result; };
 
-template<typename eT, typename derived>
-struct Base_trans<eT, derived, false> { typedef Base_trans_default<eT, derived> result; };
+template<typename derived>
+struct Base_trans<derived, false> { typedef Base_trans_default<derived> result; };
 
 
 
 template<typename elem_type, typename derived>
 struct Base
-  : public Base_inv<elem_type, derived, is_supported_blas_type<elem_type>::value>::result
+  : public Base_inv<derived, is_supported_blas_type<elem_type>::value>::result
   , public Base_eval<elem_type, derived, is_Mat<derived>::value>::result
-  , public Base_trans<elem_type, derived, is_cx<elem_type>::value>::result
+  , public Base_trans<derived, is_cx<elem_type>::value>::result
   {
   coot_inline const derived& get_ref() const;
   

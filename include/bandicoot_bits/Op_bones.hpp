@@ -34,11 +34,11 @@ class Op : public Base< typename T1::elem_type, Op<T1, op_type> >
 
   inline         ~Op();
   
-  coot_aligned const T1&                    m;
-  coot_aligned       elem_type              aux;
-  coot_aligned       uword                  aux_uword_a;
-  coot_aligned       uword                  aux_uword_b;
-  coot_aligned       uword                  aux_uword_c;
+  coot_aligned const T1&       m;
+  coot_aligned       elem_type aux;
+  coot_aligned       uword     aux_uword_a;
+  coot_aligned       uword     aux_uword_b;
+  coot_aligned       uword     aux_uword_c;
   
   static const bool is_row = false; // TODO: expand
   static const bool is_col = false; // TODO: expand
