@@ -21,12 +21,12 @@
 template<typename T1>
 coot_warn_unused
 coot_inline
-const Op<typename T1::elem_type, T1, op_htrans>
+const Op<T1, op_htrans>
 trans(const Base<typename T1::elem_type,T1>& X)
   {
   coot_extra_debug_sigprint();
   
-  return Op<typename T1::elem_type, T1, op_htrans>(X.get_ref());
+  return Op<T1, op_htrans>(X.get_ref());
   }
 
 
@@ -34,12 +34,12 @@ trans(const Base<typename T1::elem_type,T1>& X)
 template<typename T1>
 coot_warn_unused
 coot_inline
-const Op<typename T1::elem_type, T1, op_htrans>
+const Op<T1, op_htrans>
 htrans(const Base<typename T1::elem_type,T1>& X)
   {
   coot_extra_debug_sigprint();
   
-  return Op<typename T1::elem_type, T1, op_htrans>(X.get_ref());
+  return Op<T1, op_htrans>(X.get_ref());
   }
 
 

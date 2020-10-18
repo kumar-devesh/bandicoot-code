@@ -25,7 +25,6 @@
 //
 // is_row           = boolean indicating whether the Q object can be treated a row vector
 // is_col           = boolean indicating whether the Q object can be treated a column vector
-// is_xvec          = boolean indicating whether the Q object is a vector with unknown orientation
 //
 // Q                = object that can be unwrapped via the unwrap family of classes (ie. Q must be convertible to Mat)
 //
@@ -44,7 +43,6 @@ class SizeProxy< Mat<eT> >
 
   static const bool is_row = false;
   static const bool is_col = false;
-  static const bool is_xvec = false;
 
   coot_aligned const Mat<eT>& Q;
 
@@ -72,7 +70,6 @@ class SizeProxy< Col<eT> >
 
   static const bool is_row = false;
   static const bool is_col = true;
-  static const bool is_xvec = false;
 
   coot_aligned const Col<eT>& Q;
 
@@ -100,7 +97,6 @@ class SizeProxy< Row<eT> >
 
   static const bool is_row = true;
   static const bool is_col = false;
-  static const bool is_xvec = false;
 
   coot_aligned const Row<eT>& Q;
 
@@ -128,7 +124,6 @@ class SizeProxy< subview<eT> >
 
   static const bool is_row = false;
   static const bool is_col = false;
-  static const bool is_xvec = false;
 
   coot_aligned const subview<eT>& Q;
 
@@ -156,7 +151,6 @@ class SizeProxy< subview_col<eT> >
 
   static const bool is_row = false;
   static const bool is_col = true;
-  static const bool is_xvec = false;
 
   coot_aligned const subview_col<eT>& Q;
 
@@ -184,7 +178,6 @@ class SizeProxy< subview_row<eT> >
 
   static const bool is_row = true;
   static const bool is_col = false;
-  static const bool is_xvec = false;
 
   coot_aligned const subview_row<eT>& Q;
 
@@ -202,22 +195,21 @@ class SizeProxy< subview_row<eT> >
 
 
 // eOp
-template<typename out_eT, typename T1, typename eop_type>
-class SizeProxy< eOp<out_eT, T1, eop_type> >
+template<typename T1, typename eop_type>
+class SizeProxy< eOp<T1, eop_type> >
   {
   public:
 
-  typedef out_eT                                   elem_type;
+  typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
-  typedef eOp<out_eT, T1, eop_type>                stored_type;
+  typedef eOp<T1, eop_type>                        stored_type;
 
-  static const bool is_row = eOp<out_eT, T1, eop_type>::is_row;
-  static const bool is_col = eOp<out_eT, T1, eop_type>::is_col;
-  static const bool is_xvec = eOp<out_eT, T1, eop_type>::is_xvec;
+  static const bool is_row = eOp<T1, eop_type>::is_row;
+  static const bool is_col = eOp<T1, eop_type>::is_col;
 
-  coot_aligned const eOp<out_eT, T1, eop_type>& Q;
+  coot_aligned const eOp<T1, eop_type>& Q;
 
-  inline explicit SizeProxy(const eOp<out_eT, T1, eop_type>& A)
+  inline explicit SizeProxy(const eOp<T1, eop_type>& A)
     : Q(A)
     {
     coot_extra_debug_sigprint();
@@ -231,22 +223,21 @@ class SizeProxy< eOp<out_eT, T1, eop_type> >
 
 
 // eGlue
-template<typename out_eT, typename T1, typename T2, typename eglue_type>
-class SizeProxy< eGlue<out_eT, T1, T2, eglue_type> >
+template<typename T1, typename T2, typename eglue_type>
+class SizeProxy< eGlue<T1, T2, eglue_type> >
   {
   public:
 
-  typedef out_eT                                   elem_type;
+  typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
-  typedef eGlue<out_eT, T1, T2, eglue_type>            stored_type;
+  typedef eGlue<T1, T2, eglue_type>                stored_type;
 
-  static const bool is_row = eGlue<out_eT, T1, T2, eglue_type>::is_row;
-  static const bool is_col = eGlue<out_eT, T1, T2, eglue_type>::is_col;
-  static const bool is_xvec = eGlue<out_eT, T1, T2, eglue_type>::is_xvec;
+  static const bool is_row = eGlue<T1, T2, eglue_type>::is_row;
+  static const bool is_col = eGlue<T1, T2, eglue_type>::is_col;
 
-  coot_aligned const eGlue<out_eT, T1, T2, eglue_type>& Q;
+  coot_aligned const eGlue<T1, T2, eglue_type>& Q;
 
-  inline explicit SizeProxy(const eGlue<out_eT, T1, T2, eglue_type>& A)
+  inline explicit SizeProxy(const eGlue<T1, T2, eglue_type>& A)
     : Q(A)
     {
     coot_extra_debug_sigprint();
@@ -261,23 +252,22 @@ class SizeProxy< eGlue<out_eT, T1, T2, eglue_type> >
 
 // Op: in order to get its size, we need to unwrap it.
 // TODO: maybe this can be done better?
-template<typename out_eT, typename T1, typename op_type>
-class SizeProxy< Op<out_eT, T1, op_type> >
+template<typename T1, typename op_type>
+class SizeProxy< Op<T1, op_type> >
   {
   public:
 
-  typedef out_eT                                   elem_type;
+  typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
-  typedef Mat<out_eT>                              stored_type;
+  typedef Mat<elem_type>                           stored_type;
 
-  static const bool is_row = Op<out_eT, T1, op_type>::is_row;
-  static const bool is_col = Op<out_eT, T1, op_type>::is_col;
-  static const bool is_xvec = Op<out_eT, T1, op_type>::is_xvec;
+  static const bool is_row = Op<T1, op_type>::is_row;
+  static const bool is_col = Op<T1, op_type>::is_col;
 
-  coot_aligned const unwrap<Op<out_eT, T1, op_type>> U;
-  coot_aligned const Mat<out_eT>& Q;
+  coot_aligned const no_conv_unwrap<Op<T1, op_type>> U;
+  coot_aligned const Mat<elem_type>& Q;
 
-  inline explicit SizeProxy(const Op<out_eT, T1, op_type>& A)
+  inline explicit SizeProxy(const Op<T1, op_type>& A)
     : U(A)
     , Q(U.M)
     {
@@ -291,25 +281,106 @@ class SizeProxy< Op<out_eT, T1, op_type> >
 
 
 
-// Glue: in order to get its size, we need to unwrap it.
-// TODO: maybe this can be done better?
-template<typename out_eT, typename T1, typename T2, typename glue_type>
-class SizeProxy< Glue<out_eT, T1, T2, glue_type> >
+// We know the size of op_htrans and op_htrans2.
+template<typename T1>
+class SizeProxy< Op<T1, op_htrans> >
+  {
+  public:
+
+  typedef typename T1::elem_type                   elem_type;
+  typedef typename get_pod_type<elem_type>::result pod_type;
+  typedef Mat<elem_type>                           stored_type;
+
+  static const bool is_row = Op<T1, op_htrans>::is_row;
+  static const bool is_col = Op<T1, op_htrans>::is_col;
+
+  coot_aligned const SizeProxy<T1> Q;
+
+  inline explicit SizeProxy(const Op<T1, op_htrans>& A)
+    : Q(A.m)
+    {
+    coot_extra_debug_sigprint();
+    }
+
+  coot_aligned uword get_n_rows() const { return Q.get_n_cols(); }
+  coot_aligned uword get_n_cols() const { return Q.get_n_rows(); }
+  coot_aligned uword get_n_elem() const { return Q.get_n_elem(); }
+  };
+
+
+
+template<typename T1>
+class SizeProxy< Op<T1, op_htrans2> >
+  {
+  public:
+
+  typedef typename T1::elem_type                   elem_type;
+  typedef typename get_pod_type<elem_type>::result pod_type;
+  typedef Mat<elem_type>                           stored_type;
+
+  static const bool is_row = Op<T1, op_htrans2>::is_row;
+  static const bool is_col = Op<T1, op_htrans2>::is_col;
+
+  coot_aligned const SizeProxy<T1> Q;
+
+  inline explicit SizeProxy(const Op<T1, op_htrans2>& A)
+    : Q(A.m)
+    {
+    coot_extra_debug_sigprint();
+    }
+
+  coot_aligned uword get_n_rows() const { return Q.get_n_cols(); }
+  coot_aligned uword get_n_cols() const { return Q.get_n_rows(); }
+  coot_aligned uword get_n_elem() const { return Q.get_n_elem(); }
+  };
+
+
+
+template<typename out_eT, typename T1, typename mtop_type>
+class SizeProxy< mtOp<out_eT, T1, mtop_type> >
   {
   public:
 
   typedef out_eT                                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
-  typedef Mat<out_eT>                              stored_type;
+  typedef mtOp<out_eT, T1, mtop_type>              stored_type;
 
-  static const bool is_row = Glue<out_eT, T1, T2, glue_type>::is_row;
-  static const bool is_col = Glue<out_eT, T1, T2, glue_type>::is_col;
-  static const bool is_xvec = Glue<out_eT, T1, T2, glue_type>::is_xvec;
+  static const bool is_row = mtOp<out_eT, T1, mtop_type>::is_row;
+  static const bool is_col = mtOp<out_eT, T1, mtop_type>::is_col;
 
-  coot_aligned const unwrap<Glue<out_eT, T1, T2, glue_type>> U;
-  coot_aligned const Mat<out_eT>& Q;
+  coot_aligned const mtOp<out_eT, T1, mtop_type>& Q;
 
-  inline explicit SizeProxy(const Glue<out_eT, T1, T2, glue_type>& A)
+  inline explicit SizeProxy(const mtOp<out_eT, T1, mtop_type>& A)
+    : Q(A)
+    {
+    coot_extra_debug_sigprint();
+    }
+
+  coot_aligned uword get_n_rows() const { return Q.get_n_rows(); }
+  coot_aligned uword get_n_cols() const { return Q.get_n_cols(); }
+  coot_aligned uword get_n_elem() const { return Q.get_n_elem(); }
+  };
+
+
+
+// Glue: in order to get its size, we need to unwrap it.
+// TODO: maybe this can be done better?
+template<typename T1, typename T2, typename glue_type>
+class SizeProxy< Glue<T1, T2, glue_type> >
+  {
+  public:
+
+  typedef typename T1::elem_type                   elem_type;
+  typedef typename get_pod_type<elem_type>::result pod_type;
+  typedef Mat<elem_type>                           stored_type;
+
+  static const bool is_row = Glue<T1, T2, glue_type>::is_row;
+  static const bool is_col = Glue<T1, T2, glue_type>::is_col;
+
+  coot_aligned const no_conv_unwrap<Glue<T1, T2, glue_type>> U;
+  coot_aligned const Mat<elem_type>& Q;
+
+  inline explicit SizeProxy(const Glue<T1, T2, glue_type>& A)
     : U(A)
     , Q(U.M)
     {

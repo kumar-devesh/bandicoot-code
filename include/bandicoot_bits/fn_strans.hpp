@@ -21,7 +21,7 @@
 template<typename T1>
 coot_warn_unused
 coot_inline
-const Op<typename T1::elem_type, T1, op_strans>
+const Op<T1, op_strans>
 strans
   (
   const Base<typename T1::elem_type,T1>& X,
@@ -31,7 +31,7 @@ strans
   coot_extra_debug_sigprint();
   coot_ignore(junk);
   
-  return Op<typename T1::elem_type, T1, op_strans>(X.get_ref());
+  return Op<T1, op_strans>(X.get_ref());
   }
 
 
@@ -40,7 +40,7 @@ strans
 template<typename T1>
 coot_warn_unused
 coot_inline
-const Op<typename T1::elem_type, T1, op_htrans>
+const Op<T1, op_htrans>
 strans
   (
   const Base<typename T1::elem_type,T1>& X,
@@ -50,7 +50,7 @@ strans
   coot_extra_debug_sigprint();
   coot_ignore(junk);
   
-  return Op<typename T1::elem_type, T1, op_htrans>(X.get_ref());
+  return Op<T1, op_htrans>(X.get_ref());
   }
 
 

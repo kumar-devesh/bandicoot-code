@@ -151,10 +151,10 @@ Base<elem_type,derived>::raw_print(std::ostream& user_stream, const std::string 
 
 template<typename eT, typename derived>
 coot_inline
-const Op<eT, derived, op_inv>
+const Op<derived, op_inv>
 Base_inv_yes<eT, derived>::i() const
   {
-  return Op<eT, derived, op_inv>(static_cast<const derived&>(*this));
+  return Op<derived, op_inv>(static_cast<const derived&>(*this));
   }
 
 
@@ -194,30 +194,30 @@ Base_eval_expr<elem_type, derived>::eval() const
 
 template<typename eT, typename derived>
 coot_inline
-const Op<eT, derived, op_htrans>
+const Op<derived, op_htrans>
 Base_trans_cx<eT, derived>::t() const
   {
-  return Op<eT, derived, op_htrans>( static_cast<const derived&>(*this) );
+  return Op<derived, op_htrans>( static_cast<const derived&>(*this) );
   }
 
 
 
 template<typename eT, typename derived>
 coot_inline
-const Op<eT, derived, op_htrans>
+const Op<derived, op_htrans>
 Base_trans_cx<eT, derived>::ht() const
   {
-  return Op<eT, derived, op_htrans>( static_cast<const derived&>(*this) );
+  return Op<derived, op_htrans>( static_cast<const derived&>(*this) );
   }
 
 
 
 template<typename eT, typename derived>
 coot_inline
-const Op<eT, derived, op_strans>
+const Op<derived, op_strans>
 Base_trans_cx<eT, derived>::st() const
   {
-  return Op<eT, derived, op_strans>( static_cast<const derived&>(*this) );
+  return Op<derived, op_strans>( static_cast<const derived&>(*this) );
   }
 
 
@@ -227,30 +227,30 @@ Base_trans_cx<eT, derived>::st() const
 
 template<typename eT, typename derived>
 coot_inline
-const Op<eT, derived, op_htrans>
+const Op<derived, op_htrans>
 Base_trans_default<eT, derived>::t() const
   {
-  return Op<eT, derived, op_htrans>( static_cast<const derived&>(*this) );
+  return Op<derived, op_htrans>( static_cast<const derived&>(*this) );
   }
 
 
 
 template<typename eT, typename derived>
 coot_inline
-const Op<eT, derived, op_htrans>
+const Op<derived, op_htrans>
 Base_trans_default<eT, derived>::ht() const
   {
-  return Op<eT, derived, op_htrans>( static_cast<const derived&>(*this) );
+  return Op<derived, op_htrans>( static_cast<const derived&>(*this) );
   }
 
 
 
 template<typename eT, typename derived>
 coot_inline
-const Op<eT, derived, op_htrans>
+const Op<derived, op_htrans>
 Base_trans_default<eT, derived>::st() const
   {
-  return Op<eT, derived, op_htrans>( static_cast<const derived&>(*this) );
+  return Op<derived, op_htrans>( static_cast<const derived&>(*this) );
   }
 
 

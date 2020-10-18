@@ -21,11 +21,11 @@
 template<typename out_eT, typename T1>
 inline 
 void
-op_htrans::apply(Mat<out_eT>& out, const Op<out_eT, T1, op_htrans>& in)
+op_htrans::apply(Mat<out_eT>& out, const Op<T1, op_htrans>& in)
   {
   coot_extra_debug_sigprint();
   
-  const unwrap<T1> U(in.m);
+  const no_conv_unwrap<T1> U(in.m);
   
   if(U.is_alias(out))
     {
@@ -80,11 +80,11 @@ op_htrans::apply_noalias(Mat<out_eT>& out,
 template<typename out_eT, typename T1>
 inline 
 void
-op_htrans2::apply(Mat<out_eT>& out, const Op<out_eT, T1, op_htrans2>& in)
+op_htrans2::apply(Mat<out_eT>& out, const Op<T1, op_htrans2>& in)
   {
   coot_extra_debug_sigprint();
   
-  const unwrap<T1> U(in.m);
+  const no_conv_unwrap<T1> U(in.m);
   
   if(U.is_alias(out))
     {

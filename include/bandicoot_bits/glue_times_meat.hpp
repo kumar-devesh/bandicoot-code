@@ -22,7 +22,7 @@ template<uword N>
 template<typename out_eT, typename T1, typename T2>
 inline
 void
-glue_times_redirect<N>::apply(Mat<out_eT>& out, const Glue<out_eT, T1, T2, glue_times>& X)
+glue_times_redirect<N>::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_times>& X)
   {
   coot_extra_debug_sigprint();
   
@@ -42,6 +42,8 @@ glue_times_redirect<N>::apply(Mat<out_eT>& out, const Glue<out_eT, T1, T2, glue_
     glue_times::apply
       <
       out_eT,
+      typename T1::elem_type,
+      typename T2::elem_type,
       partial_unwrap<T1>::do_trans,
       partial_unwrap<T2>::do_trans,
       (partial_unwrap<T1>::do_times || partial_unwrap<T2>::do_times)
@@ -55,6 +57,8 @@ glue_times_redirect<N>::apply(Mat<out_eT>& out, const Glue<out_eT, T1, T2, glue_
     glue_times::apply
       <
       out_eT,
+      typename T1::elem_type,
+      typename T2::elem_type,
       partial_unwrap<T1>::do_trans,
       partial_unwrap<T2>::do_trans,
       (partial_unwrap<T1>::do_times || partial_unwrap<T2>::do_times)
@@ -70,7 +74,7 @@ glue_times_redirect<N>::apply(Mat<out_eT>& out, const Glue<out_eT, T1, T2, glue_
 template<typename out_eT, typename T1, typename T2>
 inline
 void
-glue_times_redirect<2>::apply(Mat<out_eT>& out, const Glue<out_eT, T1, T2, glue_times>& X)
+glue_times_redirect<2>::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_times>& X)
   {
   coot_extra_debug_sigprint();
   
@@ -119,10 +123,10 @@ glue_times_redirect<2>::apply(Mat<out_eT>& out, const Glue<out_eT, T1, T2, glue_
 
 
 
-template<typename out_eT2, typename out_eT1, typename T1, typename T2, typename T3>
+template<typename out_eT, typename T1, typename T2, typename T3>
 inline
 void
-glue_times_redirect<3>::apply(Mat<out_eT2>& out, const Glue<out_eT2, Glue<out_eT1, T1, T2, glue_times>, T3, glue_times>& X)
+glue_times_redirect<3>::apply(Mat<out_eT>& out, const Glue<Glue<T1, T2, glue_times>, T3, glue_times>& X)
   {
   coot_extra_debug_sigprint();
   
@@ -138,7 +142,7 @@ glue_times_redirect<3>::apply(Mat<out_eT2>& out, const Glue<out_eT2, Glue<out_eT
   const typename partial_unwrap<T3>::stored_type& C = tmp3.M;
   
   const bool use_alpha = partial_unwrap<T1>::do_times || partial_unwrap<T2>::do_times || partial_unwrap<T3>::do_times;
-  const out_eT2  alpha = use_alpha ? (tmp1.get_val() * tmp2.get_val() * tmp3.get_val()) : out_eT2(0);
+  const out_eT   alpha = use_alpha ? (tmp1.get_val() * tmp2.get_val() * tmp3.get_val()) : out_eT(0);
   
   const bool alias = tmp1.is_alias(out) || tmp2.is_alias(out) || tmp3.is_alias(out);
   
@@ -146,7 +150,10 @@ glue_times_redirect<3>::apply(Mat<out_eT2>& out, const Glue<out_eT2, Glue<out_eT
     {
     glue_times::apply
       <
-      out_eT2,
+      out_eT,
+      typename T1::elem_type,
+      typename T2::elem_type,
+      typename T3::elem_type,
       partial_unwrap<T1>::do_trans,
       partial_unwrap<T2>::do_trans,
       partial_unwrap<T3>::do_trans,
@@ -156,11 +163,14 @@ glue_times_redirect<3>::apply(Mat<out_eT2>& out, const Glue<out_eT2, Glue<out_eT
     }
   else
     {
-    Mat<out_eT2> tmp;
+    Mat<out_eT> tmp;
     
     glue_times::apply
       <
-      out_eT2,
+      out_eT,
+      typename T1::elem_type,
+      typename T2::elem_type,
+      typename T3::elem_type,
       partial_unwrap<T1>::do_trans,
       partial_unwrap<T2>::do_trans,
       partial_unwrap<T3>::do_trans,
@@ -174,10 +184,10 @@ glue_times_redirect<3>::apply(Mat<out_eT2>& out, const Glue<out_eT2, Glue<out_eT
 
 
 
-template<typename out_eT3, typename out_eT2, typename out_eT1, typename T1, typename T2, typename T3, typename T4>
+template<typename out_eT, typename T1, typename T2, typename T3, typename T4>
 inline
 void
-glue_times_redirect<4>::apply(Mat<out_eT3>& out, const Glue<out_eT3, Glue<out_eT2, Glue<out_eT1, T1, T2, glue_times>, T3, glue_times>, T4, glue_times>& X)
+glue_times_redirect<4>::apply(Mat<out_eT>& out, const Glue<Glue<Glue<T1, T2, glue_times>, T3, glue_times>, T4, glue_times>& X)
   {
   coot_extra_debug_sigprint();
   
@@ -195,7 +205,7 @@ glue_times_redirect<4>::apply(Mat<out_eT3>& out, const Glue<out_eT3, Glue<out_eT
   const typename partial_unwrap<T4>::stored_type& D = tmp4.M;
   
   const bool use_alpha = partial_unwrap<T1>::do_times || partial_unwrap<T2>::do_times || partial_unwrap<T3>::do_times || partial_unwrap<T4>::do_times;
-  const out_eT3  alpha = use_alpha ? (tmp1.get_val() * tmp2.get_val() * tmp3.get_val() * tmp4.get_val()) : out_eT3(0);
+  const out_eT   alpha = use_alpha ? (tmp1.get_val() * tmp2.get_val() * tmp3.get_val() * tmp4.get_val()) : out_eT(0);
   
   const bool alias = tmp1.is_alias(out) || tmp2.is_alias(out) || tmp3.is_alias(out) || tmp4.is_alias(out);
   
@@ -203,7 +213,11 @@ glue_times_redirect<4>::apply(Mat<out_eT3>& out, const Glue<out_eT3, Glue<out_eT
     {
     glue_times::apply
       <
-      out_eT3,
+      out_eT,
+      typename T1::elem_type,
+      typename T2::elem_type,
+      typename T3::elem_type,
+      typename T4::elem_type,
       partial_unwrap<T1>::do_trans,
       partial_unwrap<T2>::do_trans,
       partial_unwrap<T3>::do_trans,
@@ -214,11 +228,15 @@ glue_times_redirect<4>::apply(Mat<out_eT3>& out, const Glue<out_eT3, Glue<out_eT
     }
   else
     {
-    Mat<out_eT3> tmp;
+    Mat<out_eT> tmp;
     
     glue_times::apply
       <
-      out_eT3,
+      out_eT,
+      typename T1::elem_type,
+      typename T2::elem_type,
+      typename T3::elem_type,
+      typename T4::elem_type,
       partial_unwrap<T1>::do_trans,
       partial_unwrap<T2>::do_trans,
       partial_unwrap<T3>::do_trans,
@@ -236,11 +254,11 @@ glue_times_redirect<4>::apply(Mat<out_eT3>& out, const Glue<out_eT3, Glue<out_eT
 template<typename out_eT, typename T1, typename T2>
 inline
 void
-glue_times::apply(Mat<out_eT>& out, const Glue<out_eT, T1, T2, glue_times>& X)
+glue_times::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_times>& X)
   {
   coot_extra_debug_sigprint();
   
-  const sword N_mat = 1 + depth_lhs< glue_times, Glue<out_eT, T1, T2, glue_times> >::num;
+  const sword N_mat = 1 + depth_lhs< glue_times, Glue<T1, T2, glue_times> >::num;
   
   coot_extra_debug_print(coot_str::format("N_mat = %d") % N_mat);
   

@@ -18,28 +18,24 @@
 
 
 
-template<typename out_eT, typename T1, typename op_type>
-class Op : public Base< out_eT, Op<out_eT, T1, op_type> >
+template<typename T1, typename op_type>
+class Op : public Base< typename T1::elem_type, Op<T1, op_type> >
   {
   public:
   
-  typedef typename T1::elem_type                   in_elem_type;
-  typedef out_eT                                   elem_type;
+  typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
   
   inline explicit Op(const T1& in_m);
-  inline          Op(const T1& in_m, const in_elem_type in_aux);
-  inline          Op(const T1& in_m, const in_elem_type in_aux,         const uword in_aux_uword_a, const uword in_aux_uword_b);
+  inline          Op(const T1& in_m, const elem_type in_aux);
+  inline          Op(const T1& in_m, const elem_type in_aux,         const uword in_aux_uword_a, const uword in_aux_uword_b);
   inline          Op(const T1& in_m, const uword     in_aux_uword_a, const uword in_aux_uword_b);
   inline          Op(const T1& in_m, const uword     in_aux_uword_a, const uword in_aux_uword_b, const uword in_aux_uword_c, const char junk);
-
-  template<typename in_eT>
-  inline explicit Op(const Op<in_eT, T1, op_type>& in);
 
   inline         ~Op();
   
   coot_aligned const T1&                    m;
-  coot_aligned       in_elem_type           aux;
+  coot_aligned       elem_type              aux;
   coot_aligned       uword                  aux_uword_a;
   coot_aligned       uword                  aux_uword_b;
   coot_aligned       uword                  aux_uword_c;

@@ -70,13 +70,13 @@ class subview : public Base<eT, subview<eT> >
   template<typename T1> inline void operator%=(const Base<eT, T1>& x);
   template<typename T1> inline void operator/=(const Base<eT, T1>& x);
 
-  template<typename T1> inline void inplace_op(const Op<eT, T1, op_conv_to>& x, twoway_kernel_id::enum_id kernel, const char* identifier);
+  template<typename T1> inline void inplace_op(const mtOp<eT, T1, mtop_conv_to>& x, twoway_kernel_id::enum_id kernel, const char* identifier);
 
-  template<typename T1> inline void operator= (const Op<eT, T1, op_conv_to>& x);
-  template<typename T1> inline void operator+=(const Op<eT, T1, op_conv_to>& x);
-  template<typename T1> inline void operator-=(const Op<eT, T1, op_conv_to>& x);
-  template<typename T1> inline void operator%=(const Op<eT, T1, op_conv_to>& x);
-  template<typename T1> inline void operator/=(const Op<eT, T1, op_conv_to>& x);
+  template<typename T1> inline void operator= (const mtOp<eT, T1, mtop_conv_to>& x);
+  template<typename T1> inline void operator+=(const mtOp<eT, T1, mtop_conv_to>& x);
+  template<typename T1> inline void operator-=(const mtOp<eT, T1, mtop_conv_to>& x);
+  template<typename T1> inline void operator%=(const mtOp<eT, T1, mtop_conv_to>& x);
+  template<typename T1> inline void operator/=(const mtOp<eT, T1, mtop_conv_to>& x);
 
   template<typename eT1> inline static void       extract(Mat<eT1>& out, const subview& in);
   template<typename eT1> inline static void  plus_inplace(Mat<eT1>& out, const subview& in);
@@ -163,9 +163,9 @@ class subview_row : public subview<eT>
   template<typename T1>
   inline void operator= (const Base<eT,T1>& x);
   
-  coot_inline const Op<eT, subview_row<eT>, op_htrans>  t() const;
-  coot_inline const Op<eT, subview_row<eT>, op_htrans> ht() const;
-  coot_inline const Op<eT, subview_row<eT>, op_strans> st() const;
+  coot_inline const Op<subview_row<eT>, op_htrans>  t() const;
+  coot_inline const Op<subview_row<eT>, op_htrans> ht() const;
+  coot_inline const Op<subview_row<eT>, op_strans> st() const;
   
   
   protected:

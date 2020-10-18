@@ -25,11 +25,14 @@ class eop_core
   
   // matrices
   
-  template<typename eT2, typename T1> inline static void apply              (Mat<eT2>& out, const eOp<eT2, T1, eop_type>& x);
-  template<typename eT2, typename T1> inline static void apply_inplace_plus (Mat<eT2>& out, const eOp<eT2, T1, eop_type>& x);
-  template<typename eT2, typename T1> inline static void apply_inplace_minus(Mat<eT2>& out, const eOp<eT2, T1, eop_type>& x);
-  template<typename eT2, typename T1> inline static void apply_inplace_schur(Mat<eT2>& out, const eOp<eT2, T1, eop_type>& x);
-  template<typename eT2, typename T1> inline static void apply_inplace_div  (Mat<eT2>& out, const eOp<eT2, T1, eop_type>& x);
+  template<typename eT, typename T1> inline static void apply              (Mat<eT>& out, const eOp<T1, eop_type>& x);
+
+  template<typename eT, typename T2> inline static void apply              (Mat<eT>& out, const eOp<mtOp<eT, eOp<T2, eop_type>, mtop_conv_to>, eop_type>& X);
+
+  template<typename eT, typename T1> inline static void apply_inplace_plus (Mat<eT>& out, const eOp<T1, eop_type>& x);
+  template<typename eT, typename T1> inline static void apply_inplace_minus(Mat<eT>& out, const eOp<T1, eop_type>& x);
+  template<typename eT, typename T1> inline static void apply_inplace_schur(Mat<eT>& out, const eOp<T1, eop_type>& x);
+  template<typename eT, typename T1> inline static void apply_inplace_div  (Mat<eT>& out, const eOp<T1, eop_type>& x);
   
   
   // cubes
@@ -39,22 +42,115 @@ class eop_core
 
 
 
-class eop_scalar_plus       : public eop_core<eop_scalar_plus>       {};
-class eop_neg               : public eop_core<eop_neg>               {};
-class eop_scalar_minus_pre  : public eop_core<eop_scalar_minus_pre>  {};
-class eop_scalar_minus_post : public eop_core<eop_scalar_minus_post> {};
-class eop_scalar_times      : public eop_core<eop_scalar_times>      {};
-class eop_scalar_div_pre    : public eop_core<eop_scalar_div_pre>    {};
-class eop_scalar_div_post   : public eop_core<eop_scalar_div_post>   {};
-class eop_square            : public eop_core<eop_square>            {};
-class eop_sqrt              : public eop_core<eop_sqrt>              {};
+// every eop has the ability to apply a conversion before or after; if 'chainable' is true, then
+// it is possible to apply a conversion *between* two eops of the same type
+
+
+
+class eop_scalar_plus       : public eop_core<eop_scalar_plus>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_plus_scalar;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_plus_scalar;
+  const static bool is_chainable = true;
+  };
+
+class eop_neg               : public eop_core<eop_neg>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_neg_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_neg_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_scalar_minus_pre  : public eop_core<eop_scalar_minus_pre>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_minus_scalar_pre_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_minus_scalar_pre_post;
+  const static bool is_chainable = true;
+  };
+
+class eop_scalar_minus_post : public eop_core<eop_scalar_minus_post>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_minus_scalar_post;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_minus_scalar_post;
+  const static bool is_chainable = true;
+  };
+
+class eop_scalar_times      : public eop_core<eop_scalar_times>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_mul_scalar;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_mul_scalar;
+  const static bool is_chainable = true;
+  };
+class eop_scalar_div_pre    : public eop_core<eop_scalar_div_pre>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_div_scalar_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_div_scalar_pre;
+  const static bool is_chainable = true;
+  };
+
+class eop_scalar_div_post   : public eop_core<eop_scalar_div_post>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_div_scalar_post;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_div_scalar_post;
+  const static bool is_chainable = true;
+  };
+
+class eop_square            : public eop_core<eop_square>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_square_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_square_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_sqrt              : public eop_core<eop_sqrt>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_sqrt_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_sqrt_post;
+  const static bool is_chainable = false;
+  };
 
 // // TODO
-class eop_log               : public eop_core<eop_log>               {};
+
+class eop_log               : public eop_core<eop_log>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_log_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_log_post;
+  const static bool is_chainable = false;
+  };
+
 // class eop_log2              : public eop_core<eop_log2>              {};
 // class eop_log10             : public eop_core<eop_log10>             {};
 // class eop_trunc_log         : public eop_core<eop_trunc_log>         {};
-class eop_exp               : public eop_core<eop_exp>               {};
+
+class eop_exp               : public eop_core<eop_exp>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_exp_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_exp_post;
+  const static bool is_chainable = false;
+  };
+
 // class eop_exp2              : public eop_core<eop_exp2>              {};
 // class eop_exp10             : public eop_core<eop_exp10>             {};
 // class eop_trunc_exp         : public eop_core<eop_trunc_exp>         {};
