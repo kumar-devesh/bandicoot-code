@@ -404,10 +404,10 @@ void test_eop_conv_to(const out_eT aux = out_eT(0))
     x[i] = (i + 1);
     }
 
-  typedef Op<out_eT, Mat<in_eT>, op_conv_to> internal_conv_to_type;
+  typedef mtOp<out_eT, Mat<in_eT>, mtop_conv_to> internal_conv_to_type;
 
-  typedef eOp<out_eT, internal_conv_to_type, eop_type> eop_with_internal_conv_to_type;
-  typedef eOp<out_eT, Mat<out_eT>, eop_type> eop_after_conv_to_type;
+  typedef eOp<internal_conv_to_type, eop_type> eop_with_internal_conv_to_type;
+  typedef eOp<Mat<out_eT>, eop_type> eop_after_conv_to_type;
 
   Mat<out_eT> xc = conv_to<Mat<out_eT>>::from(x);
   // Manually assemble eOp with conv_to internally.
@@ -420,8 +420,8 @@ void test_eop_conv_to(const out_eT aux = out_eT(0))
     }
 
   // Now have the conv_to externally.
-  typedef eOp<in_eT, Mat<in_eT>, eop_type> eop_before_conv_to_type;
-  typedef Op<out_eT, eop_before_conv_to_type, op_conv_to> eop_with_external_conv_to_type;
+  typedef eOp<Mat<in_eT>, eop_type> eop_before_conv_to_type;
+  typedef mtOp<out_eT, eop_before_conv_to_type, mtop_conv_to> eop_with_external_conv_to_type;
 
   Mat<out_eT> z1(eop_with_external_conv_to_type(eop_before_conv_to_type(x, aux)));
   Mat<in_eT> xop(eop_before_conv_to_type(x, aux));
@@ -557,10 +557,10 @@ void test_double_merged_eop_conv_to(out_eT aux_val)
     x[i] = (i + 1);
     }
 
-  typedef eOp<in_eT, Mat<in_eT>, eop_type> inner_eop_type;
-  typedef Op<out_eT, inner_eop_type, op_conv_to> conv_to_type;
-  typedef eOp<out_eT, conv_to_type, eop_type> outer_eop_type;
-  typedef eOp<out_eT, Mat<out_eT>, eop_type> standalone_outer_eop_type;
+  typedef eOp<Mat<in_eT>, eop_type> inner_eop_type;
+  typedef mtOp<out_eT, inner_eop_type, mtop_conv_to> conv_to_type;
+  typedef eOp<conv_to_type, eop_type> outer_eop_type;
+  typedef eOp<Mat<out_eT>, eop_type> standalone_outer_eop_type;
 
   // Do all operations at once (hopefully).
   Mat<out_eT> y1 = outer_eop_type(conv_to_type(inner_eop_type(x, aux_in)), aux_out);
