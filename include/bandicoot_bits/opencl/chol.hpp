@@ -58,7 +58,7 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
 
   runtime_t::cq_guard guard;
 
-  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(kernel_id::ltri_set_zero);
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::ltri_set_zero);
 
   // n_rows == n_cols because the Cholesky decomposition requires square matrices.
   runtime_t::adapt_uword dev_n_rows(n_rows);

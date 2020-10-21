@@ -41,6 +41,7 @@ struct runtime_dev_info
   };
 
 
+
 // TODO: if this is placed into a run-time library and executed there, what happens when two programs use the run-time library at the same time?
 class runtime_t
   {
@@ -56,14 +57,12 @@ class runtime_t
   
   coot_aligned runtime_dev_info dev_info;
   
-  coot_aligned std::vector<cl_kernel>  u32_kernels;
-  coot_aligned std::vector<cl_kernel>  s32_kernels;
-  coot_aligned std::vector<cl_kernel>  u64_kernels;
-  coot_aligned std::vector<cl_kernel>  s64_kernels;
-  coot_aligned std::vector<cl_kernel>    f_kernels;
-  coot_aligned std::vector<cl_kernel>    d_kernels;
-  coot_aligned std::vector<cl_kernel> cx_f_kernels;
-  coot_aligned std::vector<cl_kernel> cx_d_kernels;
+  coot_aligned rt_common::kernels_t<std::vector<cl_kernel>>                                             oneway_kernels;
+  coot_aligned rt_common::kernels_t<rt_common::kernels_t<std::vector<cl_kernel>>>                       twoway_kernels;
+  coot_aligned rt_common::kernels_t<rt_common::kernels_t<rt_common::kernels_t<std::vector<cl_kernel>>>> threeway_kernels;
+
+  //  coot_aligned std::vector<cl_kernel> cx_f_kernels;
+  //  coot_aligned std::vector<cl_kernel> cx_d_kernels;
 
   #if defined(COOT_USE_CXX11)
   coot_aligned std::recursive_mutex mutex;
@@ -79,11 +78,18 @@ class runtime_t
   inline bool interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plat_id, cl_device_id in_dev_id, const bool print_info) const;
   
   inline bool setup_queue(cl_context& out_context, cl_command_queue& out_queue, cl_platform_id in_plat_id, cl_device_id in_dev_id) const;
-  
-  template<typename eT>
-  inline bool init_kernels(std::vector<cl_kernel>& kernels, const std::string& source, const std::vector<std::string>& names);
-  
-  
+
+  inline bool compile_kernels(const std::string& source, std::vector<std::pair<std::string, cl_kernel*>>& names);
+
+  template<typename eT1, typename... eTs, typename HeldType, typename EnumType>
+  inline
+  const cl_kernel&
+  get_kernel(const rt_common::kernels_t<HeldType>& k, const EnumType num);
+
+  template<typename eT, typename EnumType>
+  inline
+  const cl_kernel&
+  get_kernel(const rt_common::kernels_t<std::vector<cl_kernel>>& k, const EnumType num);
   
   public:
 
@@ -118,8 +124,15 @@ class runtime_t
   inline void delete_extra_cq(cl_command_queue&  in_queue);
   
   // TODO: add function to return info about device as a string
-  
-  template<typename eT> inline cl_kernel get_kernel(const kernel_id::enum_id num);
+
+  template<typename eT1>
+  inline const cl_kernel& get_kernel(const oneway_kernel_id::enum_id num);
+
+  template<typename eT2, typename eT1>
+  inline const cl_kernel& get_kernel(const twoway_kernel_id::enum_id num);
+
+  template<typename eT3, typename eT2, typename eT1>
+  inline const cl_kernel& get_kernel(const threeway_kernel_id::enum_id num);
   
   class program_wrapper;
   class cq_guard;

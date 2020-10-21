@@ -19,14 +19,12 @@
 
 
 template<uword N>
-template<typename T1, typename T2>
+template<typename out_eT, typename T1, typename T2>
 inline
 void
-glue_times_redirect<N>::apply(Mat<typename T1::elem_type>& out, const Glue<T1,T2,glue_times>& X)
+glue_times_redirect<N>::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_times>& X)
   {
   coot_extra_debug_sigprint();
-  
-  typedef typename T1::elem_type eT;
   
   const partial_unwrap<T1> tmp1(X.A);
   const partial_unwrap<T2> tmp2(X.B);
@@ -35,7 +33,7 @@ glue_times_redirect<N>::apply(Mat<typename T1::elem_type>& out, const Glue<T1,T2
   const typename partial_unwrap<T2>::stored_type& B = tmp2.M;
   
   const bool use_alpha = partial_unwrap<T1>::do_times || partial_unwrap<T2>::do_times;
-  const eT       alpha = use_alpha ? (tmp1.get_val() * tmp2.get_val()) : eT(0);
+  const out_eT   alpha = use_alpha ? (tmp1.get_val() * tmp2.get_val()) : out_eT(0);
   
   const bool alias = tmp1.is_alias(out) || tmp2.is_alias(out);
   
@@ -43,7 +41,9 @@ glue_times_redirect<N>::apply(Mat<typename T1::elem_type>& out, const Glue<T1,T2
     {
     glue_times::apply
       <
-      eT,
+      out_eT,
+      typename T1::elem_type,
+      typename T2::elem_type,
       partial_unwrap<T1>::do_trans,
       partial_unwrap<T2>::do_trans,
       (partial_unwrap<T1>::do_times || partial_unwrap<T2>::do_times)
@@ -52,11 +52,13 @@ glue_times_redirect<N>::apply(Mat<typename T1::elem_type>& out, const Glue<T1,T2
     }
   else
     {
-    Mat<eT> tmp;
+    Mat<out_eT> tmp;
     
     glue_times::apply
       <
-      eT,
+      out_eT,
+      typename T1::elem_type,
+      typename T2::elem_type,
       partial_unwrap<T1>::do_trans,
       partial_unwrap<T2>::do_trans,
       (partial_unwrap<T1>::do_times || partial_unwrap<T2>::do_times)
@@ -69,14 +71,12 @@ glue_times_redirect<N>::apply(Mat<typename T1::elem_type>& out, const Glue<T1,T2
 
 
 
-template<typename T1, typename T2>
+template<typename out_eT, typename T1, typename T2>
 inline
 void
-glue_times_redirect<2>::apply(Mat<typename T1::elem_type>& out, const Glue<T1,T2,glue_times>& X)
+glue_times_redirect<2>::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_times>& X)
   {
   coot_extra_debug_sigprint();
-  
-  typedef typename T1::elem_type eT;
   
   const partial_unwrap<T1> tmp1(X.A);
   const partial_unwrap<T2> tmp2(X.B);
@@ -85,7 +85,7 @@ glue_times_redirect<2>::apply(Mat<typename T1::elem_type>& out, const Glue<T1,T2
   const typename partial_unwrap<T2>::stored_type& B = tmp2.M;
   
   const bool use_alpha = partial_unwrap<T1>::do_times || partial_unwrap<T2>::do_times;
-  const eT       alpha = use_alpha ? (tmp1.get_val() * tmp2.get_val()) : eT(0);
+  const out_eT   alpha = use_alpha ? (tmp1.get_val() * tmp2.get_val()) : out_eT(0);
   
   const bool alias = tmp1.is_alias(out) || tmp2.is_alias(out);
   
@@ -93,7 +93,9 @@ glue_times_redirect<2>::apply(Mat<typename T1::elem_type>& out, const Glue<T1,T2
     {
     glue_times::apply
       <
-      eT,
+      out_eT,
+      typename T1::elem_type,
+      typename T2::elem_type,
       partial_unwrap<T1>::do_trans,
       partial_unwrap<T2>::do_trans,
       (partial_unwrap<T1>::do_times || partial_unwrap<T2>::do_times)
@@ -102,11 +104,13 @@ glue_times_redirect<2>::apply(Mat<typename T1::elem_type>& out, const Glue<T1,T2
     }
   else
     {
-    Mat<eT> tmp;
+    Mat<out_eT> tmp;
     
     glue_times::apply
       <
-      eT,
+      out_eT,
+      typename T1::elem_type,
+      typename T2::elem_type,
       partial_unwrap<T1>::do_trans,
       partial_unwrap<T2>::do_trans,
       (partial_unwrap<T1>::do_times || partial_unwrap<T2>::do_times)
@@ -119,14 +123,12 @@ glue_times_redirect<2>::apply(Mat<typename T1::elem_type>& out, const Glue<T1,T2
 
 
 
-template<typename T1, typename T2, typename T3>
+template<typename out_eT, typename T1, typename T2, typename T3>
 inline
 void
-glue_times_redirect<3>::apply(Mat<typename T1::elem_type>& out, const Glue< Glue<T1,T2,glue_times>, T3, glue_times>& X)
+glue_times_redirect<3>::apply(Mat<out_eT>& out, const Glue<Glue<T1, T2, glue_times>, T3, glue_times>& X)
   {
   coot_extra_debug_sigprint();
-  
-  typedef typename T1::elem_type eT;
   
   // we have exactly 3 objects
   // hence we can safely expand X as X.A.A, X.A.B and X.B
@@ -140,7 +142,7 @@ glue_times_redirect<3>::apply(Mat<typename T1::elem_type>& out, const Glue< Glue
   const typename partial_unwrap<T3>::stored_type& C = tmp3.M;
   
   const bool use_alpha = partial_unwrap<T1>::do_times || partial_unwrap<T2>::do_times || partial_unwrap<T3>::do_times;
-  const eT       alpha = use_alpha ? (tmp1.get_val() * tmp2.get_val() * tmp3.get_val()) : eT(0);
+  const out_eT   alpha = use_alpha ? (tmp1.get_val() * tmp2.get_val() * tmp3.get_val()) : out_eT(0);
   
   const bool alias = tmp1.is_alias(out) || tmp2.is_alias(out) || tmp3.is_alias(out);
   
@@ -148,7 +150,10 @@ glue_times_redirect<3>::apply(Mat<typename T1::elem_type>& out, const Glue< Glue
     {
     glue_times::apply
       <
-      eT,
+      out_eT,
+      typename T1::elem_type,
+      typename T2::elem_type,
+      typename T3::elem_type,
       partial_unwrap<T1>::do_trans,
       partial_unwrap<T2>::do_trans,
       partial_unwrap<T3>::do_trans,
@@ -158,11 +163,14 @@ glue_times_redirect<3>::apply(Mat<typename T1::elem_type>& out, const Glue< Glue
     }
   else
     {
-    Mat<eT> tmp;
+    Mat<out_eT> tmp;
     
     glue_times::apply
       <
-      eT,
+      out_eT,
+      typename T1::elem_type,
+      typename T2::elem_type,
+      typename T3::elem_type,
       partial_unwrap<T1>::do_trans,
       partial_unwrap<T2>::do_trans,
       partial_unwrap<T3>::do_trans,
@@ -176,14 +184,12 @@ glue_times_redirect<3>::apply(Mat<typename T1::elem_type>& out, const Glue< Glue
 
 
 
-template<typename T1, typename T2, typename T3, typename T4>
+template<typename out_eT, typename T1, typename T2, typename T3, typename T4>
 inline
 void
-glue_times_redirect<4>::apply(Mat<typename T1::elem_type>& out, const Glue< Glue< Glue<T1,T2,glue_times>, T3, glue_times>, T4, glue_times>& X)
+glue_times_redirect<4>::apply(Mat<out_eT>& out, const Glue<Glue<Glue<T1, T2, glue_times>, T3, glue_times>, T4, glue_times>& X)
   {
   coot_extra_debug_sigprint();
-  
-  typedef typename T1::elem_type eT;
   
   // there is exactly 4 objects
   // hence we can safely expand X as X.A.A.A, X.A.A.B, X.A.B and X.B
@@ -199,7 +205,7 @@ glue_times_redirect<4>::apply(Mat<typename T1::elem_type>& out, const Glue< Glue
   const typename partial_unwrap<T4>::stored_type& D = tmp4.M;
   
   const bool use_alpha = partial_unwrap<T1>::do_times || partial_unwrap<T2>::do_times || partial_unwrap<T3>::do_times || partial_unwrap<T4>::do_times;
-  const eT       alpha = use_alpha ? (tmp1.get_val() * tmp2.get_val() * tmp3.get_val() * tmp4.get_val()) : eT(0);
+  const out_eT   alpha = use_alpha ? (tmp1.get_val() * tmp2.get_val() * tmp3.get_val() * tmp4.get_val()) : out_eT(0);
   
   const bool alias = tmp1.is_alias(out) || tmp2.is_alias(out) || tmp3.is_alias(out) || tmp4.is_alias(out);
   
@@ -207,7 +213,11 @@ glue_times_redirect<4>::apply(Mat<typename T1::elem_type>& out, const Glue< Glue
     {
     glue_times::apply
       <
-      eT,
+      out_eT,
+      typename T1::elem_type,
+      typename T2::elem_type,
+      typename T3::elem_type,
+      typename T4::elem_type,
       partial_unwrap<T1>::do_trans,
       partial_unwrap<T2>::do_trans,
       partial_unwrap<T3>::do_trans,
@@ -218,11 +228,15 @@ glue_times_redirect<4>::apply(Mat<typename T1::elem_type>& out, const Glue< Glue
     }
   else
     {
-    Mat<eT> tmp;
+    Mat<out_eT> tmp;
     
     glue_times::apply
       <
-      eT,
+      out_eT,
+      typename T1::elem_type,
+      typename T2::elem_type,
+      typename T3::elem_type,
+      typename T4::elem_type,
       partial_unwrap<T1>::do_trans,
       partial_unwrap<T2>::do_trans,
       partial_unwrap<T3>::do_trans,
@@ -237,14 +251,14 @@ glue_times_redirect<4>::apply(Mat<typename T1::elem_type>& out, const Glue< Glue
 
 
 
-template<typename T1, typename T2>
+template<typename out_eT, typename T1, typename T2>
 inline
 void
-glue_times::apply(Mat<typename T1::elem_type>& out, const Glue<T1,T2,glue_times>& X)
+glue_times::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_times>& X)
   {
   coot_extra_debug_sigprint();
   
-  const sword N_mat = 1 + depth_lhs< glue_times, Glue<T1,T2,glue_times> >::num;
+  const sword N_mat = 1 + depth_lhs< glue_times, Glue<T1, T2, glue_times> >::num;
   
   coot_extra_debug_print(coot_str::format("N_mat = %d") % N_mat);
   
@@ -253,10 +267,10 @@ glue_times::apply(Mat<typename T1::elem_type>& out, const Glue<T1,T2,glue_times>
 
 
 
-template<typename eT, const bool do_trans_A, const bool do_trans_B>
+template<typename eT1, typename eT2, const bool do_trans_A, const bool do_trans_B>
 inline
 uword
-glue_times::mul_storage_cost(const Mat<eT>& A, const Mat<eT>& B)
+glue_times::mul_storage_cost(const Mat<eT1>& A, const Mat<eT2>& B)
   {
   const uword final_A_n_rows = (do_trans_A == false) ? A.n_rows : A.n_cols;
   const uword final_B_n_cols = (do_trans_B == false) ? B.n_cols : B.n_rows;
@@ -268,7 +282,9 @@ glue_times::mul_storage_cost(const Mat<eT>& A, const Mat<eT>& B)
 
 template
   <
-  typename   eT,
+  typename   out_eT,
+  typename   eT1,
+  typename   eT2,
   const bool do_trans_A,
   const bool do_trans_B,
   const bool use_alpha
@@ -277,10 +293,10 @@ inline
 void
 glue_times::apply
   (
-        Mat<eT>& out,
-  const Mat<eT>& A,
-  const Mat<eT>& B,
-  const eT       alpha
+        Mat<out_eT>& out,
+  const Mat<eT1>&    A,
+  const Mat<eT2>&    B,
+  const out_eT       alpha
   )
   {
   coot_extra_debug_sigprint();
@@ -301,58 +317,58 @@ glue_times::apply
   
   if( (do_trans_A == false) && (do_trans_B == false) && (use_alpha == false) )
     {
-         if( (A.n_rows == 1) && (is_cx<eT>::no) )  { gemv<true,         false, false>::apply(out, B, A); }
-    else if( (B.n_cols == 1)                    )  { gemv<false,        false, false>::apply(out, A, B); }
-    else                                           { gemm<false, false, false, false>::apply(out, A, B); }
+         if( (A.n_rows == 1) && (is_cx<out_eT>::no) )  { gemv<true,         false, false>::apply(out, B, A); }
+    else if( (B.n_cols == 1)                        )  { gemv<false,        false, false>::apply(out, A, B); }
+    else                                               { gemm<false, false, false, false>::apply(out, A, B); }
     }
   else
   if( (do_trans_A == false) && (do_trans_B == false) && (use_alpha == true) )
     {
-         if( (A.n_rows == 1) && (is_cx<eT>::no) )  { gemv<true,         true, false>::apply(out, B, A, alpha); }
-    else if( (B.n_cols == 1)                    )  { gemv<false,        true, false>::apply(out, A, B, alpha); }
-    else                                           { gemm<false, false, true, false>::apply(out, A, B, alpha); }
+         if( (A.n_rows == 1) && (is_cx<out_eT>::no) )  { gemv<true,         true, false>::apply(out, B, A, alpha); }
+    else if( (B.n_cols == 1)                        )  { gemv<false,        true, false>::apply(out, A, B, alpha); }
+    else                                               { gemm<false, false, true, false>::apply(out, A, B, alpha); }
     }
   else
   if( (do_trans_A == true) && (do_trans_B == false) && (use_alpha == false) )
     {
-         if( (A.n_cols == 1) && (is_cx<eT>::no) )  { gemv<true,        false, false>::apply(out, B, A); }
-    else if( (B.n_cols == 1)                    )  { gemv<true,        false, false>::apply(out, A, B); }
-    else                                           { gemm<true, false, false, false>::apply(out, A, B); }
+         if( (A.n_cols == 1) && (is_cx<out_eT>::no) )  { gemv<true,        false, false>::apply(out, B, A); }
+    else if( (B.n_cols == 1)                        )  { gemv<true,        false, false>::apply(out, A, B); }
+    else                                               { gemm<true, false, false, false>::apply(out, A, B); }
     }
   else
   if( (do_trans_A == true) && (do_trans_B == false) && (use_alpha == true) )
     {
-         if( (A.n_cols == 1) && (is_cx<eT>::no) )  { gemv<true,        true, false>::apply(out, B, A, alpha); }
-    else if( (B.n_cols == 1)                    )  { gemv<true,        true, false>::apply(out, A, B, alpha); }
-    else                                           { gemm<true, false, true, false>::apply(out, A, B, alpha); }
+         if( (A.n_cols == 1) && (is_cx<out_eT>::no) )  { gemv<true,        true, false>::apply(out, B, A, alpha); }
+    else if( (B.n_cols == 1)                        )  { gemv<true,        true, false>::apply(out, A, B, alpha); }
+    else                                               { gemm<true, false, true, false>::apply(out, A, B, alpha); }
     }
   else
   if( (do_trans_A == false) && (do_trans_B == true) && (use_alpha == false) )
     {
-         if( (A.n_rows == 1) && (is_cx<eT>::no)  )  { gemv<false,       false, false>::apply(out, B, A); }
-    else if( (B.n_rows == 1) && (is_cx<eT>::no)  )  { gemv<false,       false, false>::apply(out, A, B); }
-    else                                            { gemm<false, true, false, false>::apply(out, A, B); }
+         if( (A.n_rows == 1) && (is_cx<out_eT>::no)  )  { gemv<false,       false, false>::apply(out, B, A); }
+    else if( (B.n_rows == 1) && (is_cx<out_eT>::no)  )  { gemv<false,       false, false>::apply(out, A, B); }
+    else                                                { gemm<false, true, false, false>::apply(out, A, B); }
     }
   else
   if( (do_trans_A == false) && (do_trans_B == true) && (use_alpha == true) )
     {
-         if( (A.n_rows == 1) && (is_cx<eT>::no) ) { gemv<false,       true, false>::apply(out, B, A, alpha); }
-    else if( (B.n_rows == 1) && (is_cx<eT>::no) ) { gemv<false,       true, false>::apply(out, A, B, alpha); }
-    else                                          { gemm<false, true, true, false>::apply(out, A, B, alpha); }
+         if( (A.n_rows == 1) && (is_cx<out_eT>::no) ) { gemv<false,       true, false>::apply(out, B, A, alpha); }
+    else if( (B.n_rows == 1) && (is_cx<out_eT>::no) ) { gemv<false,       true, false>::apply(out, A, B, alpha); }
+    else                                              { gemm<false, true, true, false>::apply(out, A, B, alpha); }
     }
   else
   if( (do_trans_A == true) && (do_trans_B == true) && (use_alpha == false) )
     {
-         if( (A.n_cols == 1) && (is_cx<eT>::no) )  { gemv<false,      false, false>::apply(out, B, A); }
-    else if( (B.n_rows == 1) && (is_cx<eT>::no) )  { gemv<true,       false, false>::apply(out, A, B); }
-    else                                           { gemm<true, true, false, false>::apply(out, A, B); }
+         if( (A.n_cols == 1) && (is_cx<out_eT>::no) )  { gemv<false,      false, false>::apply(out, B, A); }
+    else if( (B.n_rows == 1) && (is_cx<out_eT>::no) )  { gemv<true,       false, false>::apply(out, A, B); }
+    else                                               { gemm<true, true, false, false>::apply(out, A, B); }
     }
   else
   if( (do_trans_A == true) && (do_trans_B == true) && (use_alpha == true) )
     {
-         if( (A.n_cols == 1) && (is_cx<eT>::no) )  { gemv<false,      true, false>::apply(out, B, A, alpha); }
-    else if( (B.n_rows == 1) && (is_cx<eT>::no) )  { gemv<true,       true, false>::apply(out, A, B, alpha); }
-    else                                           { gemm<true, true, true, false>::apply(out, A, B, alpha); }
+         if( (A.n_cols == 1) && (is_cx<out_eT>::no) )  { gemv<false,      true, false>::apply(out, B, A, alpha); }
+    else if( (B.n_rows == 1) && (is_cx<out_eT>::no) )  { gemv<true,       true, false>::apply(out, A, B, alpha); }
+    else                                               { gemm<true, true, true, false>::apply(out, A, B, alpha); }
     }
   }
 
@@ -360,7 +376,10 @@ glue_times::apply
 
 template
   <
-  typename   eT,
+  typename   out_eT,
+  typename   eT1,
+  typename   eT2,
+  typename   eT3,
   const bool do_trans_A,
   const bool do_trans_B,
   const bool do_trans_C,
@@ -370,33 +389,33 @@ inline
 void
 glue_times::apply
   (
-        Mat<eT>& out,
-  const Mat<eT>& A,
-  const Mat<eT>& B,
-  const Mat<eT>& C,
-  const eT       alpha
+        Mat<out_eT>& out,
+  const Mat<eT1>&    A,
+  const Mat<eT2>&    B,
+  const Mat<eT3>&    C,
+  const out_eT       alpha
   )
   {
   coot_extra_debug_sigprint();
   
-  Mat<eT> tmp;
+  Mat<out_eT> tmp;
   
-  const uword storage_cost_AB = glue_times::mul_storage_cost<eT, do_trans_A, do_trans_B>(A, B);
-  const uword storage_cost_BC = glue_times::mul_storage_cost<eT, do_trans_B, do_trans_C>(B, C);
+  const uword storage_cost_AB = glue_times::mul_storage_cost<eT1, eT2, do_trans_A, do_trans_B>(A, B);
+  const uword storage_cost_BC = glue_times::mul_storage_cost<eT1, eT2, do_trans_B, do_trans_C>(B, C);
   
   if(storage_cost_AB <= storage_cost_BC)
     {
     // out = (A*B)*C
     
-    glue_times::apply<eT, do_trans_A, do_trans_B, use_alpha>(tmp, A,   B, alpha);
-    glue_times::apply<eT, false,      do_trans_C, false    >(out, tmp, C, eT(0));
+    glue_times::apply<out_eT, eT1, eT2, do_trans_A, do_trans_B, use_alpha>(tmp, A,   B, alpha);
+    glue_times::apply<out_eT, eT1, eT2, false,      do_trans_C, false    >(out, tmp, C, out_eT(0));
     }
   else
     {
     // out = A*(B*C)
     
-    glue_times::apply<eT, do_trans_B, do_trans_C, use_alpha>(tmp, B, C,   alpha);
-    glue_times::apply<eT, do_trans_A, false,      false    >(out, A, tmp, eT(0));
+    glue_times::apply<out_eT, eT1, eT2, do_trans_B, do_trans_C, use_alpha>(tmp, B, C,   alpha);
+    glue_times::apply<out_eT, eT1, eT2, do_trans_A, false,      false    >(out, A, tmp, out_eT(0));
     }
   }
 
@@ -404,7 +423,11 @@ glue_times::apply
 
 template
   <
-  typename   eT,
+  typename   out_eT,
+  typename   eT1,
+  typename   eT2,
+  typename   eT3,
+  typename   eT4,
   const bool do_trans_A,
   const bool do_trans_B,
   const bool do_trans_C,
@@ -415,36 +438,36 @@ inline
 void
 glue_times::apply
   (
-        Mat<eT>& out,
-  const Mat<eT>& A,
-  const Mat<eT>& B,
-  const Mat<eT>& C,
-  const Mat<eT>& D,
-  const eT       alpha
+        Mat<out_eT>& out,
+  const Mat<eT1>& A,
+  const Mat<eT2>& B,
+  const Mat<eT3>& C,
+  const Mat<eT4>& D,
+  const out_eT    alpha
   )
   {
   coot_extra_debug_sigprint();
   
-  Mat<eT> tmp;
+  Mat<out_eT> tmp;
   
-  const uword storage_cost_AC = glue_times::mul_storage_cost<eT, do_trans_A, do_trans_C>(A, C);
-  const uword storage_cost_BD = glue_times::mul_storage_cost<eT, do_trans_B, do_trans_D>(B, D);
+  const uword storage_cost_AC = glue_times::mul_storage_cost<eT1, eT3, do_trans_A, do_trans_C>(A, C);
+  const uword storage_cost_BD = glue_times::mul_storage_cost<eT2, eT4, do_trans_B, do_trans_D>(B, D);
   
   if(storage_cost_AC <= storage_cost_BD)
     {
     // out = (A*B*C)*D
     
-    glue_times::apply<eT, do_trans_A, do_trans_B, do_trans_C, use_alpha>(tmp, A, B, C, alpha);
+    glue_times::apply<out_eT, eT1, eT2, eT3, do_trans_A, do_trans_B, do_trans_C, use_alpha>(tmp, A, B, C, alpha);
     
-    glue_times::apply<eT, false, do_trans_D, false>(out, tmp, D, eT(0));
+    glue_times::apply<out_eT, eT4, out_eT, false, do_trans_D, false>(out, tmp, D, out_eT(0));
     }
   else
     {
     // out = A*(B*C*D)
     
-    glue_times::apply<eT, do_trans_B, do_trans_C, do_trans_D, use_alpha>(tmp, B, C, D, alpha);
+    glue_times::apply<out_eT, eT2, eT3, eT4, do_trans_B, do_trans_C, do_trans_D, use_alpha>(tmp, B, C, D, alpha);
     
-    glue_times::apply<eT, do_trans_A, false, false>(out, A, tmp, eT(0));
+    glue_times::apply<out_eT, eT1, out_eT, do_trans_A, false, false>(out, A, tmp, out_eT(0));
     }
   }
 

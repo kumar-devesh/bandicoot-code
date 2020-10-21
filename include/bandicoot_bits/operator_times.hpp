@@ -27,7 +27,7 @@ operator*
   {
   coot_extra_debug_sigprint();
   
-  return eOp<T1, eop_scalar_times>(X,k);
+  return eOp<T1, eop_scalar_times>(X, k);
   }
 
 
@@ -41,7 +41,7 @@ operator*
   {
   coot_extra_debug_sigprint();
   
-  return eOp<T1, eop_scalar_times>(X,k);  // NOTE: order is swapped
+  return eOp<T1, eop_scalar_times>(X, k);  // NOTE: order is swapped
   }
 
 
@@ -100,7 +100,7 @@ typename
 enable_if2
   <
   (is_coot_type<T1>::value && is_coot_type<T2>::value && (is_same_type<typename T1::elem_type, typename T2::elem_type>::no)),
-  const mtGlue< typename promote_type<typename T1::elem_type, typename T2::elem_type>::result, T1, T2, glue_mixed_times >
+  const Glue< T1, T2, glue_mixed_times >
   >::result
 operator*
   (
@@ -113,11 +113,9 @@ operator*
   typedef typename T1::elem_type eT1;
   typedef typename T2::elem_type eT2;
   
-  typedef typename promote_type<eT1,eT2>::result out_eT;
-  
   promote_type<eT1,eT2>::check();
   
-  return mtGlue<out_eT, T1, T2, glue_mixed_times>( X, Y );
+  return Glue<T1, T2, glue_mixed_times>( X, Y );
   }
 
 

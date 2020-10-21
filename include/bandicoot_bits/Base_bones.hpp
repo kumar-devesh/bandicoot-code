@@ -21,7 +21,7 @@
 template<typename derived>
 struct Base_inv_yes
   {
-  coot_inline const Op<derived,op_inv> i() const;   //!< matrix inverse
+  coot_inline const Op<derived, op_inv> i() const;   //!< matrix inverse
   };
 
 
@@ -70,18 +70,18 @@ struct Base_eval<elem_type, derived, false> { typedef Base_eval_expr<elem_type, 
 template<typename derived>
 struct Base_trans_cx
   {
-  coot_inline const Op<derived,op_htrans>  t() const;
-  coot_inline const Op<derived,op_htrans> ht() const;
-  coot_inline const Op<derived,op_strans> st() const;  // simple transpose: no complex conjugates
+  coot_inline const Op<derived, op_htrans>  t() const;
+  coot_inline const Op<derived, op_htrans> ht() const;
+  coot_inline const Op<derived, op_strans> st() const;  // simple transpose: no complex conjugates
   };
 
 
 template<typename derived>
 struct Base_trans_default
   {
-  coot_inline const Op<derived,op_htrans>  t() const;
-  coot_inline const Op<derived,op_htrans> ht() const;
-  coot_inline const Op<derived,op_htrans> st() const;  // return op_htrans instead of op_strans, as it's handled better by matrix multiplication code
+  coot_inline const Op<derived, op_htrans>  t() const;
+  coot_inline const Op<derived, op_htrans> ht() const;
+  coot_inline const Op<derived, op_htrans> st() const;  // return op_htrans instead of op_strans, as it's handled better by matrix multiplication code
   };
 
 

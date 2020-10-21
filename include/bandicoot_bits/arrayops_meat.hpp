@@ -18,10 +18,10 @@
 
 
 
-template<typename eT>
+template<typename out_eT, typename in_eT>
 inline
 void
-arrayops::copy(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem)
+arrayops::copy(dev_mem_t<out_eT> dest, dev_mem_t<in_eT> src, const uword n_elem)
   {
   coot_extra_debug_sigprint();
 
@@ -37,7 +37,7 @@ arrayops::inplace_set_scalar(dev_mem_t<eT> dest, const eT val, const uword n_ele
   {
   coot_extra_debug_sigprint();
 
-  coot_rt_t::inplace_op_scalar(dest, val, n_elem, kernel_id::inplace_set_scalar);
+  coot_rt_t::inplace_op_scalar(dest, val, n_elem, oneway_kernel_id::inplace_set_scalar);
   }
 
 
@@ -49,7 +49,7 @@ arrayops::inplace_plus_scalar(dev_mem_t<eT> dest, const eT val, const uword n_el
   {
   coot_extra_debug_sigprint();
 
-  coot_rt_t::inplace_op_scalar(dest, val, n_elem, kernel_id::inplace_plus_scalar);
+  coot_rt_t::inplace_op_scalar(dest, val, n_elem, oneway_kernel_id::inplace_plus_scalar);
   }
 
 
@@ -62,7 +62,7 @@ arrayops::inplace_minus_scalar(dev_mem_t<eT> dest, const eT val, const uword n_e
   {
   coot_extra_debug_sigprint();
 
-  coot_rt_t::inplace_op_scalar(dest, val, n_elem, kernel_id::inplace_minus_scalar);
+  coot_rt_t::inplace_op_scalar(dest, val, n_elem, oneway_kernel_id::inplace_minus_scalar);
   }
 
 
@@ -75,7 +75,7 @@ arrayops::inplace_mul_scalar(dev_mem_t<eT> dest, const eT val, const uword n_ele
   {
   coot_extra_debug_sigprint();
 
-  coot_rt_t::inplace_op_scalar(dest, val, n_elem, kernel_id::inplace_mul_scalar);
+  coot_rt_t::inplace_op_scalar(dest, val, n_elem, oneway_kernel_id::inplace_mul_scalar);
   }
 
 
@@ -88,55 +88,55 @@ arrayops::inplace_div_scalar(dev_mem_t<eT> dest, const eT val, const uword n_ele
   {
   coot_extra_debug_sigprint();
 
-  coot_rt_t::inplace_op_scalar(dest, val, n_elem, kernel_id::inplace_div_scalar);
+  coot_rt_t::inplace_op_scalar(dest, val, n_elem, oneway_kernel_id::inplace_div_scalar);
   }
 
 
 
-template<typename eT>
+template<typename eT1, typename eT2>
 inline
 void
-arrayops::inplace_plus_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem)
+arrayops::inplace_plus_array(dev_mem_t<eT2> dest, dev_mem_t<eT1> src, const uword n_elem)
   {
   coot_extra_debug_sigprint();
 
-  coot_rt_t::inplace_op_array(dest, src, n_elem, kernel_id::inplace_plus_array);
+  coot_rt_t::inplace_op_array(dest, src, n_elem, twoway_kernel_id::inplace_plus_array);
   }
 
 
 
-template<typename eT>
+template<typename eT1, typename eT2>
 inline
 void
-arrayops::inplace_minus_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem)
+arrayops::inplace_minus_array(dev_mem_t<eT2> dest, dev_mem_t<eT1> src, const uword n_elem)
   {
   coot_extra_debug_sigprint();
 
-  coot_rt_t::inplace_op_array(dest, src, n_elem, kernel_id::inplace_minus_array);
+  coot_rt_t::inplace_op_array(dest, src, n_elem, twoway_kernel_id::inplace_minus_array);
   }
 
 
 
-template<typename eT>
+template<typename eT1, typename eT2>
 inline
 void
-arrayops::inplace_mul_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem)
+arrayops::inplace_mul_array(dev_mem_t<eT2> dest, dev_mem_t<eT1> src, const uword n_elem)
   {
   coot_extra_debug_sigprint();
 
-  coot_rt_t::inplace_op_array(dest, src, n_elem, kernel_id::inplace_mul_array);
+  coot_rt_t::inplace_op_array(dest, src, n_elem, twoway_kernel_id::inplace_mul_array);
   }
 
 
 
-template<typename eT>
+template<typename eT1, typename eT2>
 inline
 void
-arrayops::inplace_div_array(dev_mem_t<eT> dest, dev_mem_t<eT> src, const uword n_elem)
+arrayops::inplace_div_array(dev_mem_t<eT2> dest, dev_mem_t<eT1> src, const uword n_elem)
   {
   coot_extra_debug_sigprint();
 
-  coot_rt_t::inplace_op_array(dest, src, n_elem, kernel_id::inplace_div_array);
+  coot_rt_t::inplace_op_array(dest, src, n_elem, twoway_kernel_id::inplace_div_array);
   }
 
 

@@ -31,6 +31,7 @@ class Op : public Base< typename T1::elem_type, Op<T1, op_type> >
   inline          Op(const T1& in_m, const elem_type in_aux,         const uword in_aux_uword_a, const uword in_aux_uword_b);
   inline          Op(const T1& in_m, const uword     in_aux_uword_a, const uword in_aux_uword_b);
   inline          Op(const T1& in_m, const uword     in_aux_uword_a, const uword in_aux_uword_b, const uword in_aux_uword_c, const char junk);
+
   inline         ~Op();
   
   coot_aligned const T1&       m;

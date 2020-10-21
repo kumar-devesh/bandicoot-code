@@ -121,7 +121,7 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
     }
 
   // Now we need to set the lower triangular part of the matrix to zeros.
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(kernel_id::ltri_set_zero);
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::ltri_set_zero);
 
   const void* args[] = {
       &(mem.cuda_mem_ptr),

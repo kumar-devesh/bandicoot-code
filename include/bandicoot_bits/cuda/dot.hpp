@@ -18,12 +18,14 @@
 /**
  * Compute a dot product between two vectors.
  */
-template<typename eT>
+template<typename eT1, typename eT2>
 inline
-eT
-dot(dev_mem_t<eT> mem1, dev_mem_t<eT> mem2, const uword n_elem)
+typename promote_type<eT1, eT2>::result
+dot(dev_mem_t<eT1> mem1, dev_mem_t<eT2> mem2, const uword n_elem)
   {
   coot_extra_debug_sigprint();
+
+  typedef typename promote_type<eT1, eT2>::result promoted_eT;
 
   coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "cuda runtime not valid" );
 
@@ -42,11 +44,11 @@ dot(dev_mem_t<eT> mem1, dev_mem_t<eT> mem2, const uword n_elem)
 
   const uword chunk_size = n_elem / n_chunks;
 
-  Mat<eT> tmp(n_chunks, 1);
+  Mat<promoted_eT> tmp(n_chunks, 1);
 
-  CUfunction k1 = get_rt().cuda_rt.get_kernel<eT>(kernel_id::dot_chunked);
+  CUfunction k1 = get_rt().cuda_rt.get_kernel<eT2, eT1>(twoway_kernel_id::dot_chunked);
 
-  dev_mem_t<eT> tmp_mem = tmp.get_dev_mem(false);
+  dev_mem_t<promoted_eT> tmp_mem = tmp.get_dev_mem(false);
 
   const void* args[] = {
       &(tmp_mem.cuda_mem_ptr),
@@ -69,7 +71,7 @@ dot(dev_mem_t<eT> mem1, dev_mem_t<eT> mem2, const uword n_elem)
 
   // Now that we've computed a partial sum, sum it.  This is really not the best approach; it only uses one thread.  It could be improved to repeatedly use, e.g., accu_chunked.
 
-  CUfunction k2 = get_rt().cuda_rt.get_kernel<eT>(kernel_id::dot_twostage);
+  CUfunction k2 = get_rt().cuda_rt.get_kernel<eT2, eT1>(twoway_kernel_id::dot_twostage);
 
   const size_t A_start = n_chunks * chunk_size;
 
@@ -91,7 +93,7 @@ dot(dev_mem_t<eT> mem1, dev_mem_t<eT> mem2, const uword n_elem)
 
   coot_check_cuda_error(result, "cuda::dot(): cuLaunchKernel() failed");
 
-  eT ret = eT(tmp(0));
+  promoted_eT ret = promoted_eT(tmp(0));
 
   return ret;
   }

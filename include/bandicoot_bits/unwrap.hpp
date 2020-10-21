@@ -99,42 +99,23 @@ struct unwrap< Col<eT> >
 
 
 
-template<typename out_eT, typename T1, typename T2, typename glue_type>
-struct unwrap< mtGlue<out_eT, T1, T2, glue_type> >
+// Since this is not no_conv_unwrap, we have to ensure that the stored_type has the correct out_eT.
+template<typename out_eT, typename T1>
+struct unwrap< mtOp<out_eT, T1, mtop_conv_to> >
   {
   typedef Mat<out_eT> stored_type;
-  
+
   inline
-  unwrap(const mtGlue<out_eT, T1, T2, glue_type>& A)
+  unwrap(const mtOp<out_eT, T1, mtop_conv_to>& A)
     : M(A)
     {
     coot_extra_debug_sigprint();
     }
-  
+
   const Mat<out_eT> M;
-  
+
   template<typename eT2>
-  coot_inline bool is_alias(const Mat<eT2>&) const { return false; }
-  };
-
-
-
-template<typename out_eT, typename T1, typename op_type>
-struct unwrap< mtOp<out_eT, T1, op_type> >
-  {
-  typedef Mat<out_eT> stored_type;
-  
-  inline
-  unwrap(const mtOp<out_eT, T1, op_type>& A)
-    : M(A)
-    {
-    coot_extra_debug_sigprint();
-    }
-  
-  const Mat<out_eT> M;
-  
-  template<typename eT2>
-  coot_inline bool is_alias(const Mat<eT2>&) const { return false; }
+  coot_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
   };
 
 
@@ -247,7 +228,7 @@ template<typename T1>
 struct partial_unwrap< Op<T1, op_htrans2> >
   {
   typedef typename T1::elem_type eT;
-  typedef Mat<eT>                stored_type;
+  typedef Mat<eT> stored_type;
   
   inline
   partial_unwrap(const Op<T1, op_htrans2>& A)
@@ -276,7 +257,7 @@ struct partial_unwrap< Op< Mat<eT>, op_htrans2> >
   typedef Mat<eT> stored_type;
   
   inline
-  partial_unwrap(const Op< Mat<eT>, op_htrans2>& A)
+  partial_unwrap(const Op<Mat<eT>, op_htrans2>& A)
     : val(A.aux)
     , M  (A.m)
     {
@@ -296,42 +277,15 @@ struct partial_unwrap< Op< Mat<eT>, op_htrans2> >
 
 
 
-template<typename T1>
-struct partial_unwrap< eOp<T1, eop_scalar_times> >
-  {
-  typedef typename T1::elem_type eT;
-  typedef Mat<eT>                stored_type;
-  
-  inline
-  partial_unwrap(const eOp<T1, eop_scalar_times>& A)
-    : val(A.aux)
-    , M  (A.P.Q)
-    {
-    coot_extra_debug_sigprint();
-    }
-  
-  coot_inline eT get_val() const { return val; }
-  
-  coot_inline bool is_alias(const Mat<eT>&) const { return false; }
-  
-  static const bool do_trans = false;
-  static const bool do_times = true;
-  
-  const eT      val;
-  const Mat<eT> M;
-  };
-
-
-
 template<typename eT>
 struct partial_unwrap< eOp<Mat<eT>, eop_scalar_times> >
   {
   typedef Mat<eT> stored_type;
   
   inline
-  partial_unwrap(const eOp<Mat<eT>,eop_scalar_times>& A)
+  partial_unwrap(const eOp<Mat<eT>, eop_scalar_times>& A)
     : val(A.aux)
-    , M  (A.P.Q)
+    , M  (A.m.Q)
     {
     coot_extra_debug_sigprint();
     }
@@ -349,39 +303,14 @@ struct partial_unwrap< eOp<Mat<eT>, eop_scalar_times> >
 
 
 
-template<typename T1>
-struct partial_unwrap< eOp<T1, eop_neg> >
-  {
-  typedef typename T1::elem_type eT;
-  typedef Mat<eT>                stored_type;
-  
-  inline
-  partial_unwrap(const eOp<T1, eop_neg>& A)
-    : M(A.P.Q)
-    {
-    coot_extra_debug_sigprint();
-    }
-  
-  coot_inline eT get_val() const { return eT(-1); }
-  
-  coot_inline bool is_alias(const Mat<eT>&) const { return false; }
-  
-  static const bool do_trans = false;
-  static const bool do_times = true;
-  
-  const Mat<eT> M;
-  };
-
-
-
 template<typename eT>
 struct partial_unwrap< eOp<Mat<eT>, eop_neg> >
   {
   typedef Mat<eT> stored_type;
   
   inline
-  partial_unwrap(const eOp<Mat<eT>,eop_neg>& A)
-    : M(A.P.Q)
+  partial_unwrap(const eOp<Mat<eT>, eop_neg>& A)
+    : M(A.m.Q)
     {
     coot_extra_debug_sigprint();
     }
@@ -394,6 +323,35 @@ struct partial_unwrap< eOp<Mat<eT>, eop_neg> >
   static const bool do_times = true;
   
   const Mat<eT>& M;
+  };
+
+
+
+// To partially unwrap a conversion operation, perform only the conversion---and partially unwrap everything else.
+template<typename eT, typename T1, typename mtop_type>
+struct partial_unwrap< mtOp<eT, T1, mtop_type> >
+  {
+  typedef Mat<eT> stored_type;
+
+  inline
+  partial_unwrap(const mtOp<eT, T1, mtop_type>& X)
+    : Q(X.q)
+    // It's possible this can miss some opportunities to merge the conversion with the operation,
+    // but we don't currently have a great way to capture the not-yet-unwrapped type held in any T1.
+    , M(mtOp<eT, typename partial_unwrap<T1>::stored_type, mtop_type>(Q.M))
+    {
+    coot_extra_debug_sigprint();
+    }
+
+  inline eT get_val() const { return Q.get_val(); }
+
+  coot_hot coot_inline bool is_alias(const Mat<eT>& X) const { return false; }
+
+  static const bool do_trans = partial_unwrap<T1>::do_trans;
+  static const bool do_times = partial_unwrap<T1>::do_times;
+
+  const partial_unwrap<T1> Q;
+  Mat<eT> M;
   };
 
 

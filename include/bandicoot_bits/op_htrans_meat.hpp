@@ -18,20 +18,18 @@
 
 
 
-template<typename T1>
+template<typename out_eT, typename T1>
 inline 
 void
-op_htrans::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_htrans>& in)
+op_htrans::apply(Mat<out_eT>& out, const Op<T1, op_htrans>& in)
   {
   coot_extra_debug_sigprint();
   
-  typedef typename T1::elem_type eT;
-  
-  const unwrap<T1> U(in.m);
+  const no_conv_unwrap<T1> U(in.m);
   
   if(U.is_alias(out))
     {
-    Mat<eT> tmp;
+    Mat<out_eT> tmp;
     
     op_htrans::apply_noalias(tmp, U.M);
     
@@ -45,10 +43,13 @@ op_htrans::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_htrans>& in)
 
 
 
-template<typename eT>
+template<typename out_eT, typename in_eT>
 inline
 void
-op_htrans::apply_noalias(Mat<eT>& out, const Mat<eT>& A, const typename coot_not_cx<eT>::result* junk)
+op_htrans::apply_noalias(Mat<out_eT>& out,
+                         const Mat<in_eT>& A,
+                         const typename coot_not_cx<in_eT>::result*,
+                         const typename coot_not_cx<out_eT>::result*)
   {
   coot_extra_debug_sigprint();
   
@@ -57,10 +58,13 @@ op_htrans::apply_noalias(Mat<eT>& out, const Mat<eT>& A, const typename coot_not
 
 
 
-template<typename eT>
+template<typename out_eT, typename in_eT>
 inline
 void
-op_htrans::apply_noalias(Mat<eT>& out, const Mat<eT>& A, const typename coot_cx_only<eT>::result* junk)
+op_htrans::apply_noalias(Mat<out_eT>& out,
+                         const Mat<in_eT>& A,
+                         const typename coot_cx_only<in_eT>::result*,
+                         const typename coot_cx_only<out_eT>::result*)
   {
   coot_extra_debug_sigprint();
   
@@ -73,20 +77,18 @@ op_htrans::apply_noalias(Mat<eT>& out, const Mat<eT>& A, const typename coot_cx_
 
 
 
-template<typename T1>
+template<typename out_eT, typename T1>
 inline 
 void
-op_htrans2::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_htrans2>& in)
+op_htrans2::apply(Mat<out_eT>& out, const Op<T1, op_htrans2>& in)
   {
   coot_extra_debug_sigprint();
   
-  typedef typename T1::elem_type eT;
-  
-  const unwrap<T1> U(in.m);
+  const no_conv_unwrap<T1> U(in.m);
   
   if(U.is_alias(out))
     {
-    Mat<eT> tmp;
+    Mat<out_eT> tmp;
     
     op_htrans2::apply_noalias(tmp, U.M);
     
@@ -100,10 +102,13 @@ op_htrans2::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_htrans2>& in)
 
 
 
-template<typename eT>
+template<typename out_eT, typename in_eT>
 inline
 void
-op_htrans2::apply_noalias(Mat<eT>& out, const Mat<eT>& A, const typename coot_not_cx<eT>::result* junk)
+op_htrans2::apply_noalias(Mat<out_eT>& out,
+                          const Mat<in_eT>& A,
+                          const typename coot_not_cx<in_eT>::result*,
+                          const typename coot_not_cx<out_eT>::result*)
   {
   coot_extra_debug_sigprint();
   
@@ -112,10 +117,13 @@ op_htrans2::apply_noalias(Mat<eT>& out, const Mat<eT>& A, const typename coot_no
 
 
 
-template<typename eT>
+template<typename out_eT, typename in_eT>
 inline
 void
-op_htrans2::apply_noalias(Mat<eT>& out, const Mat<eT>& A, const typename coot_cx_only<eT>::result* junk)
+op_htrans2::apply_noalias(Mat<out_eT>& out,
+                          const Mat<in_eT>& A,
+                          const typename coot_cx_only<in_eT>::result*,
+                          const typename coot_cx_only<out_eT>::result*)
   {
   coot_extra_debug_sigprint();
   

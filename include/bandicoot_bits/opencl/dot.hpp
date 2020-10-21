@@ -19,14 +19,16 @@
 /**
  * Compute the dot product of two vectors.
  */
-template<typename eT>
+template<typename eT1, typename eT2>
 inline
-eT
-dot(dev_mem_t<eT> mem1, dev_mem_t<eT> mem2, const uword n_elem)
+typename promote_type<eT1, eT2>::result
+dot(dev_mem_t<eT1> mem1, dev_mem_t<eT2> mem2, const uword n_elem)
   {
   coot_extra_debug_sigprint();
 
   coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot_cl_rt not valid" );
+
+  typedef typename promote_type<eT1, eT2>::result promoted_eT;
 
   // work out the number of chunks, ensuring that there are at least 4 elements per compunit
 
@@ -43,15 +45,15 @@ dot(dev_mem_t<eT> mem1, dev_mem_t<eT> mem2, const uword n_elem)
 
   const uword chunk_size = n_elem / n_chunks;
 
-  Mat<eT> tmp(n_chunks, 1);
+  Mat<promoted_eT> tmp(n_chunks, 1);
 
   runtime_t::cq_guard guard;
 
   cl_int status = 0;
 
-  cl_kernel k1 = get_rt().cl_rt.get_kernel<eT>(kernel_id::dot_chunked);
+  cl_kernel k1 = get_rt().cl_rt.get_kernel<eT2, eT1>(twoway_kernel_id::dot_chunked);
 
-  dev_mem_t<eT> tmp_mem = tmp.get_dev_mem(false);
+  dev_mem_t<promoted_eT> tmp_mem = tmp.get_dev_mem(false);
 
   runtime_t::adapt_uword dev_chunk_size(chunk_size);
   runtime_t::adapt_uword dev_n_chunks  (n_chunks  );
@@ -72,7 +74,7 @@ dot(dev_mem_t<eT> mem1, dev_mem_t<eT> mem2, const uword n_elem)
 
   clFlush(get_rt().cl_rt.get_cq());
 
-  cl_kernel k2 = get_rt().cl_rt.get_kernel<eT>(kernel_id::dot_twostage);
+  cl_kernel k2 = get_rt().cl_rt.get_kernel<eT2, eT1>(twoway_kernel_id::dot_twostage);
 
   runtime_t::adapt_uword dev_out_len(tmp.n_elem);
   runtime_t::adapt_uword dev_A_start(n_chunks * chunk_size);
@@ -95,5 +97,5 @@ dot(dev_mem_t<eT> mem1, dev_mem_t<eT> mem2, const uword n_elem)
 
   clFlush(get_rt().cl_rt.get_cq());
 
-  return tmp(0);
+  return promoted_eT(tmp(0));
   }

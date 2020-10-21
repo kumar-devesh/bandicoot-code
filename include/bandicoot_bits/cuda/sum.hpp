@@ -18,14 +18,14 @@
 
 
 
-template<typename eT>
+template<typename eT1, typename eT2>
 inline
 void
-sum_colwise(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword n_rows, const uword n_cols)
+sum_colwise(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword n_rows, const uword n_cols, const bool post_conv_apply)
   {
   coot_extra_debug_sigprint();
 
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(kernel_id::sum_colwise);
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT2, eT1>(post_conv_apply ? twoway_kernel_id::sum_colwise_conv_post : twoway_kernel_id::sum_colwise_conv_pre);
 
   const void* args[] = {
       &(out.cuda_mem_ptr),
@@ -48,14 +48,14 @@ sum_colwise(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword n_rows, const 
 
 
 
-template<typename eT>
+template<typename eT1, typename eT2>
 inline
 void
-sum_rowwise(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword n_rows, const uword n_cols)
+sum_rowwise(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword n_rows, const uword n_cols, const bool post_conv_apply)
   {
   coot_extra_debug_sigprint();
 
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(kernel_id::sum_rowwise);
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT2, eT1>(post_conv_apply ? twoway_kernel_id::sum_rowwise_conv_post : twoway_kernel_id::sum_rowwise_conv_pre);
 
   const void* args[] = {
       &(out.cuda_mem_ptr),
@@ -78,14 +78,14 @@ sum_rowwise(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword n_rows, const 
 
 
 
-template<typename eT>
+template<typename eT1, typename eT2>
 inline
 void
-sum_colwise_subview(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword M_n_rows, const uword start_row, const uword start_col, const uword n_rows, const uword n_cols)
+sum_colwise_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword M_n_rows, const uword start_row, const uword start_col, const uword n_rows, const uword n_cols, const bool post_conv_apply)
   {
   coot_extra_debug_sigprint();
 
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(kernel_id::submat_sum_colwise);
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT2, eT1>(post_conv_apply ? twoway_kernel_id::submat_sum_colwise_conv_post : twoway_kernel_id::submat_sum_colwise_conv_pre);
 
   const void* args[] = {
       &(out.cuda_mem_ptr),
@@ -111,14 +111,14 @@ sum_colwise_subview(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword M_n_ro
 
 
 
-template<typename eT>
+template<typename eT1, typename eT2>
 inline
 void
-sum_rowwise_subview(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword M_n_rows, const uword start_row, const uword start_col, const uword n_rows, const uword n_cols)
+sum_rowwise_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword M_n_rows, const uword start_row, const uword start_col, const uword n_rows, const uword n_cols, const bool post_conv_apply)
   {
   coot_extra_debug_sigprint();
 
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(kernel_id::submat_sum_rowwise);
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT2, eT1>(post_conv_apply ? twoway_kernel_id::submat_sum_rowwise_conv_post : twoway_kernel_id::submat_sum_rowwise_conv_pre);
 
   const void* args[] = {
       &(out.cuda_mem_ptr),

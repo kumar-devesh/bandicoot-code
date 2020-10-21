@@ -18,10 +18,10 @@
 
 
 
-template<typename eT>
+template<typename eT1, typename eT2>
 inline
 void
-sum_colwise(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword n_rows, const uword n_cols)
+sum_colwise(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword n_rows, const uword n_cols, const bool post_conv_apply)
   {
   coot_extra_debug_sigprint();
 
@@ -29,7 +29,7 @@ sum_colwise(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword n_rows, const 
 
   runtime_t::cq_guard guard;
 
-  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(kernel_id::sum_colwise);
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT2, eT1>(post_conv_apply ? twoway_kernel_id::sum_colwise_conv_post : twoway_kernel_id::sum_colwise_conv_pre);
 
   cl_int status = 0;
 
@@ -52,10 +52,10 @@ sum_colwise(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword n_rows, const 
 
 
 
-template<typename eT>
+template<typename eT1, typename eT2>
 inline
 void
-sum_rowwise(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword n_rows, const uword n_cols)
+sum_rowwise(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword n_rows, const uword n_cols, const bool post_conv_apply)
   {
   coot_extra_debug_sigprint();
 
@@ -63,7 +63,7 @@ sum_rowwise(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword n_rows, const 
 
   runtime_t::cq_guard guard;
 
-  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(kernel_id::sum_rowwise);
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT2, eT1>(post_conv_apply ? twoway_kernel_id::sum_rowwise_conv_post : twoway_kernel_id::sum_rowwise_conv_pre);
 
   cl_int status = 0;
 
@@ -86,10 +86,10 @@ sum_rowwise(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword n_rows, const 
 
 
 
-template<typename eT>
+template<typename eT1, typename eT2>
 inline
 void
-sum_colwise_subview(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword M_n_rows, const uword start_row, const uword start_col, const uword n_rows, const uword n_cols)
+sum_colwise_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword M_n_rows, const uword start_row, const uword start_col, const uword n_rows, const uword n_cols, const bool post_conv_apply)
   {
   coot_extra_debug_sigprint();
 
@@ -97,7 +97,7 @@ sum_colwise_subview(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword M_n_ro
 
   runtime_t::cq_guard guard;
 
-  cl_kernel k1 = get_rt().cl_rt.get_kernel<eT>(kernel_id::submat_sum_colwise);
+  cl_kernel k1 = get_rt().cl_rt.get_kernel<eT2, eT1>(post_conv_apply ? twoway_kernel_id::submat_sum_colwise_conv_post : twoway_kernel_id::submat_sum_colwise_conv_pre);
 
   cl_int status = 0;
 
@@ -128,10 +128,10 @@ sum_colwise_subview(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword M_n_ro
 
 
 
-template<typename eT>
+template<typename eT1, typename eT2>
 inline
 void
-sum_rowwise_subview(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword M_n_rows, const uword start_row, const uword start_col, const uword n_rows, const uword n_cols)
+sum_rowwise_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword M_n_rows, const uword start_row, const uword start_col, const uword n_rows, const uword n_cols, const bool post_conv_apply)
   {
   coot_extra_debug_sigprint();
 
@@ -139,7 +139,7 @@ sum_rowwise_subview(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword M_n_ro
 
   runtime_t::cq_guard guard;
 
-  cl_kernel k1 = get_rt().cl_rt.get_kernel<eT>(kernel_id::submat_sum_rowwise);
+  cl_kernel k1 = get_rt().cl_rt.get_kernel<eT2, eT1>(post_conv_apply ? twoway_kernel_id::submat_sum_rowwise_conv_post : twoway_kernel_id::submat_sum_rowwise_conv_pre);
 
   cl_int status = 0;
 

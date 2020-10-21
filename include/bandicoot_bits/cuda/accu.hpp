@@ -46,7 +46,7 @@ accu_chunked(dev_mem_t<eT> mem, const uword n_elem)
 
   Mat<eT> tmp(n_chunks, 1);
 
-  CUfunction k1 = get_rt().cuda_rt.get_kernel<eT>(kernel_id::accu_chunked);
+  CUfunction k1 = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu_chunked);
 
   dev_mem_t<eT> tmp_mem = tmp.get_dev_mem(false);
 
@@ -68,7 +68,7 @@ accu_chunked(dev_mem_t<eT> mem, const uword n_elem)
 
   coot_check_cuda_error(result, "cuda::accu_chunked(): cuLaunchKernel() failed");
 
-  CUfunction k2 = get_rt().cuda_rt.get_kernel<eT>(kernel_id::accu_twostage);
+  CUfunction k2 = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu_twostage);
 
   const size_t A_start = n_chunks * chunk_size;
 
@@ -108,7 +108,7 @@ accu_simple(dev_mem_t<eT> mem, const uword n_elem)
 
   Mat<eT> tmp(1, 1);
 
-  CUfunction k1 = get_rt().cuda_rt.get_kernel<eT>(kernel_id::accu_simple);
+  CUfunction k1 = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu_simple);
 
   dev_mem_t<eT> tmp_mem = tmp.get_dev_mem(false);
 
@@ -145,7 +145,7 @@ accu_subview(dev_mem_t<eT> mem, const uword m_n_rows, const uword aux_row1, cons
 
   Mat<eT> tmp(1, n_cols);
 
-  CUfunction k1 = get_rt().cuda_rt.get_kernel<eT>(kernel_id::submat_sum_colwise);
+  CUfunction k1 = get_rt().cuda_rt.get_kernel<eT, eT>(twoway_kernel_id::submat_sum_colwise_conv_pre);
 
   dev_mem_t<eT> tmp_mem = tmp.get_dev_mem(false);
 
@@ -172,7 +172,7 @@ accu_subview(dev_mem_t<eT> mem, const uword m_n_rows, const uword aux_row1, cons
 
   // combine the column sums
 
-  CUfunction k2 = get_rt().cuda_rt.get_kernel<eT>(kernel_id::accu_simple);
+  CUfunction k2 = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu_simple);
 
   const void* args2[] = {
       &(tmp_mem.cuda_mem_ptr),

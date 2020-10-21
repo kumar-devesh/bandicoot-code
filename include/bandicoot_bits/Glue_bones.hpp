@@ -32,7 +32,7 @@ class Glue : public Base<typename T1::elem_type, Glue<T1, T2, glue_type> >
   coot_inline  Glue(const T1& in_A, const T2& in_B);
   coot_inline  Glue(const T1& in_A, const T2& in_B, const uword in_aux_uword);
   coot_inline ~Glue();
-  
+
   const T1&   A;
   const T2&   B;
         uword aux_uword;

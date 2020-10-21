@@ -103,7 +103,7 @@ subview<eT>::operator= (const subview<eT>& x)
 template<typename eT>
 inline
 void
-subview<eT>::inplace_op(const eT val, kernel_id::enum_id kernel)
+subview<eT>::inplace_op(const eT val, oneway_kernel_id::enum_id kernel)
   {
   coot_extra_debug_sigprint();
 
@@ -142,7 +142,7 @@ subview<eT>::operator+= (const eT val)
   {
   coot_extra_debug_sigprint();
 
-  inplace_op(val, kernel_id::submat_inplace_plus_scalar);
+  inplace_op(val, oneway_kernel_id::submat_inplace_plus_scalar);
   }
 
 
@@ -154,7 +154,7 @@ subview<eT>::operator-= (const eT val)
   {
   coot_extra_debug_sigprint();
 
-  inplace_op(val, kernel_id::submat_inplace_minus_scalar);
+  inplace_op(val, oneway_kernel_id::submat_inplace_minus_scalar);
   }
 
 
@@ -166,7 +166,7 @@ subview<eT>::operator*= (const eT val)
   {
   coot_extra_debug_sigprint();
 
-  inplace_op(val, kernel_id::submat_inplace_mul_scalar);
+  inplace_op(val, oneway_kernel_id::submat_inplace_mul_scalar);
   }
 
 
@@ -178,7 +178,7 @@ subview<eT>::operator/= (const eT val)
   {
   coot_extra_debug_sigprint();
 
-  inplace_op(val, kernel_id::submat_inplace_div_scalar);
+  inplace_op(val, oneway_kernel_id::submat_inplace_div_scalar);
   }
 
 
@@ -187,12 +187,12 @@ template<typename eT>
 template<typename T1>
 inline
 void
-subview<eT>::inplace_op(const Base<eT,T1>& in, kernel_id::enum_id num, const char* identifier)
+subview<eT>::inplace_op(const Base<eT, T1>& in, twoway_kernel_id::enum_id num, const char* identifier)
   {
   coot_extra_debug_sigprint();
 
-  const unwrap<T1>   U(in.get_ref());
-  const Mat<eT>& X = U.M;
+  const no_conv_unwrap<T1> U(in.get_ref());
+  const typename no_conv_unwrap<T1>::stored_type X = U.M;
 
   coot_assert_same_size(n_rows, n_cols, X.n_rows, X.n_cols, identifier);
 
@@ -207,13 +207,13 @@ template<typename eT>
 template<typename T1>
 inline
 void
-subview<eT>::operator= (const Base<eT,T1>& in)
+subview<eT>::operator= (const Base<eT, T1>& in)
   {
   coot_extra_debug_sigprint();
 
   // TODO: the code below uses the submat_inplace_set_mat kernel, but it may be faster to use the commented-out code with clEnqueueCopyBufferRect() with the OpenCL backend
 
-  inplace_op(in, kernel_id::submat_inplace_set_mat, "subview::operator=()");
+  inplace_op(in, twoway_kernel_id::submat_inplace_set_mat, "subview::operator=()");
     
   /*
   const unwrap<T1>   U(in.get_ref());
@@ -253,11 +253,11 @@ template<typename eT>
 template<typename T1>
 inline
 void
-subview<eT>::operator+= (const Base<eT,T1>& in)
+subview<eT>::operator+= (const Base<eT, T1>& in)
   {
   coot_extra_debug_sigprint();
   
-  inplace_op(in, kernel_id::submat_inplace_plus_mat, "subview::operator+=()");
+  inplace_op(in, twoway_kernel_id::submat_inplace_plus_mat, "subview::operator+=()");
   }
 
 
@@ -266,11 +266,11 @@ template<typename eT>
 template<typename T1>
 inline
 void
-subview<eT>::operator-= (const Base<eT,T1>& in)
+subview<eT>::operator-= (const Base<eT, T1>& in)
   {
   coot_extra_debug_sigprint();
   
-  inplace_op(in, kernel_id::submat_inplace_minus_mat, "subview::operator-=()");
+  inplace_op(in, twoway_kernel_id::submat_inplace_minus_mat, "subview::operator-=()");
   }
 
 
@@ -279,11 +279,11 @@ template<typename eT>
 template<typename T1>
 inline
 void
-subview<eT>::operator%= (const Base<eT,T1>& in)
+subview<eT>::operator%= (const Base<eT, T1>& in)
   {
   coot_extra_debug_sigprint();
   
-  inplace_op(in, kernel_id::submat_inplace_schur_mat, "subview::operator%=()");
+  inplace_op(in, twoway_kernel_id::submat_inplace_schur_mat, "subview::operator%=()");
   }
 
 
@@ -292,11 +292,97 @@ template<typename eT>
 template<typename T1>
 inline
 void
-subview<eT>::operator/= (const Base<eT,T1>& in)
+subview<eT>::operator/= (const Base<eT, T1>& in)
   {
   coot_extra_debug_sigprint();
   
-  inplace_op(in, kernel_id::submat_inplace_div_mat, "subview::operator/=()");
+  inplace_op(in, twoway_kernel_id::submat_inplace_div_mat, "subview::operator/=()");
+  }
+
+
+
+template<typename eT>
+template<typename T1>
+inline
+void
+subview<eT>::inplace_op(const mtOp<eT, T1, mtop_conv_to>& x, twoway_kernel_id::enum_id num, const char* identifier)
+  {
+  coot_extra_debug_sigprint();
+
+  // Avoid explicitly performing the conv_to so we can incorporate it into our operation here.
+  const no_conv_unwrap<T1>   U(x.m.Q);
+  const Mat<typename T1::elem_type>& X = U.M;
+
+  coot_assert_same_size(n_rows, n_cols, X.n_rows, X.n_cols, identifier);
+
+  if(n_elem == 0)  { return; }
+
+  coot_rt_t::inplace_op_subview(m.get_dev_mem(false), X.get_dev_mem(false), m.n_rows, aux_row1, aux_col1, X.n_rows, X.n_cols, num, identifier);
+  }
+
+
+
+template<typename eT>
+template<typename T1>
+inline
+void
+subview<eT>::operator= (const mtOp<eT, T1, mtop_conv_to>& x)
+  {
+  coot_extra_debug_sigprint();
+
+  inplace_op(x, twoway_kernel_id::submat_inplace_set_mat, "subview::operator=()");
+  }
+
+
+
+template<typename eT>
+template<typename T1>
+inline
+void
+subview<eT>::operator+=(const mtOp<eT, T1, mtop_conv_to>& x)
+  {
+  coot_extra_debug_sigprint();
+
+  inplace_op(x, twoway_kernel_id::submat_inplace_plus_mat, "subview::operator+=()");
+  }
+
+
+
+template<typename eT>
+template<typename T1>
+inline
+void
+subview<eT>::operator-=(const mtOp<eT, T1, mtop_conv_to>& x)
+  {
+  coot_extra_debug_sigprint();
+
+  inplace_op(x, twoway_kernel_id::submat_inplace_minus_mat, "subview::operator-=()");
+  }
+
+
+
+template<typename eT>
+template<typename T1>
+inline
+void
+subview<eT>::operator%=(const mtOp<eT, T1, mtop_conv_to>& x)
+  {
+  coot_extra_debug_sigprint();
+
+  inplace_op(x, twoway_kernel_id::submat_inplace_schur_mat, "subview::operator%=()");
+  }
+
+
+
+template<typename eT>
+template<typename T1>
+inline
+void
+subview<eT>::operator/=(const mtOp<eT, T1, mtop_conv_to>& x)
+  {
+  coot_extra_debug_sigprint();
+
+  inplace_op(x, twoway_kernel_id::submat_inplace_div_mat, "subview::operator/=()");
   }
 
 
@@ -308,7 +394,7 @@ subview<eT>::fill(const eT val)
   {
   coot_extra_debug_sigprint();
   
-  (*this).inplace_op(val, kernel_id::submat_inplace_set_scalar);
+  (*this).inplace_op(val, oneway_kernel_id::submat_inplace_set_scalar);
   }
 
 
@@ -454,9 +540,10 @@ subview<eT>::is_empty() const
 
 //! X = Y.submat(...)
 template<typename eT>
+template<typename eT1>
 inline
 void
-subview<eT>::extract(Mat<eT>& out, const subview<eT>& in)
+subview<eT>::extract(Mat<eT1>& out, const subview<eT>& in)
   {
   coot_extra_debug_sigprint();
   
@@ -497,9 +584,10 @@ subview<eT>::extract(Mat<eT>& out, const subview<eT>& in)
 
 //! X += Y.submat(...)
 template<typename eT>
+template<typename eT1>
 inline
 void
-subview<eT>::plus_inplace(Mat<eT>& out, const subview<eT>& in)
+subview<eT>::plus_inplace(Mat<eT1>& out, const subview<eT>& in)
   {
   coot_extra_debug_sigprint();
   
@@ -514,9 +602,10 @@ subview<eT>::plus_inplace(Mat<eT>& out, const subview<eT>& in)
 
 //! X -= Y.submat(...)
 template<typename eT>
+template<typename eT1>
 inline
 void
-subview<eT>::minus_inplace(Mat<eT>& out, const subview<eT>& in)
+subview<eT>::minus_inplace(Mat<eT1>& out, const subview<eT>& in)
   {
   coot_extra_debug_sigprint();
   
@@ -531,9 +620,10 @@ subview<eT>::minus_inplace(Mat<eT>& out, const subview<eT>& in)
 
 //! X %= Y.submat(...)
 template<typename eT>
+template<typename eT1>
 inline
 void
-subview<eT>::schur_inplace(Mat<eT>& out, const subview<eT>& in)
+subview<eT>::schur_inplace(Mat<eT1>& out, const subview<eT>& in)
   {
   coot_extra_debug_sigprint();
   
@@ -548,9 +638,10 @@ subview<eT>::schur_inplace(Mat<eT>& out, const subview<eT>& in)
 
 //! X /= Y.submat(...)
 template<typename eT>
+template<typename eT1>
 inline
 void
-subview<eT>::div_inplace(Mat<eT>& out, const subview<eT>& in)
+subview<eT>::div_inplace(Mat<eT1>& out, const subview<eT>& in)
   {
   coot_extra_debug_sigprint();
   

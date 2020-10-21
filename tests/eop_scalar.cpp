@@ -434,19 +434,19 @@ TEST_CASE("submat_huge_scalar_fill")
 
 
 
-template<typename eT>
+template<typename eT1, typename eT2>
 void test_eop_scalar_plus()
   {
-  Mat<eT> x(5, 5);
-  x.fill(eT(3));
+  Mat<eT1> x(5, 5);
+  x.fill(eT1(3));
 
-  Mat<eT> y = x + eT(1);
+  Mat<eT2> y = conv_to<Mat<eT2>>::from(x) + eT2(1);
 
   for (uword r = 0; r < 5; ++r)
     {
     for (uword c = 0; c < 5; ++c)
       {
-      REQUIRE( eT(y(r, c)) == Approx(eT(x(r, c)) + eT(1)) );
+      REQUIRE( eT2(y(r, c)) == Approx(eT2(eT1(x(r, c)) + eT2(1))) );
       }
     }
   }
@@ -455,12 +455,42 @@ void test_eop_scalar_plus()
 
 TEST_CASE("eop_scalar_plus_1")
   {
-  test_eop_scalar_plus<float>();
-  test_eop_scalar_plus<double>();
-  test_eop_scalar_plus<u32>();
-  test_eop_scalar_plus<s32>();
-  test_eop_scalar_plus<u64>();
-  test_eop_scalar_plus<s64>();
+  test_eop_scalar_plus<u32, u32>();
+  test_eop_scalar_plus<u32, s32>();
+  test_eop_scalar_plus<u32, u64>();
+  test_eop_scalar_plus<u32, s64>();
+  test_eop_scalar_plus<u32, float>();
+  test_eop_scalar_plus<u32, double>();
+  test_eop_scalar_plus<s32, u32>();
+  test_eop_scalar_plus<s32, s32>();
+  test_eop_scalar_plus<s32, u64>();
+  test_eop_scalar_plus<s32, s64>();
+  test_eop_scalar_plus<s32, float>();
+  test_eop_scalar_plus<s32, double>();
+  test_eop_scalar_plus<u64, u32>();
+  test_eop_scalar_plus<u64, s32>();
+  test_eop_scalar_plus<u64, u64>();
+  test_eop_scalar_plus<u64, s64>();
+  test_eop_scalar_plus<u64, float>();
+  test_eop_scalar_plus<u64, double>();
+  test_eop_scalar_plus<s64, u32>();
+  test_eop_scalar_plus<s64, s32>();
+  test_eop_scalar_plus<s64, u64>();
+  test_eop_scalar_plus<s64, s64>();
+  test_eop_scalar_plus<s64, float>();
+  test_eop_scalar_plus<s64, double>();
+  test_eop_scalar_plus<float, u32>();
+  test_eop_scalar_plus<float, s32>();
+  test_eop_scalar_plus<float, u64>();
+  test_eop_scalar_plus<float, s64>();
+  test_eop_scalar_plus<float, float>();
+  test_eop_scalar_plus<float, double>();
+  test_eop_scalar_plus<double, u32>();
+  test_eop_scalar_plus<double, s32>();
+  test_eop_scalar_plus<double, u64>();
+  test_eop_scalar_plus<double, s64>();
+  test_eop_scalar_plus<double, float>();
+  test_eop_scalar_plus<double, double>();
   }
 
 

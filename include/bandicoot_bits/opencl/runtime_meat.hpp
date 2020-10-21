@@ -62,31 +62,22 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
   if(status == false)  { coot_debug_warn("coot::opencl::runtime_t: couldn't setup queue"); return false; }
   
   // setup kernels
-  
-  status = init_kernels<u32>(u32_kernels, kernel_src::get_source(), kernel_id::get_names());
+
+  std::vector<std::pair<std::string, cl_kernel*>> name_map;
+  type_to_dev_string type_map;
+  std::string src =
+      kernel_src::get_src_preamble() +
+      rt_common::get_three_elem_kernel_src(threeway_kernels, kernel_src::get_threeway_source(), threeway_kernel_id::get_names(), name_map, type_map) +
+      rt_common::get_two_elem_kernel_src(twoway_kernels, kernel_src::get_twoway_source(), twoway_kernel_id::get_names(), "", name_map, type_map) +
+      rt_common::get_one_elem_kernel_src(oneway_kernels, kernel_src::get_oneway_source(), oneway_kernel_id::get_names(), "", name_map, type_map) +
+      kernel_src::get_src_epilogue();
+
+  status = compile_kernels(src, name_map);
   if(status == false)  { coot_debug_warn("coot::opencl::runtime_t: couldn't setup OpenCL kernels"); return false; }
-  
-  status = init_kernels<s32>(s32_kernels, kernel_src::get_source(), kernel_id::get_names());
-  if(status == false)  { coot_debug_warn("coot::opencl::runtime_t: couldn't setup OpenCL kernels"); return false; }
-  
-  status = init_kernels<u64>(u64_kernels, kernel_src::get_source(), kernel_id::get_names());
-  if(status == false)  { coot_debug_warn("coot::opencl::runtime_t: couldn't setup OpenCL kernels"); return false; }
-  
-  status = init_kernels<s64>(s64_kernels, kernel_src::get_source(), kernel_id::get_names());
-  if(status == false)  { coot_debug_warn("coot::opencl::runtime_t: couldn't setup OpenCL kernels"); return false; }
-  
-  status = init_kernels<float>(f_kernels, kernel_src::get_source(), kernel_id::get_names());
-  if(status == false)  { coot_debug_warn("coot::opencl::runtime_t: couldn't setup OpenCL kernels"); return false; }
-  
-  // TODO: if 64 bit floats are supported, initialise double kernels
-  status = init_kernels<double>(d_kernels, kernel_src::get_source(), kernel_id::get_names());
-  if(status == false)  { coot_debug_warn("coot::opencl::runtime_t: couldn't setup OpenCL kernels"); return false; }
-  
   
   // TODO: refactor to allow use the choice of clBLAS or clBLast backends
-  // TODO: refactor to allow use of cuBLAS backened (lots of work!)
-  
-  
+
+
   // setup clBLAS
   
   
@@ -131,6 +122,7 @@ runtime_t::lock()
 
 
 
+
 inline
 void
 runtime_t::unlock()
@@ -159,9 +151,9 @@ runtime_t::internal_cleanup()
   
   // TODO: go through each kernel vector
   
-  const uword f_kernels_size = f_kernels.size();
+  //const uword f_kernels_size = f_kernels.size();
   
-  for(uword i=0; i<f_kernels_size; ++i)  { if(f_kernels.at(i) != NULL)  { clReleaseKernel(f_kernels.at(i)); } }
+  //for(uword i=0; i<f_kernels_size; ++i)  { if(f_kernels.at(i) != NULL)  { clReleaseKernel(f_kernels.at(i)); } }
   
   if(cq   != NULL)  { clReleaseCommandQueue(cq); cq   = NULL; }
   if(ctxt != NULL)  { clReleaseContext(ctxt);    ctxt = NULL; }
@@ -519,10 +511,9 @@ runtime_t::setup_queue(cl_context& out_context, cl_command_queue& out_queue, cl_
 
 
 
-template<typename eT>
 inline
 bool
-runtime_t::init_kernels(std::vector<cl_kernel>& kernels, const std::string& source, const std::vector<std::string>& names)
+runtime_t::compile_kernels(const std::string& source, std::vector<std::pair<std::string, cl_kernel*>>& names)
   {
   coot_extra_debug_sigprint();
   
@@ -550,135 +541,46 @@ runtime_t::init_kernels(std::vector<cl_kernel>& kernels, const std::string& sour
     {
     cout << "status: " << coot_cl_error::as_string(status) << endl;
     
-    std::cout << "coot_cl_rt::init_kernels(): couldn't create program" << std::endl;
+    std::cout << "coot_cl_rt::compile_kernels(): couldn't create program" << std::endl;
     return false;
     }
   
-  // TODO: the defines need to be progressively built
-  // use std::string, concatenation and .c_str()
-  
-  std::string build_options;
-  std::string prefix;
-  
-  if(is_same_type<eT, u32>::yes)
-    {
-    prefix = "u32_";
-    
-    build_options += "-D PREFIX=";
-    build_options += prefix;
-    build_options += " ";
-    build_options += "-D eT=uint";
-    build_options += " ";
-    build_options += "-D promoted_eT=float";
-    build_options += " ";
-    }
-  else
-  if(is_same_type<eT, s32>::yes)
-    {
-    prefix = "s32_";
-    
-    build_options += "-D PREFIX=";
-    build_options += prefix;
-    build_options += " ";
-    build_options += "-D eT=int";
-    build_options += " ";
-    build_options += "-D promoted_eT=float";
-    build_options += " ";
-    }
-  else
-  if(is_same_type<eT, u64>::yes)
-    {
-    prefix = "u64_";
-    
-    build_options += "-D PREFIX=";
-    build_options += prefix;
-    build_options += " ";
-    build_options += "-D eT=ulong";
-    build_options += " ";
-    build_options += "-D promoted_eT=float";
-    build_options += " ";
-    }
-  else
-  if(is_same_type<eT, s64>::yes)
-    {
-    prefix = "s64_";
-    
-    build_options += "-D PREFIX=";
-    build_options += prefix;
-    build_options += " ";
-    build_options += "-D eT=long";
-    build_options += " ";
-    build_options += "-D promoted_eT=float";
-    build_options += " ";
-    }
-  else
-  if(is_same_type<eT, float>::yes)
-    {
-    prefix = "f_";
-    
-    build_options += "-D PREFIX=";
-    build_options += prefix;
-    build_options += " ";
-    build_options += "-D eT=float";
-    build_options += " ";
-    build_options += "-D promoted_eT=float";
-    build_options += " ";
-    }
-  else
-  if(is_same_type<eT, double>::yes)
-    {
-    prefix = "d_";
-    
-    build_options += "-D PREFIX=";
-    build_options += prefix;
-    build_options += " ";
-    build_options += "-D eT=double";
-    build_options += " ";
-    build_options += "-D promoted_eT=double";
-    build_options += " ";
-    }
-  
-  
-  build_options += ((sizeof(uword) >= 8) && dev_info.has_sizet64) ? "-D UWORD=ulong" : "-D UWORD=uint";
-    
+  std::string build_options = ((sizeof(uword) >= 8) && dev_info.has_sizet64) ? std::string("-D UWORD=ulong") : std::string("-D UWORD=uint");
+
   status = clBuildProgram(prog_holder.prog, 0, NULL, build_options.c_str(), NULL, NULL);
-  
+
   if(status != CL_SUCCESS)
     {
     cout << "status: " << coot_cl_error::as_string(status) << endl;
-    
-    size_t len = 0;
-    char buffer[10240];  // TODO: use std::vector<char> or podarray
 
-    clGetProgramBuildInfo(prog_holder.prog, dev_id, CL_PROGRAM_BUILD_LOG, sizeof(buffer), buffer, &len);
-    std::cout << "coot_cl_rt::init_kernels(): couldn't build program;"              << std::endl;
-    std::cout << "coot_cl_rt::init_kernels(): output from clGetProgramBuildInfo():" << std::endl;
+    size_t len = 0;
+
+    // Get the length of the error log and then allocate enough space for it.
+    clGetProgramBuildInfo(prog_holder.prog, dev_id, CL_PROGRAM_BUILD_LOG, 0, NULL, &len);
+    char* buffer = new char[len];
+
+    clGetProgramBuildInfo(prog_holder.prog, dev_id, CL_PROGRAM_BUILD_LOG, len, buffer, NULL);
+    std::cout << "coot::cl_rt::compile_kernels(): couldn't build program;"              << std::endl;
+    std::cout << "coot::cl_rt::compile_kernels(): output from clGetProgramBuildInfo():" << std::endl;
     std::cout << buffer << std::endl;
-    
+    delete buffer;
+
     return false;
     }
-  
-  
-  const uword n_kernels = names.size();
-  
-  kernels.resize(n_kernels);
-  
-  for(uword i=0; i < n_kernels; ++i)
+
+
+  for (uword i = 0; i < names.size(); ++i)
     {
-    status = 0;
-    
-    const std::string kernel_name = prefix + names.at(i);
-    
-    kernels.at(i) = clCreateKernel(prog_holder.prog, kernel_name.c_str(), &status);
-    
-    if((status != CL_SUCCESS) || (kernels[i] == NULL))
+    (*names.at(i).second) = clCreateKernel(prog_holder.prog, names.at(i).first.c_str(), &status);
+
+    if((status != CL_SUCCESS) || (names.at(i).second == NULL))
       {
       std::cout << coot_cl_error::as_string(status) << endl;
-      std::cout << "kernel_name: " << kernel_name << endl;
+      std::cout << "kernel_name: " << names.at(i).first << endl;
       return false;
       }
     }
-  
+
   return true;
   }
 
@@ -846,20 +748,66 @@ runtime_t::delete_extra_cq(cl_command_queue& in_queue)
 
 template<typename eT>
 inline
-cl_kernel
-runtime_t::get_kernel(const kernel_id::enum_id num)
+const cl_kernel&
+runtime_t::get_kernel(const oneway_kernel_id::enum_id num)
+  {
+  return get_kernel<eT>(oneway_kernels, num);
+  }
+
+
+
+template<typename eT1, typename eT2>
+inline
+const cl_kernel&
+runtime_t::get_kernel(const twoway_kernel_id::enum_id num)
+  {
+  return get_kernel<eT1, eT2>(twoway_kernels, num);
+  }
+
+
+
+template<typename eT1, typename eT2, typename eT3>
+inline
+const cl_kernel&
+runtime_t::get_kernel(const threeway_kernel_id::enum_id num)
+  {
+  return get_kernel<eT1, eT2, eT3>(threeway_kernels, num);
+  }
+
+
+
+template<typename eT1, typename... eTs, typename HeldType, typename EnumType>
+inline
+const cl_kernel&
+runtime_t::get_kernel(const rt_common::kernels_t<HeldType>& k, const EnumType num)
   {
   coot_extra_debug_sigprint();
-  
-  coot_debug_check( (valid == false), "coot_cl_rt not valid" );
-  
-       if(is_same_type<eT,u32   >::yes)  { return u32_kernels.at(num); }
-  else if(is_same_type<eT,s32   >::yes)  { return s32_kernels.at(num); }
-  else if(is_same_type<eT,u64   >::yes)  { return u64_kernels.at(num); }
-  else if(is_same_type<eT,s64   >::yes)  { return s64_kernels.at(num); }
-  else if(is_same_type<eT,float >::yes)  { return   f_kernels.at(num); }
-  else if(is_same_type<eT,double>::yes)  { return   d_kernels.at(num); }
-  else { coot_debug_check(true, "unsupported element type" ); }
+
+       if(is_same_type<eT1, u32   >::yes) { return get_kernel<eTs...>(k.u32_kernels, num); }
+  else if(is_same_type<eT1, s32   >::yes) { return get_kernel<eTs...>(k.s32_kernels, num); }
+  else if(is_same_type<eT1, u64   >::yes) { return get_kernel<eTs...>(k.u64_kernels, num); }
+  else if(is_same_type<eT1, s64   >::yes) { return get_kernel<eTs...>(k.s64_kernels, num); }
+  else if(is_same_type<eT1, float >::yes) { return get_kernel<eTs...>(  k.f_kernels, num); }
+  else if(is_same_type<eT1, double>::yes) { return get_kernel<eTs...>(  k.d_kernels, num); }
+  else { coot_debug_check(true, "unsupported element type"); }
+  }
+
+
+
+template<typename eT, typename EnumType>
+inline
+const cl_kernel&
+runtime_t::get_kernel(const rt_common::kernels_t<std::vector<cl_kernel>>& k, const EnumType num)
+  {
+  coot_extra_debug_sigprint();
+
+       if(is_same_type<eT, u32   >::yes) { return k.u32_kernels.at(num); }
+  else if(is_same_type<eT, s32   >::yes) { return k.s32_kernels.at(num); }
+  else if(is_same_type<eT, u64   >::yes) { return k.u64_kernels.at(num); }
+  else if(is_same_type<eT, s64   >::yes) { return k.s64_kernels.at(num); }
+  else if(is_same_type<eT, float >::yes) { return   k.f_kernels.at(num); }
+  else if(is_same_type<eT, double>::yes) { return   k.d_kernels.at(num); }
+  else { coot_debug_check(true, "unsupported element type"); }
   }
 
 

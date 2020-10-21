@@ -22,11 +22,20 @@ struct runtime_t
 
   inline ~runtime_t();
 
-  template<typename eT>
-  inline bool init_kernels(std::vector<CUfunction>& kernels, const std::string& source, const std::vector<std::string>& names);
+  template<typename eT, typename higher_eT1, typename higher_eT2>
+  inline std::string substitute_types(const std::string& source, const std::string& prefix);
 
-  template<typename eT>
-  inline CUfunction& get_kernel(const kernel_id::enum_id num);
+  inline bool compile_kernels(const std::string& source,
+                              std::vector<std::pair<std::string, CUfunction*>>& names);
+
+  template<typename eT1>
+  inline const CUfunction& get_kernel(const oneway_kernel_id::enum_id num);
+
+  template<typename eT2, typename eT1>
+  inline const CUfunction& get_kernel(const twoway_kernel_id::enum_id num);
+
+  template<typename eT3, typename eT2, typename eT1>
+  inline const CUfunction& get_kernel(const threeway_kernel_id::enum_id num);
 
   template<typename eT>
   inline eT* acquire_memory(const uword n_elem);
@@ -49,14 +58,23 @@ struct runtime_t
 
   private:
 
+  // internal functions to actually get the right kernel
+
+  template<typename eT1, typename... eTs, typename HeldType, typename EnumType>
+  inline
+  const CUfunction&
+  get_kernel(const rt_common::kernels_t<HeldType>& k, const EnumType num);
+
+  template<typename eT, typename EnumType>
+  inline
+  const CUfunction&
+  get_kernel(const rt_common::kernels_t<std::vector<CUfunction>>& k, const EnumType num);
+
   coot_aligned bool                     valid;
 
-  coot_aligned std::vector<CUfunction>  u32_kernels;
-  coot_aligned std::vector<CUfunction>  s32_kernels;
-  coot_aligned std::vector<CUfunction>  u64_kernels;
-  coot_aligned std::vector<CUfunction>  s64_kernels;
-  coot_aligned std::vector<CUfunction>    f_kernels;
-  coot_aligned std::vector<CUfunction>    d_kernels;
+  coot_aligned rt_common::kernels_t<std::vector<CUfunction>>                                             oneway_kernels;
+  coot_aligned rt_common::kernels_t<rt_common::kernels_t<std::vector<CUfunction>>>                       twoway_kernels;
+  coot_aligned rt_common::kernels_t<rt_common::kernels_t<rt_common::kernels_t<std::vector<CUfunction>>>> threeway_kernels;
 
   coot_aligned CUdevice cuDevice;
   coot_aligned CUcontext context;

@@ -49,25 +49,17 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
   cudaError_t result2 = cudaGetDeviceProperties(&dev_prop, wanted_device);
   coot_check_cuda_error(result2, "cuda::runtime_t::init(): couldn't get device properties");
 
-  bool status = false;
+  std::vector<std::pair<std::string, CUfunction*>> name_map;
+  type_to_dev_string type_map;
+  std::string src =
+      get_cuda_src_preamble() +
+      rt_common::get_three_elem_kernel_src(threeway_kernels, get_cuda_threeway_kernel_src(), threeway_kernel_id::get_names(), name_map, type_map) +
+      rt_common::get_two_elem_kernel_src(twoway_kernels, get_cuda_twoway_kernel_src(), twoway_kernel_id::get_names(), "", name_map, type_map) +
+      rt_common::get_one_elem_kernel_src(oneway_kernels, get_cuda_oneway_kernel_src(), oneway_kernel_id::get_names(), "", name_map, type_map) +
+      get_cuda_src_epilogue();
 
-  status = init_kernels<u32>(u32_kernels, get_cuda_kernel_src(), get_cuda_kernel_names());
-  if (status == false) { coot_debug_warn("cuda::runtime_t::init(): couldn't set up CUDA u32 kernels"); }
-
-  status = init_kernels<s32>(s32_kernels, get_cuda_kernel_src(), get_cuda_kernel_names());
-  if (status == false) { coot_debug_warn("cuda::runtime_t::init(): couldn't set up CUDA s32 kernels"); }
-
-  status = init_kernels<u64>(u64_kernels, get_cuda_kernel_src(), get_cuda_kernel_names());
-  if (status == false) { coot_debug_warn("cuda::runtime_t::init(): couldn't set up CUDA u64 kernels"); }
-
-  status = init_kernels<s64>(s64_kernels, get_cuda_kernel_src(), get_cuda_kernel_names());
-  if (status == false) { coot_debug_warn("cuda::runtime_t::init(): couldn't set up CUDA s64 kernels"); }
-
-  status = init_kernels<float>(f_kernels, get_cuda_kernel_src(), get_cuda_kernel_names());
-  if (status == false) { coot_debug_warn("cuda::runtime_t::init(): couldn't set up CUDA float kernels"); }
-
-  status = init_kernels<double>(d_kernels, get_cuda_kernel_src(), get_cuda_kernel_names());
-  if (status == false) { coot_debug_warn("cuda::runtime_t::init(): couldn't set up CUDA double kernels"); }
+  bool status = compile_kernels(src, name_map);
+  if (status == false) { coot_debug_warn("cuda::runtime_t::init(): couldn't set up CUDA kernels"); }
 
   // Initialize RNG struct.
   curandCreateGenerator(&randGen, CURAND_RNG_PSEUDO_DEFAULT);
@@ -82,13 +74,14 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
   // TODO: destroy context in destructor
   }
 
-template<typename eT>
+
+
 inline
 bool
-runtime_t::init_kernels(std::vector<CUfunction>& kernels, const std::string& source, const std::vector<std::string>& names)
+runtime_t::compile_kernels(const std::string& source,
+                           std::vector<std::pair<std::string, CUfunction*>>& names)
   {
   // We'll use NVRTC to compile each of the kernels we need on the fly.
-
   nvrtcProgram prog;
   nvrtcResult result = nvrtcCreateProgram(
       &prog,          // program holder
@@ -100,70 +93,31 @@ runtime_t::init_kernels(std::vector<CUfunction>& kernels, const std::string& sou
   coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcCreateProgram() failed");
 
   // Construct the macros that we need.
-  std::string prefix;
-  std::string macro1;
-  std::string macro2;
-  std::string macro3;
+  const char** opts = new const char*[3];
+  opts[0] = "--gpu-architecture=compute_30";
+  opts[1] = "--fmad=false";
+  opts[2] = "-D UWORD=size_t"; /* TODO: what about 32-bit? */
 
-  if (is_same_type<eT, u32>::yes)
-    {
-    prefix = "u32_";
-    macro2 = "-D eT=uint";
-    macro3 = "-D promoted_eT=float";
-    }
-  else if (is_same_type<eT, s32>::yes)
-    {
-    prefix = "s32_";
-    macro2 = "-D eT=int";
-    macro3 = "-D promoted_eT=float";
-    }
-  else if (is_same_type<eT, u64>::yes)
-    {
-    prefix = "u64_";
-    macro2 = "-D eT=size_t";
-    macro3 = "-D promoted_eT=float";
-    }
-  else if (is_same_type<eT, s64>::yes)
-    {
-    prefix = "s64_";
-    macro2 = "-D eT=long";
-    macro3 = "-D promoted_eT=float";
-    }
-  else if (is_same_type<eT, float>::yes)
-    {
-    prefix = "f_";
-    macro2 = "-D eT=float";
-    macro3 = "-D promoted_eT=float";
-    }
-  else if (is_same_type<eT, double>::yes)
-    {
-    prefix = "d_";
-    macro2 = "-D eT=double";
-    macro3 = "-D promoted_eT=double";
-    }
+  result = nvrtcCompileProgram(prog,  // prog
+                               3,     // numOptions
+                               opts); // options
 
-  macro1 = "-D PREFIX=" + prefix;
+  delete[] opts;
 
-  const char *opts[] = {"--gpu-architecture=compute_30",
-                        "--fmad=false",
-                        macro1.c_str(),
-                        macro2.c_str(),
-                        macro3.c_str(),
-                        "-D UWORD=size_t" /* TODO: what about 32-bit? */};
+  // If compilation failed, display what went wrong.  The NVRTC outputs aren't
+  // always very helpful though...
+  if (result != NVRTC_SUCCESS)
+    {
+    size_t logSize;
+    result = (nvrtcGetProgramLogSize(prog, &logSize));
+    coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcGetProgramLogSize() failed");
 
-  result  = nvrtcCompileProgram(prog,  // prog
-                                6,     // numOptions
-                                opts); // options
-  // TODO: this should display the log instead of just failing
-  coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcCompileProgram() failed");
+    char *log = new char[logSize];
+    result = (nvrtcGetProgramLog(prog, log));
+    coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcGetProgramLog() failed");
 
-  size_t logSize;
-  result = (nvrtcGetProgramLogSize(prog, &logSize));
-  coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcGetProgramLogSize() failed");
-
-  char *log = new char[logSize];
-  result = (nvrtcGetProgramLog(prog, log));
-  coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcGetProgramLog() failed; log:\n\n" + std::string(log));
+    coot_stop_runtime_error("cuda::runtime_t::init_kernels(): compilation failed", std::string(log));
+    }
 
   // Obtain PTX from the program.
   size_t ptxSize;
@@ -181,15 +135,10 @@ runtime_t::init_kernels(std::vector<CUfunction>& kernels, const std::string& sou
 
   // Now that everything is compiled, unpack the results into individual kernels
   // that we can access.
-  const uword n_kernels = names.size();
-
-  kernels.resize(n_kernels);
-
-  for (uword i = 0; i < n_kernels; ++i)
+  for (uword i = 0; i < names.size(); ++i)
     {
-    const std::string name = prefix + names.at(i);
-    result2 = cuModuleGetFunction(&kernels.at(i), module, name.c_str());
-    coot_check_cuda_error(result2, "cuda::runtime_t::init_kernels(): cuModuleGetFunction() failed for function " + name);
+    result2 = cuModuleGetFunction(names.at(i).second, module, names.at(i).first.c_str());
+    coot_check_cuda_error(result2, "cuda::runtime_t::init_kernels(): cuModuleGetFunction() failed for function " + names.at(i).first);
     }
 
   return true;
@@ -208,19 +157,67 @@ runtime_t::~runtime_t()
 
 template<typename eT>
 inline
-CUfunction&
-runtime_t::get_kernel(const kernel_id::enum_id num)
+const CUfunction&
+runtime_t::get_kernel(const oneway_kernel_id::enum_id num)
+  {
+  return get_kernel<eT>(oneway_kernels, num);
+  }
+
+
+
+template<typename eT1, typename eT2>
+inline
+const CUfunction&
+runtime_t::get_kernel(const twoway_kernel_id::enum_id num)
+  {
+  return get_kernel<eT1, eT2>(twoway_kernels, num);
+  }
+
+
+
+template<typename eT1, typename eT2, typename eT3>
+inline
+const CUfunction&
+runtime_t::get_kernel(const threeway_kernel_id::enum_id num)
+  {
+  return get_kernel<eT1, eT2, eT3>(threeway_kernels, num);
+  }
+
+
+
+template<typename eT1, typename... eTs, typename HeldType, typename EnumType>
+inline
+const CUfunction&
+runtime_t::get_kernel(const rt_common::kernels_t<HeldType>& k, const EnumType num)
+  {
+  coot_extra_debug_sigprint();
+
+       if(is_same_type<eT1,u32   >::yes)  { return get_kernel<eTs...>(k.u32_kernels, num); }
+  else if(is_same_type<eT1,s32   >::yes)  { return get_kernel<eTs...>(k.s32_kernels, num); }
+  else if(is_same_type<eT1,u64   >::yes)  { return get_kernel<eTs...>(k.u64_kernels, num); }
+  else if(is_same_type<eT1,s64   >::yes)  { return get_kernel<eTs...>(k.s64_kernels, num); }
+  else if(is_same_type<eT1,float >::yes)  { return get_kernel<eTs...>(  k.f_kernels, num); }
+  else if(is_same_type<eT1,double>::yes)  { return get_kernel<eTs...>(  k.d_kernels, num); }
+  else { coot_debug_check(true, "unsupported element type" ); }
+  }
+
+
+
+template<typename eT, typename EnumType>
+inline
+const CUfunction&
+runtime_t::get_kernel(const rt_common::kernels_t<std::vector<CUfunction>>& k, const EnumType num)
   {
   coot_extra_debug_sigprint();
 
   coot_debug_check( (valid == false), "cuda::runtime_t not valid" );
 
-       if(is_same_type<eT,u32   >::yes)  { return u32_kernels.at(num); }
-  else if(is_same_type<eT,s32   >::yes)  { return s32_kernels.at(num); }
-  else if(is_same_type<eT,u64   >::yes)  { return u64_kernels.at(num); }
-  else if(is_same_type<eT,s64   >::yes)  { return s64_kernels.at(num); }
-  else if(is_same_type<eT,float >::yes)  { return   f_kernels.at(num); }
-  else if(is_same_type<eT,double>::yes)  { return   d_kernels.at(num); }
+       if(is_same_type<eT,u32   >::yes)  { return k.u32_kernels.at(num); }
+  else if(is_same_type<eT,s32   >::yes)  { return k.s32_kernels.at(num); }
+  else if(is_same_type<eT,u64   >::yes)  { return k.u64_kernels.at(num); }
+  else if(is_same_type<eT,s64   >::yes)  { return k.s64_kernels.at(num); }
+  else if(is_same_type<eT,float >::yes)  { return   k.f_kernels.at(num); }
+  else if(is_same_type<eT,double>::yes)  { return   k.d_kernels.at(num); }
   else { coot_debug_check(true, "unsupported element type" ); }
   }
 

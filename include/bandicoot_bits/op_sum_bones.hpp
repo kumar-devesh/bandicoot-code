@@ -21,17 +21,17 @@ class op_sum
   {
   public:
   
-  template<typename T1>
-  inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1, op_sum>& in);
-  
+  template<typename eT2, typename T1>
+  inline static void apply(Mat<eT2>& out, const Op<T1, op_sum>& in);
+
   template<typename eT>
-  inline static void apply(Mat<eT>& out, const Op<subview<eT>,op_sum>& in);
+  inline static void apply(Mat<eT>& out, const Op<subview<eT>, op_sum>& in);
   
-  template<typename eT>
-  inline static void apply_noalias(Mat<eT>& out, const Mat<eT>& A, const uword dim);
+  template<typename out_eT, typename in_eT>
+  inline static void apply_noalias(Mat<out_eT>& out, const Mat<in_eT>& A, const uword dim, const bool post_conv_apply);
   
-  template<typename eT>
-  inline static void apply_noalias(Mat<eT>& out, const subview<eT>& sv, const uword dim);
+  template<typename out_eT, typename in_eT>
+  inline static void apply_noalias(Mat<out_eT>& out, const subview<in_eT>& sv, const uword dim, const bool post_conv_apply);
   };
 
 

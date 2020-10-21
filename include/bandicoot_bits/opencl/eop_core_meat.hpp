@@ -19,15 +19,15 @@
 /**
  * Run an OpenCL non-inplace elementwise kernel.
  */
-template<typename eT>
+template<typename eT1, typename eT2>
 inline
 void
-eop_scalar(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword n_elem, const eT aux_val, kernel_id::enum_id num)
+eop_scalar(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword n_elem, const eT1 aux_val_pre, const eT2 aux_val_post, twoway_kernel_id::enum_id num)
   {
   coot_extra_debug_sigprint();
 
   // Get kernel.
-  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(num);
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT2, eT1>(num);
 
   runtime_t::cq_guard guard;
   runtime_t::adapt_uword N(n_elem);
@@ -36,8 +36,9 @@ eop_scalar(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword n_elem, cons
 
   status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &dest.cl_mem_ptr);
   status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), & src.cl_mem_ptr);
-  status |= clSetKernelArg(kernel, 2, sizeof(eT),     &aux_val        );
-  status |= clSetKernelArg(kernel, 3, N.size,         N.addr          );
+  status |= clSetKernelArg(kernel, 2, sizeof(eT1),    &aux_val_pre    );
+  status |= clSetKernelArg(kernel, 3, sizeof(eT2),    &aux_val_post   );
+  status |= clSetKernelArg(kernel, 4, N.size,         N.addr          );
 
   size_t work_size = size_t(n_elem);
 

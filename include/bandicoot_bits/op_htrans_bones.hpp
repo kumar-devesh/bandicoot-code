@@ -21,14 +21,20 @@ class op_htrans
   {
   public:
   
-  template<typename T1>
-  inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_htrans>& in);
+  template<typename out_eT, typename T1>
+  inline static void apply(Mat<out_eT>& out, const Op<T1, op_htrans>& in);
   
-  template<typename eT>
-  inline static void apply_noalias(Mat<eT>& out, const Mat<eT>& A, const typename coot_not_cx<eT>::result* junk = 0);
+  template<typename out_eT, typename in_eT>
+  inline static void apply_noalias(Mat<out_eT>& out,
+                                   const Mat<in_eT>& A,
+                                   const typename coot_not_cx<in_eT>::result* junk1 = 0,
+                                   const typename coot_not_cx<out_eT>::result* junk2 = 0);
   
-  template<typename eT>
-  inline static void apply_noalias(Mat<eT>& out, const Mat<eT>& A, const typename coot_cx_only<eT>::result* junk = 0);
+  template<typename out_eT, typename in_eT>
+  inline static void apply_noalias(Mat<out_eT>& out,
+                                   const Mat<in_eT>& A,
+                                   const typename coot_cx_only<in_eT>::result* junk1 = 0,
+                                   const typename coot_cx_only<out_eT>::result* junk2 = 0);
   };
 
 
@@ -37,14 +43,20 @@ class op_htrans2
   {
   public:
   
-  template<typename T1>
-  inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_htrans2>& in);
+  template<typename out_eT, typename T1>
+  inline static void apply(Mat<out_eT>& out, const Op<T1, op_htrans2>& in);
   
-  template<typename eT>
-  inline static void apply_noalias(Mat<eT>& out, const Mat<eT>& A, const typename coot_not_cx<eT>::result* junk = 0);
+  template<typename out_eT, typename in_eT>
+  inline static void apply_noalias(Mat<out_eT>& out,
+                                   const Mat<in_eT>& A,
+                                   const typename coot_not_cx<in_eT>::result* junk1 = 0,
+                                   const typename coot_not_cx<out_eT>::result* junk2 = 0);
   
-  template<typename eT>
-  inline static void apply_noalias(Mat<eT>& out, const Mat<eT>& A, const typename coot_cx_only<eT>::result* junk = 0);
+  template<typename out_eT, typename in_eT>
+  inline static void apply_noalias(Mat<out_eT>& out,
+                                   const Mat<in_eT>& A,
+                                   const typename coot_cx_only<in_eT>::result* junk1 = 0,
+                                   const typename coot_cx_only<out_eT>::result* junk2 = 0);
   };
 
 

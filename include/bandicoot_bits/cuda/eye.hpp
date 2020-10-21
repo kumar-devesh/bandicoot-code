@@ -28,7 +28,7 @@ eye(dev_mem_t<eT> dest, const uword n_rows, const uword n_cols)
 
   coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "cuda::eye(): cuda runtime not valid");
 
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(kernel_id::inplace_set_eye);
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::inplace_set_eye);
 
   const void* args[] = {
       &(dest.cuda_mem_ptr),

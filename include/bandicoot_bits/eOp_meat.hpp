@@ -33,6 +33,8 @@ inline
 eOp<T1, eop_type>::eOp(const T1& in_m, const typename T1::elem_type in_aux)
   : m(in_m)
   , aux(in_aux)
+  , aux_uword_a(uword(0))
+  , aux_uword_b(uword(0))
   {
   coot_extra_debug_sigprint();
   }
@@ -43,6 +45,7 @@ template<typename T1, typename eop_type>
 inline
 eOp<T1, eop_type>::eOp(const T1& in_m, const uword in_aux_uword_a, const uword in_aux_uword_b)
   : m(in_m)
+  , aux(typename T1::elem_type(0))
   , aux_uword_a(in_aux_uword_a)
   , aux_uword_b(in_aux_uword_b)
   {
@@ -71,7 +74,7 @@ eOp<T1, eop_type>::~eOp()
   coot_extra_debug_sigprint();
   }
 
-  
+
 
 template<typename T1, typename eop_type>
 coot_inline
