@@ -22,7 +22,7 @@ class op_htrans
   public:
   
   template<typename out_eT, typename T1>
-  inline static void apply(Mat<out_eT>& out, const Op<out_eT, T1, op_htrans>& in);
+  inline static void apply(Mat<out_eT>& out, const Op<T1, op_htrans>& in);
   
   template<typename out_eT, typename in_eT>
   inline static void apply_noalias(Mat<out_eT>& out,
@@ -44,7 +44,7 @@ class op_htrans2
   public:
   
   template<typename out_eT, typename T1>
-  inline static void apply(Mat<out_eT>& out, const Op<out_eT, T1, op_htrans2>& in);
+  inline static void apply(Mat<out_eT>& out, const Op<T1, op_htrans2>& in);
   
   template<typename out_eT, typename in_eT>
   inline static void apply_noalias(Mat<out_eT>& out,

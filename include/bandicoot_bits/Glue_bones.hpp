@@ -18,8 +18,8 @@
 
 
 
-template<typename out_eT, typename T1, typename T2, typename glue_type>
-class Glue : public Base<out_eT, Glue<out_eT, T1, T2, glue_type> >
+template<typename T1, typename T2, typename glue_type>
+class Glue : public Base<typename T1::elem_type, Glue<T1, T2, glue_type> >
   {
   public:
   
@@ -33,9 +33,6 @@ class Glue : public Base<out_eT, Glue<out_eT, T1, T2, glue_type> >
   coot_inline  Glue(const T1& in_A, const T2& in_B, const uword in_aux_uword);
   coot_inline ~Glue();
 
-  template<typename in_eT>
-  inline explicit Glue(const Glue<in_eT, T1, T2, glue_type>& in);
-  
   const T1&   A;
   const T2&   B;
         uword aux_uword;

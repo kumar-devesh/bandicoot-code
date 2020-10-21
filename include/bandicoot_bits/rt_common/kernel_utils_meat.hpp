@@ -23,25 +23,31 @@ inline std::string substitute_types(const std::string& input, const std::string&
   // for now: shitty implementation.  try again later...
   std::string output = input;
 
-  size_t pos = output.find("eT1");
+  size_t pos = output.find("fp_eT1");
+  while (pos != std::string::npos)
+    {
+    output.replace(pos, 6, type_map.template map<typename promote_type<eT1, float>::result>());
+    pos = output.find("fp_eT1");
+    }
+
+  pos = output.find("eT1");
   while (pos != std::string::npos)
     {
     output.replace(pos, 3, type_map.template map<eT1>());
     pos = output.find("eT1");
     }
 
-  pos = output.find("oneway_fp_eT");
-  while (pos != std::string::npos)
-    {
-    output.replace(pos, 12, type_map.template map<typename promote_type<eT1, float>::result>());
-    pos = output.find("oneway_fp_eT");
-    }
-
   // Add two-way types if needed.
   if (!is_same_type<eT2, void>::value)
     {
     typedef typename promote_type<eT1, eT2>::result twoway_promoted_eT;
-    typedef typename promote_type<twoway_promoted_eT, float>::result twoway_fp_eT;
+
+    pos = output.find("fp_eT2");
+    while (pos != std::string::npos)
+      {
+      output.replace(pos, 6, type_map.template map<typename promote_type<eT2, float>::result>());
+      pos = output.find("fp_eT2");
+      }
 
     pos = output.find("eT2");
     while (pos != std::string::npos)
@@ -57,18 +63,17 @@ inline std::string substitute_types(const std::string& input, const std::string&
       pos = output.find("twoway_promoted_eT");
       }
 
-    pos = output.find("twoway_fp_eT");
-    while (pos != std::string::npos)
-      {
-      output.replace(pos, 12, type_map.template map<twoway_fp_eT>());
-      pos = output.find("twoway_fp_eT");
-      }
-
     // Add three-way types if needed.
     if (!is_same_type<eT3, void>::value)
       {
       typedef typename promote_type<twoway_promoted_eT, eT3>::result threeway_promoted_eT;
-      typedef typename promote_type<threeway_promoted_eT, float>::result threeway_fp_eT;
+
+      pos = output.find("fp_eT3");
+      while (pos != std::string::npos)
+        {
+        output.replace(pos, 6, type_map.template map<typename promote_type<eT3, float>::result>());
+        pos = output.find("fp_eT3");
+        }
 
       pos = output.find("eT3");
       while (pos != std::string::npos)
@@ -82,13 +87,6 @@ inline std::string substitute_types(const std::string& input, const std::string&
         {
         output.replace(pos, 20, type_map.template map<threeway_promoted_eT>());
         pos = output.find("threeway_promoted_eT");
-        }
-
-      pos = output.find("threeway_fp_eT");
-      while (pos != std::string::npos)
-        {
-        output.replace(pos, 14, type_map.template map<threeway_fp_eT>());
-        pos = output.find("threeway_fp_eT");
         }
       }
     }

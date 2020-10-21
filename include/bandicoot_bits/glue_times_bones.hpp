@@ -24,8 +24,8 @@ struct depth_lhs
   static const uword num = 0;
   };
 
-template<typename out_eT, typename glue_type, typename T1, typename T2>
-struct depth_lhs< glue_type, Glue<out_eT, T1, T2, glue_type> >
+template<typename glue_type, typename T1, typename T2>
+struct depth_lhs< glue_type, Glue<T1, T2, glue_type> >
   {
   static const uword num = 1 + depth_lhs<glue_type, T1>::num;
   };
@@ -36,7 +36,7 @@ template<uword N>
 struct glue_times_redirect
   {
   template<typename out_eT, typename T1, typename T2>
-  inline static void apply(Mat<out_eT>& out, const Glue<out_eT, T1, T2, glue_times>& X);
+  inline static void apply(Mat<out_eT>& out, const Glue<T1, T2, glue_times>& X);
   };
 
 
@@ -44,23 +44,23 @@ template<>
 struct glue_times_redirect<2>
   {
   template<typename out_eT, typename T1, typename T2>
-  inline static void apply(Mat<out_eT>& out, const Glue<out_eT, T1, T2, glue_times>& X);
+  inline static void apply(Mat<out_eT>& out, const Glue<T1, T2, glue_times>& X);
   };
 
 
 template<>
 struct glue_times_redirect<3>
   {
-  template<typename out_eT2, typename out_eT1, typename T1, typename T2, typename T3>
-  inline static void apply(Mat<out_eT2>& out, const Glue<out_eT2, Glue<out_eT1, T1, T2, glue_times>, T3, glue_times>& X);
+  template<typename out_eT, typename T1, typename T2, typename T3>
+  inline static void apply(Mat<out_eT>& out, const Glue<Glue<T1, T2, glue_times>, T3, glue_times>& X);
   };
 
 
 template<>
 struct glue_times_redirect<4>
   {
-  template<typename out_eT3, typename out_eT2, typename out_eT1, typename T1, typename T2, typename T3, typename T4>
-  inline static void apply(Mat<out_eT3>& out, const Glue<out_eT3, Glue<out_eT2, Glue<out_eT1, T1, T2, glue_times>, T3, glue_times>, T4, glue_times>& X);
+  template<typename out_eT, typename T1, typename T2, typename T3, typename T4>
+  inline static void apply(Mat<out_eT>& out, const Glue<Glue<Glue<T1, T2, glue_times>, T3, glue_times>, T4, glue_times>& X);
   };
 
 
@@ -71,7 +71,7 @@ class glue_times
   
   
   template<typename out_eT, typename T1, typename T2>
-  inline static void apply(Mat<out_eT>& out, const Glue<out_eT, T1, T2, glue_times>& X);
+  inline static void apply(Mat<out_eT>& out, const Glue<T1, T2, glue_times>& X);
   
   //
   

@@ -46,13 +46,13 @@ template<const bool, const bool, const bool>             class gemv;
 
 template<                 typename eT, typename gen_type> class  Gen; 
 
-template<typename out_eT, typename T1, typename  op_type> class   Op; 
-template<typename out_eT, typename T1, typename eop_type> class  eOp;
+template<typename T1, typename  op_type> class   Op; 
+template<typename T1, typename eop_type> class  eOp;
 
-template<typename out_eT, typename T1, typename T2, typename  glue_type> class   Glue;
-template<typename out_eT, typename T1, typename T2, typename eglue_type> class  eGlue;
+template<typename out_eT, typename T1, typename mtop_type> class mtOp;
 
-
+template<typename T1, typename T2, typename  glue_type> class   Glue;
+template<typename T1, typename T2, typename eglue_type> class  eGlue;
 
 template<                 typename eT, typename gen_type> class  GenCube; 
 
@@ -74,7 +74,8 @@ class op_inv;
 class op_strans;
 class op_htrans;
 class op_htrans2;
-class op_conv_to;
+
+class mtop_conv_to;
 
 class eop_scalar_plus;
 class eop_neg;

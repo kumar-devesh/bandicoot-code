@@ -17,12 +17,12 @@
 //! @{
 
 
-template<typename out_eT, typename T1, typename T2, typename eglue_type>
-class eGlue : public Base<out_eT, eGlue<out_eT, T1, T2, eglue_type> >
+template<typename T1, typename T2, typename eglue_type>
+class eGlue : public Base< typename T1::elem_type, eGlue<T1, T2, eglue_type> >
   {
   public:
   
-  typedef out_eT                                   elem_type;
+  typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
   
   static const bool is_col = (T1::is_col || T2::is_col);
@@ -34,9 +34,6 @@ class eGlue : public Base<out_eT, eGlue<out_eT, T1, T2, eglue_type> >
   coot_inline ~eGlue();
   coot_inline  eGlue(const T1& in_A, const T2& in_B);
 
-  template<typename in_eT>
-  inline explicit eGlue(eGlue<in_eT, T1, T2, eglue_type>& in);
-  
   coot_inline uword get_n_rows() const;
   coot_inline uword get_n_cols() const;
   coot_inline uword get_n_elem() const;

@@ -191,8 +191,8 @@ subview<eT>::inplace_op(const Base<eT, T1>& in, twoway_kernel_id::enum_id num, c
   {
   coot_extra_debug_sigprint();
 
-  const unwrap<T1>   U(in.get_ref());
-  const Mat<eT>& X = U.M;
+  const no_conv_unwrap<T1> U(in.get_ref());
+  const typename no_conv_unwrap<T1>::stored_type X = U.M;
 
   coot_assert_same_size(n_rows, n_cols, X.n_rows, X.n_cols, identifier);
 
@@ -305,12 +305,12 @@ template<typename eT>
 template<typename T1>
 inline
 void
-subview<eT>::inplace_op(const Op<eT, T1, op_conv_to>& x, twoway_kernel_id::enum_id num, const char* identifier)
+subview<eT>::inplace_op(const mtOp<eT, T1, mtop_conv_to>& x, twoway_kernel_id::enum_id num, const char* identifier)
   {
   coot_extra_debug_sigprint();
 
   // Avoid explicitly performing the conv_to so we can incorporate it into our operation here.
-  const unwrap<T1>   U(x.m);
+  const no_conv_unwrap<T1>   U(x.m.Q);
   const Mat<typename T1::elem_type>& X = U.M;
 
   coot_assert_same_size(n_rows, n_cols, X.n_rows, X.n_cols, identifier);
@@ -326,7 +326,7 @@ template<typename eT>
 template<typename T1>
 inline
 void
-subview<eT>::operator= (const Op<eT, T1, op_conv_to>& x)
+subview<eT>::operator= (const mtOp<eT, T1, mtop_conv_to>& x)
   {
   coot_extra_debug_sigprint();
 
@@ -339,7 +339,7 @@ template<typename eT>
 template<typename T1>
 inline
 void
-subview<eT>::operator+=(const Op<eT, T1, op_conv_to>& x)
+subview<eT>::operator+=(const mtOp<eT, T1, mtop_conv_to>& x)
   {
   coot_extra_debug_sigprint();
 
@@ -352,7 +352,7 @@ template<typename eT>
 template<typename T1>
 inline
 void
-subview<eT>::operator-=(const Op<eT, T1, op_conv_to>& x)
+subview<eT>::operator-=(const mtOp<eT, T1, mtop_conv_to>& x)
   {
   coot_extra_debug_sigprint();
 
@@ -365,7 +365,7 @@ template<typename eT>
 template<typename T1>
 inline
 void
-subview<eT>::operator%=(const Op<eT, T1, op_conv_to>& x)
+subview<eT>::operator%=(const mtOp<eT, T1, mtop_conv_to>& x)
   {
   coot_extra_debug_sigprint();
 
@@ -378,7 +378,7 @@ template<typename eT>
 template<typename T1>
 inline
 void
-subview<eT>::operator/=(const Op<eT, T1, op_conv_to>& x)
+subview<eT>::operator/=(const mtOp<eT, T1, mtop_conv_to>& x)
   {
   coot_extra_debug_sigprint();
 

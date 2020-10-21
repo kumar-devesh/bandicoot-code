@@ -26,9 +26,10 @@ as_scalar(const Base<typename T1::elem_type, T1>& X)
   coot_extra_debug_sigprint();
   
   typedef typename T1::elem_type eT;
+  typedef typename no_conv_unwrap<T1>::elem_type in_eT;
   
-  const unwrap<T1>   U(X.get_ref());
-  const Mat<eT>& A = U.M;
+  const no_conv_unwrap<T1> U(X.get_ref());
+  const Mat<in_eT>& A = U.M;
   
   if(A.n_elem != 1)
     {
@@ -37,7 +38,7 @@ as_scalar(const Base<typename T1::elem_type, T1>& X)
     return Datum<eT>::nan;
     }
   
-  return A(0,0);
+  return eT(A(0,0));
   }
 
 

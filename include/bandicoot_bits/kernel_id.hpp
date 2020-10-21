@@ -108,16 +108,22 @@ struct twoway_kernel_id
     inplace_div_array,
     //
     equ_array_plus_scalar,
-    equ_array_neg,
-    equ_array_minus_scalar_pre,
+    equ_array_neg_pre,
+    equ_array_neg_post,
+    equ_array_minus_scalar_pre_pre,
+    equ_array_minus_scalar_pre_post,
     equ_array_minus_scalar_post,
     equ_array_mul_scalar,
     equ_array_div_scalar_pre,
     equ_array_div_scalar_post,
-    equ_array_square,
-    equ_array_sqrt,
-    equ_array_exp,
-    equ_array_log,
+    equ_array_square_pre,
+    equ_array_square_post,
+    equ_array_sqrt_pre,
+    equ_array_sqrt_post,
+    equ_array_exp_pre,
+    equ_array_exp_post,
+    equ_array_log_pre,
+    equ_array_log_post,
     //
     get_diag,
     //
@@ -159,16 +165,22 @@ struct twoway_kernel_id
     names.push_back("inplace_div_array");
 
     names.push_back("equ_array_plus_scalar");
-    names.push_back("equ_array_neg");
-    names.push_back("equ_array_minus_scalar_pre");
+    names.push_back("equ_array_neg_pre");
+    names.push_back("equ_array_neg_post");
+    names.push_back("equ_array_minus_scalar_pre_pre");
+    names.push_back("equ_array_minus_scalar_pre_post");
     names.push_back("equ_array_minus_scalar_post");
     names.push_back("equ_array_mul_scalar");
     names.push_back("equ_array_div_scalar_pre");
     names.push_back("equ_array_div_scalar_post");
-    names.push_back("equ_array_square");
-    names.push_back("equ_array_sqrt");
-    names.push_back("equ_array_exp");
-    names.push_back("equ_array_log");
+    names.push_back("equ_array_square_pre");
+    names.push_back("equ_array_square_post");
+    names.push_back("equ_array_sqrt_pre");
+    names.push_back("equ_array_sqrt_post");
+    names.push_back("equ_array_exp_pre");
+    names.push_back("equ_array_exp_post");
+    names.push_back("equ_array_log_pre");
+    names.push_back("equ_array_log_post");
 
     names.push_back("get_diag");
 

@@ -27,15 +27,15 @@ template<typename eglue_type>
 template<typename eT3, typename T1, typename T2>
 inline
 void
-eglue_core<eglue_type>::apply(Mat<eT3>& out, const eGlue<eT3, T1, T2, eglue_type>& x)
+eglue_core<eglue_type>::apply(Mat<eT3>& out, const eGlue<T1, T2, eglue_type>& x)
   {
   coot_extra_debug_sigprint();
   
   typedef typename T1::elem_type eT1;
   typedef typename T2::elem_type eT2;
   
-  const unwrap<typename SizeProxy<T1>::stored_type> UA(x.A.Q);
-  const unwrap<typename SizeProxy<T2>::stored_type> UB(x.B.Q);
+  const unwrap<T1> UA(x.A.Q);
+  const unwrap<T2> UB(x.B.Q);
   
   const Mat<eT1>& A = UA.M;
   const Mat<eT2>& B = UB.M;
@@ -64,7 +64,7 @@ template<typename eglue_type>
 template<typename eT3, typename T1, typename T2>
 inline
 void
-eglue_core<eglue_type>::apply_inplace_plus(Mat<eT3>& out, const eGlue<eT3, T1, T2, eglue_type>& x)
+eglue_core<eglue_type>::apply_inplace_plus(Mat<eT3>& out, const eGlue<T1, T2, eglue_type>& x)
   {
   coot_extra_debug_sigprint();
   
@@ -82,7 +82,7 @@ template<typename eglue_type>
 template<typename eT3, typename T1, typename T2>
 inline
 void
-eglue_core<eglue_type>::apply_inplace_minus(Mat<eT3>& out, const eGlue<eT3, T1, T2, eglue_type>& x)
+eglue_core<eglue_type>::apply_inplace_minus(Mat<eT3>& out, const eGlue<T1, T2, eglue_type>& x)
   {
   coot_extra_debug_sigprint();
   
@@ -100,7 +100,7 @@ template<typename eglue_type>
 template<typename eT3, typename T1, typename T2>
 inline
 void
-eglue_core<eglue_type>::apply_inplace_schur(Mat<eT3>& out, const eGlue<eT3, T1, T2, eglue_type>& x)
+eglue_core<eglue_type>::apply_inplace_schur(Mat<eT3>& out, const eGlue<T1, T2, eglue_type>& x)
   {
   coot_extra_debug_sigprint();
   
@@ -118,7 +118,7 @@ template<typename eglue_type>
 template<typename eT3, typename T1, typename T2>
 inline
 void
-eglue_core<eglue_type>::apply_inplace_div(Mat<eT3>& out, const eGlue<eT3, T1, T2, eglue_type>& x)
+eglue_core<eglue_type>::apply_inplace_div(Mat<eT3>& out, const eGlue<T1, T2, eglue_type>& x)
   {
   coot_extra_debug_sigprint();
   

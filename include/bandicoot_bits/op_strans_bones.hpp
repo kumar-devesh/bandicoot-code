@@ -22,7 +22,7 @@ class op_strans
   public:
   
   template<typename out_eT, typename T1>
-  inline static void apply(Mat<out_eT>& out, const Op<out_eT, T1, op_strans>& in);
+  inline static void apply(Mat<out_eT>& out, const Op<T1, op_strans>& in);
   
   template<typename out_eT, typename in_eT>
   inline static void apply_noalias(Mat<out_eT>& out, const Mat<in_eT>& A);

@@ -21,7 +21,7 @@
 template<typename out_eT, typename T1>
 inline 
 void
-op_strans::apply(Mat<out_eT>& out, const Op<out_eT, T1, op_strans>& in)
+op_strans::apply(Mat<out_eT>& out, const Op<T1, op_strans>& in)
   {
   coot_extra_debug_sigprint();
   

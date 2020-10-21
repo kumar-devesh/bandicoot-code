@@ -14,11 +14,6 @@
 
 
 
-// Empty struct for use with Op.
-class op_conv_to { };
-
-
-
 template<typename T2>
 struct conv_to
   {
@@ -33,13 +28,13 @@ struct conv_to
   static
   typename enable_if2<
       !is_same_type<typename T1::elem_type, out_eT>::value,
-      Op<out_eT, T1, op_conv_to>
+      mtOp<out_eT, T1, mtop_conv_to>
   >::result
   from(const T1& in)
     {
     coot_extra_debug_sigprint();
 
-    return Op<out_eT, T1, op_conv_to>(in);
+    return mtOp<out_eT, T1, mtop_conv_to>(in);
     }
 
 
@@ -62,162 +57,74 @@ struct conv_to
 
 
 
-  // Overloads for existing Op, Glue, eOp, and eGlue
-
-
-
-  template<typename in_eT, typename T1, typename op_type>
+  // When we get an Op or a Glue, there's no hope of delaying the conversion.
+  // (Exception: when it's an op_htrans or op_htrans2.)
+  template<typename T1, typename op_type>
   inline
   static
   typename enable_if2<
-      !is_same_type<out_eT, typename T1::elem_type>::value &&
-      !is_same_type<op_type, op_conv_to>::value,
-      Op<out_eT, T1, op_type>
+      is_same_type<typename T1::elem_type, out_eT>::no,
+      Mat<out_eT>
   >::result
-  from(const Op<in_eT, T1, op_type>& in)
+  from(const Op<T1, op_type>& in)
     {
     coot_extra_debug_sigprint();
 
-    return Op<out_eT, T1, op_type>(in);
+    Mat<out_eT> out;
+    op_type::apply(out, in);
+
+    return out;
     }
 
 
 
-
-  template<typename in_eT, typename T1, typename eop_type>
+  template<typename T1, typename T3, typename glue_type>
   inline
   static
   typename enable_if2<
-      !is_same_type<out_eT, typename T1::elem_type>::value,
-      eOp<out_eT, T1, eop_type>
+      is_same_type<typename T1::elem_type, out_eT>::no,
+      Mat<out_eT>
   >::result
-  from(const eOp<out_eT, T1, eop_type>& in)
+  from(const Glue<T1, T3, glue_type>& in)
     {
     coot_extra_debug_sigprint();
 
-    return eOp<out_eT, T1, eop_type>(in);
+    Mat<out_eT> out;
+    glue_type::apply(out, in);
+
+    return out;
     }
+
+
+
+  template<typename T1>
+  inline
+  static
+  typename enable_if2<
+      is_same_type<typename T1::elem_type, out_eT>::no,
+      mtOp<out_eT, Op<T1, op_htrans>, mtop_conv_to>
+  >::result
+  from(const Op<T1, op_htrans>& in)
+    {
+    coot_extra_debug_sigprint();
+
+    return mtOp<out_eT, Op<T1, op_htrans>, mtop_conv_to>(in);
+    }
+
+
+
+  template<typename T1>
+  inline
+  static
+  typename enable_if2<
+      is_same_type<typename T1::elem_type, out_eT>::no,
+      mtOp<out_eT, Op<T1, op_htrans2>, mtop_conv_to>
+  >::result
+  from(const Op<T1, op_htrans2>& in)
+    {
+    coot_extra_debug_sigprint();
+
+    return mtOp<out_eT, Op<T1, op_htrans2>, mtop_conv_to>(in);
+    }
+
   };
-
-
-
-// Tools for simplifying chained operations with a conv_to inside of them.
-//
-// Note that because of the rules above, it's not possible that we can get
-// a conv_to no-op (where in_eT == out_eT), so we don't need to consider that
-// case.
-
-
-
-// base case: no conv_to or no simplification possible
-template<typename T1>
-inline
-static
-const T1&
-conv_to_preapply(const T1& in)
-  {
-  coot_extra_debug_sigprint();
-
-  return in;
-  }
-
-
-
-template<typename out_eT, typename in_eT, typename T1, typename op_type>
-inline
-static
-typename enable_if2<
-    !is_same_type<op_type, op_conv_to>::value &&
-    // make sure that no conversion is already happening
-    is_same_type<in_eT, typename T1::elem_type>::value,
-    Op<out_eT, T1, op_type>
->::result
-conv_to_preapply(const Op<out_eT, Op<in_eT, T1, op_type>, op_conv_to>& in)
-  {
-  coot_extra_debug_sigprint();
-
-  return Op<out_eT, T1, op_type>(in);
-  }
-
-
-
-// sums can be applied pre- or post-conversion
-template<typename out_eT, typename T1>
-inline
-static
-Op<out_eT, T1, op_sum>
-conv_to_preapply(const Op<out_eT, Op<out_eT, T1, op_conv_to>, op_sum>& in)
-  {
-  coot_extra_debug_sigprint();
-
-  return Op<out_eT, T1, op_sum>(in.m.m, in.aux_uword_a, 1); // 1 => apply sum pre-conversion
-  }
-
-
-
-template<typename out_eT, typename in_eT, typename T1, typename eop_type>
-inline
-static
-typename enable_if2<
-    // make sure that no conversion is already happening
-    is_same_type<in_eT, typename T1::elem_type>::value,
-    eOp<out_eT, T1, eop_type>
->::result
-conv_to_preapply(const Op<out_eT, eOp<in_eT, T1, eop_type>, op_conv_to>& in)
-  {
-  coot_extra_debug_sigprint();
-
-  return eOp<out_eT, T1, eop_type>(in.m);
-  }
-
-
-
-// An eOp that has a conv_to in it wrapped around the same op can also be combined.
-template<typename out_eT, typename in_eT, typename T1, typename eop_type>
-inline
-static
-typename enable_if2<
-    // make sure that no conversion is already happening
-    is_same_type<in_eT, typename T1::elem_type>::value,
-    eOp<out_eT, T1, eop_type>
->::result
-conv_to_preapply(const eOp<out_eT, Op<out_eT, eOp<in_eT, T1, eop_type>, op_conv_to>, eop_type>& in)
-  {
-  coot_extra_debug_sigprint();
-
-  return eOp<out_eT, T1, eop_type>(in.m.m, in.aux_in, true);
-  }
-
-
-
-template<typename out_eT, typename in_eT, typename T1, typename T2, typename glue_type>
-inline
-static
-typename enable_if2<
-    // make sure that no conversion is already happening
-    is_same_type<in_eT, typename T1::elem_type>::value,
-    Glue<out_eT, T1, T2, glue_type>
->::result
-conv_to_preapply(const Op<out_eT, Glue<in_eT, T1, T2, glue_type>, op_conv_to>& in)
-  {
-  coot_extra_debug_sigprint();
-
-  return Glue<out_eT, T1, T2, glue_type>(in);
-  }
-
-
-
-template<typename out_eT, typename in_eT, typename T1, typename T2, typename glue_type>
-inline
-static
-typename enable_if2<
-    // make sure that no conversion is already happening
-    is_same_type<in_eT, typename T1::elem_type>::value,
-    eGlue<out_eT, T1, T2, glue_type>
->::result
-conv_to_preapply(const Op<out_eT, eGlue<in_eT, T1, T2, glue_type>, op_conv_to>& in)
-  {
-  coot_extra_debug_sigprint();
-
-  return eGlue<out_eT, T1, T2, glue_type>(in);
-  }

@@ -11,7 +11,7 @@ OBJECTS = $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 
 %.o: %.cpp $(DEPS)
 #	$(CXX) $(CXX_FLAGS) -DCOOT_DEFAULT_BACKEND=$(BACKEND) -o $@ -c $<
-	#$(CXX) $(CXX_FLAGS) -o $@ -c $<
+	$(CXX) $(CXX_FLAGS) -o $@ -c $<
 
 main: $(OBJECTS)
 	$(CXX) $(CXX_FLAGS) -o $@ $(OBJECTS) $(LIB_FLAGS)

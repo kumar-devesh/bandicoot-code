@@ -161,6 +161,7 @@ namespace coot
   #include "bandicoot_bits/eGlue_bones.hpp"
   #include "bandicoot_bits/eop_core_bones.hpp"
   #include "bandicoot_bits/eglue_core_bones.hpp"
+  #include "bandicoot_bits/mtOp_bones.hpp"
   #include "bandicoot_bits/Op_bones.hpp"
   #include "bandicoot_bits/Glue_bones.hpp"
   #include "bandicoot_bits/coot_rng_bones.hpp"
@@ -168,6 +169,8 @@ namespace coot
   #include "bandicoot_bits/op_sum_bones.hpp"
   #include "bandicoot_bits/op_htrans_bones.hpp"
   #include "bandicoot_bits/op_strans_bones.hpp"
+
+  #include "bandicoot_bits/mtop_conv_to_bones.hpp"
   
   #include "bandicoot_bits/glue_times_bones.hpp"
 
@@ -246,6 +249,7 @@ namespace coot
   //
   // classes that underlay metaprogramming 
   
+  #include "bandicoot_bits/no_conv_unwrap.hpp"
   #include "bandicoot_bits/unwrap.hpp"
   #include "bandicoot_bits/SizeProxy.hpp"
   
@@ -318,6 +322,7 @@ namespace coot
   #include "bandicoot_bits/eGlue_meat.hpp"
   #include "bandicoot_bits/eop_core_meat.hpp"
   #include "bandicoot_bits/eglue_core_meat.hpp"
+  #include "bandicoot_bits/mtOp_meat.hpp"
   #include "bandicoot_bits/Op_meat.hpp"
   #include "bandicoot_bits/Glue_meat.hpp"
   #include "bandicoot_bits/coot_rng_meat.hpp"
@@ -325,6 +330,8 @@ namespace coot
   #include "bandicoot_bits/op_sum_meat.hpp"
   #include "bandicoot_bits/op_htrans_meat.hpp"
   #include "bandicoot_bits/op_strans_meat.hpp"
+
+  #include "bandicoot_bits/mtop_conv_to_meat.hpp"
   
   #include "bandicoot_bits/glue_times_meat.hpp"
   

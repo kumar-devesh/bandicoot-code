@@ -190,30 +190,30 @@ Col<eT>::operator arma::Col<eT>() const
 
 template<typename eT>
 coot_inline
-const Op<eT, Col<eT>, op_htrans>
+const Op<Col<eT>, op_htrans>
 Col<eT>::t() const
   {
-  return Op<eT, Col<eT>, op_htrans>(*this);
+  return Op<Col<eT>, op_htrans>(*this);
   }
 
 
 
 template<typename eT>
 coot_inline
-const Op<eT, Col<eT>, op_htrans>
+const Op<Col<eT>, op_htrans>
 Col<eT>::ht() const
   {
-  return Op<eT, Col<eT>, op_htrans>(*this);
+  return Op<Col<eT>, op_htrans>(*this);
   }
 
 
 
 template<typename eT>
 coot_inline
-const Op<eT, Col<eT>, op_strans>
+const Op<Col<eT>, op_strans>
 Col<eT>::st() const
   {
-  return Op<eT, Col<eT>, op_strans>(*this);
+  return Op<Col<eT>, op_strans>(*this);
   }
 
 
