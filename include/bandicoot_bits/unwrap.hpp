@@ -99,6 +99,26 @@ struct unwrap< Col<eT> >
 
 
 
+template<typename eT>
+struct unwrap< subview<eT> >
+  {
+  typedef subview<eT> stored_type;
+
+  inline
+  unwrap(const subview<eT>& A)
+    : M(A)
+    {
+    coot_extra_debug_sigprint();
+    }
+
+  const subview<eT>& M;
+
+  template<typename eT2>
+  coot_inline bool is_alias(const subview<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
+  };
+
+
+
 // Since this is not no_conv_unwrap, we have to ensure that the stored_type has the correct out_eT.
 template<typename out_eT, typename T1>
 struct unwrap< mtOp<out_eT, T1, mtop_conv_to> >
