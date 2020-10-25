@@ -561,65 +561,32 @@ coot_rt_t::eop_scalar(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword
 template<typename eT>
 inline
 eT
-coot_rt_t::accu_chunked(const dev_mem_t<eT> mem, const uword n_elem)
+coot_rt_t::accu(const dev_mem_t<eT> mem, const uword n_elem)
   {
   coot_extra_debug_sigprint();
 
   if (get_rt().backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
-    return opencl::accu_chunked(mem, n_elem);
+    return opencl::accu(mem, n_elem);
     #else
-    coot_stop_runtime_error("coot_rt::accu_chunked(): OpenCL backend not enabled");
+    coot_stop_runtime_error("coot_rt::accu(): OpenCL backend not enabled");
     #endif
     }
   else if (get_rt().backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    return cuda::accu_chunked(mem, n_elem);
+    return cuda::accu(mem, n_elem);
     #else
-    coot_stop_runtime_error("coot_rt::accu_chunked(): CUDA backend not enabled");
+    coot_stop_runtime_error("coot_rt::accu(): CUDA backend not enabled");
     #endif
     }
   else
     {
-    coot_stop_runtime_error("coot_rt::accu_chunked(): unknown backend");
+    coot_stop_runtime_error("coot_rt::accu(): unknown backend");
     }
 
-  return eT(0); // fix warnings
-  }
-
-
-
-template<typename eT>
-inline
-eT
-coot_rt_t::accu_simple(const dev_mem_t<eT> mem, const uword n_elem)
-  {
-  coot_extra_debug_sigprint();
-
-  if (get_rt().backend == CL_BACKEND)
-    {
-    #if defined(COOT_USE_OPENCL)
-    return opencl::accu_simple(mem, n_elem);
-    #else
-    coot_stop_runtime_error("coot_rt::accu_simple(): OpenCL backend not enabled");
-    #endif
-    }
-  else if (get_rt().backend == CUDA_BACKEND)
-    {
-    #if defined(COOT_USE_CUDA)
-    return cuda::accu_simple(mem, n_elem);
-    #else
-    coot_stop_runtime_error("coot_rt::accu_simple(): CUDA backend not enabled");
-    #endif
-    }
-  else
-    {
-    coot_stop_runtime_error("coot_rt::accu_simple(): unknown backend");
-    }
-
-  return eT(0); // fix warnings
+  return eT(0);
   }
 
 

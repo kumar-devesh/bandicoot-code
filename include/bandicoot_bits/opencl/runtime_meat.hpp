@@ -352,6 +352,9 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
   cl_uint dev_ptr_width   = 0;
   cl_uint dev_opencl_ver  = 0;
   cl_uint dev_align       = 0;
+
+  size_t dev_max_wg         = 0;
+  size_t dev_wavefront_size = 0;
   
   
   clGetDeviceInfo(in_dev_id, CL_DEVICE_VENDOR,              sizeof(dev_name1),           &dev_name1,   NULL);
@@ -361,7 +364,8 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
   clGetDeviceInfo(in_dev_id, CL_DEVICE_DOUBLE_FP_CONFIG,    sizeof(cl_device_fp_config), &dev_fp64,    NULL);
   clGetDeviceInfo(in_dev_id, CL_DEVICE_MAX_COMPUTE_UNITS,   sizeof(cl_uint),             &dev_n_units, NULL);
   clGetDeviceInfo(in_dev_id, CL_DEVICE_MEM_BASE_ADDR_ALIGN, sizeof(cl_uint),             &dev_align,   NULL);
-  
+  clGetDeviceInfo(in_dev_id, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(size_t),              &dev_max_wg,  NULL);
+
   // contrary to the official OpenCL specification (OpenCL 1.2, sec 4.2 and sec 6.1.1).
   // certain OpenCL implementations use internal size_t which doesn't correspond to CL_DEVICE_ADDRESS_BITS
   // example: Clover from Mesa 13.0.4, running as AMD OLAND (DRM 2.48.0 / 4.9.14-200.fc25.x86_64, LLVM 3.9.1)
@@ -398,10 +402,10 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
       status = clBuildProgram(tmp_program, 0, NULL, NULL, NULL, NULL);
       
       // cout << "status: " << coot_cl_error::as_string(status) << endl;
-      // 
+       
       // size_t len = 0;
       // char buffer[10240];
-      // 
+       
       // clGetProgramBuildInfo(tmp_program, in_dev_id, CL_PROGRAM_BUILD_LOG, sizeof(buffer), buffer, &len);
       // std::cout << "output from clGetProgramBuildInfo():" << std::endl;
       // std::cout << buffer << std::endl;
@@ -412,6 +416,10 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
         
         if(status == CL_SUCCESS)
           {
+          // Extract what might be the warp or wavefront size.
+          // It seems possible this could be different per kernel, but we'll hope not.
+          status = clGetKernelWorkGroupInfo(tmp_kernel, in_dev_id, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, sizeof(size_t), &dev_wavefront_size, NULL);
+
           tmp_dev_mem = clCreateBuffer(tmp_context, CL_MEM_READ_WRITE, sizeof(cl_uint)*4, NULL, &status);
           
           clSetKernelArg(tmp_kernel, 0, sizeof(cl_mem),  &tmp_dev_mem);
@@ -451,24 +459,28 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
   if(print_info)
     {
     get_cerr_stream().flush();
-    get_cerr_stream() << "name1:       " << dev_name1 << std::endl;
-    get_cerr_stream() << "name2:       " << dev_name2 << std::endl;
-    get_cerr_stream() << "name3:       " << dev_name3 << std::endl;
-    get_cerr_stream() << "is_gpu:      " << (dev_type == CL_DEVICE_TYPE_GPU)  << std::endl;
-    get_cerr_stream() << "fp64:        " << dev_fp64 << std::endl;
-    get_cerr_stream() << "sizet_width: " << dev_sizet_width  << std::endl;
-    get_cerr_stream() << "ptr_width:   " << dev_ptr_width << std::endl;
-    get_cerr_stream() << "n_units:     " << dev_n_units << std::endl;
-    get_cerr_stream() << "opencl_ver:  " << dev_opencl_ver << std::endl;
-  //get_cerr_stream() << "align:       " << dev_align  << std::endl;
+    get_cerr_stream() << "name1:          " << dev_name1 << std::endl;
+    get_cerr_stream() << "name2:          " << dev_name2 << std::endl;
+    get_cerr_stream() << "name3:          " << dev_name3 << std::endl;
+    get_cerr_stream() << "is_gpu:         " << (dev_type == CL_DEVICE_TYPE_GPU)  << std::endl;
+    get_cerr_stream() << "fp64:           " << dev_fp64 << std::endl;
+    get_cerr_stream() << "sizet_width:    " << dev_sizet_width  << std::endl;
+    get_cerr_stream() << "ptr_width:      " << dev_ptr_width << std::endl;
+    get_cerr_stream() << "n_units:        " << dev_n_units << std::endl;
+    get_cerr_stream() << "opencl_ver:     " << dev_opencl_ver << std::endl;
+  //get_cerr_stream() << "align:          " << dev_align  << std::endl;
+    get_cerr_stream() << "max_wg:         " << dev_max_wg << std::endl;
+    get_cerr_stream() << "wavefront_size: " << dev_wavefront_size << std::endl;
     }
   
-  out_info.is_gpu      = (dev_type == CL_DEVICE_TYPE_GPU);
-  out_info.has_float64 = (dev_fp64 != 0);
-  out_info.has_sizet64 = (dev_sizet_width >= 8);
-  out_info.ptr_width   = uword(dev_ptr_width);
-  out_info.n_units     = uword(dev_n_units);
-  out_info.opencl_ver  = uword(dev_opencl_ver);
+  out_info.is_gpu         = (dev_type == CL_DEVICE_TYPE_GPU);
+  out_info.has_float64    = (dev_fp64 != 0);
+  out_info.has_sizet64    = (dev_sizet_width >= 8);
+  out_info.ptr_width      = uword(dev_ptr_width);
+  out_info.n_units        = uword(dev_n_units);
+  out_info.opencl_ver     = uword(dev_opencl_ver);
+  out_info.max_wg         = uword(dev_max_wg);
+  out_info.wavefront_size = uword(dev_wavefront_size);
   
   return (status == CL_SUCCESS);
   }
@@ -547,12 +559,24 @@ runtime_t::compile_kernels(const std::string& source, std::vector<std::pair<std:
   
   std::string build_options = ((sizeof(uword) >= 8) && dev_info.has_sizet64) ? std::string("-D UWORD=ulong") : std::string("-D UWORD=uint");
 
+  // Add the wavefront size to the build options.
+  std::ostringstream wavefront_size_options;
+  wavefront_size_options << " -D WAVEFRONT_SIZE=" << dev_info.wavefront_size;
+  wavefront_size_options << " -D WAVEFRONT_SIZE_NAME=";
+  if (dev_info.wavefront_size == 8 || dev_info.wavefront_size == 16 || dev_info.wavefront_size == 32 || dev_info.wavefront_size == 64 || dev_info.wavefront_size == 128)
+    {
+    wavefront_size_options << dev_info.wavefront_size;
+    }
+  else
+    {
+    wavefront_size_options << "other";
+    }
+  build_options += wavefront_size_options.str();
+
   status = clBuildProgram(prog_holder.prog, 0, NULL, build_options.c_str(), NULL, NULL);
 
   if(status != CL_SUCCESS)
     {
-    cout << "status: " << coot_cl_error::as_string(status) << endl;
-
     size_t len = 0;
 
     // Get the length of the error log and then allocate enough space for it.
@@ -591,6 +615,24 @@ uword
 runtime_t::get_n_units() const
   {
   return (valid) ? dev_info.n_units : uword(0);
+  }
+
+
+
+inline
+uword
+runtime_t::get_max_wg() const
+  {
+  return (valid) ? dev_info.max_wg : uword(0);
+  }
+
+
+
+inline
+uword
+runtime_t::get_wavefront_size() const
+  {
+  return (valid) ? dev_info.wavefront_size : uword(0);
   }
 
 

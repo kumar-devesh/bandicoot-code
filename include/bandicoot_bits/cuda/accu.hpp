@@ -17,117 +17,106 @@
 //! @{
 
 /**
- * Accumulate all the elements in the device memory in a chunked fashion.
+ * Accumulate all elements in `mem`.
  */
 template<typename eT>
 inline
 eT
-accu_chunked(dev_mem_t<eT> mem, const uword n_elem)
+accu(dev_mem_t<eT> mem, const uword n_elem)
   {
   coot_extra_debug_sigprint();
 
   coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "cuda runtime not valid" );
 
-  // work out number of chunks
-  // make sure there are at least 4 elements per compunit
-
-  uword n_chunks = get_rt().cuda_rt.dev_prop.multiProcessorCount;
-
-  while(n_chunks >= 1)
+  if (std::is_same<eT, float>::value)
     {
-    if( (n_elem / n_chunks) >= uword(4) )  { break; }
+    float result;
+    cublasStatus_t status = cublasSasum(get_rt().cuda_rt.cublas_handle, n_elem, (float*) mem.cuda_mem_ptr, 1, &result);
 
-    n_chunks /= uword(2);
+    coot_check_cublas_error( status, "cuda::accu::apply(): call to cublasSasum() failed" );
+    return result;
     }
+  else if (std::is_same<eT, double>::value)
+    {
+    double result;
+    cublasStatus_t status = cublasDasum(get_rt().cuda_rt.cublas_handle, n_elem, (double*) mem.cuda_mem_ptr, 1, &result);
 
-  n_chunks = (std::max)(uword(1), n_chunks);
+    coot_check_cublas_error( status, "cuda::accu::apply(): call to cublasDasum() failed" );
+    return result;
+    }
+  else
+    {
+    CUfunction k = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu);
+    CUfunction k_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu_small);
 
-  const uword chunk_size = n_elem / n_chunks;
+    // Compute grid size; ideally we want to use the maximum possible number of threads per block.
+    kernel_dims dims = one_dimensional_grid_dims(n_elem / (2 * std::ceil(std::log2(n_elem))));
 
-  Mat<eT> tmp(n_chunks, 1);
+    // Create auxiliary memory, with size equal to the number of blocks.
+    Mat<eT> aux(dims.d[0], 1);
+    dev_mem_t<eT> aux_mem = aux.get_dev_mem(false);
+    // Initialize this to the right size, if we will have a second run.
+    Mat<eT> aux2;
+    if (dims.d[0] > 1)
+      {
+      kernel_dims second_dims = one_dimensional_grid_dims(dims.d[0]);
+      aux2.zeros(second_dims.d[0], 1);
+      }
+    dev_mem_t<eT> aux_mem2 = aux2.get_dev_mem(false);
+    Mat<eT>* out = &aux;
 
-  CUfunction k1 = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu_chunked);
+    dev_mem_t<eT>* in_mem = &mem;
+    dev_mem_t<eT>* out_mem = &aux_mem;
 
-  dev_mem_t<eT> tmp_mem = tmp.get_dev_mem(false);
+    // Each outer iteration will reduce down to the number of blocks.
+    // So, we'll simply keep reducing until we only have one block left.
+    uword in_n_elem = n_elem;
+    do
+      {
+      // Ensure we always use a power of 2 for the number of threads.
+      const uword num_threads = (uword) std::pow(2.0f, std::ceil(std::log2((float) dims.d[3])));
 
-  const void* args[] = {
-      &(tmp_mem.cuda_mem_ptr),
-      &(mem.cuda_mem_ptr),
-      (uword*) &chunk_size,
-      (uword*) &n_chunks };
+      const void* args[] = {
+          &(in_mem->cuda_mem_ptr),
+          (uword*) &in_n_elem,
+          &(out_mem->cuda_mem_ptr) };
 
-  const kernel_dims dims = one_dimensional_grid_dims(n_chunks);
+      CUresult result = cuLaunchKernel(
+          num_threads < 32 ? k_small : k, // if we have fewer threads than a single warp, we can use a more optimized version of the kernel
+          dims.d[0], dims.d[1], dims.d[2],
+          num_threads, dims.d[4], dims.d[5],
+          2 * num_threads * sizeof(eT), // shared mem should have size equal to number of threads times 2
+          NULL,
+          (void**) args,
+          0);
 
-  CUresult result = cuLaunchKernel(
-      k1,
-      dims.d[0], dims.d[1], dims.d[2],
-      dims.d[3], dims.d[4], dims.d[5],
-      0, NULL, // shared mem and stream
-      (void**) args,
-      0);
+      coot_check_cuda_error(result, "cuda::accu(): cuLaunchKernel() failed");
 
-  coot_check_cuda_error(result, "cuda::accu_chunked(): cuLaunchKernel() failed");
+      if (dims.d[0] == 1)
+        {
+        // We are done.  Terminate.
+        break;
+        }
 
-  CUfunction k2 = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu_twostage);
+      in_n_elem = out->n_elem;
+      if (in_mem == &mem)
+        {
+        in_mem = &aux_mem;
+        out_mem = &aux_mem2;
+        }
+      else
+        {
+        std::swap(in_mem, out_mem);
+        out = (out == &aux) ? &aux2 : &aux;
+        }
 
-  const size_t A_start = n_chunks * chunk_size;
+      // Now compute sizes for the next iteration.
+      dims = one_dimensional_grid_dims(in_n_elem / (2 * std::ceil(std::log2(in_n_elem))));
 
-  const void* args2[] = {
-      &(tmp_mem.cuda_mem_ptr),
-      (uword*) &tmp.n_elem,
-      &(mem.cuda_mem_ptr),
-      (uword*) &A_start,
-      (uword*) &n_elem };
+      } while (true);
 
-  result = cuLaunchKernel(
-      k2,
-      1, 1, 1, // grid dims
-      1, 1, 1, // block dims
-      0, NULL,
-      (void**) args2,
-      0);
-
-  coot_check_cuda_error(result, "cuda::accu_chunked(): cuLaunchKernel() failed");
-
-  return eT(tmp(0));
-  }
-
-
-
-/**
- * Accumulate all the elements in the device memory, but using a simple one-pass strategy.
- */
-template<typename eT>
-inline
-eT
-accu_simple(dev_mem_t<eT> mem, const uword n_elem)
-  {
-  coot_extra_debug_sigprint();
-
-  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "cuda runtime not valid" );
-
-  Mat<eT> tmp(1, 1);
-
-  CUfunction k1 = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu_simple);
-
-  dev_mem_t<eT> tmp_mem = tmp.get_dev_mem(false);
-
-  const void* args[] = {
-      &(tmp_mem.cuda_mem_ptr),
-      &(mem.cuda_mem_ptr),
-      (uword*) &n_elem };
-
-  CUresult result = cuLaunchKernel(
-      k1,
-      1, 1, 1, // block dims
-      1, 1, 1, // grid dims
-      0, NULL,
-      (void**) args,
-      0);
-
-  coot_check_cuda_error(result, "cuda::accu_simple(): cuLaunchKernel() failed");
-
-  return eT(tmp(0));
+    return eT((*out)[0]);
+    }
   }
 
 

@@ -29,73 +29,67 @@ dot(dev_mem_t<eT1> mem1, dev_mem_t<eT2> mem2, const uword n_elem)
 
   coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "cuda runtime not valid" );
 
-  // work out the number of chunks, making sure there are at least 4 elements per compunit
-
-  uword n_chunks = get_rt().cuda_rt.dev_prop.multiProcessorCount;
-
-  while(n_chunks >= 1)
+  // If we can, try to use cuBLAS.
+  if (std::is_same<eT1, eT2>::value && std::is_same<eT1, float>::value)
     {
-    if( (n_elem / n_chunks) >= uword(4) ) { break; }
+    float result;
+    cublasStatus_t status = cublasSdot(get_rt().cuda_rt.cublas_handle, n_elem, (float*) mem1.cuda_mem_ptr, 1, (float*) mem2.cuda_mem_ptr, 1, &result);
 
-    n_chunks /= uword(2);
+    coot_check_cublas_error( status, "cuda::dot::apply() call to cublasSdot() failed" );
+    return result;
     }
+  else if (std::is_same<eT1, eT2>::value && std::is_same<eT1, double>::value)
+    {
+    double result;
+    cublasStatus_t status = cublasDdot(get_rt().cuda_rt.cublas_handle, n_elem, (double*) mem1.cuda_mem_ptr, 1, (double*) mem2.cuda_mem_ptr, 1, &result);
 
-  n_chunks = (std::max)(uword(1), n_chunks);
+    coot_check_cublas_error( status, "cuda::dot::apply() call to cublasDdot() failed" );
+    return result;
+    }
+  else
+    {
+    // In any other situation, we'll use our own kernels.
+    CUfunction k = get_rt().cuda_rt.get_kernel<eT2, eT1>(twoway_kernel_id::dot);
+    CUfunction k_small = get_rt().cuda_rt.get_kernel<eT2, eT1>(twoway_kernel_id::dot_small);
 
-  const uword chunk_size = n_elem / n_chunks;
+    // Compute grid size; ideally we want to use the maximum possible number of threads per block.
+    kernel_dims dims = one_dimensional_grid_dims(n_elem / (2 * std::ceil(std::log2(n_elem))));
 
-  Mat<promoted_eT> tmp(n_chunks, 1);
+    // Create auxiliary memory, with size equal to the number of blocks.
+    Mat<promoted_eT> aux(dims.d[0], 1);
+    dev_mem_t<promoted_eT> aux_mem = aux.get_dev_mem(false);
 
-  CUfunction k1 = get_rt().cuda_rt.get_kernel<eT2, eT1>(twoway_kernel_id::dot_chunked);
+    // We'll only run once with the dot kernel, and if this still needs further reduction, we can use accu().
 
-  dev_mem_t<promoted_eT> tmp_mem = tmp.get_dev_mem(false);
+    // Ensure we always use a power of 2 for the number of threads.
+    const uword num_threads = (uword) std::pow(2.0f, std::ceil(std::log2((float) dims.d[3])));
 
-  const void* args[] = {
-      &(tmp_mem.cuda_mem_ptr),
-      &(mem1.cuda_mem_ptr),
-      &(mem2.cuda_mem_ptr),
-      (uword*) &chunk_size,
-      (uword*) &n_chunks };
+    const void* args[] = {
+        &(aux_mem.cuda_mem_ptr),
+        &(mem1.cuda_mem_ptr),
+        &(mem2.cuda_mem_ptr),
+        (uword*) &n_elem };
 
-  const kernel_dims dims = one_dimensional_grid_dims(n_chunks);
+    CUresult result = cuLaunchKernel(
+        num_threads < 32 ? k_small : k, // if we have fewer threads than a single warp, we can use a more optimized version of the kernel
+        dims.d[0], dims.d[1], dims.d[2],
+        num_threads, dims.d[4], dims.d[5],
+        2 * num_threads * sizeof(promoted_eT), // shared mem should have size equal to number of threads times 2
+        NULL,
+        (void**) args,
+        0);
 
-  CUresult result = cuLaunchKernel(
-      k1,
-      dims.d[0], dims.d[1], dims.d[2],
-      dims.d[3], dims.d[4], dims.d[5],
-      0, NULL, // shared mem and stream
-      (void**) args,
-      0);
+    coot_check_cuda_error(result, "cuda::dot(): cuLaunchKernel() failed");
 
-  coot_check_cuda_error(result, "cuda::dot(): cuLaunchKernel() failed");
-
-  // Now that we've computed a partial sum, sum it.  This is really not the best approach; it only uses one thread.  It could be improved to repeatedly use, e.g., accu_chunked.
-
-  CUfunction k2 = get_rt().cuda_rt.get_kernel<eT2, eT1>(twoway_kernel_id::dot_twostage);
-
-  const size_t A_start = n_chunks * chunk_size;
-
-  const void* args2[] = {
-      &(tmp_mem.cuda_mem_ptr),
-      (uword*) &tmp.n_elem,
-      &(mem1.cuda_mem_ptr),
-      &(mem2.cuda_mem_ptr),
-      (uword*) &A_start,
-      (uword*) &n_elem };
-
-  result = cuLaunchKernel(
-      k2,
-      1, 1, 1, // grid dims
-      1, 1, 1, // block dims
-      0, NULL,
-      (void**) args2,
-      0);
-
-  coot_check_cuda_error(result, "cuda::dot(): cuLaunchKernel() failed");
-
-  promoted_eT ret = promoted_eT(tmp(0));
-
-  return ret;
+    if (aux.n_elem == 1)
+      {
+      return promoted_eT(aux[0]);
+      }
+    else
+      {
+      return accu(aux_mem, aux.n_elem);
+      }
+    }
   }
 
 //! @}

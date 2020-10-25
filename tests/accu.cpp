@@ -18,15 +18,41 @@
 using namespace coot;
 
 template<typename eT>
-void test_accu_1()
+void test_accu_small()
   {
-  Mat<eT> x(5, 5);
-  for (uword i = 0; i < 25; ++i)
+  Mat<eT> x(4, 4);
+  for (uword i = 0; i < 16; ++i)
     x[i] = i + 1;
 
   eT sum = accu(x);
 
-  REQUIRE(sum == Approx(eT(325)) );
+  REQUIRE(sum == Approx(eT(136)) );
+  }
+
+
+
+TEST_CASE("accu_small")
+  {
+  test_accu_small<double>();
+  test_accu_small<float>();
+  test_accu_small<u32>();
+  test_accu_small<s32>();
+  test_accu_small<u64>();
+  test_accu_small<s64>();
+  }
+
+
+
+template<typename eT>
+void test_accu_1()
+  {
+  Mat<eT> x(80, 80);
+  for (uword i = 0; i < 6400; ++i)
+    x[i] = i + 1;
+
+  eT sum = accu(x);
+
+  REQUIRE(sum == Approx(eT(20483200)) );
   }
 
 

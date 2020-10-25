@@ -52,7 +52,7 @@ void fill_randu(arma::Mat<s64>& x)
 
 
 
-template<typename MatType>
+template<typename MatType1, typename MatType2>
 double run_benchmark(const uword elem, const bool cuda)
   {
   // set the correct backend
@@ -61,8 +61,11 @@ double run_benchmark(const uword elem, const bool cuda)
   else
     get_rt().backend = CL_BACKEND;
 
-  MatType x;
+  MatType1 x;
   x.set_size(elem, 1);
+  fill_randu(x);
+  MatType2 y;
+  y.set_size(elem, 1);
   fill_randu(x);
 
   // finish all delayed operations
@@ -72,11 +75,11 @@ double run_benchmark(const uword elem, const bool cuda)
   double t;
 
   c.tic();
-  const double result = accu(x);
+  const double result = dot(x, y);
   get_rt().synchronise();
   t = c.toc();
 
-  // prevent optimization of accu() call
+  // prevent optimization of dot() call
   if (result < 0)
     std::cerr << "something wrong with the results!\n";
 
@@ -85,7 +88,7 @@ double run_benchmark(const uword elem, const bool cuda)
 
 
 
-template<typename MatType>
+template<typename MatType1, typename MatType2>
 void run_benchmarks(const uword elem,
                     const bool cuda,
                     const size_t trials,
@@ -97,8 +100,8 @@ void run_benchmarks(const uword elem,
   {
   for (size_t trial = 0; trial < trials; ++trial)
     {
-    const double t = run_benchmark<MatType>(elem, cuda);
-    const double bw = (elem * sizeof(typename MatType::elem_type) / t) / std::pow(2.0, 30.0);
+    const double t = run_benchmark<MatType1, MatType2>(elem, cuda);
+    const double bw = (elem * (sizeof(typename MatType1::elem_type) + sizeof(typename MatType2::elem_type)) / t) / std::pow(2.0, 30.0);
 
     out << task_name << "," << device_name << "," << backend_name << "," << elem_type << ","
         << elem << ",1," << trial << "," << t << "," << bw << "\n";
@@ -124,7 +127,7 @@ int main(int argc, char** argv)
 
   wall_clock c;
 
-  std::cout << "accu: element accumulation benchmark comparison\n";
+  std::cout << "dot: element dot product benchmark comparison\n";
   std::cout << "  bandicoot version " << coot::coot_version::as_string() << '\n';
   std::cout << "  armadillo version " << arma::arma_version::as_string() << '\n';
   std::cout << '\n';
@@ -143,19 +146,23 @@ int main(int argc, char** argv)
     exit(1);
     }
 
-  run_benchmarks<arma::Mat<s32>>(elem, false, trials, "accu", device_name, "cpu", "int32", out_file);
-  run_benchmarks<coot::Mat<s32>>(elem, false, trials, "accu", device_name, "opencl", "int32", out_file);
-  run_benchmarks<coot::Mat<s32>>(elem, true, trials, "accu", device_name, "cuda", "int32", out_file);
+  run_benchmarks<arma::Mat<s32>, arma::Mat<s32>>(elem, false, trials, "dot", device_name, "cpu", "int32", out_file);
+  run_benchmarks<coot::Mat<s32>, coot::Mat<s32>>(elem, false, trials, "dot", device_name, "opencl", "int32", out_file);
+  run_benchmarks<coot::Mat<s32>, coot::Mat<s32>>(elem, true, trials, "dot", device_name, "cuda", "int32", out_file);
 
-  run_benchmarks<arma::Mat<s64>>(elem, false, trials, "accu", device_name, "cpu", "int64", out_file);
-  run_benchmarks<coot::Mat<s64>>(elem, false, trials, "accu", device_name, "opencl", "int64", out_file);
-  run_benchmarks<coot::Mat<s64>>(elem, true, trials, "accu", device_name, "cuda", "int64", out_file);
+  run_benchmarks<arma::Mat<s64>, arma::Mat<s64>>(elem, false, trials, "dot", device_name, "cpu", "int64", out_file);
+  run_benchmarks<coot::Mat<s64>, coot::Mat<s64>>(elem, false, trials, "dot", device_name, "opencl", "int64", out_file);
+  run_benchmarks<coot::Mat<s64>, coot::Mat<s64>>(elem, true, trials, "dot", device_name, "cuda", "int64", out_file);
 
-  run_benchmarks<arma::fmat>(elem, false, trials, "accu", device_name, "cpu", "float", out_file);
-  run_benchmarks<coot::fmat>(elem, false, trials, "accu", device_name, "opencl", "float", out_file);
-  run_benchmarks<coot::fmat>(elem, true, trials, "accu", device_name, "cuda", "float", out_file);
+  run_benchmarks<arma::fmat, arma::fmat>(elem, false, trials, "dot", device_name, "cpu", "float", out_file);
+  run_benchmarks<coot::fmat, coot::fmat>(elem, false, trials, "dot", device_name, "opencl", "float", out_file);
+  run_benchmarks<coot::fmat, coot::fmat>(elem, true, trials, "dot", device_name, "cuda", "float", out_file);
 
-  run_benchmarks<arma::mat>(elem, false, trials, "accu", device_name, "cpu", "double", out_file);
-  run_benchmarks<coot::mat>(elem, false, trials, "accu", device_name, "opencl", "double", out_file);
-  run_benchmarks<coot::mat>(elem, true, trials, "accu", device_name, "cuda", "double", out_file);
+  run_benchmarks<arma::mat, arma::mat>(elem, false, trials, "dot", device_name, "cpu", "double", out_file);
+  run_benchmarks<coot::mat, coot::mat>(elem, false, trials, "dot", device_name, "opencl", "double", out_file);
+  run_benchmarks<coot::mat, coot::mat>(elem, true, trials, "dot", device_name, "cuda", "double", out_file);
+
+  run_benchmarks<arma::mat, arma::Mat<s32>>(elem, false, trials, "dot", device_name, "cpu", "double/s32", out_file);
+  run_benchmarks<coot::mat, coot::Mat<s32>>(elem, false, trials, "dot", device_name, "opencl", "double/s32", out_file);
+  run_benchmarks<coot::mat, coot::Mat<s32>>(elem, true, trials, "dot", device_name, "cuda", "double/s32", out_file);
   }

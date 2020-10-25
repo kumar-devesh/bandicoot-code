@@ -32,27 +32,7 @@ accu(const Base<typename T1::elem_type, T1>& X)
 
   if(A.n_elem == 0)  { return eT(0); }
 
-  return coot_rt_t::accu_chunked(A.get_dev_mem(false), A.n_elem);
-  }
-
-
-
-template<typename T1>
-coot_warn_unused
-inline
-typename T1::elem_type
-accu_simple(const Base<typename T1::elem_type, T1>& X)
-  {
-  coot_extra_debug_sigprint();
-  
-  typedef typename T1::elem_type eT;
-  
-  const unwrap<T1>   U(X.get_ref());
-  const Mat<eT>& A = U.M;
-  
-  if(A.n_elem == 0)  { return eT(0); }
-
-  return coot_rt_t::accu_simple(A.get_dev_mem(false), A.n_elem);
+  return coot_rt_t::accu(A.get_dev_mem(false), A.n_elem);
   }
 
 
