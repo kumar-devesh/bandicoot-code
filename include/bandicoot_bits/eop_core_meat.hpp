@@ -92,7 +92,7 @@ eop_core<eop_type>::apply(Mat<eT>& out, const eOp<T1, eop_type>& x)
 
   if (!force_conv_unwrap)
     {
-    const no_conv_unwrap<T1> U(x.m.Q);
+    const no_conv_unwrap<typename SizeProxy<T1>::stored_type> U(x.m.Q);
     const Mat<in_eT>& A = U.M;
 
     dev_mem_t<in_eT> A_dev_mem = A.get_dev_mem(false);
@@ -102,7 +102,7 @@ eop_core<eop_type>::apply(Mat<eT>& out, const eOp<T1, eop_type>& x)
   else
     {
     // We have to perform any conversion before this level.
-    const unwrap<T1> U(x.m.Q);
+    const unwrap<typename SizeProxy<T1>::stored_type> U(x.m.Q);
     const Mat<typename T1::elem_type>& A = U.M;
 
     dev_mem_t<typename T1::elem_type> A_dev_mem = A.get_dev_mem(false);
