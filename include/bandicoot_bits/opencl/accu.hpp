@@ -77,7 +77,7 @@ accu(dev_mem_t<eT> mem, const uword n_elem)
     const uword pow2_total_num_threads = (total_num_threads % pow2_group_size == 0) ? total_num_threads : ((total_num_threads / pow2_group_size) + 1) * pow2_group_size;
 
     // If the number of threads is less than the wavefront size, we need to use the small kernel.
-    cl_kernel* k_use = (pow2_group_size < wavefront_size) ? &k_small : &k;
+    cl_kernel* k_use = (pow2_group_size <= wavefront_size) ? &k_small : &k;
 
     status |= clSetKernelArg(*k_use, 0, sizeof(cl_mem),               &(in_mem->cl_mem_ptr));
     status |= clSetKernelArg(*k_use, 1, dev_n_elem.size,              dev_n_elem.addr);
