@@ -30,9 +30,6 @@ accu(dev_mem_t<eT> mem, const uword n_elem)
 
   cl_int status = 0;
 
-  // Note that CLBLAS does provide the sasum() and dasum() functions, but these seem
-  // to be slower than the handwritten kernels (fairly significantly!).
-
   cl_kernel k = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu);
   cl_kernel k_small = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu_small);
 
