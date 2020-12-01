@@ -70,6 +70,33 @@ TEST_CASE("accu_1")
 
 
 template<typename eT>
+void test_accu_strange_size()
+  {
+  Col<eT> x(608);
+
+  for(uword i = 0; i < 608; ++i)
+    x[i] = i + 1;
+
+  eT sum = accu(x);
+
+  REQUIRE(sum == Approx(eT(185136)));
+  }
+
+
+
+TEST_CASE("accu_strange_size")
+  {
+  test_accu_strange_size<double>();
+  test_accu_strange_size<float>();
+  test_accu_strange_size<u32>();
+  test_accu_strange_size<s32>();
+  test_accu_strange_size<u64>();
+  test_accu_strange_size<s64>();
+  }
+
+
+
+template<typename eT>
 void test_accu_2()
   {
   Mat<eT> x(10, 5);

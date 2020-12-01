@@ -64,7 +64,7 @@ accu(dev_mem_t<eT> mem, const uword n_elem)
         &(out_mem->cuda_mem_ptr) };
 
     CUresult result = cuLaunchKernel(
-        num_threads < 32 ? k_small : k, // if we have fewer threads than a single warp, we can use a more optimized version of the kernel
+        num_threads <= 32 ? k_small : k, // if we have fewer threads than a single warp, we can use a more optimized version of the kernel
         dims.d[0], dims.d[1], dims.d[2],
         num_threads, dims.d[4], dims.d[5],
         2 * num_threads * sizeof(eT), // shared mem should have size equal to number of threads times 2
