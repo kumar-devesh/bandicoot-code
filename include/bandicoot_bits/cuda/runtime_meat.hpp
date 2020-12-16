@@ -84,7 +84,7 @@ runtime_t::compile_kernels(const std::string& source,
   // We'll use NVRTC to compile each of the kernels we need on the fly.
   nvrtcProgram prog;
   nvrtcResult result = nvrtcCreateProgram(
-      &prog,          // CUDA Runtime Compilation program
+      &prog,          // CUDA runtime compilation program
       source.c_str(), // CUDA program source
       "coot_kernels", // CUDA program name
       0,              // number of headers used
