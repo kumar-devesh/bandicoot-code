@@ -24,6 +24,7 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
 
   valid = false;
 
+
   CUresult result = cuInit(0);
   coot_check_cuda_error(result, "cuda::runtime_t::init(): cuInit() failed");
 
@@ -96,8 +97,6 @@ runtime_t::compile_kernels(const std::string& source,
     {
     "--fmad=false",
     "-D UWORD=size_t",
-    "--relocatable-device-code=true",
-    "--restrict"
     };
 
   // Get compute capabilities.
