@@ -105,11 +105,11 @@ inline std::string substitute_types(const std::string& input, const std::string&
 
 template<typename KernelType, typename TypeMapper, typename higher_eT1 = void, typename higher_eT2 = void>
 inline std::string get_one_elem_kernel_src(kernels_t<std::vector<KernelType>>& kernels,
-                                             const std::string& source,
-                                             const std::vector<std::string>& kernel_names,
-                                             const std::string& prefix,
-                                             std::vector<std::pair<std::string, KernelType*>>& name_map,
-                                             const TypeMapper& type_map)
+                                           const std::string& source,
+                                           const std::vector<std::string>& kernel_names,
+                                           const std::string& prefix,
+                                           std::vector<std::pair<std::string, KernelType*>>& name_map,
+                                           const TypeMapper& type_map)
   {
   const std::string u32_src = substitute_types<TypeMapper, u32, higher_eT1, higher_eT2>(source, prefix + "u32_", type_map);
   const std::string s32_src = substitute_types<TypeMapper, s32, higher_eT1, higher_eT2>(source, prefix + "s32_", type_map);

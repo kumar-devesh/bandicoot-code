@@ -1,10 +1,10 @@
 // Copyright 2019 Ryan Curtin (http://www.ratml.org/)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,6 +23,7 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
   coot_debug_check( (wanted_platform != 0), "cuda::runtime_t::init(): wanted_platform must be 0 for the CUDA backend" );
 
   valid = false;
+
 
   CUresult result = cuInit(0);
   coot_check_cuda_error(result, "cuda::runtime_t::init(): cuInit() failed");
@@ -84,25 +85,35 @@ runtime_t::compile_kernels(const std::string& source,
   // We'll use NVRTC to compile each of the kernels we need on the fly.
   nvrtcProgram prog;
   nvrtcResult result = nvrtcCreateProgram(
-      &prog,          // program holder
-      source.c_str(), // buffer with source
-      "coot_kernels", // name
-      0,              // numHeaders
-      NULL,           // headers
-      NULL);          // includeNames
+      &prog,          // CUDA runtime compilation program
+      source.c_str(), // CUDA program source
+      "coot_kernels", // CUDA program name
+      0,              // number of headers used
+      NULL,           // sources of the headers
+      NULL);          // name of each header
   coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcCreateProgram() failed");
 
-  // Construct the macros that we need.
-  const char** opts = new const char*[3];
-  opts[0] = "--gpu-architecture=compute_30";
-  opts[1] = "--fmad=false";
-  opts[2] = "-D UWORD=size_t"; /* TODO: what about 32-bit? */
+  std::vector<const char*> opts =
+    {
+    "--fmad=false",
+    "-D UWORD=size_t",
+    };
 
-  result = nvrtcCompileProgram(prog,  // prog
-                               3,     // numOptions
-                               opts); // options
+  // Get compute capabilities.
+  int major, minor = 0;
+  CUresult result2 = cuDeviceGetAttribute(&major, CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MAJOR, cuDevice);
+  coot_check_cuda_error(result2, "cuda::runtime_t::init_kernels(): cuDeviceGetAttribute() failed");
+  result2 = cuDeviceGetAttribute(&minor, CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MINOR, cuDevice);
+  coot_check_cuda_error(result2, "cuda::runtime_t::init_kernels(): cuDeviceGetAttribute() failed");
 
-  delete[] opts;
+  std::stringstream gpu_arch_opt;
+  gpu_arch_opt << "--gpu-architecture=compute_" << major << minor;
+  const std::string& gpu_arch_opt_tmp = gpu_arch_opt.str();
+  opts.push_back(gpu_arch_opt_tmp.c_str());
+
+  result = nvrtcCompileProgram(prog,         // CUDA runtime compilation program
+                               opts.size(),  // number of compile options
+                               opts.data()); // compile options
 
   // If compilation failed, display what went wrong.  The NVRTC outputs aren't
   // always very helpful though...
@@ -128,7 +139,7 @@ runtime_t::compile_kernels(const std::string& source,
   result = nvrtcGetPTX(prog, ptx);
   coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcGetPTX() failed");
 
-  CUresult result2 = cuInit(0);
+  result2 = cuInit(0);
   CUmodule module;
   result2 = cuModuleLoadDataEx(&module, ptx, 0, 0, 0);
   coot_check_cuda_error(result2, "cuda::runtime_t::init_kernels(): cuModuleLoadDataEx() failed");
