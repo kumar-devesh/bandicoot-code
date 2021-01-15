@@ -32,10 +32,12 @@ accu(dev_mem_t<eT> mem, const uword n_elem)
   CUfunction k_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu_small);
 
   // Compute grid size; ideally we want to use the maximum possible number of threads per block.
-  kernel_dims dims = one_dimensional_grid_dims(n_elem / (2 * std::ceil(std::log2(n_elem))));
+    std::cout << (n_elem / (2 * std::ceil(std::log2(n_elem)))) << " (from " << n_elem << ")\n";
+  kernel_dims dims = one_dimensional_grid_dims(std::ceil(n_elem / (2 * std::ceil(std::log2(n_elem)))));
 
   // Create auxiliary memory, with size equal to the number of blocks.
   Mat<eT> aux(dims.d[0], 1);
+  std::cout << "set aux size " << dims.d[0] << "\n";
   dev_mem_t<eT> aux_mem = aux.get_dev_mem(false);
   // Initialize this to the right size, if we will have a second run.
   Mat<eT> aux2;
@@ -43,6 +45,7 @@ accu(dev_mem_t<eT> mem, const uword n_elem)
     {
     kernel_dims second_dims = one_dimensional_grid_dims(dims.d[0]);
     aux2.zeros(second_dims.d[0], 1);
+    std::cout << "set aux2 size " << second_dims.d[0] << "\n";
     }
   dev_mem_t<eT> aux_mem2 = aux2.get_dev_mem(false);
   Mat<eT>* out = &aux;
@@ -93,7 +96,8 @@ accu(dev_mem_t<eT> mem, const uword n_elem)
       }
 
     // Now compute sizes for the next iteration.
-    dims = one_dimensional_grid_dims(in_n_elem / (2 * std::ceil(std::log2(in_n_elem))));
+    std::cout << (in_n_elem / (2 * std::ceil(std::log2(in_n_elem)))) << " (from " << in_n_elem << "\n";
+    dims = one_dimensional_grid_dims(std::ceil(in_n_elem / (2 * std::ceil(std::log2(in_n_elem)))));
 
     } while (true);
 
