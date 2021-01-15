@@ -43,17 +43,17 @@ accu(dev_mem_t<eT> mem, const uword n_elem)
   const size_t k1_work_offset    = 0;
   const uword wavefront_size = get_rt().cl_rt.get_wavefront_size();
 
-  uword total_num_threads = n_elem / (2 * std::ceil(std::log2(n_elem)));
+  uword total_num_threads = std::ceil(n_elem / (2 * std::ceil(std::log2(n_elem))));
   uword local_group_size = std::min(kernel_wg_size, total_num_threads);
 
   // Create auxiliary memory.
-  const uword aux_size = (total_num_threads + (local_group_size - 1)) / local_group_size;
+  const uword aux_size = std::ceil((total_num_threads + (local_group_size - 1)) / local_group_size);
   Mat<eT> aux(aux_size, 1);
   aux.zeros();
   Mat<eT> aux2;
   if (aux_size > 1)
     {
-    const uword aux2_size = (aux_size + (local_group_size - 1)) / local_group_size;
+    const uword aux2_size = std::ceil((aux_size + (local_group_size - 1)) / local_group_size);
     aux2.zeros(aux2_size, 1);
     }
 
@@ -99,6 +99,7 @@ accu(dev_mem_t<eT> mem, const uword n_elem)
       {
       in_mem = &aux_mem;
       out_mem = &aux_mem2;
+      out = &aux2;
       }
     else
       {
@@ -107,7 +108,7 @@ accu(dev_mem_t<eT> mem, const uword n_elem)
       }
 
     // Now, compute sizes for the next iteration.
-    total_num_threads = in_n_elem / (2 * std::ceil(std::log2(in_n_elem)));
+    total_num_threads = std::ceil(in_n_elem / (2 * std::ceil(std::log2(in_n_elem))));
     local_group_size = std::min(kernel_wg_size, total_num_threads);
 
     } while (true); // The loop terminates in the middle.

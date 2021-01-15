@@ -4,8 +4,8 @@
 LIB_FLAGS = -lOpenCL -lclBLAS -lnvrtc -lcudart -lcublas -lcuda -lcurand -lcusolver -llapack -larmadillo
 
 CXX_FLAGS = -std=c++11 -Wshadow -Wall -pedantic -O0 -I../include/ -g -DCOOT_USE_U64S64
-#BACKEND = CL_BACKEND
-BACKEND = CUDA_BACKEND
+BACKEND = CL_BACKEND
+#BACKEND = CUDA_BACKEND
 
 OBJECTS = $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 
