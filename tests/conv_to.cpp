@@ -647,7 +647,6 @@ TEST_CASE("rowwise_sum_conv_to")
   }
 
 
-/*
 TEST_CASE("submat_colwise_sum_conv_to")
   {
   Mat<u32> x(3, 3);
@@ -691,7 +690,6 @@ TEST_CASE("submat_rowwise_sum_conv_to")
     REQUIRE( u64(y2[i]) == u64(3 * u64(u32(-1))) );
     }
   }
-*/
 
 
 // inplace_set/plus/minus/schur/div_mat

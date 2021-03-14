@@ -562,7 +562,7 @@ subview<eT>::extract(Mat<eT1>& out, const subview<eT>& in)
     return;
     }
 
-  coot_rt_t::extract_subview(out.get_dev_mem(false), in.m.get_dev_mem(false), in.m.n_rows, in.m.n_cols, in.aux_row1, in.aux_col1, in.n_rows, in.n_cols);
+  coot_rt_t::copy_subview(out.get_dev_mem(false), in.m.get_dev_mem(false), in.aux_row1, in.aux_col1, in.m.n_rows, in.m.n_cols, in.n_rows, in.n_cols);
   
 //  size_t src_origin[3] = { in.aux_row1*sizeof(eT), in.aux_col1, 0 };
 //  size_t dst_origin[3] = { 0, 0, 0 };

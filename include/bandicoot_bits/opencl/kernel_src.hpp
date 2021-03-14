@@ -450,6 +450,18 @@ kernel_src::init_twoway_source()
   "    } \n"
   "  } \n"
   "\n"
+  "__kernel void COOT_FN(PREFIX,submat_extract)(__global eT2* out, __global const eT1* in, const UWORD in_start_row, const UWORD in_start_col, const UWORD in_n_rows, const UWORD out_n_rows, const UWORD out_n_cols) \n"
+  "  { \n"
+  "  const UWORD row = get_global_id(0); \n"  // row in source matrix
+  "  const UWORD col = get_global_id(1); \n"  // col in source matrix
+  "  if( (row <= out_n_rows) && (col <= out_n_cols) ) \n"
+  "    { \n"
+  "    const UWORD  in_index = (in_start_row + row) + ((in_start_col + col) * in_n_rows); \n"
+  "    const UWORD out_index = row + col * out_n_rows; \n"
+  "    out[out_index] = (eT2) in[in_index]; \n"
+  "    } \n"
+  "  } \n"
+  "\n"
   "__kernel void COOT_FN(PREFIX,equ_array_plus_scalar)(__global eT2* out, __global const eT1* A, const eT1 val_pre, const eT2 val_post, const UWORD N) \n"
   "  { \n"
   "  const UWORD i = get_global_id(0); \n"

@@ -167,44 +167,4 @@ inplace_op_subview(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword M_
 
 
 
-/**
- * Use OpenCL to extract a subview into the place of a matrix.
- */
-template<typename eT>
-inline
-void
-extract_subview(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword M_n_rows, const uword M_n_cols, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols)
-  {
-  coot_extra_debug_sigprint();
-
-  runtime_t::cq_guard guard;
-
-  // treat the matrix as an image rotated 90 degrees
-  // width  of img = number of rows
-  // height of img = number of cols
-
-  // whoever designed the API for clEnqueueCopyBufferRect() should be permanently removed from the gene pool;
-  // the starting row needs to be multiplied by the element size,
-  // because it was too logical to add a separate "size of element" argument
-
-  // TODO: is using clEnqueueCopyBufferRect actually faster than using a dedicated kernel?
-
-  size_t src_origin[3] = { aux_row1 * sizeof(eT), aux_col1, 0 };
-  size_t dst_origin[3] = { 0, 0, 0 };
-
-  size_t region[3] = { n_rows * sizeof(eT), n_cols, 1 };
-
-  size_t src_row_pitch   = sizeof(eT) * M_n_rows;
-  size_t src_slice_pitch = sizeof(eT) * M_n_cols * M_n_rows;
-
-  size_t dst_row_pitch   = 0;
-  size_t dst_slice_pitch = 0;
-
-  cl_int status = clEnqueueCopyBufferRect(get_rt().cl_rt.get_cq(), src.cl_mem_ptr, dest.cl_mem_ptr, src_origin, dst_origin, region, src_row_pitch, src_slice_pitch, dst_row_pitch, dst_slice_pitch, 0, NULL, NULL);
-
-  coot_check_runtime_error( (status != 0), "subview::extract(): couldn't copy buffer");
-  }
-
-
-
 //! @}

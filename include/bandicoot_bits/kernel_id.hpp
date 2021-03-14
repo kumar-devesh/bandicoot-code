@@ -96,11 +96,13 @@ struct twoway_kernel_id
   {
   enum enum_id
     {
+    // TODO: I don't think these are in-place...
     submat_inplace_set_mat = 0,
     submat_inplace_plus_mat,
     submat_inplace_minus_mat,
     submat_inplace_schur_mat,
     submat_inplace_div_mat,
+    submat_extract,
     //
     inplace_plus_array,
     inplace_minus_array,
@@ -158,6 +160,7 @@ struct twoway_kernel_id
     names.push_back("submat_inplace_minus_mat");
     names.push_back("submat_inplace_schur_mat");
     names.push_back("submat_inplace_div_mat");
+    names.push_back("submat_extract");
 
     names.push_back("inplace_plus_array");
     names.push_back("inplace_minus_array");
