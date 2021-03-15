@@ -97,6 +97,32 @@ TEST_CASE("accu_strange_size")
 
 
 template<typename eT>
+void test_accu_large()
+  {
+  arma::Col<eT> cpu_x = arma::conv_to<arma::Col<eT>>::from(arma::randu<arma::Col<double>>(100000) * 10.0);
+  cpu_x.randu();
+  Col<eT> x(cpu_x);
+
+  eT cpu_sum = accu(cpu_x);
+  eT sum = accu(x);
+
+  REQUIRE(sum == Approx(cpu_sum));
+  }
+
+
+
+TEST_CASE("accu_large")
+  {
+  test_accu_large<double>();
+  test_accu_large<float>();
+  test_accu_large<u32>();
+  test_accu_large<s32>();
+  test_accu_large<u64>();
+  test_accu_large<s64>();
+  }
+
+
+template<typename eT>
 void test_accu_2()
   {
   Mat<eT> x(10, 5);

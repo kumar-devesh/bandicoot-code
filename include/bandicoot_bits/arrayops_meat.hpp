@@ -30,6 +30,18 @@ arrayops::copy(dev_mem_t<out_eT> dest, dev_mem_t<in_eT> src, const uword n_elem)
 
 
 
+template<typename out_eT, typename in_eT>
+inline
+void
+arrayops::copy_subview(dev_mem_t<out_eT> dest, dev_mem_t<in_eT> src, const uword aux_row1, const uword aux_col1, const uword M_n_rows, const uword M_n_cols, const uword n_rows, const uword n_cols)
+  {
+  coot_extra_debug_sigprint();
+
+  coot_rt_t::copy_subview(dest, src, aux_row1, aux_col1, M_n_rows, M_n_cols, n_rows, n_cols);
+  }
+
+
+
 template<typename eT>
 inline
 void

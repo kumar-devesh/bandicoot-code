@@ -32,7 +32,7 @@ accu(dev_mem_t<eT> mem, const uword n_elem)
   CUfunction k_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu_small);
 
   // Compute grid size; ideally we want to use the maximum possible number of threads per block.
-  kernel_dims dims = one_dimensional_grid_dims(n_elem / (2 * std::ceil(std::log2(n_elem))));
+  kernel_dims dims = one_dimensional_grid_dims(std::ceil(n_elem / (2 * std::ceil(std::log2(n_elem)))));
 
   // Create auxiliary memory, with size equal to the number of blocks.
   Mat<eT> aux(dims.d[0], 1);
@@ -85,6 +85,7 @@ accu(dev_mem_t<eT> mem, const uword n_elem)
       {
       in_mem = &aux_mem;
       out_mem = &aux_mem2;
+      out = &aux2;
       }
     else
       {
@@ -93,7 +94,7 @@ accu(dev_mem_t<eT> mem, const uword n_elem)
       }
 
     // Now compute sizes for the next iteration.
-    dims = one_dimensional_grid_dims(in_n_elem / (2 * std::ceil(std::log2(in_n_elem))));
+    dims = one_dimensional_grid_dims(std::ceil(in_n_elem / (2 * std::ceil(std::log2(in_n_elem)))));
 
     } while (true);
 

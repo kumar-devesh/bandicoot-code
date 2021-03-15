@@ -29,6 +29,21 @@ mtop_conv_to::apply(Mat<out_eT>& out, const mtOp<out_eT, T1, mtop_conv_to>& X)
 
 
 
+template<typename out_eT, typename in_eT>
+inline
+void
+mtop_conv_to::apply(Mat<out_eT>& out, const mtOp<out_eT, subview<in_eT>, mtop_conv_to>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  const subview<in_eT>& U(X.m.Q);
+
+  arrayops::copy_subview(out.get_dev_mem(false), U.m.get_dev_mem(false), U.aux_row1, U.aux_col1, U.m.n_rows, U.m.n_cols, U.n_rows, U.n_cols);
+  }
+
+
+
+
 template<typename out_eT, typename T1, typename eop_type>
 inline
 void
