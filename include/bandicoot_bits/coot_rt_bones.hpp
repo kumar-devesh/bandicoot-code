@@ -152,6 +152,9 @@ class coot_rt_t
   template<typename eT1, typename eT2>
   static inline typename promote_type<eT1, eT2>::result dot(const dev_mem_t<eT1> mem1, const dev_mem_t<eT2> mem2, const uword n_elem);
 
+  template<typename eT>
+  static inline void eig_sym(dev_mem_t<eT> eigval, dev_mem_t<eT> eigvec, const dev_mem_t<eT> A, const uword n_rows);
+
   static inline void synchronise();
 
   // RC-TODO: unified interface for some other operations?

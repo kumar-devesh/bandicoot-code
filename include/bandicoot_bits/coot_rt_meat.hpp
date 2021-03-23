@@ -1217,3 +1217,34 @@ coot_rt_t::dot(const dev_mem_t<eT1> mem1, const dev_mem_t<eT2> mem2, const uword
 
   return typename promote_type<eT1, eT2>::result(0); // fix warning
   }
+
+
+
+template<typename eT>
+inline
+void
+coot_rt_t::eig_sym(dev_mem_t<eT> eigval, dev_mem_t<eT> eigvec, const dev_mem_t<eT> A, const uword n_rows)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    opencl::eig_sym(eigval, eigvec, A, n_rows);
+    #else
+    coot_stop_runtime_error("coot_rt::eig_sym(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    cuda::eig_sym(eigval, eigvec, A, n_rows);
+    #else
+    coot_stop_runtime_error("coot_rt::eig_sym(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::eig_sym(): unknown backend");
+    }
+  }
