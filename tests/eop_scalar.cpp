@@ -800,3 +800,34 @@ TEST_CASE("eop_exp")
   test_eop_exp<u64>();
   test_eop_exp<s64>();
   }
+
+
+
+template<typename eT>
+void test_eop_abs()
+  {
+  Mat<eT> x(5, 5);
+  x.fill(eT(-3));
+
+  Mat<eT> y = abs(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(std::abs(eT(x(r, c))))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_abs")
+  {
+  test_eop_exp<float>();
+  test_eop_exp<double>();
+  test_eop_exp<u32>();
+  test_eop_exp<s32>();
+  test_eop_exp<u64>();
+  test_eop_exp<s64>();
+  }
