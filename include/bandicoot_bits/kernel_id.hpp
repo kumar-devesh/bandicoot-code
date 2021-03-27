@@ -126,6 +126,7 @@ struct twoway_kernel_id
     equ_array_exp_post,
     equ_array_log_pre,
     equ_array_log_post,
+    equ_array_abs,
     //
     get_diag,
     //
@@ -184,6 +185,7 @@ struct twoway_kernel_id
     names.push_back("equ_array_exp_post");
     names.push_back("equ_array_log_pre");
     names.push_back("equ_array_log_post");
+    names.push_back("equ_array_abs");
 
     names.push_back("get_diag");
 

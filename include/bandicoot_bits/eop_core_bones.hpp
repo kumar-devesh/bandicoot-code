@@ -166,7 +166,16 @@ class eop_exp               : public eop_core<eop_exp>
 // class eop_acosh             : public eop_core<eop_acosh>             {};
 // class eop_asinh             : public eop_core<eop_asinh>             {};
 // class eop_atanh             : public eop_core<eop_atanh>             {};
-// class eop_abs               : public eop_core<eop_abs>               {};
+
+class eop_abs               : public eop_core<eop_abs>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_abs;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_abs;
+  const static bool is_chainable = true; // not clear why anyone would write a chain like this
+  };
+
 // class eop_arg               : public eop_core<eop_arg>               {};
 // class eop_conj              : public eop_core<eop_conj>              {};
 // class eop_pow               : public eop_core<eop_pow>               {};
