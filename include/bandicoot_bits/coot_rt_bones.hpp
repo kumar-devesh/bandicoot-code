@@ -103,6 +103,15 @@ class coot_rt_t
   static inline eT accu_subview(const dev_mem_t<eT> mem, const uword M_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols);
 
   template<typename eT>
+  static inline eT min(const dev_mem_t<eT> mem, const uword n_elem);
+
+  template<typename eT>
+  static inline eT max(const dev_mem_t<eT> mem, const uword n_elem);
+
+  template<typename eT>
+  static inline eT max_abs(const dev_mem_t<eT> mem, const uword n_elem);
+
+  template<typename eT>
   static inline bool chol(dev_mem_t<eT> out, const uword n_rows);
 
   template<typename eT>
@@ -152,8 +161,8 @@ class coot_rt_t
   template<typename eT1, typename eT2>
   static inline typename promote_type<eT1, eT2>::result dot(const dev_mem_t<eT1> mem1, const dev_mem_t<eT2> mem2, const uword n_elem);
 
-  template<typename eT>
-  static inline void eig_sym(dev_mem_t<eT> eigval, dev_mem_t<eT> eigvec, const dev_mem_t<eT> A, const uword n_rows);
+//  template<typename eT>
+//  static inline void eig_sym(dev_mem_t<eT> eigval, dev_mem_t<eT> eigvec, const dev_mem_t<eT> A, const uword n_rows);
 
   static inline void synchronise();
 
