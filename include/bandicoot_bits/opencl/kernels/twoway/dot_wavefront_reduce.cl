@@ -13,7 +13,7 @@
 // ------------------------------------------------------------------------
 
 void
-COOT_FN(PREFIX,dot_wavefront_reduce_other)(__local volatile eT1* data, UWORD tid)
+COOT_FN(PREFIX,dot_wavefront_reduce_other)(__local volatile twoway_promoted_eT* data, UWORD tid)
   {
   for(UWORD i = WAVEFRONT_SIZE; i > 0; i >>= 1)
     {
@@ -25,7 +25,7 @@ COOT_FN(PREFIX,dot_wavefront_reduce_other)(__local volatile eT1* data, UWORD tid
 
 
 void
-COOT_FN(PREFIX,dot_wavefront_reduce_8)(__local volatile eT1* data, UWORD tid)
+COOT_FN(PREFIX,dot_wavefront_reduce_8)(__local volatile twoway_promoted_eT* data, UWORD tid)
   {
   data[tid] += data[tid + 8];
   data[tid] += data[tid + 4];
@@ -36,7 +36,7 @@ COOT_FN(PREFIX,dot_wavefront_reduce_8)(__local volatile eT1* data, UWORD tid)
 
 
 void
-COOT_FN(PREFIX,dot_wavefront_reduce_16)(__local volatile eT1* data, UWORD tid)
+COOT_FN(PREFIX,dot_wavefront_reduce_16)(__local volatile twoway_promoted_eT* data, UWORD tid)
   {
   data[tid] += data[tid + 16];
   data[tid] += data[tid + 8];
@@ -48,7 +48,7 @@ COOT_FN(PREFIX,dot_wavefront_reduce_16)(__local volatile eT1* data, UWORD tid)
 
 
 void
-COOT_FN(PREFIX,dot_wavefront_reduce_32)(__local volatile eT1* data, UWORD tid)
+COOT_FN(PREFIX,dot_wavefront_reduce_32)(__local volatile twoway_promoted_eT* data, UWORD tid)
   {
   data[tid] += data[tid + 32];
   data[tid] += data[tid + 16];
@@ -61,7 +61,7 @@ COOT_FN(PREFIX,dot_wavefront_reduce_32)(__local volatile eT1* data, UWORD tid)
 
 
 void
-COOT_FN(PREFIX,dot_wavefront_reduce_64)(__local volatile eT1* data, UWORD tid)
+COOT_FN(PREFIX,dot_wavefront_reduce_64)(__local volatile twoway_promoted_eT* data, UWORD tid)
   {
   data[tid] += data[tid + 64];
   data[tid] += data[tid + 32];
@@ -75,7 +75,7 @@ COOT_FN(PREFIX,dot_wavefront_reduce_64)(__local volatile eT1* data, UWORD tid)
 
 
 void
-COOT_FN(PREFIX,dot_wavefront_reduce_128)(__local volatile eT1* data, UWORD tid)
+COOT_FN(PREFIX,dot_wavefront_reduce_128)(__local volatile twoway_promoted_eT* data, UWORD tid)
   {
   data[tid] += data[tid + 128];
   data[tid] += data[tid + 64];
