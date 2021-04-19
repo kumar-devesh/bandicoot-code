@@ -34,14 +34,14 @@ void test_larfg_manual()
   H.eye();
   Col<eT> v_aug = x;
   v_aug[0] = eT(1);
-  H -= v_aug * v_aug.t();
+  H -= tau * v_aug * v_aug.t();
 
   Col<eT> out = H * x_copy;
 
   REQUIRE(((eT) out[0]) == Approx((eT) x[0]));
   for (uword i = 1; i < 10; ++i)
     {
-    REQUIRE(abs(out[i]) < eT(1e-8));
+    REQUIRE(abs(out[i]) < eT(1e-5));
     }
   }
 
@@ -58,7 +58,32 @@ TEST_CASE("larfg_manual")
 template<typename eT>
 void test_larfg_zeros()
   {
+  // Ensure that if we pass x equal to all zeros, then we get the correct result back (tau = 0, H = I).
+  Col<eT> x(10);
+  x.zeros();
 
+  const double tau = lapack::larfg(x);
+
+  REQUIRE(tau == Approx(eT(0)).margin(1e-6));
+
+  for (uword i = 0; i < 10; ++i)
+    {
+    REQUIRE(((eT) x[i]) == Approx(eT(0)).margin(1e-6));
+    }
+
+  // In addition, if alpha (e.g. x[0]) is greater than zero but the rest of x is 0, this should still be the case.
+  x.zeros();
+  x[0] = eT(5);
+
+  const double tau2 = lapack::larfg(x);
+
+  REQUIRE(tau2 == Approx(eT(0)).margin(1e-6));
+
+  REQUIRE(((eT) x[0]) == Approx(eT(5)));
+  for (uword i = 1; i < 10; ++i)
+    {
+    REQUIRE(((eT) x[i]) == Approx(eT(0)).margin(1e-6));
+    }
   }
 
 

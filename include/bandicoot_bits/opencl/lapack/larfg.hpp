@@ -78,7 +78,15 @@ larfg(dev_mem_t<eT> x, const uword n_elem, const uword rescaling_pass = 1)
   coot_check_cl_error(status, "larfg()");
 
   // This is an approximation of dlamch('E') / dlamch('S').
-  const eT min_norm = std::numeric_limits<eT>::epsilon() / std::numeric_limits<eT>::min();
+  // TODO: is this upside down?
+  const eT min_norm = std::numeric_limits<eT>::min() / std::numeric_limits<eT>::epsilon();
+
+  eT norm_result = eT(0);
+  status |= clEnqueueReadBuffer(get_rt().cl_rt.get_cq(), norm_mem.cl_mem_ptr, CL_TRUE, 0, sizeof(eT), &norm_result, 0, NULL, NULL);
+  coot_check_cl_error(status, "larfg()");
+  std::cout << "norm result: " << norm_result << "\n";
+
+  const size_t global_work_size[1] = { size_t(n_elem) };
 
   // Now immediately enqueue the larfg_work kernel.
   status |= clSetKernelArg(larfg_k, 0, sizeof(cl_mem), &(x.cl_mem_ptr));
@@ -86,18 +94,22 @@ larfg(dev_mem_t<eT> x, const uword n_elem, const uword rescaling_pass = 1)
   status |= clSetKernelArg(larfg_k, 2, sizeof(cl_mem), &(norm_mem.cl_mem_ptr));
   status |= clSetKernelArg(larfg_k, 3, sizeof(eT),     &min_norm);
 
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), larfg_k, k1_work_dim, &k1_work_offset, &pow2_total_num_threads, &pow2_group_size, 0, NULL, NULL);
+  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), larfg_k, 1, NULL, global_work_size, NULL, 0, NULL, NULL);
   coot_check_cl_error(status, "larfg()");
 
   // Get `alpha` and `beta` to compute `tau`.
   eT beta = eT(0);
   status |= clEnqueueReadBuffer(get_rt().cl_rt.get_cq(), x.cl_mem_ptr, CL_TRUE, 0, sizeof(eT), &beta, 0, NULL, NULL);
   coot_check_cl_error(status, "larfg()");
+  std::cout << "got beta " << beta << "\n";
+  std::cout << "min norm " << min_norm << "\n";
+  const eT alpha = norm[0];
 
   // Was `beta` too small?  If so, we have to rescale and try again.
   // This will call larfg() recursively up to 20 times.
-  if (std::abs(beta) < min_norm && rescaling_pass < 20)
+  if (std::abs(beta + alpha) > min_norm && std::abs(beta) < min_norm && rescaling_pass < 20)
     {
+    std::cout << "beta was too small! rescaling\n";
     // Scale all elements in x.
     inplace_op_scalar(x, min_norm, n_elem, oneway_kernel_id::inplace_div_scalar);
 
@@ -113,11 +125,15 @@ larfg(dev_mem_t<eT> x, const uword n_elem, const uword rescaling_pass = 1)
 
     return tau;
     }
+  else if (std::abs(beta + alpha) < min_norm)
+    {
+    // In this case, x was all zeros, and we return tau = 0.
+    return 0.0;
+    }
   else
     {
     // No rescaling needed---just compute tau and return it.
-    const eT alpha = norm[0];
-    const eT tau = (beta / (alpha - beta));
+    const eT tau = (beta - alpha) / beta;
 
     return tau;
     }
