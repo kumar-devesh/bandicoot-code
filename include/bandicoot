@@ -218,6 +218,7 @@ namespace coot
     #include "bandicoot_bits/opencl/gemv.hpp"
     #include "bandicoot_bits/opencl/sum.hpp"
     #include "bandicoot_bits/opencl/dot.hpp"
+    #include "bandicoot_bits/opencl/lapack/larfg.hpp"
     }
   #endif
 
@@ -243,6 +244,11 @@ namespace coot
     #include "bandicoot_bits/cuda/dot.hpp"
     }
   #endif
+
+  namespace lapack
+    {
+    #include "bandicoot_bits/lapack/larfg.hpp"
+    }
 
   #include "bandicoot_bits/coot_rt_meat.hpp"
   
