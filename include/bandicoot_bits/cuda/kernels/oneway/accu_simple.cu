@@ -23,7 +23,10 @@ COOT_FN(PREFIX,accu_simple)(eT1* out,
     {
     eT1 acc = (eT1)(0); // runtime unrolling is not supported by CUDA
     for(UWORD i = 0; i < A_len; ++i)
-      { acc += A[i]; }
+      {
+      acc += A[i];
+      }
+
     out[0] = acc;
     }
   }

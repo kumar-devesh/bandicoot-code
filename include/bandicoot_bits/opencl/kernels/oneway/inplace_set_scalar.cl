@@ -22,5 +22,8 @@ COOT_FN(PREFIX,inplace_set_scalar)(__global eT1* out,
                                    const UWORD N)
   {
   const UWORD i = get_global_id(0);
-  if(i < N)  { out[i] = val; }
+  if(i < N)
+    {
+    out[i] = val;
+    }
   }

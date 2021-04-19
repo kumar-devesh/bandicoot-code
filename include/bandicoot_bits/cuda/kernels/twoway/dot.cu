@@ -47,7 +47,7 @@ COOT_FN(PREFIX,dot)(twoway_promoted_eT* out_mem,
       aux_mem[tid] += aux_mem[tid + s];
       }
     __syncthreads();
-  }
+    }
 
   if (tid < 32) // unroll last warp's worth of work
     {

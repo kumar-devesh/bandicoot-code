@@ -27,8 +27,11 @@ COOT_FN(PREFIX,submat_sum_colwise_conv_pre)(eT2* out,
     {
     const eT1* colptr = &(A[ (col + start_col)*A_n_rows + start_row ]);
     eT2 acc = (eT2)(0);
-    for(UWORD i=0; i < sub_n_rows; ++i)
-      { acc += (eT2) colptr[i]; }
+    for(UWORD i = 0; i < sub_n_rows; ++i)
+      {
+      acc += (eT2) colptr[i];
+      }
+
     out[col] = acc;
     }
   }

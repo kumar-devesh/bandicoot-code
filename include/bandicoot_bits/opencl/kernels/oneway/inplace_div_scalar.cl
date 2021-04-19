@@ -19,5 +19,8 @@ COOT_FN(PREFIX,inplace_div_scalar)(__global eT1* out,
                                    const UWORD N)
   {
   const UWORD i = get_global_id(0);
-  if(i < N)  { out[i] /= val; }
+  if(i < N)
+    {
+    out[i] /= val;
+    }
   }

@@ -24,8 +24,11 @@ COOT_FN(PREFIX,sum_colwise_conv_post)(eT2* out,
     {
     const eT1* colptr = &(A[ col*A_n_rows ]);
     eT1 acc = (eT1) (0);
-    for(UWORD i=0; i < A_n_rows; ++i)
-      { acc += colptr[i]; }
+    for (UWORD i = 0; i < A_n_rows; ++i)
+      {
+      acc += colptr[i];
+      }
+
     out[col] = (eT2) (acc);
     }
   }

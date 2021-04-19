@@ -23,8 +23,11 @@ COOT_FN(PREFIX,sum_rowwise_conv_post)(eT2* out,
   if(row < A_n_rows)
     {
     eT1 acc = (eT1)(0);
-    for(UWORD i=0; i < A_n_cols; ++i)
-      { acc += A[i*A_n_rows + row]; }
+    for (UWORD i = 0; i < A_n_cols; ++i)
+      {
+      acc += A[i*A_n_rows + row];
+      }
+
     out[row] = (eT2) (acc);
     }
   }

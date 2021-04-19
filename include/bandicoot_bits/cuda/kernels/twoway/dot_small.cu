@@ -45,7 +45,7 @@ COOT_FN(PREFIX,dot_small)(twoway_promoted_eT* out_mem,
       {
       aux_mem[tid] += aux_mem[tid + s];
       }
-  }
+    }
 
   if (tid == 0)
     {
