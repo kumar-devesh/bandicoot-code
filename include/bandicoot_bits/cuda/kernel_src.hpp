@@ -264,6 +264,16 @@ get_cuda_oneway_kernel_src()
 
 inline
 std::string
+get_cuda_oneway_real_kernel_src()
+  {
+  // TODO
+  return "";
+  }
+
+
+
+inline
+std::string
 get_cuda_twoway_kernel_src()
   {
   // NOTE: kernel names must match the list in the kernel_id struct

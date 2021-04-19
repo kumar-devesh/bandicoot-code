@@ -73,6 +73,7 @@ struct runtime_t
   coot_aligned bool                     valid;
 
   coot_aligned rt_common::kernels_t<std::vector<CUfunction>>                                             oneway_kernels;
+  coot_aligned rt_common::kernels_t<std::vector<CUfunction>>                                             oneway_real_kernels;
   coot_aligned rt_common::kernels_t<rt_common::kernels_t<std::vector<CUfunction>>>                       twoway_kernels;
   coot_aligned rt_common::kernels_t<rt_common::kernels_t<rt_common::kernels_t<std::vector<CUfunction>>>> threeway_kernels;
 
