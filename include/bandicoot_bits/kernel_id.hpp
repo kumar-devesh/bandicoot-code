@@ -92,6 +92,44 @@ struct oneway_kernel_id
 
 
 
+// These kernels should only be used with float or double element types.
+struct oneway_real_kernel_id
+  {
+  enum enum_id
+    {
+    larfg = 0
+    };
+
+
+  static
+  inline
+  std::vector<std::string>
+  init_names()
+    {
+    // NOTE: the order and names of kernels in "names" must match the order and names in the kernel_id enum
+
+    std::vector<std::string> names;
+
+    names.push_back("larfg");
+
+    return names;
+    }
+
+
+
+  static
+  inline
+  const std::vector<std::string>&
+  get_names()
+    {
+    static const std::vector<std::string> names = init_names();
+
+    return names;
+    }
+  };
+
+
+
 struct twoway_kernel_id
   {
   enum enum_id

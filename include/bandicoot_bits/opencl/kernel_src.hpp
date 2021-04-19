@@ -21,6 +21,8 @@ struct kernel_src
   static inline const std::string&  get_oneway_source();
   static inline       std::string  init_oneway_source();
 
+  static inline const std::string&  get_oneway_real_source();
+
   static inline const std::string&  get_twoway_source();
   static inline       std::string  init_twoway_source();
 
@@ -341,6 +343,18 @@ kernel_src::init_oneway_source()
   "    } \n"
   "  }\n"
   ;
+
+  return source;
+  }
+
+
+
+inline
+const std::string&
+kernel_src::get_oneway_real_source()
+  {
+  // TODO
+  static const std::string source = "";
 
   return source;
   }
