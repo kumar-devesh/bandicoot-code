@@ -1,10 +1,10 @@
 // Copyright 2021 Ryan Curtin (https://www.ratml.org/)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,13 +13,16 @@
 // ------------------------------------------------------------------------
 
 // TODO: extend to complex cases
-__kernel
-void
-COOT_FN(PREFIX,larfg)(__global eT1* x, const UWORD N, __global eT1* norm, const eT1 min_norm)
-  {
-  const UWORD tid = get_global_id(0);
 
-  if (tid < N)
+__global__
+void
+COOT_FN(PREFIX,larfg)(eT1* x,
+                      const UWORD N,
+                      eT1* norm,
+                      const eT1 min_val)
+  {
+  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x;
+  if (i < N)
     {
     const eT1 norm_val = sqrt(norm[0]);
     const eT1 alpha = x[0];
@@ -28,7 +31,7 @@ COOT_FN(PREFIX,larfg)(__global eT1* x, const UWORD N, __global eT1* norm, const 
     if (alpha == norm_val)
       {
       // If all elements in x are 0, we'll set tau to 0 at the higher level.
-      if (tid == 0)
+      if (i == 0)
         {
         norm[2] = -1;
         }
@@ -46,15 +49,15 @@ COOT_FN(PREFIX,larfg)(__global eT1* x, const UWORD N, __global eT1* norm, const 
     else
       {
       // Now perform scaling of x in order to produce v.
-      if (tid == 0)
+      if (i == 0)
         {
-        x[tid] = beta;
+        x[i] = beta;
         norm[0] = alpha;
         norm[1] = beta;
         }
       else
         {
-        x[tid] /= (alpha - beta);
+        x[i] /= (alpha - beta);
         }
       }
     }

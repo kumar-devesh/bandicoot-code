@@ -29,6 +29,12 @@ larfg(dev_mem_t<eT> x, const uword n_elem, const uword rescaling_pass = 1)
   {
   coot_extra_debug_sigprint();
 
+  // Edge case: if x has one or zero elements, tau is zero and we don't need to do anything.
+  if (n_elem <= 1)
+    {
+    return eT(0);
+    }
+
   coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot_cl_rt not valid" );
 
   cl_int status = 0;
@@ -54,8 +60,8 @@ larfg(dev_mem_t<eT> x, const uword n_elem, const uword rescaling_pass = 1)
   // TODO: better error message... or maybe just check at a higher level?
   coot_debug_check( (aux_size > 1), "larfg(): input size too large" );
 
-  // This will store `norm`.
-  Mat<eT> norm(1, 1);
+  // This will store `norm`, and after the larfg kernel, it will store [alpha, beta, status].
+  Mat<eT> norm(3, 1);
 
   runtime_t::cq_guard guard;
 
@@ -66,7 +72,7 @@ larfg(dev_mem_t<eT> x, const uword n_elem, const uword rescaling_pass = 1)
   const uword pow2_group_size = (uword) std::pow(2.0f, std::ceil(std::log2((float) local_group_size)));
   const uword pow2_total_num_threads = (total_num_threads % pow2_group_size == 0) ? total_num_threads : ((total_num_threads / pow2_group_size) + 1) * pow2_group_size;
 
-  cl_kernel* dot_use = (pow2_group_size < wavefront_size) ? &dot_small_k : &dot_k;
+  cl_kernel* dot_use = (pow2_group_size <= wavefront_size) ? &dot_small_k : &dot_k;
 
   status |= clSetKernelArg(*dot_use, 0, sizeof(cl_mem),                        &(norm_mem.cl_mem_ptr));
   status |= clSetKernelArg(*dot_use, 1, sizeof(cl_mem),                        &(x.cl_mem_ptr));
@@ -77,14 +83,8 @@ larfg(dev_mem_t<eT> x, const uword n_elem, const uword rescaling_pass = 1)
   status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), *dot_use, k1_work_dim, &k1_work_offset, &pow2_total_num_threads, &pow2_group_size, 0, NULL, NULL);
   coot_check_cl_error(status, "larfg()");
 
-  // This is an approximation of dlamch('E') / dlamch('S').
-  // TODO: is this upside down?
+  // This is an approximation of dlamch('S') / dlamch('E').
   const eT min_norm = std::numeric_limits<eT>::min() / std::numeric_limits<eT>::epsilon();
-
-  eT norm_result = eT(0);
-  status |= clEnqueueReadBuffer(get_rt().cl_rt.get_cq(), norm_mem.cl_mem_ptr, CL_TRUE, 0, sizeof(eT), &norm_result, 0, NULL, NULL);
-  coot_check_cl_error(status, "larfg()");
-  std::cout << "norm result: " << norm_result << "\n";
 
   const size_t global_work_size[1] = { size_t(n_elem) };
 
@@ -98,18 +98,16 @@ larfg(dev_mem_t<eT> x, const uword n_elem, const uword rescaling_pass = 1)
   coot_check_cl_error(status, "larfg()");
 
   // Get `alpha` and `beta` to compute `tau`.
-  eT beta = eT(0);
-  status |= clEnqueueReadBuffer(get_rt().cl_rt.get_cq(), x.cl_mem_ptr, CL_TRUE, 0, sizeof(eT), &beta, 0, NULL, NULL);
+  eT out_vals[3];
+  status |= clEnqueueReadBuffer(get_rt().cl_rt.get_cq(), norm_mem.cl_mem_ptr, CL_TRUE, 0, sizeof(eT) * 3, &out_vals, 0, NULL, NULL);
   coot_check_cl_error(status, "larfg()");
-  std::cout << "got beta " << beta << "\n";
-  std::cout << "min norm " << min_norm << "\n";
-  const eT alpha = norm[0];
 
   // Was `beta` too small?  If so, we have to rescale and try again.
   // This will call larfg() recursively up to 20 times.
-  if (std::abs(beta + alpha) > min_norm && std::abs(beta) < min_norm && rescaling_pass < 20)
+  // NOTE: this functionality is currently inaccessible, since dot() will just return a zero norm in this case.
+  // (Relevant functionality in the kernel is commented out.)
+  if (out_vals[2] == eT(-2) && rescaling_pass < 20)
     {
-    std::cout << "beta was too small! rescaling\n";
     // Scale all elements in x.
     inplace_op_scalar(x, min_norm, n_elem, oneway_kernel_id::inplace_div_scalar);
 
@@ -119,13 +117,13 @@ larfg(dev_mem_t<eT> x, const uword n_elem, const uword rescaling_pass = 1)
     // Set beta back to its unscaled value---but only if we're at the top of the recursion.
     if (rescaling_pass == 1)
     {
-      status |= clEnqueueWriteBuffer(get_rt().cl_rt.get_cq(), x.cl_mem_ptr, CL_TRUE, 0, sizeof(eT), &beta, 0, NULL, NULL);
+      status |= clEnqueueWriteBuffer(get_rt().cl_rt.get_cq(), x.cl_mem_ptr, CL_TRUE, 0, sizeof(eT), &out_vals[1], 0, NULL, NULL);
       coot_check_cl_error(status, "larfg()");
     }
 
     return tau;
     }
-  else if (std::abs(beta + alpha) < min_norm)
+  else if (out_vals[2] == eT(-1))
     {
     // In this case, x was all zeros, and we return tau = 0.
     return 0.0;
@@ -133,7 +131,7 @@ larfg(dev_mem_t<eT> x, const uword n_elem, const uword rescaling_pass = 1)
   else
     {
     // No rescaling needed---just compute tau and return it.
-    const eT tau = (beta - alpha) / beta;
+    const eT tau = (out_vals[1] - out_vals[0]) / out_vals[1];
 
     return tau;
     }

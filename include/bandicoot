@@ -242,6 +242,7 @@ namespace coot
     #include "bandicoot_bits/cuda/gemv.hpp"
     #include "bandicoot_bits/cuda/sum.hpp"
     #include "bandicoot_bits/cuda/dot.hpp"
+    #include "bandicoot_bits/cuda/lapack/larfg.hpp"
     }
   #endif
 

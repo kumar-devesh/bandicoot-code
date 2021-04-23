@@ -1238,8 +1238,7 @@ coot_rt_t::larfg(const dev_mem_t<eT> x, const uword n_elem)
   else if (get_rt().backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
- //   return cuda::larfg(x, n_elem);
-    return eT(0);
+    return cuda::larfg(x, n_elem);
     #else
     coot_stop_runtime_error("coot_rt::larfg(): CUDA backend not enabled");
     #endif
