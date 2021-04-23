@@ -31,6 +31,9 @@ struct runtime_t
   template<typename eT1>
   inline const CUfunction& get_kernel(const oneway_kernel_id::enum_id num);
 
+  template<typename eT1>
+  inline const CUfunction& get_kernel(const oneway_real_kernel_id::enum_id num);
+
   template<typename eT2, typename eT1>
   inline const CUfunction& get_kernel(const twoway_kernel_id::enum_id num);
 

@@ -177,6 +177,16 @@ runtime_t::get_kernel(const oneway_kernel_id::enum_id num)
 
 
 
+template<typename eT>
+inline
+const CUfunction&
+runtime_t::get_kernel(const oneway_real_kernel_id::enum_id num)
+  {
+  return get_kernel<eT>(oneway_real_kernels, num);
+  }
+
+
+
 template<typename eT1, typename eT2>
 inline
 const CUfunction&

@@ -110,8 +110,16 @@ inline
 std::string
 get_cuda_oneway_real_kernel_src()
   {
-  // TODO
-  return "";
+  std::string result = "";
+
+  // Load each file for each kernel.
+  for (const std::string& kernel_name : oneway_real_kernel_id::get_names())
+    {
+    std::string filename = "oneway_real/" + kernel_name + ".cu";
+    result += read_file(filename);
+    }
+
+  return result;
   }
 
 
