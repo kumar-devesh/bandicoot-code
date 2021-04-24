@@ -1,0 +1,13 @@
+image: mlpack/jenkins-amd64-cuda11.2.2-ubuntu
+
+build:
+  stage: build
+  script:
+    - cd tests
+    - BACKEND=CUDA_BACKEND make
+
+test:
+  stage: test
+  script:
+    - cd tests
+    - ./main
