@@ -62,6 +62,7 @@ class runtime_t
   coot_aligned runtime_dev_info dev_info;
   
   coot_aligned rt_common::kernels_t<std::vector<cl_kernel>>                                             oneway_kernels;
+  coot_aligned rt_common::kernels_t<std::vector<cl_kernel>>                                             oneway_real_kernels;
   coot_aligned rt_common::kernels_t<rt_common::kernels_t<std::vector<cl_kernel>>>                       twoway_kernels;
   coot_aligned rt_common::kernels_t<rt_common::kernels_t<rt_common::kernels_t<std::vector<cl_kernel>>>> threeway_kernels;
 
@@ -133,6 +134,9 @@ class runtime_t
 
   template<typename eT1>
   inline const cl_kernel& get_kernel(const oneway_kernel_id::enum_id num);
+
+  template<typename eT1>
+  inline const cl_kernel& get_kernel(const oneway_real_kernel_id::enum_id num);
 
   template<typename eT2, typename eT1>
   inline const cl_kernel& get_kernel(const twoway_kernel_id::enum_id num);

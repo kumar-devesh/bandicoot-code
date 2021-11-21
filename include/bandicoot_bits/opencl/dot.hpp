@@ -48,11 +48,11 @@ dot(dev_mem_t<eT1> mem1, dev_mem_t<eT2> mem2, const uword n_elem)
   const size_t k1_work_offset    = 0;
   const uword wavefront_size = get_rt().cl_rt.get_wavefront_size();
 
-  uword total_num_threads = n_elem / (2 * std::ceil(std::log2(n_elem)));
+  uword total_num_threads = std::ceil(n_elem / (2 * std::ceil(std::log2(n_elem))));
   uword local_group_size = std::min(kernel_wg_size, total_num_threads);
 
   // Create auxiliary memory.
-  const uword aux_size = (total_num_threads + (local_group_size - 1)) / local_group_size;
+  const uword aux_size = std::ceil((total_num_threads + (local_group_size - 1)) / local_group_size);
   Mat<promoted_eT> aux(aux_size, 1);
   aux.zeros();
   dev_mem_t<promoted_eT> aux_mem = aux.get_dev_mem(false);
@@ -67,7 +67,7 @@ dot(dev_mem_t<eT1> mem1, dev_mem_t<eT2> mem2, const uword n_elem)
   const uword pow2_total_num_threads = (total_num_threads % pow2_group_size == 0) ? total_num_threads : ((total_num_threads / pow2_group_size) + 1) * pow2_group_size;
 
   // If the number of threads is less than the wavefront size, we need to use the small kernel.
-  cl_kernel* k_use = (pow2_group_size < wavefront_size) ? &k_small : &k;
+  cl_kernel* k_use = (pow2_group_size <= wavefront_size) ? &k_small : &k;
 
   status |= clSetKernelArg(*k_use, 0, sizeof(cl_mem),                        &(aux_mem.cl_mem_ptr));
   status |= clSetKernelArg(*k_use, 1, sizeof(cl_mem),                        &(mem1.cl_mem_ptr));

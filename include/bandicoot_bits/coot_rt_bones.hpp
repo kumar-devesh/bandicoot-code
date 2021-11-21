@@ -152,6 +152,11 @@ class coot_rt_t
   template<typename eT1, typename eT2>
   static inline typename promote_type<eT1, eT2>::result dot(const dev_mem_t<eT1> mem1, const dev_mem_t<eT2> mem2, const uword n_elem);
 
+  // LAPACK-style utility functions
+
+  template<typename eT>
+  static inline eT larfg(const dev_mem_t<eT> x, const uword n_elem);
+
   static inline void synchronise();
 
   // RC-TODO: unified interface for some other operations?

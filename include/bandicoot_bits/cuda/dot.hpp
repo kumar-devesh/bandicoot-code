@@ -53,7 +53,7 @@ dot(dev_mem_t<eT1> mem1, dev_mem_t<eT2> mem2, const uword n_elem)
     CUfunction k_small = get_rt().cuda_rt.get_kernel<eT2, eT1>(twoway_kernel_id::dot_small);
 
     // Compute grid size; ideally we want to use the maximum possible number of threads per block.
-    kernel_dims dims = one_dimensional_grid_dims(n_elem / (2 * std::ceil(std::log2(n_elem))));
+    kernel_dims dims = one_dimensional_grid_dims(std::ceil(n_elem / (2 * std::ceil(std::log2(n_elem)))));
 
     // Create auxiliary memory, with size equal to the number of blocks.
     Mat<promoted_eT> aux(dims.d[0], 1);
@@ -71,7 +71,7 @@ dot(dev_mem_t<eT1> mem1, dev_mem_t<eT2> mem2, const uword n_elem)
         (uword*) &n_elem };
 
     CUresult result = cuLaunchKernel(
-        num_threads < 32 ? k_small : k, // if we have fewer threads than a single warp, we can use a more optimized version of the kernel
+        num_threads <= 32 ? k_small : k, // if we have fewer threads than a single warp, we can use a more optimized version of the kernel
         dims.d[0], dims.d[1], dims.d[2],
         num_threads, dims.d[4], dims.d[5],
         2 * num_threads * sizeof(promoted_eT), // shared mem should have size equal to number of threads times 2

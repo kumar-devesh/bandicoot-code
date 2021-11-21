@@ -57,6 +57,7 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
       rt_common::get_three_elem_kernel_src(threeway_kernels, get_cuda_threeway_kernel_src(), threeway_kernel_id::get_names(), name_map, type_map) +
       rt_common::get_two_elem_kernel_src(twoway_kernels, get_cuda_twoway_kernel_src(), twoway_kernel_id::get_names(), "", name_map, type_map) +
       rt_common::get_one_elem_kernel_src(oneway_kernels, get_cuda_oneway_kernel_src(), oneway_kernel_id::get_names(), "", name_map, type_map) +
+      rt_common::get_one_elem_real_kernel_src(oneway_real_kernels, get_cuda_oneway_real_kernel_src(), oneway_real_kernel_id::get_names(), "", name_map, type_map) +
       get_cuda_src_epilogue();
 
   bool status = compile_kernels(src, name_map);
@@ -172,6 +173,16 @@ const CUfunction&
 runtime_t::get_kernel(const oneway_kernel_id::enum_id num)
   {
   return get_kernel<eT>(oneway_kernels, num);
+  }
+
+
+
+template<typename eT>
+inline
+const CUfunction&
+runtime_t::get_kernel(const oneway_real_kernel_id::enum_id num)
+  {
+  return get_kernel<eT>(oneway_real_kernels, num);
   }
 
 
