@@ -94,4 +94,40 @@ struct type_to_dev_string
     {
     return perform_type_mapping<T>();
     }
+
+
+
+  // Return the name of the abs() function to use for a floating point type.
+  template<typename T>
+  static
+  inline
+  std::string
+  abs_func(const typename enable_if2<std::is_floating_point<T>::value, void>::result* = 0)
+    {
+    return "fabs";
+    }
+
+
+
+  // Return the name of the abs() function to use for a signed integral type.
+  template<typename T>
+  static
+  inline
+  std::string
+  abs_func(const typename enable_if2<std::is_signed<T>::value && !std::is_floating_point<T>::value, void>::result* = 0)
+    {
+    return "abs";
+    }
+
+
+
+  // Return the name of the abs() function to use for an unsigned type.  (Here, we use nothing...)
+  template<typename T>
+  static
+  inline
+  std::string
+  abs_func(const typename enable_if2<!std::is_signed<T>::value, void>::result* = 0)
+    {
+    return "";
+    }
   };

@@ -124,7 +124,9 @@ kernel_src::init_oneway_source()
   // NOTE: kernel names must match the list in the kernel_id struct
 
   std::vector<std::string> aux_function_filenames = {
-      "accu_wavefront_reduce.cl"
+      "accu_wavefront_reduce.cl",
+      "min_wavefront_reduce.cl",
+      "max_wavefront_reduce.cl"
   };
 
   std::string source = "";

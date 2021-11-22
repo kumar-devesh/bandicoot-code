@@ -81,7 +81,9 @@ get_cuda_oneway_kernel_src()
   // NOTE: kernel names must match the list in the kernel_id struct
 
   std::vector<std::string> aux_function_filenames = {
-      "accu_warp_reduce.cu"
+      "accu_warp_reduce.cu",
+      "min_warp_reduce.cu",
+      "max_warp_reduce.cu"
   };
 
   std::string result = "";

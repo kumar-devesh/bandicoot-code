@@ -36,6 +36,13 @@ struct oneway_kernel_id
     accu,
     accu_small,
     //
+    min,
+    min_small,
+    max,
+    max_small,
+    max_abs,
+    max_abs_small,
+    //
     trace,
     //
     ltri_set_zero,
@@ -69,6 +76,13 @@ struct oneway_kernel_id
     names.push_back("accu_simple");
     names.push_back("accu");
     names.push_back("accu_small");
+
+    names.push_back("min");
+    names.push_back("min_small");
+    names.push_back("max");
+    names.push_back("max_small");
+    names.push_back("max_abs");
+    names.push_back("max_abs_small");
 
     names.push_back("trace");
 
@@ -164,6 +178,7 @@ struct twoway_kernel_id
     equ_array_exp_post,
     equ_array_log_pre,
     equ_array_log_post,
+    equ_array_abs,
     //
     get_diag,
     //
@@ -222,6 +237,7 @@ struct twoway_kernel_id
     names.push_back("equ_array_exp_post");
     names.push_back("equ_array_log_pre");
     names.push_back("equ_array_log_post");
+    names.push_back("equ_array_abs");
 
     names.push_back("get_diag");
 

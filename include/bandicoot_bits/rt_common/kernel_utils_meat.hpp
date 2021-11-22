@@ -23,7 +23,14 @@ inline std::string substitute_types(const std::string& input, const std::string&
   // for now: shitty implementation.  try again later...
   std::string output = input;
 
-  size_t pos = output.find("fp_eT1");
+  size_t pos = output.find("ET1_ABS");
+  while (pos != std::string::npos)
+    {
+    output.replace(pos, 7, type_map.template abs_func<eT1>());
+    pos = output.find("ET1_ABS");
+    }
+
+  pos = output.find("fp_eT1");
   while (pos != std::string::npos)
     {
     output.replace(pos, 6, type_map.template map<typename promote_type<eT1, float>::result>());

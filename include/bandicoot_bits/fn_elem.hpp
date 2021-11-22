@@ -78,6 +78,51 @@ log(const T1& A)
   }
 
 
+
+//
+// abs
+
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename enable_if2< is_coot_type<T1>::value && std::is_signed<typename T1::elem_type>::value, const eOp<T1, eop_abs> >::result
+abs(const T1& A)
+  {
+  coot_extra_debug_sigprint();
+
+  return eOp<T1, eop_abs>(A);
+  }
+
+
+
+// abs(unsigned)... nothing to do
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename enable_if2< is_coot_type<T1>::value && !std::is_signed<typename T1::elem_type>::value, const T1&>::result
+abs(const T1& A)
+  {
+  coot_extra_debug_sigprint();
+
+  return A;
+  }
+
+
+
+// abs(abs)... nothing to do
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_abs>& >::result
+abs(const eOp<T1, eop_abs>& A)
+  {
+  coot_extra_debug_sigprint();
+
+  return A;
+  }
+
+
+
 // TODO: more element-wise functions
 
 
