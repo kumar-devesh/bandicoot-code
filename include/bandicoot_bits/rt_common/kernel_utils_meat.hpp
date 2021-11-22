@@ -162,6 +162,34 @@ inline std::string get_one_elem_kernel_src(kernels_t<std::vector<KernelType>>& k
 
 
 
+template<typename KernelType, typename TypeMapper, typename higher_eT1 = void, typename higher_eT2 = void>
+inline std::string get_one_elem_real_kernel_src(kernels_t<std::vector<KernelType>>& kernels,
+                                                const std::string& source,
+                                                const std::vector<std::string>& kernel_names,
+                                                const std::string& prefix,
+                                                std::vector<std::pair<std::string, KernelType*>>& name_map,
+                                                const TypeMapper& type_map)
+  {
+  const std::string   f_src = substitute_types<TypeMapper, float, higher_eT1, higher_eT2>(source, prefix + "f_", type_map);
+  const std::string   d_src = substitute_types<TypeMapper, double, higher_eT1, higher_eT2>(source, prefix + "d_", type_map);
+
+  kernels.f_kernels.resize(kernel_names.size());
+  kernels.d_kernels.resize(kernel_names.size());
+
+  for (size_t j = 0; j < kernel_names.size(); ++j)
+    {
+    name_map.push_back(std::make_pair(prefix + "f_" + kernel_names[j], &kernels.f_kernels.at(j)));
+    }
+  for (size_t j = 0; j < kernel_names.size(); ++j)
+    {
+    name_map.push_back(std::make_pair(prefix + "d_" + kernel_names[j], &kernels.d_kernels.at(j)));
+    }
+
+  return f_src + d_src;
+  }
+
+
+
 template<typename KernelType, typename TypeMapper, typename higher_eT = void>
 inline std::string get_two_elem_kernel_src(kernels_t<kernels_t<std::vector<KernelType>>>& kernels,
                                            const std::string& source,

@@ -21,6 +21,9 @@ struct kernel_src
   static inline const std::string&  get_oneway_source();
   static inline       std::string  init_oneway_source();
 
+  static inline const std::string&  get_oneway_real_source();
+  static inline       std::string  init_oneway_real_source();
+
   static inline const std::string&  get_twoway_source();
   static inline       std::string  init_twoway_source();
 
@@ -139,6 +142,38 @@ kernel_src::init_oneway_source()
   for (const std::string& kernel_name : oneway_kernel_id::get_names())
     {
     std::string filename = "oneway/" + kernel_name + ".cl";
+    source += read_file(filename);
+    }
+
+  return source;
+  }
+
+
+
+inline
+const std::string&
+kernel_src::get_oneway_real_source()
+  {
+  // TODO
+  static const std::string source = init_oneway_real_source();
+
+  return source;
+  }
+
+
+
+inline
+std::string
+kernel_src::init_oneway_real_source()
+  {
+  // NOTE: kernel names must match the list in the kernel_id struct
+
+  std::string source = "";
+
+  // Load each file for each kernel.
+  for (const std::string& kernel_name : oneway_real_kernel_id::get_names())
+    {
+    std::string filename = "oneway_real/" + kernel_name + ".cl";
     source += read_file(filename);
     }
 

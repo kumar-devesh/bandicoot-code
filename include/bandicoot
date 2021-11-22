@@ -224,6 +224,7 @@ namespace coot
     #include "bandicoot_bits/opencl/max.hpp"
     #include "bandicoot_bits/opencl/max_abs.hpp"
 //    #include "bandicoot_bits/opencl/eig.hpp"
+    #include "bandicoot_bits/opencl/lapack/larfg.hpp"
     }
   #endif
 
@@ -251,8 +252,14 @@ namespace coot
     #include "bandicoot_bits/cuda/max.hpp"
     #include "bandicoot_bits/cuda/max_abs.hpp"
 //    #include "bandicoot_bits/cuda/eig.hpp"
+    #include "bandicoot_bits/cuda/lapack/larfg.hpp"
     }
   #endif
+
+  namespace lapack
+    {
+    #include "bandicoot_bits/lapack/larfg.hpp"
+    }
 
   #include "bandicoot_bits/coot_rt_meat.hpp"
   
