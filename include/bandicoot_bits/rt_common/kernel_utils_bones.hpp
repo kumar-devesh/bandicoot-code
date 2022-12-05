@@ -31,6 +31,19 @@ inline std::string substitute_types(const std::string& source, const std::string
 
 
 /**
+ * Initialize `name_map` with names for all of the one-element kernels given in
+ * `kernels`.  This is equivalent to calling `get_one_elem_kernel_src()`, except
+ * that no source is collected.
+ */
+template<typename KernelType>
+inline void init_one_elem_kernel_map(kernels_t<std::vector<KernelType>>& kernels,
+                                     std::vector<std::pair<std::string, KernelType*>>& name_map,
+                                     const std::string& prefix,
+                                     const std::vector<std::string>& kernel_names);
+
+
+
+/**
  * Given one-element kernel source `source` and a collection of KernelTypes
  * `kernels`, generate a source string that contains those kernels specialized
  * to each of the types supported by bandicoot, with the appropriate prefixes.
@@ -54,6 +67,19 @@ inline std::string get_one_elem_kernel_src(kernels_t<std::vector<KernelType>>& k
                                            const std::string& prefix,
                                            std::vector<std::pair<std::string, KernelType*>>& name_map,
                                            const TypeMapper& type_map);
+
+
+
+/**
+ * Initialize `name_map` with names for all of the one-element real kernels
+ * given in `kernels`.  This is equivalent to calling
+ * `get_one_elem_real_kernel_src()`, except that no source is collected.
+ */
+template<typename KernelType>
+inline void init_one_elem_real_kernel_map(kernels_t<std::vector<KernelType>>& kernels,
+                                          std::vector<std::pair<std::string, KernelType*>>& name_map,
+                                          const std::string& prefix,
+                                          const std::vector<std::string>& kernel_names);
 
 
 
@@ -85,6 +111,19 @@ inline std::string get_one_elem_real_kernel_src(kernels_t<std::vector<KernelType
 
 
 /**
+ * Initialize `name_map` with names for all of the two-element kernels given in
+ * `kernels`.  This is equivalent to calling `get_two_elem_kernel_src()`, except
+ * that no source is collected.
+ */
+template<typename KernelType>
+inline void init_two_elem_kernel_map(kernels_t<kernels_t<std::vector<KernelType>>>& kernels,
+                                     std::vector<std::pair<std::string, KernelType*>>& name_map,
+                                     const std::string& prefix,
+                                     const std::vector<std::string>& kernel_names);
+
+
+
+/**
  * Given two-element kernel source `source` and a collection of KernelTypes
  * `kernels`, generate a source string that contains those kernels specialized
  * to all pairs of the the types supported by bandicoot, with the appropriate
@@ -109,6 +148,19 @@ inline std::string get_two_elem_kernel_src(kernels_t<kernels_t<std::vector<Kerne
                                            const std::string& prefix,
                                            std::vector<std::pair<std::string, KernelType*>>& name_map,
                                            const TypeMapper& type_map);
+
+
+
+/**
+ * Initialize `name_map` with names for all of the three-element kernels given
+ * in `kernels`.  This is equivalent to calling `get_three_elem_kernel_src()`,
+ * except that no source is collected.
+ */
+template<typename KernelType>
+inline void init_three_elem_kernel_map(kernels_t<kernels_t<kernels_t<std::vector<KernelType>>>>& kernels,
+                                       std::vector<std::pair<std::string, KernelType*>>& name_map,
+                                       const std::string& prefix,
+                                       const std::vector<std::string>& kernel_names);
 
 
 

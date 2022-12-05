@@ -50,18 +50,29 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
   cudaError_t result2 = cudaGetDeviceProperties(&dev_prop, wanted_device);
   coot_check_cuda_error(result2, "cuda::runtime_t::init(): couldn't get device properties");
 
-  std::vector<std::pair<std::string, CUfunction*>> name_map;
-  type_to_dev_string type_map;
-  std::string src =
-      get_cuda_src_preamble() +
-      rt_common::get_three_elem_kernel_src(threeway_kernels, get_cuda_threeway_kernel_src(), threeway_kernel_id::get_names(), name_map, type_map) +
-      rt_common::get_two_elem_kernel_src(twoway_kernels, get_cuda_twoway_kernel_src(), twoway_kernel_id::get_names(), "", name_map, type_map) +
-      rt_common::get_one_elem_kernel_src(oneway_kernels, get_cuda_oneway_kernel_src(), oneway_kernel_id::get_names(), "", name_map, type_map) +
-      rt_common::get_one_elem_real_kernel_src(oneway_real_kernels, get_cuda_oneway_real_kernel_src(), oneway_real_kernel_id::get_names(), "", name_map, type_map) +
-      get_cuda_src_epilogue();
+  // Attempt to load cached kernels, if available.
+  const std::string unique_host_id = unique_host_device_id();
+  size_t cached_kernel_size = cache::has_cached_kernels(unique_host_id);
+  bool load_success = false;
+  if (cached_kernel_size > 0)
+    {
+    load_success = load_cached_kernels(unique_host_id, cached_kernel_size);
+    if (!load_success)
+      {
+      coot_debug_warn("cuda::runtime_t::init(): couldn't load cached kernels for unique host id '" + unique_host_id + "'");
+      }
+    }
 
-  bool status = compile_kernels(src, name_map);
-  if (status == false) { coot_debug_warn("cuda::runtime_t::init(): couldn't set up CUDA kernels"); }
+  if (cached_kernel_size == 0 || !load_success)
+    {
+    // compile_kernels() will also attempt to perform caching internally
+    bool status = compile_kernels(unique_host_id);
+    if (status == false)
+      {
+      coot_debug_warn("cuda::runtime_t::init(): couldn't set up CUDA kernels");
+      return false;
+      }
+    }
 
   // Initialize RNG struct.
   curandCreateGenerator(&randGen, CURAND_RNG_PSEUDO_DEFAULT);
@@ -79,10 +90,76 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
 
 
 inline
-bool
-runtime_t::compile_kernels(const std::string& source,
-                           std::vector<std::pair<std::string, CUfunction*>>& names)
+std::string
+runtime_t::unique_host_device_id() const
   {
+  // Generate a string that corresponds to this specific device and CUDA version.
+  // We'll use the UUID of the device, and the version of the runtime.
+  std::ostringstream oss;
+  int runtime_version;
+  cudaError_t result = cudaRuntimeGetVersion(&runtime_version);
+  coot_check_cuda_error(result, "cuda::runtime_t::unique_host_device_id(): cudaRuntimeGetVersion() failed");
+  // Print each half-byte in hex.
+  for (size_t i = 0; i < 16; i++)
+    {
+    oss << std::setw(2) << std::setfill('0') << std::hex << ((unsigned int) dev_prop.uuid.bytes[i] & 0xFF);
+    }
+  oss << "_" << std::dec << runtime_version;
+  return oss.str();
+  }
+
+
+
+inline
+bool
+runtime_t::load_cached_kernels(const std::string& unique_host_device_id, const size_t kernel_size)
+  {
+  coot_extra_debug_sigprint();
+
+  get_cerr_stream() << "runtime_t::load_cached_kernels()" << std::endl;
+
+  // Allocate a buffer large enough to store the program.
+  char* kernel_buffer = new char[kernel_size];
+  bool status = cache::read_cached_kernels(unique_host_device_id, (unsigned char*) kernel_buffer);
+  if (status == false)
+    {
+    coot_debug_warn("cuda::runtime_t::load_cached_kernels(): could not load kernels for unique host device id '" + unique_host_device_id + "'");
+    delete[] kernel_buffer;
+    return false;
+    }
+
+  // Create the map of kernel names.
+  std::vector<std::pair<std::string, CUfunction*>> name_map;
+  rt_common::init_three_elem_kernel_map(threeway_kernels, name_map, threeway_kernel_id::get_names(), "");
+  rt_common::init_two_elem_kernel_map(twoway_kernels, name_map, twoway_kernel_id::get_names(), "");
+  rt_common::init_one_elem_kernel_map(oneway_kernels, name_map, oneway_kernel_id::get_names(), "");
+  rt_common::init_one_elem_real_kernel_map(oneway_real_kernels, name_map, oneway_real_kernel_id::get_names(), "");
+
+  get_cerr_stream() << "runtime_t::load_cached_kernels() loading operation done" << std::endl;
+
+  status = create_kernels(name_map, kernel_buffer);
+  delete[] kernel_buffer;
+  return status;
+  }
+
+
+
+inline
+bool
+runtime_t::compile_kernels(const std::string& unique_host_device_id)
+  {
+  get_cerr_stream() << "runtime_t::compile_kernels()" << std::endl;
+
+  std::vector<std::pair<std::string, CUfunction*>> name_map;
+  type_to_dev_string type_map;
+  std::string source =
+      get_cuda_src_preamble() +
+      rt_common::get_three_elem_kernel_src(threeway_kernels, get_cuda_threeway_kernel_src(), threeway_kernel_id::get_names(), name_map, type_map) +
+      rt_common::get_two_elem_kernel_src(twoway_kernels, get_cuda_twoway_kernel_src(), twoway_kernel_id::get_names(), "", name_map, type_map) +
+      rt_common::get_one_elem_kernel_src(oneway_kernels, get_cuda_oneway_kernel_src(), oneway_kernel_id::get_names(), "", name_map, type_map) +
+      rt_common::get_one_elem_real_kernel_src(oneway_real_kernels, get_cuda_oneway_real_kernel_src(), oneway_real_kernel_id::get_names(), "", name_map, type_map) +
+      get_cuda_src_epilogue();
+
   // We'll use NVRTC to compile each of the kernels we need on the fly.
   nvrtcProgram prog;
   nvrtcResult result = nvrtcCreateProgram(
@@ -132,26 +209,57 @@ runtime_t::compile_kernels(const std::string& source,
     }
 
   // Obtain PTX from the program.
-  size_t ptxSize;
-  result = nvrtcGetPTXSize(prog, &ptxSize);
+  size_t ptx_size;
+  result = nvrtcGetPTXSize(prog, &ptx_size);
   coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcGetPTXSize() failed");
 
-  char *ptx = new char[ptxSize];
+  char *ptx = new char[ptx_size];
   result = nvrtcGetPTX(prog, ptx);
   coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcGetPTX() failed");
 
-  result2 = cuInit(0);
+  bool create_kernel_result = create_kernels(name_map, ptx);
+
+  if (create_kernel_result)
+    {
+    // Try to cache the kernels we compiled.
+    const bool cache_result = cache::cache_kernels(unique_host_device_id, (unsigned char*) ptx, ptx_size);
+    if (cache_result == false)
+      {
+      coot_debug_warn("cuda::runtime_t::init_kernels(): could not cache compiled CUDA kernels");
+      // This is not fatal, so we can proceed.
+      }
+    }
+
+  delete[] ptx;
+
+  get_cerr_stream() << "finished runtime_t::compile_kernels()" << std::endl;
+
+  return create_kernel_result;
+  }
+
+
+
+inline
+bool
+runtime_t::create_kernels(const std::vector<std::pair<std::string, CUfunction*>>& name_map,
+                          char* ptx)
+  {
+  get_cerr_stream() << "runtime_t::create_kernels()" << std::endl;
+
+  CUresult result = cuInit(0);
   CUmodule module;
-  result2 = cuModuleLoadDataEx(&module, ptx, 0, 0, 0);
-  coot_check_cuda_error(result2, "cuda::runtime_t::init_kernels(): cuModuleLoadDataEx() failed");
+  result = cuModuleLoadDataEx(&module, ptx, 0, 0, 0);
+  coot_check_cuda_error(result, "cuda::runtime_t::create_kernels(): cuModuleLoadDataEx() failed");
 
   // Now that everything is compiled, unpack the results into individual kernels
   // that we can access.
-  for (uword i = 0; i < names.size(); ++i)
+  for (uword i = 0; i < name_map.size(); ++i)
     {
-    result2 = cuModuleGetFunction(names.at(i).second, module, names.at(i).first.c_str());
-    coot_check_cuda_error(result2, "cuda::runtime_t::init_kernels(): cuModuleGetFunction() failed for function " + names.at(i).first);
+    result = cuModuleGetFunction(name_map.at(i).second, module, name_map.at(i).first.c_str());
+    coot_check_cuda_error(result, "cuda::runtime_t::create_kernels(): cuModuleGetFunction() failed for function " + name_map.at(i).first);
     }
+
+  get_cerr_stream() << "finished runtime_t::create_kernels()" << std::endl;
 
   return true;
   }
