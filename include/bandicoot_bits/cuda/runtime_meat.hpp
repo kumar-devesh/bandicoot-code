@@ -185,7 +185,7 @@ runtime_t::compile_kernels(const std::string& unique_host_device_id)
   coot_check_cuda_error(result2, "cuda::runtime_t::init_kernels(): cuDeviceGetAttribute() failed");
 
   std::stringstream gpu_arch_opt;
-  gpu_arch_opt << "--gpu-architecture=compute_" << major << minor;
+  gpu_arch_opt << "--gpu-architecture=sm_" << major << minor;
   const std::string& gpu_arch_opt_tmp = gpu_arch_opt.str();
   opts.push_back(gpu_arch_opt_tmp.c_str());
 
@@ -209,20 +209,20 @@ runtime_t::compile_kernels(const std::string& unique_host_device_id)
     }
 
   // Obtain PTX from the program.
-  size_t ptx_size;
-  result = nvrtcGetPTXSize(prog, &ptx_size);
-  coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcGetPTXSize() failed");
+  size_t cubin_size;
+  result = nvrtcGetCUBINSize(prog, &cubin_size);
+  coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcGetCUBINSize() failed");
 
-  char *ptx = new char[ptx_size];
-  result = nvrtcGetPTX(prog, ptx);
-  coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcGetPTX() failed");
+  char *cubin = new char[cubin_size];
+  result = nvrtcGetCUBIN(prog, cubin);
+  coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcGetCUBIN() failed");
 
-  bool create_kernel_result = create_kernels(name_map, ptx);
+  bool create_kernel_result = create_kernels(name_map, cubin);
 
   if (create_kernel_result)
     {
     // Try to cache the kernels we compiled.
-    const bool cache_result = cache::cache_kernels(unique_host_device_id, (unsigned char*) ptx, ptx_size);
+    const bool cache_result = cache::cache_kernels(unique_host_device_id, (unsigned char*) cubin, cubin_size);
     if (cache_result == false)
       {
       coot_debug_warn("cuda::runtime_t::init_kernels(): could not cache compiled CUDA kernels");
@@ -230,7 +230,7 @@ runtime_t::compile_kernels(const std::string& unique_host_device_id)
       }
     }
 
-  delete[] ptx;
+  delete[] cubin;
 
   get_cerr_stream() << "finished runtime_t::compile_kernels()" << std::endl;
 
