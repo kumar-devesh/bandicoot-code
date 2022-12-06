@@ -35,9 +35,10 @@ open_cache(const std::string& unique_host_device_id,
       try_open(f, "/var/cache/bandicoot/cache/", unique_host_device_id, write);
       if (f.is_open() && f.good())
         return f;
+
+      coot_extra_debug_warn("could not open /var/cache/bandicoot/cache/, moving on");
     #endif
 
-    get_cerr_stream() << "could not open /var/cache/bandicoot/cache/, moving on" << std::endl;
     const char* homedir = getenv("HOME");
     if (homedir == NULL)
       {
@@ -75,7 +76,7 @@ try_open(std::fstream& f,
       {
       if (!try_recursive_mkdir(dirname))
         {
-        get_cerr_stream() << "failed to create directory " << dirname << " for cache" << std::endl;
+        coot_extra_debug_warn(std::string("failed to create directory ") + dirname + std::string("' for kernel cache"));
         return; // We failed to make the directory, so we can't open the stream.
         }
       else
@@ -89,7 +90,7 @@ try_open(std::fstream& f,
       }
     else
       {
-      get_cerr_stream() << "got errno " << errno << " and write is " << write << std::endl;
+      coot_extra_debug_warn(std::string("error while opening kernel cache directory '") + dirname + std::string("': ")  + std::string(strerror(errno)));
       return; // No stream can be opened.
       }
     }
@@ -97,18 +98,17 @@ try_open(std::fstream& f,
   if (!(info.st_mode & S_IFDIR))
     {
     // The directory is not a directory, so we can't do anything.
-    get_cerr_stream() << "search directory " << dirname << " is not a directory" << std::endl;
+    coot_extra_debug_warn(std::string("cache directory '") + dirname + std::string("' is not a directory"));
     return;
     }
 
   // Now attempt to open the file.  Processing whether it succeeds is up to the caller.
-  get_cerr_stream() << "attempting to open " << dirname + filename << std::endl;
   f.open(dirname + filename,
          write ? (std::fstream::binary | std::fstream::trunc | std::fstream::out)
                : (std::fstream::binary | std::fstream::in));
   if (!f.is_open())
     {
-    get_cerr_stream() << "opening '" << dirname + filename << "' failed: " << strerror(errno) << std::endl;
+    coot_extra_debug_warn(std::string("opening kernel cache '") + dirname + filename + std::string("' failed: ") + std::string(strerror(errno)));
     }
   }
 
@@ -134,14 +134,7 @@ try_recursive_mkdir(const std::string& dirname)
         {
         // Ignore any EEXISTs.  If we got something else, we fail.
         if (errno != EEXIST)
-          {
-          get_cerr_stream() << "got errno " << errno << " for making directory " << tmp << std::endl;
           return false;
-          }
-        else
-          {
-          get_cerr_stream() << "created directory " << tmp << std::endl;
-          }
         }
       tmp[i] = delim;
       }
@@ -161,7 +154,7 @@ inline size_t has_cached_kernels(const std::string& unique_host_device_id)
   // If opening the file failed for any reason, reject.
   if (!f.is_open() || !f.good())
     {
-    get_cerr_stream() << "could not open cache file " << unique_host_device_id << std::endl;
+    coot_extra_debug_warn(std::string("failed to open kernel cache for device ") + unique_host_device_id);
     return 0;
     }
 
@@ -172,13 +165,15 @@ inline size_t has_cached_kernels(const std::string& unique_host_device_id)
   f.read((char*) &f_ver_patch, sizeof(size_t));
   if (f_ver_major != COOT_VERSION_MAJOR || f_ver_minor != COOT_VERSION_MINOR || f_ver_patch != COOT_VERSION_PATCH)
     {
-    get_cerr_stream() << "cache contained incorrect bandicoot version " << f_ver_major << "." << f_ver_minor << "." << f_ver_patch << std::endl;
+    std::ostringstream oss;
+    oss << "kernel cache was created by incorrect bandicoot version " << f_ver_major << "." << f_ver_minor << "." << f_ver_patch;
+    coot_warn(oss.str());
     return 0;
     }
 
   if (!f.good())
     {
-    get_cerr_stream() << "error reading bandicoot version from cache: " << strerror(errno) << std::endl;
+    coot_warn(std::string("error reading bandicoot version from kernel cache: ") + std::string(strerror(errno)));
     return 0;
     }
 
@@ -187,7 +182,7 @@ inline size_t has_cached_kernels(const std::string& unique_host_device_id)
   f.read((char*) &f_kernel_size, sizeof(size_t));
   if (!f.good())
     {
-    get_cerr_stream() << "failed to read kernel size from cache" << std::endl;
+    coot_warn(std::string("error reading kernel size from kernel cache: ") + std::string(strerror(errno)));
     return 0;
     }
 
@@ -217,9 +212,10 @@ inline bool read_cached_kernels(const std::string& unique_host_device_id,
   f.read((char*) &s, sizeof(size_t));
   f.read((char*) &s, sizeof(size_t));
   if (!f.good())
+    {
+    coot_warn(std::string("error reading from kernel cache: ") + std::string(strerror(errno)));
     return false;
-
-  get_cerr_stream() << "read buffer of length " << s << std::endl;
+    }
 
   // Now read into the buffer.
   f.read((char*) buffer, s);
@@ -239,11 +235,9 @@ inline bool cache_kernels(const std::string& unique_host_device_id,
   // If opening the file failed for some reason, fail.
   if (!f.is_open() || !f.good())
     {
-    get_cerr_stream() << "failed to open stream for " << unique_host_device_id << std::endl;
+    coot_warn(std::string("failed to open kernel cache for writing for device ") + std::string(unique_host_device_id));
     return false;
     }
-
-  get_cerr_stream() << "opened stream successfully!" << std::endl;
 
   size_t f_v_major, f_v_minor, f_v_patch;
   f_v_major = size_t(COOT_VERSION_MAJOR);
@@ -255,11 +249,10 @@ inline bool cache_kernels(const std::string& unique_host_device_id,
   f.write((char*) &f_v_minor, sizeof(size_t));
   f.write((char*) &f_v_patch, sizeof(size_t));
   f.write((char*) &buf_len, sizeof(size_t));
-  get_cerr_stream() << "write buffer of length " << buf_len << std::endl;
   f.write((char*) buffer, buf_len);
   if (!f.good())
     {
-    get_cerr_stream() << "serialization failure, errno " << errno << std::endl;
+    coot_warn(std::string("error writing kernel cache: ") + std::string(strerror(errno)));
     return false;
     }
 
