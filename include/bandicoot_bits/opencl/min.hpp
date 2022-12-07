@@ -27,7 +27,7 @@ min(dev_mem_t<eT> mem, const uword n_elem)
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot_cl_rt not valid" );
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::min(): OpenCL runtime not valid" );
 
   cl_int status = 0;
 

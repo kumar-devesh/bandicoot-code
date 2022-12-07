@@ -29,7 +29,7 @@ struct gemv
     {
     coot_extra_debug_sigprint();
 
-    coot_stop_runtime_error("cuda::gemv(): unsupported type");
+    coot_stop_runtime_error("coot::cuda::gemv(): unsupported type");
     }
 
 
@@ -56,7 +56,7 @@ struct gemv
 
     result = cublasSgemv(get_rt().cuda_rt.cublas_handle, trans_a, M, N, (float*) &alpha, A.cuda_mem_ptr, lda, x.cuda_mem_ptr, incx, (float*) &beta, y.cuda_mem_ptr, incy);
 
-    coot_check_cublas_error( result, "cuda::gemv::apply(): call to cublasSgemv() failed" );
+    coot_check_cublas_error( result, "coot::cuda::gemv(): call to cublasSgemv() failed" );
     }
 
 
@@ -83,7 +83,7 @@ struct gemv
 
     result = cublasDgemv(get_rt().cuda_rt.cublas_handle, trans_a, M, N, (double*) &alpha, A.cuda_mem_ptr, lda, x.cuda_mem_ptr, incx, (double*) &beta, y.cuda_mem_ptr, incy);
 
-    coot_check_cublas_error( result, "cuda::gemv::apply(): call to cublasSgemv() failed" );
+    coot_check_cublas_error( result, "coot::cuda::gemv(): call to cublasSgemv() failed" );
     }
   };
 

@@ -27,7 +27,7 @@ dot(dev_mem_t<eT1> mem1, dev_mem_t<eT2> mem2, const uword n_elem)
 
   typedef typename promote_type<eT1, eT2>::result promoted_eT;
 
-  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "cuda runtime not valid" );
+  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "coot::cuda::dot(): cuda runtime not valid" );
 
   // If we can, try to use cuBLAS.
   if (std::is_same<eT1, eT2>::value && std::is_same<eT1, float>::value)
@@ -35,7 +35,7 @@ dot(dev_mem_t<eT1> mem1, dev_mem_t<eT2> mem2, const uword n_elem)
     float result;
     cublasStatus_t status = cublasSdot(get_rt().cuda_rt.cublas_handle, n_elem, (float*) mem1.cuda_mem_ptr, 1, (float*) mem2.cuda_mem_ptr, 1, &result);
 
-    coot_check_cublas_error( status, "cuda::dot::apply() call to cublasSdot() failed" );
+    coot_check_cublas_error( status, "coot::cuda::dot(): call to cublasSdot() failed" );
     return result;
     }
   else if (std::is_same<eT1, eT2>::value && std::is_same<eT1, double>::value)
@@ -43,7 +43,7 @@ dot(dev_mem_t<eT1> mem1, dev_mem_t<eT2> mem2, const uword n_elem)
     double result;
     cublasStatus_t status = cublasDdot(get_rt().cuda_rt.cublas_handle, n_elem, (double*) mem1.cuda_mem_ptr, 1, (double*) mem2.cuda_mem_ptr, 1, &result);
 
-    coot_check_cublas_error( status, "cuda::dot::apply() call to cublasDdot() failed" );
+    coot_check_cublas_error( status, "coot::cuda::dot() call to cublasDdot() failed" );
     return result;
     }
   else
@@ -79,7 +79,7 @@ dot(dev_mem_t<eT1> mem1, dev_mem_t<eT2> mem2, const uword n_elem)
         (void**) args,
         0);
 
-    coot_check_cuda_error(result, "cuda::dot(): cuLaunchKernel() failed");
+    coot_check_cuda_error(result, "coot::cuda::dot(): cuLaunchKernel() failed");
 
     if (aux.n_elem == 1)
       {

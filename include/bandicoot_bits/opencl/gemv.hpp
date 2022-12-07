@@ -29,7 +29,7 @@ struct gemv
     {
     coot_extra_debug_sigprint();
 
-    coot_stop_runtime_error("opencl::gemv(): unsupported type");
+    coot_stop_runtime_error("coot::opencl::gemv(): unsupported type");
     }
 
 
@@ -58,7 +58,7 @@ struct gemv
     status |= clblasSgemv(clblasColumnMajor, transA, M, N, alpha, A.cl_mem_ptr, 0, lda, x.cl_mem_ptr, 0, inc, beta, y.cl_mem_ptr, 0, inc, 1, &queue, 0, NULL, NULL);
     status |= clFlush(queue);
 
-    coot_check_cl_error(status, "opencl::gemv(): eT = float");
+    coot_check_cl_error(status, "coot::opencl::gemv(): eT = float");
     }
 
 
@@ -87,7 +87,7 @@ struct gemv
     status |= clblasDgemv(clblasColumnMajor, transA, M, N, alpha, A.cl_mem_ptr, 0, lda, x.cl_mem_ptr, 0, inc, beta, y.cl_mem_ptr, 0, inc, 1, &queue, 0, NULL, NULL);
     status |= clFlush(queue);
 
-    coot_check_cl_error(status, "opencl::gemv(): eT = double");
+    coot_check_cl_error(status, "coot::opencl::gemv(): eT = double");
     }
   };
 

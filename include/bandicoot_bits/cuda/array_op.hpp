@@ -47,7 +47,7 @@ array_op(dev_mem_t<eT3> out, const uword n_elem, dev_mem_t<eT1> in_a, dev_mem_t<
       (void**) args, // arguments
       0);
 
-  coot_check_cuda_error( result, "cuda::array_op(): cuLaunchKernel() failed" );
+  coot_check_cuda_error( result, "coot::cuda::array_op(): cuLaunchKernel() failed" );
   }
 
 
@@ -64,7 +64,7 @@ copy_array(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword n_elem)
 
   cudaError_t result = cudaMemcpy(dest.cuda_mem_ptr, src.cuda_mem_ptr, sizeof(eT) * size_t(n_elem), cudaMemcpyDeviceToDevice);
 
-  coot_check_cuda_error(result, "cuda::copy_array(): couldn't copy buffer" );
+  coot_check_cuda_error(result, "coot::cuda::copy_array(): couldn't copy buffer" );
   }
 
 
@@ -97,7 +97,7 @@ copy_array(dev_mem_t<out_eT> dest, const dev_mem_t<in_eT> src, const uword n_ele
       (void**) args, // arguments
       0);
 
-  coot_check_cuda_error(result, "cuda::copy_array(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "coot::cuda::copy_array(): cuLaunchKernel() failed");
   }
 
 
@@ -133,7 +133,7 @@ copy_subview(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword aux_row1, 
       height,
       cudaMemcpyDeviceToDevice);
 
-  coot_check_cuda_error(result, "cuda::copy_subview(): couldn't copy buffer");
+  coot_check_cuda_error(result, "coot::cuda::copy_subview(): couldn't copy buffer");
   }
 
 
@@ -171,7 +171,7 @@ copy_subview(dev_mem_t<out_eT> dest, const dev_mem_t<in_eT> src, const uword aux
       (void**) args,
       0);
 
-  coot_check_cuda_error(result, "cuda::copy_subview(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "coot::cuda::copy_subview(): cuLaunchKernel() failed");
   }
 
 

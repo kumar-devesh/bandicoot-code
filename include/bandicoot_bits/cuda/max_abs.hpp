@@ -27,7 +27,7 @@ max_abs(dev_mem_t<eT> mem, const uword n_elem)
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "cuda runtime not valid" );
+  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "coot::cuda::max_abs(): cuda runtime not valid" );
 
   CUfunction k = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::max);
   CUfunction k_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::max_abs_small);
@@ -73,7 +73,7 @@ max_abs(dev_mem_t<eT> mem, const uword n_elem)
         (void**) args,
         0);
 
-    coot_check_cuda_error(result, "cuda::accu(): cuLaunchKernel() failed");
+    coot_check_cuda_error(result, "coot::cuda::max_abs(): cuLaunchKernel() failed");
 
     if (dims.d[0] == 1)
       {

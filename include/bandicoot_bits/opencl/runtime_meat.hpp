@@ -52,14 +52,14 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
   bool status = false;
   
   status = search_devices(plt_id, dev_id, manual_selection, wanted_platform, wanted_device, print_info);
-  if(status == false)  { coot_debug_warn("coot::opencl::runtime_t: couldn't find a suitable device"); return false; }
+  if(status == false)  { coot_debug_warn("coot::cl_rt.init(): couldn't find a suitable device"); return false; }
   
   interrogate_device(dev_info, plt_id, dev_id, print_info);
   
-  if(dev_info.opencl_ver < 120)  { coot_debug_warn("coot::opencl::runtime_t: selected device has OpenCL version < 1.2"); return false; }
+  if(dev_info.opencl_ver < 120)  { coot_debug_warn("coot::cl_rt.init(): selected device has OpenCL version < 1.2"); return false; }
   
   status = setup_queue(ctxt, cq, plt_id, dev_id);
-  if(status == false)  { coot_debug_warn("coot::opencl::runtime_t: couldn't setup queue"); return false; }
+  if(status == false)  { coot_debug_warn("coot::cl_rt.init(): couldn't setup queue"); return false; }
   
   // setup kernels
 
@@ -74,23 +74,17 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
       kernel_src::get_src_epilogue();
 
   status = compile_kernels(src, name_map);
-  if(status == false)  { coot_debug_warn("coot::opencl::runtime_t: couldn't setup OpenCL kernels"); return false; }
+  if(status == false)  { coot_debug_warn("coot::cl_rt.init(): couldn't setup OpenCL kernels"); return false; }
   
   // TODO: refactor to allow use the choice of clBLAS or clBLast backends
 
 
   // setup clBLAS
-  
-  
-  get_cerr_stream().flush();
-  get_cerr_stream() << "setup clBLAS: start" << endl;
-  
+  coot_extra_debug_warn("coot::cl_rt.init(): begin clBLAS setup");
   cl_int clblas_status = clblasSetup();
+  coot_extra_debug_warn("coot::cl_rt.init(): finished clBLAS setup");
   
-  get_cerr_stream().flush();
-  get_cerr_stream() << "setup clBLAS: end" << endl;
-    
-  if(clblas_status != CL_SUCCESS)  { coot_debug_warn("coot::opencl::runtime_t: couldn't setup clBLAS"); return false; }
+  if(clblas_status != CL_SUCCESS)  { coot_debug_warn("coot::cl_rt.init(): couldn't setup clBLAS"); return false; }
   
   if(status == false)
     {
@@ -115,7 +109,7 @@ runtime_t::lock()
   
   #if defined(COOT_USE_CXX11)
     {
-    coot_extra_debug_print("calling mutex.lock()");
+    coot_extra_debug_print("coot::cl_rt: calling mutex.lock()");
     mutex.lock();
     }
   #endif
@@ -132,7 +126,7 @@ runtime_t::unlock()
   
   #if defined(COOT_USE_CXX11)
     {
-    coot_extra_debug_print("calling mutex.unlock()");
+    coot_extra_debug_print("coot::cl_rt: calling mutex.unlock()");
     mutex.unlock();
     }
   #endif
@@ -177,7 +171,7 @@ runtime_t::search_devices(cl_platform_id& out_plt_id, cl_device_id& out_dev_id, 
   
   if((status != CL_SUCCESS) || (n_platforms == 0))
     {
-    coot_debug_warn("coot::opencl::runtime_t::search_devices(): no OpenCL platforms available");
+    coot_debug_warn("coot::cl_rt.init(): no OpenCL platforms available");
     return false;
     }
   
@@ -187,7 +181,7 @@ runtime_t::search_devices(cl_platform_id& out_plt_id, cl_device_id& out_dev_id, 
   
   if(status != CL_SUCCESS)
     {
-    coot_debug_warn("coot::opencl::runtime_t::search_devices(): couldn't get info on OpenCL platforms");
+    coot_debug_warn("coot::cl_rt.init(): couldn't get info on OpenCL platforms");
     return false;
     }
   
@@ -257,7 +251,7 @@ runtime_t::search_devices(cl_platform_id& out_plt_id, cl_device_id& out_dev_id, 
     {
     if(wanted_platform >= platform_ids.size())
       {
-      coot_debug_warn("invalid platform number");
+      coot_debug_warn("coot::cl_rt.init(): invalid platform number");
       return false;
       }
     
@@ -265,7 +259,7 @@ runtime_t::search_devices(cl_platform_id& out_plt_id, cl_device_id& out_dev_id, 
     
     if(wanted_device >= local_device_ids.size())
       {
-      coot_debug_warn("invalid device number");
+      coot_debug_warn("coot::cl_rt.init(): invalid device number");
       return false;
       }
     
@@ -299,8 +293,6 @@ runtime_t::search_devices(cl_platform_id& out_plt_id, cl_device_id& out_dev_id, 
     for(size_t local_device_count = 0; local_device_count < local_n_devices; ++local_device_count)
       {
       const int tmp_val = local_device_pri.at(local_device_count);
-      
-      // cout << "platform_count: " << platform_count << "  local_device_count: " << local_device_count << "  priority: " << tmp_val << "   best_val: " << best_val << endl;
       
       if(best_val < tmp_val)
         {
@@ -552,9 +544,7 @@ runtime_t::compile_kernels(const std::string& source, std::vector<std::pair<std:
   
   if((status != CL_SUCCESS) || (prog_holder.prog == NULL))
     {
-    cout << "status: " << coot_cl_error::as_string(status) << endl;
-    
-    std::cout << "coot_cl_rt::compile_kernels(): couldn't create program" << std::endl;
+    coot_warn(std::string("coot::cl_rt.init(): couldn't create program: ") + coot_cl_error::as_string(status));
     return false;
     }
   
@@ -585,9 +575,8 @@ runtime_t::compile_kernels(const std::string& source, std::vector<std::pair<std:
     char* buffer = new char[len];
 
     clGetProgramBuildInfo(prog_holder.prog, dev_id, CL_PROGRAM_BUILD_LOG, len, buffer, NULL);
-    std::cout << "coot::cl_rt::compile_kernels(): couldn't build program;"              << std::endl;
-    std::cout << "coot::cl_rt::compile_kernels(): output from clGetProgramBuildInfo():" << std::endl;
-    std::cout << buffer << std::endl;
+    coot_warn("coot::cl_rt.init(): couldn't build program; output from clGetProgramBuildInfo():");
+    coot_warn(buffer);
     delete buffer;
 
     return false;
@@ -600,8 +589,7 @@ runtime_t::compile_kernels(const std::string& source, std::vector<std::pair<std:
 
     if((status != CL_SUCCESS) || (names.at(i).second == NULL))
       {
-      std::cout << coot_cl_error::as_string(status) << endl;
-      std::cout << "kernel_name: " << names.at(i).first << endl;
+      coot_warn(std::string("coot::cl_rt.init(): couldn't create kernel ") + names.at(i).first + std::string(": ") + coot_cl_error::as_string(status));
       return false;
       }
     }
@@ -672,20 +660,20 @@ runtime_t::acquire_memory(const uword n_elem)
   {
   coot_extra_debug_sigprint();
   
-  coot_check_runtime_error( (valid == false), "coot_cl_rt::acquire_memory(): runtime not valid" );
+  coot_check_runtime_error( (valid == false), "coot::cl_rt.acquire_memory(): runtime not valid" );
   
   if(n_elem == 0)  { return NULL; }
   
   coot_debug_check
    (
    ( size_t(n_elem) > (std::numeric_limits<size_t>::max() / sizeof(eT)) ),
-   "coot_cl_rt::acquire_memory(): requested size is too large"
+   "coot::cl_rt.acquire_memory(): requested size is too large"
    );
 
   cl_int status = 0;
   cl_mem result = clCreateBuffer(ctxt, CL_MEM_READ_WRITE, sizeof(eT)*(std::max)(uword(1), n_elem), NULL, &status);
   
-  coot_check_bad_alloc( ((status != CL_SUCCESS) || (result == NULL)), "coot_cl_rt::acquire_memory(): not enough memory on device" );
+  coot_check_bad_alloc( ((status != CL_SUCCESS) || (result == NULL)), "coot::cl_rt.acquire_memory(): not enough memory on device" );
   
   return result;
   }
@@ -698,7 +686,7 @@ runtime_t::release_memory(cl_mem dev_mem)
   {
   coot_extra_debug_sigprint();
   
-  coot_debug_check( (valid == false), "coot_cl_rt not valid" );
+  coot_debug_check( (valid == false), "coot::cl_rt not valid" );
   
   if(dev_mem)  { clReleaseMemObject(dev_mem); }
   }
@@ -720,7 +708,7 @@ runtime_t::get_device()
   {
   coot_extra_debug_sigprint();
   
-  coot_debug_check( (valid == false), "coot_cl_rt not valid" );
+  coot_debug_check( (valid == false), "coot::cl_rt not valid" );
   
   return dev_id;
   }
@@ -733,7 +721,7 @@ runtime_t::get_context()
   {
   coot_extra_debug_sigprint();
   
-  coot_debug_check( (valid == false), "coot_cl_rt not valid" );
+  coot_debug_check( (valid == false), "coot::cl_rt not valid" );
   
   return ctxt;
   }
@@ -746,7 +734,7 @@ runtime_t::get_cq()
   {
   coot_extra_debug_sigprint();
   
-  coot_debug_check( (valid == false), "coot_cl_rt not valid" );
+  coot_debug_check( (valid == false), "coot::cl_rt not valid" );
   
   return cq;
   }
@@ -759,7 +747,7 @@ runtime_t::create_extra_cq(cl_command_queue& out_queue)
   {
   coot_extra_debug_sigprint();
   
-  coot_debug_check( (valid == false), "coot_cl_rt not valid" );
+  coot_debug_check( (valid == false), "coot::cl_rt not valid" );
   
   cl_int status = 0;
   
@@ -782,7 +770,7 @@ runtime_t::delete_extra_cq(cl_command_queue& in_queue)
   {
   coot_extra_debug_sigprint();
   
-  coot_debug_check( (valid == false), "coot_cl_rt not valid" );
+  coot_debug_check( (valid == false), "coot::cl_rt not valid" );
   
   if(in_queue != NULL)  { clReleaseCommandQueue(in_queue); in_queue = NULL; }
   }
@@ -903,7 +891,7 @@ runtime_t::cq_guard::cq_guard()
   
   if(get_rt().cl_rt.is_valid())
     {
-    coot_extra_debug_print("calling clFinish()");
+    coot_extra_debug_print("coot::cl_rt: calling clFinish()");
     clFinish(get_rt().cl_rt.get_cq());  // force synchronisation
     
     //coot_extra_debug_print("calling clFlush()");
@@ -920,7 +908,7 @@ runtime_t::cq_guard::~cq_guard()
   
   if(get_rt().cl_rt.is_valid())
     {
-    coot_extra_debug_print("calling clFlush()");
+    coot_extra_debug_print("coot::cl_rt: calling clFlush()");
     clFlush(get_rt().cl_rt.get_cq());  // submit all enqueued commands
     }
   
