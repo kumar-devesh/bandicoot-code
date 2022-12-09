@@ -1,5 +1,9 @@
 image: mlpack/jenkins-amd64-cuda11.2.2-ubuntu
 
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+
 stages:
   - build
   - test-cuda
