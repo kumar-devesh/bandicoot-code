@@ -32,8 +32,6 @@ main(int argc, char** argv)
     return returnCode;
     }
 
-
-
   std::cout << "Bandicoot version: " << coot::coot_version::as_string() << '\n';
 
   if (coot::get_rt().backend == coot::CL_BACKEND)
