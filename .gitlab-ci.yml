@@ -18,8 +18,6 @@ test-cuda:
   tags: [gpu]
   stage: test-cuda
   script: |
-    ls
-    cd bandicoot-code
     cd tests
     make clean && BACKEND=CUDA_BACKEND make -j2
     export CUDA_VISIBLE_DEVICES=0
@@ -33,7 +31,6 @@ test-opencl:
   tags: [gpu]
   stage: test-opencl
   script: |
-    cd bandicoot-code
     cd tests
     make clean && BACKEND=CL_BACKEND make -j2
     export CUDA_VISIBLE_DEVICES=0
