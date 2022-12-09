@@ -1,12 +1,12 @@
 // Copyright 2019 Conrad Sanderson (http://conradsanderson.id.au)
 // Copyright 2019 Ryan Curtin (http://www.ratml.org)
 // Copyright 2019 National ICT Australia (NICTA)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,6 +24,16 @@
 int
 main(int argc, char** argv)
   {
+  Catch::Session session;
+  const int returnCode = session.applyCommandLine(argc, argv);
+  // Check for a command line error.
+  if (returnCode != 0)
+    {
+    return returnCode;
+    }
+
+
+
   std::cout << "Bandicoot version: " << coot::coot_version::as_string() << '\n';
 
   if (coot::get_rt().backend == coot::CL_BACKEND)
@@ -37,6 +47,6 @@ main(int argc, char** argv)
 
   coot::get_rt().init(true);
 
-  Catch::Session().run(argc, argv);
+  return session.run();
   }
 
