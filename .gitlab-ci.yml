@@ -1,13 +1,44 @@
 image: mlpack/jenkins-amd64-cuda11.2.2-ubuntu
 
-build:
-  stage: build
-  script:
-    - cd tests
-    - BACKEND=CUDA_BACKEND make
+stages:
+  - build
+  - test-cuda
+  - test-opencl
 
-test:
-  stage: test
-  script:
-    - cd tests
-    - ./main
+build-job:
+  tags: [gpu]
+  stage: build
+  script: |
+    ls
+  artifacts:
+    paths:
+    - bandicoot-code
+
+test-cuda:
+  tags: [gpu]
+  stage: test-cuda
+  script: |
+    ls
+    cd bandicoot-code
+    cd tests
+    make clean && BACKEND=CUDA_BACKEND make -j2
+    export CUDA_VISIBLE_DEVICES=0
+    ./main
+    export CUDA_VISIBLE_DEVICES=1
+    ./main
+    export CUDA_VISIBLE_DEVICES=3
+    ./main
+
+test-opencl:
+  tags: [gpu]
+  stage: test-opencl
+  script: |
+    cd bandicoot-code
+    cd tests
+    make clean && BACKEND=CL_BACKEND make -j2
+    export CUDA_VISIBLE_DEVICES=0
+    ./main
+    export CUDA_VISIBLE_DEVICES=1
+    ./main
+    export CUDA_VISIBLE_DEVICES=3
+    ./main
