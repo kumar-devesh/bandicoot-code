@@ -19,26 +19,34 @@ open_cache(const std::string& unique_host_device_id,
            const bool write)
   {
   // Strategy:
-  //  Linux/UNIX:
-  //    - search /var/cache/bandicoot/
+  //
+  //    - search COOT_KERNEL_CACHE_DIR (if defined)
+  //    - search COOT_SYSTEM_KERNEL_CACHE_DIR (defaults to /var/cache/bandicoot/)
   //    - search $HOME/.bandicoot/cache/
-  //  Windows:
-  //    - search $USER_HOME/.bandicoot/cache/
   //
 
   std::fstream f;
 
+  // First check COOT_KERNEL_CACHE_DIR, if it's defined.
+  #if defined(COOT_KERNEL_CACHE_DIR)
+    try_open(f, COOT_KERNEL_CACHE_DIR, unique_host_device_id, write);
+    if (f.is_open() && f.good())
+      return f;
+
+    coot_extra_debug_warn(std::string("could not open COOT_KERNEL_CACHE_DIR: ") + std::string(COOT_KERNEL_CACHE_DIR) + std::string(", moving on"));
+  #endif
+
+  // Next check COOT_SYSTEM_KERNEL_CACHE_DIR, if it's defined.
+  #if defined(COOT_SYSTEM_KERNEL_CACHE_DIR)
+    try_open(f, COOT_SYSTEM_KERNEL_CACHE_DIR, unique_host_device_id, write);
+    if (f.is_open() && f.good())
+      return f;
+
+    coot_extra_debug_warn(std::string("could not open COOT_SYSTEM_KERNEL_CACHE_DIR: ") + std::string(COOT_SYSTEM_KERNEL_CACHE_DIR) + std::string(", moving on"));
+  #endif
+
   #ifndef WIN32
     // We are on Linux or OS X (or something exotic).
-    #ifdef __linux__
-      // See if /var/cache/ has anything.
-      try_open(f, "/var/cache/bandicoot/cache/", unique_host_device_id, write);
-      if (f.is_open() && f.good())
-        return f;
-
-      coot_extra_debug_warn("could not open /var/cache/bandicoot/cache/, moving on");
-    #endif
-
     const char* homedir = getenv("HOME");
     if (homedir == NULL)
       {
@@ -69,7 +77,6 @@ try_open(std::fstream& f,
   struct stat info;
   if (stat(dirname.c_str(), &info) == -1)
     {
-    get_cerr_stream() << "stat dirname " << dirname << " failed, errno " << errno << std::endl;
     // Check to see what the error was.
     // If the directory simply doesn't exist, we can try and make it if `write` is true.
     if ((errno == ENOENT || errno == ENOTDIR) && write)
