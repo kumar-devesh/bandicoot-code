@@ -41,7 +41,7 @@ fill_randu(dev_mem_t<eT> dest, const uword n)
 
   coot_check_cuda_error(result, "coot::cuda::fill_randu(): couldn't access device memory");
 
-  delete cpu_rand;
+  delete[] cpu_rand;
   }
 
 
@@ -87,7 +87,7 @@ fill_randn(dev_mem_t<eT> dest, const uword n)
 
   coot_check_cuda_error(result, "coot::cuda::fill_randu(): couldn't access device memory");
 
-  delete cpu_rand;
+  delete[] cpu_rand;
   }
 
 

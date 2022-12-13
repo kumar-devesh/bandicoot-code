@@ -321,7 +321,7 @@ void test_copy_from_dev_mem()
     REQUIRE( cpu_mem[i] == Approx(eT(i)) );
     }
 
-  delete cpu_mem;
+  delete[] cpu_mem;
   }
 
 
@@ -356,7 +356,7 @@ void test_copy_into_dev_mem()
     REQUIRE( eT(x(i)) == Approx(eT(i)) );
     }
 
-  delete cpu_mem;
+  delete[] cpu_mem;
   }
 
 
