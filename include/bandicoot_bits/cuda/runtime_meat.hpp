@@ -98,7 +98,7 @@ runtime_t::unique_host_device_id() const
   std::ostringstream oss;
   int runtime_version;
   cudaError_t result = cudaRuntimeGetVersion(&runtime_version);
-  coot_check_cuda_error(result, "cuda::runtime_t::unique_host_device_id(): cudaRuntimeGetVersion() failed");
+  coot_check_cuda_error(result, "coot::cuda_rt.unique_host_device_id(): cudaRuntimeGetVersion() failed");
   // Print each half-byte in hex.
   for (size_t i = 0; i < 16; i++)
     {
@@ -116,14 +116,12 @@ runtime_t::load_cached_kernels(const std::string& unique_host_device_id, const s
   {
   coot_extra_debug_sigprint();
 
-  get_cerr_stream() << "runtime_t::load_cached_kernels()" << std::endl;
-
   // Allocate a buffer large enough to store the program.
   char* kernel_buffer = new char[kernel_size];
   bool status = cache::read_cached_kernels(unique_host_device_id, (unsigned char*) kernel_buffer);
   if (status == false)
     {
-    coot_debug_warn("cuda::runtime_t::load_cached_kernels(): could not load kernels for unique host device id '" + unique_host_device_id + "'");
+    coot_debug_warn("coot::cuda_rt.init(): could not load kernels for unique host device id '" + unique_host_device_id + "'");
     delete[] kernel_buffer;
     return false;
     }
@@ -134,8 +132,6 @@ runtime_t::load_cached_kernels(const std::string& unique_host_device_id, const s
   rt_common::init_two_elem_kernel_map(twoway_kernels, name_map, twoway_kernel_id::get_names(), "");
   rt_common::init_one_elem_kernel_map(oneway_kernels, name_map, oneway_kernel_id::get_names(), "");
   rt_common::init_one_elem_real_kernel_map(oneway_real_kernels, name_map, oneway_real_kernel_id::get_names(), "");
-
-  get_cerr_stream() << "runtime_t::load_cached_kernels() loading operation done" << std::endl;
 
   status = create_kernels(name_map, kernel_buffer);
   delete[] kernel_buffer;
@@ -148,8 +144,6 @@ inline
 bool
 runtime_t::compile_kernels(const std::string& unique_host_device_id)
   {
-  get_cerr_stream() << "runtime_t::compile_kernels()" << std::endl;
-
   std::vector<std::pair<std::string, CUfunction*>> name_map;
   type_to_dev_string type_map;
   std::string source =

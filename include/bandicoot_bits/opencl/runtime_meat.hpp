@@ -677,7 +677,7 @@ runtime_t::compile_kernels(const std::string& unique_host_id)
     {
     get_cerr_stream() << "status: " << coot_cl_error::as_string(status) << endl;
 
-    get_cerr_stream() << "coot_cl_rt::compile_kernels(): couldn't create program" << std::endl;
+    get_cerr_stream() << "coot::cl_rt.init(): couldn't create program" << std::endl;
     return false;
     }
 
@@ -705,7 +705,7 @@ runtime_t::compile_kernels(const std::string& unique_host_id)
     bool cache_status = cache_kernels(unique_host_id, prog_holder);
     if (cache_status == false)
       {
-      coot_debug_warn("coot::cl_rt::compile_kernels(): couldn't cache compiled OpenCL kernels");
+      coot_debug_warn("coot::cl_rt.init(): couldn't cache compiled OpenCL kernels");
       // This is not fatal, so we can proceed.
       }
     }
@@ -745,7 +745,7 @@ runtime_t::create_kernels(const std::vector<std::pair<std::string, cl_kernel*>>&
 
     if((status != CL_SUCCESS) || (name_map.at(i).second == NULL))
       {
-      coot_warn(std::string("coot::cl_rt.init(): couldn't create kernel ") + names.at(i).first + std::string(": ") + coot_cl_error::as_string(status));
+      coot_warn(std::string("coot::cl_rt.init(): couldn't create kernel ") + name_map.at(i).first + std::string(": ") + coot_cl_error::as_string(status));
       return false;
       }
     }
@@ -768,13 +768,12 @@ runtime_t::cache_kernels(const std::string& unique_host_device_id,
   status = clGetProgramInfo(prog_holder.prog, CL_PROGRAM_BINARY_SIZES, sizeof(size_t), &binary_size, NULL);
   if (status != CL_SUCCESS)
     {
-    get_cerr_stream() << "opencl::runtime_t::cache_kernels(): clGetProgramInfo() call to get binary size failed with ";
-    get_cerr_stream() << coot_cl_error::as_string(status) << std::endl;
+    coot_warn(std::string("coot::cl_rt.init(): clGetProgramInfo() call to get binary size failed with ") + coot_cl_error::as_string(status));
     return false;
     }
   else if (binary_size == 0)
     {
-    get_cerr_stream() << "opencl::runtime_t::cache_kernels(): reported binary size is 0; not caching" << std::endl;
+    coot_warn("coot::cl_rt.init(): reported binary size is 0; not caching");
     return false;
     }
 
@@ -783,8 +782,7 @@ runtime_t::cache_kernels(const std::string& unique_host_device_id,
   status = clGetProgramInfo(prog_holder.prog, CL_PROGRAM_BINARIES, sizeof(size_t), &buffer, NULL);
   if (status != CL_SUCCESS)
     {
-    get_cerr_stream() << "opencl::runtime_t::cache_kernels(): clGetProgramInfo() call to get binaries failed with ";
-    get_cerr_stream() << coot_cl_error::as_string(status) << std::endl;
+    coot_warn(std::string("coot::cl_rt.init(): clGetProgramInfo() call to get binaries failed with ") + coot_cl_error::as_string(status));
     return false;
     }
 
