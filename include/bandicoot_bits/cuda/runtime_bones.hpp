@@ -25,8 +25,13 @@ struct runtime_t
   template<typename eT, typename higher_eT1, typename higher_eT2>
   inline std::string substitute_types(const std::string& source, const std::string& prefix);
 
-  inline bool compile_kernels(const std::string& source,
-                              std::vector<std::pair<std::string, CUfunction*>>& names);
+  inline std::string unique_host_device_id() const;
+
+  inline bool load_cached_kernels(const std::string& unique_host_device_id, const size_t kernel_size);
+
+  inline bool compile_kernels(const std::string& unique_host_device_id);
+
+  inline bool create_kernels(const std::vector<std::pair<std::string, CUfunction*>>& name_map, char* ptx);
 
   template<typename eT1>
   inline const CUfunction& get_kernel(const oneway_kernel_id::enum_id num);

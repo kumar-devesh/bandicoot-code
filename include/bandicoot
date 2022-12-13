@@ -25,6 +25,7 @@
  // TODO: use a more fine-grained minimum version (eg. 6.500)
 #endif
 
+// TODO: this warning seems wrong
 #if !defined(ARMA_USE_U64S64)
   #pragma message("WARNING: present installation of Armadillo doesn't have 64 bit integers enabled")
 #endif
@@ -75,6 +76,16 @@
   #include <cusolverDn.h>
 #endif
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <errno.h>
+#include <iomanip>
+
+#ifndef WIN32
+  #include <unistd.h>
+  #include <pwd.h>
+#endif
+
 // TODO: include any stuff here that is not meant to be in the coot namespace
 
 
@@ -104,6 +115,11 @@ namespace coot
   // runtime
   
   #include "bandicoot_bits/kernel_id.hpp"
+
+  namespace cache
+    {
+    #include "bandicoot_bits/cache_bones.hpp"
+    }
 
   namespace rt_common
     {
@@ -195,6 +211,11 @@ namespace coot
   
   //
   // runtime
+
+  namespace cache
+    {
+    #include "bandicoot_bits/cache_meat.hpp"
+    }
 
   namespace rt_common
     {

@@ -42,7 +42,7 @@ fill_randu(dev_mem_t<eT> dest, const uword n)
 
   coot_check_runtime_error( (status != CL_SUCCESS), "opencl::fill_randu(): couldn't access device memory");
 
-  delete cpu_rand;
+  delete[] cpu_rand;
   }
 
 
@@ -75,7 +75,7 @@ fill_randn(dev_mem_t<eT> dest, const uword n)
 
   coot_check_runtime_error( (status != CL_SUCCESS), "opencl::fill_randn(): couldn't access device memory");
 
-  delete cpu_rand;
+  delete[] cpu_rand;
   }
 
 

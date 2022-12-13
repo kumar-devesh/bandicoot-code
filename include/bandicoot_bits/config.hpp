@@ -133,6 +133,21 @@
   #undef COOT_PRINT_ERRORS
 #endif
 
+// Uncomment and modify the lines below to specify a custom directory to store Bandicoot kernels to.
+// Alternately, define COOT_KERNEL_CACHE_DIR in your program.
+// Note that COOT_KERNEL_CACHE_DIR must have a / as its final character (or \ on Windows).
+// 
+// #if defined(COOT_KERNEL_CACHE_DIR)
+//   #undef COOT_KERNEL_CACHE_DIR
+//   #define COOT_KERNEL_CACHE_DIR /custom/cache/location/
+// #endif
+
+// Set default location of system-wide kernel cache on Linux.
+#if !defined(COOT_SYSTEM_KERNEL_CACHE_DIR)
+  #if __linux__
+    #define COOT_SYSTEM_KERNEL_CACHE_DIR "/var/cache/bandicoot/"
+  #endif
+#endif
 
 // if Bandicoot was installed on this system via CMake and COOT_USE_WRAPPER is not defined,
 // COOT_AUX_LIBS lists the libraries required by Bandicoot on this system, and
