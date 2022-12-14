@@ -26,7 +26,7 @@ accu(dev_mem_t<eT> mem, const uword n_elem)
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "cuda runtime not valid" );
+  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "coot::cuda::accu(): cuda runtime not valid" );
 
   CUfunction k = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu);
   CUfunction k_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu_small);
@@ -72,7 +72,7 @@ accu(dev_mem_t<eT> mem, const uword n_elem)
         (void**) args,
         0);
 
-    coot_check_cuda_error(result, "cuda::accu(): cuLaunchKernel() failed");
+    coot_check_cuda_error(result, "coot::cuda::accu(): cuLaunchKernel() failed");
 
     if (dims.d[0] == 1)
       {
@@ -110,7 +110,7 @@ accu_subview(dev_mem_t<eT> mem, const uword m_n_rows, const uword aux_row1, cons
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "cuda runtime not valid" );
+  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "coot::cuda::accu(): cuda runtime not valid" );
 
   // TODO: implement specialised handling for two cases: (i) n_cols = 1, (ii) n_rows = 1
 
@@ -139,7 +139,7 @@ accu_subview(dev_mem_t<eT> mem, const uword m_n_rows, const uword aux_row1, cons
       (void**) args,
       0);
 
-  coot_check_cuda_error(result, "cuda::accu_subview(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "coot::cuda::accu_subview(): cuLaunchKernel() failed");
 
   // combine the column sums
 
@@ -158,7 +158,7 @@ accu_subview(dev_mem_t<eT> mem, const uword m_n_rows, const uword aux_row1, cons
       (void**) args2,
       0);
 
-  coot_check_cuda_error(result, "cuda::accu_subview(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "coot::cuda::accu_subview(): cuLaunchKernel() failed");
 
   return tmp(0);
   }

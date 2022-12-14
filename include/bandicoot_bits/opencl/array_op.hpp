@@ -48,7 +48,7 @@ array_op(dev_mem_t<eT3> out, const uword n_elem, dev_mem_t<eT1> in_a, dev_mem_t<
 
   status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
 
-  coot_check_runtime_error( (status != 0), "opencl::array_op(): couldn't execute kernel" );
+  coot_check_runtime_error( (status != 0), "coot::opencl::array_op(): couldn't execute kernel" );
   }
 
 
@@ -69,7 +69,7 @@ copy_array(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword n_elem)
 
   cl_int status = clEnqueueCopyBuffer(get_rt().cl_rt.get_cq(), src.cl_mem_ptr, dest.cl_mem_ptr, size_t(0), size_t(0), sizeof(eT) * size_t(n_elem), cl_uint(0), NULL, NULL);
 
-  coot_check_runtime_error( (status != 0), "opencl::copy_array(): couldn't copy buffer" );
+  coot_check_runtime_error( (status != 0), "coot::opencl::copy_array(): couldn't copy buffer" );
   }
 
 
@@ -103,7 +103,7 @@ copy_array(dev_mem_t<out_eT> dest, const dev_mem_t<in_eT> src, const uword n_ele
 
   status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
 
-  coot_check_runtime_error( (status != 0), "opencl::copy_array(): couldn't copy buffer");
+  coot_check_runtime_error( (status != 0), "coot::opencl::copy_array(): couldn't copy buffer");
   }
 
 
@@ -143,7 +143,7 @@ copy_subview(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword aux_row1, 
 
   cl_int status = clEnqueueCopyBufferRect(get_rt().cl_rt.get_cq(), src.cl_mem_ptr, dest.cl_mem_ptr, src_origin, dst_origin, region, src_row_pitch, src_slice_pitch, dst_row_pitch, dst_slice_pitch, 0, NULL, NULL);
 
-  coot_check_runtime_error( (status != 0), "opencl::copy_subview(): couldn't copy buffer");
+  coot_check_runtime_error( (status != 0), "coot::opencl::copy_subview(): couldn't copy buffer");
   }
 
 
@@ -182,7 +182,7 @@ copy_subview(dev_mem_t<out_eT> dest, const dev_mem_t<in_eT> src, const uword aux
 
   status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
 
-  coot_check_runtime_error( (status != 0), "opencl::copy_subview(): couldn't copy buffer");
+  coot_check_runtime_error( (status != 0), "coot::opencl::copy_subview(): couldn't copy buffer");
   }
 
 

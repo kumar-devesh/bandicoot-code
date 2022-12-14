@@ -46,7 +46,7 @@ eop_scalar(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword n_elem, co
       (void**) args, // arguments
       0);
 
-  coot_check_cuda_error(result, "cuda::eop_scalar(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "coot::cuda::eop_scalar(): cuLaunchKernel() failed");
   }
 
 

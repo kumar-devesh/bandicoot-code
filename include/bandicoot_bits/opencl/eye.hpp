@@ -26,7 +26,7 @@ eye(dev_mem_t<eT> dest, const uword n_rows, const uword n_cols)
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "opencl::eye(): opencl runtime not valid" );
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::eye(): OpenCL runtime not valid" );
 
   runtime_t::cq_guard guard;
 
@@ -45,7 +45,7 @@ eye(dev_mem_t<eT> dest, const uword n_rows, const uword n_cols)
 
   status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 2, NULL, global_work_size, NULL, 0, NULL, NULL);
 
-  coot_check_runtime_error( (status != 0), "opencl::eye(): couldn't execute kernel" );
+  coot_check_runtime_error( (status != 0), "coot::opencl::eye(): couldn't execute kernel" );
   }
 
 

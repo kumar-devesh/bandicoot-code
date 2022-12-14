@@ -45,7 +45,7 @@ inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, oneway_k
 
   status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, global_work_size, NULL, 0, NULL, NULL);
 
-  coot_check_runtime_error( (status != 0), "opencl::inplace_op_scalar(): couldn't execute kernel" );
+  coot_check_runtime_error( (status != 0), "coot::opencl::inplace_op_scalar(): couldn't execute kernel" );
   }
 
 
@@ -79,7 +79,7 @@ inplace_op_array(dev_mem_t<eT2> dest, dev_mem_t<eT1> src, const uword n_elem, tw
 
   status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, global_work_size, NULL, 0, NULL, NULL);
 
-  coot_check_runtime_error( (status != 0), "opencl::inplace_op_array(): couldn't execute kernel");
+  coot_check_runtime_error( (status != 0), "coot::opencl::inplace_op_array(): couldn't execute kernel");
   }
 
 
@@ -121,7 +121,7 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_row1, const
   // NOTE: Clover / Mesa 13.0.4 can't handle offsets
   status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 2, global_work_offset, global_work_size, NULL, 0, NULL, NULL);
 
-  coot_check_runtime_error( (status != 0), "opencl::inplace_op_subview(): couldn't execute kernel" );
+  coot_check_runtime_error( (status != 0), "coot::opencl::inplace_op_subview(): couldn't execute kernel" );
   }
 
 

@@ -43,7 +43,7 @@ sum_colwise(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword n_rows, cons
       (void**) args,
       0);
 
-  coot_check_cuda_error(result, "cuda::sum_colwise(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "coot::cuda::sum_colwise(): cuLaunchKernel() failed");
   }
 
 
@@ -73,7 +73,7 @@ sum_rowwise(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword n_rows, cons
       (void**) args,
       0);
 
-  coot_check_cuda_error(result, "cuda::sum_rowwise(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "coot::cuda::sum_rowwise(): cuLaunchKernel() failed");
   }
 
 
@@ -106,7 +106,7 @@ sum_colwise_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword M_n_
       (void**) args,
       0);
 
-  coot_check_cuda_error(result, "cuda::sum_colwise_subview(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "coot::cuda::sum_colwise_subview(): cuLaunchKernel() failed");
   }
 
 
@@ -139,7 +139,7 @@ sum_rowwise_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword M_n_
       (void**) args,
       0);
 
-  coot_check_cuda_error(result, "cuda::sum_rowwise_subview(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "coot::cuda::sum_rowwise_subview(): cuLaunchKernel() failed");
   }
 
 

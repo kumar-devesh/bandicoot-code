@@ -40,7 +40,7 @@ fill_randu(dev_mem_t<eT> dest, const uword n)
 
   cl_int status = clEnqueueWriteBuffer(get_rt().cl_rt.get_cq(), dest.cl_mem_ptr, CL_TRUE, 0, sizeof(eT) * n, cpu_rand, 0, NULL, NULL);
 
-  coot_check_runtime_error( (status != CL_SUCCESS), "opencl::fill_randu(): couldn't access device memory");
+  coot_check_runtime_error( (status != CL_SUCCESS), "coot::opencl::fill_randu(): couldn't access device memory");
 
   delete[] cpu_rand;
   }
@@ -73,7 +73,7 @@ fill_randn(dev_mem_t<eT> dest, const uword n)
 
   cl_int status = clEnqueueWriteBuffer(get_rt().cl_rt.get_cq(), dest.cl_mem_ptr, CL_TRUE, 0, sizeof(eT) * n, cpu_rand, 0, NULL, NULL);
 
-  coot_check_runtime_error( (status != CL_SUCCESS), "opencl::fill_randn(): couldn't access device memory");
+  coot_check_runtime_error( (status != CL_SUCCESS), "coot::opencl::fill_randn(): couldn't access device memory");
 
   delete[] cpu_rand;
   }

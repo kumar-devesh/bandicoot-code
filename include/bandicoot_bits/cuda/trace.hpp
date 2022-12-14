@@ -26,7 +26,7 @@ trace(dev_mem_t<eT> mem, const uword n_rows, const uword n_cols)
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "cuda::trace(): cuda runtime not valid");
+  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "coot::cuda::trace(): cuda runtime not valid");
 
   const uword diag_len = (std::min)(n_rows, n_cols);
 
@@ -51,7 +51,7 @@ trace(dev_mem_t<eT> mem, const uword n_rows, const uword n_cols)
       (void**) args,
       0);
 
-  coot_check_cuda_error(result, "cuda::trace(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "coot::cuda::trace(): cuLaunchKernel() failed");
 
   return eT(tmp(0));
   }

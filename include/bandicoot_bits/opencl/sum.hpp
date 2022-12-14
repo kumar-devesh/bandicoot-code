@@ -25,7 +25,7 @@ sum_colwise(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword n_rows, cons
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "opencl::sum_colwise(): opencl runtime not valid" );
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::sum_colwise(): opencl runtime not valid" );
 
   runtime_t::cq_guard guard;
 
@@ -47,7 +47,7 @@ sum_colwise(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword n_rows, cons
 
   status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
 
-  coot_check_cl_error(status, "opencl::sum_colwise(): failed to run kernel");
+  coot_check_cl_error(status, "coot::opencl::sum_colwise(): failed to run kernel");
   }
 
 
@@ -59,7 +59,7 @@ sum_rowwise(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword n_rows, cons
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "opencl::sum_colwise(): opencl runtime not valid" );
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::sum_colwise(): opencl runtime not valid" );
 
   runtime_t::cq_guard guard;
 
@@ -81,7 +81,7 @@ sum_rowwise(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword n_rows, cons
 
   status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
 
-  coot_check_cl_error(status, "opencl::sum_rowwise(): failed to run kernel");
+  coot_check_cl_error(status, "coot::opencl::sum_rowwise(): failed to run kernel");
   }
 
 
@@ -93,7 +93,7 @@ sum_colwise_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword M_n_
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "opencl::sum_colwise(): opencl runtime not valid" );
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::sum_colwise(): opencl runtime not valid" );
 
   runtime_t::cq_guard guard;
 
@@ -123,7 +123,7 @@ sum_colwise_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword M_n_
 
   status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), k1, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
 
-  coot_check_cl_error(status, "opencl::sum_colwise_subview(): failed to run kernel");
+  coot_check_cl_error(status, "coot::opencl::sum_colwise_subview(): failed to run kernel");
   }
 
 
@@ -135,7 +135,7 @@ sum_rowwise_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword M_n_
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "opencl::sum_colwise(): opencl runtime not valid" );
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::sum_colwise(): opencl runtime not valid" );
 
   runtime_t::cq_guard guard;
 
@@ -165,7 +165,7 @@ sum_rowwise_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword M_n_
 
   status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), k1, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
 
-  coot_check_cl_error(status, "opencl::sum_rowwise_subview(): failed to run kernel");
+  coot_check_cl_error(status, "coot::opencl::sum_rowwise_subview(): failed to run kernel");
   }
 
 

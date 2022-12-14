@@ -93,10 +93,10 @@ struct gemm
       throw std::invalid_argument("cannot multiply with this eT");
       }
 
-    coot_check_cublas_error( result, "cuda::gemm::apply(): call to cublas?gemm() failed" );
+    coot_check_cublas_error( result, "coot::cuda::gemm(): call to cublas?gemm() failed" );
 
     #else
-    throw std::invalid_argument("cuda backend not enabled");
+    throw std::invalid_argument("coot::cuda::gemm(): CUDA backend not enabled");
     #endif
     }
   };

@@ -44,7 +44,7 @@ inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, oneway_k
       (void**) args, // arguments
       0);
 
-  coot_check_cuda_error( result, "cuda::inplace_op_scalar(): cuLaunchKernel() failed" );
+  coot_check_cuda_error( result, "coot::cuda::inplace_op_scalar(): cuLaunchKernel() failed" );
   }
 
 
@@ -77,7 +77,7 @@ inplace_op_array(dev_mem_t<eT2> dest, dev_mem_t<eT1> src, const uword n_elem, tw
       (void**) args, // arguments
       0);
 
-  coot_check_cuda_error( result, "cuda::inplace_op_array(): cuLaunchKernel() failed" );
+  coot_check_cuda_error( result, "coot::cuda::inplace_op_array(): cuLaunchKernel() failed" );
   }
 
 
@@ -119,7 +119,7 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_row1, const
       (void**) args,
       0);
 
-  coot_check_cuda_error( result, "cuda::inplace_op_subview(): cuLaunchKernel() failed");
+  coot_check_cuda_error( result, "coot::cuda::inplace_op_subview(): cuLaunchKernel() failed");
   }
 
 

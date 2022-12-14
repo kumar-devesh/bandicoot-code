@@ -20,27 +20,27 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (wanted_platform != 0), "cuda::runtime_t::init(): wanted_platform must be 0 for the CUDA backend" );
+  coot_debug_check( (wanted_platform != 0), "coot::cuda_rt.init(): wanted_platform must be 0 for the CUDA backend" );
 
   valid = false;
 
 
   CUresult result = cuInit(0);
-  coot_check_cuda_error(result, "cuda::runtime_t::init(): cuInit() failed");
+  coot_check_cuda_error(result, "coot::cuda_rt.init(): cuInit() failed");
 
   int device_count = 0;
   result = cuDeviceGetCount(&device_count);
-  coot_check_cuda_error(result, "cuda::runtime_t::init(): cuDeviceGetCount() failed");
+  coot_check_cuda_error(result, "coot::cuda_rt.init(): cuDeviceGetCount() failed");
 
   // Ensure that the desired device is within the range of devices we have.
   // TODO: better error message?
-  coot_debug_check( ((int) wanted_device >= device_count), "cuda::runtime_t::init(): invalid wanted_device" );
+  coot_debug_check( ((int) wanted_device >= device_count), "coot::cuda_rt.init(): invalid wanted_device" );
 
   result = cuDeviceGet(&cuDevice, wanted_device);
-  coot_check_cuda_error(result, "cuda::runtime_t::init(): cuDeviceGet() failed");
+  coot_check_cuda_error(result, "coot::cuda_rt.init(): cuDeviceGet() failed");
 
   result = cuCtxCreate(&context, 0, cuDevice);
-  coot_check_cuda_error(result, "cuda::runtime_t::init(): cuCtxCreate() failed");
+  coot_check_cuda_error(result, "coot::cuda_rt.init(): cuCtxCreate() failed");
 
   // NOTE: it seems size_t will have the same size on the device and host;
   // given the definition of uword, we will assume uword on the host is equivalent
@@ -48,7 +48,7 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
   //
   // NOTE: float will also have the same size as the host (generally 32 bits)
   cudaError_t result2 = cudaGetDeviceProperties(&dev_prop, wanted_device);
-  coot_check_cuda_error(result2, "cuda::runtime_t::init(): couldn't get device properties");
+  coot_check_cuda_error(result2, "coot::cuda_rt.init(): couldn't get device properties");
 
   // Attempt to load cached kernels, if available.
   const std::string unique_host_id = unique_host_device_id();
@@ -59,7 +59,7 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
     load_success = load_cached_kernels(unique_host_id, cached_kernel_size);
     if (!load_success)
       {
-      coot_debug_warn("cuda::runtime_t::init(): couldn't load cached kernels for unique host id '" + unique_host_id + "'");
+      coot_debug_warn("coot::cuda_rt.init(): couldn't load cached kernels for unique host id '" + unique_host_id + "'");
       }
     }
 
@@ -69,7 +69,7 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
     bool status = compile_kernels(unique_host_id);
     if (status == false)
       {
-      coot_debug_warn("cuda::runtime_t::init(): couldn't set up CUDA kernels");
+      coot_debug_warn("coot::cuda_rt.init(): couldn't set up CUDA kernels");
       return false;
       }
     }
@@ -98,7 +98,7 @@ runtime_t::unique_host_device_id() const
   std::ostringstream oss;
   int runtime_version;
   cudaError_t result = cudaRuntimeGetVersion(&runtime_version);
-  coot_check_cuda_error(result, "cuda::runtime_t::unique_host_device_id(): cudaRuntimeGetVersion() failed");
+  coot_check_cuda_error(result, "coot::cuda_rt.unique_host_device_id(): cudaRuntimeGetVersion() failed");
   // Print each half-byte in hex.
   for (size_t i = 0; i < 16; i++)
     {
@@ -116,14 +116,12 @@ runtime_t::load_cached_kernels(const std::string& unique_host_device_id, const s
   {
   coot_extra_debug_sigprint();
 
-  get_cerr_stream() << "runtime_t::load_cached_kernels()" << std::endl;
-
   // Allocate a buffer large enough to store the program.
   char* kernel_buffer = new char[kernel_size];
   bool status = cache::read_cached_kernels(unique_host_device_id, (unsigned char*) kernel_buffer);
   if (status == false)
     {
-    coot_debug_warn("cuda::runtime_t::load_cached_kernels(): could not load kernels for unique host device id '" + unique_host_device_id + "'");
+    coot_debug_warn("coot::cuda_rt.init(): could not load kernels for unique host device id '" + unique_host_device_id + "'");
     delete[] kernel_buffer;
     return false;
     }
@@ -134,8 +132,6 @@ runtime_t::load_cached_kernels(const std::string& unique_host_device_id, const s
   rt_common::init_two_elem_kernel_map(twoway_kernels, name_map, twoway_kernel_id::get_names(), "");
   rt_common::init_one_elem_kernel_map(oneway_kernels, name_map, oneway_kernel_id::get_names(), "");
   rt_common::init_one_elem_real_kernel_map(oneway_real_kernels, name_map, oneway_real_kernel_id::get_names(), "");
-
-  get_cerr_stream() << "runtime_t::load_cached_kernels() loading operation done" << std::endl;
 
   status = create_kernels(name_map, kernel_buffer);
   delete[] kernel_buffer;
@@ -148,8 +144,6 @@ inline
 bool
 runtime_t::compile_kernels(const std::string& unique_host_device_id)
   {
-  get_cerr_stream() << "runtime_t::compile_kernels()" << std::endl;
-
   std::vector<std::pair<std::string, CUfunction*>> name_map;
   type_to_dev_string type_map;
   std::string source =
@@ -169,7 +163,7 @@ runtime_t::compile_kernels(const std::string& unique_host_device_id)
       0,              // number of headers used
       NULL,           // sources of the headers
       NULL);          // name of each header
-  coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcCreateProgram() failed");
+  coot_check_nvrtc_error(result, "coot::cuda_rt.init(): nvrtcCreateProgram() failed");
 
   std::vector<const char*> opts =
     {
@@ -180,9 +174,9 @@ runtime_t::compile_kernels(const std::string& unique_host_device_id)
   // Get compute capabilities.
   int major, minor = 0;
   CUresult result2 = cuDeviceGetAttribute(&major, CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MAJOR, cuDevice);
-  coot_check_cuda_error(result2, "cuda::runtime_t::init_kernels(): cuDeviceGetAttribute() failed");
+  coot_check_cuda_error(result2, "coot::cuda_rt.init(): cuDeviceGetAttribute() failed");
   result2 = cuDeviceGetAttribute(&minor, CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MINOR, cuDevice);
-  coot_check_cuda_error(result2, "cuda::runtime_t::init_kernels(): cuDeviceGetAttribute() failed");
+  coot_check_cuda_error(result2, "coot::cuda_rt.init(): cuDeviceGetAttribute() failed");
 
   std::stringstream gpu_arch_opt;
   gpu_arch_opt << "--gpu-architecture=sm_" << major << minor;
@@ -199,23 +193,23 @@ runtime_t::compile_kernels(const std::string& unique_host_device_id)
     {
     size_t logSize;
     result = (nvrtcGetProgramLogSize(prog, &logSize));
-    coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcGetProgramLogSize() failed");
+    coot_check_nvrtc_error(result, "coot::cuda_rt.init(): nvrtcGetProgramLogSize() failed");
 
     char *log = new char[logSize];
     result = (nvrtcGetProgramLog(prog, log));
-    coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcGetProgramLog() failed");
+    coot_check_nvrtc_error(result, "coot::cuda_rt.init(): nvrtcGetProgramLog() failed");
 
-    coot_stop_runtime_error("cuda::runtime_t::init_kernels(): compilation failed", std::string(log));
+    coot_stop_runtime_error("coot::cuda_rt.init(): compilation failed", std::string(log));
     }
 
   // Obtain PTX from the program.
   size_t cubin_size;
   result = nvrtcGetCUBINSize(prog, &cubin_size);
-  coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcGetCUBINSize() failed");
+  coot_check_nvrtc_error(result, "coot::cuda_rt.init(): nvrtcGetCUBINSize() failed");
 
   char *cubin = new char[cubin_size];
   result = nvrtcGetCUBIN(prog, cubin);
-  coot_check_nvrtc_error(result, "cuda::runtime_t::init_kernels(): nvrtcGetCUBIN() failed");
+  coot_check_nvrtc_error(result, "coot::cuda_rt.init(): nvrtcGetCUBIN() failed");
 
   bool create_kernel_result = create_kernels(name_map, cubin);
 
@@ -225,14 +219,12 @@ runtime_t::compile_kernels(const std::string& unique_host_device_id)
     const bool cache_result = cache::cache_kernels(unique_host_device_id, (unsigned char*) cubin, cubin_size);
     if (cache_result == false)
       {
-      coot_debug_warn("cuda::runtime_t::init_kernels(): could not cache compiled CUDA kernels");
+      coot_debug_warn("coot::cuda_rt.init(): could not cache compiled CUDA kernels");
       // This is not fatal, so we can proceed.
       }
     }
 
   delete[] cubin;
-
-  get_cerr_stream() << "finished runtime_t::compile_kernels()" << std::endl;
 
   return create_kernel_result;
   }
@@ -242,24 +234,20 @@ runtime_t::compile_kernels(const std::string& unique_host_device_id)
 inline
 bool
 runtime_t::create_kernels(const std::vector<std::pair<std::string, CUfunction*>>& name_map,
-                          char* ptx)
+                          char* cubin)
   {
-  get_cerr_stream() << "runtime_t::create_kernels()" << std::endl;
-
   CUresult result = cuInit(0);
   CUmodule module;
-  result = cuModuleLoadDataEx(&module, ptx, 0, 0, 0);
-  coot_check_cuda_error(result, "cuda::runtime_t::create_kernels(): cuModuleLoadDataEx() failed");
+  result = cuModuleLoadDataEx(&module, cubin, 0, 0, 0);
+  coot_check_cuda_error(result, "coot::cuda_rt.init(): cuModuleLoadDataEx() failed");
 
   // Now that everything is compiled, unpack the results into individual kernels
   // that we can access.
   for (uword i = 0; i < name_map.size(); ++i)
     {
     result = cuModuleGetFunction(name_map.at(i).second, module, name_map.at(i).first.c_str());
-    coot_check_cuda_error(result, "cuda::runtime_t::create_kernels(): cuModuleGetFunction() failed for function " + name_map.at(i).first);
+    coot_check_cuda_error(result, "coot::cuda_rt.init(): cuModuleGetFunction() failed for function " + name_map.at(i).first);
     }
-
-  get_cerr_stream() << "finished runtime_t::create_kernels()" << std::endl;
 
   return true;
   }
@@ -340,7 +328,7 @@ runtime_t::get_kernel(const rt_common::kernels_t<std::vector<CUfunction>>& k, co
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (valid == false), "cuda::runtime_t not valid" );
+  coot_debug_check( (valid == false), "coot::cuda_rt not valid" );
 
        if(is_same_type<eT,u32   >::yes)  { return k.u32_kernels.at(num); }
   else if(is_same_type<eT,s32   >::yes)  { return k.s32_kernels.at(num); }
@@ -361,7 +349,7 @@ runtime_t::acquire_memory(const uword n_elem)
   void* result;
   cudaError_t error = cudaMalloc(&result, sizeof(eT) * n_elem);
 
-  coot_check_cuda_error(error, "cuda::acquire_memory(): couldn't allocate memory");
+  coot_check_cuda_error(error, "coot::cuda_rt.acquire_memory(): couldn't allocate memory");
 
   return (eT*) result;
   }
@@ -375,7 +363,7 @@ runtime_t::release_memory(eT* cuda_mem)
     {
     cudaError_t error = cudaFree(cuda_mem);
 
-    coot_check_cuda_error(error, "cuda::release_memory(): couldn't free memory");
+    coot_check_cuda_error(error, "coot::cuda_rt.release_memory(): couldn't free memory");
     }
   }
 

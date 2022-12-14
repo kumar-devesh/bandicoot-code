@@ -26,7 +26,7 @@ eye(dev_mem_t<eT> dest, const uword n_rows, const uword n_cols)
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "cuda::eye(): cuda runtime not valid");
+  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "coot::cuda::eye(): cuda runtime not valid");
 
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::inplace_set_eye);
 
@@ -45,7 +45,7 @@ eye(dev_mem_t<eT> dest, const uword n_rows, const uword n_cols)
       (void**) args,
       0);
 
-  coot_check_cuda_error(result, "cuda::eye(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "coot::cuda::eye(): cuLaunchKernel() failed");
   }
 
 

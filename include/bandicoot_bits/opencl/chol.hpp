@@ -26,7 +26,7 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "opencl::chol(): opencl runtime not valid");
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::chol(): OpenCL runtime not valid");
 
   magma_int_t info   = 0;
   magma_int_t status = 0;
@@ -38,20 +38,18 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
 
   if(is_float<eT>::value)
     {
-//    std::cout << "using float" << std::endl;
     status = magma_spotrf_gpu(MagmaUpper, n_rows, mem.cl_mem_ptr, n_rows, &info);
     }
   else if(is_double<eT>::value)
     {
-//    std::cout << "using double" << std::endl;
     status = magma_dpotrf_gpu(MagmaUpper, n_rows, mem.cl_mem_ptr, n_rows, &info);
     }
   else
     {
-    coot_debug_check( true, "opencl::chol(): not implemented for given type" );
+    coot_debug_check( true, "coot::opencl::chol(): not implemented for given type" );
     }
 
-  coot_check_magma_error(status, "opencl::chol(): MAGMA failure in potrf_gpu()");
+  coot_check_magma_error(status, "coot::opencl::chol(): MAGMA failure in potrf_gpu()");
 
   // now set the lower triangular part (excluding diagonal) to zero
   cl_int status2 = 0;
@@ -72,7 +70,7 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
 
   status2 |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 2, global_work_offset, global_work_size, NULL, 0, NULL, NULL);
 
-  coot_check_cl_error(status2, "opencl::chol(): failed to run kernel ltri_set_zero");
+  coot_check_cl_error(status2, "coot::opencl::chol(): failed to run kernel ltri_set_zero");
 
   //// using MAGMA 1.3
   //status = magma_dpotrf_gpu(MagmaUpper, out.n_rows, out.get_dev_mem(), 0, out.n_rows, get_rt().cl_rt.get_cq(), &info);

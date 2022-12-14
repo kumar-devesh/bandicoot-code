@@ -26,7 +26,7 @@ struct gemm
     {
     coot_extra_debug_sigprint();
 
-    coot_stop_runtime_error("opencl::gemm(): unsupported type");
+    coot_stop_runtime_error("coot::opencl::gemm(): unsupported type");
     }
 
 
@@ -58,7 +58,7 @@ struct gemm
     status |= clblasSgemm(clblasColumnMajor, transA, transB, M, N, K, alpha, A.cl_mem_ptr, 0, lda, B.cl_mem_ptr, 0, ldb, beta, C.cl_mem_ptr, 0, ldc, 1, &queue, 0, NULL, NULL);
     status |= clFlush(queue);
 
-    coot_check_cl_error(status, "gemm::apply(): eT = float");
+    coot_check_cl_error(status, "coot::opencl::gemm(): eT = float");
     }
 
 
@@ -90,6 +90,6 @@ struct gemm
     status |= clblasDgemm(clblasColumnMajor, transA, transB, M, N, K, alpha, A.cl_mem_ptr, 0, lda, B.cl_mem_ptr, 0, ldb, beta, C.cl_mem_ptr, 0, ldc, 1, &queue, 0, NULL, NULL);
     status |= clFlush(queue);
 
-    coot_check_cl_error(status, "gemm::apply(): eT = double");
+    coot_check_cl_error(status, "coot::opencl::gemm(): eT = double");
     }
   };

@@ -26,7 +26,7 @@ accu(dev_mem_t<eT> mem, const uword n_elem)
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot_cl_rt not valid" );
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::accu(): OpenCL runtime not valid" );
 
   cl_int status = 0;
 
@@ -125,7 +125,7 @@ accu_subview(dev_mem_t<eT> mem, const uword m_n_rows, const uword aux_row1, cons
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot_cl_rt not valid" );
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::accu(): OpenCL runtime not valid" );
 
   // TODO: implement specialised handling for two cases: (i) n_cols = 1, (ii) n_rows = 1
 

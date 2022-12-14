@@ -31,7 +31,7 @@ struct runtime_t
 
   inline bool compile_kernels(const std::string& unique_host_device_id);
 
-  inline bool create_kernels(const std::vector<std::pair<std::string, CUfunction*>>& name_map, char* ptx);
+  inline bool create_kernels(const std::vector<std::pair<std::string, CUfunction*>>& name_map, char* cubin);
 
   template<typename eT1>
   inline const CUfunction& get_kernel(const oneway_kernel_id::enum_id num);
