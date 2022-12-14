@@ -831,3 +831,122 @@ TEST_CASE("eop_abs")
   test_eop_exp<u64>();
   test_eop_exp<s64>();
   }
+
+
+
+template<typename eT>
+void test_eop_log2()
+  {
+  Mat<eT> x(5, 5);
+  x.fill(eT(3));
+
+  Mat<eT> y = log2(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(std::log2(eT(x(r, c))))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_log2")
+  {
+  test_eop_log2<float>();
+  test_eop_log2<double>();
+  test_eop_log2<u32>();
+  test_eop_log2<s32>();
+  test_eop_log2<u64>();
+  test_eop_log2<s64>();
+  }
+
+
+
+template<typename eT>
+void test_eop_log10()
+  {
+  Mat<eT> x(5, 5);
+  x.fill(eT(3));
+
+  Mat<eT> y = log10(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(std::log10(eT(x(r, c))))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_log10")
+  {
+  test_eop_log10<float>();
+  test_eop_log10<double>();
+  test_eop_log10<u32>();
+  test_eop_log10<s32>();
+  test_eop_log10<u64>();
+  test_eop_log10<s64>();
+  }
+
+
+
+template<typename eT>
+void test_eop_trunc_log()
+  {
+  Mat<eT> x(5, 5);
+  x.fill(eT(3));
+  x[0] = std::numeric_limits<eT>::infinity();
+  x[1] = eT(0);
+  x[2] = eT(-1);
+
+  Mat<eT> y = trunc_log(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(arma::trunc_log(eT(x(r, c))))) );
+      }
+    }
+  }
+
+
+
+template<typename eT>
+void test_eop_trunc_log_pos()
+  {
+  Mat<eT> x(5, 5);
+  x.fill(eT(3));
+  x[0] = std::numeric_limits<eT>::infinity() + 1;
+  x[1] = eT(1);
+  x[2] = eT(2);
+
+  Mat<eT> y = trunc_log(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(arma::trunc_log(eT(x(r, c))))) );
+      }
+    }
+  }
+
+
+
+// We can't test anything that will return a negative value for unsigned types.
+TEST_CASE("eop_trunc_log")
+  {
+  test_eop_trunc_log<float>();
+  test_eop_trunc_log<double>();
+  test_eop_trunc_log_pos<u32>();
+  test_eop_trunc_log<s32>();
+  test_eop_trunc_log_pos<u64>();
+  test_eop_trunc_log<s64>();
+  }

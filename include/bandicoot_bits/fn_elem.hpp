@@ -80,6 +80,54 @@ log(const T1& A)
 
 
 //
+// log2
+
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_log2> >::result
+log2(const T1& A)
+  {
+  coot_extra_debug_sigprint();
+  
+  return eOp<T1, eop_log2>(A);
+  }
+
+
+
+//
+// log10
+
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_log10> >::result
+log10(const T1& A)
+  {
+  coot_extra_debug_sigprint();
+  
+  return eOp<T1, eop_log10>(A);
+  }
+
+
+
+//
+// trunc_log
+
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_trunc_log> >::result
+trunc_log(const T1& A)
+  {
+  coot_extra_debug_sigprint();
+  
+  return eOp<T1, eop_trunc_log>(A);
+  }
+
+
+
+//
 // abs
 
 template<typename T1>

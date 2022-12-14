@@ -127,8 +127,6 @@ class eop_sqrt              : public eop_core<eop_sqrt>
   const static bool is_chainable = false;
   };
 
-// // TODO
-
 class eop_log               : public eop_core<eop_log>
   {
   public:
@@ -138,9 +136,32 @@ class eop_log               : public eop_core<eop_log>
   const static bool is_chainable = false;
   };
 
-// class eop_log2              : public eop_core<eop_log2>              {};
-// class eop_log10             : public eop_core<eop_log10>             {};
-// class eop_trunc_log         : public eop_core<eop_trunc_log>         {};
+class eop_log2              : public eop_core<eop_log2>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_log2_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_log2_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_log10             : public eop_core<eop_log10>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_log10_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_log10_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_trunc_log         : public eop_core<eop_trunc_log>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_trunc_log_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_trunc_log_post;
+  const static bool is_chainable = false;
+  };
 
 class eop_exp               : public eop_core<eop_exp>
   {
