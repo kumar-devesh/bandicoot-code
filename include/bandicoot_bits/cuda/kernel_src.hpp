@@ -27,6 +27,7 @@ get_cuda_src_preamble()
   "#define COOT_FN2(ARG1, ARG2)  ARG1 ## ARG2 \n"
   "#define COOT_FN(ARG1,ARG2) COOT_FN2(ARG1,ARG2)\n"
   "\n"
+  "#define COOT_PI " STR2(M_PI) "\n"
   // Properties for specific types.
   "__device__ inline bool coot_is_fp(const uint) { return false; } \n"
   "__device__ inline bool coot_is_fp(const int) { return false; } \n"

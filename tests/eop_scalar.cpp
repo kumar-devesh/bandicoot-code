@@ -1512,3 +1512,35 @@ TEST_CASE("eglue_hypot")
 
 
 
+template<typename eT>
+void test_eop_sinc()
+  {
+  arma::mat xd_cpu(5, 5, arma::fill::randn);
+  xd_cpu *= 50;
+  arma::Mat<eT> x_cpu = arma::conv_to<arma::Mat<eT>>::from(xd_cpu);
+
+  Mat<eT> x(x_cpu);
+
+  Mat<eT> y = sinc(x);
+  arma::Mat<eT> y_cpu = arma::sinc(x_cpu);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(y_cpu(r, c))).epsilon(0.01) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_sinc")
+  {
+  test_eop_sinc<float>();
+  test_eop_sinc<double>();
+  test_eop_sinc<u32>();
+  test_eop_sinc<s32>();
+  test_eop_sinc<u64>();
+  test_eop_sinc<s64>();
+  }

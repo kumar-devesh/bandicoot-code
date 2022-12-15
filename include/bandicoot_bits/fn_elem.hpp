@@ -365,6 +365,22 @@ atanh(const T1& A)
 
 
 //
+// sinc
+
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_sinc> >::result
+sinc(const T1& A)
+  {
+  coot_extra_debug_sigprint();
+
+  return eOp<T1, eop_sinc>(A);
+  }
+
+
+
+//
 // atan2
 
 template<typename T1, typename T2>

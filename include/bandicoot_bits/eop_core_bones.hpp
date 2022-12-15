@@ -307,6 +307,15 @@ class eop_atanh             : public eop_core<eop_atanh>
   const static bool is_chainable = false;
   };
 
+class eop_sinc              : public eop_core<eop_sinc>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_sinc_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_sinc_post;
+  const static bool is_chainable = false;
+  };
+
 class eop_abs               : public eop_core<eop_abs>
   {
   public:

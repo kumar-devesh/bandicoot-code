@@ -214,7 +214,8 @@ struct twoway_kernel_id
     equ_array_asinh_post,
     equ_array_atanh_pre,
     equ_array_atanh_post,
-    // equ_array_sinc,
+    equ_array_sinc_pre,
+    equ_array_sinc_post,
     equ_array_abs,
     //
     get_diag,
@@ -310,6 +311,8 @@ struct twoway_kernel_id
     names.push_back("equ_array_asinh_post");
     names.push_back("equ_array_atanh_pre");
     names.push_back("equ_array_atanh_post");
+    names.push_back("equ_array_sinc_pre");
+    names.push_back("equ_array_sinc_post");
     names.push_back("equ_array_abs");
 
     names.push_back("get_diag");
