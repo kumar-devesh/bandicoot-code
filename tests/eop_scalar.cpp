@@ -1445,3 +1445,70 @@ TEST_CASE("eop_atanh")
 
 
 
+template<typename eT>
+void test_eglue_atan2()
+  {
+  arma::Mat<eT> x_cpu(5, 5, arma::fill::randn);
+  x_cpu *= 50;
+  arma::Mat<eT> y_cpu(5, 5, arma::fill::randn);
+  y_cpu *= 50;
+
+  Mat<eT> x(x_cpu);
+  Mat<eT> y(y_cpu);
+
+  Mat<eT> z = atan2(x, y);
+
+  arma::Mat<eT> z_cpu = arma::atan2(x_cpu, y_cpu);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(z(r, c)) == Approx(eT(z_cpu(r, c))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eglue_atan2")
+  {
+  test_eglue_atan2<float>();
+  test_eglue_atan2<double>();
+  }
+
+
+
+template<typename eT>
+void test_eglue_hypot()
+  {
+  arma::Mat<eT> x_cpu(5, 5, arma::fill::randu);
+  x_cpu *= 50;
+  arma::Mat<eT> y_cpu(5, 5, arma::fill::randu);
+  y_cpu *= 50;
+
+  Mat<eT> x(x_cpu);
+  Mat<eT> y(y_cpu);
+
+  Mat<eT> z = hypot(x, y);
+  arma::Mat<eT> z_cpu = arma::hypot(x_cpu, y_cpu);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(z(r, c)) == Approx(eT(z_cpu(r, c))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eglue_hypot")
+  {
+  test_eglue_hypot<float>();
+  test_eglue_hypot<double>();
+  }
+
+
+

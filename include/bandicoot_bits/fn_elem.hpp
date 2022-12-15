@@ -365,6 +365,38 @@ atanh(const T1& A)
 
 
 //
+// atan2
+
+template<typename T1, typename T2>
+coot_warn_unused
+coot_inline
+typename enable_if2< is_coot_type<T1>::value && is_coot_type<T2>::value && is_real<typename T1::elem_type>::value && is_real<typename T2::elem_type>::value, const eGlue<T1, T2, eglue_atan2> >::result
+atan2(const T1& X, const T2& Y)
+  {
+  coot_extra_debug_sigprint();
+
+  return eGlue<T1, T2, eglue_atan2>(X, Y);
+  }
+
+
+
+//
+// hypot
+
+template<typename T1, typename T2>
+coot_warn_unused
+coot_inline
+typename enable_if2< is_coot_type<T1>::value && is_coot_type<T2>::value && is_real<typename T1::elem_type>::value && is_real<typename T2::elem_type>::value, const eGlue<T1, T2, eglue_hypot> >::result
+hypot(const T1& X, const T2& Y)
+  {
+  coot_extra_debug_sigprint();
+
+  return eGlue<T1, T2, eglue_hypot>(X, Y);
+  }
+
+
+
+//
 // abs
 
 template<typename T1>
