@@ -176,6 +176,12 @@ struct twoway_kernel_id
     equ_array_sqrt_post,
     equ_array_exp_pre,
     equ_array_exp_post,
+    equ_array_exp2_pre,
+    equ_array_exp2_post,
+    equ_array_exp10_pre,
+    equ_array_exp10_post,
+    equ_array_trunc_exp_pre,
+    equ_array_trunc_exp_post,
     equ_array_log_pre,
     equ_array_log_post,
     equ_array_log2_pre,
@@ -241,6 +247,12 @@ struct twoway_kernel_id
     names.push_back("equ_array_sqrt_post");
     names.push_back("equ_array_exp_pre");
     names.push_back("equ_array_exp_post");
+    names.push_back("equ_array_exp2_pre");
+    names.push_back("equ_array_exp2_post");
+    names.push_back("equ_array_exp10_pre");
+    names.push_back("equ_array_exp10_post");
+    names.push_back("equ_array_trunc_exp_pre");
+    names.push_back("equ_array_trunc_exp_post");
     names.push_back("equ_array_log_pre");
     names.push_back("equ_array_log_post");
     names.push_back("equ_array_log2_pre");

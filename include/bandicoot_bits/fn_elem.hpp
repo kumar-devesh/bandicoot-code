@@ -64,6 +64,51 @@ exp(const T1& A)
 
 
 //
+// exp2
+
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_exp2> >::result
+exp2(const T1& A)
+  {
+  coot_extra_debug_sigprint();
+  
+  return eOp<T1, eop_exp2>(A);
+  }
+
+
+//
+// exp10
+
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_exp10> >::result
+exp10(const T1& A)
+  {
+  coot_extra_debug_sigprint();
+  
+  return eOp<T1, eop_exp10>(A);
+  }
+
+
+//
+// trunc_exp
+
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_trunc_exp> >::result
+trunc_exp(const T1& A)
+  {
+  coot_extra_debug_sigprint();
+  
+  return eOp<T1, eop_trunc_exp>(A);
+  }
+
+
+//
 // log
 
 template<typename T1>

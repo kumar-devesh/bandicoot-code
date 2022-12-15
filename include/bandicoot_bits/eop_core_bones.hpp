@@ -172,9 +172,33 @@ class eop_exp               : public eop_core<eop_exp>
   const static bool is_chainable = false;
   };
 
-// class eop_exp2              : public eop_core<eop_exp2>              {};
-// class eop_exp10             : public eop_core<eop_exp10>             {};
-// class eop_trunc_exp         : public eop_core<eop_trunc_exp>         {};
+class eop_exp2              : public eop_core<eop_exp2>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_exp2_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_exp2_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_exp10             : public eop_core<eop_exp10>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_exp10_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_exp10_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_trunc_exp         : public eop_core<eop_trunc_exp>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_trunc_exp_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_trunc_exp_post;
+  const static bool is_chainable = false;
+  };
+
 // class eop_cos               : public eop_core<eop_cos>               {};
 // class eop_sin               : public eop_core<eop_sin>               {};
 // class eop_tan               : public eop_core<eop_tan>               {};

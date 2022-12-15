@@ -950,3 +950,109 @@ TEST_CASE("eop_trunc_log")
   test_eop_trunc_log_pos<u64>();
   test_eop_trunc_log<s64>();
   }
+
+
+
+template<typename eT>
+void test_eop_exp2()
+  {
+  Mat<eT> x(5, 5);
+  x.fill(eT(3));
+
+  Mat<eT> y = exp2(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(exp2(eT(x(r, c))))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_exp2")
+  {
+  test_eop_exp2<float>();
+  test_eop_exp2<double>();
+  test_eop_exp2<u32>();
+  test_eop_exp2<s32>();
+  test_eop_exp2<u64>();
+  test_eop_exp2<s64>();
+  }
+
+
+
+template<typename eT>
+void test_eop_exp10()
+  {
+  Mat<eT> x(5, 5);
+  x.fill(eT(3));
+
+  Mat<eT> y = exp10(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(exp10(eT(x(r, c))))).epsilon(0.01) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_exp10")
+  {
+  test_eop_exp10<float>();
+  test_eop_exp10<double>();
+  test_eop_exp10<u32>();
+  test_eop_exp10<s32>();
+  test_eop_exp10<u64>();
+  test_eop_exp10<s64>();
+  }
+
+
+
+
+template<typename eT>
+void test_eop_trunc_exp()
+  {
+  Mat<eT> x(5, 5);
+  x.fill(eT(3));
+  x[0] = eT(10);
+  x[1] = eT(100);
+  x[2] = eT(1000);
+  if ((double) std::numeric_limits<eT>::max() < exp(100))
+    {
+    x[1] = eT(log(double(std::numeric_limits<eT>::max())));
+    x[2] = eT(x[1]);
+    }
+  else if ((double) std::numeric_limits<eT>::max() < exp(100))
+    {
+    x[2] = eT(log(double(std::numeric_limits<eT>::max())));
+    }
+
+  Mat<eT> y = trunc_exp(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(arma::trunc_exp(eT(x(r, c))))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_trunc_exp")
+  {
+  test_eop_trunc_exp<float>();
+  test_eop_trunc_exp<double>();
+  test_eop_trunc_exp<u32>();
+  test_eop_trunc_exp<s32>();
+  test_eop_trunc_exp<u64>();
+  test_eop_trunc_exp<s64>();
+  }
