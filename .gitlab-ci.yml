@@ -21,6 +21,7 @@ build-job:
 test-cuda:
   tags: [gpu]
   stage: test-cuda
+  needs: ["build"]
   script: |
     cd tests
     make clean && BACKEND=CUDA_BACKEND make -j2
@@ -34,6 +35,7 @@ test-cuda:
 test-opencl:
   tags: [gpu]
   stage: test-opencl
+  needs: ["build"]
   script: |
     cd tests
     make clean && BACKEND=CL_BACKEND make -j2
