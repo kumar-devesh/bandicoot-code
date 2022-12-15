@@ -199,18 +199,113 @@ class eop_trunc_exp         : public eop_core<eop_trunc_exp>
   const static bool is_chainable = false;
   };
 
-// class eop_cos               : public eop_core<eop_cos>               {};
-// class eop_sin               : public eop_core<eop_sin>               {};
-// class eop_tan               : public eop_core<eop_tan>               {};
-// class eop_acos              : public eop_core<eop_acos>              {};
-// class eop_asin              : public eop_core<eop_asin>              {};
-// class eop_atan              : public eop_core<eop_atan>              {};
-// class eop_cosh              : public eop_core<eop_cosh>              {};
-// class eop_sinh              : public eop_core<eop_sinh>              {};
-// class eop_tanh              : public eop_core<eop_tanh>              {};
-// class eop_acosh             : public eop_core<eop_acosh>             {};
-// class eop_asinh             : public eop_core<eop_asinh>             {};
-// class eop_atanh             : public eop_core<eop_atanh>             {};
+class eop_cos               : public eop_core<eop_cos>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_cos_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_cos_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_sin               : public eop_core<eop_sin>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_sin_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_sin_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_tan               : public eop_core<eop_tan>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_tan_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_tan_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_acos              : public eop_core<eop_acos>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_acos_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_acos_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_asin              : public eop_core<eop_asin>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_asin_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_asin_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_atan              : public eop_core<eop_atan>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_atan_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_atan_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_cosh              : public eop_core<eop_cosh>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_cosh_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_cosh_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_sinh              : public eop_core<eop_sinh>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_sinh_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_sinh_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_tanh              : public eop_core<eop_tanh>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_tanh_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_tanh_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_acosh             : public eop_core<eop_acosh>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_acosh_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_acosh_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_asinh             : public eop_core<eop_asinh>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_asinh_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_asinh_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_atanh             : public eop_core<eop_atanh>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_atanh_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_atanh_post;
+  const static bool is_chainable = false;
+  };
 
 class eop_abs               : public eop_core<eop_abs>
   {

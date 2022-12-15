@@ -1056,3 +1056,392 @@ TEST_CASE("eop_trunc_exp")
   test_eop_trunc_exp<u64>();
   test_eop_trunc_exp<s64>();
   }
+
+
+
+template<typename eT>
+void test_eop_cos()
+  {
+  arma::Mat<double> x_cpu(5, 5, arma::fill::randu);
+  x_cpu *= 50;
+  Mat<eT> x(arma::conv_to<arma::Mat<eT>>::from(x_cpu));
+
+  Mat<eT> y = sin(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(sin(eT(x(r, c))))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_cos")
+  {
+  test_eop_cos<float>();
+  test_eop_cos<double>();
+  test_eop_cos<u32>();
+  test_eop_cos<s32>();
+  test_eop_cos<u64>();
+  test_eop_cos<s64>();
+  }
+
+
+
+template<typename eT>
+void test_eop_sin()
+  {
+  arma::Mat<double> x_cpu(5, 5, arma::fill::randu);
+  x_cpu *= 50;
+  Mat<eT> x(arma::conv_to<arma::Mat<eT>>::from(x_cpu));
+
+  Mat<eT> y = sin(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(sin(eT(x(r, c))))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_sin")
+  {
+  test_eop_sin<float>();
+  test_eop_sin<double>();
+  test_eop_sin<u32>();
+  test_eop_sin<s32>();
+  test_eop_sin<u64>();
+  test_eop_sin<s64>();
+  }
+
+
+
+template<typename eT>
+void test_eop_tan()
+  {
+  arma::Mat<double> x_cpu(5, 5, arma::fill::randu);
+  x_cpu *= 50;
+  Mat<eT> x(arma::conv_to<arma::Mat<eT>>::from(x_cpu));
+
+  Mat<eT> y = sin(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(sin(eT(x(r, c))))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_tan")
+  {
+  test_eop_tan<float>();
+  test_eop_tan<double>();
+  test_eop_tan<u32>();
+  test_eop_tan<s32>();
+  test_eop_tan<u64>();
+  test_eop_tan<s64>();
+  }
+
+
+
+template<typename eT>
+void test_eop_acos()
+  {
+  arma::Mat<double> x_cpu(5, 5, arma::fill::randu);
+  x_cpu[3] = 1.0;
+  Mat<eT> x(arma::conv_to<arma::Mat<eT>>::from(x_cpu));
+
+  Mat<eT> y = sin(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(sin(eT(x(r, c))))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_acos")
+  {
+  test_eop_acos<float>();
+  test_eop_acos<double>();
+  test_eop_acos<u32>();
+  test_eop_acos<s32>();
+  test_eop_acos<u64>();
+  test_eop_acos<s64>();
+  }
+
+
+
+template<typename eT>
+void test_eop_asin()
+  {
+  arma::Mat<double> x_cpu(5, 5, arma::fill::randu);
+  x_cpu[3] = 1.0;
+  Mat<eT> x(arma::conv_to<arma::Mat<eT>>::from(x_cpu));
+
+  Mat<eT> y = sin(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(sin(eT(x(r, c))))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_asin")
+  {
+  test_eop_asin<float>();
+  test_eop_asin<double>();
+  test_eop_asin<u32>();
+  test_eop_asin<s32>();
+  test_eop_asin<u64>();
+  test_eop_asin<s64>();
+  }
+
+
+
+template<typename eT>
+void test_eop_atan()
+  {
+  arma::Mat<double> x_cpu(5, 5, arma::fill::randu);
+  x_cpu *= 50;
+  Mat<eT> x(arma::conv_to<arma::Mat<eT>>::from(x_cpu));
+
+  Mat<eT> y = sin(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(sin(eT(x(r, c))))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_atan")
+  {
+  test_eop_atan<float>();
+  test_eop_atan<double>();
+  test_eop_atan<u32>();
+  test_eop_atan<s32>();
+  test_eop_atan<u64>();
+  test_eop_atan<s64>();
+  }
+
+
+
+template<typename eT>
+void test_eop_cosh()
+  {
+  arma::Mat<double> x_cpu(5, 5, arma::fill::randu);
+  x_cpu *= 50;
+  Mat<eT> x(arma::conv_to<arma::Mat<eT>>::from(x_cpu));
+
+  Mat<eT> y = sin(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(sin(eT(x(r, c))))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_cosh")
+  {
+  test_eop_cosh<float>();
+  test_eop_cosh<double>();
+  test_eop_cosh<u32>();
+  test_eop_cosh<s32>();
+  test_eop_cosh<u64>();
+  test_eop_cosh<s64>();
+  }
+
+
+
+template<typename eT>
+void test_eop_sinh()
+  {
+  arma::Mat<double> x_cpu(5, 5, arma::fill::randu);
+  x_cpu *= 50;
+  Mat<eT> x(arma::conv_to<arma::Mat<eT>>::from(x_cpu));
+
+  Mat<eT> y = sin(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(sin(eT(x(r, c))))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_sinh")
+  {
+  test_eop_sinh<float>();
+  test_eop_sinh<double>();
+  test_eop_sinh<u32>();
+  test_eop_sinh<s32>();
+  test_eop_sinh<u64>();
+  test_eop_sinh<s64>();
+  }
+
+
+
+template<typename eT>
+void test_eop_tanh()
+  {
+  arma::Mat<double> x_cpu(5, 5, arma::fill::randu);
+  x_cpu *= 50;
+  Mat<eT> x(arma::conv_to<arma::Mat<eT>>::from(x_cpu));
+
+  Mat<eT> y = sin(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(sin(eT(x(r, c))))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_tanh")
+  {
+  test_eop_tanh<float>();
+  test_eop_tanh<double>();
+  test_eop_tanh<u32>();
+  test_eop_tanh<s32>();
+  test_eop_tanh<u64>();
+  test_eop_tanh<s64>();
+  }
+
+
+
+template<typename eT>
+void test_eop_acosh()
+  {
+  arma::Mat<double> x_cpu(5, 5, arma::fill::randu);
+  x_cpu *= 50;
+  x_cpu += 1;
+  x_cpu[2] = 1.0;
+  Mat<eT> x(arma::conv_to<arma::Mat<eT>>::from(x_cpu));
+
+  Mat<eT> y = sin(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(sin(eT(x(r, c))))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_acosh")
+  {
+  test_eop_acosh<float>();
+  test_eop_acosh<double>();
+  test_eop_acosh<u32>();
+  test_eop_acosh<s32>();
+  test_eop_acosh<u64>();
+  test_eop_acosh<s64>();
+  }
+
+
+
+template<typename eT>
+void test_eop_asinh()
+  {
+  arma::Mat<double> x_cpu(5, 5, arma::fill::randu);
+  x_cpu *= 50;
+  Mat<eT> x(arma::conv_to<arma::Mat<eT>>::from(x_cpu));
+
+  Mat<eT> y = sin(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(sin(eT(x(r, c))))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_asinh")
+  {
+  test_eop_asinh<float>();
+  test_eop_asinh<double>();
+  test_eop_asinh<u32>();
+  test_eop_asinh<s32>();
+  test_eop_asinh<u64>();
+  test_eop_asinh<s64>();
+  }
+
+
+
+template<typename eT>
+void test_eop_atanh()
+  {
+  arma::Mat<double> x_cpu(5, 5, arma::fill::randu);
+  x_cpu *= 50;
+  Mat<eT> x(arma::conv_to<arma::Mat<eT>>::from(x_cpu));
+
+  Mat<eT> y = sin(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(sin(eT(x(r, c))))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("eop_atanh")
+  {
+  test_eop_atanh<float>();
+  test_eop_atanh<double>();
+  test_eop_atanh<u32>();
+  test_eop_atanh<s32>();
+  test_eop_atanh<u64>();
+  test_eop_atanh<s64>();
+  }
+
+
+
