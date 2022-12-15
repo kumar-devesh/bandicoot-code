@@ -11,7 +11,7 @@ stages:
 
 build-job:
   tags: [gpu]
-  stage: build
+  stage: build-job
   script: |
     ls
   artifacts:
