@@ -456,7 +456,148 @@ abs(const eOp<T1, eop_abs>& A)
 
 
 
-// TODO: more element-wise functions
+//
+// pow
+
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename enable_if2< is_coot_type<T1>::value, eOp<T1, eop_pow> >::result
+pow(const T1& A, const typename T1::elem_type exponent)
+  {
+  coot_extra_debug_sigprint();
+
+  return eOp<T1, eop_pow>(A, exponent);
+  }
+
+
+
+//
+// floor
+// TODO: optimizations to skip processing entirely for integer types
+
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename enable_if2< is_coot_type<T1>::value, eOp<T1, eop_floor> >::result
+floor(const T1& A)
+  {
+  coot_extra_debug_sigprint();
+
+  return eOp<T1, eop_floor>(A);
+  }
+
+
+
+//
+// ceil
+
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename enable_if2< is_coot_type<T1>::value, eOp<T1, eop_ceil> >::result
+ceil(const T1& A)
+  {
+  coot_extra_debug_sigprint();
+
+  return eOp<T1, eop_ceil>(A);
+  }
+
+
+
+//
+// round
+
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename enable_if2< is_coot_type<T1>::value, eOp<T1, eop_round> >::result
+round(const T1& A)
+  {
+  coot_extra_debug_sigprint();
+
+  return eOp<T1, eop_round>(A);
+  }
+
+
+
+//
+// trunc
+
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename enable_if2< is_coot_type<T1>::value, eOp<T1, eop_trunc> >::result
+trunc(const T1& A)
+  {
+  coot_extra_debug_sigprint();
+
+  return eOp<T1, eop_trunc>(A);
+  }
+
+
+
+//
+// sign
+
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename enable_if2< is_coot_type<T1>::value, eOp<T1, eop_sign> >::result
+sign(const T1& A)
+  {
+  coot_extra_debug_sigprint();
+
+  return eOp<T1, eop_sign>(A);
+  }
+
+
+
+//
+// erf
+
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename enable_if2< is_coot_type<T1>::value, eOp<T1, eop_erf> >::result
+erf(const T1& A)
+  {
+  coot_extra_debug_sigprint();
+
+  return eOp<T1, eop_erf>(A);
+  }
+
+
+
+//
+// erfc
+
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename enable_if2< is_coot_type<T1>::value, eOp<T1, eop_erfc> >::result
+erfc(const T1& A)
+  {
+  coot_extra_debug_sigprint();
+
+  return eOp<T1, eop_erfc>(A);
+  }
+
+
+
+//
+// lgamma
+
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename enable_if2< is_coot_type<T1>::value, eOp<T1, eop_lgamma> >::result
+lgamma(const T1& A)
+  {
+  coot_extra_debug_sigprint();
+
+  return eOp<T1, eop_lgamma>(A);
+  }
 
 
 

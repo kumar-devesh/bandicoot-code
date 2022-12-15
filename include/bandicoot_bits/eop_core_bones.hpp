@@ -91,6 +91,7 @@ class eop_scalar_times      : public eop_core<eop_scalar_times>
   const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_mul_scalar;
   const static bool is_chainable = true;
   };
+
 class eop_scalar_div_pre    : public eop_core<eop_scalar_div_pre>
   {
   public:
@@ -327,15 +328,87 @@ class eop_abs               : public eop_core<eop_abs>
 
 // class eop_arg               : public eop_core<eop_arg>               {};
 // class eop_conj              : public eop_core<eop_conj>              {};
-// class eop_pow               : public eop_core<eop_pow>               {};
-// class eop_floor             : public eop_core<eop_floor>             {};
-// class eop_ceil              : public eop_core<eop_ceil>              {};
-// class eop_round             : public eop_core<eop_round>             {};
-// class eop_trunc             : public eop_core<eop_trunc>             {};
-// class eop_sign              : public eop_core<eop_sign>              {};
-// class eop_erf               : public eop_core<eop_erf>               {};
-// class eop_erfc              : public eop_core<eop_erfc>              {};
-// class eop_lgamma            : public eop_core<eop_lgamma>            {};
+
+class eop_pow               : public eop_core<eop_pow>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_pow_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_pow_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_floor             : public eop_core<eop_floor>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_floor_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_floor_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_ceil              : public eop_core<eop_ceil>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_ceil_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_ceil_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_round             : public eop_core<eop_round>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_round_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_round_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_trunc             : public eop_core<eop_trunc>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_trunc_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_trunc_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_sign              : public eop_core<eop_sign>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_sign_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_sign_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_erf               : public eop_core<eop_erf>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_erf_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_erf_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_erfc              : public eop_core<eop_erfc>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_erfc_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_erfc_post;
+  const static bool is_chainable = false;
+  };
+
+class eop_lgamma            : public eop_core<eop_lgamma>
+  {
+  public:
+
+  const static twoway_kernel_id::enum_id kernel_conv_pre  = twoway_kernel_id::equ_array_lgamma_pre;
+  const static twoway_kernel_id::enum_id kernel_conv_post = twoway_kernel_id::equ_array_lgamma_post;
+  const static bool is_chainable = false;
+  };
 
 template<typename eop_type>
 struct get_default { template<typename eT> static inline eT val() { return eT(0); } };

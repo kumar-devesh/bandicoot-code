@@ -217,6 +217,24 @@ struct twoway_kernel_id
     equ_array_sinc_pre,
     equ_array_sinc_post,
     equ_array_abs,
+    equ_array_pow_pre,
+    equ_array_pow_post,
+    equ_array_floor_pre,
+    equ_array_floor_post,
+    equ_array_ceil_pre,
+    equ_array_ceil_post,
+    equ_array_round_pre,
+    equ_array_round_post,
+    equ_array_trunc_pre,
+    equ_array_trunc_post,
+    equ_array_sign_pre,
+    equ_array_sign_post,
+    equ_array_erf_pre,
+    equ_array_erf_post,
+    equ_array_erfc_pre,
+    equ_array_erfc_post,
+    equ_array_lgamma_pre,
+    equ_array_lgamma_post,
     //
     get_diag,
     //
@@ -314,6 +332,24 @@ struct twoway_kernel_id
     names.push_back("equ_array_sinc_pre");
     names.push_back("equ_array_sinc_post");
     names.push_back("equ_array_abs");
+    names.push_back("equ_array_pow_pre");
+    names.push_back("equ_array_pow_post");
+    names.push_back("equ_array_floor_pre");
+    names.push_back("equ_array_floor_post");
+    names.push_back("equ_array_ceil_pre");
+    names.push_back("equ_array_ceil_post");
+    names.push_back("equ_array_round_pre");
+    names.push_back("equ_array_round_post");
+    names.push_back("equ_array_trunc_pre");
+    names.push_back("equ_array_trunc_post");
+    names.push_back("equ_array_sign_pre");
+    names.push_back("equ_array_sign_post");
+    names.push_back("equ_array_erf_pre");
+    names.push_back("equ_array_erf_post");
+    names.push_back("equ_array_erfc_pre");
+    names.push_back("equ_array_erfc_post");
+    names.push_back("equ_array_lgamma_pre");
+    names.push_back("equ_array_lgamma_post");
 
     names.push_back("get_diag");
 
