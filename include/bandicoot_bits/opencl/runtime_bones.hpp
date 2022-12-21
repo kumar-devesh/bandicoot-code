@@ -97,6 +97,11 @@ class runtime_t
   template<typename eT3, typename eT2, typename eT1>
   inline const cl_kernel& get_kernel(const threeway_kernel_id::enum_id num);
 
+  // Get random number generator.
+
+  template<typename eT> cl_mem get_xorwow_state() const;
+  inline size_t get_num_rng_threads() const;
+
   class program_wrapper;
   class cq_guard;
   class adapt_uword;
@@ -120,6 +125,11 @@ class runtime_t
   coot_aligned rt_common::kernels_t<std::vector<cl_kernel>>                                             oneway_real_kernels;
   coot_aligned rt_common::kernels_t<rt_common::kernels_t<std::vector<cl_kernel>>>                       twoway_kernels;
   coot_aligned rt_common::kernels_t<rt_common::kernels_t<rt_common::kernels_t<std::vector<cl_kernel>>>> threeway_kernels;
+
+  // Internally-held RNG state.
+  coot_aligned cl_mem   f_xorwow_state;
+  coot_aligned cl_mem   d_xorwow_state;
+  coot_aligned size_t   num_rng_threads;
 
   #if defined(COOT_USE_CXX11)
   coot_aligned std::recursive_mutex mutex;

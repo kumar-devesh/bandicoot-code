@@ -109,6 +109,23 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
 
   valid = true;
 
+  // Now set up the XORWOW RNGs for float and double.
+  // For type eT, we must store 6 * sizeof(eT) * num_rng_threads for each RNG,
+  // where num_rng_threads is the maximum kernel work group size for the randu kernel.
+  // This means that we will effectively have one RNG per thread.
+  cl_kernel rng_kernel = get_kernel<float>(oneway_real_kernel_id::inplace_xorwow_randu);
+  status = clGetKernelWorkGroupInfo(rng_kernel, dev_id, CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &num_rng_threads, NULL);
+  coot_check_cl_error(status, "coot::cl_rt.init()");
+  size_t preferred_work_group_size_multiple;
+  status = clGetKernelWorkGroupInfo(rng_kernel, dev_id, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, sizeof(size_t), &preferred_work_group_size_multiple, NULL);
+  coot_check_cl_error(status, "coot::cl_rt.init()");
+  num_rng_threads *= preferred_work_group_size_multiple;
+
+  f_xorwow_state = acquire_memory<u32>(6 * num_rng_threads);
+  init_xorwow_state<u32>(f_xorwow_state, num_rng_threads);
+  d_xorwow_state = acquire_memory<u64>(6 * num_rng_threads);
+  init_xorwow_state<u64>(d_xorwow_state, num_rng_threads);
+
   return true;
   }
 
@@ -1043,6 +1060,48 @@ runtime_t::get_kernel(const rt_common::kernels_t<std::vector<cl_kernel>>& k, con
   else if(is_same_type<eT, float >::yes) { return   k.f_kernels.at(num); }
   else if(is_same_type<eT, double>::yes) { return   k.d_kernels.at(num); }
   else { coot_debug_check(true, "unsupported element type"); }
+  }
+
+
+
+template<typename eT>
+inline
+cl_mem
+runtime_t::get_xorwow_state() const
+  {
+  std::ostringstream oss;
+  oss << "coot::cl_rt.get_xorwow_state(): no RNG available for type " << typeid(eT).name();
+  coot_stop_runtime_error(oss.str());
+  return cl_mem(0);
+  }
+
+
+
+template<>
+inline
+cl_mem
+runtime_t::get_xorwow_state<float>() const
+  {
+  return f_xorwow_state;
+  }
+
+
+
+template<>
+inline
+cl_mem
+runtime_t::get_xorwow_state<double>() const
+  {
+  return d_xorwow_state;
+  }
+
+
+
+inline
+size_t
+runtime_t::get_num_rng_threads() const
+  {
+  return num_rng_threads;
   }
 
 

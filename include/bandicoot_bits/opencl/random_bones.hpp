@@ -13,7 +13,9 @@
 // ------------------------------------------------------------------------
 
 // Utility functions for generating random numbers via OpenCL.
-// TODO: these currently generate random numbers on the CPU and then send them to the GPU.  That's awful!
+
+template<typename eT>
+inline void init_xorwow_state(cl_mem state, const size_t num_rng_threads);
 
 template<typename eT>
 inline void fill_randu(dev_mem_t<eT> dest, const uword n);

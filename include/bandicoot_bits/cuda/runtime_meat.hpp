@@ -75,7 +75,11 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
     }
 
   // Initialize RNG struct.
-  curandCreateGenerator(&randGen, CURAND_RNG_PSEUDO_DEFAULT);
+  curandStatus_t result3;
+  result3 = curandCreateGenerator(&xorwow_rand, CURAND_RNG_PSEUDO_XORWOW);
+  coot_check_curand_error(result3, "coot::cuda_rt.init(): curandCreateGenerator() failed");
+  curandCreateGenerator(&philox_rand, CURAND_RNG_PSEUDO_PHILOX4_32_10);
+  coot_check_curand_error(result3, "coot::cuda_rt.init(): curandCreateGenerator() failed");
 
   // Initialize cuBLAS.
   cublasCreate(&cublas_handle);
@@ -257,8 +261,17 @@ runtime_t::create_kernels(const std::vector<std::pair<std::string, CUfunction*>>
 inline
 runtime_t::~runtime_t()
   {
-  // Clean up cuBLAS handle.
-  cublasDestroy(cublas_handle);
+  if (valid)
+    {
+    // Clean up RNGs.
+    curandStatus_t status = curandDestroyGenerator(xorwow_rand);
+    coot_check_curand_error(status, "coot::cuda_rt.cleanup(): curandDestroyGenerator() failed");
+    status = curandDestroyGenerator(philox_rand);
+    coot_check_curand_error(status, "coot::cuda_rt.cleanup(): curandDestroyGenerator() failed");
+
+    // Clean up cuBLAS handle.
+    cublasDestroy(cublas_handle);
+    }
   }
 
 

@@ -17,28 +17,219 @@
 
 using namespace coot;
 
+template<typename eT>
+void test_randu()
+  {
+  Mat<eT> f = randu<Mat<eT>>(1000, 1000);
+  arma::Mat<eT> f_cpu(f);
+  for (uword r = 0; r < 1000; ++r)
+    {
+    for (uword c = 0; c < 1000; ++c)
+      {
+      REQUIRE( eT(f_cpu(r, c)) >= eT(0) );
+      REQUIRE( eT(f_cpu(r, c)) <= eT(1) );
+      }
+    }
+  }
+
+
+
 TEST_CASE("randu_1", "[randu]")
 {
-  //randi(3, 3, distr_param(0, 1));
-  mat f = randu<mat>(3, 3);
-
-  f.print();
-
-  mat g = randu<mat>(3, 3);
-  g.print();
-/*   mat src(4, 1); */
-/*   src.randn(); */
-/*   mat dst(4, 1); */
-/*   dst.randu(); */
-
-/*   src.print(); */
-/*   dst.print(); */
-
-/*   // Copy the first three elements from src to dst. */
-/*   cudaMemcpy((double*)dst.get_dev_mem().cuda_mem_ptr, src.get_dev_mem().cuda_mem_ptr, sizeof(double) * 3, cudaMemcpyDeviceToDevice); */
-/*   // Copy first element from src to last element in dst. */
-/*   cudaMemcpy((double*)dst.get_dev_mem().cuda_mem_ptr + 3, src.get_dev_mem().cuda_mem_ptr, sizeof(double) * 1, cudaMemcpyDeviceToDevice); */
-
-/*   src.print(); */
-/*   dst.print(); */
+  test_randu<float>();
+  test_randu<double>();
+  test_randu<u32>();
+  test_randu<s32>();
+  test_randu<u64>();
+  test_randu<s64>();
 }
+
+
+
+// Use member .randu() function.
+template<typename eT>
+void test_randu_2()
+  {
+  Mat<eT> f(1000, 1000);
+  f.randu();
+  arma::Mat<eT> f_cpu(f);
+  for (uword r = 0; r < 1000; ++r)
+    {
+    for (uword c = 0; c < 1000; ++c)
+      {
+      REQUIRE( eT(f_cpu(r, c)) >= eT(0) );
+      REQUIRE( eT(f_cpu(r, c)) <= eT(1) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("randu_2", "[randu]")
+{
+  test_randu_2<float>();
+  test_randu_2<double>();
+  test_randu_2<u32>();
+  test_randu_2<s32>();
+  test_randu_2<u64>();
+  test_randu_2<s64>();
+}
+
+
+
+// Use member .randu() function and set size.
+template<typename eT>
+void test_randu_3()
+  {
+  Mat<eT> f(5, 5);
+  f.randu(1000, 1000);
+  REQUIRE( f.n_rows == 1000 );
+  REQUIRE( f.n_cols == 1000 );
+  arma::Mat<eT> f_cpu(f);
+
+  for (uword r = 0; r < 1000; ++r)
+    {
+    for (uword c = 0; c < 1000; ++c)
+      {
+      REQUIRE( eT(f_cpu(r, c)) >= eT(0) );
+      REQUIRE( eT(f_cpu(r, c)) <= eT(1) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("randu_3", "[randu]")
+{
+  test_randu_3<float>();
+  test_randu_3<double>();
+  test_randu_3<u32>();
+  test_randu_3<s32>();
+  test_randu_3<u64>();
+  test_randu_3<s64>();
+}
+
+
+
+
+// Test Row/Col randu().
+template<typename eT>
+void test_row_col_randu()
+  {
+  Row<eT> r1(1000);
+  r1.randu();
+  Row<eT> r2(10);
+  r2.randu(1000);
+  Row<eT> r3 = randu<Row<eT>>(1000);
+  Row<eT> r4 = randu<Row<eT>>(1, 1000);
+
+  Col<eT> c1(1000);
+  c1.randu();
+  Col<eT> c2(10);
+  c2.randu(1000);
+  Col<eT> c3 = randu<Col<eT>>(1000);
+  Col<eT> c4 = randu<Col<eT>>(1000, 1);
+
+  REQUIRE( r1.n_elem == 1000 );
+  REQUIRE( r2.n_elem == 1000 );
+  REQUIRE( r3.n_elem == 1000 );
+  REQUIRE( r4.n_elem == 1000 );
+  REQUIRE( c1.n_elem == 1000 );
+  REQUIRE( c2.n_elem == 1000 );
+  REQUIRE( c3.n_elem == 1000 );
+  REQUIRE( c4.n_elem == 1000 );
+
+  arma::Row<eT> r1_cpu(r1);
+  arma::Row<eT> r2_cpu(r2);
+  arma::Row<eT> r3_cpu(r3);
+  arma::Row<eT> r4_cpu(r4);
+  arma::Col<eT> c1_cpu(c1);
+  arma::Col<eT> c2_cpu(c2);
+  arma::Col<eT> c3_cpu(c3);
+  arma::Col<eT> c4_cpu(c4);
+
+  for (uword i = 0; i < 1000; ++i)
+    {
+    REQUIRE( eT(r1_cpu[i]) >= eT(0) );
+    REQUIRE( eT(r1_cpu[i]) <= eT(1) );
+    REQUIRE( eT(r2_cpu[i]) >= eT(0) );
+    REQUIRE( eT(r2_cpu[i]) <= eT(1) );
+    REQUIRE( eT(r3_cpu[i]) >= eT(0) );
+    REQUIRE( eT(r3_cpu[i]) <= eT(1) );
+    REQUIRE( eT(r4_cpu[i]) >= eT(0) );
+    REQUIRE( eT(r4_cpu[i]) <= eT(1) );
+    REQUIRE( eT(c1_cpu[i]) >= eT(0) );
+    REQUIRE( eT(c1_cpu[i]) <= eT(1) );
+    REQUIRE( eT(c2_cpu[i]) >= eT(0) );
+    REQUIRE( eT(c2_cpu[i]) <= eT(1) );
+    REQUIRE( eT(c3_cpu[i]) >= eT(0) );
+    REQUIRE( eT(c3_cpu[i]) <= eT(1) );
+    REQUIRE( eT(c4_cpu[i]) >= eT(0) );
+    REQUIRE( eT(c4_cpu[i]) <= eT(1) );
+    }
+  }
+
+
+
+TEST_CASE("randu_row_col", "[randu]")
+  {
+  test_row_col_randu<float>();
+  test_row_col_randu<double>();
+  test_row_col_randu<u32>();
+  test_row_col_randu<s32>();
+  test_row_col_randu<u64>();
+  test_row_col_randu<s64>();
+  }
+
+
+
+// For floating-point types only.
+template<typename eT>
+void test_randu_distr()
+  {
+  // Sample a large number of random values, then bin them into 5 bins.
+  // The empirically observed probability of each bin should match 0.2, plus or minus some variance (calculation detailed below).
+
+  Row<eT> f = randu<Row<eT>>(10000);
+  arma::Row<size_t> bin_counts(5);
+  arma::Row<eT> f_cpu(f);
+  for (size_t i = 0; i < 10000; ++i)
+    {
+    const eT val = f_cpu[i];
+    if (val >= 0.8)
+      ++bin_counts[4];
+    else if (val >= 0.6)
+      ++bin_counts[3];
+    else if (val >= 0.4)
+      ++bin_counts[2];
+    else if (val >= 0.2)
+      ++bin_counts[1];
+    else
+      ++bin_counts[0];
+    }
+  std::cout << "bin counts: " << bin_counts[0] << " " << bin_counts[1] << " " << bin_counts[2] << " " << bin_counts[3] << " " << bin_counts[4] << "\n";
+
+  // Each bin contains the sum of samples of n = 10k Bernoulli trials with p = 0.2.
+  // So, their sum is ~ B(n, p) = B(10k, 0.2).
+  // If randu() produced samples that are actually uniformly randomly distributed,
+  // then with 0.9999999 probability, the sum will lie in the range [1795, 2210].
+  // (Note that the Bernoulli distribution is not symmetric for p != 0.5, like in our case.)
+  REQUIRE( bin_counts[0] >= 1795 );
+  REQUIRE( bin_counts[0] <= 2210 );
+  REQUIRE( bin_counts[1] >= 1795 );
+  REQUIRE( bin_counts[1] <= 2210 );
+  REQUIRE( bin_counts[2] >= 1795 );
+  REQUIRE( bin_counts[2] <= 2210 );
+  REQUIRE( bin_counts[3] >= 1795 );
+  REQUIRE( bin_counts[3] <= 2210 );
+  REQUIRE( bin_counts[4] >= 1795 );
+  REQUIRE( bin_counts[4] <= 2210 );
+  }
+
+
+
+TEST_CASE("randu_distr", "[randu]")
+  {
+  test_randu_distr<float>();
+  test_randu_distr<double>();
+  }

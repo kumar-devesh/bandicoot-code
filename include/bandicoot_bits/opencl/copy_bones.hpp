@@ -1,4 +1,4 @@
-// Copyright 2019 Ryan Curtin (http://www.ratml.org/)
+// Copyright 2019 Ryan Curtin (http://www.ratml.org)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,19 +12,24 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-#include <bandicoot>
-#include "catch.hpp"
 
-using namespace coot;
-/*
-TEST_CASE("randn_1", "[randn]")
-{
-  //randi(3, 3, distr_param(0, 1));
-  mat f = randn<mat>(3, 3);
+//! \addtogroup opencl
+//! @{
 
-  f.print();
 
-  mat g = randn<mat>(3, 3);
-  g.print();
-}
-*/
+
+template<typename eT>
+inline
+void
+copy_from_dev_mem(eT* dest, const dev_mem_t<eT> src, const uword N);
+
+
+
+template<typename eT>
+inline
+void
+copy_into_dev_mem(dev_mem_t<eT> dest, const eT* src, const uword N);
+
+
+
+//! @}

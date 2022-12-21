@@ -55,7 +55,10 @@ struct runtime_t
 
   inline bool is_valid() const { return valid; }
 
-  coot_aligned curandGenerator_t randGen;
+  // use CURAND_ORDERING_PSEUDO_SEEDED with XORWOW / CURAND_ORDERING_PSEUDO_BEST
+  // We use XORWOW for uniform distributions, and Philox for normal distributions.
+  coot_aligned curandGenerator_t xorwow_rand;
+  coot_aligned curandGenerator_t philox_rand;
 
   coot_aligned cudaDeviceProp    dev_prop;
 

@@ -16,7 +16,7 @@
 #include "catch.hpp"
 
 using namespace coot;
-
+/*
 TEST_CASE("randi_1", "[norm]")
 {
   //randi(3, 3, distr_param(0, 1));
@@ -38,3 +38,4 @@ TEST_CASE("randi_1", "[norm]")
   src.print();
   dst.print();
 }
+*/

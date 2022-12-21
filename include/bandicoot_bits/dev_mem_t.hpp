@@ -1,10 +1,10 @@
-// Copyright 2019 Ryan Curtin (http://www.ratml.org/)
-//
+// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
+// 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-//
+// 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,19 +12,12 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-#include <bandicoot>
-#include "catch.hpp"
 
-using namespace coot;
-/*
-TEST_CASE("randn_1", "[randn]")
-{
-  //randi(3, 3, distr_param(0, 1));
-  mat f = randn<mat>(3, 3);
 
-  f.print();
-
-  mat g = randn<mat>(3, 3);
-  g.print();
-}
-*/
+// this can hold either CUDA memory or CL memory
+template<typename eT>
+union dev_mem_t
+  {
+  cl_mem cl_mem_ptr;
+  eT* cuda_mem_ptr;
+  };

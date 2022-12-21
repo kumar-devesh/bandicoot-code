@@ -37,6 +37,13 @@ inline std::string substitute_types(const std::string& input, const std::string&
     pos = output.find("fp_eT1");
     }
 
+  pos = output.find("uint_eT1");
+  while (pos != std::string::npos)
+    {
+    output.replace(pos, 8, type_map.template map<typename uint_type<eT1>::result>());
+    pos = output.find("uint_eT1");
+    }
+
   pos = output.find("eT1");
   while (pos != std::string::npos)
     {
@@ -54,6 +61,13 @@ inline std::string substitute_types(const std::string& input, const std::string&
       {
       output.replace(pos, 6, type_map.template map<typename promote_type<eT2, float>::result>());
       pos = output.find("fp_eT2");
+      }
+
+    pos = output.find("uint_eT2");
+    while (pos != std::string::npos)
+      {
+      output.replace(pos, 8, type_map.template map<typename uint_type<eT2>::result>());
+      pos = output.find("uint_eT2");
       }
 
     pos = output.find("eT2");
@@ -80,6 +94,13 @@ inline std::string substitute_types(const std::string& input, const std::string&
         {
         output.replace(pos, 6, type_map.template map<typename promote_type<eT3, float>::result>());
         pos = output.find("fp_eT3");
+        }
+
+      pos = output.find("uint_eT3");
+      while (pos != std::string::npos)
+        {
+        output.replace(pos, 8, type_map.template map<typename uint_type<eT3>::result>());
+        pos = output.find("uint_eT3");
         }
 
       pos = output.find("eT3");

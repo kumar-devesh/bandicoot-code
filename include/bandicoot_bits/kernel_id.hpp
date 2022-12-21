@@ -111,7 +111,8 @@ struct oneway_real_kernel_id
   {
   enum enum_id
     {
-    larfg = 0
+    larfg = 0,
+    inplace_xorwow_randu
     };
 
 
@@ -125,6 +126,7 @@ struct oneway_real_kernel_id
     std::vector<std::string> names;
 
     names.push_back("larfg");
+    names.push_back("inplace_xorwow_randu");
 
     return names;
     }

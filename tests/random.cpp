@@ -43,7 +43,7 @@ void test_randu()
 
 
 
-TEST_CASE("randu_1")
+TEST_CASE("randu_1_old")
   {
 //  test_randu<double>();
   test_randu<float>();

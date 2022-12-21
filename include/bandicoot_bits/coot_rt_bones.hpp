@@ -14,14 +14,6 @@
 
 
 
-// this can hold either CUDA memory or CL memory
-template<typename eT>
-union dev_mem_t
-  {
-  cl_mem cl_mem_ptr;
-  eT* cuda_mem_ptr;
-  };
-
 enum coot_backend_t
   {
   CL_BACKEND = 0,

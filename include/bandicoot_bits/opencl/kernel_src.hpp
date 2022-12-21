@@ -39,6 +39,11 @@ inline
 const std::string&
 kernel_src::get_src_preamble()
   {
+  char u32_max[32];
+  char u64_max[32];
+  snprintf(u32_max, 32, "%llu", (unsigned long long) std::numeric_limits<u32>::max());
+  snprintf(u64_max, 32, "%llu", (unsigned long long) std::numeric_limits<u64>::max());
+
   static const std::string source = \
 
   "#ifdef cl_khr_pragma_unroll \n"
@@ -60,6 +65,12 @@ kernel_src::get_src_preamble()
   "#define COOT_FN_3_2(ARG1,ARG2,ARG3) ARG1 ## ARG2 ## ARG3 \n"
   "#define COOT_FN_3(ARG1,ARG2,ARG3) COOT_FN_3_2(ARG1,ARG2,ARG3) \n"
   "\n"
+  "inline uint coot_type_max_uint() { return " + std::string(u32_max) + "; } \n"
+  "inline ulong coot_type_max_ulong() { return " + std::string(u64_max) + "; } \n"
+  "\n"
+  // Utilities for XORWOW RNG.
+  "inline uint f_xorwow_incr() { return 268183997; } \n"
+  "inline ulong d_xorwow_incr() { return 2274084621458550325; } \n"
   ;
 
   return source;
