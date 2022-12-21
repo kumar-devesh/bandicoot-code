@@ -1,4 +1,4 @@
-image: mlpack/jenkins-amd64-cuda11.2.2-ubuntu
+image: mlpack/jenkins-amd64-cuda-11.2.2-ubuntu
 
 workflow:
   rules:
