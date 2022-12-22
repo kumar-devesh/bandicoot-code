@@ -110,14 +110,14 @@ fill_randu(dev_mem_t<eT> dest, const uword n)
 template<typename eT>
 inline
 void
-fill_randn(dev_mem_t<eT> dest, const uword n)
+fill_randn(dev_mem_t<eT> dest, const uword n, const double mu, const double sd)
   {
   coot_extra_debug_sigprint();
 
   if (n == 0) { return; }
 
   // TODO: replace awful implementation
-
+/*
   // Generate n random numbers.
   eT* cpu_rand = new eT[n];
 
@@ -136,6 +136,7 @@ fill_randn(dev_mem_t<eT> dest, const uword n)
   coot_check_runtime_error( (status != CL_SUCCESS), "coot::opencl::fill_randn(): couldn't access device memory");
 
   delete[] cpu_rand;
+*/
   }
 
 

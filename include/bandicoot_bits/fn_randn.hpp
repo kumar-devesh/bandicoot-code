@@ -22,58 +22,72 @@
 
 
 
-template<typename obj_type>
+template<typename T>
 coot_warn_unused
 inline
-obj_type
-/* coot::mat */
-randn(const uword n_rows, const uword n_cols, const typename coot_Mat_Col_Row_only<obj_type>::result* junk = nullptr)
-/* randu(const uword n_rows, const uword n_cols) */
+T
+randn(const uword n_rows, const uword n_cols, const distr_param& param = distr_param(), const typename coot_Mat_Col_Row_only<T>::result* junk = nullptr)
   {
   coot_extra_debug_sigprint();
-  /* coot_ignore(junk); */
+  coot_ignore(junk);
 
-  /* typedef typename obj_type::elem_type eT; */
+  if(is_Col<T>::value)
+    {
+    coot_debug_check( (n_cols != 1), "randn(): incompatible size" );
+    }
+  else if(is_Row<T>::value)
+    {
+    coot_debug_check( (n_rows != 1), "randn(): incompatible size" );
+    }
 
-  /* if(is_Col<obj_type>::value) */
-  /*   { */
-  /*   coot_debug_check( (n_cols != 1), "randu(): incompatible size" ); */
-  /*   } */
-  /* else */
-  /* if(is_Row<obj_type>::value) */
-  /*   { */
-  /*   coot_debug_check( (n_rows != 1), "randu(): incompatible size" ); */
-  /*   } */
+  T out(n_rows, n_cols);
 
-  /* obj_type out(n_rows, n_cols, arma_nozeros_indicator()); */
-  obj_type out(n_rows, n_cols);
-  /* coot::mat out(n_rows, n_cols); */
+  double a, b;
+  if (param.state == 0)
+    {
+    // defaults
+    a = 0.0;
+    b = 1.0;
+    }
+  else if (param.state == 1)
+    {
+    // ints
+    a = (double) param.a_int;
+    b = (double) param.b_int;
+    }
+  else if (param.state == 2)
+    {
+    // doubles
+    a = param.a_double;
+    b = param.b_double;
+    }
+  else
+    {
+    coot_stop_runtime_error("randn(): incorrect distribution parameter settimgs");
+    }
 
-/*   int a; */
-/*   int b; */
+  coot_debug_check( (b < 0.0), "randn(): incorrect distribution parameters: sd must be greater than or equal to 0" );
 
-/*   if(param.state == 0) */
-/*     { */
-/*     a = 0; */
-/*     b = coot_rng::randi<eT>::max_val(); */
-/*     } */
-/*   else */
-/*   if(param.state == 1) */
-/*     { */
-/*     a = param.a_int; */
-/*     b = param.b_int; */
-/*     } */
-/*   else */
-/*     { */
-/*     a = int(param.a_double); */
-/*     b = int(param.b_double); */
-/*     } */
-
-/*   coot_debug_check( (a > b), "randi(): incorrect distribution parameters: a must be less than b" ); */
-  coot_rng::fill_randn(out.get_dev_mem(false), out.n_elem);
-  /* coot_rng::randu<eT>::fill(out.get_dev_mem(false), out.n_elem); */
+  coot_rng::fill_randn(out.get_dev_mem(false), out.n_elem, a, b);
 
   return out;
+  }
+
+
+
+template<typename T>
+coot_warn_unused
+inline
+T
+randn(const uword n_elem, const distr_param& param = distr_param(), const typename coot_Mat_Col_Row_only<T>::result* junk = nullptr)
+  {
+  coot_extra_debug_sigprint();
+  coot_ignore(junk);
+
+  const uword n_rows = (is_Row<T>::value) ? uword(1) : n_elem;
+  const uword n_cols = (is_Row<T>::value) ? n_elem   : uword(1);
+
+  return randn<T>(n_rows, n_cols, param);
   }
 
 

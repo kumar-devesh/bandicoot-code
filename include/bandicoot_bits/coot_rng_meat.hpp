@@ -23,9 +23,9 @@ inline void coot_rng::fill_randu(dev_mem_t<eT> dest, const uword n)
 
 
 template<typename eT>
-inline void coot_rng::fill_randn(dev_mem_t<eT> dest, const uword n)
+inline void coot_rng::fill_randn(dev_mem_t<eT> dest, const uword n, const double mu, const double sd)
   {
   coot_extra_debug_sigprint();
 
-  coot_rt_t::fill_randn(dest, n);
+  coot_rt_t::fill_randn(dest, n, mu, sd);
   }

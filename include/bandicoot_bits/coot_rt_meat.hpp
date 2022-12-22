@@ -498,14 +498,14 @@ coot_rt_t::fill_randu(dev_mem_t<eT> dest, const uword n)
 template<typename eT>
 inline
 void
-coot_rt_t::fill_randn(dev_mem_t<eT> dest, const uword n)
+coot_rt_t::fill_randn(dev_mem_t<eT> dest, const uword n, const double mu, const double sd)
   {
   coot_extra_debug_sigprint();
 
   if (get_rt().backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
-    opencl::fill_randn(dest, n);
+    opencl::fill_randn(dest, n, mu, sd);
     #else
     coot_stop_runtime_error("coot_rt::fill_randn(): OpenCL backend not enabled");
     #endif
@@ -513,7 +513,7 @@ coot_rt_t::fill_randn(dev_mem_t<eT> dest, const uword n)
   else if (get_rt().backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    cuda::fill_randn(dest, n);
+    cuda::fill_randn(dest, n, mu, sd);
     #else
     coot_stop_runtime_error("coot_rt::fill_randn(): CUDA backend not enabled");
     #endif

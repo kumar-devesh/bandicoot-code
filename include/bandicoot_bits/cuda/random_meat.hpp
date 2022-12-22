@@ -85,32 +85,34 @@ fill_randu(dev_mem_t<double> dest, const uword n)
 template<typename eT>
 inline
 void
-fill_randn(dev_mem_t<eT> dest, const uword n)
+fill_randn(dev_mem_t<eT> dest, const uword n, const double mu, const double sd)
   {
   coot_extra_debug_sigprint();
 
   if (n == 0) { return; }
 
-  // This generic implementation for any type is a joke!
-  // TODO: replace it with something that doesn't suck
-
-  // Generate n random numbers.
-  eT* cpu_rand = new eT[n];
-
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::normal_distribution<eT> n_distr;
-  for (uword i = 0; i < n; ++i)
+  // For integral types, truncate just like Armadillo.
+  // We'll generate numbers using a floating-point type of the same width, then pass over it to truncate and cast back to the right type.
+  if (std::is_same<eT, u32>::value || std::is_same<eT, s32>::value)
     {
-    cpu_rand[i] = n_distr(gen);
+    dev_mem_t<float> reinterpreted_mem;
+    reinterpreted_mem.cuda_mem_ptr = (float*) dest.cuda_mem_ptr;
+    fill_randn(reinterpreted_mem, n, mu, sd);
+    copy_array(dest, reinterpreted_mem, n);
     }
-
-  // Now push it to the device.
-  cudaError_t result = cudaMemcpy(dest.cuda_mem_ptr, cpu_rand, n * sizeof(eT), cudaMemcpyHostToDevice);
-
-  coot_check_cuda_error(result, "coot::cuda::fill_randu(): couldn't access device memory");
-
-  delete[] cpu_rand;
+  else if (std::is_same<eT, u64>::value || std::is_same<eT, s64>::value)
+    {
+    dev_mem_t<double> reinterpreted_mem;
+    reinterpreted_mem.cuda_mem_ptr = (double*) dest.cuda_mem_ptr;
+    fill_randn(reinterpreted_mem, n, mu, sd);
+    copy_array(dest, reinterpreted_mem, n);
+    }
+  else
+    {
+    std::ostringstream oss;
+    oss << "coot::cuda::fill_randn(): not implemented for type " << typeid(eT).name();
+    coot_stop_runtime_error(oss.str());
+    }
   }
 
 
@@ -118,13 +120,29 @@ fill_randn(dev_mem_t<eT> dest, const uword n)
 template<>
 inline
 void
-fill_randn(dev_mem_t<float> dest, const uword n)
+fill_randn(dev_mem_t<float> dest, const uword n, const double mu, const double sd)
   {
   coot_extra_debug_sigprint();
 
   if (n == 0) { return; }
 
-  curandGenerateNormal(get_rt().cuda_rt.philox_rand, dest.cuda_mem_ptr, n, 0.0, 1.0);
+  curandStatus_t result = curandGenerateNormal(get_rt().cuda_rt.philox_rand, dest.cuda_mem_ptr, n, mu, sd);
+  coot_check_curand_error(result, "coot::cuda::fill_randn(): curandGenerateNormal() failed");
+  }
+
+
+
+template<>
+inline
+void
+fill_randn(dev_mem_t<double> dest, const uword n, const double mu, const double sd)
+  {
+  coot_extra_debug_sigprint();
+
+  if (n == 0) { return; }
+
+  curandStatus_t result = curandGenerateNormalDouble(get_rt().cuda_rt.philox_rand, dest.cuda_mem_ptr, n, mu, sd);
+  coot_check_curand_error(result, "coot::cuda::fill_randn(): curandGenerateNormalDouble() failed");
   }
 
 

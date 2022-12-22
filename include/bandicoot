@@ -112,6 +112,7 @@ namespace coot
   #include "bandicoot_bits/span.hpp"
   #include "bandicoot_bits/constants.hpp"
   #include "bandicoot_bits/dev_mem_t.hpp"
+  #include "bandicoot_bits/distr_param.hpp"
   
   //
   // runtime
@@ -343,6 +344,7 @@ namespace coot
   #include "bandicoot_bits/fn_min.hpp"
   #include "bandicoot_bits/fn_max.hpp"
   #include "bandicoot_bits/fn_randu.hpp"
+  #include "bandicoot_bits/fn_randn.hpp"
   
   
   //

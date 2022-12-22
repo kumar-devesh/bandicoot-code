@@ -80,7 +80,7 @@ class coot_rt_t
   static inline void fill_randu(dev_mem_t<eT> dest, const uword n);
 
   template<typename eT>
-  static inline void fill_randn(dev_mem_t<eT> dest, const uword n);
+  static inline void fill_randn(dev_mem_t<eT> dest, const uword n, const double mu, const double sd);
 
   template<typename eT1, typename eT2, typename eT3>
   static inline void array_op(dev_mem_t<eT3> dest, const uword n_elem, const dev_mem_t<eT1> A_mem, const dev_mem_t<eT2> B_mem, const threeway_kernel_id::enum_id num);
