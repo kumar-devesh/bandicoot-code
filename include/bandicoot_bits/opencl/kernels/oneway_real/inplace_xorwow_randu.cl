@@ -15,7 +15,7 @@
 // See algorithm "xorwow" from page 5 of "Xorshift RNGs" by George Marsaglia.
 inline
 uint_eT1
-COOT_FN(PREFIX,inplace_xorwow)(uint_eT1* xorwow_state)
+COOT_FN(PREFIX,xorwow)(uint_eT1* xorwow_state)
   {
   // xorwow_state[0] through xorwow_state[4] represent the 5 state integers,
   // and xorwow_state[5] holds the counter.
@@ -57,7 +57,7 @@ COOT_FN(PREFIX,inplace_xorwow_randu)(__global eT1* mem,
 
   while (i < n_elem)
     {
-    uint_eT1 t = COOT_FN(PREFIX,inplace_xorwow)(local_xorwow_state);
+    uint_eT1 t = COOT_FN(PREFIX,xorwow)(local_xorwow_state);
     // Now normalize to [0, 1] and compute the output.
     mem[i] = (t / (eT1) COOT_FN(coot_type_max_,uint_eT1)());
     i += num_threads;
