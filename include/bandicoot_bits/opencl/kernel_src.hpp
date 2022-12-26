@@ -60,6 +60,18 @@ kernel_src::get_src_preamble()
   "#define COOT_FN_3_2(ARG1,ARG2,ARG3) ARG1 ## ARG2 ## ARG3 \n"
   "#define COOT_FN_3(ARG1,ARG2,ARG3) COOT_FN_3_2(ARG1,ARG2,ARG3) \n"
   "\n"
+  // Utility functions to return the correct min/max value for a given type.
+  "inline float coot_type_min_float() { return FLT_MIN; } \n"
+  "inline double coot_type_min_double() { return DBL_MIN; } \n"
+  "inline float coot_type_max_float() { return FLT_MAX; } \n"
+  "inline double coot_type_max_double() { return DBL_MAX; } \n"
+  "\n"
+  "inline bool coot_is_fp_uint() { return false; } \n"
+  "inline bool coot_is_fp_int() { return false; } \n"
+  "inline bool coot_is_fp_ulong() { return false; } \n"
+  "inline bool coot_is_fp_long() { return false; } \n"
+  "inline bool coot_is_fp_float() { return true; } \n"
+  "inline bool coot_is_fp_double() { return true; } \n"
   ;
 
   return source;

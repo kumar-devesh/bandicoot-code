@@ -80,6 +80,8 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <iomanip>
+#include <limits.h>
+#include <float.h>
 
 #ifndef WIN32
   #include <unistd.h>
