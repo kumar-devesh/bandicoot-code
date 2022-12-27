@@ -132,10 +132,11 @@ runtime_t::load_cached_kernels(const std::string& unique_host_device_id, const s
 
   // Create the map of kernel names.
   std::vector<std::pair<std::string, CUfunction*>> name_map;
-  rt_common::init_three_elem_kernel_map(threeway_kernels, name_map, threeway_kernel_id::get_names(), "");
-  rt_common::init_two_elem_kernel_map(twoway_kernels, name_map, twoway_kernel_id::get_names(), "");
-  rt_common::init_one_elem_kernel_map(oneway_kernels, name_map, oneway_kernel_id::get_names(), "");
+  rt_common::init_zero_elem_kernel_map(zeroway_kernels, name_map, zeroway_kernel_id::get_names());
   rt_common::init_one_elem_real_kernel_map(oneway_real_kernels, name_map, oneway_real_kernel_id::get_names(), "");
+  rt_common::init_one_elem_kernel_map(oneway_kernels, name_map, oneway_kernel_id::get_names(), "");
+  rt_common::init_two_elem_kernel_map(twoway_kernels, name_map, twoway_kernel_id::get_names(), "");
+  rt_common::init_three_elem_kernel_map(threeway_kernels, name_map, threeway_kernel_id::get_names(), "");
 
   status = create_kernels(name_map, kernel_buffer);
   delete[] kernel_buffer;
@@ -152,10 +153,11 @@ runtime_t::compile_kernels(const std::string& unique_host_device_id)
   type_to_dev_string type_map;
   std::string source =
       get_cuda_src_preamble() +
-      rt_common::get_three_elem_kernel_src(threeway_kernels, get_cuda_threeway_kernel_src(), threeway_kernel_id::get_names(), name_map, type_map) +
-      rt_common::get_two_elem_kernel_src(twoway_kernels, get_cuda_twoway_kernel_src(), twoway_kernel_id::get_names(), "", name_map, type_map) +
-      rt_common::get_one_elem_kernel_src(oneway_kernels, get_cuda_oneway_kernel_src(), oneway_kernel_id::get_names(), "", name_map, type_map) +
+      rt_common::get_zero_elem_kernel_src(zeroway_kernels, get_cuda_zeroway_kernel_src(), zeroway_kernel_id::get_names(), name_map, type_map) +
       rt_common::get_one_elem_real_kernel_src(oneway_real_kernels, get_cuda_oneway_real_kernel_src(), oneway_real_kernel_id::get_names(), "", name_map, type_map) +
+      rt_common::get_one_elem_kernel_src(oneway_kernels, get_cuda_oneway_kernel_src(), oneway_kernel_id::get_names(), "", name_map, type_map) +
+      rt_common::get_two_elem_kernel_src(twoway_kernels, get_cuda_twoway_kernel_src(), twoway_kernel_id::get_names(), "", name_map, type_map) +
+      rt_common::get_three_elem_kernel_src(threeway_kernels, get_cuda_threeway_kernel_src(), threeway_kernel_id::get_names(), name_map, type_map) +
       get_cuda_src_epilogue();
 
   // We'll use NVRTC to compile each of the kernels we need on the fly.
@@ -272,6 +274,15 @@ runtime_t::~runtime_t()
     // Clean up cuBLAS handle.
     cublasDestroy(cublas_handle);
     }
+  }
+
+
+
+inline
+const CUfunction&
+runtime_t::get_kernel(const zeroway_kernel_id::enum_id num)
+  {
+  return zeroway_kernels.at(num);
   }
 
 

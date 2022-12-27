@@ -33,6 +33,8 @@ struct runtime_t
 
   inline bool create_kernels(const std::vector<std::pair<std::string, CUfunction*>>& name_map, char* cubin);
 
+  inline const CUfunction& get_kernel(const zeroway_kernel_id::enum_id num);
+
   template<typename eT1>
   inline const CUfunction& get_kernel(const oneway_kernel_id::enum_id num);
 
@@ -83,6 +85,7 @@ struct runtime_t
 
   coot_aligned bool                     valid;
 
+  coot_aligned std::vector<CUfunction>                                                                   zeroway_kernels;
   coot_aligned rt_common::kernels_t<std::vector<CUfunction>>                                             oneway_kernels;
   coot_aligned rt_common::kernels_t<std::vector<CUfunction>>                                             oneway_real_kernels;
   coot_aligned rt_common::kernels_t<rt_common::kernels_t<std::vector<CUfunction>>>                       twoway_kernels;

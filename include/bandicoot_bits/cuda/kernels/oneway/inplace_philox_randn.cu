@@ -1,4 +1,4 @@
-// Copyright 2019 Ryan Curtin (http://www.ratml.org/)
+// Copyright 2022 Ryan Curtin (http://www.ratml.org/)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,17 +12,16 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-// Utility functions for generating random numbers via OpenCL.
+// This kernel is a placeholder---we don't use it with the CUDA backend.
+// It does nothing.  We use cuRand instead.
 
-template<typename eT>
-inline void init_xorwow_state(cl_mem state, const size_t num_rng_threads);
-
-inline void init_philox_state(cl_mem state, const size_t num_rng_threads);
-
-template<typename eT>
-inline void fill_randu(dev_mem_t<eT> dest, const uword n);
-
-template<typename eT>
-inline void fill_randn(dev_mem_t<eT> dest, const uword n, const double mu, const double sd);
-
-// TODO: fill_randi, etc...
+__global__
+void
+COOT_FN(PREFIX,inplace_philox_randn)(eT1* mem,
+                                     unsigned int* philox_state,
+                                     const UWORD n_elem,
+                                     const fp_eT1 mu,
+                                     const fp_eT1 sd)
+  {
+  // Do nothing!
+  }

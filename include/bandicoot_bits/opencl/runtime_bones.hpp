@@ -85,6 +85,8 @@ class runtime_t
 
   // TODO: add function to return info about device as a string
 
+  inline const cl_kernel& get_kernel(const zeroway_kernel_id::enum_id num);
+
   template<typename eT1>
   inline const cl_kernel& get_kernel(const oneway_kernel_id::enum_id num);
 
@@ -100,6 +102,7 @@ class runtime_t
   // Get random number generator.
 
   template<typename eT> cl_mem get_xorwow_state() const;
+  inline cl_mem get_philox_state() const;
   inline size_t get_num_rng_threads() const;
 
   class program_wrapper;
@@ -121,14 +124,16 @@ class runtime_t
 
   coot_aligned runtime_dev_info dev_info;
 
+  coot_aligned std::vector<cl_kernel>                                                                   zeroway_kernels;
   coot_aligned rt_common::kernels_t<std::vector<cl_kernel>>                                             oneway_kernels;
   coot_aligned rt_common::kernels_t<std::vector<cl_kernel>>                                             oneway_real_kernels;
   coot_aligned rt_common::kernels_t<rt_common::kernels_t<std::vector<cl_kernel>>>                       twoway_kernels;
   coot_aligned rt_common::kernels_t<rt_common::kernels_t<rt_common::kernels_t<std::vector<cl_kernel>>>> threeway_kernels;
 
   // Internally-held RNG state.
-  coot_aligned cl_mem   f_xorwow_state;
-  coot_aligned cl_mem   d_xorwow_state;
+  coot_aligned cl_mem   xorwow32_state;
+  coot_aligned cl_mem   xorwow64_state;
+  coot_aligned cl_mem   philox_state;
   coot_aligned size_t   num_rng_threads;
 
   #if defined(COOT_USE_CXX11)

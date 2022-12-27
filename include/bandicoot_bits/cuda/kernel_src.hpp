@@ -51,7 +51,6 @@ get_cuda_src_epilogue()
   return "}\n";
   }
 
-// shitty single kernel for fill()
 
 
 inline
@@ -80,6 +79,26 @@ read_file(const std::string& filename)
                        std::istreambuf_iterator<char>());
 
   return file_contents;
+  }
+
+
+
+inline
+std::string
+get_cuda_zeroway_kernel_src()
+  {
+  // NOTE: kernel names must match the list in the kernel_id struct
+
+  std::string result = "";
+
+  // Now, load each file for each kernel.
+  for (const std::string& kernel_name : zeroway_kernel_id::get_names())
+    {
+    std::string filename = "zeroway/" + kernel_name + ".cu";
+    result += read_file(filename);
+    }
+
+  return result;
   }
 
 

@@ -18,6 +18,9 @@ struct kernel_src
   {
   static inline const std::string&  get_src_preamble();
 
+  static inline const std::string&  get_zeroway_source();
+  static inline       std::string  init_zeroway_source();
+
   static inline const std::string&  get_oneway_source();
   static inline       std::string  init_oneway_source();
 
@@ -67,10 +70,6 @@ kernel_src::get_src_preamble()
   "\n"
   "inline uint coot_type_max_uint() { return " + std::string(u32_max) + "; } \n"
   "inline ulong coot_type_max_ulong() { return " + std::string(u64_max) + "; } \n"
-  "\n"
-  // Utilities for XORWOW RNG.
-  "inline uint f_xorwow_incr() { return 268183997; } \n"
-  "inline ulong d_xorwow_incr() { return 2274084621458550325; } \n"
   ;
 
   return source;
@@ -104,6 +103,49 @@ read_file(const std::string& filename)
                        std::istreambuf_iterator<char>());
 
   return file_contents;
+  }
+
+
+
+inline
+const std::string&
+kernel_src::get_zeroway_source()
+  {
+  static const std::string source = init_zeroway_source();
+
+  return source;
+  }
+
+
+
+inline
+std::string
+kernel_src::init_zeroway_source()
+  {
+  // NOTE: kernel names must match the list in the kernel_id struct
+
+  std::vector<std::string> aux_function_filenames = {
+      "xorwow_rng.cl",
+      "philox_rng.cl"
+  };
+
+  std::string source = "";
+
+  // First, load any auxiliary functions.
+  for (const std::string& filename : aux_function_filenames)
+    {
+    std::string full_filename = "zeroway/" + filename;
+    source += read_file(full_filename);
+    }
+
+  // Now, load each file for each kernel.
+  for (const std::string& kernel_name : zeroway_kernel_id::get_names())
+    {
+    std::string filename = "zeroway/" + kernel_name + ".cl";
+    source += read_file(filename);
+    }
+
+  return source;
   }
 
 

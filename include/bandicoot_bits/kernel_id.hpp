@@ -14,6 +14,41 @@
 
 
 
+struct zeroway_kernel_id
+  {
+  enum enum_id
+    {
+    invalid_kernel
+    };
+
+
+  static
+  inline
+  std::vector<std::string>
+  init_names()
+    {
+    // NOTE: the order and names of kernels in "names" must match the order and names in the kernel_id enum
+
+    std::vector<std::string> names;
+
+    return names;
+    };
+
+
+  static
+  inline
+  const std::vector<std::string>&
+  get_names()
+    {
+    static const std::vector<std::string> names = init_names();
+
+    return names;
+    }
+  };
+
+
+
+
 struct oneway_kernel_id
   {
   enum enum_id
@@ -46,6 +81,10 @@ struct oneway_kernel_id
     trace,
     //
     ltri_set_zero,
+    //
+    inplace_xorwow_randu,
+    inplace_philox_randn,
+    //
     invalid_kernel
     };
 
@@ -88,6 +127,9 @@ struct oneway_kernel_id
 
     names.push_back("ltri_set_zero");
 
+    names.push_back("inplace_xorwow_randu");
+    names.push_back("inplace_philox_randn");
+
     return names;
     }
 
@@ -111,8 +153,7 @@ struct oneway_real_kernel_id
   {
   enum enum_id
     {
-    larfg = 0,
-    inplace_xorwow_randu
+    larfg = 0
     };
 
 
@@ -126,7 +167,6 @@ struct oneway_real_kernel_id
     std::vector<std::string> names;
 
     names.push_back("larfg");
-    names.push_back("inplace_xorwow_randu");
 
     return names;
     }

@@ -134,6 +134,41 @@ inline std::string substitute_types(const std::string& input, const std::string&
 template<typename KernelType>
 inline
 void
+init_zero_elem_kernel_map(std::vector<KernelType>& kernels,
+                          std::vector<std::pair<std::string, KernelType*>>& name_map,
+                          const std::vector<std::string>& kernel_names)
+  {
+  kernels.resize(kernel_names.size());
+
+  for (size_t j = 0; j < kernel_names.size(); ++j)
+    {
+    name_map.push_back(std::make_pair(kernel_names[j], &kernels.at(j)));
+    }
+  }
+
+
+
+template<typename KernelType, typename TypeMapper>
+inline
+std::string
+get_zero_elem_kernel_src(std::vector<KernelType>& kernels,
+                         const std::string& source,
+                         const std::vector<std::string>& kernel_names,
+                         std::vector<std::pair<std::string, KernelType*>>& name_map,
+                         const TypeMapper& type_map)
+  {
+  const std::string src = substitute_types<TypeMapper, void, void, void>(source, "", type_map);
+
+  init_zero_elem_kernel_map(kernels, name_map, kernel_names);
+
+  return src;
+  }
+
+
+
+template<typename KernelType>
+inline
+void
 init_one_elem_kernel_map(kernels_t<std::vector<KernelType>>& kernels,
                          std::vector<std::pair<std::string, KernelType*>>& name_map,
                          const std::vector<std::string>& kernel_names,
