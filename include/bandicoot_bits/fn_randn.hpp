@@ -42,33 +42,7 @@ randn(const uword n_rows, const uword n_cols, const distr_param& param = distr_p
 
   T out(n_rows, n_cols);
 
-  double a, b;
-  if (param.state == 0)
-    {
-    // defaults
-    a = 0.0;
-    b = 1.0;
-    }
-  else if (param.state == 1)
-    {
-    // ints
-    a = (double) param.a_int;
-    b = (double) param.b_int;
-    }
-  else if (param.state == 2)
-    {
-    // doubles
-    a = param.a_double;
-    b = param.b_double;
-    }
-  else
-    {
-    coot_stop_runtime_error("randn(): incorrect distribution parameter settimgs");
-    }
-
-  coot_debug_check( (b < 0.0), "randn(): incorrect distribution parameters: sd must be greater than or equal to 0" );
-
-  coot_rng::fill_randn(out.get_dev_mem(false), out.n_elem, a, b);
+  coot_rng::fill_randn(out.get_dev_mem(false), out.n_elem, param);
 
   return out;
   }

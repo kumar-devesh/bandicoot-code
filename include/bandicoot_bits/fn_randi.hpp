@@ -17,11 +17,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup fn_randi
-//! @{
-
-
-
 template<typename T>
 coot_warn_unused
 inline
@@ -43,28 +38,7 @@ randi(const uword n_rows, const uword n_cols, const distr_param& param = distr_p
 
   T out(n_rows, n_cols);
 
-  int a;
-  int b;
-
-  if (param.state == 0)
-    {
-    a = 0;
-    b = std::numeric_limits<int>::max();
-    }
-  else if (param.state == 1)
-    {
-    a = param.a_int;
-    b = param.b_int;
-    }
-  else
-    {
-    a = int(param.a_double);
-    b = int(param.b_double);
-    }
-
-  coot_debug_check( (a > b), "randi(): incorrect distribution parameters: a must be less than b" );
-
-  coot_rng::fill_randi(out.get_dev_mem(false), out.n_elem, a, b);
+  coot_rng::fill_randi(out.get_dev_mem(false), out.n_elem, param);
 
   return out;
   }

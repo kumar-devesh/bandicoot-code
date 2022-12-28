@@ -19,8 +19,8 @@ struct coot_rng
   static inline void fill_randu(dev_mem_t<eT> dest, const uword n);
 
   template<typename eT>
-  static inline void fill_randn(dev_mem_t<eT> dest, const uword n, const double mu = 0.0, const double sd = 1.0);
+  static inline void fill_randn(dev_mem_t<eT> dest, const uword n, const distr_param& param = distr_param());
 
   template<typename eT>
-  static inline void fill_randi(dev_mem_t<eT> dest, const uword n, const int lo = 0, const int hi = std::numeric_limits<int>::max() );
+  static inline void fill_randi(dev_mem_t<eT> dest, const uword n, const distr_param& param = distr_param());
   };
