@@ -153,4 +153,14 @@ fill_randn(dev_mem_t<eT> dest, const uword n, const double mu, const double sd)
 
 
 
-// TODO: fill_randi, etc...
+template<typename eT>
+inline
+void
+fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int hi)
+  {
+  coot_extra_debug_sigprint();
+
+  if (n == 0) { return; }
+
+  // ...
+  }

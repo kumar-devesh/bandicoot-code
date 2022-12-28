@@ -526,6 +526,37 @@ coot_rt_t::fill_randn(dev_mem_t<eT> dest, const uword n, const double mu, const 
 
 
 
+template<typename eT>
+inline
+void
+coot_rt_t::fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int hi)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    opencl::fill_randi(dest, n, lo, hi);
+    #else
+    coot_stop_runtime_error("coot_rt::fill_randi(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    cuda::fill_randi(dest, n, lo, hi);
+    #else
+    coot_stop_runtime_error("coot_rt::fill_randi(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::fill_randi(): unknown backend");
+    }
+  }
+
+
+
 template<typename eT1, typename eT2, typename eT3>
 inline
 void

@@ -58,6 +58,7 @@ struct oneway_kernel_id
     inplace_minus_scalar,
     inplace_mul_scalar,
     inplace_div_scalar,
+    inplace_mod_scalar,
     //
     submat_inplace_set_scalar,
     submat_inplace_plus_scalar,
@@ -103,6 +104,7 @@ struct oneway_kernel_id
     names.push_back("inplace_minus_scalar");
     names.push_back("inplace_mul_scalar");
     names.push_back("inplace_div_scalar");
+    names.push_back("inplace_mod_scalar");
 
     names.push_back("submat_inplace_set_scalar");
     names.push_back("submat_inplace_plus_scalar");

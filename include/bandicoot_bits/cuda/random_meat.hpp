@@ -147,34 +147,90 @@ fill_randn(dev_mem_t<double> dest, const uword n, const double mu, const double 
 
 
 
+// 32-bit version
 template<typename eT>
 inline
 void
-fill_randi(dev_mem_t<eT> dest, const uword n, const int a, const int b)
+fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int hi, const typename std::enable_if<std::is_same<typename uint_type<eT>::result, u32>::value>::type* junk = nullptr)
   {
   coot_extra_debug_sigprint();
 
   if (n == 0) { return; }
 
-  // This generic implementation for any type is a joke!
-  // TODO: replace it with something that doesn't suck
+  // 32-bit types may have a smaller effective range.  (But not if they are floating point.)
+  const u32 bounded_hi = (std::is_floating_point<eT>::value) ? hi : std::min((u32) hi, (u32) std::numeric_limits<eT>::max());
 
-  // Generate n random numbers.
-  eT* cpu_rand = new eT[n];
+  // Strategy: generate completely random bits in [0, u32_MAX]; modulo down to [0, range]; add lo to finally get [lo, hi];
+  // then make sure the return type is correct.
+  //
+  // This overload uses curandGenerate(), which makes 32-bit unsigned integers.
 
-  std::mt19937 gen;
-  std::uniform_real_distribution<float> n_distr;
-  for (uword i = 0; i < n; ++i)
+  dev_mem_t<u32> u32_dest;
+  u32_dest.cuda_mem_ptr = (u32*) dest.cuda_mem_ptr;
+
+  const u32 range = (bounded_hi - lo);
+  curandStatus_t result = curandGenerate(get_rt().cuda_rt.xorwow_rand, u32_dest.cuda_mem_ptr, n);
+  coot_check_curand_error(result, "coot::cuda::fill_randi(): curandGenerate() failed");
+
+  // [0, u32_MAX] --> [0, range] (only needed if range != u32_MAX)
+  if (range != std::numeric_limits<u32>::max())
     {
-    cpu_rand[i] = abs(ceilf(n_distr(gen) * (b - a) + a));
+    inplace_op_scalar(u32_dest, (u32) range + 1, n, oneway_kernel_id::inplace_mod_scalar);
     }
 
-  // Now push it to the device.
-  cudaError_t result = cudaMemcpy(dest.cuda_mem_ptr, cpu_rand, n * sizeof(eT), cudaMemcpyHostToDevice);
+  // Now cast it to the correct type, if needed.
+  if (!std::is_same<eT, u32>::value)
+    {
+    copy_array(dest, u32_dest, n);
+    }
 
-  coot_check_cuda_error(result, "cuda::fill_randi(): couldn't access device memory");
-
-  delete cpu_rand;
+  // [0, range] --> [lo, hi]
+  // We do this after the casting, in case eT is a signed type and lo < 0.
+  if (lo != 0)
+    {
+    inplace_op_scalar(dest, (eT) lo, n, oneway_kernel_id::inplace_plus_scalar);
+    }
   }
 
-// TODO: fill_randi, etc...
+
+
+// 64-bit version
+template<typename eT>
+inline
+void
+fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int hi, const typename std::enable_if<std::is_same<typename uint_type<eT>::result, u64>::value>::type* junk = nullptr)
+  {
+  coot_extra_debug_sigprint();
+
+  if (n == 0) { return; }
+
+  // Strategy: generate completely random bits in [0, u64_MAX]; modulo down to [0, range]; add lo to finally get [lo, hi];
+  // then make sure the return type is correct.
+
+  dev_mem_t<u64> u64_dest;
+  u64_dest.cuda_mem_ptr = (u64*) dest.cuda_mem_ptr;
+
+  const u64 range = (hi - lo);
+  // We use the 32-bit XORWOW generator, but just generate a sequence of twice the usual length (since we are generating for u64s not u32s).
+  curandStatus_t result = curandGenerate(get_rt().cuda_rt.xorwow_rand, (u32*) dest.cuda_mem_ptr, 2 * n);
+  coot_check_curand_error(result, "coot::cuda::fill_randi(): curandGenerate() failed");
+
+  // [0, u64_MAX] --> [0, range] (only needed if range != u64_MAX)
+  if (range != std::numeric_limits<u64>::max())
+    {
+    inplace_op_scalar(u64_dest, (u64) range + 1, n, oneway_kernel_id::inplace_mod_scalar);
+    }
+
+  // Now cast it to the correct type, if needed.
+  if (!std::is_same<eT, u64>::value)
+    {
+    copy_array(dest, u64_dest, n);
+    }
+
+  // [0, range] --> [lo, hi]
+  // We do this after the casting, in case eT is a signed type and lo < 0.
+  if (lo != 0)
+    {
+    inplace_op_scalar(dest, (eT) lo, n, oneway_kernel_id::inplace_plus_scalar);
+    }
+  }

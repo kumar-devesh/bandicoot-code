@@ -345,6 +345,7 @@ namespace coot
   #include "bandicoot_bits/fn_max.hpp"
   #include "bandicoot_bits/fn_randu.hpp"
   #include "bandicoot_bits/fn_randn.hpp"
+  #include "bandicoot_bits/fn_randi.hpp"
   
   
   //

@@ -25,4 +25,5 @@ inline void fill_randu(dev_mem_t<eT> dest, const uword n);
 template<typename eT>
 inline void fill_randn(dev_mem_t<eT> dest, const uword n, const double mu, const double sd);
 
-// TODO: fill_randi, etc...
+template<typename eT>
+inline void fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int hi);
