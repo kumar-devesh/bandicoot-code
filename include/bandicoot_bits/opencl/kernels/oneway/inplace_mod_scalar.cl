@@ -14,13 +14,13 @@
 
 __kernel
 void
-COOT_FN(PREFIX,inplace_div_scalar)(__global eT1* out,
+COOT_FN(PREFIX,inplace_mod_scalar)(__global eT1* out,
                                    const eT1 val,
                                    const UWORD N)
   {
   const UWORD i = get_global_id(0);
   if(i < N)
     {
-    out[i] %= val;
+    out[i] = (eT1) ((uint_eT1) out[i] % (uint_eT1) val);
     }
   }
