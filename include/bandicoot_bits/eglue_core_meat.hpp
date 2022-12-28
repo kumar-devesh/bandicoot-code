@@ -39,6 +39,8 @@ eglue_core<eglue_type>::apply(Mat<eT3>& out, const eGlue<T1, T2, eglue_type>& x)
   
   const Mat<eT1>& A = UA.M;
   const Mat<eT2>& B = UB.M;
+
+  // TODO: there is no size checking here!
   
   if(is_same_type<eglue_type, eglue_plus >::yes)
     {
@@ -55,6 +57,14 @@ eglue_core<eglue_type>::apply(Mat<eT3>& out, const eGlue<T1, T2, eglue_type>& x)
   else if(is_same_type<eglue_type, eglue_schur>::yes)
     {
     coot_rt_t::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), threeway_kernel_id::equ_array_mul_array);
+    }
+  else if(is_same_type<eglue_type, eglue_atan2>::yes)
+    {
+    coot_rt_t::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), threeway_kernel_id::equ_array_atan2);
+    }
+  else if(is_same_type<eglue_type, eglue_hypot>::yes)
+    {
+    coot_rt_t::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), threeway_kernel_id::equ_array_hypot);
     }
   }
 

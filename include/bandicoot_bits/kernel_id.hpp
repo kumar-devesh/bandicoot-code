@@ -222,9 +222,65 @@ struct twoway_kernel_id
     equ_array_sqrt_post,
     equ_array_exp_pre,
     equ_array_exp_post,
+    equ_array_exp2_pre,
+    equ_array_exp2_post,
+    equ_array_exp10_pre,
+    equ_array_exp10_post,
+    equ_array_trunc_exp_pre,
+    equ_array_trunc_exp_post,
     equ_array_log_pre,
     equ_array_log_post,
+    equ_array_log2_pre,
+    equ_array_log2_post,
+    equ_array_log10_pre,
+    equ_array_log10_post,
+    equ_array_trunc_log_pre,
+    equ_array_trunc_log_post,
+    equ_array_cos_pre,
+    equ_array_cos_post,
+    equ_array_sin_pre,
+    equ_array_sin_post,
+    equ_array_tan_pre,
+    equ_array_tan_post,
+    equ_array_acos_pre,
+    equ_array_acos_post,
+    equ_array_asin_pre,
+    equ_array_asin_post,
+    equ_array_atan_pre,
+    equ_array_atan_post,
+    equ_array_cosh_pre,
+    equ_array_cosh_post,
+    equ_array_sinh_pre,
+    equ_array_sinh_post,
+    equ_array_tanh_pre,
+    equ_array_tanh_post,
+    equ_array_acosh_pre,
+    equ_array_acosh_post,
+    equ_array_asinh_pre,
+    equ_array_asinh_post,
+    equ_array_atanh_pre,
+    equ_array_atanh_post,
+    equ_array_sinc_pre,
+    equ_array_sinc_post,
     equ_array_abs,
+    equ_array_pow_pre,
+    equ_array_pow_post,
+    equ_array_floor_pre,
+    equ_array_floor_post,
+    equ_array_ceil_pre,
+    equ_array_ceil_post,
+    equ_array_round_pre,
+    equ_array_round_post,
+    equ_array_trunc_pre,
+    equ_array_trunc_post,
+    equ_array_sign_pre,
+    equ_array_sign_post,
+    equ_array_erf_pre,
+    equ_array_erf_post,
+    equ_array_erfc_pre,
+    equ_array_erfc_post,
+    equ_array_lgamma_pre,
+    equ_array_lgamma_post,
     //
     get_diag,
     //
@@ -281,9 +337,65 @@ struct twoway_kernel_id
     names.push_back("equ_array_sqrt_post");
     names.push_back("equ_array_exp_pre");
     names.push_back("equ_array_exp_post");
+    names.push_back("equ_array_exp2_pre");
+    names.push_back("equ_array_exp2_post");
+    names.push_back("equ_array_exp10_pre");
+    names.push_back("equ_array_exp10_post");
+    names.push_back("equ_array_trunc_exp_pre");
+    names.push_back("equ_array_trunc_exp_post");
     names.push_back("equ_array_log_pre");
     names.push_back("equ_array_log_post");
+    names.push_back("equ_array_log2_pre");
+    names.push_back("equ_array_log2_post");
+    names.push_back("equ_array_log10_pre");
+    names.push_back("equ_array_log10_post");
+    names.push_back("equ_array_trunc_log_pre");
+    names.push_back("equ_array_trunc_log_post");
+    names.push_back("equ_array_cos_pre");
+    names.push_back("equ_array_cos_post");
+    names.push_back("equ_array_sin_pre");
+    names.push_back("equ_array_sin_post");
+    names.push_back("equ_array_tan_pre");
+    names.push_back("equ_array_tan_post");
+    names.push_back("equ_array_acos_pre");
+    names.push_back("equ_array_acos_post");
+    names.push_back("equ_array_asin_pre");
+    names.push_back("equ_array_asin_post");
+    names.push_back("equ_array_atan_pre");
+    names.push_back("equ_array_atan_post");
+    names.push_back("equ_array_cosh_pre");
+    names.push_back("equ_array_cosh_post");
+    names.push_back("equ_array_sinh_pre");
+    names.push_back("equ_array_sinh_post");
+    names.push_back("equ_array_tanh_pre");
+    names.push_back("equ_array_tanh_post");
+    names.push_back("equ_array_acosh_pre");
+    names.push_back("equ_array_acosh_post");
+    names.push_back("equ_array_asinh_pre");
+    names.push_back("equ_array_asinh_post");
+    names.push_back("equ_array_atanh_pre");
+    names.push_back("equ_array_atanh_post");
+    names.push_back("equ_array_sinc_pre");
+    names.push_back("equ_array_sinc_post");
     names.push_back("equ_array_abs");
+    names.push_back("equ_array_pow_pre");
+    names.push_back("equ_array_pow_post");
+    names.push_back("equ_array_floor_pre");
+    names.push_back("equ_array_floor_post");
+    names.push_back("equ_array_ceil_pre");
+    names.push_back("equ_array_ceil_post");
+    names.push_back("equ_array_round_pre");
+    names.push_back("equ_array_round_post");
+    names.push_back("equ_array_trunc_pre");
+    names.push_back("equ_array_trunc_post");
+    names.push_back("equ_array_sign_pre");
+    names.push_back("equ_array_sign_post");
+    names.push_back("equ_array_erf_pre");
+    names.push_back("equ_array_erf_post");
+    names.push_back("equ_array_erfc_pre");
+    names.push_back("equ_array_erfc_post");
+    names.push_back("equ_array_lgamma_pre");
+    names.push_back("equ_array_lgamma_post");
 
     names.push_back("get_diag");
 
@@ -328,6 +440,9 @@ struct threeway_kernel_id
     equ_array_mul_array,
     equ_array_div_array,
     //
+    equ_array_atan2,
+    equ_array_hypot,
+    //
     invalid_kernel
     };
 
@@ -344,6 +459,9 @@ struct threeway_kernel_id
     names.push_back("equ_array_minus_array");
     names.push_back("equ_array_mul_array");
     names.push_back("equ_array_div_array");
+
+    names.push_back("equ_array_atan2");
+    names.push_back("equ_array_hypot");
 
     return names;
     }

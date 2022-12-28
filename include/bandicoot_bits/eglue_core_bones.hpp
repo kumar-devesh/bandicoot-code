@@ -69,4 +69,22 @@ class eglue_schur : public eglue_core<eglue_schur>
 
 
 
+class eglue_atan2 : public eglue_core<eglue_atan2>
+  {
+  public:
+
+  inline static const char* text() { return "element-wise atan2"; }
+  };
+
+
+
+class eglue_hypot : public eglue_core<eglue_hypot>
+  {
+  public:
+
+  inline static const char* text() { return "element-wise hypot"; }
+  };
+
+
+
 //! @}
