@@ -85,6 +85,7 @@ struct oneway_kernel_id
     //
     inplace_xorwow_randu,
     inplace_philox_randn,
+    inplace_xorwow_randi,
     //
     invalid_kernel
     };
@@ -131,6 +132,7 @@ struct oneway_kernel_id
 
     names.push_back("inplace_xorwow_randu");
     names.push_back("inplace_philox_randn");
+    names.push_back("inplace_xorwow_randi");
 
     return names;
     }

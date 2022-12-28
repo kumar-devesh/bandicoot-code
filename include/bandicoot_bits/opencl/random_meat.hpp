@@ -162,5 +162,44 @@ fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int hi)
 
   if (n == 0) { return; }
 
-  // ...
+  // Get the kernel and set up to run it.
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::inplace_xorwow_randi);
+
+  runtime_t::cq_guard guard;
+  runtime_t::adapt_uword n_cl(n);
+
+  cl_int status = 0;
+
+  cl_mem xorwow_state = get_rt().cl_rt.get_xorwow_state<eT>();
+
+  typedef typename uint_type<eT>::result uint_eT;
+  uint_eT range;
+  if (std::is_same<uint_eT, u32>::value)
+    {
+    uint_eT bounded_hi = (std::is_floating_point<eT>::value) ? hi : std::min((u32) hi, (u32) std::numeric_limits<eT>::max());
+    range = (bounded_hi - lo);
+    }
+  else
+    {
+    range = (hi - lo);
+    }
+  // OpenCL kernels cannot use `bool` arguments.
+  char needs_modulo = (range != std::numeric_limits<uint_eT>::max());
+  eT cl_lo = eT(lo);
+
+  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem),  &(dest.cl_mem_ptr) );
+  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem),  &(xorwow_state) );
+  status |= clSetKernelArg(kernel, 2, n_cl.size,       n_cl.addr );
+  status |= clSetKernelArg(kernel, 3, sizeof(eT),      &cl_lo );
+  status |= clSetKernelArg(kernel, 4, sizeof(uint_eT), &range );
+  status |= clSetKernelArg(kernel, 5, sizeof(char),    &needs_modulo );
+
+  // Each thread will do as many elements as it can.
+  // This avoids memory synchronization issues, since each RNG state will be local to only a single run of the kernel.
+  const size_t num_rng_threads = get_rt().cl_rt.get_num_rng_threads();
+  const size_t num_threads = std::min(num_rng_threads, n);
+
+  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &num_threads, NULL, 0, NULL, NULL);
+
+  coot_check_cl_error(status, "randi()");
   }
