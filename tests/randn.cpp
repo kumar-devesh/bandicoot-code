@@ -26,14 +26,7 @@ void test_randn()
     {
     for (uword c = 0; c < 1000; ++c)
       {
-      if (eT(f_cpu(r, c)) < 0)
-        {
-        REQUIRE( eT(f_cpu(r, c)) <= eT(500) );
-        }
-      else
-        {
-        REQUIRE( -eT(f_cpu(r, c)) <= eT(500) );
-        }
+      REQUIRE( abs(eT(f_cpu(r, c))) <= eT(500) );
       }
     }
   }
@@ -44,9 +37,7 @@ TEST_CASE("randn_1", "[randn]")
 {
   test_randn<float>();
   test_randn<double>();
-//  test_randn<u32>();
   test_randn<s32>();
-//  test_randn<u64>();
   test_randn<s64>();
 }
 
@@ -63,14 +54,7 @@ void test_randn_2()
     {
     for (uword c = 0; c < 1000; ++c)
       {
-      if (eT(f_cpu(r, c)) < 0)
-        {
-        REQUIRE( eT(f_cpu(r, c)) <= eT(500) );
-        }
-      else
-        {
-        REQUIRE( -eT(f_cpu(r, c)) <= eT(500) );
-        }
+      REQUIRE( abs(eT(f_cpu(r, c))) <= eT(500) );
       }
     }
   }
@@ -81,9 +65,7 @@ TEST_CASE("randn_2", "[randn]")
 {
   test_randn_2<float>();
   test_randn_2<double>();
-//  test_randn_2<u32>();
   test_randn_2<s32>();
-//  test_randn_2<u64>();
   test_randn_2<s64>();
 }
 
@@ -103,14 +85,7 @@ void test_randn_3()
     {
     for (uword c = 0; c < 1000; ++c)
       {
-      if (eT(f_cpu(r, c)) < 0)
-        {
-        REQUIRE( eT(f_cpu(r, c)) <= eT(500) );
-        }
-      else
-        {
-        REQUIRE( -eT(f_cpu(r, c)) <= eT(500) );
-        }
+      REQUIRE( abs(eT(f_cpu(r, c))) <= eT(500) );
       }
     }
   }
@@ -121,9 +96,7 @@ TEST_CASE("randn_3", "[randn]")
 {
   test_randn_3<float>();
   test_randn_3<double>();
-//  test_randn_3<u32>();
   test_randn_3<s32>();
-//  test_randn_3<u64>();
   test_randn_3<s64>();
 }
 
@@ -167,70 +140,14 @@ void test_row_col_randn()
 
   for (uword i = 0; i < 1000; ++i)
     {
-    if (eT(r1_cpu[i]) < 0)
-      {
-      REQUIRE( eT(r1_cpu[i]) <= eT(500) );
-      }
-    else
-      {
-      REQUIRE( -eT(r1_cpu[i]) <= eT(500) );
-      }
-    if (eT(r2_cpu[i]) < 0)
-      {
-      REQUIRE( eT(r2_cpu[i]) <= eT(500) );
-      }
-    else
-      {
-      REQUIRE( -eT(r2_cpu[i]) <= eT(500) );
-      }
-    if (eT(r3_cpu[i]) < 0)
-      {
-      REQUIRE( eT(r3_cpu[i]) <= eT(500) );
-      }
-    else
-      {
-      REQUIRE( -eT(r3_cpu[i]) <= eT(500) );
-      }
-    if (eT(r4_cpu[i]) < 0)
-      {
-      REQUIRE( eT(r4_cpu[i]) <= eT(500) );
-      }
-    else
-      {
-      REQUIRE( -eT(r4_cpu[i]) <= eT(500) );
-      }
-    if (eT(c1_cpu[i]) < 0)
-      {
-      REQUIRE( eT(c1_cpu[i]) <= eT(500) );
-      }
-    else
-      {
-      REQUIRE( -eT(c1_cpu[i]) <= eT(500) );
-      }
-    if (eT(c2_cpu[i]) < 0)
-      {
-      REQUIRE( eT(c2_cpu[i]) <= eT(500) );
-      }
-    else
-      {
-      REQUIRE( -eT(c2_cpu[i]) <= eT(500) );
-      }
-    if (eT(c3_cpu[i]) < 0)
-      {
-      REQUIRE( eT(c3_cpu[i]) <= eT(500) );
-      }
-    else
-      {
-      REQUIRE( -eT(c3_cpu[i]) <= eT(500) );
-      }
-    if (eT(c4_cpu[i]) < 0)
-      {
-      REQUIRE( eT(c4_cpu[i]) <= eT(500) );
-      }
-    else
-      {
-      REQUIRE( -eT(c4_cpu[i]) <= eT(500) );
-      }
+    REQUIRE( abs(eT(r1_cpu[i])) <= eT(500) );
+    REQUIRE( abs(eT(r2_cpu[i])) <= eT(500) );
+    REQUIRE( abs(eT(r3_cpu[i])) <= eT(500) );
+    REQUIRE( abs(eT(r4_cpu[i])) <= eT(500) );
+    REQUIRE( abs(eT(c1_cpu[i])) <= eT(500) );
+    REQUIRE( abs(eT(c2_cpu[i])) <= eT(500) );
+    REQUIRE( abs(eT(c3_cpu[i])) <= eT(500) );
+    REQUIRE( abs(eT(c4_cpu[i])) <= eT(500) );
     }
   }
 
@@ -240,9 +157,7 @@ TEST_CASE("randn_row_col", "[randn]")
   {
   test_row_col_randn<float>();
   test_row_col_randn<double>();
-//  test_row_col_randn<u32>();
   test_row_col_randn<s32>();
-//  test_row_col_randn<u64>();
   test_row_col_randn<s64>();
   }
 
@@ -334,7 +249,7 @@ void test_randn_distr(const double mu = 0.0, const double sd = 1.0, const size_t
 
   // First compute some convenience values we'll use later.
   arma::rowvec log_facts(50001); // log_facts[i] = log(i!)
-  for (uword i = 2; i <= 50001; ++i)
+  for (uword i = 2; i < 50001; ++i)
     {
     log_facts[i] = log_facts[i - 1] + std::log(i);
     }
@@ -407,8 +322,37 @@ void test_randn_distr(const double mu = 0.0, const double sd = 1.0, const size_t
 
 
 
+template<typename eT>
+void run_randn_distr_tests()
+  {
+  test_randn_distr<eT>(0.0, 1.0, 0);
+  test_randn_distr<eT>(0.0, 1.0, 1);
+
+  // Now try changing around the mean and standard deviation, with them taking integer values.
+  for (int mu = -10; mu <= 10; mu += 5)
+    {
+    for (int sd = 1; sd < 5; sd += 1)
+      {
+      test_randn_distr<eT>(mu, sd, 2);
+      }
+    }
+
+  // Now use floating-point values for the mean and standard deviations.
+  for (uword i = 0; i < 5; ++i)
+    {
+    eT mu = pow(2.0, i);
+    for (uword j = 0; j < 5; ++j)
+      {
+      eT sd = pow(2.0, j);
+      test_randn_distr<eT>(mu, sd, 3);
+      }
+    }
+  }
+
+
+
 TEST_CASE("randn_distr", "[randn]")
   {
-  test_randn_distr<float>();
-  test_randn_distr<double>();
+  run_randn_distr_tests<float>();
+  run_randn_distr_tests<double>();
   }
