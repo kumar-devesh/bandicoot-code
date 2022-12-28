@@ -22,9 +22,9 @@ void test_randu()
   {
   Mat<eT> f = randu<Mat<eT>>(1000, 1000);
   arma::Mat<eT> f_cpu(f);
-  for (uword r = 0; r < 1000; ++r)
+  for (uword c = 0; c < 1000; ++c)
     {
-    for (uword c = 0; c < 1000; ++c)
+    for (uword r = 0; r < 1000; ++r)
       {
       REQUIRE( eT(f_cpu(r, c)) >= eT(0) );
       REQUIRE( eT(f_cpu(r, c)) <= eT(1) );
@@ -53,9 +53,9 @@ void test_randu_2()
   Mat<eT> f(1000, 1000);
   f.randu();
   arma::Mat<eT> f_cpu(f);
-  for (uword r = 0; r < 1000; ++r)
+  for (uword c = 0; c < 1000; ++c)
     {
-    for (uword c = 0; c < 1000; ++c)
+    for (uword r = 0; r < 1000; ++r)
       {
       REQUIRE( eT(f_cpu(r, c)) >= eT(0) );
       REQUIRE( eT(f_cpu(r, c)) <= eT(1) );
@@ -207,13 +207,12 @@ void test_randu_distr()
     else
       ++bin_counts[0];
     }
-  std::cout << "bin counts: " << bin_counts[0] << " " << bin_counts[1] << " " << bin_counts[2] << " " << bin_counts[3] << " " << bin_counts[4] << "\n";
 
   // Each bin contains the sum of samples of n = 10k Bernoulli trials with p = 0.2.
   // So, their sum is ~ B(n, p) = B(10k, 0.2).
   // If randu() produced samples that are actually uniformly randomly distributed,
   // then with 0.9999999 probability, the sum will lie in the range [1795, 2210].
-  // (Note that the Bernoulli distribution is not symmetric for p != 0.5, like in our case.)
+  // (Note that the binomial distribution is not symmetric for p != 0.5, like in our case.)
   REQUIRE( bin_counts[0] >= 1795 );
   REQUIRE( bin_counts[0] <= 2210 );
   REQUIRE( bin_counts[1] >= 1795 );
