@@ -31,6 +31,7 @@ struct oneway_kernel_id
     submat_inplace_div_scalar,
     //
     inplace_set_eye,
+    linspace,
     //
     accu_simple,
     accu,
@@ -72,6 +73,7 @@ struct oneway_kernel_id
     names.push_back("submat_inplace_div_scalar");
 
     names.push_back("inplace_set_eye");
+    names.push_back("linspace");
 
     names.push_back("accu_simple");
     names.push_back("accu");

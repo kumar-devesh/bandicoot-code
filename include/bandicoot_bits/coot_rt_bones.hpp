@@ -161,6 +161,9 @@ class coot_rt_t
   template<typename eT1, typename eT2>
   static inline typename promote_type<eT1, eT2>::result dot(const dev_mem_t<eT1> mem1, const dev_mem_t<eT2> mem2, const uword n_elem);
 
+  template<typename eT>
+  static inline void linspace(const dev_mem_t<eT> mem, const eT start, const eT end, const uword num);
+
   // LAPACK-style utility functions
 
   template<typename eT>
