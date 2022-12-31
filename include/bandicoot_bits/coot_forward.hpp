@@ -98,16 +98,6 @@ class glue_mixed_schur;
 class glue_mixed_div;
 class glue_mixed_times;
 
-struct traits_op_default
-  {
-  struct traits
-    {
-    // By default, an Op cannot also perform a type conversion.  (Some Ops can.)
-    static constexpr bool can_inline_conv_to = false;
-    };
-  };
-
-
 //! \addtogroup fill
 //! @{
 

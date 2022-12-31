@@ -70,21 +70,6 @@ mtop_conv_to::apply(Mat<out_eT>& out, const mtOp<out_eT, eGlue<T1, T2, eglue_typ
 
 
 
-template<typename out_eT, typename T1, typename op_type>
-inline
-void
-mtop_conv_to::apply(Mat<out_eT>& out,
-                    const mtOp<out_eT, Op<T1, op_type>, mtop_conv_to>& X,
-                    const typename enable_if<op_type::traits::can_inline_conv_to>::type* junk)
-  {
-  coot_extra_debug_sigprint();
-  coot_ignore(junk);
-
-  op_type::apply(out, X.q);
-  }
-
-
-
 template<typename out_eT, typename T1>
 inline
 void

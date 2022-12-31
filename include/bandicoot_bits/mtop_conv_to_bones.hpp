@@ -31,9 +31,6 @@ class mtop_conv_to
   template<typename out_eT, typename T1, typename T2, typename eglue_type>
   static inline void apply(Mat<out_eT>& out, const mtOp<out_eT, eGlue<T1, T2, eglue_type>, mtop_conv_to>& X);
 
-  template<typename out_eT, typename T1, typename op_type>
-  static inline void apply(Mat<out_eT>& out, const mtOp<out_eT, Op<T1, op_type>, mtop_conv_to>& X, const typename enable_if<op_type::traits::can_inline_conv_to>::type* junk = 0);
-
   // Direct applications.
   template<typename out_eT, typename T1> static inline void apply_inplace_plus (Mat<out_eT>& out, const mtOp<out_eT, T1, mtop_conv_to>& X);
   template<typename out_eT, typename T1> static inline void apply_inplace_minus(Mat<out_eT>& out, const mtOp<out_eT, T1, mtop_conv_to>& X);
