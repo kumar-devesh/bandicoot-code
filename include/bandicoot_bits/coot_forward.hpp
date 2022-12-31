@@ -74,6 +74,7 @@ class op_inv;
 class op_strans;
 class op_htrans;
 class op_htrans2;
+class op_repmat;
 
 class mtop_conv_to;
 
@@ -96,6 +97,15 @@ class glue_mixed_minus;
 class glue_mixed_schur;
 class glue_mixed_div;
 class glue_mixed_times;
+
+struct traits_op_default
+  {
+  struct traits
+    {
+    // By default, an Op cannot also perform a type conversion.  (Some Ops can.)
+    static constexpr bool can_inline_conv_to = false;
+    };
+  };
 
 
 //! \addtogroup fill
