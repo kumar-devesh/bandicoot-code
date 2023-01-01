@@ -13,39 +13,11 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup coot_version
-//! @{
 
-
-
-#define COOT_VERSION_MAJOR 0
-#define COOT_VERSION_MINOR 100
-#define COOT_VERSION_PATCH 2
-#define COOT_VERSION_NOTE  "unstable development version"
-
-
-
-struct coot_version
+// this can hold either CUDA memory or CL memory
+template<typename eT>
+union dev_mem_t
   {
-  static const unsigned int major = COOT_VERSION_MAJOR;
-  static const unsigned int minor = COOT_VERSION_MINOR;
-  static const unsigned int patch = COOT_VERSION_PATCH;
-  
-  static
-  inline
-  std::string
-  as_string()
-    {
-    std::stringstream ss;
-    ss << coot_version::major << '.' << coot_version::minor << '.' << coot_version::patch;
-    
-    const std::string note = COOT_VERSION_NOTE;
-    if(note.length() > 0)  { ss << " (" << note << ')'; }
-    
-    return ss.str();
-    }
+  cl_mem cl_mem_ptr;
+  eT* cuda_mem_ptr;
   };
-
-
-
-//! @}

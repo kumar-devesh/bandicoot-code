@@ -31,6 +31,36 @@ inline std::string substitute_types(const std::string& source, const std::string
 
 
 /**
+ * Initialize `name_map` with names for all of the zero-element kernels given in
+ * `kernels`.  This is equivalent to calling `get_zero_elem_kernel_src()`, except
+ * that no source is collected.
+ */
+template<typename KernelType>
+inline void init_zero_elem_kernel_map(std::vector<KernelType>& kernels,
+                                      std::vector<std::pair<std::string, KernelType*>>& name_map,
+                                      const std::vector<std::string>& kernel_names);
+
+
+
+/**
+ * Given one-element kernel source `source` and a collection of KernelTypes
+ * `kernels`, generate a source string that contains those kernels.
+ *
+ * The `name_map` structure will be filled with pairs mapping the names of
+ * generated kernels to KernelType objects.
+ *
+ * The `TypeMapper` object is used to map types to strings representing the type that should be used on the device.
+ */
+template<typename KernelType, typename TypeMapper>
+inline std::string get_zero_elem_kernel_src(std::vector<KernelType>& kernels,
+                                            const std::string& source,
+                                            const std::vector<std::string>& kernel_names,
+                                            std::vector<std::pair<std::string, KernelType*>>& name_map,
+                                            const TypeMapper& type_map);
+
+
+
+/**
  * Initialize `name_map` with names for all of the one-element kernels given in
  * `kernels`.  This is equivalent to calling `get_one_elem_kernel_src()`, except
  * that no source is collected.
