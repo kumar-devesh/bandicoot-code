@@ -189,6 +189,7 @@ namespace coot
   #include "bandicoot_bits/op_strans_bones.hpp"
   #include "bandicoot_bits/op_min_bones.hpp"
   #include "bandicoot_bits/op_max_bones.hpp"
+  #include "bandicoot_bits/op_resize_bones.hpp"
 
   #include "bandicoot_bits/mtop_conv_to_bones.hpp"
   
@@ -340,6 +341,7 @@ namespace coot
   #include "bandicoot_bits/fn_conv_to.hpp"
   #include "bandicoot_bits/fn_min.hpp"
   #include "bandicoot_bits/fn_max.hpp"
+  #include "bandicoot_bits/fn_resize.hpp"
   
   
   //
@@ -374,6 +376,7 @@ namespace coot
   #include "bandicoot_bits/op_strans_meat.hpp"
   #include "bandicoot_bits/op_min_meat.hpp"
   #include "bandicoot_bits/op_max_meat.hpp"
+  #include "bandicoot_bits/op_resize_meat.hpp"
 
   #include "bandicoot_bits/mtop_conv_to_meat.hpp"
   

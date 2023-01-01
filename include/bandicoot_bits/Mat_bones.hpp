@@ -153,6 +153,9 @@ class Mat : public Base< eT, Mat<eT> >
   inline void reset();
   inline void set_size(const uword new_n_elem);
   inline void set_size(const uword new_n_rows, const uword new_n_cols);
+
+  inline void   resize(const uword new_n_elem);
+  inline void   resize(const uword new_n_rows, const uword new_n_cols);
   
   inline void impl_print(const std::string extra_text) const;
   
