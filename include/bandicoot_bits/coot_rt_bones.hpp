@@ -14,14 +14,6 @@
 
 
 
-// this can hold either CUDA memory or CL memory
-template<typename eT>
-union dev_mem_t
-  {
-  cl_mem cl_mem_ptr;
-  eT* cuda_mem_ptr;
-  };
-
 enum coot_backend_t
   {
   CL_BACKEND = 0,
@@ -88,7 +80,10 @@ class coot_rt_t
   static inline void fill_randu(dev_mem_t<eT> dest, const uword n);
 
   template<typename eT>
-  static inline void fill_randn(dev_mem_t<eT> dest, const uword n);
+  static inline void fill_randn(dev_mem_t<eT> dest, const uword n, const double mu, const double sd);
+
+  template<typename eT>
+  static inline void fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int hi);
 
   template<typename eT1, typename eT2, typename eT3>
   static inline void array_op(dev_mem_t<eT3> dest, const uword n_elem, const dev_mem_t<eT1> A_mem, const dev_mem_t<eT2> B_mem, const threeway_kernel_id::enum_id num);

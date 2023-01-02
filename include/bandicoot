@@ -107,11 +107,14 @@ namespace coot
   #include "bandicoot_bits/coot_config.hpp"
   #include "bandicoot_bits/traits.hpp"
   #include "bandicoot_bits/promote_type.hpp"
+  #include "bandicoot_bits/uint_type.hpp"
   #include "bandicoot_bits/upgrade_val.hpp"
   #include "bandicoot_bits/restrictors.hpp"
   #include "bandicoot_bits/access.hpp"
   #include "bandicoot_bits/span.hpp"
   #include "bandicoot_bits/constants.hpp"
+  #include "bandicoot_bits/dev_mem_t.hpp"
+  #include "bandicoot_bits/distr_param.hpp"
   
   //
   // runtime
@@ -136,6 +139,8 @@ namespace coot
     #include "bandicoot_bits/opencl/kernel_src.hpp"
     #include "bandicoot_bits/opencl/error.hpp"
     #include "bandicoot_bits/opencl/type_to_dev_string.hpp"
+    #include "bandicoot_bits/opencl/random_bones.hpp"
+    #include "bandicoot_bits/opencl/copy_bones.hpp"
     }
 
   #include "bandicoot_bits/opencl/magma_bones.hpp"
@@ -236,7 +241,7 @@ namespace coot
     #include "bandicoot_bits/opencl/eop_core_meat.hpp"
     #include "bandicoot_bits/opencl/accu.hpp"
     #include "bandicoot_bits/opencl/chol.hpp"
-    #include "bandicoot_bits/opencl/copy.hpp"
+    #include "bandicoot_bits/opencl/copy_meat.hpp"
     #include "bandicoot_bits/opencl/trace.hpp"
     #include "bandicoot_bits/opencl/eye.hpp"
     #include "bandicoot_bits/opencl/gemm.hpp"
@@ -342,6 +347,9 @@ namespace coot
   #include "bandicoot_bits/fn_conv_to.hpp"
   #include "bandicoot_bits/fn_min.hpp"
   #include "bandicoot_bits/fn_max.hpp"
+  #include "bandicoot_bits/fn_randu.hpp"
+  #include "bandicoot_bits/fn_randn.hpp"
+  #include "bandicoot_bits/fn_randi.hpp"
   #include "bandicoot_bits/fn_linspace.hpp"
   
   

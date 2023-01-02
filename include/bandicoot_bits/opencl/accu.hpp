@@ -37,6 +37,7 @@ accu(dev_mem_t<eT> mem, const uword n_elem)
   // depends on the compiled kernel.  I assume that the results for k will be identical to k_small.
   size_t kernel_wg_size;
   status = clGetKernelWorkGroupInfo(k, get_rt().cl_rt.get_device(), CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &kernel_wg_size, NULL);
+  // TODO: should we multiply by CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE?
   coot_check_cl_error(status, "accu()");
 
   const size_t k1_work_dim       = 1;

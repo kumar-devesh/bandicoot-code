@@ -21,6 +21,11 @@ inline
 std::string
 get_cuda_src_preamble()
   {
+  char u32_max[32];
+  char u64_max[32];
+  snprintf(u32_max, 32, "%llu", (unsigned long long) std::numeric_limits<u32>::max());
+  snprintf(u64_max, 32, "%llu", (unsigned long long) std::numeric_limits<u64>::max());
+
   std::string source = \
 
   "#define uint unsigned int\n"
@@ -39,6 +44,10 @@ get_cuda_src_preamble()
   "extern \"C\" {\n"
   "\n"
   "extern __shared__ char aux_shared_mem[]; \n" // this may be used in some kernels
+  "\n"
+  // u32 maps to "unsigned int", so we have to avoid ever using that name.
+  "__device__ inline int coot_type_max_u_float() { return " + std::string(u32_max) + "; } \n"
+  "__device__ inline long coot_type_max_u_double() { return " + std::string(u64_max) + "; } \n"
   "\n"
   // Utility functions to return the correct min/max value for a given type.
   // These constants are not defined in the CUDA compilation environment so we use the host's version.
@@ -89,6 +98,26 @@ read_file(const std::string& filename)
                        std::istreambuf_iterator<char>());
 
   return file_contents;
+  }
+
+
+
+inline
+std::string
+get_cuda_zeroway_kernel_src()
+  {
+  // NOTE: kernel names must match the list in the kernel_id struct
+
+  std::string result = "";
+
+  // Now, load each file for each kernel.
+  for (const std::string& kernel_name : zeroway_kernel_id::get_names())
+    {
+    std::string filename = "zeroway/" + kernel_name + ".cu";
+    result += read_file(filename);
+    }
+
+  return result;
   }
 
 

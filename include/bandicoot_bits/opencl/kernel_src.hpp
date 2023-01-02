@@ -18,6 +18,9 @@ struct kernel_src
   {
   static inline const std::string&  get_src_preamble();
 
+  static inline const std::string&  get_zeroway_source();
+  static inline       std::string  init_zeroway_source();
+
   static inline const std::string&  get_oneway_source();
   static inline       std::string  init_oneway_source();
 
@@ -39,6 +42,11 @@ inline
 const std::string&
 kernel_src::get_src_preamble()
   {
+  char u32_max[32];
+  char u64_max[32];
+  snprintf(u32_max, 32, "%llu", (unsigned long long) std::numeric_limits<u32>::max());
+  snprintf(u64_max, 32, "%llu", (unsigned long long) std::numeric_limits<u64>::max());
+
   static const std::string source = \
 
   "#ifdef cl_khr_pragma_unroll \n"
@@ -61,6 +69,9 @@ kernel_src::get_src_preamble()
   "#define COOT_FN_3(ARG1,ARG2,ARG3) COOT_FN_3_2(ARG1,ARG2,ARG3) \n"
   "\n"
   // Utility functions to return the correct min/max value for a given type.
+  "inline uint coot_type_max_uint() { return " + std::string(u32_max) + "; } \n"
+  "inline ulong coot_type_max_ulong() { return " + std::string(u64_max) + "; } \n"
+  "\n"
   "inline float coot_type_min_float() { return FLT_MIN; } \n"
   "inline double coot_type_min_double() { return DBL_MIN; } \n"
   "inline float coot_type_max_float() { return FLT_MAX; } \n"
@@ -105,6 +116,49 @@ read_file(const std::string& filename)
                        std::istreambuf_iterator<char>());
 
   return file_contents;
+  }
+
+
+
+inline
+const std::string&
+kernel_src::get_zeroway_source()
+  {
+  static const std::string source = init_zeroway_source();
+
+  return source;
+  }
+
+
+
+inline
+std::string
+kernel_src::init_zeroway_source()
+  {
+  // NOTE: kernel names must match the list in the kernel_id struct
+
+  std::vector<std::string> aux_function_filenames = {
+      "xorwow_rng.cl",
+      "philox_rng.cl"
+  };
+
+  std::string source = "";
+
+  // First, load any auxiliary functions.
+  for (const std::string& filename : aux_function_filenames)
+    {
+    std::string full_filename = "zeroway/" + filename;
+    source += read_file(full_filename);
+    }
+
+  // Now, load each file for each kernel.
+  for (const std::string& kernel_name : zeroway_kernel_id::get_names())
+    {
+    std::string filename = "zeroway/" + kernel_name + ".cl";
+    source += read_file(filename);
+    }
+
+  return source;
   }
 
 

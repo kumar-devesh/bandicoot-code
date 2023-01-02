@@ -12,40 +12,15 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-
-//! \addtogroup coot_version
-//! @{
-
-
-
-#define COOT_VERSION_MAJOR 0
-#define COOT_VERSION_MINOR 100
-#define COOT_VERSION_PATCH 3
-#define COOT_VERSION_NOTE  "unstable development version"
-
-
-
-struct coot_version
+__kernel
+void
+COOT_FN(PREFIX,inplace_mod_scalar)(__global eT1* out,
+                                   const eT1 val,
+                                   const UWORD N)
   {
-  static const unsigned int major = COOT_VERSION_MAJOR;
-  static const unsigned int minor = COOT_VERSION_MINOR;
-  static const unsigned int patch = COOT_VERSION_PATCH;
-  
-  static
-  inline
-  std::string
-  as_string()
+  const UWORD i = get_global_id(0);
+  if(i < N)
     {
-    std::stringstream ss;
-    ss << coot_version::major << '.' << coot_version::minor << '.' << coot_version::patch;
-    
-    const std::string note = COOT_VERSION_NOTE;
-    if(note.length() > 0)  { ss << " (" << note << ')'; }
-    
-    return ss.str();
+    out[i] = (eT1) ((uint_eT1) out[i] % (uint_eT1) val);
     }
-  };
-
-
-
-//! @}
+  }
