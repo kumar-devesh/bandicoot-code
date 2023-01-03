@@ -1383,6 +1383,37 @@ coot_rt_t::repmat(const dev_mem_t<eT1> src, dev_mem_t<eT2> dest, const uword n_r
 
 template<typename eT>
 inline
+void
+coot_rt_t::linspace(dev_mem_t<eT> mem, const eT start, const eT end, const uword num)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    opencl::linspace(mem, start, end, num);
+    #else
+    coot_stop_runtime_error("coot_rt::linspace(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    cuda::linspace(mem, start, end, num);
+    #else
+    coot_stop_runtime_error("coot_rt::linspace(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::dot(): unknown backend");
+    }
+  }
+
+
+
+template<typename eT>
+inline
 eT
 coot_rt_t::larfg(const dev_mem_t<eT> x, const uword n_elem)
   {

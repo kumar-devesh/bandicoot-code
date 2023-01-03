@@ -254,6 +254,7 @@ namespace coot
     #include "bandicoot_bits/opencl/max.hpp"
     #include "bandicoot_bits/opencl/max_abs.hpp"
     #include "bandicoot_bits/opencl/repmat.hpp"
+    #include "bandicoot_bits/opencl/linspace.hpp"
 //    #include "bandicoot_bits/opencl/eig.hpp"
     #include "bandicoot_bits/opencl/lapack/larfg.hpp"
     }
@@ -283,6 +284,7 @@ namespace coot
     #include "bandicoot_bits/cuda/max.hpp"
     #include "bandicoot_bits/cuda/max_abs.hpp"
     #include "bandicoot_bits/cuda/repmat.hpp"
+    #include "bandicoot_bits/cuda/linspace.hpp"
 //    #include "bandicoot_bits/cuda/eig.hpp"
     #include "bandicoot_bits/cuda/lapack/larfg.hpp"
     }
@@ -354,6 +356,7 @@ namespace coot
   #include "bandicoot_bits/fn_randi.hpp"
   #include "bandicoot_bits/fn_repmat.hpp"
   #include "bandicoot_bits/fn_resize.hpp"
+  #include "bandicoot_bits/fn_linspace.hpp"
   
   
   //
