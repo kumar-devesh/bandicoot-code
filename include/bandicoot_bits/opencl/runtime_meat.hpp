@@ -109,6 +109,25 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
 
   valid = true;
 
+  // Now set up the XORWOW RNGs for float and double.
+  // For type eT, we must store 6 * sizeof(eT) * num_rng_threads for each RNG,
+  // where num_rng_threads is the maximum kernel work group size for the randu kernel.
+  // This means that we will effectively have one RNG per thread.
+  cl_kernel rng_kernel = get_kernel<float>(oneway_kernel_id::inplace_xorwow_randu);
+  status = clGetKernelWorkGroupInfo(rng_kernel, dev_id, CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &num_rng_threads, NULL);
+  coot_check_cl_error(status, "coot::cl_rt.init()");
+  size_t preferred_work_group_size_multiple;
+  status = clGetKernelWorkGroupInfo(rng_kernel, dev_id, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, sizeof(size_t), &preferred_work_group_size_multiple, NULL);
+  coot_check_cl_error(status, "coot::cl_rt.init()");
+  num_rng_threads *= preferred_work_group_size_multiple;
+
+  xorwow32_state = acquire_memory<u32>(6 * num_rng_threads);
+  init_xorwow_state<u32>(xorwow32_state, num_rng_threads);
+  xorwow64_state = acquire_memory<u64>(6 * num_rng_threads);
+  init_xorwow_state<u64>(xorwow64_state, num_rng_threads);
+  philox_state = acquire_memory<u32>(6 * num_rng_threads);
+  init_philox_state(philox_state, num_rng_threads);
+
   return true;
   }
 
@@ -156,6 +175,8 @@ runtime_t::internal_cleanup()
   if(cq != NULL)  { clFinish(cq); }
 
   clblasTeardown();
+
+  // TODO: clean up RNGs
 
   // TODO: go through each kernel vector
 
@@ -626,10 +647,11 @@ runtime_t::load_cached_kernels(const std::string& unique_host_device_id, const s
   // So, load the compiled kernels, after initializing the name map.
 
   std::vector<std::pair<std::string, cl_kernel*>> name_map;
-  rt_common::init_three_elem_kernel_map(threeway_kernels, name_map, threeway_kernel_id::get_names(), "");
-  rt_common::init_two_elem_kernel_map(twoway_kernels, name_map, twoway_kernel_id::get_names(), "");
-  rt_common::init_one_elem_kernel_map(oneway_kernels, name_map, oneway_kernel_id::get_names(), "");
+  rt_common::init_zero_elem_kernel_map(zeroway_kernels, name_map, zeroway_kernel_id::get_names());
   rt_common::init_one_elem_real_kernel_map(oneway_real_kernels, name_map, oneway_real_kernel_id::get_names(), "");
+  rt_common::init_one_elem_kernel_map(oneway_kernels, name_map, oneway_kernel_id::get_names(), "");
+  rt_common::init_two_elem_kernel_map(twoway_kernels, name_map, twoway_kernel_id::get_names(), "");
+  rt_common::init_three_elem_kernel_map(threeway_kernels, name_map, threeway_kernel_id::get_names(), "");
 
   return create_kernels(name_map, prog_holder, "");
   }
@@ -647,10 +669,11 @@ runtime_t::compile_kernels(const std::string& unique_host_id)
   type_to_dev_string type_map;
   std::string source =
       kernel_src::get_src_preamble() +
-      rt_common::get_three_elem_kernel_src(threeway_kernels, kernel_src::get_threeway_source(), threeway_kernel_id::get_names(), name_map, type_map) +
-      rt_common::get_two_elem_kernel_src(twoway_kernels, kernel_src::get_twoway_source(), twoway_kernel_id::get_names(), "", name_map, type_map) +
-      rt_common::get_one_elem_kernel_src(oneway_kernels, kernel_src::get_oneway_source(), oneway_kernel_id::get_names(), "", name_map, type_map) +
+      rt_common::get_zero_elem_kernel_src(zeroway_kernels, kernel_src::get_zeroway_source(), zeroway_kernel_id::get_names(), name_map, type_map) +
       rt_common::get_one_elem_real_kernel_src(oneway_real_kernels, kernel_src::get_oneway_real_source(), oneway_real_kernel_id::get_names(), "", name_map, type_map) +
+      rt_common::get_one_elem_kernel_src(oneway_kernels, kernel_src::get_oneway_source(), oneway_kernel_id::get_names(), "", name_map, type_map) +
+      rt_common::get_two_elem_kernel_src(twoway_kernels, kernel_src::get_twoway_source(), twoway_kernel_id::get_names(), "", name_map, type_map) +
+      rt_common::get_three_elem_kernel_src(threeway_kernels, kernel_src::get_threeway_source(), threeway_kernel_id::get_names(), name_map, type_map) +
       kernel_src::get_src_epilogue();
 
   cl_int status;
@@ -971,6 +994,15 @@ runtime_t::delete_extra_cq(cl_command_queue& in_queue)
 
 
 
+inline
+const cl_kernel&
+runtime_t::get_kernel(const zeroway_kernel_id::enum_id num)
+  {
+  return zeroway_kernels.at(num);
+  }
+
+
+
 template<typename eT>
 inline
 const cl_kernel&
@@ -1043,6 +1075,46 @@ runtime_t::get_kernel(const rt_common::kernels_t<std::vector<cl_kernel>>& k, con
   else if(is_same_type<eT, float >::yes) { return   k.f_kernels.at(num); }
   else if(is_same_type<eT, double>::yes) { return   k.d_kernels.at(num); }
   else { coot_debug_check(true, "unsupported element type"); }
+  }
+
+
+
+template<typename eT>
+inline
+cl_mem
+runtime_t::get_xorwow_state() const
+  {
+  std::ostringstream oss;
+  oss << "coot::cl_rt.get_xorwow_state(): no RNG available for type " << typeid(eT).name();
+  coot_stop_runtime_error(oss.str());
+  return cl_mem(0);
+  }
+
+
+
+template<> inline cl_mem runtime_t::get_xorwow_state<float >() const { return xorwow32_state; }
+template<> inline cl_mem runtime_t::get_xorwow_state<u32   >() const { return xorwow32_state; }
+template<> inline cl_mem runtime_t::get_xorwow_state<s32   >() const { return xorwow32_state; }
+template<> inline cl_mem runtime_t::get_xorwow_state<double>() const { return xorwow64_state; }
+template<> inline cl_mem runtime_t::get_xorwow_state<u64   >() const { return xorwow64_state; }
+template<> inline cl_mem runtime_t::get_xorwow_state<s64   >() const { return xorwow64_state; }
+
+
+
+inline
+cl_mem
+runtime_t::get_philox_state() const
+  {
+  return philox_state;
+  }
+
+
+
+inline
+size_t
+runtime_t::get_num_rng_threads() const
+  {
+  return num_rng_threads;
   }
 
 

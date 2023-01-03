@@ -12,7 +12,66 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-// Utility functions for generating random numbers via CUDA (cuRAND).
+// Utility functions for generating random numbers via OpenCL.
+
+template<typename eT> struct preferred_rng { };
+template<> struct preferred_rng<u32> { typedef std::mt19937 result; };
+template<> struct preferred_rng<u64> { typedef std::mt19937_64 result; };
+
+// Should be called with an unsigned int as the eT type.
+template<typename eT>
+inline
+void
+init_xorwow_state(cl_mem xorwow_state, const size_t num_rng_threads)
+  {
+  coot_extra_debug_sigprint();
+
+  // TODO: allow modification of seed
+
+  // Since the states are relatively small, and we only do the seeding once, we'll initialize the values on the CPU, then copy them over.
+  // We ensure that all values are odd.
+  arma::Row<eT> cpu_state(6 * num_rng_threads, arma::fill::none);
+  typename preferred_rng<eT>::result rng;
+  for (size_t i = 0; i < cpu_state.n_elem; ++i)
+    {
+    eT val = rng();
+    if (val % 2 == 0)
+      val += 1;
+    cpu_state[i] = val;
+    }
+
+  // Copy the state to the GPU memory.
+  dev_mem_t<eT> m;
+  m.cl_mem_ptr = xorwow_state;
+  copy_into_dev_mem(m, cpu_state.memptr(), 6 * num_rng_threads);
+  }
+
+
+
+inline
+void
+init_philox_state(cl_mem philox_state, const size_t num_rng_threads)
+  {
+  coot_extra_debug_sigprint();
+
+  // TODO: allow modification of seed
+
+  // Since the states are small, we seed on the CPU, and then transfer the memory.
+  // For now we always initialize the counters to 0.  (TODO: should this be an option?)
+  arma::Row<u32> cpu_state(6 * num_rng_threads, arma::fill::zeros);
+  preferred_rng<u32>::result rng;
+  for (size_t i = 0; i < num_rng_threads; ++i)
+    {
+    cpu_state[6 * i + 4] = rng();
+    cpu_state[6 * i + 5] = rng();
+    }
+
+  // Copy the state to the GPU.
+  dev_mem_t<u32> m;
+  m.cl_mem_ptr = philox_state;
+  copy_into_dev_mem(m, cpu_state.memptr(), 6 * num_rng_threads);
+  }
+
 
 template<typename eT>
 inline
@@ -23,26 +82,30 @@ fill_randu(dev_mem_t<eT> dest, const uword n)
 
   if (n == 0) { return; }
 
-  // TODO: replace awful implementation
+  // For integral types, truncate to [0, 1] just like Armadillo.
 
-  // Generate n random numbers.
-  eT* cpu_rand = new eT[n];
+  // Get the kernel and set up to run it.
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::inplace_xorwow_randu);
 
-  std::mt19937 gen;
-  std::uniform_real_distribution<eT> u_distr;
-  for (uword i = 0; i < n; ++i)
-    {
-    cpu_rand[i] = u_distr(gen);
-    }
+  runtime_t::cq_guard guard;
+  runtime_t::adapt_uword n_cl(n);
 
-  // Now push it to the device.
-  opencl::runtime_t::cq_guard guard;
+  cl_int status = 0;
 
-  cl_int status = clEnqueueWriteBuffer(get_rt().cl_rt.get_cq(), dest.cl_mem_ptr, CL_TRUE, 0, sizeof(eT) * n, cpu_rand, 0, NULL, NULL);
+  cl_mem xorwow_state = get_rt().cl_rt.get_xorwow_state<eT>();
 
-  coot_check_runtime_error( (status != CL_SUCCESS), "coot::opencl::fill_randu(): couldn't access device memory");
+  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &(dest.cl_mem_ptr) );
+  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &(xorwow_state) );
+  status |= clSetKernelArg(kernel, 2, n_cl.size,      n_cl.addr );
 
-  delete[] cpu_rand;
+  // Each thread will do as many elements as it can.
+  // This avoids memory synchronization issues, since each RNG state will be local to only a single run of the kernel.
+  const size_t num_rng_threads = get_rt().cl_rt.get_num_rng_threads();
+  const size_t num_threads = std::min(num_rng_threads, n);
+
+  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &num_threads, NULL, 0, NULL, NULL);
+
+  coot_check_cl_error(status, "randu()");
   }
 
 
@@ -50,34 +113,93 @@ fill_randu(dev_mem_t<eT> dest, const uword n)
 template<typename eT>
 inline
 void
-fill_randn(dev_mem_t<eT> dest, const uword n)
+fill_randn(dev_mem_t<eT> dest, const uword n, const double mu, const double sd)
   {
   coot_extra_debug_sigprint();
 
   if (n == 0) { return; }
 
-  // TODO: replace awful implementation
+  // For integral types, we truncate just like Armadillo.
 
-  // Generate n random numbers.
-  eT* cpu_rand = new eT[n];
+  // Get the kernel and set up to run it.
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::inplace_philox_randn);
 
-  std::mt19937 gen;
-  std::normal_distribution<eT> n_distr;
-  for (uword i = 0; i < n; ++i)
-    {
-    cpu_rand[i] = n_distr(gen);
-    }
+  runtime_t::cq_guard guard;
+  runtime_t::adapt_uword n_cl(n);
 
-  // Now push it to the device.
-  opencl::runtime_t::cq_guard guard;
+  cl_int status = 0;
 
-  cl_int status = clEnqueueWriteBuffer(get_rt().cl_rt.get_cq(), dest.cl_mem_ptr, CL_TRUE, 0, sizeof(eT) * n, cpu_rand, 0, NULL, NULL);
+  cl_mem philox_state = get_rt().cl_rt.get_philox_state();
 
-  coot_check_runtime_error( (status != CL_SUCCESS), "coot::opencl::fill_randn(): couldn't access device memory");
+  typedef typename promote_type<eT, float>::result fp_eT1;
+  fp_eT1 cl_mu(mu);
+  fp_eT1 cl_sd(sd);
 
-  delete[] cpu_rand;
+  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &(dest.cl_mem_ptr) );
+  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &(philox_state) );
+  status |= clSetKernelArg(kernel, 2, n_cl.size,      n_cl.addr );
+  status |= clSetKernelArg(kernel, 3, sizeof(cl_mu),  &(cl_mu) );
+  status |= clSetKernelArg(kernel, 4, sizeof(cl_sd),  &(cl_sd) );
+
+  // Each thread will do as many elements as it can.
+  // This avoids memory synchronization issues, since each RNG state will be local to only a single run of the kernel.
+  const size_t num_rng_threads = get_rt().cl_rt.get_num_rng_threads();
+  const size_t num_threads = std::min(num_rng_threads, n);
+
+  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &num_threads, NULL, 0, NULL, NULL);
+
+  coot_check_cl_error(status, "randn()");
   }
 
 
 
-// TODO: fill_randi, etc...
+template<typename eT>
+inline
+void
+fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int hi)
+  {
+  coot_extra_debug_sigprint();
+
+  if (n == 0) { return; }
+
+  // Get the kernel and set up to run it.
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::inplace_xorwow_randi);
+
+  runtime_t::cq_guard guard;
+  runtime_t::adapt_uword n_cl(n);
+
+  cl_int status = 0;
+
+  cl_mem xorwow_state = get_rt().cl_rt.get_xorwow_state<eT>();
+
+  typedef typename uint_type<eT>::result uint_eT;
+  uint_eT range;
+  if (std::is_same<uint_eT, u32>::value)
+    {
+    uint_eT bounded_hi = (std::is_floating_point<eT>::value) ? hi : std::min((u32) hi, (u32) std::numeric_limits<eT>::max());
+    range = (bounded_hi - lo);
+    }
+  else
+    {
+    range = (hi - lo);
+    }
+  // OpenCL kernels cannot use `bool` arguments.
+  char needs_modulo = (range != std::numeric_limits<uint_eT>::max());
+  eT cl_lo = eT(lo);
+
+  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem),  &(dest.cl_mem_ptr) );
+  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem),  &(xorwow_state) );
+  status |= clSetKernelArg(kernel, 2, n_cl.size,       n_cl.addr );
+  status |= clSetKernelArg(kernel, 3, sizeof(eT),      &cl_lo );
+  status |= clSetKernelArg(kernel, 4, sizeof(uint_eT), &range );
+  status |= clSetKernelArg(kernel, 5, sizeof(char),    &needs_modulo );
+
+  // Each thread will do as many elements as it can.
+  // This avoids memory synchronization issues, since each RNG state will be local to only a single run of the kernel.
+  const size_t num_rng_threads = get_rt().cl_rt.get_num_rng_threads();
+  const size_t num_threads = std::min(num_rng_threads, n);
+
+  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &num_threads, NULL, 0, NULL, NULL);
+
+  coot_check_cl_error(status, "randi()");
+  }

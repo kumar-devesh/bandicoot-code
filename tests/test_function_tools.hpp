@@ -1,4 +1,4 @@
-// Copyright 2019 Ryan Curtin <ryan@ratml.org>
+// Copyright 2021 Marcus Edel (http://kurg.org/)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,15 +12,26 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
+#include <bandicoot>
 
-struct coot_rng
+using namespace coot;
+
+// Check the values of two matrices.
+template<typename MatType>
+inline void check_matrices(const MatType& a, const MatType& b, double tolerance = 1e-5)
   {
-  template<typename eT>
-  static inline void fill_randu(dev_mem_t<eT> dest, const uword n);
+  REQUIRE(a.n_rows == b.n_rows);
+  REQUIRE(a.n_cols == b.n_cols);
 
-  template<typename eT>
-  static inline void fill_randn(dev_mem_t<eT> dest, const uword n, const distr_param& param = distr_param());
-
-  template<typename eT>
-  static inline void fill_randi(dev_mem_t<eT> dest, const uword n, const distr_param& param = distr_param());
-  };
+  for(uword i = 0; i < a.n_elem; ++i)
+    {
+    if(std::abs(a(i)) < tolerance / 2)
+      {
+      REQUIRE(b(i) == Approx(0.0).margin(tolerance / 2.0));
+      }
+    else
+      {
+      REQUIRE(a(i) == Approx(b(i)).epsilon(tolerance));
+      }
+    }
+  }

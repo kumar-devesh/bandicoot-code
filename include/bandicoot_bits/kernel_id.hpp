@@ -14,6 +14,41 @@
 
 
 
+struct zeroway_kernel_id
+  {
+  enum enum_id
+    {
+    invalid_kernel
+    };
+
+
+  static
+  inline
+  std::vector<std::string>
+  init_names()
+    {
+    // NOTE: the order and names of kernels in "names" must match the order and names in the kernel_id enum
+
+    std::vector<std::string> names;
+
+    return names;
+    };
+
+
+  static
+  inline
+  const std::vector<std::string>&
+  get_names()
+    {
+    static const std::vector<std::string> names = init_names();
+
+    return names;
+    }
+  };
+
+
+
+
 struct oneway_kernel_id
   {
   enum enum_id
@@ -23,6 +58,7 @@ struct oneway_kernel_id
     inplace_minus_scalar,
     inplace_mul_scalar,
     inplace_div_scalar,
+    inplace_mod_scalar,
     //
     submat_inplace_set_scalar,
     submat_inplace_plus_scalar,
@@ -46,6 +82,11 @@ struct oneway_kernel_id
     trace,
     //
     ltri_set_zero,
+    //
+    inplace_xorwow_randu,
+    inplace_philox_randn,
+    inplace_xorwow_randi,
+    //
     invalid_kernel
     };
 
@@ -64,6 +105,7 @@ struct oneway_kernel_id
     names.push_back("inplace_minus_scalar");
     names.push_back("inplace_mul_scalar");
     names.push_back("inplace_div_scalar");
+    names.push_back("inplace_mod_scalar");
 
     names.push_back("submat_inplace_set_scalar");
     names.push_back("submat_inplace_plus_scalar");
@@ -87,6 +129,10 @@ struct oneway_kernel_id
     names.push_back("trace");
 
     names.push_back("ltri_set_zero");
+
+    names.push_back("inplace_xorwow_randu");
+    names.push_back("inplace_philox_randn");
+    names.push_back("inplace_xorwow_randi");
 
     return names;
     }
