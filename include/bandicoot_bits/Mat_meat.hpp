@@ -1535,6 +1535,44 @@ Mat<eT>::set_size(const uword new_n_rows, const uword new_n_cols)
 template<typename eT>
 inline
 void
+Mat<eT>::resize(const uword new_n_elem)
+  {
+  coot_extra_debug_sigprint();
+
+  switch(vec_state)
+    {
+    case 0:
+      // fallthrough
+    case 1:
+      (*this).resize(new_n_elem, 1);
+      break;
+
+    case 2:
+      (*this).resize(1, new_n_elem);
+      break;
+
+    default:
+      ;
+    }
+  }
+
+
+
+template<typename eT>
+inline
+void
+Mat<eT>::resize(const uword new_n_rows, const uword new_n_cols)
+  {
+  coot_extra_debug_sigprint();
+
+  op_resize::apply_mat_inplace((*this), new_n_rows, new_n_cols);
+  }
+
+
+
+template<typename eT>
+inline
+void
 Mat<eT>::impl_print(const std::string extra_text) const
   {
   coot_extra_debug_sigprint();

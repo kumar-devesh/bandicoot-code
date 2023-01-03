@@ -1350,6 +1350,37 @@ coot_rt_t::dot(const dev_mem_t<eT1> mem1, const dev_mem_t<eT2> mem2, const uword
 
 
 
+template<typename eT1, typename eT2>
+inline
+void
+coot_rt_t::repmat(const dev_mem_t<eT1> src, dev_mem_t<eT2> dest, const uword n_rows, const uword n_cols, const uword copies_per_row, const uword copies_per_col)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::repmat(src, dest, n_rows, n_cols, copies_per_row, copies_per_col);
+    #else
+    coot_stop_runtime_error("coot_rt::repmat(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::repmat(src, dest, n_rows, n_cols, copies_per_row, copies_per_col);
+    #else
+    coot_stop_runtime_error("coot_rt::repmat(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::repmat(): unknown backend");
+    }
+  }
+
+
+
 template<typename eT>
 inline
 void
