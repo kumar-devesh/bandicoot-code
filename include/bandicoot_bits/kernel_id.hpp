@@ -298,6 +298,8 @@ struct twoway_kernel_id
     //
     convert_type,
     //
+    repmat,
+    //
     invalid_kernel
     };
 
@@ -412,6 +414,8 @@ struct twoway_kernel_id
     names.push_back("dot_small");
 
     names.push_back("convert_type");
+
+    names.push_back("repmat");
 
     return names;
     }
