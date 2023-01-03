@@ -59,6 +59,7 @@ struct conv_to
 
   // When we get an Op or a Glue, there's no hope of delaying the conversion.
   // (Exception: when it's an op_htrans or op_htrans2.)
+  // Note that we always expect an Op or Glue to be able to output into a different type.
   template<typename T1, typename op_type>
   inline
   static
@@ -97,6 +98,7 @@ struct conv_to
 
 
 
+  // TODO: use traits instead
   template<typename T1>
   inline
   static
@@ -126,5 +128,4 @@ struct conv_to
 
     return mtOp<out_eT, Op<T1, op_htrans2>, mtop_conv_to>(in);
     }
-
   };

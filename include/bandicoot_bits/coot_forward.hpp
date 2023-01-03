@@ -74,6 +74,7 @@ class op_inv;
 class op_strans;
 class op_htrans;
 class op_htrans2;
+class op_repmat;
 
 class mtop_conv_to;
 
@@ -96,7 +97,6 @@ class glue_mixed_minus;
 class glue_mixed_schur;
 class glue_mixed_div;
 class glue_mixed_times;
-
 
 //! \addtogroup fill
 //! @{
