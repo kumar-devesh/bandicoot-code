@@ -31,7 +31,7 @@ struct unwrap
     coot_extra_debug_sigprint();
     }
   
-  const Mat<eT> M;
+  Mat<eT> M;
   
   template<typename eT2>
   coot_inline bool is_alias(const Mat<eT2>&) const { return false; }
@@ -132,7 +132,7 @@ struct unwrap< mtOp<out_eT, T1, mtop_conv_to> >
     coot_extra_debug_sigprint();
     }
 
-  const Mat<out_eT> M;
+  Mat<out_eT> M;
 
   template<typename eT2>
   coot_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
