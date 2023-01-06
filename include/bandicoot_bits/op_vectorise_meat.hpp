@@ -18,21 +18,98 @@
 
 
 
-//! \addtogroup op_vectorise
-//! @{
-
-
-
-template<typename T1>
+template<typename out_eT, typename T1>
 inline
 void
-op_vectorise_col::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_vectorise_col>& in)
+op_vectorise_col::apply(Mat<out_eT>& out, const Op<T1,op_vectorise_col>& in)
   {
   coot_extra_debug_sigprint();
 
-  std::cout << "1\n";
-
   op_vectorise_col::apply_direct(out, in.m);
+  }
+
+
+
+template<typename out_eT, typename T1>
+inline
+void
+op_vectorise_col::apply_direct(Mat<out_eT>& out, const T1& expr)
+  {
+  coot_extra_debug_sigprint();
+
+  const unwrap<T1> U(expr);
+
+  if(U.is_alias(out))
+    {
+    // output matrix is the same as the input matrix
+    out.set_size(out.n_elem, 1);  // set_size() doesn't destroy data as long as the number of elements in the matrix remains the same
+    }
+  else
+    {
+    out.set_size(U.M.n_elem, 1);
+    arrayops::copy(out.get_dev_mem(false), U.M.get_dev_mem(false), U.M.n_elem);
+    }
+  }
+
+
+
+template<typename out_eT, typename eT>
+inline
+void
+op_vectorise_col::apply_direct(Mat<out_eT>& out, const subview<eT>& sv)
+  {
+  coot_extra_debug_sigprint();
+
+  if(&out == &(sv.m))
+    {
+    Mat<out_eT> tmp(sv.n_elem, 1);
+    arrayops::copy_subview(tmp.get_dev_mem(false), sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
+    out.steal_mem(tmp);
+    }
+  else
+    {
+    arrayops::copy_subview(out.get_dev_mem(false), sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
+    }
+  }
+
+
+
+template<typename out_eT, typename T1>
+inline
+void
+op_vectorise_all::apply(Mat<out_eT>& out, const Op<T1,op_vectorise_all>& in)
+  {
+  coot_extra_debug_sigprint();
+
+  if (in.aux_uword_a == 0)
+    {
+    op_vectorise_col::apply_direct(out, in.m);
+    }
+  else
+    {
+    // See if we can use op_vectorise_col anyway, which we can do if the object is already a vector.
+    SizeProxy<T1> S(in.m);
+    if (S.get_n_rows() == 1 || S.get_n_cols() == 1)
+      {
+      op_vectorise_col::apply_direct(out, in.m);
+      }
+    else
+      {
+      op_vectorise_row::apply_direct(out, in.m);
+      }
+    }
+  };
+
+
+
+template<typename out_eT, typename T1>
+inline
+void
+op_vectorise_row::apply(Mat<out_eT>& out, const Op<T1,op_vectorise_row>& in)
+  {
+  coot_extra_debug_sigprint();
+
+  op_vectorise_row::apply_direct(out, in.m);
   }
 
 
@@ -40,91 +117,32 @@ op_vectorise_col::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_vectori
 template<typename T1>
 inline
 void
-op_vectorise_col::apply_direct(Mat<typename T1::elem_type>& out, const T1& expr)
+op_vectorise_row::apply_direct(Mat<typename T1::elem_type>& out, const T1& expr)
   {
   coot_extra_debug_sigprint();
 
-  std::cout << "2\n";
-  typedef typename T1::elem_type eT;
+  // Row-wise vectorisation is equivalent to a transpose followed by a vectorisation.
 
-  // allow detection of in-place operation
-  /* if(is_Mat<T1>::value || (arma_config::openmp && Proxy<T1>::use_mp)) */
-  if(is_Mat<T1>::value)
+  // TODO: select htrans/strans based on complex elements or not
+  // Using op_htrans as part of the unwrap may combine the htrans with some earlier operations in the expression.
+  unwrap<Op<T1, op_htrans>> U(Op<T1, op_htrans>(expr, 0, 0));
+
+  // If U.M is an object we created during unwrapping, steal the memory and set the size.
+  // Otherwise, copy U.M.
+  if (is_Mat<T1>::value)
     {
-    const unwrap<T1> U(expr);
-
-    if(&out == &(U.M))
-      {
-      std::cout << "same\n";
-      // output matrix is the same as the input matrix
-
-      /* out.set_size(out.n_elem, 1);  // set_size() doesn't destroy data as long as the number of elements in the matrix remains the same */
-      }
-    else
-      {
-      std::cout << "copy\n";
-      out.set_size(U.M.n_elem, 1);
-
-      /* arrayops::copy(out.memptr(), U.M.memptr(), U.M.n_elem); */
-      }
+    // If `expr` is some type of matrix, then unwrap<T1> just stores the matrix itself.
+    // That's not a temporary, and we can't steal its memory---we have to copy it.
+    out.set_size(1, U.M.n_elem);
+    arrayops::copy(out.get_dev_mem(false), U.M.get_dev_mem(false), U.M.n_elem);
     }
-  /* else */
-  /* if(is_subview<T1>::value) */
-  /*   { */
-  /*   const subview<eT>& sv = reinterpret_cast< const subview<eT>& >(expr); */
-
-  /*   if(&out == &(sv.m)) */
-  /*     { */
-  /*     Mat<eT> tmp; */
-
-  /*     op_vectorise_col::apply_subview(tmp, sv); */
-
-  /*     out.steal_mem(tmp); */
-  /*     } */
-  /*   else */
-  /*     { */
-  /*     op_vectorise_col::apply_subview(out, sv); */
-  /*     } */
-  /*   } */
-  /* else */
-  /*   { */
-  /*   const Proxy<T1> P(expr); */
-
-  /*   const bool is_alias = P.is_alias(out); */
-
-  /*   if(is_Mat<typename Proxy<T1>::stored_type>::value) */
-  /*     { */
-  /*     const quasi_unwrap<typename Proxy<T1>::stored_type> U(P.Q); */
-
-  /*     if(is_alias) */
-  /*       { */
-  /*       Mat<eT> tmp(U.M.memptr(), U.M.n_elem, 1); */
-
-  /*       out.steal_mem(tmp); */
-  /*       } */
-  /*     else */
-  /*       { */
-  /*       out.set_size(U.M.n_elem, 1); */
-
-  /*       arrayops::copy(out.memptr(), U.M.memptr(), U.M.n_elem); */
-  /*       } */
-  /*     } */
-  /*   else */
-  /*     { */
-  /*     if(is_alias) */
-  /*       { */
-  /*       Mat<eT> tmp; */
-
-  /*       op_vectorise_col::apply_proxy(tmp, P); */
-
-  /*       out.steal_mem(tmp); */
-  /*       } */
-  /*     else */
-  /*       { */
-  /*       op_vectorise_col::apply_proxy(out, P); */
-  /*       } */
-  /*     } */
-  /*   } */
+  else
+    {
+    // We must have created a temporary matrix to perform the operation, and so we can just steal its memory.
+    const uword new_n_rows = U.M.n_elem;
+    out.steal_mem(U.M);
+    out.set_size(1, new_n_rows);
+    }
   }
 
 
@@ -132,341 +150,54 @@ op_vectorise_col::apply_direct(Mat<typename T1::elem_type>& out, const T1& expr)
 template<typename eT>
 inline
 void
-op_vectorise_col::apply_subview(Mat<eT>& out, const subview<eT>& sv)
+op_vectorise_row::apply_direct(Mat<eT>& out, const subview<eT>& sv)
   {
   coot_extra_debug_sigprint();
 
-  std::cout << "3\n";
-/*   const uword sv_n_rows = sv.n_rows; */
-/*   const uword sv_n_cols = sv.n_cols; */
-
-/*   out.set_size(sv.n_elem, 1); */
-
-/*   eT* out_mem = out.memptr(); */
-
-/*   for(uword col=0; col < sv_n_cols; ++col) */
-/*     { */
-/*     arrayops::copy(out_mem, sv.colptr(col), sv_n_rows); */
-
-/*     out_mem += sv_n_rows; */
-/*     } */
+  // If `expr` is a subview, we have to extract the subview.
+  if(&out == &(sv.m))
+    {
+    Mat<eT> tmp(sv.n_elem, 1);
+    arrayops::copy_subview(tmp.get_dev_mem(false), sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
+    out.steal_mem(tmp);
+    }
+  else
+    {
+    arrayops::copy_subview(out.get_dev_mem(false), sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
+    }
   }
 
 
 
-template<typename T1>
+template<typename out_eT, typename T1>
 inline
 void
-op_vectorise_col::apply_proxy(Mat<typename T1::elem_type>& out, const Proxy<T1>& P)
+op_vectorise_row::apply_direct(Mat<out_eT>& out, const T1& expr, const typename enable_if<!std::is_same<out_eT, typename T1::elem_type>::value>::result* junk)
   {
   coot_extra_debug_sigprint();
+  coot_ignore(junk);
 
-  std::cout << "4\n";
-/*   typedef typename T1::elem_type eT; */
+  // Row-wise vectorisation is equivalent to a transpose followed by a vectorisation.
 
-/*   const uword N = P.get_n_elem(); */
+  // TODO: select htrans/strans based on complex elements or not
+  // Using op_htrans as part of the unwrap may combine the htrans with some earlier operations in the expression.
+  unwrap<Op<T1, op_htrans>> U(Op<T1, op_htrans>(expr, 0, 0));
 
-/*   out.set_size(N, 1); */
-
-/*   eT* outmem = out.memptr(); */
-
-/*   if(Proxy<T1>::use_at == false) */
-/*     { */
-/*     // TODO: add handling of aligned access ? */
-
-/*     typename Proxy<T1>::ea_type A = P.get_ea(); */
-
-/*     uword i,j; */
-
-/*     for(i=0, j=1; j < N; i+=2, j+=2) */
-/*       { */
-/*       const eT tmp_i = A[i]; */
-/*       const eT tmp_j = A[j]; */
-
-/*       outmem[i] = tmp_i; */
-/*       outmem[j] = tmp_j; */
-/*       } */
-
-/*     if(i < N) */
-/*       { */
-/*       outmem[i] = A[i]; */
-/*       } */
-/*     } */
-/*   else */
-/*     { */
-/*     const uword n_rows = P.get_n_rows(); */
-/*     const uword n_cols = P.get_n_cols(); */
-
-/*     if(n_rows == 1) */
-/*       { */
-/*       for(uword i=0; i < n_cols; ++i) */
-/*         { */
-/*         outmem[i] = P.at(0,i); */
-/*         } */
-/*       } */
-/*     else */
-/*       { */
-/*       for(uword col=0; col < n_cols; ++col) */
-/*       for(uword row=0; row < n_rows; ++row) */
-/*         { */
-/*         *outmem = P.at(row,col); */
-/*         outmem++; */
-/*         } */
-/*       } */
-/*     } */
+  // A conversion operation is always necessary when the type is different.
+  out.set_size(1, U.M.n_elem);
+  arrayops::copy(out.get_dev_mem(false), U.M.get_dev_mem(false), U.M.n_elem);
   }
 
 
 
-/* template<typename T1> */
-/* inline */
-/* void */
-/* op_vectorise_row::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_vectorise_row>& in) */
-/*   { */
-/*   coot_extra_debug_sigprint(); */
-
-/*   op_vectorise_row::apply_direct(out, in.m); */
-/*   } */
-
-
-
-/* template<typename T1> */
-/* inline */
-/* void */
-/* op_vectorise_row::apply_direct(Mat<typename T1::elem_type>& out, const T1& expr) */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
-
-/*   typedef typename T1::elem_type eT; */
-
-/*   const Proxy<T1> P(expr); */
-
-/*   if(P.is_alias(out)) */
-/*     { */
-/*     Mat<eT> tmp; */
-
-/*     op_vectorise_row::apply_proxy(tmp, P); */
-
-/*     out.steal_mem(tmp); */
-/*     } */
-/*   else */
-/*     { */
-/*     op_vectorise_row::apply_proxy(out, P); */
-/*     } */
-/*   } */
-
-
-
-/* template<typename T1> */
-/* inline */
-/* void */
-/* op_vectorise_row::apply_proxy(Mat<typename T1::elem_type>& out, const Proxy<T1>& P) */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
-
-/*   typedef typename T1::elem_type eT; */
-
-/*   const uword n_rows = P.get_n_rows(); */
-/*   const uword n_cols = P.get_n_cols(); */
-/*   const uword n_elem = P.get_n_elem(); */
-
-/*   out.set_size(1, n_elem); */
-
-/*   eT* outmem = out.memptr(); */
-
-/*   if(n_cols == 1) */
-/*     { */
-/*     if(is_Mat<typename Proxy<T1>::stored_type>::value) */
-/*       { */
-/*       const unwrap<typename Proxy<T1>::stored_type> tmp(P.Q); */
-
-/*       arrayops::copy(out.memptr(), tmp.M.memptr(), n_elem); */
-/*       } */
-/*     else */
-/*       { */
-/*       for(uword i=0; i < n_elem; ++i)  { outmem[i] = P.at(i,0); } */
-/*       } */
-/*     } */
-/*   else */
-/*     { */
-/*     for(uword row=0; row < n_rows; ++row) */
-/*       { */
-/*       uword i,j; */
-
-/*       for(i=0, j=1; j < n_cols; i+=2, j+=2) */
-/*         { */
-/*         const eT tmp_i = P.at(row,i); */
-/*         const eT tmp_j = P.at(row,j); */
-
-/*         *outmem = tmp_i; outmem++; */
-/*         *outmem = tmp_j; outmem++; */
-/*         } */
-
-/*       if(i < n_cols) */
-/*         { */
-/*         *outmem = P.at(row,i); outmem++; */
-/*         } */
-/*       } */
-/*     } */
-/*   } */
-
-
-
-template<typename T1>
+template<typename out_eT, typename eT>
 inline
 void
-op_vectorise_all::apply(Mat<typename T1::elem_type>& out, const Op<T1,op_vectorise_all>& in)
+op_vectorise_row::apply_direct(Mat<out_eT>& out, const subview<eT>& sv, const typename enable_if<!std::is_same<out_eT, eT>::value>::result* junk)
   {
   coot_extra_debug_sigprint();
+  coot_ignore(junk);
 
-/*   const uword dim = in.aux_uword_a; */
-
-/*   if(dim == 0) */
-/*     { */
-/*     op_vectorise_col::apply_direct(out, in.m); */
-/*     } */
-/*   else */
-/*     { */
-/*     op_vectorise_row::apply_direct(out, in.m); */
-/*     } */
+  out.set_size(1, sv.n_elem);
+  arrayops::copy_subview(out.get_dev_mem(false), sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
   }
-
-
-
-/* // */
-
-
-
-/* template<typename T1> */
-/* inline */
-/* void */
-/* op_vectorise_cube_col::apply(Mat<typename T1::elem_type>& out, const CubeToMatOp<T1, op_vectorise_cube_col>& in) */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
-
-/*   typedef typename T1::elem_type eT; */
-
-/*   if(is_same_type< T1, subview_cube<eT> >::yes) */
-/*     { */
-/*     op_vectorise_cube_col::apply_subview(out, reinterpret_cast< const subview_cube<eT>& >(in.m)); */
-/*     } */
-/*   else */
-/*     { */
-/*     if(is_Cube<T1>::value || (arma_config::openmp && ProxyCube<T1>::use_mp)) */
-/*       { */
-/*       op_vectorise_cube_col::apply_unwrap(out, in.m); */
-/*       } */
-/*     else */
-/*       { */
-/*       op_vectorise_cube_col::apply_proxy(out, in.m); */
-/*       } */
-/*     } */
-/*   } */
-
-
-
-/* template<typename eT> */
-/* inline */
-/* void */
-/* op_vectorise_cube_col::apply_subview(Mat<eT>& out, const subview_cube<eT>& sv) */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
-
-/*   const uword sv_nr = sv.n_rows; */
-/*   const uword sv_nc = sv.n_cols; */
-/*   const uword sv_ns = sv.n_slices; */
-
-/*   out.set_size(sv.n_elem, 1); */
-
-/*   eT* out_mem = out.memptr(); */
-
-/*   for(uword s=0; s < sv_ns; ++s) */
-/*   for(uword c=0; c < sv_nc; ++c) */
-/*     { */
-/*     arrayops::copy(out_mem, sv.slice_colptr(s,c), sv_nr); */
-
-/*     out_mem += sv_nr; */
-/*     } */
-/*   } */
-
-
-
-/* template<typename T1> */
-/* inline */
-/* void */
-/* op_vectorise_cube_col::apply_unwrap(Mat<typename T1::elem_type>& out, const T1& expr) */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
-
-/*   const unwrap_cube<T1> U(expr); */
-
-/*   out.set_size(U.M.n_elem, 1); */
-
-/*   arrayops::copy(out.memptr(), U.M.memptr(), U.M.n_elem); */
-/*   } */
-
-
-
-/* template<typename T1> */
-/* inline */
-/* void */
-/* op_vectorise_cube_col::apply_proxy(Mat<typename T1::elem_type>& out, const T1& expr) */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
-
-/*   typedef typename T1::elem_type eT; */
-
-/*   const ProxyCube<T1> P(expr); */
-
-/*   if(is_Cube<typename ProxyCube<T1>::stored_type>::value) */
-/*     { */
-/*     op_vectorise_cube_col::apply_unwrap(out, P.Q); */
-
-/*     return; */
-/*     } */
-
-/*   const uword N = P.get_n_elem(); */
-
-/*   out.set_size(N, 1); */
-
-/*   eT* outmem = out.memptr(); */
-
-/*   if(ProxyCube<T1>::use_at == false) */
-/*     { */
-/*     typename ProxyCube<T1>::ea_type A = P.get_ea(); */
-
-/*     uword i,j; */
-
-/*     for(i=0, j=1; j < N; i+=2, j+=2) */
-/*       { */
-/*       const eT tmp_i = A[i]; */
-/*       const eT tmp_j = A[j]; */
-
-/*       outmem[i] = tmp_i; */
-/*       outmem[j] = tmp_j; */
-/*       } */
-
-/*     if(i < N) */
-/*       { */
-/*       outmem[i] = A[i]; */
-/*       } */
-/*     } */
-/*   else */
-/*     { */
-/*     const uword nr = P.get_n_rows(); */
-/*     const uword nc = P.get_n_cols(); */
-/*     const uword ns = P.get_n_slices(); */
-
-/*     for(uword s=0; s < ns; ++s) */
-/*     for(uword c=0; c < nc; ++c) */
-/*     for(uword r=0; r < nr; ++r) */
-/*       { */
-/*       *outmem = P.at(r,c,s); */
-/*       outmem++; */
-/*       } */
-/*     } */
-/*   } */
-
-
-
-//! @}

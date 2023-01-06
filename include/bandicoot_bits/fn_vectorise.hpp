@@ -17,11 +17,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup fn_vectorise
-//! @{
-
-
-
 template<typename T1>
 coot_warn_unused
 inline
@@ -57,59 +52,3 @@ vectorise(const T1& X, const uword dim)
 
   return Op<T1, op_vectorise_all>(X, dim, 0);
   }
-
-
-
-/* template<typename T1> */
-/* arma_warn_unused */
-/* inline */
-/* CubeToMatOp<T1, op_vectorise_cube_col> */
-/* vectorise(const BaseCube<typename T1::elem_type, T1>& X) */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
-
-/*   return CubeToMatOp<T1, op_vectorise_cube_col>(X.get_ref()); */
-/*   } */
-
-
-
-/* //! Vectorization for sparse objects. */
-/* template<typename T1> */
-/* arma_warn_unused */
-/* inline */
-/* typename */
-/* enable_if2 */
-/*   < */
-/*   is_arma_sparse_type<T1>::value, */
-/*   const SpOp<T1, spop_vectorise_col> */
-/*   >::result */
-/* vectorise(const T1& X) */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
-
-/*   return SpOp<T1, spop_vectorise_col>(X); */
-/*   } */
-
-
-
-/* //! Vectorization for sparse objects. */
-/* template<typename T1> */
-/* arma_warn_unused */
-/* inline */
-/* typename */
-/* enable_if2 */
-/*   < */
-/*   is_arma_sparse_type<T1>::value, */
-/*   const SpOp<T1, spop_vectorise_all> */
-/*   >::result */
-/* vectorise(const T1& X, const uword dim) */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
-
-/*   arma_debug_check( (dim > 1), "vectorise(): parameter 'dim' must be 0 or 1" ); */
-
-/*   return SpOp<T1, spop_vectorise_all>(X, dim, 0); */
-/*   } */
-
-
-//! @}

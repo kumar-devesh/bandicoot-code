@@ -18,65 +18,39 @@
 
 
 
-//! \addtogroup op_vectorise
-//! @{
-
-
-
 class op_vectorise_col
-  /* : public traits_op_col */
   {
   public:
 
-  template<typename T1> inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_vectorise_col>& in);
+  template<typename out_eT, typename T1> inline static void apply(Mat<out_eT>& out, const Op<T1,op_vectorise_col>& in);
 
-  template<typename T1> inline static void apply_direct(Mat<typename T1::elem_type>& out, const T1& expr);
+  template<typename out_eT, typename T1> inline static void apply_direct(Mat<out_eT>& out, const T1& in);
 
-  template<typename eT> inline static void apply_subview(Mat<eT>& out, const subview<eT>& sv);
-
-  template<typename T1> inline static void apply_proxy(Mat<typename T1::elem_type>& out, const Proxy<T1>& P);
+  template<typename out_eT, typename eT> inline static void apply_direct(Mat<out_eT>& out, const subview<eT>& sv);
   };
-
-
-
-/* class op_vectorise_row */
-/*   : public traits_op_row */
-/*   { */
-/*   public: */
-
-/*   template<typename T1> inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_vectorise_row>& in); */
-
-/*   template<typename T1> inline static void apply_direct(Mat<typename T1::elem_type>& out, const T1& expr); */
-
-/*   template<typename T1> inline static void apply_proxy(Mat<typename T1::elem_type>& out, const Proxy<T1>& P); */
-/*   }; */
 
 
 
 class op_vectorise_all
-  /* : public traits_op_xvec */
   {
   public:
 
-  template<typename T1> inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1,op_vectorise_all>& in);
+  template<typename out_eT, typename T1> inline static void apply(Mat<out_eT>& out, const Op<T1,op_vectorise_all>& in);
   };
 
 
 
-/* class op_vectorise_cube_col */
-/*   : public traits_op_col */
-/*   { */
-/*   public: */
+class op_vectorise_row
+  {
+  public:
 
-/*   template<typename T1> inline static void apply(Mat<typename T1::elem_type>& out, const CubeToMatOp<T1, op_vectorise_cube_col>& in); */
+  template<typename out_eT, typename T1> inline static void apply(Mat<out_eT>& out, const Op<T1,op_vectorise_row>& in);
 
-/*   template<typename eT> inline static void apply_subview(Mat<eT>& out, const subview_cube<eT>& sv); */
+  template<typename T1> inline static void apply_direct(Mat<typename T1::elem_type>& out, const T1& in);
 
-/*   template<typename T1> inline static void apply_unwrap(Mat<typename T1::elem_type>& out, const T1& expr); */
+  template<typename eT> inline static void apply_direct(Mat<eT>& out, const subview<eT>& sv);
 
-/*   template<typename T1> inline static void apply_proxy(Mat<typename T1::elem_type>& out, const T1& expr); */
-/*   }; */
+  template<typename out_eT, typename T1> inline static void apply_direct(Mat<out_eT>& out, const T1& in, const typename enable_if<!std::is_same<out_eT, typename T1::elem_type>::value>::result* = 0);
 
-
-
-//! @}
+  template<typename out_eT, typename eT> inline static void apply_direct(Mat<out_eT>& out, const subview<eT>& sv, const typename enable_if<!std::is_same<out_eT, eT>::value>::result* = 0);
+  };
