@@ -13,9 +13,12 @@
 // ------------------------------------------------------------------------
 
 
-// The SizeProxy class is meant, for now, to provide an interface to partially unwrap types for eOp and eGlue,
+// The SizeProxy class is meant to provide an interface to partially unwrap types for eOp and eGlue,
 // so that the sizes of the operand can be known when the eOp or eGlue is created.  Any time a SizeProxy is
 // used, evaluations may be performed.  The underlying object Q should be used for any actual operations.
+//
+// This differs from Armadillo's Proxy because all GPU operations work directly on blocks of memory,
+// which will generally force a full unwrap when any actual operation happens.
 //
 // The SizeProxy class defines the following types and methods:
 //
@@ -31,6 +34,9 @@
 // get_n_rows()     = return the number of rows in Q
 // get_n_cols()     = return the number of columns in Q
 // get_n_elem()     = return the number of elements in Q
+//
+// Note that Q may not necessarily have the same row/col dimensions as the SizeProxy object!
+// So, do all size checks with get_n_rows()/get_n_cols()/get_n_elem(), then use Q to get a memory pointer to do operations with.
 
 template<typename eT>
 class SizeProxy< Mat<eT> >
@@ -289,15 +295,17 @@ class SizeProxy< Op<T1, op_htrans> >
 
   typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
-  typedef Mat<elem_type>                           stored_type;
+  typedef typename SizeProxy<T1>::stored_type      stored_type;
 
   static const bool is_row = Op<T1, op_htrans>::is_row;
   static const bool is_col = Op<T1, op_htrans>::is_col;
 
-  coot_aligned const SizeProxy<T1> Q;
+  coot_aligned const SizeProxy<T1> P;
+  coot_aligned const stored_type& Q;
 
   inline explicit SizeProxy(const Op<T1, op_htrans>& A)
-    : Q(A.m)
+    : P(A.m)
+    , Q(P.Q)
     {
     coot_extra_debug_sigprint();
     }
@@ -316,15 +324,17 @@ class SizeProxy< Op<T1, op_htrans2> >
 
   typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
-  typedef Mat<elem_type>                           stored_type;
+  typedef typename SizeProxy<T1>::stored_type      stored_type;
 
   static const bool is_row = Op<T1, op_htrans2>::is_row;
   static const bool is_col = Op<T1, op_htrans2>::is_col;
 
-  coot_aligned const SizeProxy<T1> Q;
+  coot_aligned const SizeProxy<T1> P;
+  coot_aligned const stored_type& Q;
 
   inline explicit SizeProxy(const Op<T1, op_htrans2>& A)
-    : Q(A.m)
+    : P(A.m)
+    , Q(P.Q)
     {
     coot_extra_debug_sigprint();
     }
@@ -394,4 +404,29 @@ class SizeProxy< Glue<T1, T2, glue_type> >
 
 
 
-//! @}
+template<typename T1>
+class SizeProxy< Op<T1, op_vectorise_col> >
+  {
+  public:
+
+  typedef typename T1::elem_type                   elem_type;
+  typedef typename get_pod_type<elem_type>::result pod_type;
+  typedef typename SizeProxy<T1>::stored_type      stored_type;
+
+  static const bool is_row = false;
+  static const bool is_col = true;
+
+  coot_aligned const SizeProxy<T1> S;
+  coot_aligned const stored_type& Q;
+
+  inline explicit SizeProxy(const Op<T1, op_vectorise_col>& A)
+    : S(A.m)
+    , Q(S.Q)
+    {
+    coot_extra_debug_sigprint();
+    }
+
+  coot_aligned uword get_n_rows() const { return Q.get_n_elem(); }
+  coot_aligned uword get_n_cols() const { return 1; }
+  coot_aligned uword get_n_elem() const { return Q.get_n_elem(); }
+  };
