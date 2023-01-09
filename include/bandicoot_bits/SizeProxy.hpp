@@ -289,22 +289,25 @@ class SizeProxy< Op<T1, op_htrans> >
 
   typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
-  typedef Mat<elem_type>                           stored_type;
+  typedef Op<typename SizeProxy<T1>::stored_type, op_htrans>               stored_type;
 
   static const bool is_row = Op<T1, op_htrans>::is_row;
   static const bool is_col = Op<T1, op_htrans>::is_col;
 
-  coot_aligned const SizeProxy<T1> Q;
+  coot_aligned const SizeProxy<T1> P;
+  // In case we computed anything for the SizeProxy, make a new Op for the partially unwrapped object.
+  coot_aligned const Op<typename SizeProxy<T1>::stored_type, op_htrans> Q;
 
   inline explicit SizeProxy(const Op<T1, op_htrans>& A)
-    : Q(A.m)
+    : P(A.m)
+    , Q(P.Q, A.aux, A.aux_uword_a, A.aux_uword_b, A.aux_uword_c)
     {
     coot_extra_debug_sigprint();
     }
 
-  coot_aligned uword get_n_rows() const { return Q.get_n_cols(); }
-  coot_aligned uword get_n_cols() const { return Q.get_n_rows(); }
-  coot_aligned uword get_n_elem() const { return Q.get_n_elem(); }
+  coot_aligned uword get_n_rows() const { return P.get_n_cols(); }
+  coot_aligned uword get_n_cols() const { return P.get_n_rows(); }
+  coot_aligned uword get_n_elem() const { return P.get_n_elem(); }
   };
 
 
@@ -314,24 +317,27 @@ class SizeProxy< Op<T1, op_htrans2> >
   {
   public:
 
-  typedef typename T1::elem_type                   elem_type;
-  typedef typename get_pod_type<elem_type>::result pod_type;
-  typedef Mat<elem_type>                           stored_type;
+  typedef typename T1::elem_type                                       elem_type;
+  typedef typename get_pod_type<elem_type>::result                     pod_type;
+  typedef Op<typename SizeProxy<T1>::stored_type, op_htrans2> stored_type;
 
   static const bool is_row = Op<T1, op_htrans2>::is_row;
   static const bool is_col = Op<T1, op_htrans2>::is_col;
 
-  coot_aligned const SizeProxy<T1> Q;
+  coot_aligned const SizeProxy<T1> P;
+  // In case we computed anything for the SizeProxy, make a new Op for the partially unwrapped object.
+  coot_aligned const Op<typename SizeProxy<T1>::stored_type, op_htrans2> Q;
 
   inline explicit SizeProxy(const Op<T1, op_htrans2>& A)
-    : Q(A.m)
+    : P(A.m)
+    , Q(P.Q, A.aux, A.aux_uword_a, A.aux_uword_b, A.aux_uword_c)
     {
     coot_extra_debug_sigprint();
     }
 
-  coot_aligned uword get_n_rows() const { return Q.get_n_cols(); }
-  coot_aligned uword get_n_cols() const { return Q.get_n_rows(); }
-  coot_aligned uword get_n_elem() const { return Q.get_n_elem(); }
+  coot_aligned uword get_n_rows() const { return P.get_n_cols(); }
+  coot_aligned uword get_n_cols() const { return P.get_n_rows(); }
+  coot_aligned uword get_n_elem() const { return P.get_n_elem(); }
   };
 
 

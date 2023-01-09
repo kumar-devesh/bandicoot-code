@@ -1,4 +1,4 @@
-// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2022 Ryan Curtin (http://www.ratml.org/)
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,36 +12,22 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-
-//! \addtogroup fn_trans
-//! @{
-
-
-
-template<typename T1>
-coot_warn_unused
-coot_inline
-const Op<T1, op_htrans>
-trans(const Base<typename T1::elem_type,T1>& X)
+__kernel
+void
+COOT_FN(PREFIX,strans)(__global eT2* out,
+                       __global const eT1* in,
+                       const UWORD in_n_rows,
+                       const UWORD in_n_cols)
   {
-  coot_extra_debug_sigprint();
+  // For a non-inplace transpose, we can use a pretty naive approach.
+  const UWORD row = get_global_id(0);
+  const UWORD col = get_global_id(1);
+  const UWORD in_offset = row + col * in_n_rows;
+  const UWORD out_offset = col + row * in_n_cols;
 
-  return Op<T1, op_htrans>(X.get_ref());
+  if( (row < in_n_rows) && (col < in_n_cols) )
+    {
+    const eT2 element = (eT2) in[in_offset];
+    out[out_offset] = element;
+    }
   }
-
-
-
-template<typename T1>
-coot_warn_unused
-coot_inline
-const Op<T1, op_htrans>
-htrans(const Base<typename T1::elem_type,T1>& X)
-  {
-  coot_extra_debug_sigprint();
-
-  return Op<T1, op_htrans>(X.get_ref());
-  }
-
-
-
-//! @}
