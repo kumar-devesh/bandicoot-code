@@ -289,18 +289,17 @@ class SizeProxy< Op<T1, op_htrans> >
 
   typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
-  typedef Op<typename SizeProxy<T1>::stored_type, op_htrans>               stored_type;
+  typedef Op<T1, op_htrans>                        stored_type;
 
   static const bool is_row = Op<T1, op_htrans>::is_row;
   static const bool is_col = Op<T1, op_htrans>::is_col;
 
   coot_aligned const SizeProxy<T1> P;
-  // In case we computed anything for the SizeProxy, make a new Op for the partially unwrapped object.
-  coot_aligned const Op<typename SizeProxy<T1>::stored_type, op_htrans> Q;
+  coot_aligned const Op<T1, op_htrans>& Q;
 
   inline explicit SizeProxy(const Op<T1, op_htrans>& A)
     : P(A.m)
-    , Q(P.Q, A.aux, A.aux_uword_a, A.aux_uword_b, A.aux_uword_c)
+    , Q(A)
     {
     coot_extra_debug_sigprint();
     }
@@ -319,18 +318,17 @@ class SizeProxy< Op<T1, op_htrans2> >
 
   typedef typename T1::elem_type                                       elem_type;
   typedef typename get_pod_type<elem_type>::result                     pod_type;
-  typedef Op<typename SizeProxy<T1>::stored_type, op_htrans2> stored_type;
+  typedef Op<T1, op_htrans2>                                           stored_type;
 
   static const bool is_row = Op<T1, op_htrans2>::is_row;
   static const bool is_col = Op<T1, op_htrans2>::is_col;
 
   coot_aligned const SizeProxy<T1> P;
-  // In case we computed anything for the SizeProxy, make a new Op for the partially unwrapped object.
-  coot_aligned const Op<typename SizeProxy<T1>::stored_type, op_htrans2> Q;
+  coot_aligned const Op<T1, op_htrans2>& Q;
 
   inline explicit SizeProxy(const Op<T1, op_htrans2>& A)
     : P(A.m)
-    , Q(P.Q, A.aux, A.aux_uword_a, A.aux_uword_b, A.aux_uword_c)
+    , Q(A)
     {
     coot_extra_debug_sigprint();
     }
@@ -370,7 +368,7 @@ class SizeProxy< mtOp<out_eT, T1, mtop_type> >
 
 
 // Glue: in order to get its size, we need to unwrap it.
-// TODO: maybe this can be done better?
+// TODO: it should be possible to compute the size of a Glue operation without an unwrap!
 template<typename T1, typename T2, typename glue_type>
 class SizeProxy< Glue<T1, T2, glue_type> >
   {
