@@ -23,11 +23,14 @@ void check_transpose(const Mat<eT1>& A, const Mat<eT2>& B)
   REQUIRE(A.n_rows == B.n_cols);
   REQUIRE(A.n_cols == B.n_rows);
 
-  for (size_t c = 0; c < A.n_cols; ++c)
+  arma::Mat<eT1> A_cpu(A);
+  arma::Mat<eT2> B_cpu(B);
+
+  for (size_t c = 0; c < A_cpu.n_cols; ++c)
     {
-    for (size_t r = 0; r < A.n_rows; ++r)
+    for (size_t r = 0; r < A_cpu.n_rows; ++r)
       {
-      REQUIRE( eT1(A(r, c)) == Approx(eT2(B(c, r))) );
+      REQUIRE( eT1(A_cpu(r, c)) == Approx(eT1(eT2(B_cpu(c, r)))) );
       }
     }
   }
