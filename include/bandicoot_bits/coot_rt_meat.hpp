@@ -1406,7 +1406,7 @@ coot_rt_t::linspace(dev_mem_t<eT> mem, const eT start, const eT end, const uword
     }
   else
     {
-    coot_stop_runtime_error("coot_rt::dot(): unknown backend");
+    coot_stop_runtime_error("coot_rt::linspace(): unknown backend");
     }
   }
 

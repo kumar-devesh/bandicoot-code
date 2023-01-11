@@ -151,7 +151,7 @@ fill_randn(dev_mem_t<double> dest, const uword n, const double mu, const double 
 template<typename eT>
 inline
 void
-fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int hi, const typename std::enable_if<std::is_same<typename uint_type<eT>::result, u32>::value>::type* junk = nullptr)
+fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int hi, const typename enable_if<std::is_same<typename uint_type<eT>::result, u32>::value>::result* junk = nullptr)
   {
   coot_extra_debug_sigprint();
 
@@ -198,7 +198,7 @@ fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int hi, const 
 template<typename eT>
 inline
 void
-fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int hi, const typename std::enable_if<std::is_same<typename uint_type<eT>::result, u64>::value>::type* junk = nullptr)
+fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int hi, const typename enable_if<std::is_same<typename uint_type<eT>::result, u64>::value>::result* junk = nullptr)
   {
   coot_extra_debug_sigprint();
 
