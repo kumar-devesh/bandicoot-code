@@ -103,3 +103,27 @@ op_resize::apply_mat_noalias(Mat<out_eT>& out, const Mat<in_eT>& A, const uword 
     out.submat(0, 0, end_row, end_col) = conv_to<Mat<out_eT>>::from(A.submat(0, 0, end_row, end_col));
     }
   }
+
+
+
+template<typename T1>
+inline
+uword
+op_resize::compute_n_rows(const Op<T1, op_resize>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(in_n_rows);
+  coot_ignore(in_n_cols);
+  return op.aux_uword_a;
+  }
+
+
+
+template<typename T1>
+inline
+uword
+op_resize::compute_n_cols(const Op<T1, op_resize>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(in_n_rows);
+  coot_ignore(in_n_cols);
+  return op.aux_uword_b;
+  }

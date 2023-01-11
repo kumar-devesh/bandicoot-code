@@ -35,6 +35,9 @@ class op_htrans
                                    const Mat<in_eT>& A,
                                    const typename coot_cx_only<in_eT>::result* junk1 = 0,
                                    const typename coot_cx_only<out_eT>::result* junk2 = 0);
+
+  template<typename T1> inline static uword compute_n_rows(const Op<T1, op_htrans>& op, const uword in_n_rows, const uword in_n_cols);
+  template<typename T1> inline static uword compute_n_cols(const Op<T1, op_htrans>& op, const uword in_n_rows, const uword in_n_cols);
   };
 
 
@@ -57,6 +60,9 @@ class op_htrans2
                                    const Mat<in_eT>& A,
                                    const typename coot_cx_only<in_eT>::result* junk1 = 0,
                                    const typename coot_cx_only<out_eT>::result* junk2 = 0);
+
+  template<typename T1> inline static uword compute_n_rows(const Op<T1, op_htrans2>& op, const uword in_n_rows, const uword in_n_cols);
+  template<typename T1> inline static uword compute_n_cols(const Op<T1, op_htrans2>& op, const uword in_n_rows, const uword in_n_cols);
   };
 
 

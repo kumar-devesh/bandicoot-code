@@ -73,6 +73,30 @@ op_htrans::apply_noalias(Mat<out_eT>& out,
 
 
 
+template<typename T1>
+inline
+uword
+op_htrans::compute_n_rows(const Op<T1, op_htrans>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(op);
+  coot_ignore(in_n_rows);
+  return in_n_cols;
+  }
+
+
+
+template<typename T1>
+inline
+uword
+op_htrans::compute_n_cols(const Op<T1, op_htrans>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(op);
+  coot_ignore(in_n_cols);
+  return in_n_rows;
+  }
+
+
+
 //
 
 
@@ -128,6 +152,30 @@ op_htrans2::apply_noalias(Mat<out_eT>& out,
   coot_extra_debug_sigprint();
   
   coot_stop_runtime_error("op_htrans2: not implemented");
+  }
+
+
+
+template<typename T1>
+inline
+uword
+op_htrans2::compute_n_rows(const Op<T1, op_htrans2>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(op);
+  coot_ignore(in_n_rows);
+  return in_n_cols;
+  }
+
+
+
+template<typename T1>
+inline
+uword
+op_htrans2::compute_n_cols(const Op<T1, op_htrans2>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(op);
+  coot_ignore(in_n_cols);
+  return in_n_rows;
   }
 
 

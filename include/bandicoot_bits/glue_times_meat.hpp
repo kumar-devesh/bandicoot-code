@@ -468,10 +468,12 @@ glue_times::apply
 
 
 
+template<typename T1, typename T2>
 inline
 uword
-glue_times::compute_n_rows(const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols)
+glue_times::compute_n_rows(const Glue<T1, T2, glue_times>& glue, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols)
   {
+  coot_ignore(glue);
   coot_ignore(A_n_cols);
   coot_ignore(B_n_rows);
   coot_ignore(B_n_cols);
@@ -480,10 +482,12 @@ glue_times::compute_n_rows(const uword A_n_rows, const uword A_n_cols, const uwo
 
 
 
+template<typename T1, typename T2>
 inline
 uword
-glue_times::compute_n_cols(const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols)
+glue_times::compute_n_cols(const Glue<T1, T2, glue_times>& glue, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols)
   {
+  coot_ignore(glue);
   coot_ignore(A_n_rows);
   coot_ignore(A_n_cols);
   coot_ignore(B_n_rows);

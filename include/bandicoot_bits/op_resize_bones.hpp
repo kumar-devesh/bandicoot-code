@@ -24,4 +24,7 @@ class op_resize
   template<typename eT> inline static void apply_mat_inplace(Mat<eT>& A, const uword new_n_rows, const uword new_n_cols);
 
   template<typename out_eT, typename in_eT> inline static void apply_mat_noalias(Mat<out_eT>& out, const Mat<in_eT>& A, const uword new_n_rows, const uword new_n_cols);
+
+  template<typename T1> inline static uword compute_n_rows(const Op<T1, op_resize>& op, const uword in_n_rows, const uword in_n_cols);
+  template<typename T1> inline static uword compute_n_cols(const Op<T1, op_resize>& op, const uword in_n_rows, const uword in_n_cols);
   };

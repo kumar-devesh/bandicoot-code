@@ -89,8 +89,10 @@ class glue_times
 
   // used by SizeProxy
 
-  inline static uword compute_n_rows(const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols);
-  inline static uword compute_n_cols(const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols);
+  template<typename T1, typename T2>
+  inline static uword compute_n_rows(const Glue<T1, T2, glue_times>& glue, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols);
+  template<typename T1, typename T2>
+  inline static uword compute_n_cols(const Glue<T1, T2, glue_times>& glue, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols);
   };
 
 

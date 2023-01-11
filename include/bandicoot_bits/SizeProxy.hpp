@@ -251,8 +251,7 @@ class SizeProxy< eGlue<T1, T2, eglue_type> >
 
 
 
-// Op: in order to get its size, we need to unwrap it.
-// TODO: maybe this can be done better?
+// We expect that each Op can compute its own size based on its arguments.
 template<typename T1, typename op_type>
 class SizeProxy< Op<T1, op_type> >
   {
@@ -260,24 +259,24 @@ class SizeProxy< Op<T1, op_type> >
 
   typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
-  typedef Mat<elem_type>                           stored_type;
+  typedef Op<T1, elem_type>                        stored_type;
 
   static const bool is_row = Op<T1, op_type>::is_row;
   static const bool is_col = Op<T1, op_type>::is_col;
 
-  coot_aligned const no_conv_unwrap<Op<T1, op_type>> U;
-  coot_aligned const Mat<elem_type>& Q;
+  coot_aligned const SizeProxy<T1> S;
+  coot_aligned const Op<T1, op_type>& Q;
 
   inline explicit SizeProxy(const Op<T1, op_type>& A)
-    : U(A)
-    , Q(U.M)
+    : S(A.m)
+    , Q(A)
     {
     coot_extra_debug_sigprint();
     }
 
-  coot_aligned uword get_n_rows() const { return Q.n_rows; }
-  coot_aligned uword get_n_cols() const { return Q.n_cols; }
-  coot_aligned uword get_n_elem() const { return Q.n_elem; }
+  coot_aligned uword get_n_rows() const { return op_type::compute_n_rows(Q, S.get_n_rows(), S.get_n_cols()); }
+  coot_aligned uword get_n_cols() const { return op_type::compute_n_cols(Q, S.get_n_rows(), S.get_n_cols()); }
+  coot_aligned uword get_n_elem() const { return get_n_rows() * get_n_cols(); }
   };
 
 
@@ -391,7 +390,7 @@ class SizeProxy< Glue<T1, T2, glue_type> >
     }
 
   // Each glue_type must implement compute_n_rows() and compute_n_cols()
-  coot_aligned uword get_n_rows() const { return glue_type::compute_n_rows(S1.get_n_rows(), S1.get_n_cols(), S2.get_n_rows(), S2.get_n_cols()); }
-  coot_aligned uword get_n_cols() const { return glue_type::compute_n_cols(S1.get_n_rows(), S1.get_n_cols(), S2.get_n_rows(), S2.get_n_cols()); }
+  coot_aligned uword get_n_rows() const { return glue_type::compute_n_rows(Q, S1.get_n_rows(), S1.get_n_cols(), S2.get_n_rows(), S2.get_n_cols()); }
+  coot_aligned uword get_n_cols() const { return glue_type::compute_n_cols(Q, S1.get_n_rows(), S1.get_n_cols(), S2.get_n_rows(), S2.get_n_cols()); }
   coot_aligned uword get_n_elem() const { return get_n_rows() * get_n_cols(); }
   };
