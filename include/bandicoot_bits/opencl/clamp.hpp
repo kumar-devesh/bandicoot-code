@@ -1,4 +1,3 @@
-// Copyright 2021 Marcus Edel (http://kurg.org)
 // Copyright 2023 Ryan Curtin (http://ratml.org)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,27 +23,24 @@ clamp(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const eT1 min_val, const eT
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "cuda::clamp(): cuda runtime not valid");
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::clamp(): OpenCL runtime not valid" );
 
-  const kernel_dims dims = one_dimensional_grid_dims(n_elem);
+  runtime_t::cq_guard guard;
 
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT2, eT1>(twoway_kernel_id::clamp);
+  runtime_t::adapt_uword local_n_elem(n_elem);
 
-  const void* args[] = {
-      &(dest.cuda_mem_ptr),
-      &(src.cuda_mem_ptr),
-      (eT1*) &min_val,
-      (eT1*) &max_val,
-      (uword*) &n_elem };
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT2, eT1>(twoway_kernel_id::clamp);
 
-  CUresult result = cuLaunchKernel(
-      kernel,
-      dims.d[0], dims.d[1], dims.d[2], // grid dims
-      dims.d[3], dims.d[4], dims.d[5], // block dims
-      0,
-      NULL,
-      (void**) args,
-      0);
+  cl_int status = 0;
 
-  coot_check_cuda_error(result, "cuda::clamp(): cuLaunchKernel() failed");
+  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem),    &(dest.cl_mem_ptr));
+  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem),    &(src.cl_mem_ptr));
+  status |= clSetKernelArg(kernel, 2, sizeof(eT1),       &min_val);
+  status |= clSetKernelArg(kernel, 3, sizeof(eT1),       &max_val);
+  status |= clSetKernelArg(kernel, 4, local_n_elem.size, local_n_elem.addr);
+
+  size_t global_work_size = size_t(n_elem);
+  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 2, NULL, &global_work_size, NULL, 0, NULL, NULL);
+
+  coot_check_runtime_error( (status != 0), "coot::opencl::clamp(): couldn't execute kernel");
   }

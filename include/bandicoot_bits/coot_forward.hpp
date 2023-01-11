@@ -76,6 +76,7 @@ class op_htrans;
 class op_htrans2;
 class op_repmat;
 class op_resize;
+class op_clamp;
 
 class mtop_conv_to;
 

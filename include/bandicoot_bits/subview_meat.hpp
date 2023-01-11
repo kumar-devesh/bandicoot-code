@@ -390,6 +390,23 @@ subview<eT>::operator/=(const mtOp<eT, T1, mtop_conv_to>& x)
 template<typename eT>
 inline
 void
+subview<eT>::clamp(const eT min_val, const eT max_val)
+  {
+  coot_extra_debug_sigprint();
+
+  coot_debug_check( (min_val > max_val), "clamp(): min_val must be less than max_val" );
+
+  // TODO: this implementation could be improved!
+  Mat<eT> tmp;
+  op_clamp::apply_direct(tmp, *this, min_val, max_val);
+  *this = tmp;
+  }
+
+
+
+template<typename eT>
+inline
+void
 subview<eT>::fill(const eT val)
   {
   coot_extra_debug_sigprint();

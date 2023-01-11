@@ -13,15 +13,16 @@
 // ------------------------------------------------------------------------
 __global__
 void
-COOT_FN(PREFIX,clamp)(const eT1* A_mem,
+COOT_FN(PREFIX,clamp)(eT2* out_mem,
+                      const eT1* A_mem,
                       const eT1 min_val,
                       const eT1 max_val,
-                      const UWORD num,
-                      eT1* out_mem)
+                      const UWORD num)
   {
-  UWORD idx = blockIdx.x * blockDim.x + threadIdx.x;
-  for(; idx < num; idx += blockDim.x * gridDim.x)
+  const UWORD idx = blockIdx.x * blockDim.x + threadIdx.x;
+  if (idx < num)
     {
-    out_mem[idx] = max(min_val, min(max_val, A_mem[idx]));
+    const eT1 clamped_val = max(min_val, min(max_val, A_mem[idx]));
+    out_mem[idx] = (eT2) clamped_val;
     }
   }

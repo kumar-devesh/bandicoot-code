@@ -3,6 +3,7 @@
 // Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 // Copyright 2021 Marcus Edel (http://kurg.org)
+// Copyright 2023 Ryan Curtin (http://ratml.org)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,50 +19,23 @@
 
 
 
-//! \addtogroup op_clamp
-//! @{
-
-
-
-template<typename T1>
+template<typename out_eT, typename T1>
 inline
 void
-op_clamp::apply(Mat<typename T1::elem_type>& out, const mtOp<typename T1::elem_type, T1, op_clamp>& in)
+op_clamp::apply(Mat<out_eT>& out, const Op<T1, op_clamp>& in)
   {
   coot_extra_debug_sigprint();
-
-  /* std::cout << "op_clamp apply\n"; */
 
   typedef typename T1::elem_type eT;
 
   const eT min_val = in.aux;
-  const eT max_val = in.aux_out_eT;
+  const eT max_val = in.aux_b;
 
   coot_debug_check( (min_val > max_val), "clamp(): min_val must be less than max_val" );
 
-  if(is_Mat<T1>::value)
-    {
-    const unwrap<T1> U(in.q);
+  const unwrap<T1> U(in.m);
 
-    op_clamp::apply_direct(out, U.M, min_val, max_val);
-    }
-  else
-    {
-    const Proxy<T1> P(in.q);
-
-/*     if(P.is_alias(out)) */
-/*       { */
-/*       Mat<eT> tmp; */
-
-/*       op_clamp::apply_proxy_noalias(tmp, P, min_val, max_val); */
-
-/*       out.steal_mem(tmp); */
-/*       } */
-/*     else */
-/*       { */
-      op_clamp::apply_proxy_noalias(out, P, min_val, max_val);
-/*       } */
-    }
+  op_clamp::apply_direct(out, U.M, min_val, max_val);
   }
 
 
@@ -73,508 +47,60 @@ op_clamp::apply_direct(Mat<eT>& out, const Mat<eT>& X, const eT min_val, const e
   {
   coot_extra_debug_sigprint();
 
-    /* std::cout << "op_clamp::apply_direct\n"; */
-  if(&out != &X)
+  if (X.n_elem == 0)
     {
     out.set_size(X.n_rows, X.n_cols);
+    return;
+    }
 
-
-    coot_rt_t::clamp(out.get_dev_mem(false), X.get_dev_mem(false), min_val, max_val, X.n_rows, X.n_cols);
+  if (&out == &X)
+    {
+    Mat<eT> tmp;
+    tmp.set_size(X.n_rows, X.n_cols);
+    coot_rt_t::clamp(tmp.get_dev_mem(false), X.get_dev_mem(false), min_val, max_val, X.n_elem);
+    out.steal_mem(tmp);
     }
   else
     {
-    coot_extra_debug_print("op_clamp::apply_direct(): inplace operation");
-
-    /* arrayops::clamp(out.memptr(), out.n_elem, min_val, max_val); */
+    out.set_size(X.n_rows, X.n_cols);
+    coot_rt_t::clamp(out.get_dev_mem(false), X.get_dev_mem(false), min_val, max_val, X.n_elem);
     }
   }
 
 
 
-template<typename T1>
+template<typename out_eT, typename in_eT>
 inline
 void
-op_clamp::apply_proxy_noalias(Mat<typename T1::elem_type>& out, const Proxy<T1>& P, const typename T1::elem_type min_val, const typename T1::elem_type max_val)
+op_clamp::apply_direct(Mat<out_eT>& out, const Mat<in_eT>& X, const in_eT min_val, const in_eT max_val)
   {
-  /* arma_extra_debug_sigprint(); */
+  coot_extra_debug_sigprint();
 
-  /* std::cout << "op_clamp::apply_proxy_noalias\n"; */
-  typedef typename T1::elem_type eT;
+  out.set_size(X.n_rows, X.n_cols);
+  if (X.n_elem == 0)
+    {
+    return;
+    }
 
-  const uword n_rows = P.get_n_rows();
-  const uword n_cols = P.get_n_cols();
-
-
-  Mat<eT> B(P.get_aligned_ea().get_ref());
-  /* Mat<eT> B(PB.get_aligned_ea().get_ref()); */
-
-
-
-  coot_rt_t::clamp(out.get_dev_mem(false), B.get_dev_mem(false), min_val, max_val, n_rows, n_cols);
-  /* out.set_size(n_rows, n_cols); */
-
-  /* eT* out_mem = out.memptr(); */
-
-  /* if(Proxy<T1>::use_at == false) */
-  /*   { */
-  /*   const uword N = P.get_n_elem(); */
-
-  /*   typename Proxy<T1>::ea_type A = P.get_ea(); */
-
-  /*   for(uword i=0; i<N; ++i) */
-  /*     { */
-  /*     const eT val = A[i]; */
-
-  /*     out_mem[i] = (val < min_val) ? min_val : ((val > max_val) ? max_val : val); */
-  /*     } */
-  /*   } */
-  /* else */
-  /*   { */
-  /*   for(uword col=0; col < n_cols; ++col) */
-  /*   for(uword row=0; row < n_rows; ++row) */
-  /*     { */
-  /*     const eT val = P.at(row,col); */
-
-  /*     (*out_mem) = (val < min_val) ? min_val : ((val > max_val) ? max_val : val); */
-
-  /*     out_mem++; */
-  /*     } */
-  /*   } */
+  coot_rt_t::clamp(out.get_dev_mem(false), X.get_dev_mem(false), min_val, max_val, X.n_elem);
   }
 
 
 
-//
-
-
-
-/* template<typename T1> */
-/* inline */
-/* void */
-/* op_clamp::apply(Cube<typename T1::elem_type>& out, const mtOpCube<typename T1::elem_type, T1, op_clamp>& in) */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
-
-/*   typedef typename T1::elem_type eT; */
-
-/*   const eT min_val = in.aux; */
-/*   const eT max_val = in.aux_out_eT; */
-
-/*   arma_debug_check( (min_val > max_val), "clamp(): min_val must be less than max_val" ); */
-
-/*   if(is_Cube<T1>::value) */
-/*     { */
-/*     const unwrap_cube<T1> U(in.m); */
-
-/*     op_clamp::apply_direct(out, U.M, min_val, max_val); */
-/*     } */
-/*   else */
-/*     { */
-/*     const ProxyCube<T1> P(in.m); */
-
-/*     if(P.is_alias(out)) */
-/*       { */
-/*       Cube<eT> tmp; */
-
-/*       op_clamp::apply_proxy_noalias(tmp, P, min_val, max_val); */
-
-/*       out.steal_mem(tmp); */
-/*       } */
-/*     else */
-/*       { */
-/*       op_clamp::apply_proxy_noalias(out, P, min_val, max_val); */
-/*       } */
-/*     } */
-/*   } */
-
-
-
-/* template<typename eT> */
-/* inline */
-/* void */
-/* op_clamp::apply_direct(Cube<eT>& out, const Cube<eT>& X, const eT min_val, const eT max_val) */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
-
-/*   if(&out != &X) */
-/*     { */
-/*     out.set_size(X.n_rows, X.n_cols, X.n_slices); */
-
-/*     const uword N = out.n_elem; */
-
-/*     const eT*   X_mem =   X.memptr(); */
-/*           eT* out_mem = out.memptr(); */
-
-/*     for(uword i=0; i<N; ++i) */
-/*       { */
-/*       const eT val = X_mem[i]; */
-
-/*       out_mem[i] = (val < min_val) ? min_val : ((val > max_val) ? max_val : val); */
-/*       } */
-/*     } */
-/*   else */
-/*     { */
-/*     arma_extra_debug_print("op_clamp::apply_direct(): inplace operation"); */
-
-/*     arrayops::clamp(out.memptr(), out.n_elem, min_val, max_val); */
-/*     } */
-/*   } */
-
-
-
-/* template<typename T1> */
-/* inline */
-/* void */
-/* op_clamp::apply_proxy_noalias(Cube<typename T1::elem_type>& out, const ProxyCube<T1>& P, const typename T1::elem_type min_val, const typename T1::elem_type max_val) */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
-
-/*   typedef typename T1::elem_type eT; */
-
-/*   const uword n_rows   = P.get_n_rows(); */
-/*   const uword n_cols   = P.get_n_cols(); */
-/*   const uword n_slices = P.get_n_slices(); */
-
-/*   out.set_size(n_rows, n_cols, n_slices); */
-
-/*   eT* out_mem = out.memptr(); */
-
-/*   if(ProxyCube<T1>::use_at == false) */
-/*     { */
-/*     const uword N = P.get_n_elem(); */
-
-/*     typename ProxyCube<T1>::ea_type A = P.get_ea(); */
-
-/*     for(uword i=0; i<N; ++i) */
-/*       { */
-/*       const eT val = A[i]; */
-
-/*       out_mem[i] = (val < min_val) ? min_val : ((val > max_val) ? max_val : val); */
-/*       } */
-/*     } */
-/*   else */
-/*     { */
-/*     for(uword s=0; s < n_slices; ++s) */
-/*     for(uword c=0; c < n_cols;   ++c) */
-/*     for(uword r=0; r < n_rows;   ++r) */
-/*       { */
-/*       const eT val = P.at(r,c,s); */
-
-/*       (*out_mem) = (val < min_val) ? min_val : ((val > max_val) ? max_val : val); */
-
-/*       out_mem++; */
-/*       } */
-/*     } */
-/*   } */
-
-
-
-//
-
-
-
-template<typename T1>
+template<typename out_eT, typename in_eT>
 inline
 void
-op_clamp_cx::apply(Mat<typename T1::elem_type>& out, const mtOp<typename T1::elem_type, T1, op_clamp_cx>& in)
+op_clamp::apply_direct(Mat<out_eT>& out, const subview<in_eT>& sv, const in_eT min_val, const in_eT max_val)
   {
-  /* arma_extra_debug_sigprint(); */
+  coot_extra_debug_sigprint();
 
-  /* typedef typename T1::elem_type eT; */
+  out.set_size(sv.n_rows, sv.n_cols);
+  if (sv.n_elem == 0)
+    {
+    return;
+    }
 
-  /* if(is_Mat<T1>::value) */
-  /*   { */
-  /*   const unwrap<T1> U(in.m); */
-
-  /*   op_clamp_cx::apply_direct(out, U.M, in.aux, in.aux_out_eT); */
-  /*   } */
-  /* else */
-  /*   { */
-  /*   const Proxy<T1> P(in.m); */
-
-  /*   if(P.is_alias(out)) */
-  /*     { */
-  /*     Mat<eT> tmp; */
-
-  /*     op_clamp_cx::apply_proxy_noalias(tmp, P, in.aux, in.aux_out_eT); */
-
-  /*     out.steal_mem(tmp); */
-  /*     } */
-  /*   else */
-  /*     { */
-  /*     op_clamp_cx::apply_proxy_noalias(out, P, in.aux, in.aux_out_eT); */
-  /*     } */
-  /*   } */
+  // TODO: this could be improved: we don't do specialized subview clamping, so instead we extract the subview.
+  Mat<in_eT> extracted_sv(sv);
+  op_clamp::apply_direct(out, extracted_sv, min_val, max_val);
   }
-
-
-
-template<typename eT>
-inline
-void
-op_clamp_cx::apply_direct(Mat<eT>& out, const Mat<eT>& X, const eT min_val, const eT max_val)
-  {
-  /* arma_extra_debug_sigprint(); */
-
-  /* typedef typename get_pod_type<eT>::result T; */
-
-  /* const T min_val_real = std::real(min_val); */
-  /* const T min_val_imag = std::imag(min_val); */
-
-  /* const T max_val_real = std::real(max_val); */
-  /* const T max_val_imag = std::imag(max_val); */
-
-  /* arma_debug_check( (min_val_real > max_val_real), "clamp(): real(min_val) must be less than real(max_val)" ); */
-  /* arma_debug_check( (min_val_imag > max_val_imag), "clamp(): imag(min_val) must be less than imag(max_val)" ); */
-
-  /* if(&out != &X) */
-  /*   { */
-  /*   out.set_size(X.n_rows, X.n_cols); */
-
-  /*   const uword N = out.n_elem; */
-
-  /*   const eT*   X_mem =   X.memptr(); */
-  /*         eT* out_mem = out.memptr(); */
-
-  /*   for(uword i=0; i<N; ++i) */
-  /*     { */
-  /*     const eT& X_val = X_mem[i]; */
-
-  /*     T val_real = std::real(X_val); */
-  /*     T val_imag = std::imag(X_val); */
-
-  /*     val_real = (val_real < min_val_real) ? min_val_real : ((val_real > max_val_real) ? max_val_real : val_real); */
-  /*     val_imag = (val_imag < min_val_imag) ? min_val_imag : ((val_imag > max_val_imag) ? max_val_imag : val_imag); */
-
-  /*     out_mem[i] = std::complex<T>(val_real,val_imag); */
-  /*     } */
-  /*   } */
-  /* else */
-  /*   { */
-  /*   arma_extra_debug_print("op_clamp_cx::apply_direct(): inplace operation"); */
-
-  /*   arrayops::clamp(out.memptr(), out.n_elem, min_val, max_val); */
-  /*   } */
-  }
-
-
-
-template<typename T1>
-inline
-void
-op_clamp_cx::apply_proxy_noalias(Mat<typename T1::elem_type>& out, const Proxy<T1>& P, const typename T1::elem_type min_val, const typename T1::elem_type max_val)
-  {
-  /* arma_extra_debug_sigprint(); */
-
-  /* typedef typename T1::elem_type eT; */
-  /* typedef typename T1::pod_type   T; */
-
-  /* const T min_val_real = std::real(min_val); */
-  /* const T min_val_imag = std::imag(min_val); */
-
-  /* const T max_val_real = std::real(max_val); */
-  /* const T max_val_imag = std::imag(max_val); */
-
-  /* arma_debug_check( (min_val_real > max_val_real), "clamp(): real(min_val) must be less than real(max_val)" ); */
-  /* arma_debug_check( (min_val_imag > max_val_imag), "clamp(): imag(min_val) must be less than imag(max_val)" ); */
-
-  /* const uword n_rows = P.get_n_rows(); */
-  /* const uword n_cols = P.get_n_cols(); */
-
-  /* out.set_size(n_rows, n_cols); */
-
-  /* eT* out_mem = out.memptr(); */
-
-  /* if(Proxy<T1>::use_at == false) */
-  /*   { */
-  /*   const uword N = P.get_n_elem(); */
-
-  /*   typename Proxy<T1>::ea_type A = P.get_ea(); */
-
-  /*   for(uword i=0; i<N; ++i) */
-  /*     { */
-  /*     T val_real = std::real(A[i]); */
-  /*     T val_imag = std::imag(A[i]); */
-
-  /*     val_real = (val_real < min_val_real) ? min_val_real : ((val_real > max_val_real) ? max_val_real : val_real); */
-  /*     val_imag = (val_imag < min_val_imag) ? min_val_imag : ((val_imag > max_val_imag) ? max_val_imag : val_imag); */
-
-  /*     out_mem[i] = std::complex<T>(val_real,val_imag); */
-  /*     } */
-  /*   } */
-  /* else */
-  /*   { */
-  /*   for(uword col=0; col < n_cols; ++col) */
-  /*   for(uword row=0; row < n_rows; ++row) */
-  /*     { */
-  /*     const eT val = P.at(row,col); */
-
-  /*     T val_real = std::real(val); */
-  /*     T val_imag = std::imag(val); */
-
-  /*     val_real = (val_real < min_val_real) ? min_val_real : ((val_real > max_val_real) ? max_val_real : val_real); */
-  /*     val_imag = (val_imag < min_val_imag) ? min_val_imag : ((val_imag > max_val_imag) ? max_val_imag : val_imag); */
-
-  /*     (*out_mem) = std::complex<T>(val_real,val_imag);  out_mem++; */
-  /*     } */
-  /*   } */
-  }
-
-
-
-//
-
-
-
-/* template<typename T1> */
-/* inline */
-/* void */
-/* op_clamp_cx::apply(Cube<typename T1::elem_type>& out, const mtOpCube<typename T1::elem_type, T1, op_clamp_cx>& in) */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
-
-/*   typedef typename T1::elem_type eT; */
-
-/*   if(is_Cube<T1>::value) */
-/*     { */
-/*     const unwrap_cube<T1> U(in.m); */
-
-/*     op_clamp_cx::apply_direct(out, U.M, in.aux, in.aux_out_eT); */
-/*     } */
-/*   else */
-/*     { */
-/*     const ProxyCube<T1> P(in.m); */
-
-/*     if(P.is_alias(out)) */
-/*       { */
-/*       Cube<eT> tmp; */
-
-/*       op_clamp_cx::apply_proxy_noalias(tmp, P, in.aux, in.aux_out_eT); */
-
-/*       out.steal_mem(tmp); */
-/*       } */
-/*     else */
-/*       { */
-/*       op_clamp_cx::apply_proxy_noalias(out, P, in.aux, in.aux_out_eT); */
-/*       } */
-/*     } */
-/*   } */
-
-
-
-/* template<typename eT> */
-/* inline */
-/* void */
-/* op_clamp_cx::apply_direct(Cube<eT>& out, const Cube<eT>& X, const eT min_val, const eT max_val) */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
-
-/*   typedef typename get_pod_type<eT>::result T; */
-
-/*   const T min_val_real = std::real(min_val); */
-/*   const T min_val_imag = std::imag(min_val); */
-
-/*   const T max_val_real = std::real(max_val); */
-/*   const T max_val_imag = std::imag(max_val); */
-
-/*   arma_debug_check( (min_val_real > max_val_real), "clamp(): real(min_val) must be less than real(max_val)" ); */
-/*   arma_debug_check( (min_val_imag > max_val_imag), "clamp(): imag(min_val) must be less than imag(max_val)" ); */
-
-/*   if(&out != &X) */
-/*     { */
-/*     out.set_size(X.n_rows, X.n_cols, X.n_slices); */
-
-/*     const uword N = out.n_elem; */
-
-/*     const eT*   X_mem =   X.memptr(); */
-/*           eT* out_mem = out.memptr(); */
-
-/*     for(uword i=0; i<N; ++i) */
-/*       { */
-/*       const eT& X_val = X_mem[i]; */
-
-/*       T val_real = std::real(X_val); */
-/*       T val_imag = std::imag(X_val); */
-
-/*       val_real = (val_real < min_val_real) ? min_val_real : ((val_real > max_val_real) ? max_val_real : val_real); */
-/*       val_imag = (val_imag < min_val_imag) ? min_val_imag : ((val_imag > max_val_imag) ? max_val_imag : val_imag); */
-
-/*       out_mem[i] = std::complex<T>(val_real,val_imag); */
-/*       } */
-/*     } */
-/*   else */
-/*     { */
-/*     arma_extra_debug_print("op_clamp_cx::apply_direct(): inplace operation"); */
-
-/*     arrayops::clamp(out.memptr(), out.n_elem, min_val, max_val); */
-/*     } */
-/*   } */
-
-
-
-/* template<typename T1> */
-/* inline */
-/* void */
-/* op_clamp_cx::apply_proxy_noalias(Cube<typename T1::elem_type>& out, const ProxyCube<T1>& P, const typename T1::elem_type min_val, const typename T1::elem_type max_val) */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
-
-/*   typedef typename T1::elem_type eT; */
-/*   typedef typename T1::pod_type   T; */
-
-/*   const T min_val_real = std::real(min_val); */
-/*   const T min_val_imag = std::imag(min_val); */
-
-/*   const T max_val_real = std::real(max_val); */
-/*   const T max_val_imag = std::imag(max_val); */
-
-/*   arma_debug_check( (min_val_real > max_val_real), "clamp(): real(min_val) must be less than real(max_val)" ); */
-/*   arma_debug_check( (min_val_imag > max_val_imag), "clamp(): imag(min_val) must be less than imag(max_val)" ); */
-
-/*   const uword n_rows   = P.get_n_rows(); */
-/*   const uword n_cols   = P.get_n_cols(); */
-/*   const uword n_slices = P.get_n_slices(); */
-
-/*   out.set_size(n_rows, n_cols, n_slices); */
-
-/*   eT* out_mem = out.memptr(); */
-
-/*   if(ProxyCube<T1>::use_at == false) */
-/*     { */
-/*     const uword N = P.get_n_elem(); */
-
-/*     typename ProxyCube<T1>::ea_type A = P.get_ea(); */
-
-/*     for(uword i=0; i<N; ++i) */
-/*       { */
-/*       T val_real = std::real(A[i]); */
-/*       T val_imag = std::imag(A[i]); */
-
-/*       val_real = (val_real < min_val_real) ? min_val_real : ((val_real > max_val_real) ? max_val_real : val_real); */
-/*       val_imag = (val_imag < min_val_imag) ? min_val_imag : ((val_imag > max_val_imag) ? max_val_imag : val_imag); */
-
-/*       out_mem[i] = std::complex<T>(val_real,val_imag); */
-/*       } */
-/*     } */
-/*   else */
-/*     { */
-/*     for(uword s=0; s < n_slices; ++s) */
-/*     for(uword c=0; c < n_cols;   ++c) */
-/*     for(uword r=0; r < n_rows;   ++r) */
-/*       { */
-/*       const eT val = P.at(r,c,s); */
-
-/*       T val_real = std::real(val); */
-/*       T val_imag = std::imag(val); */
-
-/*       val_real = (val_real < min_val_real) ? min_val_real : ((val_real > max_val_real) ? max_val_real : val_real); */
-/*       val_imag = (val_imag < min_val_imag) ? min_val_imag : ((val_imag > max_val_imag) ? max_val_imag : val_imag); */
-
-/*       (*out_mem) = std::complex<T>(val_real,val_imag);  out_mem++; */
-/*       } */
-/*     } */
-/*   } */
-
-
-
-//! @}

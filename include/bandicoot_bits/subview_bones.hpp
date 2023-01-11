@@ -83,6 +83,8 @@ class subview : public Base<eT, subview<eT> >
   template<typename eT1> inline static void minus_inplace(Mat<eT1>& out, const subview& in);
   template<typename eT1> inline static void schur_inplace(Mat<eT1>& out, const subview& in);
   template<typename eT1> inline static void   div_inplace(Mat<eT1>& out, const subview& in);
+
+  inline void clamp(const eT min_val, const eT max_val);
   
   inline void fill(const eT val);
   inline void zeros();

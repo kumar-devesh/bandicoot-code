@@ -283,6 +283,7 @@ struct twoway_kernel_id
     equ_array_erfc_post,
     equ_array_lgamma_pre,
     equ_array_lgamma_post,
+    clamp,
     //
     get_diag,
     //
@@ -400,6 +401,7 @@ struct twoway_kernel_id
     names.push_back("equ_array_erfc_post");
     names.push_back("equ_array_lgamma_pre");
     names.push_back("equ_array_lgamma_post");
+    names.push_back("clamp");
 
     names.push_back("get_diag");
 

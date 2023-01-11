@@ -13,14 +13,9 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup coot_version
-//! @{
-
-
-
 #define COOT_VERSION_MAJOR 0
 #define COOT_VERSION_MINOR 100
-#define COOT_VERSION_PATCH 7
+#define COOT_VERSION_PATCH 9
 #define COOT_VERSION_NOTE  "unstable development version"
 
 
@@ -30,7 +25,7 @@ struct coot_version
   static const unsigned int major = COOT_VERSION_MAJOR;
   static const unsigned int minor = COOT_VERSION_MINOR;
   static const unsigned int patch = COOT_VERSION_PATCH;
-  
+
   static
   inline
   std::string
@@ -38,14 +33,10 @@ struct coot_version
     {
     std::stringstream ss;
     ss << coot_version::major << '.' << coot_version::minor << '.' << coot_version::patch;
-    
+
     const std::string note = COOT_VERSION_NOTE;
     if(note.length() > 0)  { ss << " (" << note << ')'; }
-    
+
     return ss.str();
     }
   };
-
-
-
-//! @}

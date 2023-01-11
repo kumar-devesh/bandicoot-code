@@ -2,6 +2,8 @@
 //
 // Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
+// Copyright 2021 Marcus Edel (http://kurg.org)
+// Copyright 2023 Ryan Curtin (http://www.ratml.org)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,59 +18,15 @@
 // ------------------------------------------------------------------------
 
 
-
-//! \addtogroup op_clamp
-//! @{
-
-
-
 class op_clamp
-  /* : public traits_op_passthru */
   {
   public:
 
-  // matrices
+  template<typename out_eT, typename T1> inline static void apply(Mat<out_eT>& out, const Op<T1, op_clamp>& in);
 
-  template<typename T1> inline static void apply(Mat<typename T1::elem_type>& out, const mtOp<typename T1::elem_type, T1, op_clamp>& in);
+  template<typename eT> inline static void apply_direct(Mat<eT>& out, const Mat<eT>& in, const eT min_val, const eT max_val);
 
-  template<typename eT> inline static void apply_direct(Mat<eT>& out, const Mat<eT>& X, const eT min_val, const eT max_val);
+  template<typename out_eT, typename in_eT> inline static void apply_direct(Mat<out_eT>& out, const Mat<in_eT>& in, const in_eT min_val, const in_eT max_val);
 
-  template<typename T1> inline static void apply_proxy_noalias(Mat<typename T1::elem_type>& out, const Proxy<T1>& P, const typename T1::elem_type min_val, const typename T1::elem_type max_val);
-
-  // cubes
-
-/*   template<typename T1> inline static void apply(Cube<typename T1::elem_type>& out, const mtOpCube<typename T1::elem_type, T1, op_clamp>& in); */
-
-/*   template<typename eT> inline static void apply_direct(Cube<eT>& out, const Cube<eT>& X, const eT min_val, const eT max_val); */
-
-/*   template<typename T1> inline static void apply_proxy_noalias(Cube<typename T1::elem_type>& out, const ProxyCube<T1>& P, const typename T1::elem_type min_val, const typename T1::elem_type max_val); */
+  template<typename out_eT, typename in_eT> inline static void apply_direct(Mat<out_eT>& out, const subview<in_eT>& in, const in_eT min_val, const in_eT max_val);
   };
-
-
-
-class op_clamp_cx
-  /* : public traits_op_passthru */
-  {
-  public:
-
-  // matrices
-
-  template<typename T1> inline static void apply(Mat<typename T1::elem_type>& out, const mtOp<typename T1::elem_type, T1, op_clamp_cx>& in);
-
-  template<typename eT> inline static void apply_direct(Mat<eT>& out, const Mat<eT>& X, const eT min_val, const eT max_val);
-
-  template<typename T1> inline static void apply_proxy_noalias(Mat<typename T1::elem_type>& out, const Proxy<T1>& P, const typename T1::elem_type min_val, const typename T1::elem_type max_val);
-
-
-  // cubes
-
-  /* template<typename T1> inline static void apply(Cube<typename T1::elem_type>& out, const mtOpCube<typename T1::elem_type, T1, op_clamp_cx>& in); */
-
-  /* template<typename eT> inline static void apply_direct(Cube<eT>& out, const Cube<eT>& X, const eT min_val, const eT max_val); */
-
-  /* template<typename T1> inline static void apply_proxy_noalias(Cube<typename T1::elem_type>& out, const ProxyCube<T1>& P, const typename T1::elem_type min_val, const typename T1::elem_type max_val); */
-  };
-
-
-
-//! @}
