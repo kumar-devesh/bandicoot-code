@@ -605,10 +605,11 @@ TEST_CASE("double_merged_eop_conv_to")
 TEST_CASE("colwise_sum_conv_to")
   {
   Mat<u32> x(3, 3);
-  x.fill(u32(-1));
+  x.fill(std::numeric_limits<u32>::max());
 
   // If the conversion happens *after* the sum, then the sums will overflow.
   // Otherwise, they won't overflow.
+  // Overflow is undefined behavior, so we have no guarantees on what will happen, but whatever does happen, it will still be a u32.
   Mat<u64> y1 = conv_to<Mat<u64>>::from(sum(x, 0));
   Mat<u64> y2 = sum(conv_to<Mat<u64>>::from(x), 0);
 
@@ -618,8 +619,8 @@ TEST_CASE("colwise_sum_conv_to")
   REQUIRE( y2.n_cols == 3 );
   for (uword i = 0; i < 3; ++i)
     {
-    REQUIRE( u64(y1[i]) == u64(u32(-3)) );
-    REQUIRE( u64(y2[i]) == u64(3 * u64(u32(-1))) );
+    REQUIRE( u64(y1[i]) <= u64(std::numeric_limits<u32>::max()) );
+    REQUIRE( u64(y2[i]) == u64(3 * u64(std::numeric_limits<u32>::max())) );
     }
   }
 
@@ -628,10 +629,11 @@ TEST_CASE("colwise_sum_conv_to")
 TEST_CASE("rowwise_sum_conv_to")
   {
   Mat<u32> x(3, 3);
-  x.fill(u32(-1));
+  x.fill(std::numeric_limits<u32>::max());
 
   // If the conversion happens *after* the sum, then the sums will overflow.
   // Otherwise, they won't overflow.
+  // Overflow is undefined behavior, so we have no guarantees on what will happen, but whatever does happen, it will still be a u32.
   Mat<u64> y1 = conv_to<Mat<u64>>::from(sum(x, 1));
   Mat<u64> y2 = sum(conv_to<Mat<u64>>::from(x), 1);
 
@@ -641,8 +643,8 @@ TEST_CASE("rowwise_sum_conv_to")
   REQUIRE( y2.n_cols == 1 );
   for (uword i = 0; i < 3; ++i)
     {
-    REQUIRE( u64(y1[i]) == u64(u32(-3)) );
-    REQUIRE( u64(y2[i]) == u64(3 * u64(u32(-1))) );
+    REQUIRE( u64(y1[i]) <= u64(std::numeric_limits<u32>::max()) );
+    REQUIRE( u64(y2[i]) == u64(3 * u64(std::numeric_limits<u32>::max())) );
     }
   }
 
@@ -650,10 +652,11 @@ TEST_CASE("rowwise_sum_conv_to")
 TEST_CASE("submat_colwise_sum_conv_to")
   {
   Mat<u32> x(3, 3);
-  x.fill(u32(-1));
+  x.fill(std::numeric_limits<u32>::max());
 
   // If the conversion happens *after* the sum, then the sums will overflow.
   // Otherwise, they won't overflow.
+  // Overflow is undefined behavior, so we have no guarantees on what will happen, but whatever does happen, it will still be a u32.
   Mat<u64> y1 = conv_to<Mat<u64>>::from(sum(x.cols(0, 1), 0));
   Mat<u64> y2 = sum(conv_to<Mat<u64>>::from(x.cols(0, 1)), 0);
 
@@ -663,8 +666,8 @@ TEST_CASE("submat_colwise_sum_conv_to")
   REQUIRE( y2.n_cols == 2 );
   for (uword i = 0; i < 2; ++i)
     {
-    REQUIRE( u64(y1[i]) == u64(u32(-3)) );
-    REQUIRE( u64(y2[i]) == u64(3 * u64(u32(-1))) );
+    REQUIRE( u64(y1[i]) <= u64(std::numeric_limits<u32>::max()) );
+    REQUIRE( u64(y2[i]) == u64(3 * u64(std::numeric_limits<u32>::max())) );
     }
   }
 
@@ -673,10 +676,11 @@ TEST_CASE("submat_colwise_sum_conv_to")
 TEST_CASE("submat_rowwise_sum_conv_to")
   {
   Mat<u32> x(3, 3);
-  x.fill(u32(-1));
+  x.fill(std::numeric_limits<u32>::max());
 
   // If the conversion happens *after* the sum, then the sums will overflow.
   // Otherwise, they won't overflow.
+  // Overflow is undefined behavior, so we have no guarantees on what will happen, but whatever does happen, it will still be a u32.
   Mat<u64> y1 = conv_to<Mat<u64>>::from(sum(x.rows(0, 1), 1));
   Mat<u64> y2 = sum(conv_to<Mat<u64>>::from(x.rows(0, 1)), 1);
 
@@ -686,8 +690,8 @@ TEST_CASE("submat_rowwise_sum_conv_to")
   REQUIRE( y2.n_cols == 1 );
   for (uword i = 0; i < 2; ++i)
     {
-    REQUIRE( u64(y1[i]) == u64(u32(-3)) );
-    REQUIRE( u64(y2[i]) == u64(3 * u64(u32(-1))) );
+    REQUIRE( u64(y1[i]) <= u64(std::numeric_limits<u32>::max()) );
+    REQUIRE( u64(y2[i]) == u64(3 * u64(std::numeric_limits<u32>::max())) );
     }
   }
 

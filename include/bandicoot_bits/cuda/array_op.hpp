@@ -157,7 +157,7 @@ copy_subview(dev_mem_t<out_eT> dest, const dev_mem_t<in_eT> src, const uword aux
       (uword*) &n_cols
   };
 
-  const kernel_dims dims = one_dimensional_grid_dims(n_rows * n_cols);
+  const kernel_dims dims = two_dimensional_grid_dims(n_rows, n_cols);
 
   CUresult result = cuLaunchKernel(
       kernel,
