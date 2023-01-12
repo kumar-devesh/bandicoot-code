@@ -1,10 +1,10 @@
 // Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -91,12 +91,12 @@
 // TODO: include any stuff here that is not meant to be in the coot namespace
 
 
-//! \namespace coot namespace for bandicoot classes and functions
+// namespace for bandicoot classes and functions
 namespace coot
   {
-  
+
   // preliminaries
-  
+
   #include "bandicoot_bits/typedef_missing.hpp"
   #include "bandicoot_bits/coot_forward.hpp"
   #include "bandicoot_bits/coot_static_check.hpp"
@@ -115,10 +115,10 @@ namespace coot
   #include "bandicoot_bits/constants.hpp"
   #include "bandicoot_bits/dev_mem_t.hpp"
   #include "bandicoot_bits/distr_param.hpp"
-  
+
   //
   // runtime
-  
+
   #include "bandicoot_bits/kernel_id.hpp"
 
   namespace cache
@@ -164,21 +164,21 @@ namespace coot
   #endif
 
   #include "bandicoot_bits/coot_rt_bones.hpp"
-  
+
   //
   // class prototypes
-  
+
   #include "bandicoot_bits/cond_rel_bones.hpp"
-  
+
   #include "bandicoot_bits/Base_bones.hpp"
-  
+
   #include "bandicoot_bits/MatValProxy_bones.hpp"
   #include "bandicoot_bits/Mat_bones.hpp"
   #include "bandicoot_bits/Row_bones.hpp"
   #include "bandicoot_bits/Col_bones.hpp"
   #include "bandicoot_bits/SizeMat_bones.hpp"
   #include "bandicoot_bits/subview_bones.hpp"
-  
+
   #include "bandicoot_bits/arrayops_bones.hpp"
   #include "bandicoot_bits/eOp_bones.hpp"
   #include "bandicoot_bits/eGlue_bones.hpp"
@@ -188,7 +188,7 @@ namespace coot
   #include "bandicoot_bits/Op_bones.hpp"
   #include "bandicoot_bits/Glue_bones.hpp"
   #include "bandicoot_bits/coot_rng_bones.hpp"
-  
+
   #include "bandicoot_bits/op_sum_bones.hpp"
   #include "bandicoot_bits/op_htrans_bones.hpp"
   #include "bandicoot_bits/op_strans_bones.hpp"
@@ -198,26 +198,26 @@ namespace coot
   #include "bandicoot_bits/op_resize_bones.hpp"
 
   #include "bandicoot_bits/mtop_conv_to_bones.hpp"
-  
+
   #include "bandicoot_bits/glue_times_bones.hpp"
 
   #include "bandicoot_bits/wall_clock_bones.hpp"
-  
+
   //
   // low-level debugging and memory handling functions
-  
+
   #include "bandicoot_bits/debug.hpp"
   #include "bandicoot_bits/cpu_memory.hpp"
-  
-  
+
+
   //
   // wrappers for various cmath functions
-  
+
   #include "bandicoot_bits/coot_cmath.hpp"
-  
+
   // definitions for LAPACK functions
   #include "bandicoot_bits/def_lapack.hpp"
-  
+
   //
   // runtime
 
@@ -255,6 +255,7 @@ namespace coot
     #include "bandicoot_bits/opencl/max_abs.hpp"
     #include "bandicoot_bits/opencl/repmat.hpp"
     #include "bandicoot_bits/opencl/linspace.hpp"
+    #include "bandicoot_bits/opencl/trans.hpp"
 //    #include "bandicoot_bits/opencl/eig.hpp"
     #include "bandicoot_bits/opencl/lapack/larfg.hpp"
     }
@@ -285,6 +286,7 @@ namespace coot
     #include "bandicoot_bits/cuda/max_abs.hpp"
     #include "bandicoot_bits/cuda/repmat.hpp"
     #include "bandicoot_bits/cuda/linspace.hpp"
+    #include "bandicoot_bits/cuda/trans.hpp"
 //    #include "bandicoot_bits/cuda/eig.hpp"
     #include "bandicoot_bits/cuda/lapack/larfg.hpp"
     }
@@ -296,49 +298,49 @@ namespace coot
     }
 
   #include "bandicoot_bits/coot_rt_meat.hpp"
-  
+
   //
-  // classes that underlay metaprogramming 
-  
+  // classes that underlay metaprogramming
+
   #include "bandicoot_bits/no_conv_unwrap.hpp"
   #include "bandicoot_bits/unwrap.hpp"
   #include "bandicoot_bits/SizeProxy.hpp"
-  
-  
-  
+
+
+
   //
   // operators
-  
+
   #include "bandicoot_bits/operator_times.hpp"
   #include "bandicoot_bits/operator_plus.hpp"
   #include "bandicoot_bits/operator_minus.hpp"
   #include "bandicoot_bits/operator_schur.hpp"
   #include "bandicoot_bits/operator_div.hpp"
   //#include "bandicoot_bits/operator_ostream.hpp"
-  
+
   //
   // magma related
   // NOTE: magma uses rather dubious coding techniques
-  
+
   #if defined(COOT_USE_OPENCL)
     //#include "bandicoot_bits/opencl/magma13_support.hpp"
     //#include "bandicoot_bits/opencl/magma13_dpotrf.hpp"
-  
+
     #include "bandicoot_bits/opencl/magma22_support.hpp"
-  
+
     #include "bandicoot_bits/opencl/magma22_dlarfb.hpp"
     #include "bandicoot_bits/opencl/magma22_dgeqrf.hpp"
-    
+
     #include "bandicoot_bits/opencl/magma22_spotrf.hpp"
     #include "bandicoot_bits/opencl/magma22_dpotrf.hpp"
   #endif
-  
+
   //
   // user accessible functions
-  
+
   // the order of the fn_*.hpp include files matters,
   // as some files require functionality given in preceding files
-  
+
   #include "bandicoot_bits/fn_as_scalar.hpp"
   #include "bandicoot_bits/fn_elem.hpp"
   #include "bandicoot_bits/fn_trace.hpp"
@@ -357,25 +359,25 @@ namespace coot
   #include "bandicoot_bits/fn_repmat.hpp"
   #include "bandicoot_bits/fn_resize.hpp"
   #include "bandicoot_bits/fn_linspace.hpp"
-  
-  
+
+
   //
   // class meat
-  
+
   #include "bandicoot_bits/mul_gemv.hpp"
   #include "bandicoot_bits/mul_gemm.hpp"
-  
+
   #include "bandicoot_bits/cond_rel_meat.hpp"
-  
+
   #include "bandicoot_bits/Base_meat.hpp"
-  
+
   #include "bandicoot_bits/MatValProxy_meat.hpp"
   #include "bandicoot_bits/Mat_meat.hpp"
   #include "bandicoot_bits/Row_meat.hpp"
   #include "bandicoot_bits/Col_meat.hpp"
   #include "bandicoot_bits/SizeMat_meat.hpp"
   #include "bandicoot_bits/subview_meat.hpp"
-  
+
   #include "bandicoot_bits/arrayops_meat.hpp"
   #include "bandicoot_bits/eOp_meat.hpp"
   #include "bandicoot_bits/eGlue_meat.hpp"
@@ -385,7 +387,7 @@ namespace coot
   #include "bandicoot_bits/Op_meat.hpp"
   #include "bandicoot_bits/Glue_meat.hpp"
   #include "bandicoot_bits/coot_rng_meat.hpp"
-  
+
   #include "bandicoot_bits/op_sum_meat.hpp"
   #include "bandicoot_bits/op_htrans_meat.hpp"
   #include "bandicoot_bits/op_strans_meat.hpp"
@@ -395,9 +397,9 @@ namespace coot
   #include "bandicoot_bits/op_resize_meat.hpp"
 
   #include "bandicoot_bits/mtop_conv_to_meat.hpp"
-  
+
   #include "bandicoot_bits/glue_times_meat.hpp"
-  
+
   #include "bandicoot_bits/wall_clock_meat.hpp"
   }
 

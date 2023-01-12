@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup cuda
-//! @{
-
-
 
 /**
  * Compute the Cholesky decomposition using CUDA.
@@ -144,7 +140,3 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
 
   return true;
   }
-
-
-
-//! @}

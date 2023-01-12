@@ -1,20 +1,16 @@
 // Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ------------------------------------------------------------------------
-
-
-//! \addtogroup typedef_elem
-//! @{
 
 
 // we need our own typedefs for types to use in template code;
@@ -78,14 +74,14 @@
 // need both signed and unsigned versions of size_t
 
 #if defined(COOT_USE_CXX11)
-  
+
   typedef          std::size_t                         uword;
   typedef typename std::make_signed<std::size_t>::type sword;
-  
+
   // TODO: if POSIX detected, use ssize_t ?
-  
+
 #elif defined(SIZE_MAX)
-  
+
   #if   (SIZE_MAX == 0xffffffffU)
     typedef u32 uword;
     typedef s32 sword;
@@ -96,23 +92,23 @@
     #undef  COOT_UWORD_NOT_DEFINED
     #define COOT_UWORD_NOT_DEFINED
   #endif
-  
+
 #endif
 
 
 #if (!defined(SIZE_MAX) || defined(COOT_UWORD_NOT_DEFINED))
-  
+
   template<size_t width> struct gen_uword_type     { typedef u32 result; };
   template<>             struct gen_uword_type<8u> { typedef u64 result; };
-  
+
   template<size_t width> struct gen_sword_type     { typedef s32 result; };
   template<>             struct gen_sword_type<8u> { typedef s64 result; };
-  
+
   typedef typename gen_uword_type<sizeof(std::size_t)>::result uword;
   typedef typename gen_sword_type<sizeof(std::size_t)>::result sword;
-  
+
   #undef COOT_UWORD_NOT_DEFINED
-  
+
 #endif
 
 
@@ -132,6 +128,3 @@ typedef std::complex<float>  cx_float;
 typedef std::complex<double> cx_double;
 
 typedef void* void_ptr;
-
-
-//! @}

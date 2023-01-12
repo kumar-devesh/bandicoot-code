@@ -1,10 +1,10 @@
 // Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +17,7 @@
 // clMAGMA 1.3 (2014-11-14) and/or MAGMA 2.2 (2016-11-20).
 // clMAGMA 1.3 and MAGMA 2.2 are distributed under a
 // 3-clause BSD license as follows:
-// 
+//
 //  -- Innovative Computing Laboratory
 //  -- Electrical Engineering and Computer Science Department
 //  -- University of Tennessee
@@ -79,7 +79,7 @@ magma_dpotrf_gpu(magma_uplo_t uplo, magma_int_t n, magmaDouble_ptr dA, size_t dA
   double  m_one = -1.0;
   double* work;
   magma_int_t err;
-  
+
   *info = 0;
   if ( uplo != MagmaUpper && uplo != MagmaLower ) {
     *info = -1;
@@ -88,50 +88,50 @@ magma_dpotrf_gpu(magma_uplo_t uplo, magma_int_t n, magmaDouble_ptr dA, size_t dA
   } else if ( ldda < std::max(1,n) ) {
     *info = -4;
   }
-  
+
   if ( *info != 0 )
     {
     // magma_xerbla( __func__, -(*info) );
     return *info;
     }
-  
-  nb = magma_get_dpotrf_nb( n );  // TODO: test on various GPUs to get a good range of values 
-  
+
+  nb = magma_get_dpotrf_nb( n );  // TODO: test on various GPUs to get a good range of values
+
   err = magma_dmalloc_cpu(  &work, nb*nb );
   if ( err != MAGMA_SUCCESS )
     {
     *info = MAGMA_ERR_HOST_ALLOC;
     return *info;
     }
-  
+
   magma_event_t event = NULL;
-  
+
   if ((nb <= 1) || (nb >= n))
     {
     //cout << "using CPU version" << endl;
     // TODO: this code is probably unnecessary when using Armadillo to call coot::chol()
     // TODO: otherwise it only makes sense if using bandicoot as a stand-alone library
-    
+
     // use unblocked code
     magma_dgetmatrix( n, n, dA, dA_offset, ldda, work, n, queue );  // internally writes to get_g_event()
-    
+
     // TODO: replace with corresponding wrapper function from Armadillo
     // TODO: need to copy LAPACK wrappers from Armadillo to allow bandicoot work in stand-alone mode
-    
+
     //lapackf77_dpotrf( lapack_uplo_const(uplo), &n, work, &n, info );
     arma::lapack::potrf<double>( (char*)lapack_uplo_const(uplo), &n, work, &n, info );  // TODO: when adapting LAPACK wrappers, change the proto to use const char* instead of char*
-    
+
     magma_dsetmatrix( n, n, work, n, dA, dA_offset, ldda, queue );  // internally uses get_g_event()
     }
   else
     {
     //cout << "using GPU version" << endl;
-    
+
     if ( uplo == MagmaUpper )
       {
       // --------------------
       // compute Cholesky factorization A = U'*U using the left looking algorithm
-      
+
       for( j = 0; j < n; j += nb )
         {
         // apply all previous updates to diagonal block
@@ -140,32 +140,32 @@ magma_dpotrf_gpu(magma_uplo_t uplo, magma_int_t n, magmaDouble_ptr dA, size_t dA
           {
           magma_dsyrk( MagmaUpper, MagmaConjTrans, jb, j, m_one, dA(0,j), ldda, one, dA(j,j), ldda, queue ); // internally uses get_g_event()
           }
-        
+
         // start asynchronous data transfer
         magma_dgetmatrix_async( jb, jb, dA(j,j), ldda, work, jb, queue, &event );
-        
+
         // apply all previous updates to block row right of diagonal block
         if ( j+jb < n )
           {
           magma_dgemm( MagmaConjTrans, MagmaNoTrans, jb, n-j-jb, j, mz_one, dA(0, j   ), ldda, dA(0, j+jb), ldda, z_one,  dA(j, j+jb), ldda, queue );   // internally uses get_g_event()
           }
-        
+
         // simultaneous with above dgemm, transfer data, factor diagonal block on CPU, and test for positive definiteness
-        
+
         magma_event_sync( event );
-        
+
         //lapackf77_dpotrf( MagmaUpperStr, &jb, work, &jb, info );
         arma::lapack::potrf<double>( (char*)MagmaUpperStr, &jb, work, &jb, info );
-        
+
         if ( *info != 0 )
           {
           assert( *info > 0 );
           *info += j;
           break;
           }
-        
+
         magma_dsetmatrix_async( jb, jb, work, jb, dA(j,j), ldda, queue, &event );
-        
+
         // apply diagonal block to block row right of diagonal block
         if ( j+jb < n )
           {
@@ -196,22 +196,22 @@ magma_dpotrf_gpu(magma_uplo_t uplo, magma_int_t n, magmaDouble_ptr dA, size_t dA
           {
           magma_dgemm( MagmaNoTrans, MagmaConjTrans, n-j-jb, jb, j, mz_one, dA(j+jb, 0), ldda, dA(j,  0), ldda, z_one,  dA(j+jb, j), ldda, queue );  // internally uses get_g_event()
           }
-        
+
         // simultaneous with above dgemm, transfer data, factor diagonal block on CPU, and test for positive definiteness
         magma_event_sync( event );
-        
+
         //lapackf77_dpotrf( MagmaLowerStr, &jb, work, &jb, info );
         arma::lapack::potrf<double>( (char*)MagmaLowerStr, &jb, work, &jb, info );
-        
+
         if ( *info != 0 )
           {
           assert( *info > 0 );
           *info += j;
           break;
           }
-        
+
         magma_dsetmatrix_async( jb, jb, work, jb, dA(j,j), ldda, queue, &event );
-        
+
         // apply diagonal block to block column below diagonal
         if ( j+jb < n )
           {
@@ -221,10 +221,10 @@ magma_dpotrf_gpu(magma_uplo_t uplo, magma_int_t n, magmaDouble_ptr dA, size_t dA
         }
       }
     }
-  
+
   magma_queue_sync( queue );
   magma_free_cpu( work );
-  
+
   return *info;
   }
 

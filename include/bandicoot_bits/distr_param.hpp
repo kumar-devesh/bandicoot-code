@@ -17,11 +17,6 @@
 
 
 
-//! \addtogroup distr_param
-//! @{
-
-
-
 class distr_param
   {
   public:
@@ -62,7 +57,3 @@ class distr_param
     {
     }
   };
-
-
-
-//! @}

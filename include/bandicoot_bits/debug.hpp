@@ -1,20 +1,16 @@
 // Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ------------------------------------------------------------------------
-
-
-//! \addtogroup debug
-//! @{
 
 
 
@@ -24,9 +20,9 @@ std::ostream&
 coot_cout_stream(std::ostream* user_stream)
   {
   static std::ostream* cout_stream = &(COOT_COUT_STREAM);
-  
+
   if(user_stream != NULL)  { cout_stream = user_stream; }
-  
+
   return (*cout_stream);
   }
 
@@ -38,9 +34,9 @@ std::ostream&
 coot_cerr_stream(std::ostream* user_stream)
   {
   static std::ostream* cerr_stream = &(COOT_CERR_STREAM);
-  
+
   if(user_stream != NULL)  { cerr_stream = user_stream; }
-  
+
   return (*cerr_stream);
   }
 
@@ -82,7 +78,7 @@ get_cerr_stream()
 
 
 
-//! print a message to get_cerr_stream() and throw logic_error exception
+// print a message to get_cerr_stream() and throw logic_error exception
 template<typename T1>
 coot_cold
 coot_noinline
@@ -95,13 +91,13 @@ coot_stop_logic_error(const T1& x)
     get_cerr_stream() << "\nerror: " << x << std::endl;
     }
   #endif
-  
+
   throw std::logic_error( std::string(x) );
   }
 
 
 
-//! print a message to get_cerr_stream() and throw bad_alloc exception
+// print a message to get_cerr_stream() and throw bad_alloc exception
 template<typename T1>
 coot_cold
 coot_noinline
@@ -118,13 +114,13 @@ coot_stop_bad_alloc(const T1& x)
     coot_ignore(x);
     }
   #endif
-  
+
   throw std::bad_alloc();
   }
 
 
 
-//! print a message to get_cerr_stream() and throw runtime_error exception
+// print a message to get_cerr_stream() and throw runtime_error exception
 template<typename T1>
 coot_cold
 coot_noinline
@@ -137,13 +133,13 @@ coot_stop_runtime_error(const T1& x)
     get_cerr_stream() << "\nerror: " << x << std::endl;
     }
   #endif
-  
+
   throw std::runtime_error( std::string(x) );
   }
 
 
 
-//! print a message to get_cerr_stream() and throw runtime_error exception
+// print a message to get_cerr_stream() and throw runtime_error exception
 template<typename T1, typename T2>
 coot_cold
 coot_noinline
@@ -156,7 +152,7 @@ coot_stop_runtime_error(const T1& x, const T2& y)
     get_cerr_stream() << "\nerror: " << x << ": " << y << std::endl;
     }
   #endif
-  
+
   throw std::runtime_error( std::string(x) + std::string(": ") + std::string(y) );
   }
 
@@ -217,10 +213,10 @@ coot_print(const T1& x, const T2& y, const T3& z)
 //
 // coot_sigprint
 
-//! print a message the the log stream with a preceding @ character.
-//! by default the log stream is cout.
-//! used for printing the signature of a function
-//! (see the coot_extra_debug_sigprint macro) 
+// print a message the the log stream with a preceding @ character.
+// by default the log stream is cout.
+// used for printing the signature of a function
+// (see the coot_extra_debug_sigprint macro)
 inline
 void
 coot_sigprint(const char* x)
@@ -281,7 +277,7 @@ coot_thisprint(const void* this_ptr)
 // coot_warn
 
 
-//! print a message to the warn stream
+// print a message to the warn stream
 template<typename T1>
 coot_cold
 coot_noinline
@@ -346,7 +342,7 @@ coot_warn(const T1& x, const T2& y, const T3& z)
 //
 // coot_check
 
-//! if state is true, abort program
+// if state is true, abort program
 template<typename T1>
 coot_hot
 inline
@@ -398,9 +394,9 @@ std::string
 coot_incompat_size_string(const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols, const char* x)
   {
   std::stringstream tmp;
-  
+
   tmp << x << ": incompatible matrix dimensions: " << A_n_rows << 'x' << A_n_cols << " and " << B_n_rows << 'x' << B_n_cols;
-  
+
   return tmp.str();
   }
 
@@ -424,7 +420,7 @@ coot_assert_same_size(const uword A_n_rows, const uword A_n_cols, const uword B_
 
 
 
-//! stop if given matrices have different sizes
+// stop if given matrices have different sizes
 template<typename eT1, typename eT2>
 coot_hot
 inline
@@ -433,10 +429,10 @@ coot_assert_same_size(const Mat<eT1>& A, const Mat<eT2>& B, const char* x)
   {
   const uword A_n_rows = A.n_rows;
   const uword A_n_cols = A.n_cols;
-  
+
   const uword B_n_rows = B.n_rows;
   const uword B_n_cols = B.n_cols;
-  
+
   if( (A_n_rows != B_n_rows) || (A_n_cols != B_n_cols) )
     {
     coot_stop_logic_error( coot_incompat_size_string(A_n_rows, A_n_cols, B_n_rows, B_n_cols, x) );
@@ -463,7 +459,7 @@ coot_assert_mul_size(const uword A_n_rows, const uword A_n_cols, const uword B_n
 
 
 
-//! stop if given matrices are incompatible for multiplication
+// stop if given matrices are incompatible for multiplication
 template<typename eT1, typename eT2>
 coot_hot
 inline
@@ -472,7 +468,7 @@ coot_assert_mul_size(const Mat<eT1>& A, const Mat<eT2>& B, const char* x)
   {
   const uword A_n_cols = A.n_cols;
   const uword B_n_rows = B.n_rows;
-  
+
   if(A_n_cols != B_n_rows)
     {
     coot_stop_logic_error( coot_incompat_size_string(A.n_rows, A_n_cols, B_n_rows, B.n_cols, x) );
@@ -481,7 +477,7 @@ coot_assert_mul_size(const Mat<eT1>& A, const Mat<eT2>& B, const char* x)
 
 
 
-//! stop if given matrices are incompatible for multiplication
+// stop if given matrices are incompatible for multiplication
 template<typename eT1, typename eT2>
 coot_hot
 inline
@@ -490,12 +486,12 @@ coot_assert_mul_size(const Mat<eT1>& A, const Mat<eT2>& B, const bool do_trans_A
   {
   const uword final_A_n_cols = (do_trans_A == false) ? A.n_cols : A.n_rows;
   const uword final_B_n_rows = (do_trans_B == false) ? B.n_rows : B.n_cols;
-    
+
   if(final_A_n_cols != final_B_n_rows)
     {
     const uword final_A_n_rows = (do_trans_A == false) ? A.n_rows : A.n_cols;
     const uword final_B_n_cols = (do_trans_B == false) ? B.n_cols : B.n_rows;
-    
+
     coot_stop_logic_error( coot_incompat_size_string(final_A_n_rows, final_A_n_cols, final_B_n_rows, final_B_n_cols, x) );
     }
   }
@@ -510,12 +506,12 @@ coot_assert_trans_mul_size(const uword A_n_rows, const uword A_n_cols, const uwo
   {
   const uword final_A_n_cols = (do_trans_A == false) ? A_n_cols : A_n_rows;
   const uword final_B_n_rows = (do_trans_B == false) ? B_n_rows : B_n_cols;
-    
+
   if(final_A_n_cols != final_B_n_rows)
     {
     const uword final_A_n_rows = (do_trans_A == false) ? A_n_rows : A_n_cols;
     const uword final_B_n_cols = (do_trans_B == false) ? B_n_cols : B_n_rows;
-    
+
     coot_stop_logic_error( coot_incompat_size_string(final_A_n_rows, final_A_n_cols, final_B_n_rows, final_B_n_cols, x) );
     }
   }
@@ -531,10 +527,10 @@ coot_assert_blas_size(const T1& A)
   if(sizeof(uword) >= sizeof(blas_int))
     {
     bool overflow;
-    
+
     overflow = (A.n_rows > COOT_MAX_BLAS_INT);
     overflow = (A.n_cols > COOT_MAX_BLAS_INT) || overflow;
-    
+
     if(overflow)
       {
       coot_stop_runtime_error("integer overflow: matrix dimensions are too large for integer type used by BLAS and LAPACK");
@@ -553,12 +549,12 @@ coot_assert_blas_size(const T1& A, const T2& B)
   if(sizeof(uword) >= sizeof(blas_int))
     {
     bool overflow;
-    
+
     overflow = (A.n_rows > COOT_MAX_BLAS_INT);
     overflow = (A.n_cols > COOT_MAX_BLAS_INT) || overflow;
     overflow = (B.n_rows > COOT_MAX_BLAS_INT) || overflow;
     overflow = (B.n_cols > COOT_MAX_BLAS_INT) || overflow;
-    
+
     if(overflow)
       {
       coot_stop_runtime_error("integer overflow: matrix dimensions are too large for integer type used by BLAS and LAPACK");
@@ -578,9 +574,9 @@ coot_assert_blas_size(const T1& A, const T2& B)
 
 
 #if defined(COOT_NO_DEBUG)
-  
+
   #undef COOT_EXTRA_DEBUG
-  
+
   #define coot_debug_print                   true ? (void)0 : coot_print
   #define coot_debug_warn                    true ? (void)0 : coot_warn
   #define coot_debug_check                   true ? (void)0 : coot_check
@@ -588,9 +584,9 @@ coot_assert_blas_size(const T1& A, const T2& B)
   #define coot_debug_assert_mul_size         true ? (void)0 : coot_assert_mul_size
   #define coot_debug_assert_trans_mul_size   true ? (void)0 : coot_assert_trans_mul_size
   #define coot_debug_assert_blas_size        true ? (void)0 : coot_assert_blas_size
-  
+
 #else
-  
+
   #define coot_debug_print                 coot_print
   #define coot_debug_warn                  coot_warn
   #define coot_debug_check                 coot_check
@@ -598,13 +594,13 @@ coot_assert_blas_size(const T1& A, const T2& B)
   #define coot_debug_assert_mul_size       coot_assert_mul_size
   #define coot_debug_assert_trans_mul_size coot_assert_trans_mul_size
   #define coot_debug_assert_blas_size      coot_assert_blas_size
-  
+
 #endif
 
 
 
 #if defined(COOT_EXTRA_DEBUG)
-  
+
   #define coot_extra_debug_sigprint       coot_sigprint(COOT_FNSIG); coot_bktprint
   #define coot_extra_debug_sigprint_this  coot_sigprint(COOT_FNSIG); coot_thisprint
   #define coot_extra_debug_print          coot_print
@@ -612,13 +608,13 @@ coot_assert_blas_size(const T1& A, const T2& B)
   #define coot_extra_debug_check          coot_check
 
 #else
-  
+
   #define coot_extra_debug_sigprint        true ? (void)0 : coot_bktprint
   #define coot_extra_debug_sigprint_this   true ? (void)0 : coot_thisprint
   #define coot_extra_debug_print           true ? (void)0 : coot_print
   #define coot_extra_debug_warn            true ? (void)0 : coot_warn
   #define coot_extra_debug_check           true ? (void)0 : coot_check
- 
+
 #endif
 
 
@@ -631,7 +627,7 @@ coot_assert_blas_size(const T1& A, const T2& B)
     class coot_first_extra_debug_message
       {
       public:
-      
+
       inline
       coot_first_extra_debug_message()
         {
@@ -640,14 +636,14 @@ coot_assert_blas_size(const T1& A, const T2& B)
           unsigned short a;
           unsigned char  b[sizeof(unsigned short)];
           } endian_test;
-        
+
         endian_test.a = 1;
-        
+
         const bool        little_endian = (endian_test.b[0] == 1);
         const std::string note          = COOT_VERSION_NOTE;
-        
+
         std::ostream& out = get_cerr_stream();
-        
+
         out << "@ ---" << '\n';
         out << "@ Bandicoot " << coot_version::major << '.' << coot_version::minor << '.' << coot_version::patch;
         if(note.length() > 0)  { out << " (" << note << ')'; }
@@ -665,14 +661,10 @@ coot_assert_blas_size(const T1& A, const T2& B)
         out << "@ little_endian    = " << little_endian    << '\n';
         out << "@ ---" << std::endl;
         }
-      
+
       };
-    
+
     static coot_first_extra_debug_message coot_first_extra_debug_message_run;
     }
 
 #endif
-
-
-
-//! @}

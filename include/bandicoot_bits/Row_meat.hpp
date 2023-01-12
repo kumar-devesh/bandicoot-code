@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup Row
-//! @{
-
-
 
 template<typename eT>
 inline
@@ -285,5 +281,3 @@ Row<eT>::subvec(const uword in_col1, const uword in_col2) const
 #ifdef COOT_EXTRA_ROW_MEAT
   #include COOT_INCFILE_WRAP(COOT_EXTRA_ROW_MEAT)
 #endif
-
-//! @}

@@ -152,7 +152,7 @@ void test_conv_to_eop_scalar_plus()
   Mat<eT2> y = conv_to<Mat<eT2>>::from(x) + eT2(1);
 
   for (uword r = 0; r < 5; ++r)
-    { 
+    {
     for (uword c = 0; c < 5; ++c)
       {
       REQUIRE( eT2(y(r, c)) == Approx(eT2(eT1(x(r, c)) + eT2(1))) );

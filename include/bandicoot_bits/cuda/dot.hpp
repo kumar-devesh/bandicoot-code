@@ -12,8 +12,7 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-//! \addtogroup cuda
-//! @{
+
 
 /**
  * Compute a dot product between two vectors.
@@ -91,6 +90,3 @@ dot(dev_mem_t<eT1> mem1, dev_mem_t<eT2> mem2, const uword n_elem)
       }
     }
   }
-
-//! @}
-

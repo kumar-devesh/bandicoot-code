@@ -13,9 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup op_max
-//! @{
-
 
 class op_max
   {
@@ -27,7 +24,3 @@ class op_max
   template<typename T1>
   inline static typename T1::elem_type apply(const Op<eOp<T1, eop_abs>, op_max>& in);
   };
-
-
-
-//! @}

@@ -1,20 +1,16 @@
 // Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ------------------------------------------------------------------------
-
-
-//! \addtogroup traits
-//! @{
 
 
 template<typename T1>
@@ -153,11 +149,11 @@ struct is_subview_col< const subview_col<eT> >
 template<typename T>
 struct is_Gen
   { static const bool value = false; };
- 
+
 template<typename T1, typename gen_type>
 struct is_Gen< Gen<T1,gen_type> >
   { static const bool value = true; };
- 
+
 template<typename T1, typename gen_type>
 struct is_Gen< const Gen<T1,gen_type> >
   { static const bool value = true; };
@@ -166,11 +162,11 @@ struct is_Gen< const Gen<T1,gen_type> >
 template<typename T>
 struct is_Op
   { static const bool value = false; };
- 
+
 template<typename T1, typename op_type>
 struct is_Op< Op<T1, op_type> >
   { static const bool value = true; };
- 
+
 template<typename T1, typename op_type>
 struct is_Op< const Op<T1, op_type> >
   { static const bool value = true; };
@@ -179,11 +175,11 @@ struct is_Op< const Op<T1, op_type> >
 template<typename T>
 struct is_eOp
   { static const bool value = false; };
- 
+
 template<typename T1, typename eop_type>
 struct is_eOp< eOp<T1, eop_type> >
   { static const bool value = true; };
- 
+
 template<typename T1, typename eop_type>
 struct is_eOp< const eOp<T1, eop_type> >
   { static const bool value = true; };
@@ -192,11 +188,11 @@ struct is_eOp< const eOp<T1, eop_type> >
 template<typename T>
 struct is_mtOp
   { static const bool value = false; };
- 
+
 template<typename eT, typename T1, typename mtop_type>
 struct is_mtOp< mtOp<eT, T1, mtop_type> >
   { static const bool value = true; };
- 
+
 template<typename eT, typename T1, typename mtop_type>
 struct is_mtOp< const mtOp<eT, T1, mtop_type> >
   { static const bool value = true; };
@@ -205,7 +201,7 @@ struct is_mtOp< const mtOp<eT, T1, mtop_type> >
 template<typename T>
 struct is_Glue
   { static const bool value = false; };
- 
+
 template<typename T1, typename T2, typename glue_type>
 struct is_Glue< Glue<T1, T2, glue_type> >
   { static const bool value = true; };
@@ -218,7 +214,7 @@ struct is_Glue< const Glue<T1, T2, glue_type> >
 template<typename T>
 struct is_eGlue
   { static const bool value = false; };
- 
+
 template<typename T1, typename T2, typename eglue_type>
 struct is_eGlue< eGlue<T1, T2, eglue_type> >
   { static const bool value = true; };
@@ -253,16 +249,16 @@ struct is_Cube< Cube<eT> >
 template<typename T>
 struct is_GenCube
   { static const bool value = false; };
- 
+
 template<typename eT, typename gen_type>
 struct is_GenCube< GenCube<eT,gen_type> >
   { static const bool value = true; };
- 
+
 
 template<typename T>
 struct is_OpCube
   { static const bool value = false; };
- 
+
 template<typename T1, typename op_type>
 struct is_OpCube< OpCube<T1,op_type> >
   { static const bool value = true; };
@@ -271,16 +267,16 @@ struct is_OpCube< OpCube<T1,op_type> >
 template<typename T>
 struct is_eOpCube
   { static const bool value = false; };
- 
+
 template<typename T1, typename eop_type>
 struct is_eOpCube< eOpCube<T1,eop_type> >
   { static const bool value = true; };
- 
+
 
 template<typename T>
 struct is_GlueCube
   { static const bool value = false; };
- 
+
 template<typename T1, typename T2, typename glue_type>
 struct is_GlueCube< GlueCube<T1,T2,glue_type> >
   { static const bool value = true; };
@@ -289,7 +285,7 @@ struct is_GlueCube< GlueCube<T1,T2,glue_type> >
 template<typename T>
 struct is_eGlueCube
   { static const bool value = false; };
- 
+
 template<typename T1, typename T2, typename eglue_type>
 struct is_eGlueCube< eGlueCube<T1,T2,eglue_type> >
   { static const bool value = true; };
@@ -490,7 +486,7 @@ struct is_real
 template<>
 struct is_real<float>
   { static const bool value = true; };
-  
+
 template<>
 struct is_real<double>
   { static const bool value = true; };
@@ -572,7 +568,7 @@ struct is_cx< std::complex<T> >
 
 
 
-//! check for a weird implementation of the std::complex class
+// check for a weird implementation of the std::complex class
 template<typename T1>
 struct is_supported_complex
   { static const bool value = false; };
@@ -674,7 +670,7 @@ struct force_different_type
   typedef T1 T1_result;
   typedef T2 T2_result;
   };
-  
+
 
 template<typename T1>
 struct force_different_type<T1,T1>
@@ -682,8 +678,8 @@ struct force_different_type<T1,T1>
   typedef T1              T1_result;
   typedef coot_junk_class T2_result;
   };
-  
-  
+
+
 
 //
 
@@ -752,7 +748,3 @@ struct resolves_to_colvector_redirect<T1, true>  { typedef resolves_to_colvector
 
 template<typename T1>
 struct resolves_to_colvector : public resolves_to_colvector_redirect<T1, is_coot_type<T1>::value>::result {};
-
-
-
-//! @}

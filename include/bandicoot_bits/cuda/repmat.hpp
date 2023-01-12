@@ -13,8 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup cuda
-//! @{
 
 /**
  * Copy the given matrix `src` into `dest`, making `copies_per_col` copies of each column, and `copies_per_row` copies of each row.
@@ -53,7 +51,3 @@ repmat(const dev_mem_t<eT1> src, dev_mem_t<eT2> dest, const uword n_rows, const 
 
   coot_check_cuda_error(result, "coot::cuda::repmat(): cuLaunchKernel() failed");
   }
-
-
-
-//! @}
