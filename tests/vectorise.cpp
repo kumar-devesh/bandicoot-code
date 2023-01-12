@@ -85,6 +85,26 @@ TEST_CASE("direct_vectorise_row", "[vectorise]")
 
 
 
+TEST_CASE("empty_vectorise", "[vectorise]")
+  {
+  mat x;
+  vec y = vectorise(x);
+
+  REQUIRE( y.n_elem == 0 );
+  }
+
+
+
+TEST_CASE("empty_row_vectorise", "[vectorise]")
+  {
+  mat x;
+  rowvec y = vectorise(x, 1);
+
+  REQUIRE( y.n_elem == 0 );
+  }
+
+
+
 TEST_CASE("vectorise_then_trans", "[vectorise]")
   {
   mat x = randu<mat>(10, 10);
@@ -169,7 +189,6 @@ TEST_CASE("long_chained_row_vectorise", "[vectorise]")
 TEST_CASE("long_mixed_chained_vectorise", "[vectorise]")
   {
   mat x = randu<mat>(10, 10);
-  mat xt = trans(x);
 
   rowvec y = vectorise(vectorise(vectorise(vectorise(vectorise(x), 1), 0)), 1);
 
@@ -177,7 +196,7 @@ TEST_CASE("long_mixed_chained_vectorise", "[vectorise]")
 
   for (size_t i = 0; i < y.n_elem; ++i)
     {
-    REQUIRE( double(y[i]) == Approx(double(xt[i])) );
+    REQUIRE( double(y[i]) == Approx(double(x[i])) );
     }
   }
 
@@ -388,11 +407,11 @@ TEST_CASE("row_vectorises_inside_glue", "[vectorise]")
   mat x = randu<mat>(10, 10);
   mat y = randu<mat>(10, 10);
 
-  mat z = vectorise(x, 1) * trans(vectorise(y, 1));
+  mat z = trans(vectorise(x, 1)) * vectorise(y, 1);
 
   vec xv = vectorise(x, 1);
   vec yv = vectorise(y, 1);
-  mat zz = xv * trans(yv);
+  mat zz = trans(xv) * yv;
 
   REQUIRE( z.n_elem == x.n_elem * y.n_elem );
 
@@ -411,9 +430,9 @@ TEST_CASE("vectorise_inplace_subview", "[vectorise]")
   {
   mat x = randu<mat>(20, 20);
   mat x_old(x);
-  mat x_sub = x.submat(0, 0, 4, 4);
+  mat x_sub = x.submat(0, 0, 3, 3);
 
-  x.submat(0, 0, 15, 0) = vectorise(x.submat(0, 0, 4, 4));
+  x.submat(0, 0, 15, 0) = vectorise(x.submat(0, 0, 3, 3));
 
   for (size_t c = 0; c < x.n_cols; ++c)
     {
@@ -437,9 +456,9 @@ TEST_CASE("vectorise_row_inplace_subview", "[vectorise]")
   {
   mat x = randu<mat>(20, 20);
   mat x_old(x);
-  mat x_sub = x.submat(0, 0, 4, 4);
+  mat x_sub = x.submat(0, 0, 3, 3);
 
-  x.submat(0, 0, 0, 15) = vectorise(x.submat(0, 0, 4, 4), 1);
+  x.submat(0, 0, 0, 15) = vectorise(x.submat(0, 0, 3, 3), 1);
 
   for (size_t c = 0; c < x.n_cols; ++c)
     {
@@ -496,7 +515,7 @@ TEST_CASE("vectorise_row_non_inplace_subview", "[vectorise]")
 TEST_CASE("vectorise_bonanza", "[vectorise]")
   {
   mat x = randu<mat>(10, 10);
-  mat y = randu<mat>(5, 50);
+  mat y = randu<mat>(2, 50);
   mat z = randu<mat>(100, 100);
 
   vec out = vectorise(z % ((vectorise(x) * 3) * trans(vectorise(y) - 2)));
@@ -520,15 +539,15 @@ TEST_CASE("vectorise_bonanza", "[vectorise]")
 TEST_CASE("vectorise_row_bonanza", "[vectorise]")
   {
   mat x = randu<mat>(10, 10);
-  mat y = randu<mat>(5, 50);
+  mat y = randu<mat>(2, 50);
   mat z = randu<mat>(100, 100);
 
-  rowvec out = vectorise(z % ((vectorise(x, 1) * 3) * trans(vectorise(y, 1) - 2)), 1);
+  rowvec out = vectorise(z % (trans(vectorise(x, 1) * 3) * (vectorise(y, 1) - 2)), 1);
 
   // Now assemble by hand for comparison...
   vec tmp1 = vectorise(x, 1) * 3;
   vec tmp2 = vectorise(y, 1) - 2;
-  mat tmp3 = tmp1 * trans(tmp2);
+  mat tmp3 = trans(tmp1) * tmp2;
   mat tmp4 = z % tmp3;
   mat tmp4t = trans(tmp4);
 
@@ -636,7 +655,7 @@ TEMPLATE_TEST_CASE(
 
   Mat<eT1> x = randi<Mat<eT1>>(5, 5, distr_param(0, 50));
   Mat<eT1> xt = trans(x);
-  Row<eT2> y = vectorise(conv_to<Mat<eT2>>::from(x));
+  Row<eT2> y = vectorise(conv_to<Mat<eT2>>::from(x), 1);
 
   REQUIRE(y.n_elem == x.n_elem);
 
