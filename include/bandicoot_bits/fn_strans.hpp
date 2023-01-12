@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup fn_strans
-//! @{
-
-
 
 template<typename T1>
 coot_warn_unused
@@ -52,7 +48,3 @@ strans
   
   return Op<T1, op_htrans>(X.get_ref());
   }
-
-
-
-//! @}

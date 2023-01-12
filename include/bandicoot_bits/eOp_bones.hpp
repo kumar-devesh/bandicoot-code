@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup eOp
-//! @{
-
-
 
 template<typename T1, typename eop_type>
 class eOp : public Base< typename T1::elem_type, eOp<T1, eop_type> >
@@ -31,9 +27,9 @@ class eOp : public Base< typename T1::elem_type, eOp<T1, eop_type> >
   
   coot_aligned const SizeProxy<T1> m;
 
-  coot_aligned       elem_type  aux;          //!< storage of auxiliary data, user defined format
-  coot_aligned       uword      aux_uword_a;  //!< storage of auxiliary data, uword format
-  coot_aligned       uword      aux_uword_b;  //!< storage of auxiliary data, uword format
+  coot_aligned       elem_type  aux;          // storage of auxiliary data, user defined format
+  coot_aligned       uword      aux_uword_a;  // storage of auxiliary data, uword format
+  coot_aligned       uword      aux_uword_b;  // storage of auxiliary data, uword format
   
   inline         ~eOp();
   inline explicit eOp(const T1& in_m);
@@ -45,7 +41,3 @@ class eOp : public Base< typename T1::elem_type, eOp<T1, eop_type> >
   coot_inline uword get_n_cols() const;
   coot_inline uword get_n_elem() const;
   };
-
-
-
-//! @}

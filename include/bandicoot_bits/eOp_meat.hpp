@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup eOp
-//! @{
-
-
 
 template<typename T1, typename eop_type>
 inline
@@ -103,7 +99,3 @@ eOp<T1, eop_type>::get_n_elem() const
   {
   return m.get_n_elem();
   }
-
-
-
-//! @}

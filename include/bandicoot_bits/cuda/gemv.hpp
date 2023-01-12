@@ -12,9 +12,6 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-//! \addtogroup gemv
-//! @{
-
 
 
 template<bool do_trans_A = false>
@@ -86,7 +83,3 @@ struct gemv
     coot_check_cublas_error( result, "coot::cuda::gemv(): call to cublasSgemv() failed" );
     }
   };
-
-
-
-//! @}

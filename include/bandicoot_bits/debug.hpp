@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup debug
-//! @{
-
-
 
 template<typename T>
 inline
@@ -82,7 +78,7 @@ get_cerr_stream()
 
 
 
-//! print a message to get_cerr_stream() and throw logic_error exception
+// print a message to get_cerr_stream() and throw logic_error exception
 template<typename T1>
 coot_cold
 coot_noinline
@@ -101,7 +97,7 @@ coot_stop_logic_error(const T1& x)
 
 
 
-//! print a message to get_cerr_stream() and throw bad_alloc exception
+// print a message to get_cerr_stream() and throw bad_alloc exception
 template<typename T1>
 coot_cold
 coot_noinline
@@ -124,7 +120,7 @@ coot_stop_bad_alloc(const T1& x)
 
 
 
-//! print a message to get_cerr_stream() and throw runtime_error exception
+// print a message to get_cerr_stream() and throw runtime_error exception
 template<typename T1>
 coot_cold
 coot_noinline
@@ -143,7 +139,7 @@ coot_stop_runtime_error(const T1& x)
 
 
 
-//! print a message to get_cerr_stream() and throw runtime_error exception
+// print a message to get_cerr_stream() and throw runtime_error exception
 template<typename T1, typename T2>
 coot_cold
 coot_noinline
@@ -217,10 +213,10 @@ coot_print(const T1& x, const T2& y, const T3& z)
 //
 // coot_sigprint
 
-//! print a message the the log stream with a preceding @ character.
-//! by default the log stream is cout.
-//! used for printing the signature of a function
-//! (see the coot_extra_debug_sigprint macro) 
+// print a message the the log stream with a preceding @ character.
+// by default the log stream is cout.
+// used for printing the signature of a function
+// (see the coot_extra_debug_sigprint macro) 
 inline
 void
 coot_sigprint(const char* x)
@@ -281,7 +277,7 @@ coot_thisprint(const void* this_ptr)
 // coot_warn
 
 
-//! print a message to the warn stream
+// print a message to the warn stream
 template<typename T1>
 coot_cold
 coot_noinline
@@ -346,7 +342,7 @@ coot_warn(const T1& x, const T2& y, const T3& z)
 //
 // coot_check
 
-//! if state is true, abort program
+// if state is true, abort program
 template<typename T1>
 coot_hot
 inline
@@ -424,7 +420,7 @@ coot_assert_same_size(const uword A_n_rows, const uword A_n_cols, const uword B_
 
 
 
-//! stop if given matrices have different sizes
+// stop if given matrices have different sizes
 template<typename eT1, typename eT2>
 coot_hot
 inline
@@ -463,7 +459,7 @@ coot_assert_mul_size(const uword A_n_rows, const uword A_n_cols, const uword B_n
 
 
 
-//! stop if given matrices are incompatible for multiplication
+// stop if given matrices are incompatible for multiplication
 template<typename eT1, typename eT2>
 coot_hot
 inline
@@ -481,7 +477,7 @@ coot_assert_mul_size(const Mat<eT1>& A, const Mat<eT2>& B, const char* x)
 
 
 
-//! stop if given matrices are incompatible for multiplication
+// stop if given matrices are incompatible for multiplication
 template<typename eT1, typename eT2>
 coot_hot
 inline
@@ -672,7 +668,3 @@ coot_assert_blas_size(const T1& A, const T2& B)
     }
 
 #endif
-
-
-
-//! @}

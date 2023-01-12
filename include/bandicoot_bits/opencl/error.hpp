@@ -13,9 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup coot_cl_error
-//! @{
-
 
 struct coot_cl_error
   {
@@ -140,6 +137,3 @@ struct coot_clblas_error
       }
     }
   };
-
-
-//! @}

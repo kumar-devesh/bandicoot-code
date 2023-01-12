@@ -13,9 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup fn_accu
-//! @{
-
 
 template<typename T1>
 coot_warn_unused
@@ -49,7 +46,3 @@ accu(const subview<eT>& S)
 
   return coot_rt_t::accu_subview(S.m.get_dev_mem(false), S.m.n_rows, S.aux_row1, S.aux_col1, S.n_rows, S.n_cols);
   }
-
-
-
-//! @}

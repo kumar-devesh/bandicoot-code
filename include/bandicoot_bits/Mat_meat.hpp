@@ -13,9 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup Mat
-//! @{
-
 
 template<typename eT>
 inline
@@ -47,7 +44,7 @@ Mat<eT>::Mat()
 
 
 
-//! construct the matrix to have user specified dimensions
+// construct the matrix to have user specified dimensions
 template<typename eT>
 inline
 Mat<eT>::Mat(const uword in_n_rows, const uword in_n_cols)
@@ -1675,7 +1672,7 @@ Mat<eT>::get_n_elem() const
 
 
 
-//! linear element accessor without bounds check; this is very slow - do not use it unless absolutely necessary
+// linear element accessor without bounds check; this is very slow - do not use it unless absolutely necessary
 template<typename eT>
 coot_inline
 coot_warn_unused
@@ -1687,7 +1684,7 @@ Mat<eT>::operator[] (const uword ii)
 
 
 
-//! linear element accessor without bounds check; this is very slow - do not use it unless absolutely necessary
+// linear element accessor without bounds check; this is very slow - do not use it unless absolutely necessary
 template<typename eT>
 inline
 coot_warn_unused
@@ -1699,7 +1696,7 @@ Mat<eT>::operator[] (const uword ii) const
 
 
 
-//! linear element accessor without bounds check; this is very slow - do not use it unless absolutely necessary
+// linear element accessor without bounds check; this is very slow - do not use it unless absolutely necessary
 template<typename eT>
 coot_inline
 coot_warn_unused
@@ -1711,7 +1708,7 @@ Mat<eT>::at(const uword ii)
 
 
 
-//! linear element accessor without bounds check; this is very slow - do not use it unless absolutely necessary
+// linear element accessor without bounds check; this is very slow - do not use it unless absolutely necessary
 template<typename eT>
 coot_inline
 coot_warn_unused
@@ -1723,7 +1720,7 @@ Mat<eT>::at(const uword ii) const
 
 
 
-//! linear element accessor with bounds check; this is very slow - do not use it unless absolutely necessary
+// linear element accessor with bounds check; this is very slow - do not use it unless absolutely necessary
 template<typename eT>
 coot_inline
 coot_warn_unused
@@ -1737,7 +1734,7 @@ Mat<eT>::operator() (const uword ii)
 
 
 
-//! linear element accessor with bounds check; this is very slow - do not use it unless absolutely necessary
+// linear element accessor with bounds check; this is very slow - do not use it unless absolutely necessary
 template<typename eT>
 coot_inline
 coot_warn_unused
@@ -2490,7 +2487,3 @@ Mat<eT>::tail_cols(const uword N) const
 #ifdef COOT_EXTRA_MAT_MEAT
   #include COOT_INCFILE_WRAP(COOT_EXTRA_MAT_MEAT)
 #endif
-
-
-
-//! @}

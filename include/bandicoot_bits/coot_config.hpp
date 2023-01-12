@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup coot_config
-//! @{
-
-
 
 struct coot_config
   {
@@ -80,7 +76,3 @@ struct coot_config
     static const bool wrapper = false;
   #endif
   };
-
-
-
-//! @}

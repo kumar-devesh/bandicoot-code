@@ -13,9 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup fn_as_scalar
-//! @{
-
 
 template<typename T1>
 coot_warn_unused
@@ -40,7 +37,3 @@ as_scalar(const Base<typename T1::elem_type, T1>& X)
   
   return eT(A(0,0));
   }
-
-
-
-//! @}

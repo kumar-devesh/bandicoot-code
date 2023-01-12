@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup cond_rel
-//! @{
-
-
 
 template<>
 template<typename eT>
@@ -125,7 +121,3 @@ cond_rel<false>::make_neg(const eT)
   {
   return eT(0);
   }
-  
-
-
-//! @}

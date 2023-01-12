@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup MatValProxy
-//! @{
-
-
 
 template<typename eT>
 coot_inline
@@ -157,7 +153,3 @@ MatValProxy<eT>::operator/=(const eT in_val)
 
   coot_rt_t::val_div_inplace(M.dev_mem, index, in_val);
   }
-
-
-
-//! @}

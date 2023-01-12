@@ -13,24 +13,20 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup Mat
-//! @{
-
-
 
 template<typename eT>
 class Mat : public Base< eT, Mat<eT> >
   {
   public:
   
-  typedef eT                                elem_type;  //!< the type of elements stored in the matrix
-  typedef typename get_pod_type<eT>::result  pod_type;  //!< if eT is std::complex<T>, pod_type is T; otherwise pod_type is eT
+  typedef eT                                elem_type;  // the type of elements stored in the matrix
+  typedef typename get_pod_type<eT>::result  pod_type;  // if eT is std::complex<T>, pod_type is T; otherwise pod_type is eT
   
-  coot_aligned const uword n_rows;    //!< number of rows     (read-only)
-  coot_aligned const uword n_cols;    //!< number of columns  (read-only)
-  coot_aligned const uword n_elem;    //!< number of elements (read-only)
-  coot_aligned const uword vec_state; //!< 0: matrix layout; 1: column vector layout; 2: row vector layout
-  coot_aligned const uword mem_state; //!< 0: normal; 1: external;  TODO: should this be expanded to allow re-allocation if size of aux mem is smaller than requested size?
+  coot_aligned const uword n_rows;    // number of rows     (read-only)
+  coot_aligned const uword n_cols;    // number of columns  (read-only)
+  coot_aligned const uword n_elem;    // number of elements (read-only)
+  coot_aligned const uword vec_state; // 0: matrix layout; 1: column vector layout; 2: row vector layout
+  coot_aligned const uword mem_state; // 0: normal; 1: external;  TODO: should this be expanded to allow re-allocation if size of aux mem is smaller than requested size?
   
   static const bool is_col = false;
   static const bool is_row = false;
@@ -79,7 +75,7 @@ class Mat : public Base< eT, Mat<eT> >
   inline const Mat& operator=(Mat&& X);
   #endif
   
-  inline void steal_mem(Mat& X);  //!< only for writing code internal to bandicoot
+  inline void steal_mem(Mat& X);  // only for writing code internal to bandicoot
   
   inline                   Mat(const subview<eT>& X);
   inline const Mat& operator= (const subview<eT>& X);
@@ -276,7 +272,3 @@ class Mat_aux
   template<typename eT, typename T1> inline static void set_imag(Mat<eT>&                out, const Base<eT,T1>& X);
   template<typename T,  typename T1> inline static void set_imag(Mat< std::complex<T> >& out, const Base< T,T1>& X);
   };
-
-
-
-//! @}

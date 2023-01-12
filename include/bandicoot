@@ -91,7 +91,7 @@
 // TODO: include any stuff here that is not meant to be in the coot namespace
 
 
-//! \namespace coot namespace for bandicoot classes and functions
+// namespace for bandicoot classes and functions
 namespace coot
   {
   

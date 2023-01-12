@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup eop_core
-//! @{
-
-
 
 template<typename eop_type>
 class eop_core
@@ -418,6 +414,3 @@ struct get_default<eop_scalar_times> { template<typename eT> static inline eT va
 
 template<>
 struct get_default<eop_scalar_div_post> { template<typename eT> static inline eT val() { return eT(1); } };
-
-
-//! @}

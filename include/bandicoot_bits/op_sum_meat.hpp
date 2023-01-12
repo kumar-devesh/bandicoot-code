@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup op_sum
-//! @{
-
-
 
 template<typename out_eT, typename T1>
 inline
@@ -171,7 +167,3 @@ op_sum::apply_noalias(Mat<out_eT>& out, const subview<in_eT>& sv, const uword di
     coot_rt_t::sum_rowwise_subview(out.get_dev_mem(false), sv.m.get_dev_mem(false), sv.m.n_rows, sv.aux_row1, sv.aux_col1, sv.n_rows, sv.n_cols, post_conv_apply);
     }
   }
-
-
-
-//! @}

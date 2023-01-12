@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup Op
-//! @{
-
-
 
 template<typename T1, typename op_type>
 class Op : public Base< typename T1::elem_type, Op<T1, op_type> >
@@ -44,7 +40,3 @@ class Op : public Base< typename T1::elem_type, Op<T1, op_type> >
   static const bool is_col = false; // TODO: expand
   static const bool is_vec = (is_row || is_col) || (is_same_type<op_type, op_sum>::yes);
   };
-
-
-
-//! @}

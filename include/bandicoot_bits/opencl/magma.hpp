@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup opencl
-//! @{
-
-
 
 inline std::string error_as_string(const magma_int_t error_code)
   {
@@ -36,7 +32,3 @@ inline std::string error_as_string(const magma_int_t error_code)
     default:                          return "unspecified MAGMA error code";
     }
   }
-
-
-
-//! @}

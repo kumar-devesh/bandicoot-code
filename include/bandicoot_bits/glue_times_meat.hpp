@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup glue_times
-//! @{
-
-
 
 template<uword N>
 template<typename out_eT, typename T1, typename T2>
@@ -470,7 +466,3 @@ glue_times::apply
     glue_times::apply<out_eT, eT1, out_eT, do_trans_A, false, false>(out, A, tmp, out_eT(0));
     }
   }
-
-
-
-//! @}

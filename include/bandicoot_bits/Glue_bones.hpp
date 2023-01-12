@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup Glue
-//! @{
-
-
 
 template<typename T1, typename T2, typename glue_type>
 class Glue : public Base<typename T1::elem_type, Glue<T1, T2, glue_type> >
@@ -37,7 +33,3 @@ class Glue : public Base<typename T1::elem_type, Glue<T1, T2, glue_type> >
   const T2&   B;
         uword aux_uword;
   };
-
-
-
-//! @}

@@ -13,9 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup eGlue
-//! @{
-
 
 template<typename T1, typename T2, typename eglue_type>
 class eGlue : public Base< typename T1::elem_type, eGlue<T1, T2, eglue_type> >
@@ -38,7 +35,3 @@ class eGlue : public Base< typename T1::elem_type, eGlue<T1, T2, eglue_type> >
   coot_inline uword get_n_cols() const;
   coot_inline uword get_n_elem() const;
   };
-
-
-
-//! @}

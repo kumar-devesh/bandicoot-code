@@ -13,15 +13,11 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup Base
-//! @{
-
-
 
 template<typename derived>
 struct Base_inv_yes
   {
-  coot_inline const Op<derived, op_inv> i() const;   //!< matrix inverse
+  coot_inline const Op<derived, op_inv> i() const;   // matrix inverse
   };
 
 
@@ -52,7 +48,7 @@ struct Base_eval_Mat
 template<typename elem_type, typename derived>
 struct Base_eval_expr
   {
-  coot_inline Mat<elem_type> eval() const;   //!< force the immediate evaluation of a delayed expression
+  coot_inline Mat<elem_type> eval() const;   // force the immediate evaluation of a delayed expression
   };
 
 
@@ -116,7 +112,3 @@ struct Base
 //   inline coot_warn_unused uword index_min() const;
 //   inline coot_warn_unused uword index_max() const;
   };
-
-
-
-//! @}

@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup gemm
-//! @{
-
-
 
 template<const bool do_trans_A=false, const bool do_trans_B=false, const bool use_alpha=false, const bool use_beta=false>
 class gemm
@@ -37,7 +33,3 @@ class gemm
     coot_rt_t::gemm<eT, do_trans_A, do_trans_B>(C.get_dev_mem(true), C.n_rows, C.n_cols, A.get_dev_mem(true), A.n_rows, A.n_cols, B.get_dev_mem(true), local_alpha, local_beta);
     }
   };
-
-
-
-//! @}

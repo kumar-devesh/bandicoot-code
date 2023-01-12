@@ -13,9 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup fn_dot
-//! @{
-
 
 template<typename eT1, typename eT2, typename T1, typename T2>
 coot_warn_unused
@@ -39,7 +36,3 @@ dot
 
   return coot_rt_t::dot(X.get_dev_mem(false), Y.get_dev_mem(false), X.n_elem);
   }
-
-
-
-//! @}

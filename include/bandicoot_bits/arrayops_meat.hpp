@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup arrayops
-//! @{
-
-
 
 template<typename out_eT, typename in_eT>
 inline
@@ -170,7 +166,3 @@ arrayops::product(cl_mem src, const uword n_elem)
   {
   // TODO
   }
-
-
-
-//! @}

@@ -13,9 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup cond_rel
-//! @{
-
 
 //
 // for preventing pedantic compiler warnings
@@ -33,7 +30,3 @@ class cond_rel
   
   template<typename eT> coot_inline static eT make_neg(const eT val);
   };
-
-
-
-//! @}

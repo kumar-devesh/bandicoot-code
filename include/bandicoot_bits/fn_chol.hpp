@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup fn_chol
-//! @{
-
-
 
 // TODO: add optional 'layout' argument
 template<typename T1>
@@ -30,7 +26,3 @@ chol(Mat<typename T1::elem_type>& out, const Base<typename T1::elem_type, T1>& X
 
   return coot_rt_t::chol(out.get_dev_mem(true), out.n_rows);
   }
-
-
-
-//! @}

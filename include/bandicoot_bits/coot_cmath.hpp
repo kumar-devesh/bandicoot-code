@@ -14,11 +14,6 @@
 
 
 
-//! \addtogroup coot_cmath
-//! @{
-
-
-
 //
 // wrappers for isfinite
 
@@ -782,7 +777,3 @@ struct coot_arg< std::complex<double> >
     return std::arg(x);
     }
   };
-
-
-
-//! @}

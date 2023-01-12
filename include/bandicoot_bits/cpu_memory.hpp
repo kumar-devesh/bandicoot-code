@@ -13,9 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup cpu_memory
-//! @{
-
 
 class cpu_memory
   {
@@ -95,7 +92,3 @@ cpu_memory::release(eT* mem)
     }
   #endif
   }
-
-
-
-//! @}

@@ -53,7 +53,3 @@ repmat(const dev_mem_t<eT1> src, dev_mem_t<eT2> dest, const uword n_rows, const 
 
   coot_check_runtime_error( (status != 0), "coot::opencl::repmat(): couldn't execute kernel" );
   }
-
-
-
-//! @}

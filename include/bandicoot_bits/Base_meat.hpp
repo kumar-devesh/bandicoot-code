@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup Base
-//! @{
-
-
 
 template<typename elem_type, typename derived>
 coot_inline
@@ -252,7 +248,3 @@ Base_trans_default<derived>::st() const
   {
   return Op<derived, op_htrans>( static_cast<const derived&>(*this) );
   }
-
-
-
-//! @}

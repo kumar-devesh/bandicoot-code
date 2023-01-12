@@ -13,9 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup fn_trace
-//! @{
-
 
 template<typename T1>
 coot_warn_unused
@@ -34,7 +31,3 @@ trace(const Base<typename T1::elem_type, T1>& X)
 
   return coot_rt_t::trace(A.get_dev_mem(false), A.n_rows, A.n_cols);
   }
-
-
-
-//! @}

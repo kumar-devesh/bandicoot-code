@@ -13,9 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup arrayops
-//! @{
-
 
 class arrayops
   {
@@ -87,7 +84,3 @@ class arrayops
   eT
   product(cl_mem src, const uword n_elem);
   };
-
-
-
-//! @}

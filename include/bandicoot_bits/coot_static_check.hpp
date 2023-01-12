@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup coot_static_check
-//! @{
-
-
 
 template<bool ERROR___INCORRECT_OR_UNSUPPORTED_TYPE>
 struct coot_type_check_cxx1998
@@ -59,7 +55,3 @@ struct coot_type_check_cxx1998<false>
   #define coot_type_check(condition)  coot_type_check_cxx1998<condition>::apply()
 
 #endif
-
-
-
-//! @}

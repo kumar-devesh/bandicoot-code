@@ -13,9 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup fn_min
-//! @{
-
 
 template<typename T1>
 coot_warn_unused
@@ -27,7 +24,3 @@ min(const T1& X, const uword dim = 0)
 
   return op_min::apply(Op<T1, op_min>(X, dim, 0));
   }
-
-
-
-//! @}

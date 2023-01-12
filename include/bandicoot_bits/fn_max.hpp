@@ -13,9 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup fn_max
-//! @{
-
 
 template<typename T1>
 coot_warn_unused
@@ -27,7 +24,3 @@ max(const T1& X, const uword dim = 0)
 
   return op_max::apply(Op<T1, op_max>(X, dim, 0));
   }
-
-
-
-//! @}

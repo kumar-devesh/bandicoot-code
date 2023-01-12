@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup opencl
-//! @{
-
-
 
 /**
  * Run an OpenCL elementwise kernel that performs an operation on two matrices.
@@ -184,7 +180,3 @@ copy_subview(dev_mem_t<out_eT> dest, const dev_mem_t<in_eT> src, const uword aux
 
   coot_check_runtime_error( (status != 0), "coot::opencl::copy_subview(): couldn't copy buffer");
   }
-
-
-
-//! @}

@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup eglue_core
-//! @{
-
-
 
 template<typename eglue_type>
 struct eglue_core
@@ -84,7 +80,3 @@ class eglue_hypot : public eglue_core<eglue_hypot>
 
   inline static const char* text() { return "element-wise hypot"; }
   };
-
-
-
-//! @}

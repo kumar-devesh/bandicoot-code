@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup eOp
-//! @{
-
-
 
 template<typename out_eT, typename T1, typename mtop_type>
 class mtOp : public Base< out_eT, mtOp<out_eT, T1, mtop_type> >
@@ -107,6 +103,3 @@ template<typename out_eT>                                  inline uword dispatch
 
 template<typename out_eT, typename T1, typename mtop_type> inline uword dispatch_mtop_get_n_elem(const mtOp<out_eT, T1, mtop_type>& Q);
 template<typename out_eT>                                  inline uword dispatch_mtop_get_n_elem(const Mat<out_eT>& Q);
-
-
-//! @}

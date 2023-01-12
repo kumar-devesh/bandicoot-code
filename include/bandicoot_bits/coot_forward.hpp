@@ -99,9 +99,6 @@ class glue_mixed_schur;
 class glue_mixed_div;
 class glue_mixed_times;
 
-//! \addtogroup fill
-//! @{
-
 namespace fill
   {
   struct fill_none  {};
@@ -121,5 +118,3 @@ namespace fill
   static const fill_class<fill_randu> randu;
   static const fill_class<fill_randn> randn;
   }
-
-//! @}

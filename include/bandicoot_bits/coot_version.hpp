@@ -13,11 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup coot_version
-//! @{
-
-
-
 #define COOT_VERSION_MAJOR 0
 #define COOT_VERSION_MINOR 100
 #define COOT_VERSION_PATCH 7
@@ -45,7 +40,3 @@ struct coot_version
     return ss.str();
     }
   };
-
-
-
-//! @}

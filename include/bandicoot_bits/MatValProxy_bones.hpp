@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup MatValProxy
-//! @{
-
-
 
 template<typename eT>
 class MatValProxy
@@ -45,7 +41,3 @@ class MatValProxy
   inline void operator*=(const eT in_val);
   inline void operator/=(const eT in_val);
   };
-
-
-
-//! @}

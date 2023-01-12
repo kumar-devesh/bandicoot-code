@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup eglue_core
-//! @{
-
-
 
 //
 // matrices
@@ -139,7 +135,3 @@ eglue_core<eglue_type>::apply_inplace_div(Mat<eT3>& out, const eGlue<T1, T2, egl
   
   out /= tmp;
   }
-
-
-
-//! @}

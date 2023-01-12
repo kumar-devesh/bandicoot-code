@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup Glue
-//! @{
-
-
 
 template<typename T1, typename T2, typename glue_type>
 inline
@@ -47,7 +43,3 @@ Glue<T1, T2, glue_type>::~Glue()
   {
   coot_extra_debug_sigprint();
   }
-
-
-
-//! @}

@@ -13,9 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup fn_sum
-//! @{
-
 
 template<typename T1>
 coot_warn_unused
@@ -112,7 +109,3 @@ sum(const T& x)
   {
   return x;
   }
-
-
-
-//! @}

@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup fn_trans
-//! @{
-
-
 
 template<typename T1>
 coot_warn_unused
@@ -41,7 +37,3 @@ htrans(const Base<typename T1::elem_type,T1>& X)
   
   return Op<T1, op_htrans>(X.get_ref());
   }
-
-
-
-//! @}

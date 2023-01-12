@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup eGlue
-//! @{
-
-
 
 template<typename T1, typename T2, typename eglue_type>
 coot_inline
@@ -72,7 +68,3 @@ eGlue<T1, T2, eglue_type>::get_n_elem() const
   {
   return A.get_n_elem();
   }
-
-
-
-//! @}

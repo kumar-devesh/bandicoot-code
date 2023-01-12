@@ -13,9 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup fn_qr
-//! @{
-
 
 // TODO: add restrictor to allow only BLAS types
 template<typename T1>
@@ -49,7 +46,3 @@ qr
   
   return status;
   }
-
-
-
-//! @}

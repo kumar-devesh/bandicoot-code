@@ -13,26 +13,20 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup access
-//! @{
-
 
 class access
   {
   public:
   
-  //! internal function to allow modification of data declared as read-only (use with caution)
+  // internal function to allow modification of data declared as read-only (use with caution)
   template<typename T1> coot_inline static T1&  rw (const T1& x)        { return const_cast<T1& >(x); }
   template<typename T1> coot_inline static T1*& rwp(const T1* const& x) { return const_cast<T1*&>(x); }
   
-  //! internal function to obtain the real part of either a plain number or a complex number
+  // internal function to obtain the real part of either a plain number or a complex number
   template<typename eT> coot_inline static const eT& tmp_real(const eT&              X) { return X;        }
   template<typename  T> coot_inline static const   T tmp_real(const std::complex<T>& X) { return X.real(); }
   
-  //! internal function to work around braindead compilers
+  // internal function to work around braindead compilers
   template<typename eT> coot_inline static const typename enable_if2<is_not_complex<eT>::value, const eT&>::result alt_conj(const eT& X) { return X;            }
   template<typename eT> coot_inline static const typename enable_if2<    is_complex<eT>::value, const eT >::result alt_conj(const eT& X) { return std::conj(X); }
   };
-
-
-//! @}

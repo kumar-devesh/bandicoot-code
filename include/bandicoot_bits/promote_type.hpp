@@ -1,10 +1,10 @@
 // Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,9 +12,6 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-
-//! \addtogroup promote_type
-//! @{
 
 
 template<typename T1, typename T2>
@@ -93,7 +90,7 @@ template<> struct is_promotable<u64, u8 > : public is_promotable_ok { typedef u6
 #endif
 
 #if defined(COOT_USE_U64S64)
-template<> struct is_promotable<s64, u64> : public is_promotable_ok { typedef s64 result; };  // float ?  
+template<> struct is_promotable<s64, u64> : public is_promotable_ok { typedef s64 result; };  // float ?
 template<> struct is_promotable<s64, u32> : public is_promotable_ok { typedef s64 result; };
 template<> struct is_promotable<s64, s32> : public is_promotable_ok { typedef s64 result; };
 template<> struct is_promotable<s64, s16> : public is_promotable_ok { typedef s64 result; };
@@ -102,7 +99,7 @@ template<> struct is_promotable<s64, s8 > : public is_promotable_ok { typedef s6
 template<> struct is_promotable<s64, u8 > : public is_promotable_ok { typedef s64 result; };
 #endif
 
-template<> struct is_promotable<s32, u32> : public is_promotable_ok { typedef s32 result; };  // float ?  
+template<> struct is_promotable<s32, u32> : public is_promotable_ok { typedef s32 result; };  // float ?
 template<> struct is_promotable<s32, s16> : public is_promotable_ok { typedef s32 result; };
 template<> struct is_promotable<s32, u16> : public is_promotable_ok { typedef s32 result; };
 template<> struct is_promotable<s32, s8 > : public is_promotable_ok { typedef s32 result; };
@@ -188,7 +185,7 @@ template<> struct is_promotable<u8,  u64> : public is_promotable_ok { typedef u6
 #endif
 
 #if defined(COOT_USE_U64S64)
-template<> struct is_promotable<u64, s64> : public is_promotable_ok { typedef s64 result; };  // float ?  
+template<> struct is_promotable<u64, s64> : public is_promotable_ok { typedef s64 result; };  // float ?
 template<> struct is_promotable<s32, s64> : public is_promotable_ok { typedef s64 result; };
 template<> struct is_promotable<u32, s64> : public is_promotable_ok { typedef s64 result; };
 template<> struct is_promotable<s16, s64> : public is_promotable_ok { typedef s64 result; };
@@ -197,7 +194,7 @@ template<> struct is_promotable<s8 , s64> : public is_promotable_ok { typedef s6
 template<> struct is_promotable<u8 , s64> : public is_promotable_ok { typedef s64 result; };
 #endif
 
-template<> struct is_promotable<u32, s32> : public is_promotable_ok { typedef s32 result; };  // float ?  
+template<> struct is_promotable<u32, s32> : public is_promotable_ok { typedef s32 result; };  // float ?
 template<> struct is_promotable<s16, s32> : public is_promotable_ok { typedef s32 result; };
 template<> struct is_promotable<u16, s32> : public is_promotable_ok { typedef s32 result; };
 template<> struct is_promotable<s8 , s32> : public is_promotable_ok { typedef s32 result; };
@@ -228,7 +225,7 @@ struct promote_type
     {
     coot_type_check(( is_promotable<T1,T2>::value == false ));
     }
-  
+
   typedef typename is_promotable<T1,T2>::result result;
   };
 
@@ -239,7 +236,3 @@ struct eT_promoter
   {
   typedef typename promote_type<typename T1::elem_type, typename T2::elem_type>::result eT;
   };
-
-
-
-//! @}

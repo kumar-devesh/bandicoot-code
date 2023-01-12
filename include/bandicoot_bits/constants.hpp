@@ -13,9 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup constants
-//! @{
-
 
 namespace priv
   {
@@ -111,11 +108,11 @@ namespace priv
 
 
 
-//! various constants.
-//! Physical constants taken from NIST 2014 CODATA values, and some from WolframAlpha (values provided as of 2009-06-23)
-//! http://physics.nist.gov/cuu/Constants
-//! http://www.wolframalpha.com
-//! See also http://en.wikipedia.org/wiki/Physical_constant
+// various constants.
+// Physical constants taken from NIST 2014 CODATA values, and some from WolframAlpha (values provided as of 2009-06-23)
+// http://physics.nist.gov/cuu/Constants
+// http://www.wolframalpha.com
+// See also http://en.wikipedia.org/wiki/Physical_constant
 
 
 template<typename eT>
@@ -123,48 +120,48 @@ class Datum
   {
   public:
   
-  static const eT pi;       //!< ratio of any circle's circumference to its diameter
-  static const eT e;        //!< base of the natural logarithm
-  static const eT euler;    //!< Euler's constant, aka Euler-Mascheroni constant
-  static const eT gratio;   //!< golden ratio
-  static const eT sqrt2;    //!< square root of 2
-  static const eT eps;      //!< the difference between 1 and the least value greater than 1 that is representable
-  static const eT log_min;  //!< log of the minimum representable value
-  static const eT log_max;  //!< log of the maximum representable value
-  static const eT nan;      //!< "not a number"
-  static const eT inf;      //!< infinity 
+  static const eT pi;       // ratio of any circle's circumference to its diameter
+  static const eT e;        // base of the natural logarithm
+  static const eT euler;    // Euler's constant, aka Euler-Mascheroni constant
+  static const eT gratio;   // golden ratio
+  static const eT sqrt2;    // square root of 2
+  static const eT eps;      // the difference between 1 and the least value greater than 1 that is representable
+  static const eT log_min;  // log of the minimum representable value
+  static const eT log_max;  // log of the maximum representable value
+  static const eT nan;      // "not a number"
+  static const eT inf;      // infinity 
 
   // 
   
-  static const eT m_u;       //!< atomic mass constant (in kg)
-  static const eT N_A;       //!< Avogadro constant
-  static const eT k;         //!< Boltzmann constant (in joules per kelvin)
-  static const eT k_evk;     //!< Boltzmann constant (in eV/K)
-  static const eT a_0;       //!< Bohr radius (in meters)
-  static const eT mu_B;      //!< Bohr magneton
-  static const eT Z_0;       //!< characteristic impedance of vacuum (in ohms)
-  static const eT G_0;       //!< conductance quantum (in siemens)
-  static const eT k_e;       //!< Coulomb's constant (in meters per farad)
-  static const eT eps_0;     //!< electric constant (in farads per meter)
-  static const eT m_e;       //!< electron mass (in kg)
-  static const eT eV;        //!< electron volt (in joules)
-  static const eT ec;        //!< elementary charge (in coulombs)
-  static const eT F;         //!< Faraday constant (in coulombs)
-  static const eT alpha;     //!< fine-structure constant
-  static const eT alpha_inv; //!< inverse fine-structure constant
-  static const eT K_J;       //!< Josephson constant
-  static const eT mu_0;      //!< magnetic constant (in henries per meter)
-  static const eT phi_0;     //!< magnetic flux quantum (in webers)
-  static const eT R;         //!< molar gas constant (in joules per mole kelvin)
-  static const eT G;         //!< Newtonian constant of gravitation (in newton square meters per kilogram squared)
-  static const eT h;         //!< Planck constant (in joule seconds)
-  static const eT h_bar;     //!< Planck constant over 2 pi, aka reduced Planck constant (in joule seconds)
-  static const eT m_p;       //!< proton mass (in kg)
-  static const eT R_inf;     //!< Rydberg constant (in reciprocal meters)
-  static const eT c_0;       //!< speed of light in vacuum (in meters per second)
-  static const eT sigma;     //!< Stefan-Boltzmann constant
-  static const eT R_k;       //!< von Klitzing constant (in ohms)
-  static const eT b;         //!< Wien wavelength displacement law constant
+  static const eT m_u;       // atomic mass constant (in kg)
+  static const eT N_A;       // Avogadro constant
+  static const eT k;         // Boltzmann constant (in joules per kelvin)
+  static const eT k_evk;     // Boltzmann constant (in eV/K)
+  static const eT a_0;       // Bohr radius (in meters)
+  static const eT mu_B;      // Bohr magneton
+  static const eT Z_0;       // characteristic impedance of vacuum (in ohms)
+  static const eT G_0;       // conductance quantum (in siemens)
+  static const eT k_e;       // Coulomb's constant (in meters per farad)
+  static const eT eps_0;     // electric constant (in farads per meter)
+  static const eT m_e;       // electron mass (in kg)
+  static const eT eV;        // electron volt (in joules)
+  static const eT ec;        // elementary charge (in coulombs)
+  static const eT F;         // Faraday constant (in coulombs)
+  static const eT alpha;     // fine-structure constant
+  static const eT alpha_inv; // inverse fine-structure constant
+  static const eT K_J;       // Josephson constant
+  static const eT mu_0;      // magnetic constant (in henries per meter)
+  static const eT phi_0;     // magnetic flux quantum (in webers)
+  static const eT R;         // molar gas constant (in joules per mole kelvin)
+  static const eT G;         // Newtonian constant of gravitation (in newton square meters per kilogram squared)
+  static const eT h;         // Planck constant (in joule seconds)
+  static const eT h_bar;     // Planck constant over 2 pi, aka reduced Planck constant (in joule seconds)
+  static const eT m_p;       // proton mass (in kg)
+  static const eT R_inf;     // Rydberg constant (in reciprocal meters)
+  static const eT c_0;       // speed of light in vacuum (in meters per second)
+  static const eT sigma;     // Stefan-Boltzmann constant
+  static const eT R_k;       // von Klitzing constant (in ohms)
+  static const eT b;         // Wien wavelength displacement law constant
   };
 
 
@@ -289,7 +286,3 @@ namespace priv
     }
 
   }
-
-
-
-//! @}
