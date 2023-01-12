@@ -39,6 +39,12 @@ op_vectorise_col::apply_direct(Mat<out_eT>& out, const T1& expr)
 
   const unwrap<T1> U(expr);
 
+  if (U.M.n_elem == 0)
+    {
+    out.set_size(0, 1);
+    return;
+    }
+
   if(U.is_alias(out))
     {
     // output matrix is the same as the input matrix
@@ -68,6 +74,7 @@ op_vectorise_col::apply_direct(Mat<out_eT>& out, const subview<eT>& sv)
     }
   else
     {
+    out.set_size(sv.n_elem, 1);
     arrayops::copy_subview(out.get_dev_mem(false), sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
     }
   }
@@ -157,12 +164,13 @@ op_vectorise_row::apply_direct(Mat<eT>& out, const subview<eT>& sv)
   // If `expr` is a subview, we have to extract the subview.
   if(&out == &(sv.m))
     {
-    Mat<eT> tmp(sv.n_elem, 1);
+    Mat<eT> tmp(1, sv.n_elem);
     arrayops::copy_subview(tmp.get_dev_mem(false), sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
     out.steal_mem(tmp);
     }
   else
     {
+    out.set_size(1, sv.n_elem);
     arrayops::copy_subview(out.get_dev_mem(false), sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
     }
   }
