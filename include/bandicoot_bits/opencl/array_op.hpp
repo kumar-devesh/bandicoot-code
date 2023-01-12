@@ -176,11 +176,11 @@ copy_subview(dev_mem_t<out_eT> dest, const dev_mem_t<in_eT> src, const uword aux
   status |= clSetKernelArg(kernel, 5, a_n_rows.size,   a_n_rows.addr     );
   status |= clSetKernelArg(kernel, 6, a_n_cols.size,   a_n_cols.addr     );
 
-  const size_t global_work_size = size_t(n_rows * n_cols);
+  const size_t global_work_size[2] = { n_rows, n_cols };
 
   coot_extra_debug_print("clEnqueueNDRangeKernel()");
 
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
+  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 2, NULL, global_work_size, NULL, 0, NULL, NULL);
 
   coot_check_runtime_error( (status != 0), "coot::opencl::copy_subview(): couldn't copy buffer");
   }
