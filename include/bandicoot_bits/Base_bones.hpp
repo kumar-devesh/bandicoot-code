@@ -1,10 +1,10 @@
 // Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -99,16 +99,16 @@ struct Base
   , public Base_trans<derived, is_cx<elem_type>::value>::result
   {
   coot_inline const derived& get_ref() const;
-  
+
   inline void print(                           const std::string extra_text = "") const;
   inline void print(std::ostream& user_stream, const std::string extra_text = "") const;
-  
+
   inline void raw_print(                           const std::string extra_text = "") const;
   inline void raw_print(std::ostream& user_stream, const std::string extra_text = "") const;
-  
+
 //   inline coot_warn_unused elem_type min() const;
 //   inline coot_warn_unused elem_type max() const;
-//   
+//
 //   inline coot_warn_unused uword index_min() const;
 //   inline coot_warn_unused uword index_max() const;
   };

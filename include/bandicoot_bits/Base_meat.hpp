@@ -1,10 +1,10 @@
 // Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,7 +30,7 @@ void
 Base<elem_type,derived>::print(const std::string extra_text) const
   {
   const unwrap<derived> tmp( (*this).get_ref() );
-  
+
   tmp.M.impl_print(extra_text);
   }
 
@@ -42,10 +42,10 @@ void
 Base<elem_type,derived>::print(std::ostream& user_stream, const std::string extra_text) const
   {
   const unwrap<derived> tmp( (*this).get_ref() );
-  
+
   tmp.M.impl_print(user_stream, extra_text);
   }
-  
+
 
 
 template<typename elem_type, typename derived>
@@ -54,7 +54,7 @@ void
 Base<elem_type,derived>::raw_print(const std::string extra_text) const
   {
   const unwrap<derived> tmp( (*this).get_ref() );
-  
+
   tmp.M.impl_raw_print(extra_text);
   }
 
@@ -66,7 +66,7 @@ void
 Base<elem_type,derived>::raw_print(std::ostream& user_stream, const std::string extra_text) const
   {
   const unwrap<derived> tmp( (*this).get_ref() );
-  
+
   tmp.M.impl_raw_print(user_stream, extra_text);
   }
 
@@ -80,9 +80,9 @@ Base<elem_type,derived>::raw_print(std::ostream& user_stream, const std::string 
 //   {
 //   return op_min::min( (*this).get_ref() );
 //   }
-// 
-// 
-// 
+//
+//
+//
 // template<typename elem_type, typename derived>
 // inline
 // coot_warn_unused
@@ -91,9 +91,9 @@ Base<elem_type,derived>::raw_print(std::ostream& user_stream, const std::string 
 //   {
 //   return op_max::max( (*this).get_ref() );
 //   }
-// 
-// 
-// 
+//
+//
+//
 // template<typename elem_type, typename derived>
 // inline
 // coot_warn_unused
@@ -101,9 +101,9 @@ Base<elem_type,derived>::raw_print(std::ostream& user_stream, const std::string 
 // Base<elem_type,derived>::index_min() const
 //   {
 //   const Proxy<derived> P( (*this).get_ref() );
-//   
+//
 //   uword index = 0;
-//   
+//
 //   if(P.get_n_elem() == 0)
 //     {
 //     coot_debug_check(true, "index_min(): object has no elements");
@@ -112,7 +112,7 @@ Base<elem_type,derived>::raw_print(std::ostream& user_stream, const std::string 
 //     {
 //     op_min::min_with_index(P, index);
 //     }
-//   
+//
 //   return index;
 //   }
 
@@ -125,9 +125,9 @@ Base<elem_type,derived>::raw_print(std::ostream& user_stream, const std::string 
 // Base<elem_type,derived>::index_max() const
 //   {
 //   const Proxy<derived> P( (*this).get_ref() );
-//   
+//
 //   uword index = 0;
-//   
+//
 //   if(P.get_n_elem() == 0)
 //     {
 //     coot_debug_check(true, "index_max(): object has no elements");
@@ -136,7 +136,7 @@ Base<elem_type,derived>::raw_print(std::ostream& user_stream, const std::string 
 //     {
 //     op_max::max_with_index(P, index);
 //     }
-//   
+//
 //   return index;
 //   }
 
@@ -164,7 +164,7 @@ const derived&
 Base_eval_Mat<elem_type, derived>::eval() const
   {
   coot_extra_debug_sigprint();
-  
+
   return static_cast<const derived&>(*this);
   }
 
@@ -179,7 +179,7 @@ Mat<elem_type>
 Base_eval_expr<elem_type, derived>::eval() const
   {
   coot_extra_debug_sigprint();
-  
+
   return Mat<elem_type>( static_cast<const derived&>(*this) );
   }
 

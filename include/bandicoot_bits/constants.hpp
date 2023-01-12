@@ -1,10 +1,10 @@
 // Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,14 +19,14 @@ namespace priv
   class Datum_helper
     {
     public:
-    
+
     template<typename eT>
     static
     typename coot_real_only<eT>::result
     nan(typename coot_real_only<eT>::result* junk = 0)
       {
       coot_ignore(junk);
-      
+
       if(std::numeric_limits<eT>::has_quiet_NaN)
         {
         return std::numeric_limits<eT>::quiet_NaN();
@@ -36,39 +36,39 @@ namespace priv
         return eT(0);
         }
       }
-    
-    
+
+
     template<typename eT>
     static
     typename coot_cx_only<eT>::result
     nan(typename coot_cx_only<eT>::result* junk = 0)
       {
       coot_ignore(junk);
-      
+
       typedef typename get_pod_type<eT>::result T;
-      
+
       return eT( Datum_helper::nan<T>(), Datum_helper::nan<T>() );
       }
-    
-    
+
+
     template<typename eT>
     static
     typename coot_integral_only<eT>::result
     nan(typename coot_integral_only<eT>::result* junk = 0)
       {
       coot_ignore(junk);
-      
+
       return eT(0);
       }
-    
-    
+
+
     template<typename eT>
     static
     typename coot_real_only<eT>::result
     inf(typename coot_real_only<eT>::result* junk = 0)
       {
       coot_ignore(junk);
-      
+
       if(std::numeric_limits<eT>::has_infinity)
         {
         return std::numeric_limits<eT>::infinity();
@@ -78,20 +78,20 @@ namespace priv
         return std::numeric_limits<eT>::max();
         }
       }
-    
-    
+
+
     template<typename eT>
     static
     typename coot_cx_only<eT>::result
     inf(typename coot_cx_only<eT>::result* junk = 0)
       {
       coot_ignore(junk);
-      
+
       typedef typename get_pod_type<eT>::result T;
-      
+
       return eT( Datum_helper::inf<T>(), Datum_helper::inf<T>() );
       }
-    
+
 
     template<typename eT>
     static
@@ -99,10 +99,10 @@ namespace priv
     inf(typename coot_integral_only<eT>::result* junk = 0)
       {
       coot_ignore(junk);
-      
+
       return std::numeric_limits<eT>::max();
       }
-    
+
     };
   }
 
@@ -119,7 +119,7 @@ template<typename eT>
 class Datum
   {
   public:
-  
+
   static const eT pi;       // ratio of any circle's circumference to its diameter
   static const eT e;        // base of the natural logarithm
   static const eT euler;    // Euler's constant, aka Euler-Mascheroni constant
@@ -129,10 +129,10 @@ class Datum
   static const eT log_min;  // log of the minimum representable value
   static const eT log_max;  // log of the maximum representable value
   static const eT nan;      // "not a number"
-  static const eT inf;      // infinity 
+  static const eT inf;      // infinity
 
-  // 
-  
+  //
+
   static const eT m_u;       // atomic mass constant (in kg)
   static const eT N_A;       // Avogadro constant
   static const eT k;         // Boltzmann constant (in joules per kelvin)
@@ -167,7 +167,7 @@ class Datum
 
 // the long lengths of the constants are for future support of "long double"
 // and any smart compiler that does high-precision computation at compile-time
-  
+
 template<typename eT> const eT Datum<eT>::pi        = eT(3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679);
 template<typename eT> const eT Datum<eT>::e         = eT(2.7182818284590452353602874713526624977572470936999595749669676277240766303535475945713821785251664274);
 template<typename eT> const eT Datum<eT>::euler     = eT(0.5772156649015328606065120900824024310421593359399235988057672348848677267776646709369470632917467495);
@@ -219,7 +219,7 @@ typedef Datum<double> datum;
 
 namespace priv
   {
-  
+
   template<typename eT>
   static
   coot_inline
@@ -228,7 +228,7 @@ namespace priv
   most_neg(typename coot_real_only<eT>::result* junk = 0)
     {
     coot_ignore(junk);
-    
+
     if(std::numeric_limits<eT>::has_infinity)
       {
       return -(std::numeric_limits<eT>::infinity());
@@ -238,8 +238,8 @@ namespace priv
       return -(std::numeric_limits<eT>::max());
       }
     }
-  
-  
+
+
   template<typename eT>
   static
   coot_inline
@@ -248,11 +248,11 @@ namespace priv
   most_neg(typename coot_integral_only<eT>::result* junk = 0)
     {
     coot_ignore(junk);
-    
+
     return std::numeric_limits<eT>::min();
     }
-  
-  
+
+
   template<typename eT>
   static
   coot_inline
@@ -261,7 +261,7 @@ namespace priv
   most_pos(typename coot_real_only<eT>::result* junk = 0)
     {
     coot_ignore(junk);
-    
+
     if(std::numeric_limits<eT>::has_infinity)
       {
       return std::numeric_limits<eT>::infinity();
@@ -271,8 +271,8 @@ namespace priv
       return std::numeric_limits<eT>::max();
       }
     }
-  
-  
+
+
   template<typename eT>
   static
   coot_inline
@@ -281,7 +281,7 @@ namespace priv
   most_pos(typename coot_integral_only<eT>::result* junk = 0)
     {
     coot_ignore(junk);
-    
+
     return std::numeric_limits<eT>::max();
     }
 

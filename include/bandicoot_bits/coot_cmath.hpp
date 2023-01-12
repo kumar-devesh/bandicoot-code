@@ -1,10 +1,10 @@
 // Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,7 +24,7 @@ bool
 coot_isfinite(eT val)
   {
   coot_ignore(val);
-  
+
   return true;
   }
 
@@ -50,9 +50,9 @@ coot_isfinite(float x)
   #else
     {
     const float y = (std::numeric_limits<float>::max)();
-    
+
     const volatile float xx = x;
-    
+
     return (xx == xx) && (x >= -y) && (x <= y);
     }
   #endif
@@ -80,9 +80,9 @@ coot_isfinite(double x)
   #else
     {
     const double y = (std::numeric_limits<double>::max)();
-    
+
     const volatile double xx = x;
-    
+
     return (xx == xx) && (x >= -y) && (x <= y);
     }
   #endif
@@ -117,7 +117,7 @@ bool
 coot_isinf(eT val)
   {
   coot_ignore(val);
-    
+
   return false;
   }
 
@@ -139,9 +139,9 @@ coot_isinf(float x)
   #else
     {
     const float y = (std::numeric_limits<float>::max)();
-    
+
     const volatile float xx = x;
-    
+
     return (xx == xx) && ((x < -y) || (x > y));
     }
   #endif
@@ -165,9 +165,9 @@ coot_isinf(double x)
   #else
     {
     const double y = (std::numeric_limits<double>::max)();
-    
+
     const volatile double xx = x;
-    
+
     return (xx == xx) && ((x < -y) || (x > y));
     }
   #endif
@@ -195,7 +195,7 @@ bool
 coot_isnan(eT val)
   {
   coot_ignore(val);
-    
+
   return false;
   }
 
@@ -217,7 +217,7 @@ coot_isnan(float x)
   #else
     {
     const volatile float xx = x;
-    
+
     return (xx != xx);
     }
   #endif
@@ -241,7 +241,7 @@ coot_isnan(double x)
   #else
     {
     const volatile double xx = x;
-    
+
     return (xx != xx);
     }
   #endif
@@ -330,9 +330,9 @@ coot_log1p(const double x)
 
 //
 // wrappers for trigonometric functions
-// 
+//
 // wherever possible, try to use C++11 or TR1 versions of the following functions:
-// 
+//
 // complex acos
 // complex asin
 // complex atan
@@ -344,10 +344,10 @@ coot_log1p(const double x)
 // complex acosh
 // complex asinh
 // complex atanh
-// 
-// 
+//
+//
 // if C++11 or TR1 are not available, we have rudimentary versions of:
-// 
+//
 // real    acosh
 // real    asinh
 // real    atanh
@@ -371,7 +371,7 @@ coot_acos(const std::complex<T>& x)
     {
     coot_ignore(x);
     coot_stop_logic_error("acos(): need C++11 compiler");
-    
+
     return std::complex<T>(0);
     }
   #endif
@@ -396,7 +396,7 @@ coot_asin(const std::complex<T>& x)
     {
     coot_ignore(x);
     coot_stop_logic_error("asin(): need C++11 compiler");
-    
+
     return std::complex<T>(0);
     }
   #endif
@@ -421,7 +421,7 @@ coot_atan(const std::complex<T>& x)
     {
     coot_ignore(x);
     coot_stop_logic_error("atan(): need C++11 compiler");
-    
+
     return std::complex<T>(0);
     }
   #endif
@@ -543,7 +543,7 @@ coot_acosh(const std::complex<T>& x)
     {
     coot_ignore(x);
     coot_stop_logic_error("acosh(): need C++11 compiler");
-    
+
     return std::complex<T>(0);
     }
   #endif
@@ -568,7 +568,7 @@ coot_asinh(const std::complex<T>& x)
     {
     coot_ignore(x);
     coot_stop_logic_error("asinh(): need C++11 compiler");
-    
+
     return std::complex<T>(0);
     }
   #endif
@@ -593,7 +593,7 @@ coot_atanh(const std::complex<T>& x)
     {
     coot_ignore(x);
     coot_stop_logic_error("atanh(): need C++11 compiler");
-    
+
     return std::complex<T>(0);
     }
   #endif
@@ -622,10 +622,10 @@ coot_hypot_generic(const eT x, const eT y)
     {
     const eT xabs = std::abs(x);
     const eT yabs = std::abs(y);
-    
+
     eT larger;
     eT ratio;
-    
+
     if(xabs > yabs)
       {
       larger = xabs;
@@ -636,7 +636,7 @@ coot_hypot_generic(const eT x, const eT y)
       larger = yabs;
       ratio  = xabs / yabs;
       }
-    
+
     return (larger == eT(0)) ? eT(0) : (larger * std::sqrt(eT(1) + ratio * ratio));
     }
   #endif
@@ -651,9 +651,9 @@ coot_hypot(const eT x, const eT y)
   {
   coot_ignore(x);
   coot_ignore(y);
-  
+
   coot_stop_runtime_error("coot_hypot(): not implemented for integer or complex element types");
-  
+
   return eT(0);
   }
 
@@ -699,7 +699,7 @@ struct coot_arg
       {
       coot_ignore(x);
       coot_stop_logic_error("arg(): need C++11 compiler");
-      
+
       return eT(0);
       }
     #endif

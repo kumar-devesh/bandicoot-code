@@ -1,10 +1,10 @@
 // Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +17,7 @@
 // clMAGMA 1.3 (2014-11-14) and/or MAGMA 2.2 (2016-11-20).
 // clMAGMA 1.3 and MAGMA 2.2 are distributed under a
 // 3-clause BSD license as follows:
-// 
+//
 //  -- Innovative Computing Laboratory
 //  -- Electrical Engineering and Computer Science Department
 //  -- University of Tennessee
@@ -123,12 +123,12 @@ magma_dorgqr(
     // #define  A(i,j) ( A + (i) + (j)*lda )
     // #define dA(i,j) (dA + (i) + (j)*ldda)
     // #define dT(j)   (dT + (j)*nb)
-    
+
     // CS: adapt for clBLAS
-    #define  A(i_,j_)  A, (i_) + (j_)*lda 
+    #define  A(i_,j_)  A, (i_) + (j_)*lda
     #define dA(i_,j_) dA, (i_) + (j_)*ldda
     #define dT(j_)    dT, (j_)*nb
-    
+
     double c_zero = MAGMA_D_ZERO;
     double c_one  = MAGMA_D_ONE;
 
@@ -205,29 +205,29 @@ magma_dorgqr(
         m_kk = m - kk;
         n_kk = n - kk;
         k_kk = k - kk;
-        
+
         // dorgqr requires less workspace (n*nb), but is slow if k < dorgqr's block size.
         // replacing it with the 4 routines below is much faster (e.g., 60x).
         //magma_int_t iinfo;
         //lapackf77_dorgqr( &m_kk, &n_kk, &k_kk,
         //                  A(kk, kk), &lda,
         //                  &tau[kk], work, &lwork, &iinfo );
-        
+
         lapackf77_dlacpy( MagmaFullStr, &m_kk, &k_kk, A(kk,kk), &lda, work_V, &m_kk);
         lapackf77_dlaset( MagmaFullStr, &m_kk, &n_kk, &c_zero, &c_one, A(kk, kk), &lda );
-        
+
         lapackf77_dlarft( MagmaForwardStr, MagmaColumnwiseStr,
                           &m_kk, &k_kk,
                           work_V, &m_kk, &tau[kk], work_T, &k_kk);
         lapackf77_dlarfb( MagmaLeftStr, MagmaNoTransStr, MagmaForwardStr, MagmaColumnwiseStr,
                           &m_kk, &n_kk, &k_kk,
                           work_V, &m_kk, work_T, &k_kk, A(kk, kk), &lda, work, &n_kk );
-        
+
         if (kk > 0) {
             magma_dsetmatrix( m_kk, n_kk,
                               A(kk, kk),  lda,
                               dA(kk, kk), ldda, queue );
-        
+
             // Set A(1:kk,kk+1:n) to zero.
             magmablas_dlaset( MagmaFull, kk, n - kk, c_zero, c_zero, dA(0, kk), ldda, queue );
         }
@@ -237,7 +237,7 @@ magma_dorgqr(
         // Use blocked code
         // queue: set Aii (V) --> laset --> laset --> larfb --> [next]
         // CPU has no computation
-        
+
         for (i = ki; i >= 0; i -= nb) {
             ib = std::min(nb, k - i);
 
@@ -251,7 +251,7 @@ magma_dorgqr(
             // set panel to identity
             magmablas_dlaset( MagmaFull, i,  ib, c_zero, c_zero, dA(0, i), ldda, queue );
             magmablas_dlaset( MagmaFull, mi, ib, c_zero, c_one,  dA(i, i), ldda, queue );
-            
+
             if (i < n) {
                 // Apply H to A(i:m,i:n) from the left
                 magma_dlarfb_gpu( MagmaLeft, MagmaNoTrans, MagmaForward, MagmaColumnwise,
@@ -260,7 +260,7 @@ magma_dorgqr(
                                   dA(i, i), ldda, dW, lddwork, queue );
             }
         }
-    
+
         // copy result back to CPU
         magma_dgetmatrix( m, n,
                           dA(0, 0), ldda, A(0, 0), lda, queue );

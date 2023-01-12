@@ -1,10 +1,10 @@
 // Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -179,11 +179,11 @@ dev_mem_t<eT>
 coot_rt_t::acquire_memory(const uword n_elem)
   {
   coot_extra_debug_sigprint();
-  
+
 //  coot_check_runtime_error( (valid == false), "coot_rt::acquire_memory(): runtime not valid" );
-  
+
   if(n_elem == 0)  { return dev_mem_t<eT>({ NULL }); }
-  
+
   coot_debug_check
    (
    ( size_t(n_elem) > (std::numeric_limits<size_t>::max() / sizeof(eT)) ),

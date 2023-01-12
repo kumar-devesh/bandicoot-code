@@ -1,10 +1,10 @@
 // Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,7 +29,7 @@ sum
   coot_extra_debug_sigprint();
   coot_ignore(junk1);
   coot_ignore(junk2);
-  
+
   return Op<T1, op_sum>(X, dim, 0);
   }
 
@@ -48,7 +48,7 @@ sum
   {
   coot_extra_debug_sigprint();
   coot_ignore(junk);
-  
+
   return Op<T1, op_sum>(X, dim, 0);
   }
 
@@ -68,7 +68,7 @@ sum
   coot_extra_debug_sigprint();
   coot_ignore(junk1);
   coot_ignore(junk2);
-  
+
   return accu(X);
   }
 
@@ -82,7 +82,7 @@ sum(const Op<T1, op_sum>& in)
   {
   coot_extra_debug_sigprint();
   coot_extra_debug_print("sum(): two consecutive sum() calls detected");
-  
+
   return accu(in.m);
   }
 
@@ -95,7 +95,7 @@ const Op<Op<T1, op_sum>, op_sum>
 sum(const Op<T1, op_sum>& in, const uword dim)
   {
   coot_extra_debug_sigprint();
-  
+
   return Op<Op<T1, op_sum>, op_sum>(in, dim, 0);
   }
 
