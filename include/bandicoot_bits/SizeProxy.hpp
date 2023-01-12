@@ -289,22 +289,24 @@ class SizeProxy< Op<T1, op_htrans> >
 
   typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
-  typedef Mat<elem_type>                           stored_type;
+  typedef Op<T1, op_htrans>                        stored_type;
 
   static const bool is_row = Op<T1, op_htrans>::is_row;
   static const bool is_col = Op<T1, op_htrans>::is_col;
 
-  coot_aligned const SizeProxy<T1> Q;
+  coot_aligned const SizeProxy<T1> P;
+  coot_aligned const Op<T1, op_htrans>& Q;
 
   inline explicit SizeProxy(const Op<T1, op_htrans>& A)
-    : Q(A.m)
+    : P(A.m)
+    , Q(A)
     {
     coot_extra_debug_sigprint();
     }
 
-  coot_aligned uword get_n_rows() const { return Q.get_n_cols(); }
-  coot_aligned uword get_n_cols() const { return Q.get_n_rows(); }
-  coot_aligned uword get_n_elem() const { return Q.get_n_elem(); }
+  coot_aligned uword get_n_rows() const { return P.get_n_cols(); }
+  coot_aligned uword get_n_cols() const { return P.get_n_rows(); }
+  coot_aligned uword get_n_elem() const { return P.get_n_elem(); }
   };
 
 
@@ -314,24 +316,26 @@ class SizeProxy< Op<T1, op_htrans2> >
   {
   public:
 
-  typedef typename T1::elem_type                   elem_type;
-  typedef typename get_pod_type<elem_type>::result pod_type;
-  typedef Mat<elem_type>                           stored_type;
+  typedef typename T1::elem_type                                       elem_type;
+  typedef typename get_pod_type<elem_type>::result                     pod_type;
+  typedef Op<T1, op_htrans2>                                           stored_type;
 
   static const bool is_row = Op<T1, op_htrans2>::is_row;
   static const bool is_col = Op<T1, op_htrans2>::is_col;
 
-  coot_aligned const SizeProxy<T1> Q;
+  coot_aligned const SizeProxy<T1> P;
+  coot_aligned const Op<T1, op_htrans2>& Q;
 
   inline explicit SizeProxy(const Op<T1, op_htrans2>& A)
-    : Q(A.m)
+    : P(A.m)
+    , Q(A)
     {
     coot_extra_debug_sigprint();
     }
 
-  coot_aligned uword get_n_rows() const { return Q.get_n_cols(); }
-  coot_aligned uword get_n_cols() const { return Q.get_n_rows(); }
-  coot_aligned uword get_n_elem() const { return Q.get_n_elem(); }
+  coot_aligned uword get_n_rows() const { return P.get_n_cols(); }
+  coot_aligned uword get_n_cols() const { return P.get_n_rows(); }
+  coot_aligned uword get_n_elem() const { return P.get_n_elem(); }
   };
 
 
@@ -364,7 +368,7 @@ class SizeProxy< mtOp<out_eT, T1, mtop_type> >
 
 
 // Glue: in order to get its size, we need to unwrap it.
-// TODO: maybe this can be done better?
+// TODO: it should be possible to compute the size of a Glue operation without an unwrap!
 template<typename T1, typename T2, typename glue_type>
 class SizeProxy< Glue<T1, T2, glue_type> >
   {

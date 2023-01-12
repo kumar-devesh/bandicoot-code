@@ -464,6 +464,68 @@ coot_rt_t::inplace_op_subview(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, con
 
 
 
+template<typename eT1, typename eT2>
+inline
+void
+coot_rt_t::htrans(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword n_rows, const uword n_cols)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    opencl::htrans(dest, src, n_rows, n_cols);
+    #else
+    coot_stop_runtime_error("coot_rt::htrans(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    cuda::htrans(dest, src, n_rows, n_cols);
+    #else
+    coot_stop_runtime_error("coot_rt::htrans(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::htrans(): unknown backend");
+    }
+  }
+
+
+
+template<typename eT1, typename eT2>
+inline
+void
+coot_rt_t::strans(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword n_rows, const uword n_cols)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    opencl::strans(dest, src, n_rows, n_cols);
+    #else
+    coot_stop_runtime_error("coot_rt::strans(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    cuda::strans(dest, src, n_rows, n_cols);
+    #else
+    coot_stop_runtime_error("coot_rt::strans(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::strans(): unknown backend");
+    }
+  }
+
+
+
 template<typename eT>
 inline
 void
