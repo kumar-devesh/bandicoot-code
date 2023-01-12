@@ -13,9 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup op_max
-//! @{
-
 
 template<typename T1>
 inline
@@ -37,7 +34,3 @@ op_min::apply(const Op<T1, op_min>& in)
     throw std::invalid_argument("min(): not yet implemented for anything other than vectors... sorry!");
     }
   }
-
-
-
-//! @}

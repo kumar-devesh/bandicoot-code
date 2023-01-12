@@ -13,8 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup opencl
-//! @{
 
 /**
  * Run an OpenCL elementwise kernel that uses a scalar.
@@ -164,7 +162,3 @@ inplace_op_subview(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword M_
 
   coot_check_runtime_error( (status != 0), std::string(identifier) + std::string(": couldn't execute kernel") );
   }
-
-
-
-//! @}

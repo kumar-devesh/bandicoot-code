@@ -11,8 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! \addtogroup MatValProxy
-//! @{
+
 
 // Utility functions for MatValProxy with the CUDA backend.
 
@@ -117,7 +116,3 @@ val_div_inplace(dev_mem_t<eT> mem, const uword index, const eT val)
   tmp_mem.cuda_mem_ptr = mem.cuda_mem_ptr + index;
   inplace_op_scalar(tmp_mem, val, 1, oneway_kernel_id::inplace_div_scalar);
   }
-
-
-
-//! @}

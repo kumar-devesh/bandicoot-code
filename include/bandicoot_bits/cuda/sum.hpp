@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup cuda
-//! @{
-
-
 
 template<typename eT1, typename eT2>
 inline
@@ -141,7 +137,3 @@ sum_rowwise_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword M_n_
 
   coot_check_cuda_error(result, "coot::cuda::sum_rowwise_subview(): cuLaunchKernel() failed");
   }
-
-
-
-//! @}

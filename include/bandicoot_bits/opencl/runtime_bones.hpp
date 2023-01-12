@@ -140,8 +140,8 @@ class runtime_t
   coot_aligned std::recursive_mutex mutex;
   #endif
 
-  inline void   lock();  //! NOTE: do not call this function directly; instead instantiate the cq_guard class inside a relevant scope
-  inline void unlock();  //! NOTE: do not call this function directly; it's automatically called when an instance of cq_guard goes out of scope
+  inline void   lock();  // NOTE: do not call this function directly; instead instantiate the cq_guard class inside a relevant scope
+  inline void unlock();  // NOTE: do not call this function directly; it's automatically called when an instance of cq_guard goes out of scope
 
   inline void internal_cleanup();
 

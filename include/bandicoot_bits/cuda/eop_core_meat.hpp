@@ -13,8 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup cuda
-//! @{
 
 /**
  * Run a CUDA non-inplace elementwise kernel.
@@ -48,7 +46,3 @@ eop_scalar(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword n_elem, co
 
   coot_check_cuda_error(result, "coot::cuda::eop_scalar(): cuLaunchKernel() failed");
   }
-
-
-
-//! @}

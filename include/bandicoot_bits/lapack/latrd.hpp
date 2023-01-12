@@ -13,15 +13,11 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup lapack
-//! @{
 
-
-
-//! Reduce the last nb rows and columns of the symmetric/Hermitian upper
-//! triangular matrix A to real tridiagonal form by an orthogonal similarity
-//! transformation Q' * A * Q.  The matrices V and W that are needed to apply
-//! the transformation to the unreduced part of A are stored and returned.
+// Reduce the last nb rows and columns of the symmetric/Hermitian upper
+// triangular matrix A to real tridiagonal form by an orthogonal similarity
+// transformation Q' * A * Q.  The matrices V and W that are needed to apply
+// the transformation to the unreduced part of A are stored and returned.
 template<typename eT>
 void
 latrd(Mat<eT>& A,
@@ -113,5 +109,3 @@ latrd(Mat<eT>& A,
       }
     }
   }
-
-//! @}

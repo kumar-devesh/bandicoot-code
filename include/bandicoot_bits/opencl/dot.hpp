@@ -13,8 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup opencl
-//! @{
 
 /**
  * Compute the dot product of two vectors.

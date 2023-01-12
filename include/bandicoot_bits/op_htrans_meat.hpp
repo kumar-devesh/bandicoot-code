@@ -1,10 +1,10 @@
 // Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,26 +13,23 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup op_htrans
-//! @{
-
-
 
 template<typename out_eT, typename T1>
-inline 
+inline
 void
 op_htrans::apply(Mat<out_eT>& out, const Op<T1, op_htrans>& in)
   {
   coot_extra_debug_sigprint();
-  
+
   const no_conv_unwrap<T1> U(in.m);
-  
+
   if(U.is_alias(out))
     {
+    // TODO: additional optimizations are possible
+
+    // TODO: inplace implementation?
     Mat<out_eT> tmp;
-    
     op_htrans::apply_noalias(tmp, U.M);
-    
     out.steal_mem(tmp);
     }
   else
@@ -47,28 +44,25 @@ template<typename out_eT, typename in_eT>
 inline
 void
 op_htrans::apply_noalias(Mat<out_eT>& out,
-                         const Mat<in_eT>& A,
-                         const typename coot_not_cx<in_eT>::result*,
-                         const typename coot_not_cx<out_eT>::result*)
+                         const Mat<in_eT>& A)
   {
   coot_extra_debug_sigprint();
-  
-  coot_stop_runtime_error("op_htrans: not implemented");
-  }
 
+  out.set_size(A.n_cols, A.n_rows);
+  if (out.n_elem == 0)
+    {
+    return;
+    }
 
-
-template<typename out_eT, typename in_eT>
-inline
-void
-op_htrans::apply_noalias(Mat<out_eT>& out,
-                         const Mat<in_eT>& A,
-                         const typename coot_cx_only<in_eT>::result*,
-                         const typename coot_cx_only<out_eT>::result*)
-  {
-  coot_extra_debug_sigprint();
-  
-  coot_stop_runtime_error("op_htrans: not implemented");
+  if (A.n_cols == 1 || A.n_rows == 1)
+    {
+    // Simply copying the data is sufficient.
+    arrayops::copy(out.get_dev_mem(false), A.get_dev_mem(false), A.n_elem);
+    }
+  else
+    {
+    coot_rt_t::htrans(out.get_dev_mem(false), A.get_dev_mem(false), A.n_rows, A.n_cols);
+    }
   }
 
 
@@ -78,25 +72,24 @@ op_htrans::apply_noalias(Mat<out_eT>& out,
 
 
 template<typename out_eT, typename T1>
-inline 
+inline
 void
 op_htrans2::apply(Mat<out_eT>& out, const Op<T1, op_htrans2>& in)
   {
   coot_extra_debug_sigprint();
-  
+
   const no_conv_unwrap<T1> U(in.m);
-  
+
   if(U.is_alias(out))
     {
+    // TODO: implement inplace version?
     Mat<out_eT> tmp;
-    
-    op_htrans2::apply_noalias(tmp, U.M);
-    
+    op_htrans2::apply_noalias(tmp, U.M, in.aux);
     out.steal_mem(tmp);
     }
   else
     {
-    op_htrans2::apply_noalias(out, U.M);
+    op_htrans2::apply_noalias(out, U.M, in.aux);
     }
   }
 
@@ -107,29 +100,10 @@ inline
 void
 op_htrans2::apply_noalias(Mat<out_eT>& out,
                           const Mat<in_eT>& A,
-                          const typename coot_not_cx<in_eT>::result*,
-                          const typename coot_not_cx<out_eT>::result*)
+                          const out_eT val)
   {
   coot_extra_debug_sigprint();
-  
-  coot_stop_runtime_error("op_htrans2: not implemented");
+
+  op_htrans::apply_noalias(out, A);
+  arrayops::inplace_mul_scalar(out.get_dev_mem(false), val, out.n_elem);
   }
-
-
-
-template<typename out_eT, typename in_eT>
-inline
-void
-op_htrans2::apply_noalias(Mat<out_eT>& out,
-                          const Mat<in_eT>& A,
-                          const typename coot_cx_only<in_eT>::result*,
-                          const typename coot_cx_only<out_eT>::result*)
-  {
-  coot_extra_debug_sigprint();
-  
-  coot_stop_runtime_error("op_htrans2: not implemented");
-  }
-
-
-
-//! @}

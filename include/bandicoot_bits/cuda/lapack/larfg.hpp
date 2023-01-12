@@ -12,8 +12,6 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-//! \addtogroup cuda
-//! @{
 
 
 /**
@@ -132,5 +130,3 @@ larfg(dev_mem_t<eT> x, const uword n_elem, const uword rescaling_pass = 1)
     return tau;
     }
   }
-
-//! @}
