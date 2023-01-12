@@ -1,10 +1,10 @@
 // Copyright 2020 Ryan Curtin (https://www.ratml.org/)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,14 +12,11 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
+
+
 // A version of unwrap<> that avoids a final type conversion if possible.
 // It does do type conversions if they are needed for an intermediate operation.
 // This is useful for operations that can accept a different input type.
-
-//! \addtogroup unwrap
-//! @{
-
-
 
 template<typename T1>
 struct no_conv_unwrap
@@ -29,16 +26,16 @@ struct no_conv_unwrap
 
   // This is the type that unwrap<> should use if it's internally using a no_conv_unwrap.
   typedef Mat<eT>& full_unwrap_type;
-  
+
   inline
   no_conv_unwrap(const T1& A)
     : M(A)
     {
     coot_extra_debug_sigprint();
     }
-  
+
   const Mat<eT> M;
-  
+
   template<typename eT2>
   coot_inline bool is_alias(const Mat<eT2>&) const { return false; }
   };
@@ -52,16 +49,16 @@ struct no_conv_unwrap< Mat<eT> >
 
   // This is the type that unwrap<> should use if it's internally using a no_conv_unwrap.
   typedef Mat<eT>& full_unwrap_type;
-  
+
   inline
   no_conv_unwrap(const Mat<eT>& A)
     : M(A)
     {
     coot_extra_debug_sigprint();
     }
-  
+
   const Mat<eT>& M;
-  
+
   template<typename eT2>
   coot_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
   };
@@ -75,16 +72,16 @@ struct no_conv_unwrap< Row<eT> >
 
   // This is the type that unwrap<> should use if it's internally using a no_conv_unwrap.
   typedef Row<eT>& full_unwrap_type;
-  
+
   inline
   no_conv_unwrap(const Row<eT>& A)
     : M(A)
     {
     coot_extra_debug_sigprint();
     }
-  
+
   const Row<eT>& M;
-  
+
   template<typename eT2>
   coot_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
   };
@@ -105,9 +102,9 @@ struct no_conv_unwrap< Col<eT> >
     {
     coot_extra_debug_sigprint();
     }
-  
+
   const Col<eT>& M;
-  
+
   template<typename eT2>
   coot_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
   };
@@ -212,7 +209,3 @@ struct no_conv_unwrap< mtOp<out_eT, T1, mtop_conv_to> >
   template<typename eT2>
   coot_inline bool is_alias(const Mat<eT2>& X) const { return false; }
   };
-
-
-
-//! @}

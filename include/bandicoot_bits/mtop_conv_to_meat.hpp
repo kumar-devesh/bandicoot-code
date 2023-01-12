@@ -44,6 +44,20 @@ mtop_conv_to::apply(Mat<out_eT>& out, const mtOp<out_eT, subview<in_eT>, mtop_co
 
 
 
+// TODO: this overload might only be applicable for ops that support conversions during the op
+// TODO: decide whether all ops should support conversions too internally
+template<typename out_eT, typename T1, typename op_type>
+inline
+void
+mtop_conv_to::apply(Mat<out_eT>& out, const mtOp<out_eT, Op<T1, op_type>, mtop_conv_to>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  op_type::apply(out, X.m.Q);
+  }
+
+
+
 template<typename out_eT, typename T1, typename eop_type>
 inline
 void

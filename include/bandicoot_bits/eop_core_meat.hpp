@@ -13,9 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup eop_core
-//! @{
-
 
 //
 // matrices
@@ -219,7 +216,3 @@ eop_core<eop_type>::apply_inplace_div(Mat<eT>& out, const eOp<T1, eop_type>& x)
 
   out /= tmp;
   }
-
-
-
-//! @}

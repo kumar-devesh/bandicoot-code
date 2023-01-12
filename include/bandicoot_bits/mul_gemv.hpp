@@ -1,10 +1,10 @@
 // Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,16 +13,12 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup gemv
-//! @{
-
-
 
 template<const bool do_trans_A=false, const bool use_alpha=false, const bool use_beta=false>
 class gemv
   {
   public:
-  
+
   template<typename eT>
   inline
   static
@@ -37,6 +33,3 @@ class gemv
     coot_rt_t::gemv<eT, do_trans_A>(y.get_dev_mem(true), A.get_dev_mem(true), A.n_rows, A.n_cols, x.get_dev_mem(true), local_alpha, local_beta);
     }
   };
-
-
-//! @}

@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup opencl
-//! @{
-
-
 
 template<typename eT>
 inline
@@ -43,7 +39,3 @@ copy_into_dev_mem(dev_mem_t<eT> dest, const eT* src, const uword N)
 
   coot_check_cuda_error(error, "Mat::copy_into_dev_mem(): couldn't access device memory");
   }
-
-
-
-//! @}

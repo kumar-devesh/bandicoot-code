@@ -1,10 +1,10 @@
 // Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +17,7 @@
 // clMAGMA 1.3 (2014-11-14) and/or MAGMA 2.2 (2016-11-20).
 // clMAGMA 1.3 and MAGMA 2.2 are distributed under a
 // 3-clause BSD license as follows:
-// 
+//
 //  -- Innovative Computing Laboratory
 //  -- Electrical Engineering and Computer Science Department
 //  -- University of Tennessee
@@ -64,19 +64,19 @@ magma_dlarfb_gpu(
     // #define dT(i_,j_)  (dT    + (i_) + (j_)*lddt)
     // #define dC(i_,j_)  (dC    + (i_) + (j_)*lddc)
     // #define dwork(i_)  (dwork + (i_))
-    
+
     // CS: adapations for clBLAS
-    
+
     #define dV(i_,j_)  dV,    (i_) + (j_)*lddv + dV_offset
     #define dT(i_,j_)  dT,    (i_) + (j_)*lddt + dT_offset
     #define dC(i_,j_)  dC,    (i_) + (j_)*lddc + dC_offset
     #define dwork(i_)  dwork, (i_)             + dwork_offset
-    
+
     /* Constants */
     const double c_zero    = MAGMA_D_ZERO;
     const double c_one     = MAGMA_D_ONE;
     const double c_neg_one = MAGMA_D_NEG_ONE;
-    
+
     /* Check input arguments */
     magma_int_t info = 0;
     if (m < 0) {
@@ -101,12 +101,12 @@ magma_dlarfb_gpu(
         // magma_xerbla( __func__, -(info) );
         return info;
     }
-    
+
     /* Function Body */
     if (m <= 0 || n <= 0) {
         return info;
     }
-    
+
     /* Local variables */
     // opposite of trans
     magma_trans_t transt;
@@ -114,14 +114,14 @@ magma_dlarfb_gpu(
         transt = MagmaTrans;
     else
         transt = MagmaNoTrans;
-    
+
     // whether T is upper or lower triangular
     magma_uplo_t uplo;
     if (direct == MagmaForward)
         uplo = MagmaUpper;
     else
         uplo = MagmaLower;
-    
+
     // whether V is stored transposed or not
     magma_trans_t notransV, transV;
     if (storev == MagmaColumnwise) {
@@ -137,7 +137,7 @@ magma_dlarfb_gpu(
         // Form H C or H^H C
         // Comments assume H C.
         // When forming H^H C, T gets transposed via transt.
-        
+
         // W = C^H V
         magma_dgemm( MagmaTrans, notransV,
                      n, k, m,
@@ -162,7 +162,7 @@ magma_dlarfb_gpu(
         // Form C H or C H^H
         // Comments assume C H.
         // When forming C H^H, T gets transposed via trans.
-        
+
         // W = C V
         magma_dgemm( MagmaNoTrans, notransV,
                      m, k, n,

@@ -12,9 +12,6 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-//! \addtogroup gemv
-//! @{
-
 
 
 template<bool do_trans_A = false>
@@ -90,7 +87,3 @@ struct gemv
     coot_check_cl_error(status, "coot::opencl::gemv(): eT = double");
     }
   };
-
-
-
-//! @}

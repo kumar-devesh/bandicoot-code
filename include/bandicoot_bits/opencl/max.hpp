@@ -13,8 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup opencl
-//! @{
 
 /**
  * Compute the maximum of all elements in `mem`.
@@ -116,7 +114,3 @@ max(dev_mem_t<eT> mem, const uword n_elem)
 
   return eT((*out)[0]);
   }
-
-
-
-//! @}

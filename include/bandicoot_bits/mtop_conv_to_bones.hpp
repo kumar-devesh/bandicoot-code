@@ -25,6 +25,9 @@ class mtop_conv_to
   static inline void apply(Mat<out_eT>& out, const mtOp<out_eT, subview<in_eT>, mtop_conv_to>& X);
 
   // Specializations to merge type conversions with other operations.
+  template<typename out_eT, typename T1, typename op_type>
+  static inline void apply(Mat<out_eT>& out, const mtOp<out_eT, Op<T1, op_type>, mtop_conv_to>& X);
+
   template<typename out_eT, typename T1, typename eop_type>
   static inline void apply(Mat<out_eT>& out, const mtOp<out_eT, eOp<T1, eop_type>, mtop_conv_to>& X);
 
