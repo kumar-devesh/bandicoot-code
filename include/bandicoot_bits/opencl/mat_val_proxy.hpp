@@ -13,8 +13,7 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-//! \addtogroup MatValProxy
-//! @{
+
 
 // Utility functions for MatValProxy with the OpenCL backend.
 
@@ -204,7 +203,3 @@ val_div_inplace(dev_mem_t<eT> mem, const uword index, const eT val)
 
   coot_check_runtime_error( (status != CL_SUCCESS), "opencl::val_add_inplace(): couldn't access device memory" );
   }
-
-
-
-//! @}

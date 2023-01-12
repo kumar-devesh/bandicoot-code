@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup opencl
-//! @{
-
-
 
 template<typename eT>
 inline
@@ -29,7 +25,3 @@ template<typename eT>
 inline
 void
 copy_into_dev_mem(dev_mem_t<eT> dest, const eT* src, const uword N);
-
-
-
-//! @}

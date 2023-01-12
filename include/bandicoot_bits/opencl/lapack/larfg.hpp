@@ -12,8 +12,7 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-//! \addtogroup opencl
-//! @{
+
 
 /**
  * Perform the operations involved in larfg().  See the higher-level larfg() documentation for more information.
@@ -136,5 +135,3 @@ larfg(dev_mem_t<eT> x, const uword n_elem, const uword rescaling_pass = 1)
     return tau;
     }
   }
-
-//! @}

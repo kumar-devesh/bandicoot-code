@@ -13,8 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup cuda
-//! @{
 
 /**
  * Compute the trace of the matrix via CUDA.

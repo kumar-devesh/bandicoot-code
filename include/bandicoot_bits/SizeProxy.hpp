@@ -395,7 +395,3 @@ class SizeProxy< Glue<T1, T2, glue_type> >
   coot_aligned uword get_n_cols() const { return Q.n_cols; }
   coot_aligned uword get_n_elem() const { return Q.n_elem; }
   };
-
-
-
-//! @}

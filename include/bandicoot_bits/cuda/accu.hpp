@@ -13,8 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup cuda
-//! @{
 
 /**
  * Accumulate all elements in `mem`.
@@ -162,7 +160,3 @@ accu_subview(dev_mem_t<eT> mem, const uword m_n_rows, const uword aux_row1, cons
 
   return tmp(0);
   }
-
-
-
-//! @}

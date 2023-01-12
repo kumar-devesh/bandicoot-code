@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup opencl
-//! @{
-
-
 
 template<typename eT1, typename eT2>
 inline
@@ -167,7 +163,3 @@ sum_rowwise_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword M_n_
 
   coot_check_cl_error(status, "coot::opencl::sum_rowwise_subview(): failed to run kernel");
   }
-
-
-
-//! @}

@@ -13,8 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup cuda
-//! @{
 
 /**
  * Run a CUDA elementwise kernel that uses a scalar.
@@ -158,7 +156,3 @@ inplace_op_subview(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword M_
 
   coot_check_cuda_error(result, std::string(identifier) + ": cuLaunchKernel() failed");
   }
-
-
-
-//! @}

@@ -13,8 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup opencl
-//! @{
 
 /**
  * Compute the Cholesky decomposition using OpenCL.
@@ -78,7 +76,3 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
   return true;
 
   }
-
-
-
-//! @}

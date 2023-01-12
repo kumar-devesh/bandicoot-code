@@ -96,9 +96,9 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
   coot_extra_debug_warn("coot::cl_rt.init(): begin clBLAS setup");
   cl_int clblas_status = clblasSetup();
   coot_extra_debug_warn("coot::cl_rt.init(): finished clBLAS setup");
-  
+
   if(clblas_status != CL_SUCCESS)  { coot_debug_warn("coot::cl_rt.init(): couldn't setup clBLAS"); return false; }
-  
+
   if(status == false)
     {
     internal_cleanup();

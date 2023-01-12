@@ -13,18 +13,16 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup Col
-//! @{
 
-//! Class for row vectors (matrices with only one row)
+// Class for row vectors (matrices with only one row)
 
 template<typename eT>
 class Col : public Mat<eT>
   {
   public:
 
-  typedef eT                                elem_type;  //!< the type of elements stored in the matrix
-  typedef typename get_pod_type<eT>::result  pod_type;  //!< if eT is std::complex<T>, pod_type is T; otherwise pod_type is eT
+  typedef eT                                elem_type;  // the type of elements stored in the matrix
+  typedef typename get_pod_type<eT>::result  pod_type;  // if eT is std::complex<T>, pod_type is T; otherwise pod_type is eT
 
   static const bool is_col = true;
   static const bool is_row = false;
@@ -66,5 +64,3 @@ class Col : public Mat<eT>
     #include COOT_INCFILE_WRAP(COOT_EXTRA_COL_BONES)
   #endif
   };
-
-//! @}
