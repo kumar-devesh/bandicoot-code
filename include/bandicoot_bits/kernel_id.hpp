@@ -302,6 +302,9 @@ struct twoway_kernel_id
     //
     repmat,
     //
+    htrans,
+    strans,
+    //
     invalid_kernel
     };
 
@@ -418,6 +421,9 @@ struct twoway_kernel_id
     names.push_back("convert_type");
 
     names.push_back("repmat");
+
+    names.push_back("htrans");
+    names.push_back("strans");
 
     return names;
     }
