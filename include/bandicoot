@@ -267,6 +267,7 @@ namespace coot
     #include "bandicoot_bits/cuda/debug.hpp"
     #include "bandicoot_bits/cuda/kernel_misc.hpp"
     #include "bandicoot_bits/cuda/runtime_meat.hpp"
+    #include "bandicoot_bits/cuda/generic_reduce.hpp"
     #include "bandicoot_bits/cuda/inplace_op.hpp"
     #include "bandicoot_bits/cuda/array_op.hpp"
     #include "bandicoot_bits/cuda/mat_val_proxy.hpp"
