@@ -80,6 +80,11 @@ struct oneway_kernel_id
     max_abs,
     max_abs_small,
     //
+    sqrd_dbl_norm2,
+    sqrd_dbl_norm2_small,
+    sqrd_dbl_norm2_robust,
+    sqrd_dbl_norm2_robust_small,
+    //
     trace,
     //
     ltri_set_zero,
@@ -128,6 +133,11 @@ struct oneway_kernel_id
     names.push_back("max_abs");
     names.push_back("max_abs_small");
 
+    names.push_back("sqrd_dbl_norm2");
+    names.push_back("sqrd_dbl_norm2_small");
+    names.push_back("sqrd_dbl_norm2_robust");
+    names.push_back("sqrd_dbl_norm2_robust_small");
+
     names.push_back("trace");
 
     names.push_back("ltri_set_zero");
@@ -159,7 +169,12 @@ struct oneway_real_kernel_id
   {
   enum enum_id
     {
-    larfg = 0
+    larfg = 0,
+    //
+    powk_norm,
+    powk_norm_small,
+    //
+    invalid_kernel
     };
 
 
@@ -173,6 +188,9 @@ struct oneway_real_kernel_id
     std::vector<std::string> names;
 
     names.push_back("larfg");
+
+    names.push_back("powk_norm");
+    names.push_back("powk_norm_small");
 
     return names;
     }
