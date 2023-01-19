@@ -236,6 +236,7 @@ namespace coot
     {
     #include "bandicoot_bits/opencl/debug.hpp"
     #include "bandicoot_bits/opencl/runtime_meat.hpp"
+    #include "bandicoot_bits/opencl/generic_reduce.hpp"
     #include "bandicoot_bits/opencl/inplace_op.hpp"
     #include "bandicoot_bits/opencl/array_op.hpp"
     #include "bandicoot_bits/opencl/mat_val_proxy.hpp"
