@@ -13,6 +13,7 @@
 // ------------------------------------------------------------------------
 
 
+// eOps are elementwise operations with up to one scalar argument.
 
 template<typename T1, typename eop_type>
 class eOp : public Base< typename T1::elem_type, eOp<T1, eop_type> >

@@ -37,6 +37,19 @@ Op<T1, op_type>::Op(const T1& in_m, const typename T1::elem_type in_aux)
 
 template<typename T1, typename op_type>
 inline
+Op<T1, op_type>::Op(const T1& in_m, const char junk, const typename T1::elem_type in_aux, const typename T1::elem_type in_aux_b)
+  : m(in_m)
+  , aux(in_aux)
+  , aux_b(in_aux_b)
+  {
+  coot_extra_debug_sigprint();
+  coot_ignore(junk);
+  }
+
+
+
+template<typename T1, typename op_type>
+inline
 Op<T1, op_type>::Op(const T1& in_m, const typename T1::elem_type in_aux, const uword in_aux_uword_a, const uword in_aux_uword_b)
   : m(in_m)
   , aux(in_aux)
