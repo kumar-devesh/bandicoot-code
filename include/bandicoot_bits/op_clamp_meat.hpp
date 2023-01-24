@@ -104,3 +104,27 @@ op_clamp::apply_direct(Mat<out_eT>& out, const subview<in_eT>& sv, const in_eT m
   Mat<in_eT> extracted_sv(sv);
   op_clamp::apply_direct(out, extracted_sv, min_val, max_val);
   }
+
+
+
+template<typename T1>
+inline
+uword
+op_clamp::compute_n_rows(const Op<T1, op_clamp>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(op);
+  coot_ignore(in_n_cols);
+  return in_n_rows;
+  }
+
+
+
+template<typename T1>
+inline
+uword
+op_clamp::compute_n_cols(const Op<T1, op_clamp>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(op);
+  coot_ignore(in_n_rows);
+  return in_n_cols;
+  }

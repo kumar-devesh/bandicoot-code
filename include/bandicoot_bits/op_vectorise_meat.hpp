@@ -81,6 +81,30 @@ op_vectorise_col::apply_direct(Mat<out_eT>& out, const subview<eT>& sv)
 
 
 
+template<typename T1>
+inline
+uword
+op_vectorise_col::compute_n_rows(const Op<T1, op_vectorise_col>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(op);
+  return in_n_rows * in_n_cols;
+  }
+
+
+
+template<typename T1>
+inline
+uword
+op_vectorise_col::compute_n_cols(const Op<T1, op_vectorise_col>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(op);
+  coot_ignore(in_n_rows);
+  coot_ignore(in_n_cols);
+  return 1;
+  }
+
+
+
 template<typename out_eT, typename T1>
 inline
 void
@@ -106,6 +130,32 @@ op_vectorise_all::apply(Mat<out_eT>& out, const Op<T1,op_vectorise_all>& in)
       }
     }
   };
+
+
+
+template<typename T1>
+inline
+uword
+op_vectorise_all::compute_n_rows(const Op<T1, op_vectorise_all>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  if (op.aux_uword_a == 0)
+    return in_n_rows * in_n_cols;
+  else
+    return 1;
+  }
+
+
+
+template<typename T1>
+inline
+uword
+op_vectorise_all::compute_n_cols(const Op<T1, op_vectorise_all>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  if (op.aux_uword_a == 0)
+    return 1;
+  else
+    return in_n_rows * in_n_cols;
+  }
 
 
 
@@ -208,4 +258,28 @@ op_vectorise_row::apply_direct(Mat<out_eT>& out, const subview<eT>& sv, const ty
 
   out.set_size(1, sv.n_elem);
   arrayops::copy_subview(out.get_dev_mem(false), sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
+  }
+
+
+
+template<typename T1>
+inline
+uword
+op_vectorise_row::compute_n_rows(const Op<T1, op_vectorise_row>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(op);
+  coot_ignore(in_n_rows);
+  coot_ignore(in_n_cols);
+  return 1;
+  }
+
+
+
+template<typename T1>
+inline
+uword
+op_vectorise_row::compute_n_cols(const Op<T1, op_vectorise_row>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(op);
+  return in_n_rows * in_n_cols;
   }

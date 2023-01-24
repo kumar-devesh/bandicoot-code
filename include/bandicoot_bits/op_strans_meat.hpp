@@ -57,3 +57,27 @@ op_strans::apply_noalias(Mat<out_eT>& out, const Mat<in_eT>& A)
     coot_rt_t::strans(out.get_dev_mem(false), A.get_dev_mem(false), A.n_rows, A.n_cols);
     }
   }
+
+
+
+template<typename T1>
+inline
+uword
+op_strans::compute_n_rows(const Op<T1, op_strans>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(op);
+  coot_ignore(in_n_rows);
+  return in_n_cols;
+  }
+
+
+
+template<typename T1>
+inline
+uword
+op_strans::compute_n_cols(const Op<T1, op_strans>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(op);
+  coot_ignore(in_n_cols);
+  return in_n_rows;
+  }
