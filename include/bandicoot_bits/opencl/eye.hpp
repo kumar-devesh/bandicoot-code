@@ -13,8 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup opencl
-//! @{
 
 /**
  * Assign the given memory to be the identity matrix via OpenCL.
@@ -47,7 +45,3 @@ eye(dev_mem_t<eT> dest, const uword n_rows, const uword n_cols)
 
   coot_check_runtime_error( (status != 0), "coot::opencl::eye(): couldn't execute kernel" );
   }
-
-
-
-//! @}

@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup op_sum
-//! @{
-
-
 
 template<typename out_eT, typename T1>
 inline
@@ -193,7 +189,3 @@ op_sum::compute_n_cols(const Op<T1, op_sum>& op, const uword in_n_rows, const uw
   coot_ignore(in_n_rows);
   return (op.aux_uword_a == 0) ? in_n_cols : 1;
   }
-
-
-
-//! @}

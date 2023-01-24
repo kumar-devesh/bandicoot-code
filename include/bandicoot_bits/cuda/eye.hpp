@@ -13,8 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup cuda
-//! @{
 
 /**
  * Assign the given memory to be the identity matrix via CUDA.
@@ -47,7 +45,3 @@ eye(dev_mem_t<eT> dest, const uword n_rows, const uword n_cols)
 
   coot_check_cuda_error(result, "coot::cuda::eye(): cuLaunchKernel() failed");
   }
-
-
-
-//! @}

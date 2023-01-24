@@ -11,8 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! \addtogroup cuda
-//! @{
+
 
 inline std::string error_as_string(const cudaError_t error_code)
   {
@@ -297,5 +296,3 @@ inline std::string error_as_string(const curandStatus_t error_code)
     default:                                  return "unknown cuRand error code";
     }
   }
-
-//! @}

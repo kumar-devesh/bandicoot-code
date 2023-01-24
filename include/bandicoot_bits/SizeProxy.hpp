@@ -18,6 +18,9 @@
 // unwrapped when a SizeProxy is created.  (If you want to audit this, check the stored_type for each struct
 // specialization.)  The underlying object Q should be used for any actual operations.
 //
+// This differs from Armadillo's Proxy because all GPU operations work directly on blocks of memory,
+// which will generally force a full unwrap when any actual operation happens.
+//
 // The SizeProxy class defines the following types and methods:
 //
 // elem_type        = the type of the elements obtained from object Q
@@ -32,6 +35,9 @@
 // get_n_rows()     = return the number of rows in Q
 // get_n_cols()     = return the number of columns in Q
 // get_n_elem()     = return the number of elements in Q
+//
+// Note that Q may not necessarily have the same row/col dimensions as the SizeProxy object!
+// So, do all size checks with get_n_rows()/get_n_cols()/get_n_elem(), then use Q to get a memory pointer to do operations with.
 
 template<typename eT>
 class SizeProxy< Mat<eT> >
@@ -259,7 +265,7 @@ class SizeProxy< Op<T1, op_type> >
 
   typedef typename T1::elem_type                   elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
-  typedef Op<T1, elem_type>                        stored_type;
+  typedef Op<T1, op_type>                          stored_type;
 
   static const bool is_row = Op<T1, op_type>::is_row;
   static const bool is_col = Op<T1, op_type>::is_col;
@@ -277,61 +283,6 @@ class SizeProxy< Op<T1, op_type> >
   coot_aligned uword get_n_rows() const { return op_type::compute_n_rows(Q, S.get_n_rows(), S.get_n_cols()); }
   coot_aligned uword get_n_cols() const { return op_type::compute_n_cols(Q, S.get_n_rows(), S.get_n_cols()); }
   coot_aligned uword get_n_elem() const { return get_n_rows() * get_n_cols(); }
-  };
-
-
-
-// We know the size of op_htrans and op_htrans2.
-template<typename T1>
-class SizeProxy< Op<T1, op_htrans> >
-  {
-  public:
-
-  typedef typename T1::elem_type                   elem_type;
-  typedef typename get_pod_type<elem_type>::result pod_type;
-  typedef Mat<elem_type>                           stored_type;
-
-  static const bool is_row = Op<T1, op_htrans>::is_row;
-  static const bool is_col = Op<T1, op_htrans>::is_col;
-
-  coot_aligned const SizeProxy<T1> Q;
-
-  inline explicit SizeProxy(const Op<T1, op_htrans>& A)
-    : Q(A.m)
-    {
-    coot_extra_debug_sigprint();
-    }
-
-  coot_aligned uword get_n_rows() const { return Q.get_n_cols(); }
-  coot_aligned uword get_n_cols() const { return Q.get_n_rows(); }
-  coot_aligned uword get_n_elem() const { return Q.get_n_elem(); }
-  };
-
-
-
-template<typename T1>
-class SizeProxy< Op<T1, op_htrans2> >
-  {
-  public:
-
-  typedef typename T1::elem_type                   elem_type;
-  typedef typename get_pod_type<elem_type>::result pod_type;
-  typedef Mat<elem_type>                           stored_type;
-
-  static const bool is_row = Op<T1, op_htrans2>::is_row;
-  static const bool is_col = Op<T1, op_htrans2>::is_col;
-
-  coot_aligned const SizeProxy<T1> Q;
-
-  inline explicit SizeProxy(const Op<T1, op_htrans2>& A)
-    : Q(A.m)
-    {
-    coot_extra_debug_sigprint();
-    }
-
-  coot_aligned uword get_n_rows() const { return Q.get_n_cols(); }
-  coot_aligned uword get_n_cols() const { return Q.get_n_rows(); }
-  coot_aligned uword get_n_elem() const { return Q.get_n_elem(); }
   };
 
 
@@ -363,8 +314,6 @@ class SizeProxy< mtOp<out_eT, T1, mtop_type> >
 
 
 
-// Glue: in order to get its size, we need to unwrap it.
-// TODO: maybe this can be done better?
 template<typename T1, typename T2, typename glue_type>
 class SizeProxy< Glue<T1, T2, glue_type> >
   {

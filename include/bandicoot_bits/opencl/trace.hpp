@@ -13,8 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup opencl
-//! @{
 
 /**
  * Compute the trace of the matrix via OpenCL.
@@ -57,7 +55,3 @@ trace(dev_mem_t<eT> mem, const uword n_rows, const uword n_cols)
 
   return eT(tmp(0));
   }
-
-
-
-//! @}

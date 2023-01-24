@@ -13,9 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup op_max
-//! @{
-
 
 template<typename T1>
 inline
@@ -61,7 +58,3 @@ op_max::apply(const Op<eOp<T1, eop_abs>, op_max>& in)
     throw std::invalid_argument("max(): not yet implemented for anything other than vectors... sorry!");
     }
   }
-
-
-
-//! @}

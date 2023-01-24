@@ -1,10 +1,10 @@
 // Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,14 +13,9 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup operator_schur
-//! @{
-
-
 // operator %, which we define it to do a schur product (element-wise multiplication)
 
-
-//! element-wise multiplication of Base objects with same element type
+// element-wise multiplication of Base objects with same element type
 template<typename T1, typename T2>
 coot_inline
 typename
@@ -36,13 +31,13 @@ operator%
   )
   {
   coot_extra_debug_sigprint();
-  
+
   return eGlue<T1, T2, eglue_schur>(X, Y);
   }
 
 
 
-//! element-wise multiplication of Base objects with different element types
+// element-wise multiplication of Base objects with different element types
 template<typename T1, typename T2>
 inline
 typename
@@ -58,15 +53,11 @@ operator%
   )
   {
   coot_extra_debug_sigprint();
-  
+
   typedef typename T1::elem_type eT1;
   typedef typename T2::elem_type eT2;
-  
+
   promote_type<eT1,eT2>::check();
-  
+
   return eGlue<T1, T2, glue_mixed_schur>( X, Y );
   }
-
-
-
-//! @}

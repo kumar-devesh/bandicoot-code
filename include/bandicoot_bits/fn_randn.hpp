@@ -17,10 +17,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup fn_randu
-//! @{
-
-
 
 template<typename T>
 coot_warn_unused
@@ -63,7 +59,3 @@ randn(const uword n_elem, const distr_param& param = distr_param(), const typena
 
   return randn<T>(n_rows, n_cols, param);
   }
-
-
-
-//! @}

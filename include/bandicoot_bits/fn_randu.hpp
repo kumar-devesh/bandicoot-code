@@ -17,10 +17,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup fn_randu
-//! @{
-
-
 
 template<typename T>
 coot_warn_unused
@@ -63,7 +59,3 @@ randu(const uword n_elem, const typename coot_Mat_Col_Row_only<T>::result* junk 
   coot_rng::fill_randu(out.get_dev_mem(false), out.n_elem);
   return out;
   }
-
-
-
-//! @}

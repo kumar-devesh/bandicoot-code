@@ -1,10 +1,10 @@
 // Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -136,7 +136,7 @@
 // Uncomment and modify the lines below to specify a custom directory to store Bandicoot kernels to.
 // Alternately, define COOT_KERNEL_CACHE_DIR in your program.
 // Note that COOT_KERNEL_CACHE_DIR must have a / as its final character (or \ on Windows).
-// 
+//
 // #if defined(COOT_KERNEL_CACHE_DIR)
 //   #undef COOT_KERNEL_CACHE_DIR
 //   #define COOT_KERNEL_CACHE_DIR /custom/cache/location/

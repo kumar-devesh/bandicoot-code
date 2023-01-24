@@ -1,10 +1,10 @@
 // Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,9 +44,9 @@ template<const bool, const bool, const bool, const bool> class gemm;
 template<const bool, const bool, const bool>             class gemv;
 
 
-template<                 typename eT, typename gen_type> class  Gen; 
+template<                 typename eT, typename gen_type> class  Gen;
 
-template<typename T1, typename  op_type> class   Op; 
+template<typename T1, typename  op_type> class   Op;
 template<typename T1, typename eop_type> class  eOp;
 
 template<typename out_eT, typename T1, typename mtop_type> class mtOp;
@@ -54,10 +54,10 @@ template<typename out_eT, typename T1, typename mtop_type> class mtOp;
 template<typename T1, typename T2, typename  glue_type> class   Glue;
 template<typename T1, typename T2, typename eglue_type> class  eGlue;
 
-template<                 typename eT, typename gen_type> class  GenCube; 
+template<                 typename eT, typename gen_type> class  GenCube;
 
-template<                 typename T1, typename  op_type> class   OpCube; 
-template<                 typename T1, typename eop_type> class  eOpCube; 
+template<                 typename T1, typename  op_type> class   OpCube;
+template<                 typename T1, typename eop_type> class  eOpCube;
 
 template<                 typename T1, typename T2, typename  glue_type> class   GlueCube;
 template<                 typename T1, typename T2, typename eglue_type> class  eGlueCube;
@@ -76,6 +76,10 @@ class op_htrans;
 class op_htrans2;
 class op_repmat;
 class op_resize;
+class op_vectorise_col;
+class op_vectorise_row;
+class op_vectorise_all;
+class op_clamp;
 
 class mtop_conv_to;
 
@@ -99,9 +103,6 @@ class glue_mixed_schur;
 class glue_mixed_div;
 class glue_mixed_times;
 
-//! \addtogroup fill
-//! @{
-
 namespace fill
   {
   struct fill_none  {};
@@ -110,10 +111,10 @@ namespace fill
   struct fill_eye   {};
   struct fill_randu {};
   struct fill_randn {};
-  
-  template<typename fill_type> 
+
+  template<typename fill_type>
   struct fill_class { inline fill_class() {} };
-  
+
   static const fill_class<fill_none > none;
   static const fill_class<fill_zeros> zeros;
   static const fill_class<fill_ones > ones;
@@ -121,5 +122,3 @@ namespace fill
   static const fill_class<fill_randu> randu;
   static const fill_class<fill_randn> randn;
   }
-
-//! @}

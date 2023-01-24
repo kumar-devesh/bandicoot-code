@@ -13,6 +13,7 @@
 // ------------------------------------------------------------------------
 
 
+
 template<uword N>
 template<typename out_eT, typename T1, typename T2>
 inline

@@ -13,9 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup op_min
-//! @{
-
 
 class op_min
   {
@@ -24,7 +21,3 @@ class op_min
   template<typename T1>
   inline static typename T1::elem_type apply(const Op<T1, op_min>& in);
   };
-
-
-
-//! @}

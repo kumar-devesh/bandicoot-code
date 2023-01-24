@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup lapack
-//! @{
-
-
 
 /**
  * LARFG generates a real or complex elementary reflector H of order n, such
@@ -64,7 +60,3 @@ larfg(Mat<eT>& X)
 
   return coot_rt_t::larfg(X.get_dev_mem(false), X.n_elem);
   }
-
-
-
-//! @}
