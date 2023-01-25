@@ -198,6 +198,7 @@ namespace coot
   #include "bandicoot_bits/op_resize_bones.hpp"
   #include "bandicoot_bits/op_vectorise_bones.hpp"
   #include "bandicoot_bits/op_clamp_bones.hpp"
+  #include "bandicoot_bits/op_norm_bones.hpp"
 
   #include "bandicoot_bits/mtop_conv_to_bones.hpp"
 
@@ -367,6 +368,7 @@ namespace coot
   #include "bandicoot_bits/fn_linspace.hpp"
   #include "bandicoot_bits/fn_vectorise.hpp"
   #include "bandicoot_bits/fn_clamp.hpp"
+  #include "bandicoot_bits/fn_norm.hpp"
 
 
   //
@@ -405,6 +407,7 @@ namespace coot
   #include "bandicoot_bits/op_resize_meat.hpp"
   #include "bandicoot_bits/op_vectorise_meat.hpp"
   #include "bandicoot_bits/op_clamp_meat.hpp"
+  #include "bandicoot_bits/op_norm_meat.hpp"
 
   #include "bandicoot_bits/mtop_conv_to_meat.hpp"
 
