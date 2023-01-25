@@ -94,3 +94,25 @@ op_repmat::apply(Mat<out_eT>& out, const Op<mtOp<out_eT, T1, mtop_conv_to>, op_r
     apply_noalias(out, U.M, copies_per_row, copies_per_col);
     }
   }
+
+
+
+template<typename T1>
+inline
+uword
+op_repmat::compute_n_rows(const Op<T1, op_repmat>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(in_n_cols);
+  return op.aux_uword_a * in_n_rows;
+  }
+
+
+
+template<typename T1>
+inline
+uword
+op_repmat::compute_n_cols(const Op<T1, op_repmat>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(in_n_rows);
+  return op.aux_uword_b * in_n_cols;
+  }

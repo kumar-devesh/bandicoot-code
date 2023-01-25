@@ -82,4 +82,11 @@ class glue_times
 
   template<typename out_eT, typename eT1, typename eT2, typename eT3, typename eT4, const bool do_trans_A, const bool do_trans_B, const bool do_trans_C, const bool do_trans_D, const bool do_scalar_times>
   inline static void apply(Mat<out_eT>& out, const Mat<eT1>& A, const Mat<eT2>& B, const Mat<eT3>& C, const Mat<eT4>& D, const out_eT val);
+
+  // used by SizeProxy
+
+  template<typename T1, typename T2>
+  inline static uword compute_n_rows(const Glue<T1, T2, glue_times>& glue, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols);
+  template<typename T1, typename T2>
+  inline static uword compute_n_cols(const Glue<T1, T2, glue_times>& glue, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols);
   };

@@ -29,4 +29,7 @@ class op_sum
 
   template<typename out_eT, typename in_eT>
   inline static void apply_noalias(Mat<out_eT>& out, const subview<in_eT>& sv, const uword dim, const bool post_conv_apply);
+
+  template<typename T1> inline static uword compute_n_rows(const Op<T1, op_sum>& op, const uword in_n_rows, const uword in_n_cols);
+  template<typename T1> inline static uword compute_n_cols(const Op<T1, op_sum>& op, const uword in_n_rows, const uword in_n_cols);
   };

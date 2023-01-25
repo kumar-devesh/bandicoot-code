@@ -466,3 +466,31 @@ glue_times::apply
     glue_times::apply<out_eT, eT1, out_eT, do_trans_A, false, false>(out, A, tmp, out_eT(0));
     }
   }
+
+
+
+template<typename T1, typename T2>
+inline
+uword
+glue_times::compute_n_rows(const Glue<T1, T2, glue_times>& glue, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols)
+  {
+  coot_ignore(glue);
+  coot_ignore(A_n_cols);
+  coot_ignore(B_n_rows);
+  coot_ignore(B_n_cols);
+  return A_n_rows;
+  }
+
+
+
+template<typename T1, typename T2>
+inline
+uword
+glue_times::compute_n_cols(const Glue<T1, T2, glue_times>& glue, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols)
+  {
+  coot_ignore(glue);
+  coot_ignore(A_n_rows);
+  coot_ignore(A_n_cols);
+  coot_ignore(B_n_rows);
+  return B_n_cols;
+  }

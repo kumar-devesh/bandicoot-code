@@ -1,4 +1,4 @@
-// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2023 Ryan Curtin (http://ratml.org)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +12,18 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-
-
-class op_strans
+__kernel
+void
+COOT_FN(PREFIX,clamp)(__global eT2* out_mem,
+                      __global const eT1* A_mem,
+                      const eT1 min_val,
+                      const eT1 max_val,
+                      const UWORD num)
   {
-  public:
-
-  template<typename out_eT, typename T1>
-  inline static void apply(Mat<out_eT>& out, const Op<T1, op_strans>& in);
-
-  template<typename out_eT, typename in_eT>
-  inline static void apply_noalias(Mat<out_eT>& out, const Mat<in_eT>& A);
-
-  template<typename T1> inline static uword compute_n_rows(const Op<T1, op_strans>& op, const uword in_n_rows, const uword in_n_cols);
-  template<typename T1> inline static uword compute_n_cols(const Op<T1, op_strans>& op, const uword in_n_rows, const uword in_n_cols);
-  };
+  const UWORD idx = get_global_id(0);
+  if (idx < num)
+    {
+    const eT1 clamped_val = max(min_val, min(max_val, A_mem[idx]));
+    out_mem[idx] = (eT2) clamped_val;
+    }
+  }

@@ -167,3 +167,25 @@ op_sum::apply_noalias(Mat<out_eT>& out, const subview<in_eT>& sv, const uword di
     coot_rt_t::sum_rowwise_subview(out.get_dev_mem(false), sv.m.get_dev_mem(false), sv.m.n_rows, sv.aux_row1, sv.aux_col1, sv.n_rows, sv.n_cols, post_conv_apply);
     }
   }
+
+
+
+template<typename T1>
+inline
+uword
+op_sum::compute_n_rows(const Op<T1, op_sum>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(in_n_cols);
+  return (op.aux_uword_a == 0) ? 1 : in_n_rows;
+  }
+
+
+
+template<typename T1>
+inline
+uword
+op_sum::compute_n_cols(const Op<T1, op_sum>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(in_n_rows);
+  return (op.aux_uword_a == 0) ? in_n_cols : 1;
+  }

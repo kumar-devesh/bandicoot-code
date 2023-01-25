@@ -168,6 +168,9 @@ class coot_rt_t
   template<typename eT>
   static inline void linspace(const dev_mem_t<eT> mem, const eT start, const eT end, const uword num);
 
+  template<typename eT1, typename eT2>
+  static inline void clamp(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const eT1 min_val, const eT1 max_val, const uword n_elem);
+
   // LAPACK-style utility functions
 
   template<typename eT>
