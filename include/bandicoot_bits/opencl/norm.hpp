@@ -14,42 +14,6 @@
 
 
 
-inline
-float
-norm_2(dev_mem_t<float> mem, const uword n_elem)
-  {
-  coot_extra_debug_sigprint();
-
-  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "cuda runtime not valid" );
-
-  float result;
-  cublasStatus_t status = cublasSnrm2(get_rt().cuda_rt.cublas_handle, n_elem, mem.cuda_mem_ptr, 1, &result);
-
-  coot_check_cublas_error( status, "coot::cuda::norm_2(): call to cublasSnrm2() failed" );
-
-  return result;
-  }
-
-
-
-inline
-double
-norm_2(dev_mem_t<double> mem, const uword n_elem)
-  {
-  coot_extra_debug_sigprint();
-
-  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "cuda runtime not valid" );
-
-  double result;
-  cublasStatus_t status = cublasDnrm2(get_rt().cuda_rt.cublas_handle, n_elem, mem.cuda_mem_ptr, 1, &result);
-
-  coot_check_cublas_error( status, "coot::cuda::norm_2(): call to cublasDnrm2() failed" );
-
-  return result;
-  }
-
-
-
 template<typename eT>
 inline
 double
@@ -168,7 +132,7 @@ norm_2_robust(const dev_mem_t<eT> mem, const uword n_elem)
 
   if (dims.d[0] == 1)
     {
-    const double result = std::sqrt(double(aux[1])) * max_val;
+    const double result = std::sqrt(double(aux[0])) * max_val;
     return result;
     }
   else
