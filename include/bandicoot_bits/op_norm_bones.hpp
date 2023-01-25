@@ -17,9 +17,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup op_norm
-//! @{
-
 
 class op_norm
   {
@@ -45,7 +42,3 @@ class op_norm
 
   /* template<typename eT> inline static typename get_pod_type<eT>::result mat_norm_inf(const Mat<eT>& X); */
   };
-
-
-
-//! @}

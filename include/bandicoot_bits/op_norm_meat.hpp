@@ -17,10 +17,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup op_norm
-//! @{
-
-
 
 template<typename T1>
 inline
@@ -132,7 +128,3 @@ op_norm::vec_norm_2(const Proxy<T1>& P)
   /*   return op_norm::vec_norm_2_direct_robust(tmp.M); */
   /*   } */
   }
-
-
-
-//! @}
