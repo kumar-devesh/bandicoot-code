@@ -18,24 +18,31 @@
 
 
 
+// This class provides a number of methods for directly evaluating vector and matrix norms,
+// but we do not implement any optimizations for norm() expressions---so, this class is never
+// used as part of a delayed expression; that is, no Op<T1, op_norm> will ever be created.
+//
+// Whenever norm() is called, it is directly and immediately evaluated.
+//
+// So, as a result, there are a couple functions not implemented here: apply(), compute_n_rows(), compute_n_cols().
 class op_norm
   {
   public:
 
-  /* template<typename T1> arma_hot inline static typename T1::pod_type vec_norm_1(const Proxy<T1>& P, const typename  arma_not_cx<typename T1::elem_type>::result* junk = nullptr); */
-  /* template<typename T1> arma_hot inline static typename T1::pod_type vec_norm_1(const Proxy<T1>& P, const typename arma_cx_only<typename T1::elem_type>::result* junk = nullptr); */
-  /* template<typename eT> arma_hot inline static eT                    vec_norm_1_direct_std(const Mat<eT>& X); */
-  /* template<typename eT> arma_hot inline static eT                    vec_norm_1_direct_mem(const uword N, const eT* A); */
+  template<typename eT> inline static eT vec_norm_1(const Mat<eT>& X);
+  template<typename eT> inline static eT vec_norm_1(const subview<eT>& X);
 
-  template<typename T1> inline static typename T1::pod_type vec_norm_2(const Proxy<T1>& P);
-  /* template<typename eT> arma_hot inline static eT                    vec_norm_2_direct_std(const Mat<eT>& X); */
-  /* template<typename eT> arma_hot inline static eT                    vec_norm_2_direct_mem(const uword N, const eT* A); */
-  /* template<typename eT> arma_hot inline static eT                    vec_norm_2_direct_robust(const Mat<eT>& X); */
+  template<typename eT> inline static eT vec_norm_2(const Mat<eT>& X);
+  template<typename eT> inline static eT vec_norm_2(const subview<eT>& X);
 
-  /* template<typename T1> arma_hot inline static typename T1::pod_type vec_norm_k(const Proxy<T1>& P, const int k); */
+  template<typename eT> inline static eT vec_norm_k(const Mat<eT>& X, const uword p);
+  template<typename eT> inline static eT vec_norm_k(const subview<eT>& X, const uword p);
 
-  /* template<typename T1> arma_hot inline static typename T1::pod_type vec_norm_max(const Proxy<T1>& P); */
-  /* template<typename T1> arma_hot inline static typename T1::pod_type vec_norm_min(const Proxy<T1>& P); */
+  template<typename eT> inline static eT vec_norm_min(const Mat<eT>& X);
+  template<typename eT> inline static eT vec_norm_min(const subview<eT>& X);
+
+  template<typename eT> inline static eT vec_norm_max(const Mat<eT>& X);
+  template<typename eT> inline static eT vec_norm_max(const subview<eT>& X);
 
   /* template<typename eT> inline static typename get_pod_type<eT>::result mat_norm_1(const Mat<eT>& X); */
   /* template<typename eT> inline static typename get_pod_type<eT>::result mat_norm_2(const Mat<eT>& X); */

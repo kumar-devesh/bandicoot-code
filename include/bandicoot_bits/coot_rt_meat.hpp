@@ -1508,6 +1508,161 @@ coot_rt_t::clamp(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const eT1 min_va
 template<typename eT>
 inline
 eT
+coot_rt_t::vec_norm_1(const dev_mem_t<eT> mem, const uword n_elem)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::vec_norm_1(mem, n_elem);
+    #else
+    coot_stop_runtime_error("coot_rt::vec_norm_1(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::vec_norm_1(mem, n_elem);
+    #else
+    coot_stop_runtime_error("coot_rt::vec_norm_1(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::vec_norm_1(): unknown backend");
+    }
+  }
+
+
+
+template<typename eT>
+inline
+eT
+coot_rt_t::vec_norm_2(const dev_mem_t<eT> mem, const uword n_elem)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::vec_norm_2(mem, n_elem);
+    #else
+    coot_stop_runtime_error("coot_rt::vec_norm_2(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::vec_norm_2(mem, n_elem);
+    #else
+    coot_stop_runtime_error("coot_rt::vec_norm_2(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::vec_norm_2(): unknown backend");
+    }
+  }
+
+
+
+template<typename eT>
+inline
+eT
+coot_rt_t::vec_norm_k(const dev_mem_t<eT> mem, const uword n_elem, const uword k)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::vec_norm_k(mem, n_elem);
+    #else
+    coot_stop_runtime_error("coot_rt::vec_norm_k(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::vec_norm_k(mem, n_elem);
+    #else
+    coot_stop_runtime_error("coot_rt::vec_norm_k(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::vec_norm_k(): unknown backend");
+    }
+  }
+
+
+
+template<typename eT>
+inline
+eT
+coot_rt_t::vec_norm_min(const dev_mem_t<eT> mem, const uword n_elem)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::vec_norm_min(mem, n_elem);
+    #else
+    coot_stop_runtime_error("coot_rt::vec_norm_min(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::vec_norm_min(mem, n_elem);
+    #else
+    coot_stop_runtime_error("coot_rt::vec_norm_min(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::vec_norm_min(): unknown backend");
+    }
+  }
+
+
+
+template<typename eT>
+inline
+eT
+coot_rt_t::vec_norm_max(const dev_mem_t<eT> mem, const uword n_elem)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::vec_norm_max(mem, n_elem);
+    #else
+    coot_stop_runtime_error("coot_rt::vec_norm_max(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::vec_norm_max(mem, n_elem);
+    #else
+    coot_stop_runtime_error("coot_rt::vec_norm_max(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::vec_norm_max(): unknown backend");
+    }
+  }
+
+
+
+template<typename eT>
+inline
+eT
 coot_rt_t::larfg(const dev_mem_t<eT> x, const uword n_elem)
   {
   coot_extra_debug_sigprint();

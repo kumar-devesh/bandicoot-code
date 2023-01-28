@@ -39,27 +39,30 @@ norm
 
   typedef typename T1::pod_type T;
 
+  const SizeProxy<T1> S(X);
+  if(S.get_n_elem() == 0)
+    {
+    return T(0);
+    }
 
-  const Proxy<T1> P(X);
+  const bool is_vec = (S.get_n_rows() == 1) || (S.get_n_cols() == 1);
 
-  if(P.get_n_elem() == 0)  { return T(0); }
-
-  /* const bool is_vec = (T1::is_xvec) || (T1::is_row) || (T1::is_col) || (P.get_n_rows() == 1) || (P.get_n_cols() == 1); */
-  const bool is_vec = (P.get_n_rows() == 1) || (P.get_n_cols() == 1);
+  // At this point, unwrapping is unavoidable, since we perform the norm computation directly and immediately.
+  const unwrap<T1> U(X);
 
   if(is_vec)
     {
-  /*   if(k == uword(1))  { return op_norm::vec_norm_1(P); } */
-    if(k == uword(2))  { return op_norm::vec_norm_2(P); }
+    if(k == uword(1))  { return op_norm::vec_norm_1(U.M); }
+    if(k == uword(2))  { return op_norm::vec_norm_2(U.M); }
 
     coot_debug_check( (k == 0), "norm(): k must be greater than zero" );
 
-  /*   return op_norm::vec_norm_k(P, int(k)); */
+    return op_norm::vec_norm_k(U.M, int(k));
     }
   else
     {
     std::cout << "TODO: implement matrix norm\n";
-    if(k == uword(2))  { return op_norm::vec_norm_2(P); }
+    if(k == uword(2))  { return op_norm::vec_norm_2(U.M); }
   /*   const quasi_unwrap<typename Proxy<T1>::stored_type> U(P.Q); */
 
   /*   if(k == uword(1))  { return op_norm::mat_norm_1(U.M); } */
@@ -89,24 +92,28 @@ norm
 
   typedef typename T1::pod_type T;
 
-  std::cout << "norm 2\n";
-  /* const Proxy<T1> P(X); */
+  const SizeProxy<T1> S(X);
+  if (S.get_n_elem() == 0)
+    {
+    return T(0);
+    }
 
-  /* if(P.get_n_elem() == 0)  { return T(0); } */
+  const char sig    = (method != nullptr) ? method[0] : char(0);
+  const bool is_vec = (S.get_n_rows() == 1) || (S.get_n_cols() == 1);
 
-  /* const char sig    = (method != nullptr) ? method[0] : char(0); */
-  /* const bool is_vec = (T1::is_xvec) || (T1::is_row) || (T1::is_col) || (P.get_n_rows() == 1) || (P.get_n_cols() == 1); */
+  // At this point, unwrapping is unavoidable, since we perform the norm computation directly and immediately.
+  const unwrap<T1> U(X);
 
-  /* if(is_vec) */
-  /*   { */
-  /*   if( (sig == 'i') || (sig == 'I') || (sig == '+') )  { return op_norm::vec_norm_max(P); } */
-  /*   if( (sig == '-')                                 )  { return op_norm::vec_norm_min(P); } */
-  /*   if( (sig == 'f') || (sig == 'F')                 )  { return op_norm::vec_norm_2(P);   } */
+  if (is_vec)
+    {
+//    if( (sig == 'i') || (sig == 'I') || (sig == '+') )  { return op_norm::vec_norm_max(U.M); }
+//    if( (sig == '-')                                 )  { return op_norm::vec_norm_min(U.M); }
+    if( (sig == 'f') || (sig == 'F')                 )  { return op_norm::vec_norm_2(U.M);   }
 
-  /*   arma_stop_logic_error("norm(): unsupported vector norm type"); */
-  /*   } */
-  /* else */
-  /*   { */
+    coot_stop_logic_error("norm(): unsupported vector norm type");
+    }
+  else
+    {
   /*   if( (sig == 'i') || (sig == 'I') || (sig == '+') )   // inf norm */
   /*     { */
   /*     const quasi_unwrap<typename Proxy<T1>::stored_type> U(P.Q); */
@@ -119,12 +126,8 @@ norm
   /*     return op_norm::vec_norm_2(P); */
   /*     } */
 
-  /*   arma_stop_logic_error("norm(): unsupported matrix norm type"); */
-  /*   } */
+    coot_stop_logic_error("norm(): unsupported matrix norm type");
+    }
 
   return T(0);
   }
-
-
-
-//! @}
