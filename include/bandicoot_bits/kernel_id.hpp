@@ -171,6 +171,8 @@ struct oneway_real_kernel_id
     {
     larfg = 0,
     //
+    norm1,
+    norm1_small,
     powk_norm,
     powk_norm_small,
     //
@@ -189,6 +191,8 @@ struct oneway_real_kernel_id
 
     names.push_back("larfg");
 
+    names.push_back("norm1");
+    names.push_back("norm1_small");
     names.push_back("powk_norm");
     names.push_back("powk_norm_small");
 
