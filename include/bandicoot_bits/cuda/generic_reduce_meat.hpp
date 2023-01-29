@@ -23,30 +23,6 @@
 //  - eT1* out_mem
 // Additional arguments are fine, so long as those first three are the same.
 
-// This version uses the same kernel for all reduce passes.
-template<typename eT, typename... Args>
-inline
-eT
-generic_reduce(const dev_mem_t<eT> mem,
-               const uword n_elem,
-               const char* kernel_name,
-               CUfunction& kernel,
-               CUfunction& kernel_small,
-               std::tuple<Args...>& kernel_extra_args)
-  {
-  return generic_reduce(mem,
-                        n_elem,
-                        kernel_name,
-                        kernel,
-                        kernel_small,
-                        kernel_extra_args,
-                        kernel,
-                        kernel_small,
-                        kernel_extra_args);
-  }
-
-
-
 template<typename eT, typename... A1, typename... A2>
 inline
 eT
@@ -55,10 +31,10 @@ generic_reduce(const dev_mem_t<eT> mem,
                const char* kernel_name,
                CUfunction& first_kernel,
                CUfunction& first_kernel_small,
-               std::tuple<A1...>& first_kernel_extra_args,
+               const std::tuple<A1...>& first_kernel_extra_args,
                CUfunction& second_kernel,
                CUfunction& second_kernel_small,
-               std::tuple<A2...>& second_kernel_extra_args)
+               const std::tuple<A2...>& second_kernel_extra_args)
   {
   // Do first pass, hand off to appropriate smaller reduce if needed.
   // The first pass will use the first kernel; subsequent passes use the second kernel.
@@ -66,7 +42,7 @@ generic_reduce(const dev_mem_t<eT> mem,
 
   // Compute size of auxiliary memory.
   const size_t aux_mem_size = (n_elem + mtpb - 1) / mtpb;
-  Mat<eT> aux_mem(aux_mem_size);
+  Col<eT> aux_mem(aux_mem_size);
   generic_reduce_inner(mem,
                        n_elem,
                        aux_mem.get_dev_mem(false),
@@ -82,16 +58,53 @@ generic_reduce(const dev_mem_t<eT> mem,
 
 
 
+// This version uses the same kernel for all reduce passes.
+template<typename eT, typename... Args>
+inline
+eT
+generic_reduce(const dev_mem_t<eT> mem,
+               const uword n_elem,
+               const char* kernel_name,
+               CUfunction& kernel,
+               CUfunction& kernel_small,
+               const std::tuple<Args...>& kernel_extra_args)
+  {
+  return generic_reduce(mem,
+                        n_elem,
+                        kernel_name,
+                        kernel,
+                        kernel_small,
+                        kernel_extra_args,
+                        kernel,
+                        kernel_small,
+                        kernel_extra_args);
+  }
+
+
+
 // unpack_args is a metaprogramming utility to recursively iterate over the extra arguments for a kernel
 
 template<size_t i, typename... Args>
 struct
 unpack_args
   {
-  inline void apply(void** args, std::tuple<Args...>& args_tuple)
+  inline static void apply(const void** args, const std::tuple<Args...>& args_tuple)
     {
-    args[3 + i] = &std::get<i>(args_tuple);
+    args[3 + i] = &std::get<i - 1>(args_tuple);
     unpack_args<i - 1, Args...>::apply(args, args_tuple);
+    }
+  };
+
+
+
+template<typename... Args>
+struct
+unpack_args<1, Args...>
+  {
+  inline static void apply(const void** args, const std::tuple<Args...>& args_tuple)
+    {
+    // This is the last iteration of the recursion.
+    args[3] = &std::get<0>(args_tuple);
     }
   };
 
@@ -101,10 +114,11 @@ template<typename... Args>
 struct
 unpack_args<0, Args...>
   {
-  inline void apply(void** args, std::tuple<Args...>& args_tuple)
+  inline static void apply(const void** args, const std::tuple<Args...>& args_tuple)
     {
-    // This is the last iteration of the recursion.
-    args[3] = &std::get<0>(args_tuple);
+    // This gets called when there are no arguments at all.
+    coot_ignore(args);
+    coot_ignore(args_tuple);
     }
   };
 
@@ -119,10 +133,10 @@ generic_reduce_inner(const dev_mem_t<eT> mem,
                      const char* kernel_name,
                      CUfunction& first_kernel,
                      CUfunction& first_kernel_small,
-                     std::tuple<A1...>& first_kernel_extra_args,
+                     const std::tuple<A1...>& first_kernel_extra_args,
                      CUfunction& second_kernel,
                      CUfunction& second_kernel_small,
-                     std::tuple<A2...>& second_kernel_extra_args)
+                     const std::tuple<A2...>& second_kernel_extra_args)
   {
   const size_t mtpb = (size_t) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock;
 
@@ -142,11 +156,11 @@ generic_reduce_inner(const dev_mem_t<eT> mem,
     // Here, we will have to do multiple reduces.
     const size_t block_size = (n_elem + mtpb - 1) / mtpb;
 
-    void* args[3 + sizeof...(A1)];
+    const void* args[3 + sizeof...(A1)];
     args[0] = &mem.cuda_mem_ptr;
     args[1] = &n_elem;
     args[2] = &aux_mem.cuda_mem_ptr;
-    unpack_args<sizeof...(A1) - 1, A1...>::apply(args, first_kernel_extra_args);
+    unpack_args<sizeof...(A1), A1...>::apply(args, first_kernel_extra_args);
 
     CUresult result = cuLaunchKernel(
         first_kernel,
@@ -184,16 +198,16 @@ generic_reduce_inner_small(const dev_mem_t<eT> mem,
                            const char* kernel_name,
                            CUfunction& kernel,
                            CUfunction& kernel_small, // for 32 threads or fewer
-                           std::tuple<Args...>& kernel_extra_args)
+                           const std::tuple<Args...>& kernel_extra_args)
   {
   // TODO: can this be made more efficient?
   const uword num_threads = (uword) std::pow(2.0f, std::ceil(std::log2((float) n_elem)));
 
-  void* args[3 + sizeof...(Args)];
+  const void* args[3 + sizeof...(Args)];
   args[0] = &mem.cuda_mem_ptr;
   args[1] = &n_elem;
   args[2] = &aux_mem.cuda_mem_ptr;
-  unpack_args<sizeof...(Args) - 1, Args...>::apply(args, kernel_extra_args);
+  unpack_args<sizeof...(Args), Args...>::apply(args, kernel_extra_args);
 
   CUresult result = cuLaunchKernel(
       num_threads <= 32 ? kernel_small : kernel, // if we have fewer threads than a single warp, we can use a more optimized version of the kernel
