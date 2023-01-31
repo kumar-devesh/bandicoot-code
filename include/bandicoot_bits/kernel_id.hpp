@@ -80,11 +80,6 @@ struct oneway_kernel_id
     max_abs,
     max_abs_small,
     //
-    sqrd_dbl_norm2,
-    sqrd_dbl_norm2_small,
-    sqrd_dbl_norm2_robust,
-    sqrd_dbl_norm2_robust_small,
-    //
     trace,
     //
     ltri_set_zero,
@@ -132,11 +127,6 @@ struct oneway_kernel_id
     names.push_back("max_small");
     names.push_back("max_abs");
     names.push_back("max_abs_small");
-
-    names.push_back("sqrd_dbl_norm2");
-    names.push_back("sqrd_dbl_norm2_small");
-    names.push_back("sqrd_dbl_norm2_robust");
-    names.push_back("sqrd_dbl_norm2_robust_small");
 
     names.push_back("trace");
 
