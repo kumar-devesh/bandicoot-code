@@ -1577,7 +1577,7 @@ coot_rt_t::vec_norm_k(const dev_mem_t<eT> mem, const uword n_elem, const uword k
   if (get_rt().backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
-    return opencl::vec_norm_k(mem, n_elem);
+    return opencl::vec_norm_k(mem, n_elem, k);
     #else
     coot_stop_runtime_error("coot_rt::vec_norm_k(): OpenCL backend not enabled");
     #endif
@@ -1585,7 +1585,7 @@ coot_rt_t::vec_norm_k(const dev_mem_t<eT> mem, const uword n_elem, const uword k
   else if (get_rt().backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    return cuda::vec_norm_k(mem, n_elem);
+    return cuda::vec_norm_k(mem, n_elem, k);
     #else
     coot_stop_runtime_error("coot_rt::vec_norm_k(): CUDA backend not enabled");
     #endif

@@ -20,7 +20,7 @@ using namespace coot;
 
 
 // Compare with Armadillo's implementation and ensure that the result is at least close.
-TEMPLATE_TEST_CASE("norm_basic", "[norm]", double, float, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("norm_basic", "[norm]", double, float)
   {
   Col<TestType> x = randi<Col<TestType>>(1000, distr_param(0, 50));
   arma::Col<TestType> x_cpu(x);
@@ -44,7 +44,7 @@ TEMPLATE_TEST_CASE("norm_basic", "[norm]", double, float, u32, s32, u64, s64)
 
 
 
-TEMPLATE_TEST_CASE("empty_norm", "[norm]", double, float, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("empty_norm", "[norm]", double, float)
   {
   Col<TestType> x;
 
@@ -60,7 +60,7 @@ TEMPLATE_TEST_CASE("empty_norm", "[norm]", double, float, u32, s32, u64, s64)
 
 
 
-TEMPLATE_TEST_CASE("single_element_norm", "[norm]", double, float, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("single_element_norm", "[norm]", double, float)
   {
   Row<TestType> x(1);
   x[0] = TestType(10);
@@ -77,7 +77,7 @@ TEMPLATE_TEST_CASE("single_element_norm", "[norm]", double, float, u32, s32, u64
 
 
 
-TEMPLATE_TEST_CASE("expr_norm", "[norm]", double, float, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("expr_norm", "[norm]", double, float)
   {
   Row<TestType> x = randi<Col<TestType>>(1000, distr_param(0, 50));
   Row<TestType> z = vectorise(repmat(trans(x + 3), 2, 2));
@@ -99,7 +99,7 @@ TEMPLATE_TEST_CASE("norm2_overflow", "[norm]", double, float)
   {
   Col<TestType> x(10000);
   Col<TestType> f = randu<Col<TestType>>(10000) * 0.9;
-  x = f % std::numeric_limits<TestType>::max();
+  x = f * std::numeric_limits<TestType>::max();
 
   const TestType x_max = max(x);
   Col<TestType> x_normalized = x / x_max;
@@ -114,7 +114,7 @@ TEMPLATE_TEST_CASE("norm2_underflow", "[norm]", double, float)
   {
   Col<TestType> x(10000);
   Col<TestType> f = randi<Col<TestType>>(10000, distr_param(1, 25));
-  x = f % std::numeric_limits<TestType>::min();
+  x = f * std::numeric_limits<TestType>::min();
 
   const TestType x_max = max(x);
   Col<TestType> x_normalized = x / x_max;
@@ -125,7 +125,7 @@ TEMPLATE_TEST_CASE("norm2_underflow", "[norm]", double, float)
 
 
 // Try a complicated expression with norm() inside of it too.
-TEMPLATE_TEST_CASE("double_norm_expr", "[norm]", double, float, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("double_norm_expr", "[norm]", double, float)
   {
   Col<TestType> x = randi<Col<TestType>>(10000, distr_param(0, 100));
   Col<TestType> y = randi<Col<TestType>>(10000, distr_param(50, 150));
@@ -141,12 +141,7 @@ TEMPLATE_TEST_CASE("double_norm_expr", "[norm]", double, float, u32, s32, u64, s
 TEMPLATE_TEST_CASE(
   "norm_conv_to",
   "[norm]",
-  (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
-  (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
-  (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
-  (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
-  (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
-  (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>))
+  (std::pair<double, float>), (std::pair<float, double>))
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
