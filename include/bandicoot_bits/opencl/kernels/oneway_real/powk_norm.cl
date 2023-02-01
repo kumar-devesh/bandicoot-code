@@ -12,6 +12,8 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
+
+
 __kernel
 void
 COOT_FN(PREFIX,powk_norm)(__global const eT1* in_mem,

@@ -25,24 +25,24 @@ COOT_FN(PREFIX,norm_min_small)(__global const eT1* in_mem,
 
   if (i < n_elem)
     {
-    aux_mem[tid] = abs(in_mem[i]);
+    aux_mem[tid] = ET1_ABS(in_mem[i]);
     }
   if (i + get_global_size(0) < n_elem)
     {
-    const eT1 v = abs(in_mem[i + get_global_size(0)]);
+    const eT1 v = ET1_ABS(in_mem[i + get_global_size(0)]);
     aux_mem[tid] = min(aux_mem[tid], v);
     }
   i += grid_size;
 
   while (i + get_global_size(0) < n_elem)
     {
-    const eT1 v = min(abs(in_mem[i]), abs(in_mem[i + get_global_size(0)]));
+    const eT1 v = min(ET1_ABS(in_mem[i]), ET1_ABS(in_mem[i + get_global_size(0)]));
     aux_mem[tid] = min(aux_mem[tid], v);
     i += grid_size;
     }
   if (i < n_elem)
     {
-    aux_mem[tid] = min(aux_mem[tid], abs(in_mem[i]));
+    aux_mem[tid] = min(aux_mem[tid], ET1_ABS(in_mem[i]));
     }
 
   for (UWORD s = get_local_size(0) / 2; s > 0; s >>= 1)

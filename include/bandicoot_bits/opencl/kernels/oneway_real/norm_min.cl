@@ -12,6 +12,16 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
+// Forward declarations we may need.
+void COOT_FN(PREFIX,min_wavefront_reduce_other)(__local volatile eT1* data, UWORD tid);
+void COOT_FN(PREFIX,min_wavefront_reduce_8)(__local volatile eT1* data, UWORD tid);
+void COOT_FN(PREFIX,min_wavefront_reduce_16)(__local volatile eT1* data, UWORD tid);
+void COOT_FN(PREFIX,min_wavefront_reduce_32)(__local volatile eT1* data, UWORD tid);
+void COOT_FN(PREFIX,min_wavefront_reduce_64)(__local volatile eT1* data, UWORD tid);
+void COOT_FN(PREFIX,min_wavefront_reduce_128)(__local volatile eT1* data, UWORD tid);
+
+
+
 __kernel
 void
 COOT_FN(PREFIX,norm_min)(__global const eT1* in_mem,
@@ -25,24 +35,24 @@ COOT_FN(PREFIX,norm_min)(__global const eT1* in_mem,
 
   if (i < n_elem)
     {
-    aux_mem[tid] = abs(in_mem[i]);
+    aux_mem[tid] = ET1_ABS(in_mem[i]);
     }
   if (i + get_global_size(0) < n_elem)
     {
-    const eT1 v = abs(in_mem[i + get_global_size(0)]);
+    const eT1 v = ET1_ABS(in_mem[i + get_global_size(0)]);
     aux_mem[tid] = min(aux_mem[tid], v);
     }
   i += grid_size;
 
   while (i + get_global_size(0) < n_elem)
     {
-    const eT1 v = min(abs(in_mem[i]), abs(in_mem[i + get_global_size(0)]));
+    const eT1 v = min(ET1_ABS(in_mem[i]), ET1_ABS(in_mem[i + get_global_size(0)]));
     aux_mem[tid] = min(aux_mem[tid], v);
     i += grid_size;
     }
   if (i < n_elem)
     {
-    aux_mem[tid] = min(aux_mem[tid], abs(in_mem[i]));
+    aux_mem[tid] = min(aux_mem[tid], ET1_ABS(in_mem[i]));
     }
   barrier(CLK_LOCAL_MEM_FENCE);
 
