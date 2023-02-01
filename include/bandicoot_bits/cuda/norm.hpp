@@ -17,10 +17,28 @@
 template<typename eT>
 inline
 eT
-vec_norm_1(dev_mem_t<eT> mem, const uword n_elem)
+vec_norm_1(dev_mem_t<eT> mem, const uword n_elem, const typename coot_real_only<eT>::result* junk = 0)
   {
-  // TODO
-  return eT(0);
+  coot_extra_debug_sigprint();
+  coot_ignore(junk);
+
+  // For floating-point types, we perform a power-k accumulation.
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::norm1);
+  CUfunction kernel_small = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::norm1_small);
+
+  CUfunction accu_kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu);
+  CUfunction accu_kernel_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu_small);
+
+  const eT result = generic_reduce(mem,
+                                   n_elem,
+                                   "vec_norm_1",
+                                   kernel,
+                                   kernel_small,
+                                   std::make_tuple(/* no extra args */),
+                                   accu_kernel,
+                                   accu_kernel_small,
+                                   std::make_tuple(/* no extra args */));
+  return result;
   }
 
 
@@ -36,7 +54,7 @@ vec_norm_2(dev_mem_t<float> mem, const uword n_elem)
   float result;
   cublasStatus_t status = cublasSnrm2(get_rt().cuda_rt.cublas_handle, n_elem, mem.cuda_mem_ptr, 1, &result);
 
-  coot_check_cublas_error( status, "coot::cuda::norm_2(): call to cublasSnrm2() failed" );
+  coot_check_cublas_error( status, "coot::cuda::vec_norm_2(): call to cublasSnrm2() failed" );
 
   return result;
   }
@@ -54,7 +72,7 @@ vec_norm_2(dev_mem_t<double> mem, const uword n_elem)
   double result;
   cublasStatus_t status = cublasDnrm2(get_rt().cuda_rt.cublas_handle, n_elem, mem.cuda_mem_ptr, 1, &result);
 
-  coot_check_cublas_error( status, "coot::cuda::norm_2(): call to cublasDnrm2() failed" );
+  coot_check_cublas_error( status, "coot::cuda::vec_norm_2(): call to cublasDnrm2() failed" );
 
   return result;
   }
@@ -80,7 +98,7 @@ vec_norm_k(dev_mem_t<eT> mem, const uword n_elem, const uword k, const typename 
 
   const eT result = generic_reduce(mem,
                                    n_elem,
-                                   "norm_k",
+                                   "vec_norm_k",
                                    kernel,
                                    kernel_small,
                                    std::make_tuple(k),
