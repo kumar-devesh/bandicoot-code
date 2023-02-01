@@ -106,8 +106,8 @@ norm
 
   if (is_vec)
     {
-//    if( (sig == 'i') || (sig == 'I') || (sig == '+') )  { return op_norm::vec_norm_max(U.M); }
-//    if( (sig == '-')                                 )  { return op_norm::vec_norm_min(U.M); }
+    if( (sig == 'i') || (sig == 'I') || (sig == '+') )  { return op_norm::vec_norm_max(U.M); }
+    if( (sig == '-')                                 )  { return op_norm::vec_norm_min(U.M); }
     if( (sig == 'f') || (sig == 'F')                 )  { return op_norm::vec_norm_2(U.M);   }
 
     coot_stop_logic_error("norm(): unsupported vector norm type");
