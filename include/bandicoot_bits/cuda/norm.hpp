@@ -115,10 +115,28 @@ vec_norm_k(dev_mem_t<eT> mem, const uword n_elem, const uword k, const typename 
 template<typename eT>
 inline
 eT
-vec_norm_min(dev_mem_t<eT> mem, const uword n_elem)
+vec_norm_min(dev_mem_t<eT> mem, const uword n_elem, const typename coot_real_only<eT>::result* junk = 0)
   {
-  // TODO
-  return eT(0);
+  coot_extra_debug_sigprint();
+  coot_ignore(junk);
+
+  // For floating-point types, we perform a power-k accumulation.
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::norm_min);
+  CUfunction kernel_small = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::norm_min_small);
+
+  CUfunction min_kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::min);
+  CUfunction min_kernel_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::min_small);
+
+  const eT result = generic_reduce(mem,
+                                   n_elem,
+                                   "vec_norm_min",
+                                   kernel,
+                                   kernel_small,
+                                   std::make_tuple(/* no extra args */),
+                                   min_kernel,
+                                   min_kernel_small,
+                                   std::make_tuple(/* no extra args */));
+  return result;
   }
 
 
