@@ -24,7 +24,15 @@ COOT_FN(PREFIX,norm_min_small)(const eT1* in_mem,
   UWORD i = blockIdx.x * (blockDim.x * 2) + threadIdx.x;
   const UWORD grid_size = blockDim.x * 2 * gridDim.x;
 
-  aux_mem[tid] = 0;
+  if (i < n_elem)
+    {
+    aux_mem[tid] = abs(in_mem[i]);
+    }
+  if (i + blockDim.x < n_elem)
+    {
+    aux_mem[tid] = min(aux_mem[tid], abs(in_mem[i]));
+    }
+  i += grid_size;
 
   while (i + blockDim.x < n_elem)
     {
