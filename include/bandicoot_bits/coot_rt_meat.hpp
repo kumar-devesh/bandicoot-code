@@ -1532,6 +1532,8 @@ coot_rt_t::vec_norm_1(const dev_mem_t<eT> mem, const uword n_elem)
     {
     coot_stop_runtime_error("coot_rt::vec_norm_1(): unknown backend");
     }
+
+  return eT(0); // fix warning
   }
 
 
@@ -1563,6 +1565,8 @@ coot_rt_t::vec_norm_2(const dev_mem_t<eT> mem, const uword n_elem)
     {
     coot_stop_runtime_error("coot_rt::vec_norm_2(): unknown backend");
     }
+
+  return eT(0); // fix warning
   }
 
 
@@ -1594,6 +1598,8 @@ coot_rt_t::vec_norm_k(const dev_mem_t<eT> mem, const uword n_elem, const uword k
     {
     coot_stop_runtime_error("coot_rt::vec_norm_k(): unknown backend");
     }
+
+  return eT(0); // fix warning
   }
 
 
@@ -1625,6 +1631,8 @@ coot_rt_t::vec_norm_min(const dev_mem_t<eT> mem, const uword n_elem)
     {
     coot_stop_runtime_error("coot_rt::vec_norm_min(): unknown backend");
     }
+
+  return eT(0); // fix warning
   }
 
 
