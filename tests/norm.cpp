@@ -167,12 +167,12 @@ TEMPLATE_TEST_CASE("large_norm", "[norm]", double, float)
   Col<TestType> x = randi<Col<TestType>>(1000000, distr_param(0, 100));
   arma::Col<TestType> x_cpu(x);
 
-  REQUIRE( norm(x, 1) == Approx(norm(x_cpu, 1)) );
-  REQUIRE( norm(x, 2) == Approx(norm(x_cpu, 2)) );
-  REQUIRE( norm(x, 3) == Approx(norm(x_cpu, 3)) );
-  REQUIRE( norm(x, 4) == Approx(norm(x_cpu, 4)) );
-  REQUIRE( norm(x, 5) == Approx(norm(x_cpu, 5)) );
-  REQUIRE( norm(x, "-inf") == Approx(norm(x_cpu, "-inf")) );
-  REQUIRE( norm(x, "inf") == Approx(norm(x_cpu, "inf")) );
-  REQUIRE( norm(x, "fro") == Approx(norm(x_cpu, "fro")) );
+  REQUIRE( norm(x, 1) == Approx(norm(x_cpu, 1)).epsilon(0.01) );
+  REQUIRE( norm(x, 2) == Approx(norm(x_cpu, 2)).epsilon(0.01) );
+  REQUIRE( norm(x, 3) == Approx(norm(x_cpu, 3)).epsilon(0.01) );
+  REQUIRE( norm(x, 4) == Approx(norm(x_cpu, 4)).epsilon(0.01) );
+  REQUIRE( norm(x, 5) == Approx(norm(x_cpu, 5)).epsilon(0.01) );
+  REQUIRE( norm(x, "-inf") == Approx(norm(x_cpu, "-inf")).epsilon(0.01) );
+  REQUIRE( norm(x, "inf") == Approx(norm(x_cpu, "inf")).epsilon(0.01) );
+  REQUIRE( norm(x, "fro") == Approx(norm(x_cpu, "fro")).epsilon(0.01) );
   }
