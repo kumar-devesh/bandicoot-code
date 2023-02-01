@@ -112,7 +112,7 @@ eT
 op_norm::vec_norm_max(const Mat<eT>& X)
   {
   coot_extra_debug_sigprint();
-  return coot_rt_t::vec_norm_max(X.get_dev_mem(false), X.n_elem);
+  return coot_rt_t::max_abs(X.get_dev_mem(false), X.n_elem);
   }
 
 

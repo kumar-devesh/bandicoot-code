@@ -1629,36 +1629,6 @@ coot_rt_t::vec_norm_min(const dev_mem_t<eT> mem, const uword n_elem)
 
 
 
-template<typename eT>
-inline
-eT
-coot_rt_t::vec_norm_max(const dev_mem_t<eT> mem, const uword n_elem)
-  {
-  coot_extra_debug_sigprint();
-
-  if (get_rt().backend == CL_BACKEND)
-    {
-    #if defined(COOT_USE_OPENCL)
-    return opencl::vec_norm_max(mem, n_elem);
-    #else
-    coot_stop_runtime_error("coot_rt::vec_norm_max(): OpenCL backend not enabled");
-    #endif
-    }
-  else if (get_rt().backend == CUDA_BACKEND)
-    {
-    #if defined(COOT_USE_CUDA)
-    return cuda::vec_norm_max(mem, n_elem);
-    #else
-    coot_stop_runtime_error("coot_rt::vec_norm_max(): CUDA backend not enabled");
-    #endif
-    }
-  else
-    {
-    coot_stop_runtime_error("coot_rt::vec_norm_max(): unknown backend");
-    }
-  }
-
-
 
 template<typename eT>
 inline

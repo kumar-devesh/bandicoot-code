@@ -183,9 +183,6 @@ class coot_rt_t
   template<typename eT>
   static inline eT vec_norm_min(dev_mem_t<eT> mem, const uword n_elem);
 
-  template<typename eT>
-  static inline eT vec_norm_max(dev_mem_t<eT> mem, const uword n_elem);
-
   // LAPACK-style utility functions
 
   template<typename eT>

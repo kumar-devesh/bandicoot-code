@@ -141,11 +141,4 @@ vec_norm_min(dev_mem_t<eT> mem, const uword n_elem, const typename coot_real_onl
 
 
 
-template<typename eT>
-inline
-eT
-vec_norm_max(dev_mem_t<eT> mem, const uword n_elem)
-  {
-  // TODO
-  return eT(0);
-  }
+// vec_norm_max() is not needed---max_abs() is equivalent.
