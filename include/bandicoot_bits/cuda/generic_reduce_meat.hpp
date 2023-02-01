@@ -41,19 +41,27 @@ generic_reduce(const dev_mem_t<eT> mem,
   const size_t mtpb = (size_t) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock;
 
   // Compute size of auxiliary memory.
-  const size_t aux_mem_size = (n_elem + mtpb - 1) / mtpb;
+  const size_t first_aux_mem_size = (n_elem + mtpb - 1) / mtpb;
+  const size_t second_aux_mem_size = (first_aux_mem_size == 1) ? 0 : (first_aux_mem_size + mtpb - 1) / mtpb;
+  const size_t aux_mem_size = first_aux_mem_size + second_aux_mem_size;
   Col<eT> aux_mem(aux_mem_size);
-  generic_reduce_inner(mem,
-                       n_elem,
-                       aux_mem.get_dev_mem(false),
-                       kernel_name,
-                       first_kernel,
-                       first_kernel_small,
-                       first_kernel_extra_args,
-                       second_kernel,
-                       second_kernel_small,
-                       second_kernel_extra_args);
-  return eT(aux_mem[0]);
+
+  dev_mem_t<eT> aux_mem_ptr = aux_mem.get_dev_mem(false);
+  // Create offset for secondary buffer.
+  dev_mem_t<eT> second_aux_mem_ptr = aux_mem_ptr;
+  second_aux_mem_ptr.cuda_mem_ptr += first_aux_mem_size;
+  const bool first_buffer = generic_reduce_inner(mem,
+                                                 n_elem,
+                                                 aux_mem_ptr,
+                                                 kernel_name,
+                                                 first_kernel,
+                                                 first_kernel_small,
+                                                 first_kernel_extra_args,
+                                                 second_kernel,
+                                                 second_kernel_small,
+                                                 second_kernel_extra_args,
+                                                 second_aux_mem_ptr);
+  return first_buffer ? eT(aux_mem[0]) : eT(aux_mem[first_aux_mem_size]);
   }
 
 
@@ -126,7 +134,7 @@ unpack_args<0, Args...>
 
 template<typename eT, typename... A1, typename... A2>
 inline
-void
+bool
 generic_reduce_inner(const dev_mem_t<eT> mem,
                      const uword n_elem,
                      dev_mem_t<eT> aux_mem,
@@ -136,7 +144,8 @@ generic_reduce_inner(const dev_mem_t<eT> mem,
                      const std::tuple<A1...>& first_kernel_extra_args,
                      CUfunction& second_kernel,
                      CUfunction& second_kernel_small,
-                     const std::tuple<A2...>& second_kernel_extra_args)
+                     const std::tuple<A2...>& second_kernel_extra_args,
+                     dev_mem_t<eT> second_aux_mem)
   {
   const size_t mtpb = (size_t) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock;
 
@@ -150,6 +159,7 @@ generic_reduce_inner(const dev_mem_t<eT> mem,
                                first_kernel,
                                first_kernel_small,
                                first_kernel_extra_args);
+    return true;
     }
   else
     {
@@ -174,16 +184,18 @@ generic_reduce_inner(const dev_mem_t<eT> mem,
 
     // Now, take subsequent passes.
     // We use the second kernel for all subsequent passes.
-    generic_reduce_inner(mem,
-                         n_elem,
-                         aux_mem,
-                         kernel_name,
-                         second_kernel,
-                         second_kernel_small,
-                         second_kernel_extra_args,
-                         second_kernel,
-                         second_kernel_small,
-                         second_kernel_extra_args);
+    // The '!' on the return value flips whether or not the final result is in the first/second aux mem buffer.
+    return !generic_reduce_inner(aux_mem,
+                                 block_size,
+                                 second_aux_mem,
+                                 kernel_name,
+                                 second_kernel,
+                                 second_kernel_small,
+                                 second_kernel_extra_args,
+                                 second_kernel,
+                                 second_kernel_small,
+                                 second_kernel_extra_args,
+                                 aux_mem);
     }
   }
 

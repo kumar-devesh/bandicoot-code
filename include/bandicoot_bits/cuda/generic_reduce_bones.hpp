@@ -53,7 +53,7 @@ generic_reduce(const dev_mem_t<eT> mem,
 
 template<typename eT, typename... A1, typename... A2>
 inline
-void
+bool
 generic_reduce_inner(const dev_mem_t<eT> mem,
                      const uword n_elem,
                      dev_mem_t<eT> aux_mem,
@@ -63,7 +63,8 @@ generic_reduce_inner(const dev_mem_t<eT> mem,
                      const std::tuple<A1...>& first_kernel_extra_args,
                      CUfunction& second_kernel,
                      CUfunction& second_kernel_small,
-                     const std::tuple<A2...>& second_kernel_extra_args);
+                     const std::tuple<A2...>& second_kernel_extra_args,
+                     dev_mem_t<eT> second_aux_mem);
 
 
 
