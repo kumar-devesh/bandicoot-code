@@ -831,7 +831,7 @@ coot_rt_t::max_abs(const dev_mem_t<eT> mem, const uword n_elem)
   else if (get_rt().backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    return cuda::min(mem, n_elem);
+    return cuda::max_abs(mem, n_elem);
     #else
     coot_stop_runtime_error("coot_rt::max_abs(): CUDA backend not enabled");
     #endif

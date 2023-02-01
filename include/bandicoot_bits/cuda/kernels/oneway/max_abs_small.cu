@@ -51,7 +51,7 @@ COOT_FN(PREFIX,max_abs_small)(const eT1* in_mem,
       {
       aux_mem[tid] = max(aux_mem[tid], aux_mem[tid + s]);
       }
-  }
+    }
 
   if (tid == 0)
     {
