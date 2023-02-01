@@ -158,3 +158,21 @@ TEMPLATE_TEST_CASE(
   REQUIRE( norm(conv_to<Col<eT2>>::from(x), "inf") == Approx(norm(y, "inf")) );
   REQUIRE( norm(conv_to<Col<eT2>>::from(x), "fro") == Approx(norm(y, "fro")) );
   }
+
+
+
+// Compute norms of a very large vector (hopefully enough to trigger a second reduce).
+TEMPLATE_TEST_CASE("large_norm", "[norm]", double, float)
+  {
+  Col<TestType> x = randi<Col<TestType>>(1000000, distr_param(0, 100));
+  arma::Col<TestType> x_cpu(x);
+
+  REQUIRE( norm(x, 1) == Approx(norm(x_cpu, 1)) );
+  REQUIRE( norm(x, 2) == Approx(norm(x_cpu, 2)) );
+  REQUIRE( norm(x, 3) == Approx(norm(x_cpu, 3)) );
+  REQUIRE( norm(x, 4) == Approx(norm(x_cpu, 4)) );
+  REQUIRE( norm(x, 5) == Approx(norm(x_cpu, 5)) );
+  REQUIRE( norm(x, "-inf") == Approx(norm(x_cpu, "-inf")) );
+  REQUIRE( norm(x, "inf") == Approx(norm(x_cpu, "inf")) );
+  REQUIRE( norm(x, "fro") == Approx(norm(x_cpu, "fro")) );
+  }
