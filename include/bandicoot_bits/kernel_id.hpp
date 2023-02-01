@@ -165,6 +165,8 @@ struct oneway_real_kernel_id
     norm1_small,
     powk_norm,
     powk_norm_small,
+    norm_min,
+    norm_min_small,
     //
     invalid_kernel
     };
@@ -185,6 +187,8 @@ struct oneway_real_kernel_id
     names.push_back("norm1_small");
     names.push_back("powk_norm");
     names.push_back("powk_norm_small");
+    names.push_back("norm_min");
+    names.push_back("norm_min_small");
 
     return names;
     }
