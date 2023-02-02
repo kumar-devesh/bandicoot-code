@@ -22,8 +22,8 @@ vec_norm_1(dev_mem_t<eT> mem, const uword n_elem, const typename coot_real_only<
   coot_extra_debug_sigprint();
   coot_ignore(junk);
 
-  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::norm1);
-  cl_kernel kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::norm1_small);
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::vec_norm_1);
+  cl_kernel kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::vec_norm_1_small);
 
   cl_kernel accu_kernel = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu);
   cl_kernel accu_kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu_small);
@@ -59,8 +59,8 @@ vec_norm_2(dev_mem_t<eT> mem, const uword n_elem, const typename coot_real_only<
   coot_extra_debug_sigprint();
   coot_ignore(junk);
 
-  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::norm2);
-  cl_kernel kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::norm2_small);
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::vec_norm_2);
+  cl_kernel kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::vec_norm_2_small);
 
   cl_kernel accu_kernel = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu);
   cl_kernel accu_kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu_small);
@@ -80,8 +80,8 @@ vec_norm_2(dev_mem_t<eT> mem, const uword n_elem, const typename coot_real_only<
     // We detected overflow or underflow---try again.
     const eT max_elem = max_abs(mem, n_elem);
 
-    cl_kernel robust_kernel = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::norm2_robust);
-    cl_kernel robust_kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::norm2_robust_small);
+    cl_kernel robust_kernel = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::vec_norm_2_robust);
+    cl_kernel robust_kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::vec_norm_2_robust_small);
 
     const eT robust_result = generic_reduce(mem,
                                             n_elem,
@@ -112,8 +112,8 @@ vec_norm_k(dev_mem_t<eT> mem, const uword n_elem, const uword k, const typename 
   coot_extra_debug_sigprint();
   coot_ignore(junk);
 
-  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::powk_norm);
-  cl_kernel kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::powk_norm_small);
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::vec_norm_k);
+  cl_kernel kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::vec_norm_k_small);
 
   cl_kernel accu_kernel = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu);
   cl_kernel accu_kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu_small);
@@ -141,8 +141,8 @@ vec_norm_min(dev_mem_t<eT> mem, const uword n_elem, const typename coot_real_onl
   coot_extra_debug_sigprint();
   coot_ignore(junk);
 
-  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::norm_min);
-  cl_kernel kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::norm_min_small);
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::vec_norm_min);
+  cl_kernel kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::vec_norm_min_small);
 
   cl_kernel min_kernel = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::min);
   cl_kernel min_kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::min_small);

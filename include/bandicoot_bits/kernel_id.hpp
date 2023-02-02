@@ -161,16 +161,16 @@ struct oneway_real_kernel_id
     {
     larfg = 0,
     //
-    norm1,
-    norm1_small,
-    norm2,
-    norm2_small,
-    norm2_robust,
-    norm2_robust_small,
-    powk_norm,
-    powk_norm_small,
-    norm_min,
-    norm_min_small,
+    vec_norm_1,
+    vec_norm_1_small,
+    vec_norm_2,
+    vec_norm_2_small,
+    vec_norm_2_robust,
+    vec_norm_2_robust_small,
+    vec_norm_k,
+    vec_norm_k_small,
+    vec_norm_min,
+    vec_norm_min_small,
     //
     invalid_kernel
     };
@@ -187,16 +187,16 @@ struct oneway_real_kernel_id
 
     names.push_back("larfg");
 
-    names.push_back("norm1");
-    names.push_back("norm1_small");
-    names.push_back("norm2");
-    names.push_back("norm2_small");
-    names.push_back("norm2_robust");
-    names.push_back("norm2_robust_small");
-    names.push_back("powk_norm");
-    names.push_back("powk_norm_small");
-    names.push_back("norm_min");
-    names.push_back("norm_min_small");
+    names.push_back("vec_norm_1");
+    names.push_back("vec_norm_1_small");
+    names.push_back("vec_norm_2");
+    names.push_back("vec_norm_2_small");
+    names.push_back("vec_norm_2_robust");
+    names.push_back("vec_norm_2_robust_small");
+    names.push_back("vec_norm_k");
+    names.push_back("vec_norm_k_small");
+    names.push_back("vec_norm_min");
+    names.push_back("vec_norm_min_small");
 
     return names;
     }

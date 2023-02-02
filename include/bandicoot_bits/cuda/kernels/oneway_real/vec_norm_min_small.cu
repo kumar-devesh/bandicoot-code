@@ -12,13 +12,11 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-// this kernel is technically incorrect if the size is not a factor of 2!
 __global__
 void
-COOT_FN(PREFIX,powk_norm)(const eT1* in_mem,
-                          const UWORD n_elem,
-                          eT1* out_mem,
-                          const UWORD k)
+COOT_FN(PREFIX,vec_norm_min_small)(const eT1* in_mem,
+                                   const UWORD n_elem,
+                                   eT1* out_mem)
   {
   eT1* aux_mem = (eT1*) aux_shared_mem;
 
@@ -26,36 +24,37 @@ COOT_FN(PREFIX,powk_norm)(const eT1* in_mem,
   UWORD i = blockIdx.x * (blockDim.x * 2) + threadIdx.x;
   const UWORD grid_size = blockDim.x * 2 * gridDim.x;
 
-  aux_mem[tid] = 0;
+  if (i < n_elem)
+    {
+    aux_mem[tid] = abs(in_mem[i]);
+    }
+  if (i + blockDim.x < n_elem)
+    {
+    aux_mem[tid] = min(aux_mem[tid], abs(in_mem[i]));
+    }
+  i += grid_size;
 
   while (i + blockDim.x < n_elem)
     {
     // copy to local shared memory
-    const eT1 v1 = pow(in_mem[i], eT1(k));
-    const eT1 v2 = pow(in_mem[i + blockDim.x], eT1(k));
-    aux_mem[tid] += v1 + v2;
+    const eT1 v1 = abs(in_mem[i]);
+    const eT1 v2 = abs(in_mem[i + blockDim.x]);
+    const eT1 v3 = min(v1, v2);
+    aux_mem[tid] = min(aux_mem[tid], v3);
     i += grid_size;
     }
   if (i < n_elem)
     {
-    const eT1 v = pow(in_mem[i], eT1(k));
-    aux_mem[tid] += v;
+    const eT1 v = abs(in_mem[i]);
+    aux_mem[tid] = min(aux_mem[tid], v);
     }
-  __syncthreads();
 
-  for (UWORD s = blockDim.x / 2; s > 32; s >>= 1)
+  for (UWORD s = blockDim.x / 2; s > 0; s >>= 1)
     {
     if (tid < s)
       {
-      aux_mem[tid] += aux_mem[tid + s];
+      aux_mem[tid] = min(aux_mem[tid], aux_mem[tid + s]);
       }
-    __syncthreads();
-  }
-
-  if (tid < 32) // unroll last warp's worth of work
-    {
-    // Since we are just accumulating, we can use the accu_warp_reduce utility function.
-    COOT_FN(PREFIX,accu_warp_reduce)(aux_mem, tid);
     }
 
   if (tid == 0)

@@ -18,9 +18,9 @@ __device__ void COOT_FN(PREFIX,min_warp_reduce)(volatile eT1* data, int tid);
 // this kernel is technically incorrect if the size is not a factor of 2!
 __global__
 void
-COOT_FN(PREFIX,norm_min)(const eT1* in_mem,
-                         const UWORD n_elem,
-                         eT1* out_mem)
+COOT_FN(PREFIX,vec_norm_min)(const eT1* in_mem,
+                             const UWORD n_elem,
+                             eT1* out_mem)
   {
   eT1* aux_mem = (eT1*) aux_shared_mem;
 

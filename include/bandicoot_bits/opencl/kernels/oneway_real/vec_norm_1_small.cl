@@ -1,4 +1,4 @@
-// Copyright 2023 Ryan Curtin (http://www.ratml.org/)
+// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,36 +12,30 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-__global__
+__kernel
 void
-COOT_FN(PREFIX,powk_norm_small)(const eT1* in_mem,
-                                const UWORD n_elem,
-                                eT1* out_mem,
-                                const UWORD k)
+COOT_FN(PREFIX,vec_norm_1_small)(__global const eT1* in_mem,
+                                 const UWORD n_elem,
+                                 __global eT1* out_mem,
+                                 __local volatile eT1* aux_mem)
   {
-  eT1* aux_mem = (eT1*) aux_shared_mem;
-
-  const UWORD tid = threadIdx.x;
-  UWORD i = blockIdx.x * (blockDim.x * 2) + threadIdx.x;
-  const UWORD grid_size = blockDim.x * 2 * gridDim.x;
+  const UWORD tid = get_local_id(0);
+  UWORD i = get_group_id(0) * (get_local_size(0) * 2) + tid;
+  const UWORD grid_size = get_local_size(0) * 2 * get_num_groups(0);
 
   aux_mem[tid] = 0;
 
-  while (i + blockDim.x < n_elem)
+  while (i + get_local_size(0) < n_elem)
     {
-    // copy to local shared memory
-    const eT1 v1 = pow(in_mem[i], eT1(k));
-    const eT1 v2 = pow(in_mem[i + blockDim.x], eT1(k));
-    aux_mem[tid] += v1 + v2;
+    aux_mem[tid] += ET1_ABS(in_mem[i]) + ET1_ABS(in_mem[i + get_local_size(0)]);
     i += grid_size;
     }
   if (i < n_elem)
     {
-    const eT1 v = pow(in_mem[i], eT1(k));
-    aux_mem[tid] += v;
+    aux_mem[tid] += ET1_ABS(in_mem[i]);
     }
 
-  for (UWORD s = blockDim.x / 2; s > 0; s >>= 1)
+  for (UWORD s = get_local_size(0) / 2; s > 0; s >>= 1)
     {
     if (tid < s)
       {
@@ -51,6 +45,6 @@ COOT_FN(PREFIX,powk_norm_small)(const eT1* in_mem,
 
   if (tid == 0)
     {
-    out_mem[blockIdx.x] = aux_mem[0];
+    out_mem[get_group_id(0)] = aux_mem[0];
     }
   }

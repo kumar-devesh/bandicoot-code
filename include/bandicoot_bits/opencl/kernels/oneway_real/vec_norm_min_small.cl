@@ -1,4 +1,4 @@
-// Copyright 2023 Ryan Curtin (http://www.ratml.org)
+// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,46 +12,45 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-
-
 __kernel
 void
-COOT_FN(PREFIX,norm2)(__global const eT1* in_mem,
-                      const UWORD n_elem,
-                      __global eT1* out_mem,
-                      __local volatile eT1* aux_mem)
+COOT_FN(PREFIX,vec_norm_min_small)(__global const eT1* in_mem,
+                                   const UWORD n_elem,
+                                   __global eT1* out_mem,
+                                   __local volatile eT1* aux_mem)
   {
   const UWORD tid = get_local_id(0);
   UWORD i = get_group_id(0) * (get_local_size(0) * 2) + tid;
   const UWORD grid_size = get_local_size(0) * 2 * get_num_groups(0);
 
-  aux_mem[tid] = 0;
+  if (i < n_elem)
+    {
+    aux_mem[tid] = ET1_ABS(in_mem[i]);
+    }
+  if (i + get_local_size(0) < n_elem)
+    {
+    const eT1 v = ET1_ABS(in_mem[i + get_local_size(0)]);
+    aux_mem[tid] = min(aux_mem[tid], v);
+    }
+  i += grid_size;
 
   while (i + get_local_size(0) < n_elem)
     {
-    const eT1 v1 = (in_mem[i] * in_mem[i]);
-    const eT1 v2 = (in_mem[i + get_local_size(0)] * in_mem[i + get_local_size(0)]);
-    aux_mem[tid] += v1 + v2;
+    const eT1 v = min(ET1_ABS(in_mem[i]), ET1_ABS(in_mem[i + get_local_size(0)]));
+    aux_mem[tid] = min(aux_mem[tid], v);
     i += grid_size;
     }
   if (i < n_elem)
     {
-    aux_mem[tid] += (in_mem[i] * in_mem[i]);
+    aux_mem[tid] = min(aux_mem[tid], ET1_ABS(in_mem[i]));
     }
-  barrier(CLK_LOCAL_MEM_FENCE);
 
-  for (UWORD s = get_local_size(0) / 2; s > WAVEFRONT_SIZE; s >>= 1)
+  for (UWORD s = get_local_size(0) / 2; s > 0; s >>= 1)
     {
     if (tid < s)
       {
-      aux_mem[tid] += aux_mem[tid + s];
+      aux_mem[tid] = min(aux_mem[tid], aux_mem[tid + s]);
       }
-    barrier(CLK_LOCAL_MEM_FENCE);
-    }
-
-  if (tid < WAVEFRONT_SIZE)
-    {
-    COOT_FN_3(PREFIX,accu_wavefront_reduce_,WAVEFRONT_SIZE_NAME)(aux_mem, tid);
     }
 
   if (tid == 0)

@@ -22,8 +22,8 @@ vec_norm_1(dev_mem_t<eT> mem, const uword n_elem, const typename coot_real_only<
   coot_extra_debug_sigprint();
   coot_ignore(junk);
 
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::norm1);
-  CUfunction kernel_small = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::norm1_small);
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::vec_norm_1);
+  CUfunction kernel_small = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::vec_norm_1_small);
 
   CUfunction accu_kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu);
   CUfunction accu_kernel_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu_small);
@@ -89,8 +89,8 @@ vec_norm_k(dev_mem_t<eT> mem, const uword n_elem, const uword k, const typename 
   coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "cuda runtime not valid" );
 
   // For floating-point types, we perform a power-k accumulation.
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::powk_norm);
-  CUfunction kernel_small = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::powk_norm_small);
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::vec_norm_k);
+  CUfunction kernel_small = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::vec_norm_k_small);
 
   CUfunction accu_kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu);
   CUfunction accu_kernel_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu_small);
@@ -120,8 +120,8 @@ vec_norm_min(dev_mem_t<eT> mem, const uword n_elem, const typename coot_real_onl
   coot_ignore(junk);
 
   // For floating-point types, we perform a power-k accumulation.
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::norm_min);
-  CUfunction kernel_small = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::norm_min_small);
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::vec_norm_min);
+  CUfunction kernel_small = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::vec_norm_min_small);
 
   CUfunction min_kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::min);
   CUfunction min_kernel_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::min_small);

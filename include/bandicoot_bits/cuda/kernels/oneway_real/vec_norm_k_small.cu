@@ -12,15 +12,12 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-// Forward declaration of one-way kernel that we need.
-__device__ void COOT_FN(PREFIX,accu_warp_reduce)(volatile eT1* data, int tid);
-
-// this kernel is technically incorrect if the size is not a factor of 2!
 __global__
 void
-COOT_FN(PREFIX,norm1)(const eT1* in_mem,
-                      const UWORD n_elem,
-                      eT1* out_mem)
+COOT_FN(PREFIX,vec_norm_k_small)(const eT1* in_mem,
+                                 const UWORD n_elem,
+                                 eT1* out_mem,
+                                 const UWORD k)
   {
   eT1* aux_mem = (eT1*) aux_shared_mem;
 
@@ -33,31 +30,23 @@ COOT_FN(PREFIX,norm1)(const eT1* in_mem,
   while (i + blockDim.x < n_elem)
     {
     // copy to local shared memory
-    const eT1 v1 = abs(in_mem[i]);
-    const eT1 v2 = abs(in_mem[i + blockDim.x]);
+    const eT1 v1 = pow(in_mem[i], eT1(k));
+    const eT1 v2 = pow(in_mem[i + blockDim.x], eT1(k));
     aux_mem[tid] += v1 + v2;
     i += grid_size;
     }
   if (i < n_elem)
     {
-    const eT1 v = abs(in_mem[i]);
+    const eT1 v = pow(in_mem[i], eT1(k));
     aux_mem[tid] += v;
     }
-  __syncthreads();
 
-  for (UWORD s = blockDim.x / 2; s > 32; s >>= 1)
+  for (UWORD s = blockDim.x / 2; s > 0; s >>= 1)
     {
     if (tid < s)
       {
       aux_mem[tid] += aux_mem[tid + s];
       }
-    __syncthreads();
-  }
-
-  if (tid < 32) // unroll last warp's worth of work
-    {
-    // Since we are just accumulating, we can use the accu_warp_reduce utility function.
-    COOT_FN(PREFIX,accu_warp_reduce)(aux_mem, tid);
     }
 
   if (tid == 0)

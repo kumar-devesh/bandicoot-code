@@ -14,9 +14,9 @@
 
 __global__
 void
-COOT_FN(PREFIX,norm2_small)(const eT1* in_mem,
-                            const UWORD n_elem,
-                            eT1* out_mem)
+COOT_FN(PREFIX,vec_norm_2)(const eT1* in_mem,
+                           const UWORD n_elem,
+                           eT1* out_mem)
   {
   // This kernel is not used!  It is just a placeholder.
   // Only the OpenCL version is used.
