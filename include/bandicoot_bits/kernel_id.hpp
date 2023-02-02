@@ -163,6 +163,10 @@ struct oneway_real_kernel_id
     //
     norm1,
     norm1_small,
+    norm2,
+    norm2_small,
+    norm2_robust,
+    norm2_robust_small,
     powk_norm,
     powk_norm_small,
     norm_min,
@@ -185,6 +189,10 @@ struct oneway_real_kernel_id
 
     names.push_back("norm1");
     names.push_back("norm1_small");
+    names.push_back("norm2");
+    names.push_back("norm2_small");
+    names.push_back("norm2_robust");
+    names.push_back("norm2_robust_small");
     names.push_back("powk_norm");
     names.push_back("powk_norm_small");
     names.push_back("norm_min");

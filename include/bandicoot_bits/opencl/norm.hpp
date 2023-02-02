@@ -17,33 +17,90 @@
 template<typename eT>
 inline
 eT
-vec_norm_1(dev_mem_t<eT> mem, const uword n_elem)
+vec_norm_1(dev_mem_t<eT> mem, const uword n_elem, const typename coot_real_only<eT>::result* junk = 0)
   {
-  // TODO
-  return eT(0);
+  coot_extra_debug_sigprint();
+  coot_ignore(junk);
+
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::norm1);
+  cl_kernel kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::norm1_small);
+
+  cl_kernel accu_kernel = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu);
+  cl_kernel accu_kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu_small);
+
+  const eT result = generic_reduce(mem,
+                                   n_elem,
+                                   "vec_norm_1",
+                                   kernel,
+                                   kernel_small,
+                                   std::make_tuple(/* no extra args */),
+                                   accu_kernel,
+                                   accu_kernel_small,
+                                   std::make_tuple(/* no extra args */));
+  return result;
   }
 
 
 
 template<typename eT>
 inline
-double
-vec_norm_2(dev_mem_t<eT> mem, const uword n_elem)
+eT
+vec_norm_2(dev_mem_t<eT> mem, const uword n_elem, const typename coot_real_only<eT>::result* junk = 0)
   {
-  // TODO
-  return eT(0);
+  // We don't use CLBLAS despite the fact that it has a NRM2 implementation,
+  // because that implementation requires a scratch buffer of size 2 * n_elem
+  // and I don't like that idea at all!
+  //
+  // So, we just use the powk_norm kernel and check for underflow or overflow,
+  // to match the behavior of Armadillo and the CUDA backend.
+  // Note that Armadillo does not check for underflow or overflow for the
+  // general k-norm case (where k != 2), so we don't do that either.
+
+  coot_extra_debug_sigprint();
+  coot_ignore(junk);
+
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::norm2);
+  cl_kernel kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::norm2_small);
+
+  cl_kernel accu_kernel = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu);
+  cl_kernel accu_kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu_small);
+
+  const eT result = generic_reduce(mem,
+                                   n_elem,
+                                   "vec_norm_2",
+                                   kernel,
+                                   kernel_small,
+                                   std::make_tuple(/* no extra args */),
+                                   accu_kernel,
+                                   accu_kernel_small,
+                                   std::make_tuple(/* no extra args */));
+
+  if (result == eT(0) || !coot_isfinite(result))
+    {
+    // We detected overflow or underflow---try again.
+    const eT max_elem = max_abs(mem, n_elem);
+
+    cl_kernel robust_kernel = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::norm2_robust);
+    cl_kernel robust_kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::norm2_robust_small);
+
+    const eT robust_result = generic_reduce(mem,
+                                            n_elem,
+                                            "vec_norm_2_robust",
+                                            robust_kernel,
+                                            robust_kernel_small,
+                                            std::make_tuple(max_elem),
+                                            accu_kernel,
+                                            accu_kernel_small,
+                                            std::make_tuple(/* no extra args */));
+
+    return std::sqrt(robust_result) * max_elem;
+    }
+  else
+    {
+    return std::sqrt(result);
+    }
   }
 
-
-
-template<typename eT>
-inline
-double
-vec_norm_2_robust(const dev_mem_t<eT> mem, const uword n_elem)
-  {
-  // TODO
-  return eT(0);
-  }
 
 
 
@@ -52,39 +109,52 @@ inline
 eT
 vec_norm_k(dev_mem_t<eT> mem, const uword n_elem, const uword k, const typename coot_real_only<eT>::result* junk = 0)
   {
-  // TODO
-  return eT(0);
+  coot_extra_debug_sigprint();
+  coot_ignore(junk);
+
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::powk_norm);
+  cl_kernel kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::powk_norm_small);
+
+  cl_kernel accu_kernel = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu);
+  cl_kernel accu_kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu_small);
+
+  const eT result = generic_reduce(mem,
+                                   n_elem,
+                                   "vec_norm_k",
+                                   kernel,
+                                   kernel_small,
+                                   std::make_tuple(k),
+                                   accu_kernel,
+                                   accu_kernel_small,
+                                   std::make_tuple(/* no extra args */));
+  return std::pow(result, eT(1) / eT(k));
   }
 
-
-
-template<typename eT>
-inline
-double
-vec_norm_k(dev_mem_t<eT> mem, const uword n_elem, const uword k, const typename coot_integral_only<eT>::result* junk = 0)
-  {
-  // TODO
-  return eT(0);
-  }
-
-
-
-template<typename eT>
-inline
-eT
-vec_norm_min(dev_mem_t<eT> mem, const uword n_elem)
-  {
-  // TODO
-  return eT(0);
-  }
 
 
 
 template<typename eT>
 inline
 eT
-vec_norm_max(dev_mem_t<eT> mem, const uword n_elem)
+vec_norm_min(dev_mem_t<eT> mem, const uword n_elem, const typename coot_real_only<eT>::result* junk = 0)
   {
-  // TODO
-  return eT(0);
+  coot_extra_debug_sigprint();
+  coot_ignore(junk);
+
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::norm_min);
+  cl_kernel kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::norm_min_small);
+
+  cl_kernel min_kernel = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::min);
+  cl_kernel min_kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::min_small);
+
+  const eT result = generic_reduce(mem,
+                                   n_elem,
+                                   "vec_norm_min",
+                                   kernel,
+                                   kernel_small,
+                                   std::make_tuple(/* no extra args */),
+                                   min_kernel,
+                                   min_kernel_small,
+                                   std::make_tuple(/* no extra args */));
+  return result;
   }
