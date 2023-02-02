@@ -141,6 +141,7 @@ namespace coot
     #include "bandicoot_bits/opencl/type_to_dev_string.hpp"
     #include "bandicoot_bits/opencl/random_bones.hpp"
     #include "bandicoot_bits/opencl/copy_bones.hpp"
+    #include "bandicoot_bits/opencl/generic_reduce_bones.hpp"
     }
 
   #include "bandicoot_bits/opencl/magma_bones.hpp"
@@ -240,7 +241,7 @@ namespace coot
     {
     #include "bandicoot_bits/opencl/debug.hpp"
     #include "bandicoot_bits/opencl/runtime_meat.hpp"
-    #include "bandicoot_bits/opencl/generic_reduce.hpp"
+    #include "bandicoot_bits/opencl/generic_reduce_meat.hpp"
     #include "bandicoot_bits/opencl/inplace_op.hpp"
     #include "bandicoot_bits/opencl/array_op.hpp"
     #include "bandicoot_bits/opencl/mat_val_proxy.hpp"
