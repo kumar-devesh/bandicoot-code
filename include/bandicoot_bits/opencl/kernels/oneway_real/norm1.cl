@@ -37,9 +37,9 @@ COOT_FN(PREFIX,norm1)(__global const eT1* in_mem,
 
   aux_mem[tid] = 0;
 
-  while (i + get_global_size(0) < n_elem)
+  while (i + get_local_size(0) < n_elem)
     {
-    aux_mem[tid] += ET1_ABS(in_mem[i]) + ET1_ABS(in_mem[i + get_global_size(0)]);
+    aux_mem[tid] += ET1_ABS(in_mem[i]) + ET1_ABS(in_mem[i + get_local_size(0)]);
     i += grid_size;
     }
   if (i < n_elem)

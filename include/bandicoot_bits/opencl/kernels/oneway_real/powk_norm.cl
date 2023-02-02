@@ -28,10 +28,10 @@ COOT_FN(PREFIX,powk_norm)(__global const eT1* in_mem,
 
   aux_mem[tid] = 0;
 
-  while (i + get_global_size(0) < n_elem)
+  while (i + get_local_size(0) < n_elem)
     {
-    const eT1 v1 = pow(in_mem[i],                      (eT1) k);
-    const eT1 v2 = pow(in_mem[i + get_global_size(0)], (eT1) k);
+    const eT1 v1 = pow(in_mem[i],                     (eT1) k);
+    const eT1 v2 = pow(in_mem[i + get_local_size(0)], (eT1) k);
     aux_mem[tid] += v1 + v2;
     i += grid_size;
     }

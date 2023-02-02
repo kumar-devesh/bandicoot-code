@@ -26,10 +26,10 @@ COOT_FN(PREFIX,dot)(__global twoway_promoted_eT* out_mem,
 
   aux_mem[tid] = 0;
 
-  while (i + get_global_size(0) < n_elem)
+  while (i + get_local_size(0) < n_elem)
     {
     aux_mem[tid] += (((twoway_promoted_eT) A[i]) * ((twoway_promoted_eT) B[i])) +
-        (((twoway_promoted_eT) A[i + get_global_size(0)]) * ((twoway_promoted_eT) B[i + get_global_size(0)]));
+        (((twoway_promoted_eT) A[i + get_local_size(0)]) * ((twoway_promoted_eT) B[i + get_local_size(0)]));
     i += grid_size;
     }
   if (i < n_elem)
