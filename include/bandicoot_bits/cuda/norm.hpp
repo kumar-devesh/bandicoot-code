@@ -22,7 +22,6 @@ vec_norm_1(dev_mem_t<eT> mem, const uword n_elem, const typename coot_real_only<
   coot_extra_debug_sigprint();
   coot_ignore(junk);
 
-  // For floating-point types, we perform a power-k accumulation.
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::norm1);
   CUfunction kernel_small = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::norm1_small);
 
