@@ -19,7 +19,7 @@
  */
 template<typename eT>
 inline
-const std::tuple<bool, std::string>&
+std::tuple<bool, std::string>
 svd(dev_mem_t<eT> U,
     dev_mem_t<eT> S,
     dev_mem_t<eT> V,

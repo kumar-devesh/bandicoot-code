@@ -23,7 +23,7 @@
  */
 template<typename eT>
 inline
-const std::tuple<bool, std::string>&
+std::tuple<bool, std::string>
 svd(dev_mem_t<eT> U,
     dev_mem_t<eT> S,
     dev_mem_t<eT> V,
@@ -55,7 +55,7 @@ svd(dev_mem_t<eT> U,
 
   cudaError_t status2;
 
-  const char jobuvt = (compute_u_and_vt) ? 'A' : 'N';
+  const char jobuvt = (compute_u_vt) ? 'A' : 'N';
 
   // Compute the workspace sizes necessary on the host and the device.
   size_t device_buffer_size;
@@ -74,12 +74,12 @@ svd(dev_mem_t<eT> U,
                                        (void*) S.cuda_mem_ptr,
                                        cuda_data_type<eT>::type,
                                        (void*) U.cuda_mem_ptr,
-                                       // If compute_u_and_vt is false, we assume the user passed a 1x1 matrix for each,
+                                       // If compute_u_vt is false, we assume the user passed a 1x1 matrix for each,
                                        // and we also assume those matrices won't be referenced.
-                                       (compute_u_and_vt) ? n_rows : 1,
+                                       (compute_u_vt) ? n_rows : 1,
                                        cuda_data_type<eT>::type,
                                        (void*) V.cuda_mem_ptr,
-                                       (compute_u_and_vt) ? n_cols : 1,
+                                       (compute_u_vt) ? n_cols : 1,
                                        cuda_data_type<eT>::type,
                                        &device_buffer_size,
                                        &host_buffer_size);
@@ -117,10 +117,10 @@ svd(dev_mem_t<eT> U,
                             (void*) S.cuda_mem_ptr,
                             cuda_data_type<eT>::type,
                             (void*) U.cuda_mem_ptr,
-                            (compute_u_and_vt) ? n_rows : 1,
+                            (compute_u_vt) ? n_rows : 1,
                             cuda_data_type<eT>::type,
                             (void*) V.cuda_mem_ptr,
-                            (compute_u_and_vt) ? n_cols : 1,
+                            (compute_u_vt) ? n_cols : 1,
                             cuda_data_type<eT>::type,
                             (void*) device_buffer,
                             device_buffer_size,

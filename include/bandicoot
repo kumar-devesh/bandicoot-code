@@ -153,6 +153,7 @@ namespace coot
     #include "bandicoot_bits/cuda/kernel_src.hpp"
     #include "bandicoot_bits/cuda/error.hpp"
     #include "bandicoot_bits/cuda/type_to_dev_string.hpp"
+    #include "bandicoot_bits/cuda/cuda_data_type.hpp"
     }
   #endif
 
@@ -259,6 +260,7 @@ namespace coot
     #include "bandicoot_bits/opencl/linspace.hpp"
     #include "bandicoot_bits/opencl/trans.hpp"
     #include "bandicoot_bits/opencl/clamp.hpp"
+    #include "bandicoot_bits/opencl/svd.hpp"
 //    #include "bandicoot_bits/opencl/eig.hpp"
     #include "bandicoot_bits/opencl/lapack/larfg.hpp"
     }
@@ -291,6 +293,7 @@ namespace coot
     #include "bandicoot_bits/cuda/linspace.hpp"
     #include "bandicoot_bits/cuda/trans.hpp"
     #include "bandicoot_bits/cuda/clamp.hpp"
+    #include "bandicoot_bits/cuda/svd.hpp"
 //    #include "bandicoot_bits/cuda/eig.hpp"
     #include "bandicoot_bits/cuda/lapack/larfg.hpp"
     }
@@ -365,6 +368,7 @@ namespace coot
   #include "bandicoot_bits/fn_linspace.hpp"
   #include "bandicoot_bits/fn_vectorise.hpp"
   #include "bandicoot_bits/fn_clamp.hpp"
+  #include "bandicoot_bits/fn_svd.hpp"
 
 
   //

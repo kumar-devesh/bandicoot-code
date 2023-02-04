@@ -881,7 +881,7 @@ coot_rt_t::chol(dev_mem_t<eT> out, const uword n_rows)
 
 template<typename eT>
 inline
-const std::tuple<bool, std::string>&
+std::tuple<bool, std::string>
 coot_rt_t::svd(dev_mem_t<eT> U, dev_mem_t<eT> S, dev_mem_t<eT> V, dev_mem_t<eT> A, const uword n_rows, const uword n_cols, const bool compute_u_vt)
   {
   coot_extra_debug_sigprint();
@@ -904,10 +904,10 @@ coot_rt_t::svd(dev_mem_t<eT> U, dev_mem_t<eT> S, dev_mem_t<eT> V, dev_mem_t<eT> 
     }
   else
     {
-    coot_stop_runtime_error("coot_rt::svd(): unknown backend"):
+    coot_stop_runtime_error("coot_rt::svd(): unknown backend");
     }
 
-  return false; // fix warnings
+  return std::make_tuple(false, ""); // fix warnings
   }
 
 
