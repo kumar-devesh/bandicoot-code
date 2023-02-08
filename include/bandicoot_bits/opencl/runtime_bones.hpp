@@ -218,5 +218,5 @@ class runtime_t::adapt_uword
   coot_aligned u64    val64;
   coot_aligned u32    val32;
 
-  inline adapt_uword(const uword val);
+  inline adapt_uword(const uword val = 0); // default value needed for allocating several at once
   };

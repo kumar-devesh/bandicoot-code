@@ -27,16 +27,16 @@ COOT_FN(PREFIX,min_small)(__global const eT1* in_mem,
     {
     aux_mem[tid] = in_mem[i];
     }
-  if (i + get_global_size(0) < n_elem)
+  if (i + get_local_size(0) < n_elem)
     {
-    aux_mem[tid] = min(aux_mem[tid], in_mem[i + get_global_size(0)]);
+    aux_mem[tid] = min(aux_mem[tid], in_mem[i + get_local_size(0)]);
     }
   i += grid_size;
 
-  while (i + get_global_size(0) < n_elem)
+  while (i + get_local_size(0) < n_elem)
     {
     aux_mem[tid] = min(aux_mem[tid], in_mem[i]);
-    aux_mem[tid] = min(aux_mem[tid], in_mem[i + get_global_size(0)]);
+    aux_mem[tid] = min(aux_mem[tid], in_mem[i + get_local_size(0)]);
     i += grid_size;
     }
   if (i < n_elem)
