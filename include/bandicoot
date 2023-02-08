@@ -218,7 +218,8 @@ namespace coot
 
   #include "bandicoot_bits/coot_cmath.hpp"
 
-  // definitions for LAPACK functions
+  // definitions for LAPACK and BLAS functions
+  #include "bandicoot_bits/def_blas.hpp"
   #include "bandicoot_bits/def_lapack.hpp"
 
   //
@@ -337,9 +338,15 @@ namespace coot
 
     #include "bandicoot_bits/opencl/magma22_dlarfb.hpp"
     #include "bandicoot_bits/opencl/magma22_dgeqrf.hpp"
+    // #include "bandicoot_bits/opencl/magma22_dorgqr.hpp"
 
     #include "bandicoot_bits/opencl/magma22_spotrf.hpp"
     #include "bandicoot_bits/opencl/magma22_dpotrf.hpp"
+
+    //#include "bandicoot_bits/opencl/magma27_slabrd.hpp"
+    #include "bandicoot_bits/opencl/magma27_dlabrd.hpp"
+    //#include "bandicoot_bits/opencl/magma27_sgebrd.hpp"
+    #include "bandicoot_bits/opencl/magma27_dgebrd.hpp"
   #endif
 
   //

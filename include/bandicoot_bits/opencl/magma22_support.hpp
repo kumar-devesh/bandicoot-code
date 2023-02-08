@@ -57,6 +57,7 @@ check_error(const cl_int error_code)
   }
 
 
+
 // TODO: refactor code to avoid using the following global variable
 // TODO: the code below seems to only write to get_g_event(); it's never read, meaning it's not used for waiting
 // This is stuffed into a singleton for now to avoid linking issues.
@@ -68,7 +69,7 @@ inline magma_event_t* get_g_event()
 
 
 /////////////////////
-// CS: adaptions for OpenCL
+// CS: adaptations for OpenCL
 
 inline
 magma_int_t
@@ -89,6 +90,50 @@ inline magma_int_t magma_dmalloc_pinned( double **ptr_ptr, size_t n ) { return m
 inline magma_int_t magma_smalloc_pinned( float  **ptr_ptr, size_t n ) { return magma_malloc_cpu( (void**) ptr_ptr, n*sizeof(float)  ); }
 
 inline magma_int_t magma_free_pinned( void* ptr )  { free( ptr ); return MAGMA_SUCCESS; }
+
+inline magma_int_t magma_dmalloc_cpu( double** ptr_ptr, size_t n ) { return magma_malloc_cpu( (void**) ptr_ptr, n*sizeof(double) ); }
+inline magma_int_t magma_smalloc_cpu( float**  ptr_ptr, size_t n ) { return magma_malloc_cpu( (void**) ptr_ptr, n*sizeof(float)  ); }
+
+inline magma_int_t magma_free_cpu( void* ptr ) { free( ptr ); return MAGMA_SUCCESS; }
+
+
+
+inline
+magma_int_t
+magma_malloc( magma_ptr* ptr_ptr, size_t size )
+  {
+  // malloc and free sometimes don't work for size=0, so allocate some minimal size
+  if ( size == 0 ) { size = 16; }
+
+  cl_int err;
+  *ptr_ptr = clCreateBuffer( get_rt().cl_rt.get_context(), CL_MEM_READ_WRITE, size, NULL, &err );
+
+  if ( err != clblasSuccess )
+    {
+    return MAGMA_ERR_DEVICE_ALLOC;
+    }
+  return MAGMA_SUCCESS;
+  }
+
+
+
+inline
+magma_int_t
+magma_free( magma_ptr ptr )
+  {
+  cl_int err = clReleaseMemObject( ptr );
+  if ( err != clblasSuccess )
+    {
+    return MAGMA_ERR_INVALID_PTR;
+    }
+  return MAGMA_SUCCESS;
+  }
+
+
+
+inline magma_int_t magma_dmalloc( magmaDouble_ptr* ptr_ptr, size_t n ) { return magma_malloc( (magma_ptr*) ptr_ptr, n*sizeof(double) ); }
+inline magma_int_t magma_smalloc( magmaFloat_ptr*  ptr_ptr, size_t n ) { return magma_malloc( (magma_ptr*) ptr_ptr, n*sizeof(float)  ); }
+
 
 
 inline
@@ -205,6 +250,30 @@ magma_dsetmatrix(magma_int_t m, magma_int_t n, double const* hA_src, magma_int_t
 
 
 
+inline
+void
+magma_dgetvector(magma_int_t n,
+                 magmaDouble_const_ptr dx_src, size_t dx_offset, magma_int_t incx,
+                 double* hy_dst,               magma_int_t incy,
+                 magma_queue_t queue)
+  {
+  magma_dgetmatrix(1, n, dx_src, dx_offset, incx, hy_dst, incy, queue);
+  }
+
+
+
+inline
+void
+magma_dsetvector(magma_int_t m,
+                 double const* hx_src,   magma_int_t incx,
+                 magmaDouble_ptr dy_dst, size_t dy_offset, magma_int_t incy,
+                 magma_queue_t queue)
+  {
+  magma_dsetmatrix(1, m, hx_src, incx, dy_dst, dy_offset, incy, queue);
+  }
+
+
+
 //
 // float
 
@@ -255,6 +324,30 @@ magma_ssetmatrix(
         hA_src, 0, NULL, get_g_event() );
     check_error( err );
 }
+
+
+
+inline
+void
+magma_sgetvector(magma_int_t n,
+                 magmaFloat_const_ptr dx_src, size_t dx_offset, magma_int_t incx,
+                 float* hy_dst,               magma_int_t incy,
+                 magma_queue_t queue)
+  {
+  magma_sgetmatrix(n, 1, dx_src, dx_offset, incx, hy_dst, incy, queue);
+  }
+
+
+
+inline
+void
+magma_ssetvector(magma_int_t m,
+                 float const* hx_src,   magma_int_t incx,
+                 magmaFloat_ptr dy_dst, size_t dy_offset, magma_int_t incy,
+                 magma_queue_t queue)
+  {
+  magma_ssetmatrix(m, 1, hx_src, incx, dy_dst, dy_offset, incy, queue);
+  }
 
 
 
@@ -439,6 +532,34 @@ magma_ssetmatrix_async(magma_int_t m, magma_int_t n, float const* hA_src, magma_
 
   clFlush(queue);
   check_error( err );
+  }
+
+
+
+// This deals with a subtle bug with returning lwork as a float.
+// If lwork > 2**24, then it will get rounded as a float;
+// we need to ensure it is rounded up instead of down,
+// by multiplying by 1.+eps in Double precision:
+inline
+double
+magma_dmake_lwork( magma_int_t lwork )
+  {
+    #if defined(PRECISION_s) || defined(PRECISION_c)
+    real_Double_t one_eps = 1. + lapackf77_dlamch("Epsilon");
+    return double(lwork*one_eps), 0 );
+    #else
+    return double(lwork);
+    #endif
+  }
+
+
+
+inline
+float
+magma_smake_lwork( magma_int_t lwork )
+  {
+  double one_eps = 1. + std::numeric_limits<double>::epsilon();
+  return float(lwork * one_eps);
   }
 
 
@@ -744,6 +865,67 @@ magma_sgemm(
     clFlush(queue);
     check_error( err );
 }
+
+
+
+//
+// gemv
+
+inline
+void
+magma_dgemv
+  (
+  magma_trans_t trans, magma_int_t m, magma_int_t n,
+  double alpha,
+  magmaDouble_const_ptr dA, size_t dA_offset, magma_int_t ldda,
+  magmaDouble_const_ptr dx, size_t dx_offset, magma_int_t incx,
+  double beta,
+  magmaDouble_ptr dy, size_t dy_offset, magma_int_t incy,
+  magma_queue_t queue)
+  {
+  if (m <= 0 || n <= 0)
+    return;
+
+  cl_int err = clblasDgemv(
+      clblasColumnMajor,
+      clblas_trans_const( trans ),
+      size_t(m), size_t(n),
+      alpha, dA, dA_offset, ldda,
+             dx, dx_offset, incx,
+      beta,  dy, dy_offset, incy,
+      1, &queue, 0, NULL, get_g_event() );
+  clFlush(queue);
+  check_error( err );
+  }
+
+
+
+inline
+void
+magma_sgemv
+  (
+  magma_trans_t trans, magma_int_t m, magma_int_t n,
+  float alpha,
+  magmaFloat_const_ptr dA, size_t dA_offset, magma_int_t ldda,
+  magmaFloat_const_ptr dx, size_t dx_offset, magma_int_t incx,
+  float beta,
+  magmaFloat_ptr dy, size_t dy_offset, magma_int_t incy,
+  magma_queue_t queue)
+  {
+  if (m <= 0 || n <= 0)
+    return;
+
+  cl_int err = clblasSgemv(
+      clblasColumnMajor,
+      clblas_trans_const( trans ),
+      size_t(m), size_t(n),
+      alpha, dA, dA_offset, ldda,
+             dx, dx_offset, incx,
+      beta,  dy, dy_offset, incy,
+      1, &queue, 0, NULL, get_g_event() );
+  clFlush(queue);
+  check_error( err );
+  }
 
 
 
