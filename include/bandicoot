@@ -135,6 +135,7 @@ namespace coot
   #if defined(COOT_USE_OPENCL)
   namespace opencl
     {
+    #include "bandicoot_bits/opencl/magma_kernel_id.hpp"
     #include "bandicoot_bits/opencl/runtime_bones.hpp"
     #include "bandicoot_bits/opencl/kernel_src.hpp"
     #include "bandicoot_bits/opencl/error.hpp"
@@ -336,17 +337,25 @@ namespace coot
 
     #include "bandicoot_bits/opencl/magma22_support.hpp"
 
+    #include "bandicoot_bits/opencl/magma27_magmablas_bones.hpp"
+    #include "bandicoot_bits/opencl/magma27_magmablas_meat.hpp"
+
     #include "bandicoot_bits/opencl/magma22_dlarfb.hpp"
     #include "bandicoot_bits/opencl/magma22_dgeqrf.hpp"
     // #include "bandicoot_bits/opencl/magma22_dorgqr.hpp"
 
     #include "bandicoot_bits/opencl/magma22_spotrf.hpp"
+
     #include "bandicoot_bits/opencl/magma22_dpotrf.hpp"
 
     //#include "bandicoot_bits/opencl/magma27_slabrd.hpp"
-    #include "bandicoot_bits/opencl/magma27_dlabrd.hpp"
     //#include "bandicoot_bits/opencl/magma27_sgebrd.hpp"
+    //#include "bandicoot_bits/opencl/magma27_sorglq.hpp"
+
+    #include "bandicoot_bits/opencl/magma27_dlabrd.hpp"
     #include "bandicoot_bits/opencl/magma27_dgebrd.hpp"
+    #include "bandicoot_bits/opencl/magma27_dorglq.hpp"
+    //#include "bandicoot_bits/opencl/magma27_dgeqrf2.hpp"
   #endif
 
   //

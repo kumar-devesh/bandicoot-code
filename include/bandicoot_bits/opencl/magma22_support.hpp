@@ -68,6 +68,7 @@ inline magma_event_t* get_g_event()
   }
 
 
+
 /////////////////////
 // CS: adaptations for OpenCL
 
