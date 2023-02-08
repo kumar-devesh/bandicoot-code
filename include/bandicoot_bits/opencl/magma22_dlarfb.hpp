@@ -49,146 +49,161 @@
 //  of this software, even if advised of the possibility of such damage.
 
 
+
+// DLARFB applies a real block reflector H or its transpose H^H to a
+// DOUBLE PRECISION m by n matrix C, from the left.
+
+
+
 inline
 magma_int_t
-magma_dlarfb_gpu(
-    magma_side_t side, magma_trans_t trans, magma_direct_t direct, magma_storev_t storev,
-    magma_int_t m, magma_int_t n, magma_int_t k,
-    magmaDouble_const_ptr dV, size_t dV_offset,    magma_int_t lddv,
-    magmaDouble_const_ptr dT, size_t dT_offset,    magma_int_t lddt,
-    magmaDouble_ptr dC,       size_t dC_offset,    magma_int_t lddc,
-    magmaDouble_ptr dwork,    size_t dwork_offset, magma_int_t ldwork,
-    magma_queue_t queue )
-{
-    // #define dV(i_,j_)  (dV    + (i_) + (j_)*lddv)
-    // #define dT(i_,j_)  (dT    + (i_) + (j_)*lddt)
-    // #define dC(i_,j_)  (dC    + (i_) + (j_)*lddc)
-    // #define dwork(i_)  (dwork + (i_))
+magma_dlarfb_gpu
+  (
+  magma_side_t side,
+  magma_trans_t trans,
+  magma_direct_t direct,
+  magma_storev_t storev,
+  magma_int_t m,
+  magma_int_t n,
+  magma_int_t k,
+  magmaDouble_const_ptr dV, size_t dV_offset,    magma_int_t lddv,
+  magmaDouble_const_ptr dT, size_t dT_offset,    magma_int_t lddt,
+  magmaDouble_ptr dC,       size_t dC_offset,    magma_int_t lddc,
+  magmaDouble_ptr dwork,    size_t dwork_offset, magma_int_t ldwork,
+  magma_queue_t queue
+  )
+  {
+  /* Constants */
+  const double c_zero    = MAGMA_D_ZERO;
+  const double c_one     = MAGMA_D_ONE;
+  const double c_neg_one = MAGMA_D_NEG_ONE;
 
-    // CS: adapations for clBLAS
-
-    #define dV(i_,j_)  dV,    (i_) + (j_)*lddv + dV_offset
-    #define dT(i_,j_)  dT,    (i_) + (j_)*lddt + dT_offset
-    #define dC(i_,j_)  dC,    (i_) + (j_)*lddc + dC_offset
-    #define dwork(i_)  dwork, (i_)             + dwork_offset
-
-    /* Constants */
-    const double c_zero    = MAGMA_D_ZERO;
-    const double c_one     = MAGMA_D_ONE;
-    const double c_neg_one = MAGMA_D_NEG_ONE;
-
-    /* Check input arguments */
-    magma_int_t info = 0;
-    if (m < 0) {
-        info = -5;
-    } else if (n < 0) {
-        info = -6;
-    } else if (k < 0) {
-        info = -7;
-    } else if ( ((storev == MagmaColumnwise) && (side == MagmaLeft) && lddv < std::max(1,m)) ||
-                ((storev == MagmaColumnwise) && (side == MagmaRight) && lddv < std::max(1,n)) ||
-                ((storev == MagmaRowwise) && lddv < k) ) {
-        info = -9;
-    } else if (lddt < k) {
-        info = -11;
-    } else if (lddc < std::max(1,m)) {
-        info = -13;
-    } else if ( ((side == MagmaLeft) && ldwork < std::max(1,n)) ||
-                ((side == MagmaRight) && ldwork < std::max(1,m)) ) {
-        info = -15;
+  /* Check input arguments */
+  magma_int_t info = 0;
+  if (m < 0)
+    {
+    info = -5;
     }
-    if (info != 0) {
-        // magma_xerbla( __func__, -(info) );
-        return info;
+  else if (n < 0)
+    {
+    info = -6;
     }
-
-    /* Function Body */
-    if (m <= 0 || n <= 0) {
-        return info;
+  else if (k < 0)
+    {
+    info = -7;
     }
-
-    /* Local variables */
-    // opposite of trans
-    magma_trans_t transt;
-    if (trans == MagmaNoTrans)
-        transt = MagmaTrans;
-    else
-        transt = MagmaNoTrans;
-
-    // whether T is upper or lower triangular
-    magma_uplo_t uplo;
-    if (direct == MagmaForward)
-        uplo = MagmaUpper;
-    else
-        uplo = MagmaLower;
-
-    // whether V is stored transposed or not
-    magma_trans_t notransV, transV;
-    if (storev == MagmaColumnwise) {
-        notransV = MagmaNoTrans;
-        transV   = MagmaTrans;
+  else if ( ((storev == MagmaColumnwise) && (side == MagmaLeft) && lddv < std::max(1,m)) ||
+            ((storev == MagmaColumnwise) && (side == MagmaRight) && lddv < std::max(1,n)) ||
+            ((storev == MagmaRowwise) && lddv < k) )
+    {
+    info = -9;
     }
-    else {
-        notransV = MagmaTrans;
-        transV   = MagmaNoTrans;
+  else if (lddt < k)
+    {
+    info = -11;
+    }
+  else if (lddc < std::max(1,m))
+    {
+    info = -13;
+    }
+  else if ( ((side == MagmaLeft) && ldwork < std::max(1,n)) ||
+              ((side == MagmaRight) && ldwork < std::max(1,m)) )
+    {
+    info = -15;
     }
 
-    if ( side == MagmaLeft ) {
-        // Form H C or H^H C
-        // Comments assume H C.
-        // When forming H^H C, T gets transposed via transt.
-
-        // W = C^H V
-        magma_dgemm( MagmaTrans, notransV,
-                     n, k, m,
-                     c_one,  dC(0,0),  lddc,
-                             dV(0,0),  lddv,
-                     c_zero, dwork(0), ldwork, queue );
-
-        // W = W T^H = C^H V T^H
-        magma_dtrmm( MagmaRight, uplo, transt, MagmaNonUnit,
-                     n, k,
-                     c_one, dT(0,0),  lddt,
-                            dwork(0), ldwork, queue );
-
-        // C = C - V W^H = C - V T V^H C = (I - V T V^H) C = H C
-        magma_dgemm( notransV, MagmaTrans,
-                     m, n, k,
-                     c_neg_one, dV(0,0),  lddv,
-                                dwork(0), ldwork,
-                     c_one,     dC(0,0),  lddc, queue );
-    }
-    else {
-        // Form C H or C H^H
-        // Comments assume C H.
-        // When forming C H^H, T gets transposed via trans.
-
-        // W = C V
-        magma_dgemm( MagmaNoTrans, notransV,
-                     m, k, n,
-                     c_one,  dC(0,0),  lddc,
-                             dV(0,0),  lddv,
-                     c_zero, dwork(0), ldwork, queue );
-
-        // W = W T = C V T
-        magma_dtrmm( MagmaRight, uplo, trans, MagmaNonUnit,
-                     m, k,
-                     c_one, dT(0,0),  lddt,
-                            dwork(0), ldwork, queue );
-
-        // C = C - W V^H = C - C V T V^H = C (I - V T V^H) = C H
-        magma_dgemm( MagmaNoTrans, transV,
-                     m, n, k,
-                     c_neg_one, dwork(0), ldwork,
-                                dV(0,0),  lddv,
-                     c_one,     dC(0,0),  lddc, queue );
-    }
-
+  if (info != 0)
+    {
+    // magma_xerbla( __func__, -(info) );
     return info;
+    }
 
-    #undef dV
-    #undef dT
-    #undef dC
-    #undef dwork
+  /* Function Body */
+  if (m <= 0 || n <= 0)
+    {
+    return info;
+    }
 
-} /* magma_dlarfb */
+  /* Local variables */
+  // opposite of trans
+  magma_trans_t transt;
+  if (trans == MagmaNoTrans)
+    transt = MagmaTrans;
+  else
+    transt = MagmaNoTrans;
+
+  // whether T is upper or lower triangular
+  magma_uplo_t uplo;
+  if (direct == MagmaForward)
+    uplo = MagmaUpper;
+  else
+    uplo = MagmaLower;
+
+  // whether V is stored transposed or not
+  magma_trans_t notransV, transV;
+  if (storev == MagmaColumnwise)
+    {
+    notransV = MagmaNoTrans;
+    transV   = MagmaTrans;
+    }
+  else
+    {
+    notransV = MagmaTrans;
+    transV   = MagmaNoTrans;
+    }
+
+  if ( side == MagmaLeft )
+    {
+    // Form H C or H^H C
+    // Comments assume H C.
+    // When forming H^H C, T gets transposed via transt.
+
+    // W = C^H V
+    magma_dgemm( MagmaTrans, notransV,
+                 n, k, m,
+                 c_one,  dC, dC_offset,  lddc,
+                         dV, dV_offset,  lddv,
+                 c_zero, dwork, dwork_offset, ldwork, queue );
+
+    // W = W T^H = C^H V T^H
+    magma_dtrmm( MagmaRight, uplo, transt, MagmaNonUnit,
+                 n, k,
+                 c_one, dT, dT_offset,  lddt,
+                        dwork, dwork_offset, ldwork, queue );
+
+    // C = C - V W^H = C - V T V^H C = (I - V T V^H) C = H C
+    magma_dgemm( notransV, MagmaTrans,
+                 m , n, k,
+                 c_neg_one, dV,    dV_offset,    lddv,
+                            dwork, dwork_offset, ldwork,
+                 c_one,     dC,    dC_offset,    lddc, queue );
+    }
+  else
+    {
+    // Form C H or C H^H
+    // Comments assume C H.
+    // When forming C H^H, T gets transposed via trans.
+
+    // W = C V
+    magma_dgemm( MagmaNoTrans, notransV,
+                 m, k, n,
+                 c_one,  dC,    dC_offset,    lddc,
+                         dV,    dV_offset,    lddv,
+                 c_zero, dwork, dwork_offset, ldwork, queue );
+
+    // W = W T = C V T
+    magma_dtrmm( MagmaRight, uplo, trans, MagmaNonUnit,
+                 m, k,
+                 c_one, dT,     dT_offset,    lddt,
+                        dwork,  dwork_offset, ldwork, queue );
+
+    // C = C - W V^H = C - C V T V^H = C (I - V T V^H) = C H
+    magma_dgemm( MagmaNoTrans, transV,
+                 m, n, k,
+                 c_neg_one, dwork, dwork_offset, ldwork,
+                            dV,    dV_offset,    lddv,
+                 c_one,     dC,    dC_offset,    lddc, queue );
+    }
+
+  return info;
+  } /* magma_dlarfb */
