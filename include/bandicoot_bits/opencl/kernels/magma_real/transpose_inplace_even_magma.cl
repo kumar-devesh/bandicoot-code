@@ -13,9 +13,8 @@
 // ------------------------------------------------------------------------
 
 // This file contains source code adapted from
-// clMAGMA 1.3 (2014-11-14) and/or MAGMA 2.7 (2022-11-09).
-// clMAGMA 1.3 and MAGMA 2.7 are distributed under a
-// 3-clause BSD license as follows:
+// clMAGMA 1.3 (2014-11-14).
+// clMAGMA 1.3 is distributed under a 3-clause BSD license as follows:
 //
 //  -- Innovative Computing Laboratory
 //  -- Electrical Engineering and Computer Science Department
@@ -49,50 +48,77 @@
 
 
 
-// Adaptations of magmablas_* functions to use existing bandicoot backend functionality.
+// grid is ((n/nb) + 1) x (n/nb)/2, where n/nb is even.
+// lower indicates blocks in strictly lower triangle of grid, excluding diagonal.
+// lower blocks shift up by one to cover left side of matrix including diagonal.
+// upper blocks swap block indices (x,y) and shift by grid width
+// to cover right side of matrix.
+//      [ A00  A01 ]                  [ A10  .  |  .   .  ]
+//      [ A10  A11 ]                  [ A20 A21 |  .   .  ]
+// grid [ A20  A21 ] covers matrix as [ A30 A31 | A00  .  ]
+//      [ A30  A31 ]                  [ A40 A41 | A01 A11 ]
+//      [ A40  A41 ]
+//
+// Each block is NB x NB threads.
+// For non-diagonal block A, block B is symmetric block.
+// Thread (i,j) loads A(i,j) into sA(j,i) and B(i,j) into sB(j,i), i.e., transposed,
+// syncs, then saves sA(i,j) to B(i,j) and sB(i,j) to A(i,j).
+// Threads outside the matrix do not touch memory.
 
-// Make sure these match the definitions in kernel_src.hpp!
-#define MAGMABLAS_BLK_X 64
-#define MAGMABLAS_BLK_Y 32
-
-#define MAGMABLAS_TRANS_NX 32
-#define MAGMABLAS_TRANS_NY 8
-#define MAGMABLAS_TRANS_NB 32
-#define MAGMABLAS_TRANS_INPLACE_NB 16
-
-inline
+__kernel
 void
-magmablas_dlaset(magma_uplo_t uplo, magma_int_t m, magma_int_t n, double offdiag, double diag, magmaDouble_ptr dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue);
+COOT_FN(PREFIX,transpose_inplace_even_magma)(const UWORD n,
+                                             __global eT1* matrix,
+                                             const UWORD matrix_offset,
+                                             const UWORD lda)
+  {
+  matrix += matrix_offset;
 
+  __local eT1 sA[MAGMA_TRANS_INPLACE_NB][MAGMA_TRANS_INPLACE_NB + 1];
+  __local eT1 sB[MAGMA_TRANS_INPLACE_NB][MAGMA_TRANS_INPLACE_NB + 1];
 
+  UWORD i = get_local_id(0);
+  UWORD j = get_local_id(1);
 
-template<typename eT>
-inline
-void
-magmablas_run_laset_kernel(const opencl::magma_real_kernel_id::enum_id num, magma_uplo_t uplo, magma_int_t m, magma_int_t n, eT offdiag, eT diag, cl_mem dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue);
+  bool lower = (get_group_id(0) > get_group_id(1));
+  UWORD ii = (lower ? (get_group_id(0) - 1) : (get_group_id(1) + get_num_groups(1)));
+  UWORD jj = (lower ? (get_group_id(1)    ) : (get_group_id(0) + get_num_groups(1)));
 
+  ii *= MAGMA_TRANS_INPLACE_NB;
+  jj *= MAGMA_TRANS_INPLACE_NB;
 
-
-inline
-void
-magmablas_dtranspose(magma_int_t m, magma_int_t n, magmaDouble_const_ptr dA, size_t dA_offset, magma_int_t ldda, magmaDouble_ptr dAT, size_t dAT_offset, magma_int_t lddat, magma_queue_t queue);
-
-
-
-template<typename eT>
-inline
-void
-magmablas_transpose(magma_int_t m, magma_int_t n, cl_mem dA, size_t dA_offset, magma_int_t ldda, cl_mem dAT, size_t dAT_offset, magma_int_t lddat, magma_queue_t queue);
-
-
-
-inline
-void
-magmablas_dtranspose_inplace(magma_int_t n, magmaDouble_ptr dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue);
-
-
-
-template<typename eT>
-inline
-void
-magmablas_transpose_inplace(magma_int_t n, cl_mem dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue);
+  __global eT1* A = matrix + (ii + i) + (jj + j) * lda;
+  if (ii == jj)
+    {
+    if (ii + i < n && jj + j < n)
+      {
+      sA[j][i] = *A;
+      }
+    barrier(CLK_LOCAL_MEM_FENCE);
+    if (ii + i < n && jj + j < n)
+      {
+      *A = sA[i][j];
+      }
+    }
+  else
+    {
+    __global eT1* B = matrix + (jj + i) + (ii + j) * lda;
+    if (ii + i < n && jj + j < n)
+      {
+      sA[j][i] = *A;
+      }
+    if (jj + i < n && ii + j < n)
+      {
+      sB[j][i] = *B;
+      }
+    barrier(CLK_LOCAL_MEM_FENCE);
+    if (ii + i < n && jj + j < n)
+      {
+      *A = sB[i][j];
+      }
+    if (jj + i < n && ii + j < n)
+      {
+      *B = sA[i][j];
+      }
+    }
+  }

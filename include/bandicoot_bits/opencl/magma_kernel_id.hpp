@@ -19,7 +19,11 @@ struct magma_real_kernel_id
     {
     laset_full,
     laset_lower,
-    laset_upper
+    laset_upper,
+
+    transpose_magma, // _magma is to avoid potential naming conflicts
+    transpose_inplace_odd_magma,
+    transpose_inplace_even_magma
     };
 
 
@@ -36,6 +40,10 @@ struct magma_real_kernel_id
     names.push_back("laset_full");
     names.push_back("laset_lower");
     names.push_back("laset_upper");
+
+    names.push_back("transpose_magma");
+    names.push_back("transpose_inplace_odd_magma");
+    names.push_back("transpose_inplace_even_magma");
 
     return names;
     }

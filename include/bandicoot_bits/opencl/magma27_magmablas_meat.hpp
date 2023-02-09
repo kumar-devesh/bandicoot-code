@@ -167,5 +167,149 @@ magmablas_dtranspose
   magma_queue_t queue
   )
   {
-  // TODO
+  magmablas_transpose<double>(m, n, dA, dA_offset, ldda, dAT, dAT_offset, lddat, queue);
+  }
+
+
+
+template<typename eT>
+inline
+void
+magmablas_transpose
+  (
+  magma_int_t m,
+  magma_int_t n,
+  cl_mem dA,
+  size_t dA_offset,
+  magma_int_t ldda,
+  cl_mem dAT,
+  size_t dAT_offset,
+  magma_int_t lddat,
+  magma_queue_t queue
+  )
+  {
+  magma_int_t info = 0;
+  if ( m < 0 )
+    info = -1;
+  else if ( n < 0 )
+    info = -2;
+  else if ( ldda < m )
+    info = -4;
+  else if ( lddat < n )
+    info = -6;
+
+  if ( info != 0 )
+    {
+    //magma_xerbla( __func__, -(info) );
+    return;  //info;
+    }
+
+  /* Quick return */
+  if ( (m == 0) || (n == 0) )
+    return;
+
+  size_t threads[2] = { MAGMABLAS_TRANS_NX,                                      MAGMABLAS_TRANS_NY                                      };
+  size_t grid[2] =    { size_t(m + MAGMABLAS_TRANS_NB - 1) / MAGMABLAS_TRANS_NB, size_t(n + MAGMABLAS_TRANS_NB - 1) / MAGMABLAS_TRANS_NB };
+  grid[0] *= threads[0];
+  grid[1] *= threads[1];
+
+  cl_kernel k = get_rt().cl_rt.get_kernel<eT>(opencl::magma_real_kernel_id::transpose_magma);
+
+  opencl::runtime_t::adapt_uword local_m(m);
+  opencl::runtime_t::adapt_uword local_n(n);
+  opencl::runtime_t::adapt_uword local_dA_offset(dA_offset);
+  opencl::runtime_t::adapt_uword local_ldda(ldda);
+  opencl::runtime_t::adapt_uword local_dAT_offset(dAT_offset);
+  opencl::runtime_t::adapt_uword local_lddat(lddat);
+
+  cl_int status;
+  status  = clSetKernelArg(k, 0, local_m.size,          local_m.addr);
+  status |= clSetKernelArg(k, 1, local_n.size,          local_n.addr);
+  status |= clSetKernelArg(k, 2, sizeof(cl_mem),        &dA);
+  status |= clSetKernelArg(k, 3, local_dA_offset.size,  local_dA_offset.addr);
+  status |= clSetKernelArg(k, 4, local_ldda.size,       local_ldda.addr);
+  status |= clSetKernelArg(k, 5, sizeof(cl_mem),        &dAT);
+  status |= clSetKernelArg(k, 6, local_dAT_offset.size, local_dAT_offset.addr);
+  status |= clSetKernelArg(k, 7, local_lddat.size,      local_lddat.addr);
+  coot_check_runtime_error(status, "coot::opencl::magmablas_transpose(): couldn't set kernel arguments");
+
+  status = clEnqueueNDRangeKernel(queue, k, 2, NULL, grid, threads, 0, NULL, NULL);
+  coot_check_runtime_error(status, "coot::opencl::magmablas_transpose(): couldn't execute kernel");
+  }
+
+
+
+inline
+void
+magmablas_dtranspose_inplace
+  (
+  magma_int_t n,
+  magmaDouble_ptr dA,
+  size_t dA_offset,
+  magma_int_t ldda,
+  magma_queue_t queue
+  )
+  {
+  magmablas_transpose_inplace<double>(n, dA, dA_offset, ldda, queue);
+  }
+
+
+
+template<typename eT>
+inline
+void
+magmablas_transpose_inplace
+  (
+  magma_int_t n,
+  cl_mem dA,
+  size_t dA_offset,
+  magma_int_t ldda,
+  magma_queue_t queue
+  )
+  {
+  magma_int_t info = 0;
+  if (n < 0)
+    info = -1;
+  else if (ldda < n)
+    info = -3;
+
+  if (info != 0)
+    {
+    //magma_xerbla( __func__, -(info) );
+    return;  //info;
+    }
+
+  size_t threads[2] = { MAGMABLAS_TRANS_INPLACE_NB, MAGMABLAS_TRANS_INPLACE_NB };
+  int nblock = (n + MAGMABLAS_TRANS_INPLACE_NB - 1) / MAGMABLAS_TRANS_INPLACE_NB;
+
+  // need 1/2 * (nblock+1) * nblock to cover lower triangle and diagonal of matrix.
+  // block assignment differs depending on whether nblock is odd or even.
+  cl_kernel k;
+  size_t grid[2];
+  if (nblock % 2 == 1)
+    {
+    grid[0] = nblock             * threads[0];
+    grid[1] = ((nblock + 1) / 2) * threads[1];
+    k = get_rt().cl_rt.get_kernel<eT>(opencl::magma_real_kernel_id::transpose_inplace_odd_magma);
+    }
+  else
+    {
+    grid[0] = (nblock + 1)       * threads[0];
+    grid[1] = (nblock / 2)       * threads[1];
+    k = get_rt().cl_rt.get_kernel<eT>(opencl::magma_real_kernel_id::transpose_inplace_even_magma);
+    }
+
+  opencl::runtime_t::adapt_uword local_n(n);
+  opencl::runtime_t::adapt_uword local_dA_offset(dA_offset);
+  opencl::runtime_t::adapt_uword local_ldda(ldda);
+
+  cl_int status;
+  status  = clSetKernelArg(k, 0, local_n.size,         local_n.addr);
+  status |= clSetKernelArg(k, 1, sizeof(cl_mem),       &dA);
+  status |= clSetKernelArg(k, 2, local_dA_offset.size, local_dA_offset.addr);
+  status |= clSetKernelArg(k, 3, local_ldda.size,      local_ldda.addr);
+  coot_check_runtime_error(status, "coot::opencl::magmablas_transpose_inplace(): couldn't set kernel arguments");
+
+  status = clEnqueueNDRangeKernel(queue, k, 2, NULL, grid, threads, 0, NULL, NULL);
+  coot_check_runtime_error(status, "coot::opencl::magmablas_transpose_inplace(): couldn't execute kernel");
   }
