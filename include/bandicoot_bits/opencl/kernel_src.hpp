@@ -88,8 +88,12 @@ kernel_src::get_src_preamble()
   "inline bool coot_is_fp_double() { return true; } \n"
   "\n"
   // MAGMA-specific macros.
-  "#define BLK_X 64 \n"
-  "#define BLK_Y 32 \n"
+  "#define MAGMA_BLK_X 64 \n"
+  "#define MAGMA_BLK_Y 32 \n"
+  "#define MAGMA_TRANS_NX 32 \n"
+  "#define MAGMA_TRANS_NY 8 \n"
+  "#define MAGMA_TRANS_NB 32 \n"
+  "#define MAGMA_TRANS_INPLACE_NB 16 \n"
   ;
 
   return source;

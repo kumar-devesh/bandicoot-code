@@ -64,34 +64,34 @@ COOT_FN(PREFIX,transpose_magma)(const UWORD m,
                                 __global const eT1* A,
                                 const UWORD A_offset,
                                 const UWORD lda,
-                                __global const eT1* AT,
+                                __global eT1* AT,
                                 const UWORD AT_offset,
                                 const UWORD ldat)
   {
   A += A_offset;
   AT += AT_offset;
 
-  __local double sA[NB][NX+1];
+  __local eT1 sA[MAGMA_TRANS_NB][MAGMA_TRANS_NX+1];
 
-  int tx  = get_local_id(0);
-  int ty  = get_local_id(1);
-  int ibx = get_group_id(0)*NB;
-  int iby = get_group_id(1)*NB;
-  int i, j;
+  UWORD tx  = get_local_id(0);
+  UWORD ty  = get_local_id(1);
+  UWORD ibx = get_group_id(0) * MAGMA_TRANS_NB;
+  UWORD iby = get_group_id(1) * MAGMA_TRANS_NB;
+  UWORD i, j;
 
   A  += ibx + tx + (iby + ty) * lda;
   AT += iby + tx + (ibx + ty) * ldat;
 
   #pragma unroll
-  for (int tile=0; tile < NB/NX; ++tile)
+  for (int tile = 0; tile < MAGMA_TRANS_NB / MAGMA_TRANS_NX; ++tile)
     {
     // load NX-by-NB subtile transposed from A into sA
-    i = ibx + tx + tile*NX;
+    i = ibx + tx + tile * MAGMA_TRANS_NX;
     j = iby + ty;
     if (i < m)
       {
       #pragma unroll
-      for (int j2=0; j2 < NB; j2 += NY)
+      for (int j2=0; j2 < MAGMA_TRANS_NB; j2 += MAGMA_TRANS_NY)
         {
         if (j + j2 < n)
           {
@@ -100,31 +100,31 @@ COOT_FN(PREFIX,transpose_magma)(const UWORD m,
         }
       }
 
-    barrier( CLK_LOCAL_MEM_FENCE );
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     // save NB-by-NX subtile from sA into AT
     i = iby + tx;
-    j = ibx + ty + tile*NX;
+    j = ibx + ty + tile * MAGMA_TRANS_NX;
     #pragma unroll
-    for (int i2=0; i2 < NB; i2 += NX)
+    for (int i2 = 0; i2 < MAGMA_TRANS_NB; i2 += MAGMA_TRANS_NX)
       {
       if (i + i2 < n)
         {
         #pragma unroll
-        for( int j2=0; j2 < NX; j2 += NY )
+        for (int j2 = 0; j2 < MAGMA_TRANS_NX; j2 += MAGMA_TRANS_NY)
           {
           if (j + j2 < m)
             {
-            AT[i2 + j2*ldat] = sA[tx + i2][ty + j2];
+            AT[i2 + j2 * ldat] = sA[tx + i2][ty + j2];
             }
           }
         }
       }
 
-    barrier( CLK_LOCAL_MEM_FENCE );
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     // move to next subtile
-    A  += NX;
-    AT += NX*ldat;
+    A  += MAGMA_TRANS_NX;
+    AT += MAGMA_TRANS_NX * ldat;
     }
   }
