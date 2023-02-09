@@ -213,6 +213,11 @@
   #define coot_clarfb clarfb
   #define coot_zlarfb zlarfb
 
+  #define coot_sgelqf sgelqf
+  #define coot_dgelqf dgelqf
+  #define coot_cgelqf cgelqf
+  #define coot_zgelqf zgelqf
+
 #else
 
   #define coot_sgetrf SGETRF
@@ -409,6 +414,11 @@
   #define coot_dlarfb DLARFB
   #define coot_clarfb CLARFB
   #define coot_zlarfb ZLARFB
+
+  #define coot_sgelqf SGELQF
+  #define coot_dgelqf DGELQF
+  #define coot_cgelqf CGELQF
+  #define coot_zgelqf ZGELQF
 
 #endif
 
@@ -668,4 +678,10 @@ extern "C"
   void coot_fortran(coot_dlarfb)(const char* side, const char* trans, const char* direct, const char* storev, const blas_int* M, const blas_int* N, const blas_int* K, const double* V, const blas_int* ldv, const double* T, const blas_int* ldt, double* C, const blas_int* ldc, double* work, const blas_int* ldwork);
   void coot_fortran(coot_clarfb)(const char* side, const char* trans, const char* direct, const char* storev, const blas_int* M, const blas_int* N, const blas_int* K, const void*   V, const blas_int* ldv, const void*   T, const blas_int* ldt, void*   C, const blas_int* ldc, void*   work, const blas_int* ldwork);
   void coot_fortran(coot_zlarfb)(const char* side, const char* trans, const char* direct, const char* storev, const blas_int* M, const blas_int* N, const blas_int* K, const void*   V, const blas_int* ldv, const void*   T, const blas_int* ldt, void*   C, const blas_int* ldc, void*   work, const blas_int* ldwork);
+
+  // compute LQ factorization
+  void coot_fortran(coot_sgelqf)(const blas_int* M, const blas_int* N, float*  A, const blas_int* lda, float*  tau, float*  work, const blas_int* lwork, blas_int* info);
+  void coot_fortran(coot_dgelqf)(const blas_int* M, const blas_int* N, double* A, const blas_int* lda, double* tau, double* work, const blas_int* lwork, blas_int* info);
+  void coot_fortran(coot_cgelqf)(const blas_int* M, const blas_int* N, void*   A, const blas_int* lda, void*   tau, void*   work, const blas_int* lwork, blas_int* info);
+  void coot_fortran(coot_zgelqf)(const blas_int* M, const blas_int* N, void*   A, const blas_int* lda, void*   tau, void*   work, const blas_int* lwork, blas_int* info);
   }
