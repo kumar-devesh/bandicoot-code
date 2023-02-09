@@ -85,11 +85,8 @@ TEST_CASE("magma_geqrf2_1", "[geqrf2]")
 
   for (int itest = 0; itest < 10; ++itest)
     {
-//    M = 128 * (itest + 1) + 64;
-//    N = 128 * (itest + 1) + 64;
-    M = 16;
-    N = 16;
-    std::cout << "test: M " << M << ", N " << N << "\n";
+    M = 128 * (itest + 1) + 64;
+    N = 128 * (itest + 1) + 64;
     min_mn = std::min( M, N );
     lda    = M;
     n2     = lda*N;
@@ -146,20 +143,12 @@ TEST_CASE("magma_geqrf2_1", "[geqrf2]")
     coot_fortran(coot_dlaset)("L", &min_mn, &N, &c_zero, &c_zero, R, &ldr);
     coot_fortran(coot_dlacpy)("U", &min_mn, &N, h_R, &lda, R, &ldr);
 
-    arma::mat q_alias(Q, M, min_mn, false, true);
-    q_alias.print("Q");
-    arma::mat r_alias(R, min_mn, N, false, true);
-    r_alias.print("R");
-
     // error = || R - Q^H*A || / (N * ||A||)
     coot_fortran(coot_dgemm)("C", "N", &min_mn, &N, &M,
                    &c_neg_one, Q, &ldq, h_A, &lda, &c_one, R, &ldr );
     arma::mat hA_alias(h_A, M, N, false, true);
-    hA_alias.print("hA");
     Anorm = coot_fortran(coot_dlange)( "1", &M,      &N, h_A, &lda, work );
-    std::cout << "Anorm: " << Anorm << "\n";
     error = coot_fortran(coot_dlange)( "1", &min_mn, &N, R,   &ldr, work );
-    std::cout << "error: " << error << "\n";
     if ( N > 0 && Anorm > 0 )
       error /= (N*Anorm);
 
