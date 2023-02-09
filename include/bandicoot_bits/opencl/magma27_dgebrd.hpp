@@ -223,11 +223,8 @@ magma_dgebrd(
                           &A[i + i * lda], lda, queue );
     }
 
-    blas_int blas_nrow(nrow);
-    blas_int blas_ncol(ncol);
-    blas_int blas_lda(lda);
-    coot_fortran(coot_dgebrd)( &blas_nrow, &blas_ncol,
-                      &A[i + i * lda], &blas_lda, d+i, e+i,
+    coot_fortran(coot_dgebrd)( &nrow, &ncol,
+                      &A[i + i * lda], &lda, d+i, e+i,
                       tauq+i, taup+i, work, &lwork, &iinfo);
     work[0] = magma_dmake_lwork( lwkopt );
 

@@ -96,15 +96,9 @@ TEST_CASE("magma_dgebrd_1", "[gebrd]")
     REQUIRE( magma_malloc_cpu( (void**) &h_work,  (lhwork  ) * sizeof(double) ) == MAGMA_SUCCESS );
 
     /* Initialize the matrices */
-    blas_int blas_ione(ione);
-    blas_int blas_ISEED[4] = {0,0,0,1};
-    blas_int blas_n2(n2);
-    blas_int blas_M(M);
-    blas_int blas_N(N);
-    blas_int blas_lda(lda);
-    char uplo = 'A';
-    coot_fortran(coot_dlarnv)( &blas_ione, blas_ISEED, &blas_n2, h_A );
-    coot_fortran(coot_dlacpy)( &uplo, &blas_M, &blas_N, h_A, &blas_lda, h_Q, &blas_lda );
+    magma_int_t ISEED[4] = {0,0,0,1};
+    coot_fortran(coot_dlarnv)( &ione, ISEED, &n2, h_A );
+    coot_fortran(coot_dlacpy)( "A", &M, &N, h_A, &lda, h_Q, &lda );
 
     /* ====================================================================
        Performs operation using MAGMA
@@ -123,41 +117,35 @@ TEST_CASE("magma_dgebrd_1", "[gebrd]")
     // dorgbr prefers minmn*NB
     // dbdt01 needs M+N
     // dort01 prefers minmn*(minmn+1) to check Q and P
-    blas_int lwork_err;
+    magma_int_t lwork_err;
     double *h_work_err;
     lwork_err = std::max( minmn * nb, M+N );
     lwork_err = std::max( lwork_err, minmn*(minmn+1) );
     REQUIRE( magma_malloc_cpu( (void**) &h_PT,       (lda*N     ) * sizeof(double) ) == MAGMA_SUCCESS );
     REQUIRE( magma_malloc_cpu( (void**) &h_work_err, (lwork_err ) * sizeof(double) ) == MAGMA_SUCCESS );
 
-    coot_fortran(coot_dlacpy)( &uplo, &blas_M, &blas_N, h_Q, &blas_lda, h_PT, &blas_lda );
+    coot_fortran(coot_dlacpy)( "A", &M, &N, h_Q, &lda, h_PT, &lda );
 
-    blas_int blas_info;
-    blas_int blas_minmn(minmn);
     // generate Q & P'
-    char blas_q = 'Q';
-    coot_fortran(coot_dorgbr)( &blas_q, &blas_M, &blas_minmn, &blas_N, h_Q, &blas_lda, tauq, h_work_err, &lwork_err, &blas_info );
-    if (blas_info != 0)
+    coot_fortran(coot_dorgbr)( "Q", &M, &minmn, &N, h_Q, &lda, tauq, h_work_err, &lwork_err, &info );
+    if (info != 0)
       {
-      std::cerr << "lapackf77_dorgbr #1 returned error " << info << ": " << magma::error_as_string( magma_int_t(blas_info) ) << std::endl;
+      std::cerr << "lapackf77_dorgbr #1 returned error " << info << ": " << magma::error_as_string( magma_int_t(info) ) << std::endl;
       }
-    REQUIRE( blas_info == 0 );
-    char blas_p = 'P';
-    coot_fortran(coot_dorgbr)( &blas_p, &blas_minmn, &blas_N, &blas_M, h_PT, &blas_lda, taup, h_work_err, &lwork_err, &blas_info );
-    if (blas_info != 0)
+    REQUIRE( info == 0 );
+    coot_fortran(coot_dorgbr)( "P", &minmn, &N, &M, h_PT, &lda, taup, h_work_err, &lwork_err, &info );
+    if (info != 0)
       {
-      std::cerr << "lapackf77_dorgbr #2 returned error " << info << ": " << magma::error_as_string( magma_int_t(blas_info) ) << std::endl;
+      std::cerr << "lapackf77_dorgbr #2 returned error " << info << ": " << magma::error_as_string( magma_int_t(info) ) << std::endl;
       }
-    REQUIRE( blas_info == 0 );
+    REQUIRE( info == 0 );
 
     // Test 1:  Check the decomposition A := Q * B * PT
     //      2:  Check the orthogonality of Q
     //      3:  Check the orthogonality of PT
-    char blas_c = 'C';
-    char blas_r = 'R';
-    coot_fortran(coot_dbdt01)(&blas_M, &blas_N, &blas_ione, h_A, &blas_lda, h_Q, &blas_lda, diag, offdiag, h_PT, &blas_lda, h_work_err, &result[0]);
-    coot_fortran(coot_dort01)(&blas_c, &blas_M, &blas_minmn, h_Q, &blas_lda, h_work_err, &lwork_err, &result[1]);
-    coot_fortran(coot_dort01)(&blas_r, &blas_minmn, &blas_N, h_PT, &blas_lda, h_work_err, &lwork_err, &result[2]);
+    coot_fortran(coot_dbdt01)(&M, &N, &ione, h_A, &lda, h_Q, &lda, diag, offdiag, h_PT, &lda, h_work_err, &result[0]);
+    coot_fortran(coot_dort01)("C", &M, &minmn, h_Q, &lda, h_work_err, &lwork_err, &result[1]);
+    coot_fortran(coot_dort01)("R", &minmn, &N, h_PT, &lda, h_work_err, &lwork_err, &result[2]);
 
     magma_free_cpu( h_PT );
     magma_free_cpu( h_work_err );

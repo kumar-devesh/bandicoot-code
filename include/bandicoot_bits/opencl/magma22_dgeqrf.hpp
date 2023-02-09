@@ -53,6 +53,7 @@ inline
 magma_int_t
 magma_get_dgeqrf_nb( magma_int_t m, magma_int_t n )
   {
+  // Note: this is tuned for AMD Tahiti cards (taken from clBLAS).
   magma_int_t minmn = std::min(m, n);
 
   if   (minmn <= 2048) return  64;

@@ -37,6 +37,9 @@
   #define coot_cscal cscal
   #define coot_zscal zscal
 
+  #define coot_ssyrk ssyrk
+  #define coot_dsyrk dsyrk
+
 #else
 
   #define coot_sgemm SGEMM
@@ -58,6 +61,9 @@
   #define coot_dscal DSCAL
   #define coot_cscal CSCAL
   #define coot_zscal ZSCAL
+
+  #define coot_ssyrk SSYRK
+  #define coot_dsyrk DSYRK
 
 #endif
 
@@ -88,4 +94,8 @@ extern "C"
   void coot_fortran(coot_dscal)(const blas_int* n, const double* da, double* dx, const blas_int* incx);
   void coot_fortran(coot_cscal)(const blas_int* n, const void*   da, void*   dx, const blas_int* incx);
   void coot_fortran(coot_zscal)(const blas_int* n, const void*   da, void*   dx, const blas_int* incx);
+
+  // symmetric rank-k a*A*A' + b*C
+  void coot_fortran(coot_ssyrk)(const char* uplo, const char* transA, const blas_int* n, const blas_int* k, const  float* alpha, const  float* A, const blas_int* ldA, const  float* beta,  float* C, const blas_int* ldC);
+  void coot_fortran(coot_dsyrk)(const char* uplo, const char* transA, const blas_int* n, const blas_int* k, const double* alpha, const double* A, const blas_int* ldA, const double* beta, double* C, const blas_int* ldC);
   }

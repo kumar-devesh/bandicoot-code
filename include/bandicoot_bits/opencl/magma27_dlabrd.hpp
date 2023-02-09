@@ -72,16 +72,10 @@ magma_dlabrd_gpu(
     const double c_neg_one = MAGMA_D_NEG_ONE;
     const double c_one     = MAGMA_D_ONE;
     const double c_zero    = MAGMA_D_ZERO;
-    const blas_int ione = 1;
+    const magma_int_t ione = 1;
 
     /* Local variables */
-    blas_int i, i1, m_i, m_i1, n_i, n_i1;
-    blas_int blas_lda(lda);
-    blas_int blas_ldx(ldx);
-    blas_int blas_ldy(ldy);
-    blas_int blas_m(m);
-    blas_int blas_n(n);
-    blas_int blas_nb(nb);
+    magma_int_t i, i1, m_i, m_i1, n_i, n_i1;
     double alpha;
 
     /* Quick return if possible */
@@ -90,24 +84,21 @@ magma_dlabrd_gpu(
         return info;
     }
 
-    const char blas_no_trans = 'N';
-    const char blas_conj_trans = 'C';
-
     if (m >= n) {
         /* Reduce to upper bidiagonal form */
-        for (i=0; i < blas_nb; ++i) {
+        for (i=0; i < nb; ++i) {
             /* Update A(i:m, i) */
             i1   = i + 1;
-            m_i  = blas_m - i;
-            m_i1 = blas_m - (i+1);
-            n_i1 = blas_n - (i+1);
+            m_i  = m - i;
+            m_i1 = m - (i+1);
+            n_i1 = n - (i+1);
 
-            coot_fortran(coot_dgemv)(&blas_no_trans, &m_i, &i, &c_neg_one,
+            coot_fortran(coot_dgemv)("N", &m_i, &i, &c_neg_one,
                            &A[i + (0) * lda], &lda,
                            &Y[i + (0) * ldy], &ldy, &c_one,
                            &A[i + (i) * lda], &ione );
 
-            coot_fortran(coot_dgemv)(&blas_no_trans, &m_i, &i, &c_neg_one,
+            coot_fortran(coot_dgemv)("N", &m_i, &i, &c_neg_one,
                            &X[i + (0) * ldx], &ldx,
                            &A[0 + (i) * lda], &ione, &c_one,
                            &A[i + (i) * lda], &ione );
@@ -116,7 +107,7 @@ magma_dlabrd_gpu(
             alpha = A[i + (i) * lda];
             coot_fortran(coot_dlarfg)(&m_i, &alpha, &A[std::min(i+1, m-1) + (i) * lda], &ione, &tauq[i]);
             d[i] = alpha;
-            if (i+1 < blas_n) {
+            if (i+1 < n) {
                 A[i + (i) * lda] = c_one;
 
                 /* Compute Y(i+1:n, i) */
@@ -135,17 +126,17 @@ magma_dlabrd_gpu(
                                         dY, dY_offset + i+1 + (i) * lddy, lddy,
                                         &Y[i+1 + (i) * ldy],  ldy, queue );
 
-                coot_fortran(coot_dgemv)(&blas_conj_trans, &m_i, &i, &c_one,
-                               &A[i + (0) * lda], &blas_lda,
+                coot_fortran(coot_dgemv)("C", &m_i, &i, &c_one,
+                               &A[i + (0) * lda], &lda,
                                &A[i + (i) * lda], &ione, &c_zero,
                                &Y[0 + (i) * ldy], &ione );
 
-                coot_fortran(coot_dgemv)(&blas_no_trans, &n_i1, &i, &c_neg_one,
-                               &Y[i+1 + (0) * ldy], &blas_ldy,
+                coot_fortran(coot_dgemv)("N", &n_i1, &i, &c_neg_one,
+                               &Y[i+1 + (0) * ldy], &ldy,
                                &Y[0 + (i) * ldy],   &ione, &c_zero,
                                work,     &ione );
-                coot_fortran(coot_dgemv)(&blas_conj_trans, &m_i, &i, &c_one,
-                               &X[i + (0) * ldx], &blas_ldx,
+                coot_fortran(coot_dgemv)("C", &m_i, &i, &c_one,
+                               &X[i + (0) * ldx], &ldx,
                                &A[i + (i) * lda], &ione, &c_zero,
                                &Y[0 + (i) * ldy], &ione );
 
@@ -156,26 +147,26 @@ magma_dlabrd_gpu(
                     coot_fortran(coot_daxpy)(&n_i1, &c_one, work, &ione, &Y[i+1 + (i) * ldy], &ione);
                 }
 
-                coot_fortran(coot_dgemv)(&blas_conj_trans, &i, &n_i1, &c_neg_one,
-                               &A[0 + (i+1) * lda], &blas_lda,
+                coot_fortran(coot_dgemv)("C", &i, &n_i1, &c_neg_one,
+                               &A[0 + (i+1) * lda], &lda,
                                &Y[0 + (i) * ldy],   &ione, &c_one,
                                &Y[i+1 + (i) * ldy], &ione );
                 coot_fortran(coot_dscal)(&n_i1, &tauq[i], &Y[i+1 + (i) * ldy], &ione);
 
                 /* Update A[i + (i+1:n) * lda] */
-                coot_fortran(coot_dgemv)(&blas_no_trans, &n_i1, &i1, &c_neg_one,
-                               &Y[i+1 + (0) * ldy], &blas_ldy,
-                               &A[i + (0) * lda],   &blas_lda, &c_one,
-                               &A[i + (i+1) * lda], &blas_lda );
+                coot_fortran(coot_dgemv)("N", &n_i1, &i1, &c_neg_one,
+                               &Y[i+1 + (0) * ldy], &ldy,
+                               &A[i + (0) * lda],   &lda, &c_one,
+                               &A[i + (i+1) * lda], &lda );
 
-                coot_fortran(coot_dgemv)(&blas_conj_trans, &i, &n_i1, &c_neg_one,
-                               &A[0 + (i+1) * lda], &blas_lda,
-                               &X[i + (0) * ldx],   &blas_ldx, &c_one,
-                               &A[i + (i+1) * lda], &blas_lda );
+                coot_fortran(coot_dgemv)("C", &i, &n_i1, &c_neg_one,
+                               &A[0 + (i+1) * lda], &lda,
+                               &X[i + (0) * ldx],   &ldx, &c_one,
+                               &A[i + (i+1) * lda], &lda );
 
                 /* Generate reflection P(i) to annihilate A[i + (i+2:n) * lda] */
                 alpha = A[i + (i+1) * lda];
-                coot_fortran(coot_dlarfg)(&n_i1, &alpha, &A[i + (std::min(i+2,n-1)) * lda], &blas_lda, &taup[i]);
+                coot_fortran(coot_dlarfg)(&n_i1, &alpha, &A[i + (std::min(i+2,n-1)) * lda], &lda, &taup[i]);
                 e[i] = alpha;
                 A[i + (i+1) * lda] = c_one;
 
@@ -198,18 +189,18 @@ magma_dlabrd_gpu(
                                         dX, dX_offset + i+1 + (i) * lddx, lddx,
                                         &X[i+1 + (i) * ldx],  ldx, queue );
 
-                coot_fortran(coot_dgemv)(&blas_conj_trans, &n_i1, &i1, &c_one,
-                               &Y[i+1 + (0) * ldy], &blas_ldy,
-                               &A[i + (i+1) * lda], &blas_lda, &c_zero,
+                coot_fortran(coot_dgemv)("C", &n_i1, &i1, &c_one,
+                               &Y[i+1 + (0) * ldy], &ldy,
+                               &A[i + (i+1) * lda], &lda, &c_zero,
                                &X[0 + (i) * ldx],   &ione );
 
-                coot_fortran(coot_dgemv)(&blas_no_trans, &m_i1, &i1, &c_neg_one,
-                               &A[i+1 + (0) * lda], &blas_lda,
+                coot_fortran(coot_dgemv)("N", &m_i1, &i1, &c_neg_one,
+                               &A[i+1 + (0) * lda], &lda,
                                &X[0 + (i) * ldx],   &ione, &c_zero,
                                work,     &ione );
-                coot_fortran(coot_dgemv)(&blas_no_trans, &i, &n_i1, &c_one,
-                               &A[0 + (i+1) * lda], &blas_lda,
-                               &A[i + (i+1) * lda], &blas_lda, &c_zero,
+                coot_fortran(coot_dgemv)("N", &i, &n_i1, &c_one,
+                               &A[0 + (i+1) * lda], &lda,
+                               &A[i + (i+1) * lda], &lda, &c_zero,
                                &X[0 + (i) * ldx],   &ione );
 
                 // 4. Sync to make sure the result is back ----------------
@@ -218,8 +209,8 @@ magma_dlabrd_gpu(
                     coot_fortran(coot_daxpy)( &m_i1, &c_one, work, &ione, &X[i+1 + (i) * ldx], &ione);
                 }
 
-                coot_fortran(coot_dgemv)(&blas_no_trans, &m_i1, &i, &c_neg_one,
-                               &X[i+1 + (0) * ldx], &blas_ldx,
+                coot_fortran(coot_dgemv)("N", &m_i1, &i, &c_neg_one,
+                               &X[i+1 + (0) * ldx], &ldx,
                                &X[0 + (i) * ldx],   &ione, &c_one,
                                &X[i+1 + (i) * ldx], &ione );
                 coot_fortran(coot_dscal)(&m_i1, &taup[i], &X[i+1 + (i) * ldx], &ione);
@@ -231,17 +222,17 @@ magma_dlabrd_gpu(
         for (i=0; i < nb; ++i) {
             /* Update A(i, i:n) */
             i1   = i + 1;
-            m_i1 = blas_m - (i+1);
-            n_i  = blas_n - i;
-            n_i1 = blas_n - (i+1);
-            coot_fortran(coot_dgemv)(&blas_no_trans, &n_i, &i, &c_neg_one,
-                           &Y[i + (0) * ldy], &blas_ldy,
-                           &A[i + (0) * lda], &blas_lda, &c_one,
-                           &A[i + (i) * lda], &blas_lda );
-            coot_fortran(coot_dgemv)(&blas_conj_trans, &i, &n_i, &c_neg_one,
-                           &A[0 + (i) * lda], &blas_lda,
-                           &X[i + (0) * ldx], &blas_ldx, &c_one,
-                           &A[i + (i) * lda], &blas_lda );
+            m_i1 = m - (i+1);
+            n_i  = n - i;
+            n_i1 = n - (i+1);
+            coot_fortran(coot_dgemv)("N", &n_i, &i, &c_neg_one,
+                           &Y[i + (0) * ldy], &ldy,
+                           &A[i + (0) * lda], &lda, &c_one,
+                           &A[i + (i) * lda], &lda );
+            coot_fortran(coot_dgemv)("C", &i, &n_i, &c_neg_one,
+                           &A[0 + (i) * lda], &lda,
+                           &X[i + (0) * ldx], &ldx, &c_one,
+                           &A[i + (i) * lda], &lda );
 
             /* Generate reflection P(i) to annihilate A(i, i+1:n) */
             alpha = A[i + (i) * lda];
@@ -269,19 +260,19 @@ magma_dlabrd_gpu(
                                         dX, dX_offset + i+1 + (i) * lddx, lddx,
                                         &X[i+1 + (i) * ldx],  ldx, queue );
 
-                coot_fortran(coot_dgemv)(&blas_conj_trans, &n_i, &i, &c_one,
-                               &Y[i + (0) * ldy], &blas_ldy,
-                               &A[i + (i) * lda], &blas_lda, &c_zero,
+                coot_fortran(coot_dgemv)("C", &n_i, &i, &c_one,
+                               &Y[i + (0) * ldy], &ldy,
+                               &A[i + (i) * lda], &lda, &c_zero,
                                &X[0 + (i) * ldx], &ione );
 
-                coot_fortran(coot_dgemv)(&blas_no_trans, &m_i1, &i, &c_neg_one,
-                               &A[i+1 + (0) * lda], &blas_lda,
+                coot_fortran(coot_dgemv)("N", &m_i1, &i, &c_neg_one,
+                               &A[i+1 + (0) * lda], &lda,
                                &X[0 + (i) * ldx],   &ione, &c_zero,
                                work,     &ione );
 
-                coot_fortran(coot_dgemv)(&blas_no_trans, &i, &n_i, &c_one,
-                               &A[0 + (i) * lda], &blas_lda,
-                               &A[i + (i) * lda], &blas_lda, &c_zero,
+                coot_fortran(coot_dgemv)("N", &i, &n_i, &c_one,
+                               &A[0 + (i) * lda], &lda,
+                               &A[i + (i) * lda], &lda, &c_zero,
                                &X[0 + (i) * ldx], &ione );
 
                 // 4. Sync to make sure the result is back ----------------
@@ -290,19 +281,19 @@ magma_dlabrd_gpu(
                     coot_fortran(coot_daxpy)( &m_i1, &c_one, work, &ione, &X[i+1 + (i) * ldx], &ione );
                 }
 
-                coot_fortran(coot_dgemv)(&blas_no_trans, &m_i1, &i, &c_neg_one,
-                               &X[i+1 + (0) * ldx], &blas_ldx,
+                coot_fortran(coot_dgemv)("N", &m_i1, &i, &c_neg_one,
+                               &X[i+1 + (0) * ldx], &ldx,
                                &X[0 + (i) * ldx],   &ione, &c_one,
                                &X[i+1 + (i) * ldx], &ione );
                 coot_fortran(coot_dscal)( &m_i1, &taup[i], &X[i+1 + (i) * ldx], &ione );
 
                 /* Update A[i+1:m + (i) * lda] */
-                coot_fortran(coot_dgemv)(&blas_no_trans, &m_i1, &i, &c_neg_one,
-                               &A[i+1 + (0) * lda], &blas_lda,
-                               &Y[i + (0) * ldy],   &blas_ldy, &c_one,
+                coot_fortran(coot_dgemv)("N", &m_i1, &i, &c_neg_one,
+                               &A[i+1 + (0) * lda], &lda,
+                               &Y[i + (0) * ldy],   &ldy, &c_one,
                                &A[i+1 + (i) * lda], &ione );
-                coot_fortran(coot_dgemv)(&blas_no_trans, &m_i1, &i1, &c_neg_one,
-                               &X[i+1 + (0) * ldx], &blas_ldx,
+                coot_fortran(coot_dgemv)("N", &m_i1, &i1, &c_neg_one,
+                               &X[i+1 + (0) * ldx], &ldx,
                                &A[0 + (i) * lda],   &ione, &c_one,
                                &A[i+1 + (i) * lda], &ione );
 
@@ -329,17 +320,17 @@ magma_dlabrd_gpu(
                                         dY, dY_offset + i+1 + (i) * lddy, lddy,
                                         &Y[i+1 + (i) * ldy],  ldy, queue );
 
-                coot_fortran(coot_dgemv)(&blas_conj_trans, &m_i1, &i, &c_one,
-                               &A[i+1 + (0) * lda], &blas_lda,
+                coot_fortran(coot_dgemv)("C", &m_i1, &i, &c_one,
+                               &A[i+1 + (0) * lda], &lda,
                                &A[i+1 + (i) * lda], &ione, &c_zero,
                                &Y[0 + (i) * ldy],   &ione );
-                coot_fortran(coot_dgemv)(&blas_no_trans, &n_i1, &i, &c_neg_one,
-                               &Y[i+1 + (0) * ldy], &blas_ldy,
+                coot_fortran(coot_dgemv)("N", &n_i1, &i, &c_neg_one,
+                               &Y[i+1 + (0) * ldy], &ldy,
                                &Y[0 + (i) * ldy],   &ione, &c_zero,
                                work,     &ione );
 
-                coot_fortran(coot_dgemv)(&blas_conj_trans, &m_i1, &i1, &c_one,
-                               &X[i+1 + (0) * ldx], &blas_ldx,
+                coot_fortran(coot_dgemv)("C", &m_i1, &i1, &c_one,
+                               &X[i+1 + (0) * ldx], &ldx,
                                &A[i+1 + (i) * lda], &ione, &c_zero,
                                &Y[0 + (i) * ldy],   &ione );
 
@@ -349,8 +340,8 @@ magma_dlabrd_gpu(
                     coot_fortran(coot_daxpy)( &n_i1, &c_one, work, &ione, &Y[i+1 + (i) * ldy], &ione );
                 }
 
-                coot_fortran(coot_dgemv)(&blas_conj_trans, &i1, &n_i1, &c_neg_one,
-                               &A[0 + (i+1) * lda], &blas_lda,
+                coot_fortran(coot_dgemv)("C", &i1, &n_i1, &c_neg_one,
+                               &A[0 + (i+1) * lda], &lda,
                                &Y[0 + (i) * ldy],   &ione, &c_one,
                                &Y[i+1 + (i) * ldy], &ione );
                 coot_fortran(coot_dscal)( &n_i1, &tauq[i], &Y[i+1 + (i) * ldy], &ione );

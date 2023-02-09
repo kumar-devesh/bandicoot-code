@@ -13,9 +13,8 @@
 // ------------------------------------------------------------------------
 
 // This file contains source code adapted from
-// clMAGMA 1.3 (2014-11-14) and/or MAGMA 2.7 (2022-11-09).
-// clMAGMA 1.3 and MAGMA 2.7 are distributed under a
-// 3-clause BSD license as follows:
+// clMAGMA 1.3 (2014-11-14).
+// clMAGMA 1.3 is distributed under a 3-clause BSD license as follows:
 //
 //  -- Innovative Computing Laboratory
 //  -- Electrical Engineering and Computer Science Department
@@ -49,27 +48,83 @@
 
 
 
-// Adaptations of magmablas_* functions to use existing bandicoot backend functionality.
+// tile M-by-N matrix with ceil(M/NB) by ceil(N/NB) tiles sized NB-by-NB.
+// uses NX-by-NY threads, where NB/NX, NB/NY, NX/NY evenly.
+// subtile each NB-by-NB tile with (NB/NX) subtiles sized NX-by-NB
+// for each subtile
+//     load NX-by-NB subtile transposed from A into sA, as (NB/NY) blocks sized NX-by-NY
+//     save NB-by-NX subtile from sA into AT,   as (NB/NX)*(NX/NY) blocks sized NX-by-NY
+//     A  += NX
+//     AT += NX*ldat
 
-// Make sure these match the definitions in kernel_src.hpp!
-#define MAGMABLAS_BLK_X 64
-#define MAGMABLAS_BLK_Y 32
-
-
-
-inline
+__kernel
 void
-magmablas_dlaset(magma_uplo_t uplo, magma_int_t m, magma_int_t n, double offdiag, double diag, magmaDouble_ptr dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue);
+COOT_FN(PREFIX,transpose_magma)(const UWORD m,
+                                const UWORD n,
+                                __global const eT1* A,
+                                const UWORD A_offset,
+                                const UWORD lda,
+                                __global const eT1* AT,
+                                const UWORD AT_offset,
+                                const UWORD ldat)
+  {
+  A += A_offset;
+  AT += AT_offset;
 
+  __local double sA[NB][NX+1];
 
+  int tx  = get_local_id(0);
+  int ty  = get_local_id(1);
+  int ibx = get_group_id(0)*NB;
+  int iby = get_group_id(1)*NB;
+  int i, j;
 
-template<typename eT>
-inline
-void
-magmablas_run_laset_kernel(const opencl::magma_real_kernel_id::enum_id num, magma_uplo_t uplo, magma_int_t m, magma_int_t n, eT offdiag, eT diag, cl_mem dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue);
+  A  += ibx + tx + (iby + ty) * lda;
+  AT += iby + tx + (ibx + ty) * ldat;
 
+  #pragma unroll
+  for (int tile=0; tile < NB/NX; ++tile)
+    {
+    // load NX-by-NB subtile transposed from A into sA
+    i = ibx + tx + tile*NX;
+    j = iby + ty;
+    if (i < m)
+      {
+      #pragma unroll
+      for (int j2=0; j2 < NB; j2 += NY)
+        {
+        if (j + j2 < n)
+          {
+          sA[ty + j2][tx] = A[j2*lda];
+          }
+        }
+      }
 
+    barrier( CLK_LOCAL_MEM_FENCE );
 
-inline
-void
-magmablas_dtranspose(magma_int_t m, magma_int_t n, magmaDouble_const_ptr dA, size_t dA_offset, magma_int_t ldda, magmaDouble_ptr dAT, size_t dAT_offset, magma_int_t lddat, magma_queue_t queue);
+    // save NB-by-NX subtile from sA into AT
+    i = iby + tx;
+    j = ibx + ty + tile*NX;
+    #pragma unroll
+    for (int i2=0; i2 < NB; i2 += NX)
+      {
+      if (i + i2 < n)
+        {
+        #pragma unroll
+        for( int j2=0; j2 < NX; j2 += NY )
+          {
+          if (j + j2 < m)
+            {
+            AT[i2 + j2*ldat] = sA[tx + i2][ty + j2];
+            }
+          }
+        }
+      }
+
+    barrier( CLK_LOCAL_MEM_FENCE );
+
+    // move to next subtile
+    A  += NX;
+    AT += NX*ldat;
+    }
+  }

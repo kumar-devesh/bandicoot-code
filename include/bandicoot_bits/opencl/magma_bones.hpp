@@ -125,7 +125,9 @@ typedef enum {
     MagmaRowwise       = 402
 } magma_storev_t;
 
-typedef int magma_int_t;
+// NOTE: this is not the same as how MAGMA defines things!
+// However, this makes it a million times easier to support BLAS libraries with integers of different widths.
+typedef blas_int magma_int_t;
 
 typedef cl_mem magma_ptr;
 typedef cl_mem magmaInt_ptr;

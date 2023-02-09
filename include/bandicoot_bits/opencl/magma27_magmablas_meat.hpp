@@ -149,3 +149,23 @@ magmablas_run_laset_kernel
   status |= clEnqueueNDRangeKernel(queue, k, 2, NULL, grid, threads, 0, NULL, NULL);
   coot_check_runtime_error(status, "coot::opencl::magmablas_run_laset_kernel(): couldn't execute kernel");
   }
+
+
+
+inline
+void
+magmablas_dtranspose
+  (
+  magma_int_t m,
+  magma_int_t n,
+  magmaDouble_const_ptr dA,
+  size_t dA_offset,
+  magma_int_t ldda,
+  magmaDouble_ptr dAT,
+  size_t dAT_offset,
+  magma_int_t lddat,
+  magma_queue_t queue
+  )
+  {
+  // TODO
+  }

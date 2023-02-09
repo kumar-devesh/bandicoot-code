@@ -159,31 +159,28 @@ TEST_CASE("magma_dlarfb_1", "[larfb]")
             arma::Mat<double> V_alias(V, ldv, nv, false, true);
             V_alias.randu();
 
-            blas_int blas_K(K);
-            blas_int blas_ldv(ldv);
             if ( storev[istor] == MagmaColumnwise )
               {
               if ( direct[idir] == MagmaForward )
                 {
-                coot_fortran(coot_dlaset)("U", &blas_K, &blas_K, &c_zero, &c_one, V, &blas_ldv );
+                coot_fortran(coot_dlaset)("U", &K, &K, &c_zero, &c_one, V, &ldv );
                 }
               else
                 {
-                coot_fortran(coot_dlaset)("L", &blas_K, &blas_K, &c_zero, &c_one, &V[(ldv-K)], &blas_ldv );
+                coot_fortran(coot_dlaset)("L", &K, &K, &c_zero, &c_one, &V[(ldv-K)], &ldv );
                 }
               }
             else
               {
               // rowwise, swap V's dimensions
               std::swap( ldv, nv );
-              blas_ldv = blas_int(ldv);
               if ( direct[idir] == MagmaForward )
                 {
-                coot_fortran(coot_dlaset)("L", &blas_K, &blas_K, &c_zero, &c_one, V, &blas_ldv );
+                coot_fortran(coot_dlaset)("L", &K, &K, &c_zero, &c_one, V, &ldv );
                 }
               else
                 {
-                coot_fortran(coot_dlaset)("U", &blas_K, &blas_K, &c_zero, &c_one, &V[(nv-K)*ldv], &blas_ldv );
+                coot_fortran(coot_dlaset)("U", &K, &K, &c_zero, &c_one, &V[(nv-K)*ldv], &ldv );
                 }
               }
 
@@ -191,29 +188,23 @@ TEST_CASE("magma_dlarfb_1", "[larfb]")
             magma_int_t k1 = K-1;
             arma::Mat<double> T_alias(T, ldt, K, false, true);
             T_alias.randu();
-            blas_int blas_k1(k1);
-            blas_int blas_ldt(ldt);
             if ( direct[idir] == MagmaForward )
               {
-              coot_fortran(coot_dlaset)("L", &blas_k1, &blas_k1, &c_zero, &c_zero, &T[1], &blas_ldt );
+              coot_fortran(coot_dlaset)("L", &k1, &k1, &c_zero, &c_zero, &T[1], &ldt );
               }
             else
               {
-              coot_fortran(coot_dlaset)("U", &blas_k1, &blas_k1, &c_zero, &c_zero, &T[1*ldt], &blas_ldt );
+              coot_fortran(coot_dlaset)("U", &k1, &k1, &c_zero, &c_zero, &T[1*ldt], &ldt );
               }
 
             magma_dsetmatrix( M,   N,  C, ldc, dC, 0, ldc, queue );
             magma_dsetmatrix( ldv, nv, V, ldv, dV, 0, ldv, queue );
             magma_dsetmatrix( K,   K,  T, ldt, dT, 0, ldt, queue );
 
-            blas_int blas_M(M);
-            blas_int blas_N(N);
-            blas_int blas_ldc(ldc);
-            blas_int blas_ldw(ldw);
             coot_fortran(coot_dlarfb)( lapack_side_const( side[iside] ), lapack_trans_const( trans[itran] ),
                               lapack_direct_const( direct[idir] ), lapack_storev_const( storev[istor] ),
-                              &blas_M, &blas_N, &blas_K,
-                              V, &blas_ldv, T, &blas_ldt, C, &blas_ldc, W, &blas_ldw );
+                              &M, &N, &K,
+                              V, &ldv, T, &ldt, C, &ldc, W, &ldw );
 
             magma_dlarfb_gpu( side[iside], trans[itran], direct[idir], storev[istor],
                               M, N, K,
@@ -222,11 +213,10 @@ TEST_CASE("magma_dlarfb_1", "[larfb]")
             magma_dgetmatrix( M, N, dC, 0, ldc, R, ldc, queue );
 
             // compute relative error |HC_magma - HC_lapack| / |HC_lapack|
-            blas_int size = ldc*N;
-            blas_int blas_ione(ione);
-            coot_fortran(coot_daxpy)( &size, &c_neg_one, C, &blas_ione, R, &blas_ione );
-            Cnorm = coot_fortran(coot_dlange)( "F", &blas_M, &blas_N, C, &blas_ldc, work );
-            error = coot_fortran(coot_dlange)( "F", &blas_M, &blas_N, R, &blas_ldc, work ) / Cnorm;
+            magma_int_t size = ldc*N;
+            coot_fortran(coot_daxpy)( &size, &c_neg_one, C, &ione, R, &ione );
+            Cnorm = coot_fortran(coot_dlange)( "F", &M, &N, C, &ldc, work );
+            error = coot_fortran(coot_dlange)( "F", &M, &N, R, &ldc, work ) / Cnorm;
 
             REQUIRE( error < tol );
 
