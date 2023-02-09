@@ -114,7 +114,7 @@ TEST_CASE("magma_dorglq_1", "[orglq]")
        =================================================================== */
     // first, get LQ factors in both hA and hR
     magma_dsetmatrix( m, n, hA, lda, dA, 0, ldda, queue );
-//    magma_dgelqf_gpu( m, n, dA, 0, ldda, tau, h_work, lwork, &info ); // TODO: this test cannot work until this is ready!
+    magma_dgelqf_gpu( m, n, dA, 0, ldda, tau, h_work, lwork, &info );
     if (info != 0)
       {
       std::cerr << "magma_dgelqf_gpu returned error " << info << ": " << magma::error_as_string(info) << std::endl;
