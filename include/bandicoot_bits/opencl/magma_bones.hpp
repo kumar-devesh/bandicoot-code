@@ -121,6 +121,11 @@ typedef enum {
 } magma_direct_t;
 
 typedef enum {
+    MagmaQ             = 322,  /* unmbr, ungbr */
+    MagmaP             = 323
+} magma_vect_t;
+
+typedef enum {
     MagmaColumnwise    = 401,  /* larfb */
     MagmaRowwise       = 402
 } magma_storev_t;

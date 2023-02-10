@@ -166,9 +166,9 @@ inline
 magma_int_t
 magma_dgeqrf_gpu(
     magma_int_t m, magma_int_t n,
-    magmaDouble_ptr dA, magma_int_t ldda,
+    magmaDouble_ptr dA, size_t dA_offset, magma_int_t ldda,
     double *tau,
-    magmaDouble_ptr dT,
+    magmaDouble_ptr dT, size_t dT_offset,
     magma_int_t *info )
 {
     // #ifdef HAVE_clBLAS
@@ -185,8 +185,8 @@ magma_dgeqrf_gpu(
 
     // CS: dA_offset is not used
 
-    #define dA(i_, j_)  dA, ((i_) + (j_)*(ldda))
-    #define dT(i_)      dT, ((i_)*nb)
+    #define dA(i_, j_)  dA, (dA_offset + (i_) + (j_)*(ldda))
+    #define dT(i_)      dT, (dT_offset + (i_)*nb)
     #define dR(i_)      dT, ((  minmn + (i_))*nb)
     #define dwork(i_)   dT, ((2*minmn + (i_))*nb)
 

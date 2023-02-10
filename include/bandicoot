@@ -354,12 +354,16 @@ namespace coot
     //#include "bandicoot_bits/opencl/magma27_sorglq.hpp"
     //#include "bandicoot_bits/opencl/magma27_sgeqrf2.hpp"
     //#include "bandicoot_bits/opencl/magma27_sgelqf.hpp"
+    //#include "bandicoot_bits/opencl/magma27_sorgqr2.hpp"
+    //#include "bandicoot_bits/opencl/magma27_sorgbr.hpp"
 
     #include "bandicoot_bits/opencl/magma27_dlabrd.hpp"
     #include "bandicoot_bits/opencl/magma27_dgebrd.hpp"
     #include "bandicoot_bits/opencl/magma27_dorglq.hpp"
     #include "bandicoot_bits/opencl/magma27_dgeqrf2.hpp"
     #include "bandicoot_bits/opencl/magma27_dgelqf.hpp"
+    #include "bandicoot_bits/opencl/magma27_dorgqr2.hpp"
+    #include "bandicoot_bits/opencl/magma27_dorgbr.hpp"
   #endif
 
   //
