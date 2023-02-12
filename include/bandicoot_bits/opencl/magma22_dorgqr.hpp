@@ -78,7 +78,7 @@ magma_dorgqr
   magma_int_t lwork, ldda;
   magma_int_t i, ib, ki, kk;
   magma_int_t lddwork;
-  double *dA=NULL, *dV=NULL, *dW=NULL;
+  magmaDouble_ptr dA=NULL, dV=NULL, dW=NULL;
   size_t dV_offset, dW_offset;
   double *work=NULL;
   magma_queue_t queue=NULL;
@@ -168,7 +168,7 @@ magma_dorgqr
     //                  &tau[kk], work, &lwork, &iinfo );
 
     coot_fortran(coot_dlacpy)( "F", &m_kk, &k_kk, &A[kk + kk * lda], &lda, work_V, &m_kk);
-    coot_fortran(coot_dlaset)( "F", &m_kk, &n_kk, &c_zero, &c_one, A[kk + kk * lda], &lda );
+    coot_fortran(coot_dlaset)( "F", &m_kk, &n_kk, &c_zero, &c_one, &A[kk + kk * lda], &lda );
 
     coot_fortran(coot_dlarft)( "F", "C",
                                &m_kk, &k_kk,
