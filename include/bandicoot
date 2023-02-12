@@ -343,7 +343,7 @@ namespace coot
 
     #include "bandicoot_bits/opencl/magma22_dlarfb.hpp"
     #include "bandicoot_bits/opencl/magma22_dgeqrf.hpp"
-    // #include "bandicoot_bits/opencl/magma22_dorgqr.hpp"
+    #include "bandicoot_bits/opencl/magma22_dorgqr.hpp"
 
     #include "bandicoot_bits/opencl/magma22_spotrf.hpp"
 
