@@ -112,11 +112,11 @@ magma_dlabrd_gpu(
 
                 /* Compute Y(i+1:n, i) */
                 // 1. Send the block reflector  A(i+1:m, i) to the GPU ------
-                magma_dsetvector( magma_int_t(m_i),
+                magma_dsetvector( m_i,
                                   &A[i + (i) * lda], 1,
                                   dA, dA_offset + i + (i) * ldda, 1, queue );
                 // 2. Multiply ---------------------------------------------
-                magma_dgemv( MagmaConjTrans, magma_int_t(m_i), magma_int_t(n_i1), c_one,
+                magma_dgemv( MagmaConjTrans, m_i, n_i1, c_one,
                              dA, dA_offset + i + (i+1) * ldda,   ldda,
                              dA, dA_offset + i + (i) * ldda, magma_int_t(ione), c_zero,
                              dY, dY_offset + i+1 + (i) * lddy,   magma_int_t(ione), queue );
@@ -172,20 +172,20 @@ magma_dlabrd_gpu(
 
                 /* Compute X(i+1:m, i) */
                 // 1. Send the block reflector  A(i+1:m, i) to the GPU ------
-                magma_dsetvector( magma_int_t(n_i1),
+                magma_dsetvector( n_i1,
                                   &A[i + (i+1) * lda], lda,
                                   dA, dA_offset + i + (i+1) * ldda, ldda, queue );
 
                 // 2. Multiply ---------------------------------------------
-                magma_dgemv( MagmaNoTrans, magma_int_t(m_i1), magma_int_t(n_i1), c_one,
+                magma_dgemv( MagmaNoTrans, m_i1, n_i1, c_one,
                              dA, dA_offset + i+1 + (i+1) * ldda, ldda,
                              dA, dA_offset + i + (i+1) * ldda, ldda,
                              //dY, 0 + (0) * lddy, 1,
                              c_zero,
-                             dX, dX_offset + i+1 + (i) * lddx, magma_int_t(ione), queue );
+                             dX, dX_offset + i+1 + (i) * lddx, ione, queue );
 
                 // 3. Get the result back ----------------------------------
-                magma_dgetmatrix_async( magma_int_t(m_i1), 1,
+                magma_dgetmatrix_async( m_i1, 1,
                                         dX, dX_offset + i+1 + (i) * lddx, lddx,
                                         &X[i+1 + (i) * ldx],  ldx, queue );
 
@@ -243,20 +243,20 @@ magma_dlabrd_gpu(
 
                 /* Compute X(i+1:m, i) */
                 // 1. Send the block reflector  A(i, i+1:n) to the GPU ------
-                magma_dsetvector( magma_int_t(n_i),
+                magma_dsetvector( n_i,
                                   &A[i + (i) * lda], lda,
                                   dA, dA_offset + i + (i) * ldda, ldda, queue );
 
                 // 2. Multiply ---------------------------------------------
-                magma_dgemv( MagmaNoTrans, magma_int_t(m_i1), magma_int_t(n_i), c_one,
+                magma_dgemv( MagmaNoTrans, m_i1, n_i, c_one,
                              dA, dA_offset + i+1 + (i) * ldda, ldda,
                              dA, dA_offset + i + (i) * ldda, ldda,
                              //dY, 0 + (0) * lddy, 1,
                              c_zero,
-                             dX, dX_offset + i+1 + (i) * lddx, magma_int_t(ione), queue );
+                             dX, dX_offset + i+1 + (i) * lddx, ione, queue );
 
                 // 3. Get the result back ----------------------------------
-                magma_dgetmatrix_async( magma_int_t(m_i1), 1,
+                magma_dgetmatrix_async( m_i1, 1,
                                         dX, dX_offset + i+1 + (i) * lddx, lddx,
                                         &X[i+1 + (i) * ldx],  ldx, queue );
 
@@ -305,18 +305,18 @@ magma_dlabrd_gpu(
 
                 /* Compute Y(i+1:n, i) */
                 // 1. Send the block reflector  A(i+1:m, i) to the GPU ------
-                magma_dsetvector( magma_int_t(m_i1),
+                magma_dsetvector( m_i1,
                                   &A[i+1 + (i) * lda], 1,
                                   dA, dA_offset + i+1 + (i) * ldda, 1, queue );
 
                 // 2. Multiply ---------------------------------------------
-                magma_dgemv( MagmaConjTrans, magma_int_t(m_i1), magma_int_t(n_i1), c_one,
+                magma_dgemv( MagmaConjTrans, m_i1, n_i1, c_one,
                              dA, dA_offset + i+1 + (i+1) * ldda, ldda,
                              dA, dA_offset + i+1 + (i) * ldda, ione, c_zero,
                              dY, dY_offset + i+1 + (i) * lddy, ione, queue );
 
                 // 3. Get the result back ----------------------------------
-                magma_dgetmatrix_async( magma_int_t(n_i1), 1,
+                magma_dgetmatrix_async( n_i1, 1,
                                         dY, dY_offset + i+1 + (i) * lddy, lddy,
                                         &Y[i+1 + (i) * ldy],  ldy, queue );
 
