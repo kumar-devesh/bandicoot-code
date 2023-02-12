@@ -87,89 +87,26 @@ void dsplit_diag_block_invert(
 }
 
 
-/***************************************************************************//**
-    Purpose
-    -------
-    DGEQRF computes a QR factorization of a real M-by-N matrix A:
-    A = Q * R.
+// DGEQRF computes a QR factorization of a real M-by-N matrix A:
+// A = Q * R.
+//
+// This version stores the triangular dT matrices used in
+// the block QR factorization so that they can be applied directly (i.e.,
+// without being recomputed) later. As a result, the application
+// of Q is much faster. Also, the upper triangular matrices for V have 0s
+// in them. The corresponding parts of the upper triangular R are inverted and
+// stored separately in dT.
 
-    This version stores the triangular dT matrices used in
-    the block QR factorization so that they can be applied directly (i.e.,
-    without being recomputed) later. As a result, the application
-    of Q is much faster. Also, the upper triangular matrices for V have 0s
-    in them. The corresponding parts of the upper triangular R are inverted and
-    stored separately in dT.
-
-    Arguments
-    ---------
-    @param[in]
-    m       INTEGER
-            The number of rows of the matrix A.  M >= 0.
-
-    @param[in]
-    n       INTEGER
-            The number of columns of the matrix A.  N >= 0.
-
-    @param[in,out]
-    dA      DOUBLE PRECISION array on the GPU, dimension (LDDA,N)
-            On entry, the M-by-N matrix A.
-            On exit, the elements on and above the diagonal of the array
-            contain the min(M,N)-by-N upper trapezoidal matrix R (R is
-            upper triangular if m >= n); the elements below the diagonal,
-            with the array TAU, represent the orthogonal matrix Q as a
-            product of min(m,n) elementary reflectors (see Further
-            Details).
-
-    @param[in]
-    ldda    INTEGER
-            The leading dimension of the array dA.  LDDA >= max(1,M).
-            To benefit from coalescent memory accesses LDDA must be
-            divisible by 16.
-
-    @param[out]
-    tau     DOUBLE PRECISION array, dimension (min(M,N))
-            The scalar factors of the elementary reflectors (see Further
-            Details).
-
-    @param[out]
-    dT      (workspace) DOUBLE PRECISION array on the GPU,
-            dimension (2*MIN(M, N) + ceil(N/32)*32 )*NB,
-            where NB can be obtained through magma_get_dgeqrf_nb( M, N ).
-            It starts with a MIN(M,N)*NB block that stores the triangular T
-            matrices, followed by a MIN(M,N)*NB block that stores inverses of
-            the diagonal blocks of the R matrix.
-            The rest of the array is used as workspace.
-
-    @param[out]
-    info    INTEGER
-      -     = 0:  successful exit
-      -     < 0:  if INFO = -i, the i-th argument had an illegal value
-                  or another error occured, such as memory allocation failed.
-
-    Further Details
-    ---------------
-    The matrix Q is represented as a product of elementary reflectors
-
-        Q = H(1) H(2) . . . H(k), where k = min(m,n).
-
-    Each H(i) has the form
-
-        H(i) = I - tau * v * v^H
-
-    where tau is a real scalar, and v is a real vector with
-    v(1:i-1) = 0 and v(i) = 1; v(i+1:m) is stored on exit in A(i+1:m,i),
-    and tau in TAU(i).
-
-    @ingroup magma_geqrf
-*******************************************************************************/
 inline
 magma_int_t
-magma_dgeqrf_gpu(
-    magma_int_t m, magma_int_t n,
-    magmaDouble_ptr dA, size_t dA_offset, magma_int_t ldda,
-    double *tau,
-    magmaDouble_ptr dT, size_t dT_offset,
-    magma_int_t *info )
+magma_dgeqrf_gpu
+  (
+  magma_int_t m, magma_int_t n,
+  magmaDouble_ptr dA, size_t dA_offset, magma_int_t ldda,
+  double *tau,
+  magmaDouble_ptr dT, size_t dT_offset,
+  magma_int_t *info
+  )
 {
     // #ifdef HAVE_clBLAS
     // #define dA(i_, j_)  dA, (dA_offset + (i_) + (j_)*(ldda))

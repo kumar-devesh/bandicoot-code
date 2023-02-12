@@ -198,6 +198,9 @@
   #define coot_sorglq sorglq
   #define coot_dorglq dorglq
 
+  #define coot_sormqr sormqr
+  #define coot_dormqr dormqr
+
   #define coot_slacpy slacpy
   #define coot_dlacpy dlacpy
   #define coot_clacpy clacpy
@@ -399,6 +402,9 @@
 
   #define coot_sorglq SORGLQ
   #define coot_dorglq DORGLQ
+
+  #define coot_sormqr SORMQR
+  #define coot_dormqr DORMQR
 
   #define coot_slacpy SLACPY
   #define coot_dlacpy DLACPY
@@ -660,6 +666,10 @@ extern "C"
   // generate Q with orthonormal rows
   void coot_fortran(coot_sorglq)(const blas_int* m, const blas_int* n, const blas_int* k, float*  A, const blas_int* lda, const float*  tau, float*  work, const blas_int* lwork, blas_int* info);
   void coot_fortran(coot_dorglq)(const blas_int* m, const blas_int* n, const blas_int* k, double* A, const blas_int* lda, const double* tau, double* work, const blas_int* lwork, blas_int* info);
+
+  // overwrite matrix with geqrf-generated orthogonal transformation
+  void coot_fortran(coot_sormqr)(const char* side, const char* trans, const blas_int* m, const blas_int* n, const blas_int* k, const float*  A, const blas_int* lda, const float*  tau, float*  C, const blas_int* ldc, float*  work, const blas_int* lwork, blas_int* info);
+  void coot_fortran(coot_dormqr)(const char* side, const char* trans, const blas_int* m, const blas_int* n, const blas_int* k, const double* A, const blas_int* lda, const double* tau, double* C, const blas_int* ldc, double* work, const blas_int* lwork, blas_int* info);
 
   // copy all or part of one 2d array to another
   void coot_fortran(coot_slacpy)(const char* uplo, const blas_int* m, const blas_int* n, const float*  A, const blas_int* lda, float*  B, const blas_int* ldb);
