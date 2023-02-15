@@ -99,21 +99,21 @@ magma_dormqr
 
   /* Test the input arguments */
   if (!left && side != MagmaRight)
-      *info = -1;
+    *info = -1;
   else if (! notran && trans != MagmaTrans)
-      *info = -2;
+    *info = -2;
   else if (m < 0)
-      *info = -3;
+    *info = -3;
   else if (n < 0)
-      *info = -4;
+    *info = -4;
   else if (k < 0 || k > nq)
-      *info = -5;
+    *info = -5;
   else if (lda < std::max(1, nq))
-      *info = -7;
+    *info = -7;
   else if (ldc < std::max(1, m))
-      *info = -10;
+    *info = -10;
   else if (lwork < std::max(1, nw) && ! lquery)
-      *info = -12;
+    *info = -12;
 
   if (*info == 0)
     {
@@ -145,7 +145,7 @@ magma_dormqr
     {
     /* Use CPU code */
     coot_fortran(coot_dormqr)( lapack_side_const(side), lapack_trans_const(trans),
-          &m, &n, &k, A, &lda, tau, C, &ldc, work, &lwork, &iinfo);
+                               &m, &n, &k, A, &lda, tau, C, &ldc, work, &lwork, &iinfo);
     }
   else
     {

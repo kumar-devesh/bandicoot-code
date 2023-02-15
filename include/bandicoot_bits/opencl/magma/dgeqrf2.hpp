@@ -79,21 +79,22 @@ magma_dgeqrf2_gpu
 
   // check arguments
   *info = 0;
-  if (m < 0) {
-      *info = -1;
-  } else if (n < 0) {
-      *info = -2;
-  } else if (ldda < std::max(1,m)) {
+  if (m < 0)
+    *info = -1;
+  else if (n < 0)
+    *info = -2;
+  else if (ldda < std::max(1, m))
       *info = -4;
-  }
-  if (*info != 0) {
-      //magma_xerbla( __func__, -(*info) );
-      return *info;
-  }
+
+  if (*info != 0)
+    {
+    //magma_xerbla( __func__, -(*info) );
+    return *info;
+    }
 
   minmn = std::min( m, n );
   if (minmn == 0)
-      return *info;
+    return *info;
 
   nb = magma_get_dgeqrf_nb( m, n );
 
@@ -120,11 +121,12 @@ magma_dgeqrf2_gpu
   i = ((minmn-1)/nb)*nb;
   lwork = std::max( lwork, (m-i)*(n-i) + (n-i)*nb );
 
-  if (MAGMA_SUCCESS != magma_dmalloc_pinned( &work, lwork )) {
-      magma_free( dwork );
-      *info = MAGMA_ERR_HOST_ALLOC;
-      return *info;
-  }
+  if (MAGMA_SUCCESS != magma_dmalloc_pinned( &work, lwork ))
+    {
+    magma_free( dwork );
+    *info = MAGMA_ERR_HOST_ALLOC;
+    return *info;
+    }
   hwork = work + ldwork*nb;
 
   magma_queue_t queues[2];
@@ -133,102 +135,111 @@ magma_dgeqrf2_gpu
   magma_queue_create( cdev, &queues[0] );
   magma_queue_create( cdev, &queues[1] );
 
-  if ( nb > 1 && nb < minmn ) {
-      // need nb*nb for T in larft and R in dpanel_to_q
-      assert( lhwork >= 2*nb*nb );
+  if ( nb > 1 && nb < minmn )
+    {
+    // need nb*nb for T in larft and R in dpanel_to_q
+    assert( lhwork >= 2*nb*nb );
 
-      // Use blocked code initially
-      old_i = 0; old_ib = nb;
-      for (i = 0; i < minmn-nb; i += nb) {
-          ib = std::min( minmn-i, nb );
-          rows = m - i;
+    // Use blocked code initially
+    old_i = 0; old_ib = nb;
+    for (i = 0; i < minmn-nb; i += nb)
+      {
+      ib = std::min( minmn-i, nb );
+      rows = m - i;
 
-          // get i-th panel from device
-          magma_dgetmatrix_async( rows, ib,
-                                  dA, dA_offset + i + i * ldda, ldda,
-                                  &work[i], ldwork, queues[1] );
-          if (i > 0) {
-              // Apply H^H to A(i:m,i+2*ib:n) from the left
-              cols = n - old_i - 2*old_ib;
-              magma_dlarfb_gpu( MagmaLeft, MagmaConjTrans, MagmaForward, MagmaColumnwise,
-                                m-old_i, cols, old_ib,
-                                dA, dA_offset + old_i + old_i * ldda,                ldda, dT,    dT_offset, nb,
-                                dA, dA_offset + old_i + (old_i + 2 * old_ib) * ldda, ldda, dwork, 0,         lddwork, queues[0] );
+      // get i-th panel from device
+      magma_dgetmatrix_async( rows, ib,
+                              dA, dA_offset + i + i * ldda, ldda,
+                              &work[i], ldwork, queues[1] );
+      if (i > 0)
+        {
+        // Apply H^H to A(i:m,i+2*ib:n) from the left
+        cols = n - old_i - 2*old_ib;
+        magma_dlarfb_gpu( MagmaLeft, MagmaConjTrans, MagmaForward, MagmaColumnwise,
+                          m-old_i, cols, old_ib,
+                          dA, dA_offset + old_i + old_i * ldda,                ldda, dT,    dT_offset, nb,
+                          dA, dA_offset + old_i + (old_i + 2 * old_ib) * ldda, ldda, dwork, 0,         lddwork, queues[0] );
 
-              // Fix the diagonal block
-              magma_dsetmatrix_async( old_ib, old_ib,
-                                      &work[old_i],      ldwork,
-                                      dA, dA_offset + old_i + old_i * ldda, ldda, queues[0] );
+        // Fix the diagonal block
+        magma_dsetmatrix_async( old_ib, old_ib,
+                                &work[old_i],      ldwork,
+                                dA, dA_offset + old_i + old_i * ldda, ldda, queues[0] );
+        }
+
+      magma_queue_sync( queues[1] );  // wait to get work(i)
+      coot_fortran(coot_dgeqrf)( &rows, &ib, &work[i], &ldwork, &tau[i], hwork, &lhwork, info);
+      // Form the triangular factor of the block reflector in hwork
+      // H = H(i) H(i+1) . . . H(i+ib-1)
+      coot_fortran(coot_dlarft)("F", "C", &rows, &ib, &work[i], &ldwork, &tau[i], hwork, &ib);
+
+      // set  the upper triangle of panel (V) to identity
+      magma_dpanel_to_q( MagmaUpper, ib, &work[i], ldwork, hwork+ib*ib );
+
+      // send i-th V matrix to device
+      magma_dsetmatrix( rows, ib,
+                        &work[i], ldwork,
+                        dA, dA_offset + i + i * ldda, ldda, queues[1] );
+
+      if (i + ib < n)
+        {
+        // wait for previous trailing matrix update (above) to finish with dT
+        magma_queue_sync( queues[0] );
+
+        // send T matrix to device
+        magma_dsetmatrix( ib, ib,
+                          hwork, ib,
+                          dT, dT_offset, nb, queues[1] );
+
+        if (i+nb < minmn-nb)
+          {
+          // Apply H^H to A(i:m,i+ib:i+2*ib) from the left
+          magma_dlarfb_gpu( MagmaLeft, MagmaConjTrans, MagmaForward, MagmaColumnwise,
+                            rows, ib, ib,
+                            dA,    dA_offset + i + i * ldda,        ldda,
+                            dT,    dT_offset,                       nb,
+                            dA,    dA_offset + i + (i + ib) * ldda, ldda,
+                            dwork, 0,                               lddwork, queues[1] );
+          // wait for larfb to finish with dwork before larfb in next iteration starts
+          magma_queue_sync( queues[1] );
+          // restore upper triangle of panel
+          magma_dq_to_panel( MagmaUpper, ib, &work[i], ldwork, hwork+ib*ib );
           }
-
-          magma_queue_sync( queues[1] );  // wait to get work(i)
-          coot_fortran(coot_dgeqrf)( &rows, &ib, &work[i], &ldwork, &tau[i], hwork, &lhwork, info);
-          // Form the triangular factor of the block reflector in hwork
-          // H = H(i) H(i+1) . . . H(i+ib-1)
-          coot_fortran(coot_dlarft)("F", "C", &rows, &ib, &work[i], &ldwork, &tau[i], hwork, &ib);
-
-          // set  the upper triangle of panel (V) to identity
-          magma_dpanel_to_q( MagmaUpper, ib, &work[i], ldwork, hwork+ib*ib );
-
-          // send i-th V matrix to device
-          magma_dsetmatrix( rows, ib,
+        else
+          {
+          // Apply H^H to A(i:m,i+ib:n) from the left
+          magma_dlarfb_gpu( MagmaLeft, MagmaConjTrans, MagmaForward, MagmaColumnwise,
+                            rows, n-i-ib, ib,
+                            dA,    dA_offset + i + i * ldda,      ldda,
+                            dT,    dT_offset,                     nb,
+                            dA,    dA_offset + i + (i+ib) * ldda, ldda,
+                            dwork, 0,                             lddwork, queues[1] );
+          magma_dq_to_panel( MagmaUpper, ib, &work[i], ldwork, hwork+ib*ib );
+          // Fix the diagonal block
+          magma_dsetmatrix( ib, ib,
                             &work[i], ldwork,
                             dA, dA_offset + i + i * ldda, ldda, queues[1] );
-
-          if (i + ib < n) {
-              // wait for previous trailing matrix update (above) to finish with dT
-              magma_queue_sync( queues[0] );
-
-              // send T matrix to device
-              magma_dsetmatrix( ib, ib,
-                                hwork, ib,
-                                dT, dT_offset, nb, queues[1] );
-
-              if (i+nb < minmn-nb) {
-                  // Apply H^H to A(i:m,i+ib:i+2*ib) from the left
-                  magma_dlarfb_gpu( MagmaLeft, MagmaConjTrans, MagmaForward, MagmaColumnwise,
-                                    rows, ib, ib,
-                                    dA,    dA_offset + i + i * ldda,        ldda,
-                                    dT,    dT_offset,                       nb,
-                                    dA,    dA_offset + i + (i + ib) * ldda, ldda,
-                                    dwork, 0,                               lddwork, queues[1] );
-                  // wait for larfb to finish with dwork before larfb in next iteration starts
-                  magma_queue_sync( queues[1] );
-                  // restore upper triangle of panel
-                  magma_dq_to_panel( MagmaUpper, ib, &work[i], ldwork, hwork+ib*ib );
-              }
-              else {
-                  // Apply H^H to A(i:m,i+ib:n) from the left
-                  magma_dlarfb_gpu( MagmaLeft, MagmaConjTrans, MagmaForward, MagmaColumnwise,
-                                    rows, n-i-ib, ib,
-                                    dA,    dA_offset + i + i * ldda,      ldda,
-                                    dT,    dT_offset,                     nb,
-                                    dA,    dA_offset + i + (i+ib) * ldda, ldda,
-                                    dwork, 0,                             lddwork, queues[1] );
-                  magma_dq_to_panel( MagmaUpper, ib, &work[i], ldwork, hwork+ib*ib );
-                  // Fix the diagonal block
-                  magma_dsetmatrix( ib, ib,
-                                    &work[i], ldwork,
-                                    dA, dA_offset + i + i * ldda, ldda, queues[1] );
-              }
-              old_i  = i;
-              old_ib = ib;
           }
+        old_i  = i;
+        old_ib = ib;
+        }
       }
-  } else {
-      i = 0;
-  }
+    }
+  else
+    {
+    i = 0;
+    }
 
   // Use unblocked code to factor the last or only block.
-  if (i < minmn) {
-      rows = m-i;
-      cols = n-i;
-      magma_dgetmatrix( rows, cols, dA, dA_offset + i + i * ldda, ldda, work, rows, queues[1] );
-      // see comments for lwork above
-      lhwork = lwork - rows*cols;
-      coot_fortran(coot_dgeqrf)( &rows, &cols, work, &rows, &tau[i], &work[rows * cols], &lhwork, info );
-      magma_dsetmatrix( rows, cols, work, rows, dA, dA_offset + i + i * ldda, ldda, queues[1] );
-  }
+  if (i < minmn)
+    {
+    rows = m-i;
+    cols = n-i;
+    magma_dgetmatrix( rows, cols, dA, dA_offset + i + i * ldda, ldda, work, rows, queues[1] );
+    // see comments for lwork above
+    lhwork = lwork - rows*cols;
+    coot_fortran(coot_dgeqrf)( &rows, &cols, work, &rows, &tau[i], &work[rows * cols], &lhwork, info );
+    magma_dsetmatrix( rows, cols, work, rows, dA, dA_offset + i + i * ldda, ldda, queues[1] );
+    }
 
   magma_queue_destroy( queues[0] );
   magma_queue_destroy( queues[1] );
@@ -237,4 +248,4 @@ magma_dgeqrf2_gpu
   magma_free_pinned( work );
 
   return *info;
-} // magma_dgeqrf2_gpu
+  } // magma_dgeqrf2_gpu

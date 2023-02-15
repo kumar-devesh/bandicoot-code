@@ -96,42 +96,46 @@ magma_dorglq
   lwkopt = m*nb;
   work[0] = magma_dmake_lwork( lwkopt );
   lquery = (lwork == -1);
-  if (m < 0) {
-      *info = -1;
-  } else if (n < 0 || n < m) {
-      *info = -2;
-  } else if (k < 0 || k > m) {
-      *info = -3;
-  } else if (lda < std::max( 1, m )) {
-      *info = -5;
-  } else if (lwork < std::max( 1, lwkopt ) && ! lquery) {
-      *info = -8;
-  }
+  if (m < 0)
+    *info = -1;
+  else if (n < 0 || n < m)
+    *info = -2;
+  else if (k < 0 || k > m)
+    *info = -3;
+  else if (lda < std::max( 1, m ))
+    *info = -5;
+  else if (lwork < std::max( 1, lwkopt ) && !lquery)
+    *info = -8;
 
-  if (*info != 0) {
-      //magma_xerbla( __func__, -(*info) );
-      return *info;
-  }
-  else if (lquery) {
-      return *info;
-  }
+  if (*info != 0)
+    {
+    //magma_xerbla( __func__, -(*info) );
+    return *info;
+    }
+  else if (lquery)
+    {
+    return *info;
+    }
 
   // Quick return if possible
-  if (m <= 0) {
-      work[0] = c_one;
-      return *info;
-  }
+  if (m <= 0)
+    {
+    work[0] = c_one;
+    return *info;
+    }
 
   // Need at least nb*nb to store T.
   // For better LAPACK compatibility, which needs M*NB,
   // allow lwork < NB*NB and allocate here if needed.
-  if (lwork < nb*nb) {
-      if (MAGMA_SUCCESS != magma_dmalloc_cpu( &work_local, lwkopt )) {
-          *info = MAGMA_ERR_HOST_ALLOC;
-          goto cleanup;
+  if (lwork < nb*nb)
+    {
+    if (MAGMA_SUCCESS != magma_dmalloc_cpu( &work_local, lwkopt ))
+      {
+      *info = MAGMA_ERR_HOST_ALLOC;
+      goto cleanup;
       }
-      work = work_local;
-  }
+    work = work_local;
+    }
 
   // Allocate GPU work space
   // ldda*n     for matrix dA
@@ -139,10 +143,11 @@ magma_dorglq
   // lddwork*nb for dW larfb workspace
   ldda    = magma_roundup( m, 32 );
   lddwork = magma_roundup( m, 32 );
-  if (MAGMA_SUCCESS != magma_dmalloc( &dA, ldda*n + n*nb + lddwork*nb + nb*nb )) {
-      *info = MAGMA_ERR_DEVICE_ALLOC;
-      goto cleanup;
-  }
+  if (MAGMA_SUCCESS != magma_dmalloc( &dA, ldda*n + n*nb + lddwork*nb + nb*nb ))
+    {
+    *info = MAGMA_ERR_DEVICE_ALLOC;
+    goto cleanup;
+    }
 
   magmaDouble_ptr dV, dW, dT;
   size_t dV_offset, dW_offset, dT_offset;
@@ -164,44 +169,47 @@ magma_dorglq
   ki = ((k - 1) / nb) * nb;
 
   // Use blocked code
-  for( i=ki; i >= 0; i -= nb ) {
-      ib = std::min( nb, k-i );
-      // first block has extra rows to update
-      mib = ib;
-      if ( i == ki ) {
-          mib = m - i;
+  for( i = ki; i >= 0; i -= nb )
+    {
+    ib = std::min( nb, k-i );
+    // first block has extra rows to update
+    mib = ib;
+    if ( i == ki )
+      {
+      mib = m - i;
       }
 
-      // Send current panel of V (block row) to the GPU
-      coot_fortran(coot_dlaset)("L", &ib, &ib, &c_zero, &c_one, &A[i + i * lda], &lda);
-      // TODO: having this _async was causing numerical errors. Why?
-      magma_dsetmatrix( ib, n-i,
-                              &A[i + i * lda], lda,
-                              dV, dV_offset,  nb, queue );
+    // Send current panel of V (block row) to the GPU
+    coot_fortran(coot_dlaset)("L", &ib, &ib, &c_zero, &c_one, &A[i + i * lda], &lda);
+    // TODO: having this _async was causing numerical errors. Why?
+    magma_dsetmatrix( ib, n-i,
+                      &A[i + i * lda], lda,
+                      dV, dV_offset,  nb, queue );
 
-      // Form the triangular factor of the block reflector
-      // H = H(i) H(i+1) . . . H(i+ib-1)
-      n_i = n - i;
-      coot_fortran(coot_dlarft)("F", "R", &n_i, &ib,
-                        &A[i + i * lda], &lda, &tau[i], work, &nb );
-      magma_dsetmatrix_async( ib, ib,
-                              work, nb,
-                              dT, dT_offset,   nb, queue );
+    // Form the triangular factor of the block reflector
+    // H = H(i) H(i+1) . . . H(i+ib-1)
+    n_i = n - i;
+    coot_fortran(coot_dlarft)("F", "R", &n_i, &ib,
+                              &A[i + i * lda], &lda, &tau[i], work, &nb );
+    magma_dsetmatrix_async( ib, ib,
+                            work, nb,
+                            dT, dT_offset,   nb, queue );
 
-      // set panel of A (block row) to identity
-      magmablas_dlaset( MagmaFull, mib, i,   c_zero, c_zero, dA, i,            ldda, queue );
-      magmablas_dlaset( MagmaFull, mib, n-i, c_zero, c_one,  dA, i + i * ldda, ldda, queue );
+    // set panel of A (block row) to identity
+    magmablas_dlaset( MagmaFull, mib, i,   c_zero, c_zero, dA, i,            ldda, queue );
+    magmablas_dlaset( MagmaFull, mib, n-i, c_zero, c_one,  dA, i + i * ldda, ldda, queue );
 
-      if (i < m) {
-          // Apply H**H to A(i:m,i:n) from the right
-          magma_dlarfb_gpu( MagmaRight, MagmaConjTrans, MagmaForward, MagmaRowwise,
-                            m-i, n-i, ib,
-                            dV, dV_offset, nb,
-                            dT, dT_offset, nb,
-                            dA, i + i * ldda, ldda,
-                            dW, dW_offset, lddwork, queue );
+    if (i < m)
+      {
+      // Apply H**H to A(i:m,i:n) from the right
+      magma_dlarfb_gpu( MagmaRight, MagmaConjTrans, MagmaForward, MagmaRowwise,
+                        m-i, n-i, ib,
+                        dV, dV_offset, nb,
+                        dT, dT_offset, nb,
+                        dA, i + i * ldda, ldda,
+                        dW, dW_offset, lddwork, queue );
       }
-  }
+    }
 
   // copy result back to CPU
   magma_dgetmatrix( m, n, dA, 0, ldda, A, lda, queue );

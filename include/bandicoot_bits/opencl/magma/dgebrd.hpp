@@ -65,173 +65,190 @@ magma_get_dgebrd_nb(magma_int_t m, magma_int_t n)
 
 inline
 magma_int_t
-magma_dgebrd(
-    magma_int_t m, magma_int_t n,
-    double *A, magma_int_t lda, double *d, double *e,
-    double *tauq, double *taup,
-    double *work, magma_int_t lwork,
-    magma_int_t *info)
-{
-    double c_neg_one = MAGMA_D_NEG_ONE;
-    double c_one     = MAGMA_D_ONE;
-    magmaDouble_ptr dA, dwork;
+magma_dgebrd
+  (
+  magma_int_t m, magma_int_t n,
+  double *A, magma_int_t lda, double *d, double *e,
+  double *tauq, double *taup,
+  double *work, magma_int_t lwork,
+  magma_int_t *info
+  )
+  {
+  double c_neg_one = MAGMA_D_NEG_ONE;
+  double c_one     = MAGMA_D_ONE;
+  magmaDouble_ptr dA, dwork;
 
-    magma_int_t ncol, nrow, jmax, nb, ldda;
+  magma_int_t ncol, nrow, jmax, nb, ldda;
 
-    magma_int_t i, j, nx;
-    magma_int_t iinfo;
+  magma_int_t i, j, nx;
+  magma_int_t iinfo;
 
-    magma_int_t minmn;
-    magma_int_t ldwrkx, ldwrky, lwkopt;
-    magma_int_t lquery;
+  magma_int_t minmn;
+  magma_int_t ldwrkx, ldwrky, lwkopt;
+  magma_int_t lquery;
 
-    nb   = magma_get_dgebrd_nb( m, n );
-    ldda = m;
+  nb   = magma_get_dgebrd_nb( m, n );
+  ldda = m;
 
-    lwkopt = (m + n) * nb;
-    work[0] = magma_dmake_lwork( lwkopt );
-    lquery = (lwork == -1);
+  lwkopt = (m + n) * nb;
+  work[0] = magma_dmake_lwork( lwkopt );
+  lquery = (lwork == -1);
 
-    /* Check arguments */
-    *info = 0;
-    if (m < 0) {
-        *info = -1;
-    } else if (n < 0) {
-        *info = -2;
-    } else if (lda < std::max(1,m)) {
-        *info = -4;
-    } else if (lwork < lwkopt && (! lquery) ) {
-        *info = -10;
+  /* Check arguments */
+  *info = 0;
+  if (m < 0)
+    *info = -1;
+  else if (n < 0)
+    *info = -2;
+  else if (lda < std::max(1,m))
+    *info = -4;
+  else if (lwork < lwkopt && (! lquery) )
+    *info = -10;
+
+  if (*info < 0)
+    {
+    // magma_xerbla( __func__, -(*info) );
+    return *info;
     }
-    if (*info < 0) {
-        // magma_xerbla( __func__, -(*info) );
-        return *info;
-    }
-    else if (lquery)
-        return *info;
-
-    /* Quick return if possible */
-    minmn = std::min(m,n);
-    if (minmn == 0) {
-        work[0] = c_one;
-        return *info;
+  else if (lquery)
+    {
+    return *info;\
     }
 
-    // TODO: can we reuse this?
-    magma_queue_t queue = NULL;
-    magma_device_t cdev;
-    magma_getdevice( &cdev );
-    magma_queue_create( cdev, &queue );
-
-    double *work2;
-    magma_int_t lwork2 = std::max(m,n);
-    if (MAGMA_SUCCESS != magma_dmalloc_cpu( &work2, lwork2 )) {
-        *info = MAGMA_ERR_HOST_ALLOC;
-        return *info;
-    }
-    if (MAGMA_SUCCESS != magma_dmalloc( &dA, n*ldda + (m + n)*nb )) {
-        magma_free_cpu( work2 );
-        *info = MAGMA_ERR_DEVICE_ALLOC;
-        return *info;
-    }
-    dwork = dA;
-    size_t dwork_offset = n*ldda;
-
-    ldwrkx = m;
-    ldwrky = n;
-
-    /* Set the block/unblock crossover point NX. */
-    nx = 128;
-
-    /* Copy the matrix to the GPU */
-    if (minmn - nx >= 1) {
-        magma_dsetmatrix( m, n, A, lda, dA, 0, ldda, queue );
+  /* Quick return if possible */
+  minmn = std::min(m,n);
+  if (minmn == 0)
+    {
+    work[0] = c_one;
+    return *info;
     }
 
-    for (i=0; i < (minmn - nx); i += nb) {
-        /*  Reduce rows and columns i:i+nb-1 to bidiagonal form and return
-            the matrices X and Y which are needed to update the unreduced
-            part of the matrix */
-        nrow = m - i;
-        ncol = n - i;
+  // TODO: can we reuse this?
+  magma_queue_t queue = NULL;
+  magma_device_t cdev;
+  magma_getdevice( &cdev );
+  magma_queue_create( cdev, &queue );
 
-        /* Get the current panel (no need for the 1st iteration) */
-        if ( i > 0 ) {
-            magma_dgetmatrix( nrow, nb,
-                              dA, i + i * ldda, ldda,
-                              &A[i + i * lda], lda, queue );
-            magma_dgetmatrix( nb, ncol - nb,
-                              dA, i + (i+nb) * ldda, ldda,
-                              &A[i + (i+nb) * lda], lda, queue );
-        }
+  double *work2;
+  magma_int_t lwork2 = std::max(m,n);
+  if (MAGMA_SUCCESS != magma_dmalloc_cpu( &work2, lwork2 ))
+    {
+    *info = MAGMA_ERR_HOST_ALLOC;
+    return *info;
+    }
+  if (MAGMA_SUCCESS != magma_dmalloc( &dA, n*ldda + (m + n)*nb ))
+    {
+    magma_free_cpu( work2 );
+    *info = MAGMA_ERR_DEVICE_ALLOC;
+    return *info;
+    }
+  dwork = dA;
+  size_t dwork_offset = n*ldda;
 
-        magma_dlabrd_gpu(nrow, ncol, nb,
-                         &A[i + i * lda],  lda,    dA, i + (i * ldda),          ldda,
-                         d+i, e+i, tauq+i, taup+i,
-                         work,             ldwrkx, dwork, dwork_offset,               ldwrkx,  // x, dx
-                         work+(ldwrkx*nb), ldwrky, dwork, dwork_offset + (ldwrkx*nb), ldwrky,
-                         work2, lwork2, queue ); // y, dy
+  ldwrkx = m;
+  ldwrky = n;
 
-        /*  Update the trailing submatrix A(i+nb:m,i+nb:n), using an update
-            of the form  A := A - V*Y' - X*U' */
-        nrow = m - i - nb;
-        ncol = n - i - nb;
+  /* Set the block/unblock crossover point NX. */
+  nx = 128;
 
-        // Send Y back to the GPU
-        magma_dsetmatrix( nrow, nb,
-                          work + nb, ldwrkx,
-                          dwork, dwork_offset + nb, ldwrkx, queue );
-        magma_dsetmatrix( ncol, nb,
-                          work + (ldwrkx+1)*nb,                ldwrky,
-                          dwork, dwork_offset + (ldwrkx+1)*nb, ldwrky, queue );
-
-        magma_dgemm( MagmaNoTrans, MagmaConjTrans,
-                     nrow, ncol, nb,
-                     c_neg_one, dA,    (i+nb) + i * ldda,                     ldda,
-                                dwork, dwork_offset + (ldwrkx+1) * nb,        ldwrky,
-                     c_one,     dA,    (i+nb) + (i+nb) * ldda,                ldda, queue );
-
-        magma_dgemm( MagmaNoTrans, MagmaNoTrans,
-                     nrow, ncol, nb,
-                     c_neg_one, dwork, dwork_offset + nb,   ldwrkx,
-                                dA,      i + (i+nb) * ldda, ldda,
-                     c_one,     dA, (i+nb) + (i+nb) * ldda, ldda, queue );
-
-        /* Copy diagonal and off-diagonal elements of B back into A */
-        if (m >= n) {
-            jmax = i + nb;
-            for (j = i; j < jmax; ++j) {
-                A[j +     j * lda] = d[j];
-                A[j + (j+1) * lda] = e[j];
-            }
-        } else {
-            jmax = i + nb;
-            for (j = i; j < jmax; ++j) {
-                A[j +   j * lda] = d[j];
-                A[j+1 + j * lda] = e[j];
-            }
-        }
+  /* Copy the matrix to the GPU */
+  if (minmn - nx >= 1)
+    {
+    magma_dsetmatrix( m, n, A, lda, dA, 0, ldda, queue );
     }
 
-    /* Use unblocked code to reduce the remainder of the matrix */
+  for (i = 0; i < (minmn - nx); i += nb)
+    {
+    /*  Reduce rows and columns i:i+nb-1 to bidiagonal form and return
+        the matrices X and Y which are needed to update the unreduced
+        part of the matrix */
     nrow = m - i;
     ncol = n - i;
 
-    if ( 0 < minmn - nx ) {
-        magma_dgetmatrix( nrow, ncol,
-                          dA, i + i * ldda, ldda,
-                          &A[i + i * lda], lda, queue );
+    /* Get the current panel (no need for the 1st iteration) */
+    if ( i > 0 )
+      {
+      magma_dgetmatrix( nrow, nb,
+                        dA, i + i * ldda, ldda,
+                        &A[i + i * lda], lda, queue );
+      magma_dgetmatrix( nb, ncol - nb,
+                        dA, i + (i+nb) * ldda, ldda,
+                        &A[i + (i+nb) * lda], lda, queue );
+      }
+
+    magma_dlabrd_gpu(nrow, ncol, nb,
+                     &A[i + i * lda],  lda,    dA, i + (i * ldda),          ldda,
+                     d+i, e+i, tauq+i, taup+i,
+                     work,             ldwrkx, dwork, dwork_offset,               ldwrkx,  // x, dx
+                     work+(ldwrkx*nb), ldwrky, dwork, dwork_offset + (ldwrkx*nb), ldwrky,
+                     work2, lwork2, queue ); // y, dy
+
+    /*  Update the trailing submatrix A(i+nb:m,i+nb:n), using an update
+        of the form  A := A - V*Y' - X*U' */
+    nrow = m - i - nb;
+    ncol = n - i - nb;
+
+    // Send Y back to the GPU
+    magma_dsetmatrix( nrow, nb,
+                      work + nb, ldwrkx,
+                      dwork, dwork_offset + nb, ldwrkx, queue );
+    magma_dsetmatrix( ncol, nb,
+                      work + (ldwrkx+1)*nb,                ldwrky,
+                      dwork, dwork_offset + (ldwrkx+1)*nb, ldwrky, queue );
+
+    magma_dgemm( MagmaNoTrans, MagmaConjTrans,
+                 nrow, ncol, nb,
+                 c_neg_one, dA,    (i+nb) + i * ldda,                     ldda,
+                            dwork, dwork_offset + (ldwrkx+1) * nb,        ldwrky,
+                 c_one,     dA,    (i+nb) + (i+nb) * ldda,                ldda, queue );
+
+    magma_dgemm( MagmaNoTrans, MagmaNoTrans,
+                 nrow, ncol, nb,
+                 c_neg_one, dwork, dwork_offset + nb,   ldwrkx,
+                            dA,      i + (i+nb) * ldda, ldda,
+                 c_one,     dA, (i+nb) + (i+nb) * ldda, ldda, queue );
+
+    /* Copy diagonal and off-diagonal elements of B back into A */
+    if (m >= n)
+      {
+      jmax = i + nb;
+      for (j = i; j < jmax; ++j)
+        {
+        A[j +     j * lda] = d[j];
+        A[j + (j+1) * lda] = e[j];
+        }
+      }
+    else
+      {
+      jmax = i + nb;
+      for (j = i; j < jmax; ++j)
+        {
+        A[j +   j * lda] = d[j];
+        A[j+1 + j * lda] = e[j];
+        }
+      }
     }
 
-    coot_fortran(coot_dgebrd)( &nrow, &ncol,
-                      &A[i + i * lda], &lda, d+i, e+i,
-                      tauq+i, taup+i, work, &lwork, &iinfo);
-    work[0] = magma_dmake_lwork( lwkopt );
+  /* Use unblocked code to reduce the remainder of the matrix */
+  nrow = m - i;
+  ncol = n - i;
 
-    magma_free_cpu( work2 );
-    magma_free( dA );
+  if ( 0 < minmn - nx )
+    {
+    magma_dgetmatrix( nrow, ncol,
+                      dA, i + i * ldda, ldda,
+                      &A[i + i * lda], lda, queue );
+    }
 
-    magma_queue_destroy( queue );
+  coot_fortran(coot_dgebrd)( &nrow, &ncol,
+                    &A[i + i * lda], &lda, d+i, e+i,
+                    tauq+i, taup+i, work, &lwork, &iinfo);
+  work[0] = magma_dmake_lwork( lwkopt );
 
-    return *info;
-} /* magma_dgebrd */
+  magma_free_cpu( work2 );
+  magma_free( dA );
+
+  magma_queue_destroy( queue );
+
+  return *info;
+  } /* magma_dgebrd */
