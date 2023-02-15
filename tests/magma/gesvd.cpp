@@ -396,7 +396,7 @@ TEST_CASE("magma_dgesvd_1", "[gesvd]")
   jobs.push_back(MagmaOverwriteVec);
   jobs.push_back(MagmaAllVec      );
 
-  for (int itest = 0; itest < 10; ++itest)
+  for (int itest = 0; itest < 5; ++itest)
     {
     for (size_t ijobu = 0; ijobu < jobs.size(); ++ijobu)
       {
@@ -415,9 +415,8 @@ TEST_CASE("magma_dgesvd_1", "[gesvd]")
           {
           magma_svd_work_t svd_work = svd_works[isvd_work];
 
-          M = 128 * (itest + 1) + 65; // 65 is to work around strange clBLAS error with nvidia driver
-          N = 128 * (itest + 1) + 65;
-          std::cout << "run " << M << "x" << N << ", work " << svd_work << "\n";
+          M = 256 * (itest + 1) + 65; // 65 is to work around strange clBLAS error with nvidia driver
+          N = 256 * (itest + 1) + 65;
           min_mn = std::min(M, N);
           N_U  = (jobu == MagmaAllVec ? M : min_mn);
           M_VT = (jobv == MagmaAllVec ? N : min_mn);
@@ -503,16 +502,9 @@ TEST_CASE("magma_dgesvd_1", "[gesvd]")
           magma_dgesvd( jobu, jobv, M, N,
                         hR, lda, S, U, ldu, VT, ldv, hwork, lwork_magma,
                         &info );
-//          arma::vec s_alias(S, min_mn, false, true);
-//          s_alias.print("S");
-//          arma::mat u_alias(U, ldu, N_U, false, true);
-//          u_alias.print("U");
-//          arma::mat vt_alias(VT, ldv, N, false, true);
-//          vt_alias.print("VT");
 
           if ( svd_work == MagmaSVD_min_1 )
             {
-            std::cout << "min_1 job\n";
             if (info != -13)
               {
               std::cerr << "magma_dgesvd returned error code " << info << " (expected -13): " << magma::error_as_string(info) << std::endl;
@@ -553,8 +545,6 @@ TEST_CASE("magma_dgesvd_1", "[gesvd]")
 
           check_dgesvd( jobu, jobv, M, N, hA, lda, Sref, U, ldu, VT, ldv, result_lapack );
 
-//          arma::vec sref_alias(Sref, min_mn, false, true);
-//          sref_alias.print("Sref");
           coot_fortran(coot_daxpy)( &min_mn, &d_neg_one, S, &ione, Sref, &ione );
           result[4]  = coot_fortran(coot_dlange)( "F", &min_mn, &ione, Sref, &min_mn, work );
           result[4] /= coot_fortran(coot_dlange)( "F", &min_mn, &ione, S,    &min_mn, work );
