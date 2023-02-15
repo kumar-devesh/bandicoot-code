@@ -160,4 +160,109 @@ TEST_CASE("magma_dorgqr2_1", "[orgqr2]")
     }
   }
 
+
+
+TEST_CASE("magma_sorgqr2_1", "[orgqr2]")
+  {
+  if (get_rt().backend != CL_BACKEND)
+    {
+    return;
+    }
+
+  float           Anorm, error, work[1];
+  float  c_neg_one = MAGMA_S_NEG_ONE;
+  float *hA, *hR, *tau, *h_work, *hT;
+  magmaFloat_ptr dA, dT;
+  magma_int_t m, n, k;
+  magma_int_t n2, lda, ldda, lwork, min_mn, nb, info;
+  magma_int_t ione     = 1;
+
+  magma_queue_t queue = magma_queue_create();
+
+  float tol = 30 * std::numeric_limits<float>::epsilon();
+
+  for (int itest = 0; itest < 10; ++itest)
+    {
+    // Strange sizes seem necessary to work around what appear to be nvidia
+    // OpenCL driver bugs.
+    m = 64 * (itest + 1) + 75;
+    n = 64 * (itest + 1) + 75;
+    k = 64 * (itest + 1) + 75;
+
+    lda  = m;
+    ldda = magma_roundup( m, 32 );  // multiple of 32 by default
+    n2 = lda*n;
+    min_mn = std::min(m, n);
+    nb = magma_get_dgeqrf_nb( m, n );
+    lwork  = n*nb;
+
+    REQUIRE( magma_smalloc_pinned( &hR,     lda*n  ) == MAGMA_SUCCESS );
+
+    REQUIRE( magma_smalloc_cpu( &hA,     lda*n  ) == MAGMA_SUCCESS );
+    REQUIRE( magma_smalloc_cpu( &tau,    min_mn ) == MAGMA_SUCCESS );
+    REQUIRE( magma_smalloc_cpu( &h_work, lwork  ) == MAGMA_SUCCESS );
+    REQUIRE( magma_smalloc_cpu( &hT,     min_mn*nb ) == MAGMA_SUCCESS );
+
+    REQUIRE( magma_smalloc( &dA,     ldda*n ) == MAGMA_SUCCESS );
+    REQUIRE( magma_smalloc( &dT,     ( 2*min_mn + magma_roundup( n, 32 ) )*nb ) == MAGMA_SUCCESS );
+
+    // By default this uses a random uniform matrix.  We use Armadillo to create
+    // that.
+    arma::Mat<float> hA_alias(hA, lda, n, false, true);
+    hA_alias.randu();
+    coot_fortran(coot_slacpy)( "F", &m, &n, hA, &lda, hR, &lda );
+
+    Anorm = coot_fortran(coot_slange)("F", &m, &n, hA, &lda, work );
+
+    /* ====================================================================
+       Performs operation using MAGMA
+       =================================================================== */
+    // first, get QR factors in both hA and hR
+    // okay that magma_sgeqrf_gpu has special structure for R; R isn't used here.
+    magma_ssetmatrix( m, n, hA, lda, dA, 0, ldda, queue );
+    magma_sgeqrf_gpu( m, n, dA, 0, ldda, tau, dT, 0, &info );
+    if (info != 0)
+      {
+      std::cerr << "magma_sgeqrf() returned error " << info << ": " << magma::error_as_string(info) << std::endl;
+      }
+    REQUIRE( info == 0 );
+    magma_sgetmatrix( m, n, dA, 0, ldda, hA, lda, queue );
+    coot_fortran(coot_slacpy)( "F", &m, &n, hA, &lda, hR, &lda );
+    magma_sgetmatrix( nb, min_mn, dT, 0, nb, hT, nb, queue );  // for multi GPU
+
+    magma_sorgqr2( m, n, k, hR, lda, tau, &info );
+    if (info != 0)
+      {
+      std::cerr << "magma_sorgqr2() returned error " << info << ": " << magma::error_as_string(info) << std::endl;
+      }
+    REQUIRE( info == 0 );
+
+    /* =====================================================================
+       Performs operation using LAPACK
+       =================================================================== */
+    coot_fortran(coot_sorgqr)( &m, &n, &k, hA, &lda, tau, h_work, &lwork, &info );
+    if (info != 0)
+      {
+      std::cerr << "coot_sorgqr returned error " << info << ": " << magma::error_as_string(info) << std::endl;
+      }
+    REQUIRE( info == 0 );
+
+    // compute relative error |R|/|A| := |Q_magma - Q_lapack|/|A|
+    coot_fortran(coot_saxpy)( &n2, &c_neg_one, hA, &ione, hR, &ione );
+    error = coot_fortran(coot_slange)("F", &m, &n, hR, &lda, work) / Anorm;
+
+    REQUIRE( error < tol );
+
+    magma_free_pinned( hR     );
+
+    magma_free_cpu( hA  );
+    magma_free_cpu( tau );
+    magma_free_cpu( h_work );
+    magma_free_cpu( hT  );
+
+    magma_free( dA );
+    magma_free( dT );
+    }
+  }
+
 #endif

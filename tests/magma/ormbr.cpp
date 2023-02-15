@@ -241,4 +241,157 @@ TEST_CASE("magma_dormbr_1", "[ormbr]")
     }
   }
 
+
+
+TEST_CASE("magma_sormbr_1", "[ormbr]")
+  {
+  if (get_rt().backend != CL_BACKEND)
+    {
+    return;
+    }
+
+  float Cnorm, error, dwork[1];
+  float c_neg_one = MAGMA_S_NEG_ONE;
+  magma_int_t ione = 1;
+  magma_int_t m, n, k, mm, nn, nq, size, info;
+  magma_int_t ISEED[4] = {0,0,0,1};
+  magma_int_t nb, ldc, lda, lwork, lwork_max;
+  float *C, *R, *A, *work, *tau, *tauq, *taup;
+  float *d, *e;
+
+  float tol = 60 * std::numeric_limits<float>::epsilon();
+
+  // test all combinations of input parameters
+  magma_vect_t  vect [] = { MagmaQ,          MagmaP       };
+  magma_side_t  side [] = { MagmaLeft,       MagmaRight   };
+  magma_trans_t trans[] = { MagmaTrans, MagmaNoTrans };
+
+  for (int itest = 0; itest < 10; ++itest)
+    {
+    for (int ivect = 0; ivect < 2; ++ivect)
+      {
+      for (int iside = 0; iside < 2; ++iside)
+        {
+        for (int itran = 0; itran < 2; ++itran)
+          {
+          m = 128 * (itest + 1) + 63;
+          n = 128 * (itest + 1) + 63;
+          k = 128 * (itest + 1) + 63;
+          nb  = magma_get_sgebrd_nb( m, n );
+          ldc = m;
+          // A is mm x nn == nq x k (vect=Q) or k x nq (vect=P)
+          // where nq=m (left) or nq=n (right)
+          nq  = (side[iside] == MagmaLeft ? m  : n );
+          mm  = (vect[ivect] == MagmaQ    ? nq : k );
+          nn  = (vect[ivect] == MagmaQ    ? k  : nq);
+          lda = mm;
+
+          // workspace for gebrd is (mm + nn)*nb
+          // workspace for unmbr is m*nb or n*nb, depending on side
+          lwork_max = std::max( (mm + nn)*nb, std::max( m*nb, n*nb ));
+          // this rounds it up slightly if needed to agree with lwork query below
+          lwork_max = magma_int_t( float( magma_smake_lwork( lwork_max )));
+
+          REQUIRE( magma_smalloc_cpu( &C,    ldc*n ) == MAGMA_SUCCESS );
+          REQUIRE( magma_smalloc_cpu( &R,    ldc*n ) == MAGMA_SUCCESS );
+          REQUIRE( magma_smalloc_cpu( &A,    lda*nn ) == MAGMA_SUCCESS );
+          REQUIRE( magma_smalloc_cpu( &work, lwork_max ) == MAGMA_SUCCESS );
+          REQUIRE( magma_smalloc_cpu( &d,    std::min(mm,nn) ) == MAGMA_SUCCESS );
+          REQUIRE( magma_smalloc_cpu( &e,    std::min(mm,nn) ) == MAGMA_SUCCESS );
+          REQUIRE( magma_smalloc_cpu( &tauq, std::min(mm,nn) ) == MAGMA_SUCCESS );
+          REQUIRE( magma_smalloc_cpu( &taup, std::min(mm,nn) ) == MAGMA_SUCCESS );
+
+          // C is full, m x n
+          size = ldc*n;
+          coot_fortran(coot_slarnv)( &ione, ISEED, &size, C );
+          coot_fortran(coot_slacpy)( "F", &m, &n, C, &ldc, R, &ldc );
+
+          // By default the original code used uniform random matrices.
+          arma::Mat<float> A_alias(A, lda, nn, false, true);
+          A_alias.randu();
+
+          // compute BRD factorization to get Householder vectors in A, tauq, taup
+          magma_sgebrd( mm, nn, A, lda, d, e, tauq, taup, work, lwork_max, &info );
+          if (info != 0)
+            {
+            std::cerr << "magma_sgebrd returned error " << info << ": " << magma::error_as_string(info) << std::endl;
+            }
+          REQUIRE( info == 0 );
+
+          if ( vect[ivect] == MagmaQ )
+            {
+            tau = tauq;
+            }
+          else
+            {
+            tau = taup;
+            }
+
+          /* =====================================================================
+             Performs operation using LAPACK
+             =================================================================== */
+          coot_fortran(coot_sormbr)( lapack_vect_const( vect[ivect] ),
+                                     lapack_side_const( side[iside] ),
+                                     lapack_trans_const( trans[itran] ),
+                                     &m, &n, &k,
+                                     A, &lda, tau, C, &ldc, work, &lwork_max, &info );
+          if (info != 0)
+            {
+            std::cerr << "sormbr returned error " << info << ": " << magma::error_as_string(info) << std::endl;
+            }
+          REQUIRE( info == 0 );
+
+          /* ====================================================================
+             Performs operation using MAGMA
+             =================================================================== */
+          // query for workspace size
+          lwork = -1;
+          magma_sormbr( vect[ivect], side[iside], trans[itran],
+                        m, n, k,
+                        A, lda, tau, R, ldc, work, lwork, &info );
+          if (info != 0)
+            {
+            std::cerr << "magma_sormbr (lwork query) returned error " << info << ": " << magma::error_as_string(info) << std::endl;
+            }
+          REQUIRE( info == 0 );
+          lwork = magma_int_t( work[0] );
+          if ( lwork < 0 || lwork > lwork_max )
+            {
+            std::cerr << "warning: optimal lwork " << lwork << " > allocated lwork_max " << lwork_max << std::endl;
+            lwork = lwork_max;
+            }
+
+          magma_sormbr( vect[ivect], side[iside], trans[itran],
+                        m, n, k,
+                        A, lda, tau, R, ldc, work, lwork, &info );
+          if (info != 0)
+            {
+            std::cerr << "magma_sormbr returned error " << info << ": " << magma::error_as_string(info) << std::endl;
+            }
+          REQUIRE( info == 0 );
+
+          /* =====================================================================
+             compute relative error |QC_magma - QC_lapack| / |QC_lapack|
+             =================================================================== */
+          size = ldc*n;
+          coot_fortran(coot_saxpy)( &size, &c_neg_one, C, &ione, R, &ione );
+          Cnorm = coot_fortran(coot_slange)( "F", &m, &n, C, &ldc, dwork );
+          error = coot_fortran(coot_slange)( "F", &m, &n, R, &ldc, dwork ) / (std::sqrt(m*n) * Cnorm);
+
+          REQUIRE( error < tol );
+
+          magma_free_cpu( C );
+          magma_free_cpu( R );
+          magma_free_cpu( A );
+          magma_free_cpu( work );
+          magma_free_cpu( d );
+          magma_free_cpu( e );
+          magma_free_cpu( taup );
+          magma_free_cpu( tauq );
+          }
+        }
+      }
+    }
+  }
+
 #endif

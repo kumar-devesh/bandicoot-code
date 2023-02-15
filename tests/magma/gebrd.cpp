@@ -165,4 +165,114 @@ TEST_CASE("magma_dgebrd_1", "[gebrd]")
     }
   }
 
+
+
+TEST_CASE("magma_sgebrd_1", "[gebrd]")
+  {
+  if (get_rt().backend != CL_BACKEND)
+    {
+    return;
+    }
+
+  float *h_A, *h_Q, *h_PT, *h_work;
+  float *taup, *tauq;
+  float      *diag, *offdiag;
+  float      eps, result[3] = {0., 0., 0.};
+  magma_int_t M, N, n2, lda, lhwork, info, minmn, nb;
+  magma_int_t ione     = 1;
+
+  eps = std::numeric_limits<float>::epsilon();
+
+  float tol = 30. * eps;
+
+  for( int itest = 0; itest < 4; ++itest )
+    {
+    // Smaller test sizes are to work around nvidia OpenCL compiler bugs that manifest in -9999 GEMM compilation errors in clBLAS.  Sigh.
+    M = 64 * (itest + 1) + 64;
+    N = 64 * (itest + 1) + 64;
+    minmn  = std::min(M, N);
+    nb     = magma_get_sgebrd_nb(N, N);
+    lda    = M;
+    n2     = lda*N;
+    lhwork = (M + N)*nb;
+
+    REQUIRE( magma_malloc_cpu( (void**) &h_A,     (lda*N   ) * sizeof(float) ) == MAGMA_SUCCESS );
+    REQUIRE( magma_malloc_cpu( (void**) &tauq,    (minmn   ) * sizeof(float) ) == MAGMA_SUCCESS );
+    REQUIRE( magma_malloc_cpu( (void**) &taup,    (minmn   ) * sizeof(float) ) == MAGMA_SUCCESS );
+    REQUIRE( magma_malloc_cpu( (void**) &diag,    (minmn   ) * sizeof(float) ) == MAGMA_SUCCESS );
+    REQUIRE( magma_malloc_cpu( (void**) &offdiag, (minmn-1 ) * sizeof(float) ) == MAGMA_SUCCESS );
+
+    REQUIRE( magma_malloc_cpu( (void**) &h_Q,     (lda*N   ) * sizeof(float) ) == MAGMA_SUCCESS );
+    REQUIRE( magma_malloc_cpu( (void**) &h_work,  (lhwork  ) * sizeof(float) ) == MAGMA_SUCCESS );
+
+    /* Initialize the matrices */
+    magma_int_t ISEED[4] = {0,0,0,1};
+    coot_fortran(coot_slarnv)( &ione, ISEED, &n2, h_A );
+    coot_fortran(coot_slacpy)( "A", &M, &N, h_A, &lda, h_Q, &lda );
+
+    /* ====================================================================
+       Performs operation using MAGMA
+       =================================================================== */
+    magma_sgebrd( M, N, h_Q, lda,
+                  diag, offdiag, tauq, taup,
+                  h_work, lhwork, &info );
+    if (info != 0)
+      {
+      std::cerr << "magma_sgebrd returned error " << info << ": " << magma::error_as_string( info ) << std::endl;
+      }
+    REQUIRE( info == 0 );
+
+    // Now check the factorization.
+
+    // dorgbr prefers minmn*NB
+    // dbdt01 needs M+N
+    // dort01 prefers minmn*(minmn+1) to check Q and P
+    magma_int_t lwork_err;
+    float *h_work_err;
+    lwork_err = std::max( minmn * nb, M+N );
+    lwork_err = std::max( lwork_err, minmn*(minmn+1) );
+    REQUIRE( magma_malloc_cpu( (void**) &h_PT,       (lda*N     ) * sizeof(float) ) == MAGMA_SUCCESS );
+    REQUIRE( magma_malloc_cpu( (void**) &h_work_err, (lwork_err ) * sizeof(float) ) == MAGMA_SUCCESS );
+
+    coot_fortran(coot_slacpy)( "A", &M, &N, h_Q, &lda, h_PT, &lda );
+
+    // generate Q & P'
+    coot_fortran(coot_sorgbr)( "Q", &M, &minmn, &N, h_Q, &lda, tauq, h_work_err, &lwork_err, &info );
+    if (info != 0)
+      {
+      std::cerr << "lapackf77_sorgbr #1 returned error " << info << ": " << magma::error_as_string( magma_int_t(info) ) << std::endl;
+      }
+    REQUIRE( info == 0 );
+    coot_fortran(coot_sorgbr)( "P", &minmn, &N, &M, h_PT, &lda, taup, h_work_err, &lwork_err, &info );
+    if (info != 0)
+      {
+      std::cerr << "lapackf77_sorgbr #2 returned error " << info << ": " << magma::error_as_string( magma_int_t(info) ) << std::endl;
+      }
+    REQUIRE( info == 0 );
+
+    // Test 1:  Check the decomposition A := Q * B * PT
+    //      2:  Check the orthogonality of Q
+    //      3:  Check the orthogonality of PT
+    coot_fortran(coot_sbdt01)(&M, &N, &ione, h_A, &lda, h_Q, &lda, diag, offdiag, h_PT, &lda, h_work_err, &result[0]);
+    coot_fortran(coot_sort01)("C", &M, &minmn, h_Q, &lda, h_work_err, &lwork_err, &result[1]);
+    coot_fortran(coot_sort01)("R", &minmn, &N, h_PT, &lda, h_work_err, &lwork_err, &result[2]);
+
+    magma_free_cpu( h_PT );
+    magma_free_cpu( h_work_err );
+
+    REQUIRE( result[0] * eps < tol );
+    REQUIRE( result[1] * eps < tol );
+    REQUIRE( result[2] * eps < tol );
+
+    magma_free_cpu( h_A     );
+    magma_free_cpu( tauq    );
+    magma_free_cpu( taup    );
+    magma_free_cpu( diag    );
+    magma_free_cpu( offdiag );
+
+    magma_free_cpu( h_Q    );
+    magma_free_cpu( h_work );
+    }
+  }
+
 #endif

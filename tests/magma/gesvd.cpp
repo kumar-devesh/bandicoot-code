@@ -575,4 +575,307 @@ TEST_CASE("magma_dgesvd_1", "[gesvd]")
     }
   }
 
+
+
+inline
+void
+check_sgesvd(magma_vec_t jobu,
+             magma_vec_t jobv,
+             magma_int_t m, magma_int_t n,
+             float *A,  magma_int_t lda,
+             float *S,
+             float *U,  magma_int_t ldu,
+             float *VT, magma_int_t ldv,
+             float result[4])
+  {
+  float unused[1];
+  const magma_int_t izero = 0;
+  float eps = std::numeric_limits<float>::epsilon();
+
+  if (jobu == MagmaNoVec)
+    U = NULL;
+  if (jobv == MagmaNoVec)
+    VT = NULL;
+
+  // -1 indicates check not done
+  result[0] = -1;
+  result[1] = -1;
+  result[2] = -1;
+  result[3] = -1;
+
+  magma_int_t min_mn = std::min(m, n);
+  magma_int_t n_u  = (jobu == MagmaAllVec ? m : min_mn);
+  magma_int_t m_vt = (jobv == MagmaAllVec ? n : min_mn);
+
+  // dbdt01 needs m+n
+  // dort01 prefers n*(n+1) to check U; m*(m+1) to check V
+  magma_int_t lwork_err = m+n;
+  if (U != NULL)
+    lwork_err = std::max( lwork_err, n_u*(n_u+1) );
+  if (VT != NULL)
+    lwork_err = std::max( lwork_err, m_vt*(m_vt+1) );
+  float *work_err;
+  REQUIRE( magma_smalloc_cpu( &work_err, lwork_err ) == MAGMA_SUCCESS );
+
+  // dbdt01 and dort01 need max(m,n), depending
+  float *rwork_err;
+  REQUIRE( magma_smalloc_cpu( &rwork_err, std::max(m,n) ) == MAGMA_SUCCESS );
+
+  if (U != NULL && VT != NULL)
+    {
+    // since KD=0 (3rd arg), E is not referenced so pass unused (9th arg)
+    coot_fortran(coot_sbdt01)( &m, &n, &izero, A, &lda,
+                               U, &ldu, S, unused, VT, &ldv,
+                               work_err,
+                               &result[0] );
+    }
+  if ( U != NULL )
+    {
+    coot_fortran(coot_sort01)( "C", &m,  &n_u, U,  &ldu, work_err, &lwork_err, &result[1] );
+    }
+  if ( VT != NULL )
+    {
+    coot_fortran(coot_sort01)( "R", &m_vt, &n, VT, &ldv, work_err, &lwork_err, &result[2] );
+    }
+
+  result[0] *= eps;
+  result[1] *= eps;
+  result[2] *= eps;
+
+  magma_free_cpu( work_err );
+  magma_free_cpu( rwork_err );
+
+  // check S is sorted
+  result[3] = 0.;
+  for (int j = 0; j < min_mn-1; j++)
+    {
+    if ( S[j] < S[j+1] )
+      result[3] = 1.;
+    if ( S[j] < 0. )
+      result[3] = 1.;
+    }
+
+  if (min_mn > 1 && S[min_mn-1] < 0.)
+    {
+    result[3] = 1.;
+    }
+  }
+
+
+
+TEST_CASE("magma_sgesvd_1", "[gesvd]")
+  {
+  if (get_rt().backend != CL_BACKEND)
+    {
+    return;
+    }
+
+  // Constants
+  magma_int_t ione     = 1;
+  magma_int_t ineg_one = -1;
+  const float d_neg_one = -1;
+  const float nan = std::numeric_limits<float>::quiet_NaN();
+
+  // Local variables
+  float *hA, *hR, *U, *Umalloc, *VT, *VTmalloc, *hwork;
+  float dummy[1], unused[1];
+  float *S, *Sref, work[1], runused[1];
+  magma_int_t M, N, N_U, M_VT, lda, ldu, ldv, min_mn, info;
+
+  float tol = 30 * std::numeric_limits<float>::epsilon();
+
+  std::vector< magma_svd_work_t > svd_works;
+  svd_works.push_back(MagmaSVD_min     );
+  svd_works.push_back(MagmaSVD_doc     );
+  svd_works.push_back(MagmaSVD_opt_slow);
+  svd_works.push_back(MagmaSVD_min_fast);
+  svd_works.push_back(MagmaSVD_opt     );
+  svd_works.push_back(MagmaSVD_max     );
+  svd_works.push_back(MagmaSVD_query   );
+
+  std::vector< magma_vec_t > jobs;
+  jobs.push_back(MagmaNoVec       );
+  jobs.push_back(MagmaSomeVec     );
+  jobs.push_back(MagmaOverwriteVec);
+  jobs.push_back(MagmaAllVec      );
+
+  for (int itest = 0; itest < 5; ++itest)
+    {
+    for (size_t ijobu = 0; ijobu < jobs.size(); ++ijobu)
+      {
+      for (size_t ijobv = 0; ijobv < jobs.size(); ++ijobv)
+        {
+        magma_vec_t jobu = jobs[ijobu];
+        magma_vec_t jobv = jobs[ijobv];
+
+        // Skip invalid combination.
+        if (jobu == MagmaOverwriteVec && jobv == MagmaOverwriteVec )
+          {
+          continue;
+          }
+
+        for (size_t isvd_work = 0; isvd_work < svd_works.size(); ++isvd_work)
+          {
+          magma_svd_work_t svd_work = svd_works[isvd_work];
+
+          M = 256 * (itest + 1) + 65; // 65 is to work around strange clBLAS error with nvidia driver
+          N = 256 * (itest + 1) + 65;
+          min_mn = std::min(M, N);
+          N_U  = (jobu == MagmaAllVec ? M : min_mn);
+          M_VT = (jobv == MagmaAllVec ? N : min_mn);
+          lda = M;
+          ldu = M;
+          ldv = M_VT;
+
+          /* =====================================================================
+             query for workspace size
+             =================================================================== */
+          magma_int_t query_magma, query_lapack;
+          magma_sgesvd( jobu, jobv, M, N,
+                        NULL, lda, NULL, NULL, ldu, NULL, ldv, dummy, ineg_one,
+                        &info );
+          REQUIRE( info == 0 );
+          query_magma = (magma_int_t) dummy[0];
+
+          coot_fortran(coot_sgesvd)( lapack_vec_const(jobu), lapack_vec_const(jobv), &M, &N,
+                                     unused, &lda, runused,
+                                     unused, &ldu,
+                                     unused, &ldv,
+                                     dummy, &ineg_one,
+                                     &info );
+          REQUIRE( info == 0 );
+          query_lapack = (magma_int_t) dummy[0];
+
+          // Choose lwork size based on --svd-work option.
+          // We recommend using the above query for lwork rather than
+          // the formulas; we use formulas to verify the code in all cases.
+          // lwork_formula_t is a special class, just for the tester, that
+          // saves the lwork value together with a string describing its formula.
+          magma_int_t lwork_magma, lwork_lapack;
+          choose_lwork( svd_work, jobu, jobv, M, N, query_magma, query_lapack,
+                        lwork_magma, lwork_lapack );
+
+          // LAPACK and MAGMA may return different sizes;
+          // since we call both, allocate max.
+          magma_int_t lwork = std::max( lwork_magma, lwork_lapack );
+
+          /* =====================================================================
+             Allocate memory
+             =================================================================== */
+          REQUIRE( magma_smalloc_cpu( &hA,    lda*N  ) == MAGMA_SUCCESS );
+          REQUIRE( magma_smalloc_cpu( &S,     min_mn ) == MAGMA_SUCCESS );
+          REQUIRE( magma_smalloc_cpu( &Sref,  min_mn ) == MAGMA_SUCCESS );
+          REQUIRE( magma_smalloc_pinned( &hR,    lda*N ) == MAGMA_SUCCESS );
+          REQUIRE( magma_smalloc_pinned( &hwork, lwork ) == MAGMA_SUCCESS );
+
+          // U and VT either overwrite hR, or are allocated as Umalloc, VTmalloc
+          if (jobu == MagmaOverwriteVec)
+            {
+            U   = hR;
+            ldu = lda;
+            Umalloc = NULL;
+            }
+          else
+            {
+            REQUIRE( magma_smalloc_cpu( &Umalloc, ldu*N_U ) == MAGMA_SUCCESS ); // M x M (jobz=A) or M x min(M,N)
+            U = Umalloc;
+            }
+
+          if (jobv == MagmaOverwriteVec)
+            {
+            VT  = hR;
+            ldv = lda;
+            VTmalloc = NULL;
+            }
+          else
+            {
+            REQUIRE( magma_smalloc_cpu( &VTmalloc, ldv*N ) == MAGMA_SUCCESS ); // N x N (jobz=A) or min(M,N) x N
+            VT = VTmalloc;
+            }
+
+          // force check to fail if gesdd returns info error
+          float result[5]        = { nan, nan, nan, nan, nan };
+          float result_lapack[5] = { nan, nan, nan, nan, nan };
+
+          /* Initialize the matrix (random uniform) */
+          arma::Mat<float> hA_alias(hA, lda, N, false, true);
+          hA_alias.randu();
+          coot_fortran(coot_slacpy)( MagmaFullStr, &M, &N, hA, &lda, hR, &lda );
+
+          magma_sgesvd( jobu, jobv, M, N,
+                        hR, lda, S, U, ldu, VT, ldv, hwork, lwork_magma,
+                        &info );
+
+          if ( svd_work == MagmaSVD_min_1 )
+            {
+            if (info != -13)
+              {
+              std::cerr << "magma_sgesvd returned error code " << info << " (expected -13): " << magma::error_as_string(info) << std::endl;
+              }
+            REQUIRE( info == -13 );
+            }
+          else
+            {
+            if (info != 0)
+              {
+              std::cerr << "magma_sgesvd returned error " << info << ": " << magma::error_as_string(info) << std::endl;
+              }
+            REQUIRE( info == 0 );
+            }
+
+          check_sgesvd( jobu, jobv, M, N, hA, lda, S, U, ldu, VT, ldv, result );
+
+          coot_fortran(coot_slacpy)( MagmaFullStr, &M, &N, hA, &lda, hR, &lda );
+          coot_fortran(coot_sgesvd)( lapack_vec_const(jobu), lapack_vec_const(jobv), &M, &N,
+                                     hR, &lda, Sref, U, &ldu, VT, &ldv, hwork, &lwork_lapack,
+                                     &info);
+          if ( svd_work == MagmaSVD_min_1 )
+            {
+            if (info != -13)
+              {
+              std::cerr << "dgesvd returned error code " << info << " (expected -13): " << magma::error_as_string(info) << std::endl;
+              }
+            REQUIRE( info == -13 );
+            }
+          else
+            {
+            if (info != 0)
+              {
+              std::cerr << "dgesvd returned error " << info << ": " << magma::error_as_string(info) << std::endl;
+              }
+            REQUIRE( info == 0 );
+            }
+
+          check_sgesvd( jobu, jobv, M, N, hA, lda, Sref, U, ldu, VT, ldv, result_lapack );
+
+          coot_fortran(coot_saxpy)( &min_mn, &d_neg_one, S, &ione, Sref, &ione );
+          result[4]  = coot_fortran(coot_slange)( "F", &min_mn, &ione, Sref, &min_mn, work );
+          result[4] /= coot_fortran(coot_slange)( "F", &min_mn, &ione, S,    &min_mn, work );
+
+          // Some of the tests may not have been done depending on jobu and
+          // jobv; that is indicated with `-1`.
+          REQUIRE( result[0] < tol );
+          REQUIRE( result[1] < tol );
+          REQUIRE( result[2] < tol );
+          REQUIRE( result[3] < tol );
+          REQUIRE( result[4] < tol );
+
+          REQUIRE( result_lapack[0] < tol );
+          REQUIRE( result_lapack[1] < tol );
+          REQUIRE( result_lapack[2] < tol );
+          REQUIRE( result_lapack[3] < tol );
+
+          magma_free_cpu( hA );
+          magma_free_cpu( S  );
+          magma_free_cpu( Sref );
+          magma_free_pinned( hR    );
+          magma_free_pinned( hwork );
+          magma_free_cpu( VTmalloc );
+          magma_free_cpu( Umalloc  );
+          }
+        }
+      }
+    }
+  }
+
 #endif

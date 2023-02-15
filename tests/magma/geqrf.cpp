@@ -57,7 +57,7 @@ using namespace coot;
 
 #if defined(COOT_USE_OPENCL)
 
-TEST_CASE("magma_geqrf_1", "[geqrf]")
+TEST_CASE("magma_dgeqrf_1", "[geqrf]")
   {
   if (get_rt().backend != CL_BACKEND)
     {
@@ -165,7 +165,7 @@ TEST_CASE("magma_geqrf_1", "[geqrf]")
 
 
 
-TEST_CASE("magma_geqrf2_1", "[geqrf]")
+TEST_CASE("magma_dgeqrf2_1", "[geqrf]")
   {
   if (get_rt().backend != CL_BACKEND)
     {
@@ -277,6 +277,230 @@ TEST_CASE("magma_geqrf2_1", "[geqrf]")
     magma_free_pinned( h_R );
     magma_free( d_A );
     }
-
-  #endif
   }
+
+
+
+TEST_CASE("magma_sgeqrf_1", "[geqrf]")
+  {
+  if (get_rt().backend != CL_BACKEND)
+    {
+    return;
+    }
+
+  const float             d_neg_one = MAGMA_S_NEG_ONE;
+  const float             d_one     = MAGMA_S_ONE;
+  const float c_neg_one = MAGMA_S_NEG_ONE;
+  const float c_one     = MAGMA_S_ONE;
+  const float c_zero    = MAGMA_S_ZERO;
+
+  float           Anorm, error=0, error2=0;
+  float *h_A, *h_R, *tau, *h_work, tmp[1], unused[1];
+  magma_int_t M, N, n2, lda, lwork, info, min_mn, nb;
+
+  float tol = 30 * std::numeric_limits<float>::epsilon();
+
+  for (int itest = 0; itest < 10; ++itest)
+    {
+    M = 128 * (itest + 1) + 64;
+    N = 128 * (itest + 1) + 64;
+    min_mn = std::min(M, N);
+    lda    = M;
+    n2     = lda*N;
+    nb     = magma_get_dgeqrf_nb( M, N );
+
+    // query for workspace size
+    lwork = -1;
+    coot_fortran(coot_sgeqrf)( &M, &N, unused, &M, unused, tmp, &lwork, &info );
+    lwork = (magma_int_t) tmp[0];
+    lwork = std::max( lwork, N*nb );
+
+    // Allocate host memory for the matrix
+    REQUIRE( magma_smalloc_cpu( &tau,    min_mn ) == MAGMA_SUCCESS );
+    REQUIRE( magma_smalloc_cpu( &h_A,    n2     ) == MAGMA_SUCCESS );
+    REQUIRE( magma_smalloc_cpu( &h_work, lwork  ) == MAGMA_SUCCESS );
+    REQUIRE( magma_smalloc_pinned( &h_R,    n2     ) == MAGMA_SUCCESS );
+
+    // Initialize to uniform random matrix.
+    arma::Mat<float> h_A_alias(h_A, lda, N, false, true);
+    h_A_alias.randu();
+    coot_fortran(coot_slacpy)( "F", &M, &N, h_A, &lda, h_R, &lda );
+
+    /* ====================================================================
+       Performs operation using MAGMA
+       =================================================================== */
+    magma_sgeqrf( M, N, h_R, lda, tau, h_work, lwork, &info );
+    if (info != 0)
+      {
+      std::cerr << "magma_sgeqrf returned error " << info << ": " << magma::error_as_string(info) << std::endl;
+      }
+    REQUIRE( info == 0 );
+
+    /* =====================================================================
+       Check the result, following zqrt01 except using the reduced Q.
+       This works for any M,N (square, tall, wide).
+       =================================================================== */
+    magma_int_t ldq = M;
+    magma_int_t ldr = min_mn;
+    float *Q, *R;
+    float *work;
+    REQUIRE( magma_smalloc_cpu( &Q,    ldq*min_mn ) == MAGMA_SUCCESS );  // M by K
+    REQUIRE( magma_smalloc_cpu( &R,    ldr*N ) == MAGMA_SUCCESS );       // K by N
+    REQUIRE( magma_smalloc_cpu( &work, min_mn ) == MAGMA_SUCCESS );
+
+    // generate M by K matrix Q, where K = min(M,N)
+    coot_fortran(coot_slacpy)( "L", &M, &min_mn, h_R, &lda, Q, &ldq );
+    coot_fortran(coot_sorgqr)( &M, &min_mn, &min_mn, Q, &ldq, tau, h_work, &lwork, &info );
+    REQUIRE( info == 0 );
+
+    // copy K by N matrix R
+    coot_fortran(coot_slaset)( "L", &min_mn, &N, &c_zero, &c_zero, R, &ldr );
+    coot_fortran(coot_slacpy)( "U", &min_mn, &N, h_R, &lda,        R, &ldr );
+
+    // error = || R - Q^H*A || / (N * ||A||)
+    coot_fortran(coot_sgemm)( "C", "N", &min_mn, &N, &M,
+                              &c_neg_one, Q, &ldq, h_A, &lda, &c_one, R, &ldr );
+    Anorm = coot_fortran(coot_slange)( "1", &M,      &N, h_A, &lda, work );
+    error = coot_fortran(coot_slange)( "1", &min_mn, &N, R,   &ldr, work );
+    if ( N > 0 && Anorm > 0 )
+      error /= (N*Anorm);
+
+    // set R = I (K by K identity), then R = I - Q^H*Q
+    // error = || I - Q^H*Q || / N
+    coot_fortran(coot_slaset)( "U", &min_mn, &min_mn, &c_zero, &c_one, R, &ldr );
+    coot_fortran(coot_ssyrk)( "U", "C", &min_mn, &M, &d_neg_one, Q, &ldq, &d_one, R, &ldr );
+    error2 = coot_fortran(coot_slansy)( "1", "U", &min_mn, R, &ldr, work );
+    if ( N > 0 )
+      error2 /= N;
+
+    magma_free_cpu( Q    );  Q    = NULL;
+    magma_free_cpu( R    );  R    = NULL;
+    magma_free_cpu( work );  work = NULL;
+
+    REQUIRE( error < tol );
+    REQUIRE( error2 < tol );
+
+    magma_free_cpu( tau    );
+    magma_free_cpu( h_A    );
+    magma_free_cpu( h_work );
+    magma_free_pinned( h_R    );
+    }
+  }
+
+
+
+TEST_CASE("magma_sgeqrf2_1", "[geqrf]")
+  {
+  if (get_rt().backend != CL_BACKEND)
+    {
+    return;
+    }
+
+  const float             d_neg_one = MAGMA_S_NEG_ONE;
+  const float             d_one     = MAGMA_S_ONE;
+  const float c_neg_one = MAGMA_S_NEG_ONE;
+  const float c_one     = MAGMA_S_ONE;
+  const float c_zero    = MAGMA_S_ZERO;
+
+  float           Anorm, error=0, error2=0;
+  float *h_A, *h_R, *tau, *h_work, tmp[1], unused[1];
+  magmaDouble_ptr d_A;
+  magma_int_t M, N, n2, lda, ldda, lwork, info, min_mn;
+
+  float tol = 30 * std::numeric_limits<float>::epsilon();
+
+  magma_queue_t queue = magma_queue_create();
+
+  for (int itest = 0; itest < 10; ++itest)
+    {
+    M = 128 * (itest + 1) + 64;
+    N = 128 * (itest + 1) + 64;
+    min_mn = std::min( M, N );
+    lda    = M;
+    n2     = lda*N;
+    ldda   = magma_roundup( M, 32 );  // multiple of 32 by default
+
+    lwork = -1;
+    coot_fortran(coot_sgeqrf)(&M, &N, unused, &M, unused, tmp, &lwork, &info);
+    lwork = (magma_int_t) tmp[0];
+
+    REQUIRE( magma_smalloc_cpu( &tau,    min_mn ) == MAGMA_SUCCESS );
+    REQUIRE( magma_smalloc_cpu( &h_A,    n2     ) == MAGMA_SUCCESS );
+    REQUIRE( magma_smalloc_cpu( &h_work, lwork  ) == MAGMA_SUCCESS );
+    REQUIRE( magma_smalloc_pinned( &h_R,    n2     ) == MAGMA_SUCCESS );
+    REQUIRE( magma_smalloc( &d_A,    ldda*N ) == MAGMA_SUCCESS );
+
+    // Generate a uniform random matrix for h_A.
+    arma::Mat<float> h_A_alias(h_A, lda, N, false, true);
+    h_A_alias.randu();
+    // Copy that matrix to h_R and then d_A.
+    coot_fortran(coot_slacpy)( "A", &M, &N, h_A, &lda, h_R, &lda );
+    magma_ssetmatrix( M, N, h_R, lda, d_A, 0, ldda, queue );
+
+    // LAPACK complaint arguments
+    magma_sgeqrf2_gpu( M, N, d_A, 0, ldda, tau, &info );
+
+    if (info != 0)
+      {
+      std::cerr << "magma_sgeqrf2_gpu returned error " << info << ": " << magma::error_as_string(info) << std::endl;
+      }
+    REQUIRE( info == 0 );
+
+    /* =====================================================================
+       Check the result, following zqrt01 except using the reduced Q.
+       This works for any M,N (square, tall, wide).
+       Only for version 2, which has LAPACK complaint output.
+       Or   for version 3, after restoring diagonal blocks of A above.
+       =================================================================== */
+    magma_sgetmatrix( M, N, d_A, 0, ldda, h_R, lda, queue );
+
+    magma_int_t ldq = M;
+    magma_int_t ldr = min_mn;
+    float *Q, *R;
+    float *work;
+    REQUIRE( magma_smalloc_cpu( &Q,    ldq*min_mn ) == MAGMA_SUCCESS );  // M by K
+    REQUIRE( magma_smalloc_cpu( &R,    ldr*N ) == MAGMA_SUCCESS );       // K by N
+    REQUIRE( magma_smalloc_cpu( &work, min_mn ) == MAGMA_SUCCESS );
+
+    // generate M by K matrix Q, where K = min(M,N)
+    coot_fortran(coot_slacpy)("L", &M, &min_mn, h_R, &lda, Q, &ldq);
+    coot_fortran(coot_sorgqr)(&M, &min_mn, &min_mn, Q, &ldq, tau, h_work, &lwork, &info);
+    REQUIRE( info == 0 );
+
+    // copy K by N matrix R
+    coot_fortran(coot_slaset)("L", &min_mn, &N, &c_zero, &c_zero, R, &ldr);
+    coot_fortran(coot_slacpy)("U", &min_mn, &N, h_R, &lda, R, &ldr);
+
+    // error = || R - Q^H*A || / (N * ||A||)
+    coot_fortran(coot_sgemm)("C", "N", &min_mn, &N, &M,
+                   &c_neg_one, Q, &ldq, h_A, &lda, &c_one, R, &ldr );
+    arma::Mat<float> hA_alias(h_A, M, N, false, true);
+    Anorm = coot_fortran(coot_slange)( "1", &M,      &N, h_A, &lda, work );
+    error = coot_fortran(coot_slange)( "1", &min_mn, &N, R,   &ldr, work );
+    if ( N > 0 && Anorm > 0 )
+      error /= (N*Anorm);
+
+    // set R = I (K by K identity), then R = I - Q^H*Q
+    // error = || I - Q^H*Q || / N
+    coot_fortran(coot_slaset)("U", &min_mn, &min_mn, &c_zero, &c_one, R, &ldr);
+    coot_fortran(coot_ssyrk)("U", "C", &min_mn, &M, &d_neg_one, Q, &ldq, &d_one, R, &ldr);
+    error2 = coot_fortran(coot_slansy)("1", "U", &min_mn, R, &ldr, work);
+    if ( N > 0 )
+      error2 /= N;
+
+    magma_free_cpu( Q    );  Q    = NULL;
+    magma_free_cpu( R    );  R    = NULL;
+    magma_free_cpu( work );  work = NULL;
+
+    REQUIRE( error < tol );
+    REQUIRE( error2 < tol );
+
+    magma_free_cpu( tau    );
+    magma_free_cpu( h_A    );
+    magma_free_cpu( h_work );
+    magma_free_pinned( h_R );
+    magma_free( d_A );
+    }
+  }
+
+#endif

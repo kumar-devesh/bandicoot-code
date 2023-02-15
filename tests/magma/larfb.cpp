@@ -236,4 +236,163 @@ TEST_CASE("magma_dlarfb_1", "[larfb]")
   magma_queue_destroy( queue );
   }
 
+
+
+TEST_CASE("magma_slarfb_1", "[larfb]")
+  {
+  if (get_rt().backend != CL_BACKEND)
+    {
+    return;
+    }
+
+  const float c_zero    = MAGMA_S_ZERO;
+  const float c_one     = MAGMA_S_ONE;
+  const float c_neg_one = MAGMA_S_NEG_ONE;
+  const magma_int_t ione = 1;
+
+  magma_int_t M, N, K, ldc, ldv, ldt, ldw, ldw2, nv;
+  float Cnorm, error, work[1];
+
+  // test all combinations of input parameters
+  magma_side_t   side  [] = { MagmaLeft,       MagmaRight    };
+  magma_trans_t  trans [] = { MagmaTrans, MagmaNoTrans  };
+  magma_direct_t direct[] = { MagmaForward,    MagmaBackward };
+  magma_storev_t storev[] = { MagmaColumnwise, MagmaRowwise  };
+
+  float tol = 30 * std::numeric_limits<float>::epsilon();
+
+  magma_queue_t queue = magma_queue_create();
+
+  for (int itest = 0; itest < 10; ++itest)
+    {
+    itest += 1;
+    M = 128 * (itest + 1) + 65; // If we use 64, crashes are observed with the nvidia OpenCL drivers.
+    N = 128 * (itest + 1) + 65; // That's probably an artifact of the poor nvidia OpenCL support, not
+    K = 128 * (itest + 1) + 65; // a bug in clBLAS.
+
+    for (int iside = 0; iside < 2; ++iside)
+      {
+      for (int itran = 0; itran < 2; ++itran)
+        {
+        for (int idir  = 0; idir  < 2; ++idir )
+          {
+          for (int istor = 0; istor < 2; ++istor)
+            {
+            ldc = magma_roundup( M, 32 );  // multiple of 32 by default
+            ldt = magma_roundup( K, 32 );  // multiple of 32 by default
+            ldw = (side[iside] == MagmaLeft ? N : M);
+            ldw2 = std::min( M, N );
+            // (ldv, nv) get swapped later if rowwise
+            ldv = (side[iside] == MagmaLeft ? M : N);
+            nv  = K;
+
+            // Allocate memory for matrices
+            float *C, *R, *V, *T, *W;
+            REQUIRE( magma_smalloc_cpu( &C, ldc*N ) == MAGMA_SUCCESS );
+            REQUIRE( magma_smalloc_cpu( &R, ldc*N ) == MAGMA_SUCCESS );
+            REQUIRE( magma_smalloc_cpu( &V, ldv*K ) == MAGMA_SUCCESS );
+            REQUIRE( magma_smalloc_cpu( &T, ldt*K ) == MAGMA_SUCCESS );
+            REQUIRE( magma_smalloc_cpu( &W, ldw*K ) == MAGMA_SUCCESS );
+
+            magmaFloat_ptr dC, dV, dT, dW, dW2;
+            REQUIRE( magma_smalloc( &dC,  ldc*N  ) == MAGMA_SUCCESS );
+            REQUIRE( magma_smalloc( &dV,  ldv*K  ) == MAGMA_SUCCESS );
+            REQUIRE( magma_smalloc( &dT,  ldt*K  ) == MAGMA_SUCCESS );
+            REQUIRE( magma_smalloc( &dW,  ldw*K  ) == MAGMA_SUCCESS );
+            REQUIRE( magma_smalloc( &dW2, ldw2*K ) == MAGMA_SUCCESS );
+
+            // C is M x N.
+            // Fill with random values.
+            arma::Mat<float> C_alias(C, ldc, N, false, true);
+            C_alias.randu();
+
+            // V is ldv x nv. See larfb docs for description.
+            // if column-wise and left,  M x K
+            // if column-wise and right, N x K
+            // if row-wise and left,     K x M
+            // if row-wise and right,    K x N
+            arma::Mat<float> V_alias(V, ldv, nv, false, true);
+            V_alias.randu();
+
+            if ( storev[istor] == MagmaColumnwise )
+              {
+              if ( direct[idir] == MagmaForward )
+                {
+                coot_fortran(coot_slaset)("U", &K, &K, &c_zero, &c_one, V, &ldv );
+                }
+              else
+                {
+                coot_fortran(coot_slaset)("L", &K, &K, &c_zero, &c_one, &V[(ldv-K)], &ldv );
+                }
+              }
+            else
+              {
+              // rowwise, swap V's dimensions
+              std::swap( ldv, nv );
+              if ( direct[idir] == MagmaForward )
+                {
+                coot_fortran(coot_slaset)("L", &K, &K, &c_zero, &c_one, V, &ldv );
+                }
+              else
+                {
+                coot_fortran(coot_slaset)("U", &K, &K, &c_zero, &c_one, &V[(nv-K)*ldv], &ldv );
+                }
+              }
+
+            // T is K x K, upper triangular for forward, and lower triangular for backward
+            magma_int_t k1 = K-1;
+            arma::Mat<float> T_alias(T, ldt, K, false, true);
+            T_alias.randu();
+            if ( direct[idir] == MagmaForward )
+              {
+              coot_fortran(coot_slaset)("L", &k1, &k1, &c_zero, &c_zero, &T[1], &ldt );
+              }
+            else
+              {
+              coot_fortran(coot_slaset)("U", &k1, &k1, &c_zero, &c_zero, &T[1*ldt], &ldt );
+              }
+
+            magma_ssetmatrix( M,   N,  C, ldc, dC, 0, ldc, queue );
+            magma_ssetmatrix( ldv, nv, V, ldv, dV, 0, ldv, queue );
+            magma_ssetmatrix( K,   K,  T, ldt, dT, 0, ldt, queue );
+
+            coot_fortran(coot_slarfb)( lapack_side_const( side[iside] ), lapack_trans_const( trans[itran] ),
+                              lapack_direct_const( direct[idir] ), lapack_storev_const( storev[istor] ),
+                              &M, &N, &K,
+                              V, &ldv, T, &ldt, C, &ldc, W, &ldw );
+
+            magma_slarfb_gpu( side[iside], trans[itran], direct[idir], storev[istor],
+                              M, N, K,
+                              dV, 0, ldv, dT, 0, ldt, dC, 0, ldc, dW, 0, ldw, queue );
+            // dC must be ldc*N at least
+            magma_sgetmatrix( M, N, dC, 0, ldc, R, ldc, queue );
+
+            // compute relative error |HC_magma - HC_lapack| / |HC_lapack|
+            magma_int_t size = ldc*N;
+            coot_fortran(coot_saxpy)( &size, &c_neg_one, C, &ione, R, &ione );
+            Cnorm = coot_fortran(coot_slange)( "F", &M, &N, C, &ldc, work );
+            error = coot_fortran(coot_slange)( "F", &M, &N, R, &ldc, work ) / Cnorm;
+
+            REQUIRE( error < tol );
+
+            magma_free_cpu( C );
+            magma_free_cpu( R );
+            magma_free_cpu( V );
+            magma_free_cpu( T );
+            magma_free_cpu( W );
+
+            magma_free( dC  );
+            magma_free( dV  );
+            magma_free( dT  );
+            magma_free( dW  );
+            magma_free( dW2 );
+            }
+          }
+        }
+      }
+    }
+
+  magma_queue_destroy( queue );
+  }
+
 #endif

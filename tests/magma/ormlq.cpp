@@ -190,4 +190,139 @@ TEST_CASE("magma_dormlq_1", "[ormlq]")
     }
   }
 
+
+
+TEST_CASE("magma_sormlq_1", "[ormlq]")
+  {
+  if (get_rt().backend != CL_BACKEND)
+    {
+    return;
+    }
+
+  float Cnorm, error, work[1];
+  float c_neg_one = MAGMA_S_NEG_ONE;
+  magma_int_t ione = 1;
+  magma_int_t nn, m, n, k, size, info;
+  magma_int_t ISEED[4] = {0,0,0,1};
+  magma_int_t nb, ldc, lda, lwork, lwork_max, ldda;
+  float *C, *R, *A, *W, *tau;
+  magmaFloat_ptr dA;
+
+  float tol = 60 * std::numeric_limits<float>::epsilon();
+
+  // test all combinations of input parameters
+  magma_side_t  side [] = { MagmaLeft,       MagmaRight   };
+  magma_trans_t trans[] = { MagmaTrans, MagmaNoTrans };
+
+  magma_queue_t queue = magma_queue_create();
+
+  for( int itest = 0; itest < 10; ++itest )
+    {
+    for( int iside = 0; iside < 2; ++iside )
+      {
+      for( int itran = 0; itran < 2; ++itran )
+        {
+        m = 128 * (itest + 1) + 64;
+        n = 128 * (itest + 1) + 64;
+        k = 128 * (itest + 1) + 64;
+        nb  = magma_get_sgelqf_nb( m, n );
+        ldc = m;
+        // A is k x nn == k x m (left) or k x n (right)
+        nn = (side[iside] == MagmaLeft ? m : n);
+        lda = k;
+        ldda = magma_roundup( k, 32 );
+
+        // need at least 2*nb*nb for gelqf
+        lwork_max = std::max( std::max( m*nb, n*nb ), 2*nb*nb );
+        // this rounds it up slightly if needed to agree with lwork query
+        lwork_max = magma_int_t( float( magma_smake_lwork( lwork_max )));
+
+        REQUIRE( magma_smalloc_cpu( &C,   ldc*n ) == MAGMA_SUCCESS );
+        REQUIRE( magma_smalloc_cpu( &R,   ldc*n ) == MAGMA_SUCCESS );
+        REQUIRE( magma_smalloc_cpu( &A,   lda*nn ) == MAGMA_SUCCESS );
+        REQUIRE( magma_smalloc_cpu( &W,   lwork_max ) == MAGMA_SUCCESS );
+        REQUIRE( magma_smalloc_cpu( &tau, k ) == MAGMA_SUCCESS );
+        REQUIRE( magma_smalloc( &dA, ldda * n) == MAGMA_SUCCESS );
+
+        // C is full, m x n
+        size = ldc*n;
+        coot_fortran(coot_slarnv)( &ione, ISEED, &size, C );
+        coot_fortran(coot_slacpy)( "F", &m, &n, C, &ldc, R, &ldc );
+
+        // By default the matrix used is random uniform; we'll use Armadillo
+        // to do that.
+        arma::Mat<float> A_alias(A, lda, nn, false, true);
+        A_alias.randu();
+
+        // compute LQ factorization to get Householder vectors in A, tau
+        magma_ssetmatrix( k, nn, A, lda, dA, 0, ldda, queue );
+        magma_sgelqf_gpu( k, nn, dA, 0, ldda, tau, W, lwork_max, &info );
+        magma_sgetmatrix( k, nn, dA, 0, ldda, A, lda, queue );
+        if (info != 0)
+          {
+          std::cerr << "magma_sgelqf() returned error " << info << ": " << magma::error_as_string(info) << std::endl;
+          }
+        REQUIRE( info == 0 );
+
+        /* =====================================================================
+           Performs operation using LAPACK
+           =================================================================== */
+        coot_fortran(coot_sormlq)( lapack_side_const( side[iside] ), lapack_trans_const( trans[itran] ),
+                          &m, &n, &k,
+                          A, &lda, tau, C, &ldc, W, &lwork_max, &info );
+        if (info != 0)
+          {
+          std::cerr << "sormlq returned error " << info << ": " << magma::error_as_string(info) << std::endl;
+          }
+        REQUIRE( info == 0 );
+
+        /* ====================================================================
+           Performs operation using MAGMA
+           =================================================================== */
+        // query for workspace size
+        lwork = -1;
+        magma_sormlq( side[iside], trans[itran],
+                      m, n, k,
+                      A, lda, tau, R, ldc, W, lwork, &info );
+        if (info != 0)
+          {
+          std::cerr << "magma_sormlq (lwork query) returned error " << info << ": " << magma::error_as_string(info) << std::endl;
+          }
+        REQUIRE( info == 0 );
+        lwork = (magma_int_t) W[0];
+        if ( lwork < 0 || lwork > lwork_max )
+          {
+          std::cerr << "warning: optimal lwork " << lwork << " > allocated lwork_max " << lwork_max << std::endl;
+          }
+
+        magma_sormlq( side[iside], trans[itran],
+                      m, n, k,
+                      A, lda, tau, R, ldc, W, lwork, &info );
+        if (info != 0)
+          {
+          std::cerr << "magma_sormlq returned error " << info << ": " << magma::error_as_string(info) << std::endl;
+          }
+        REQUIRE( info == 0 );
+
+        /* =====================================================================
+           compute relative error |QC_magma - QC_lapack| / |QC_lapack|
+           =================================================================== */
+        size = ldc*n;
+        coot_fortran(coot_saxpy)( &size, &c_neg_one, C, &ione, R, &ione );
+        Cnorm = coot_fortran(coot_slange)( "F", &m, &n, C, &ldc, work );
+        error = coot_fortran(coot_slange)( "F", &m, &n, R, &ldc, work ) / (std::sqrt(m*n) * Cnorm);
+
+        REQUIRE( error < tol );
+
+        magma_free_cpu( C );
+        magma_free_cpu( R );
+        magma_free_cpu( A );
+        magma_free_cpu( W );
+        magma_free_cpu( tau );
+        magma_free( dA );
+        }
+      }
+    }
+  }
+
 #endif
