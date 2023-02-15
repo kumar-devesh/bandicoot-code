@@ -120,11 +120,6 @@ magma_dgeqrf_gpu
   magma_int_t *info
   )
   {
-  magmaDouble_ptr dR = dT;
-  size_t dR_offset = dT_offset + minmn;
-  magmaDouble_ptr dwork = dT;
-  size_t dwork_offset = dT_offset + 2 * minmn;
-
   double *work, *hwork, *R;
   magma_int_t cols, i, ib, ldwork, lddwork, lhwork, lwork, minmn, nb, old_i, old_ib, rows;
 
@@ -154,6 +149,10 @@ magma_dgeqrf_gpu
   // dT    is minmn*nb
   // dR    is minmn*nb
   // dwork is n*nb
+  magmaDouble_ptr dR = dT;
+  size_t dR_offset = dT_offset + minmn;
+  magmaDouble_ptr dwork = dT;
+  size_t dwork_offset = dT_offset + 2 * minmn;
   lddwork = n;
 
   // work  is m*nb for panel
