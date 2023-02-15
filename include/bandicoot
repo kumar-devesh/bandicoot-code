@@ -332,9 +332,6 @@ namespace coot
   // NOTE: magma uses rather dubious coding techniques
 
   #if defined(COOT_USE_OPENCL)
-    //#include "bandicoot_bits/opencl/magma13_support.hpp"
-    //#include "bandicoot_bits/opencl/magma13_dpotrf.hpp"
-
     #include "bandicoot_bits/opencl/magma22_support.hpp"
     #include "bandicoot_bits/opencl/magma27_dpanel_to_q.hpp"
 
