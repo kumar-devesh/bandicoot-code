@@ -138,41 +138,12 @@ inline magma_int_t magma_smalloc( magmaFloat_ptr*  ptr_ptr, size_t n ) { return 
 
 
 inline
-void
-magma_getdevice(magma_device_t* dev)
+magma_queue_t
+magma_queue_create()
   {
-  (*dev) = get_rt().cl_rt.get_device();
-  }
-
-
-// inline
-// magma_int_t
-// magma_getdevices(
-//     magma_device_t* devices,
-//     magma_int_t     size,
-//     magma_int_t*    numPtr )
-// {
-//     // TODO just copy from g_runtime.get_devices()
-//     cl_int err;
-//     //err = clGetDeviceIDs( gPlatform, CL_DEVICE_TYPE_GPU, 1, size, devices, num );
-//     size_t n;
-//     err = clGetContextInfo(
-//         g_runtime.get_context(), CL_CONTEXT_DEVICES,
-//         size*sizeof(magma_device_t), devices, &n );
-//     *numPtr = n / sizeof(magma_device_t);
-//     check_error( err );
-//     return err;
-// }
-
-
-
-inline
-void
-magma_queue_create(magma_device_t dev, magma_queue_t* queue)
-  {
-  (void)dev;  // ignore the variable
-
-  get_rt().cl_rt.create_extra_cq(*queue);
+  magma_queue_t result;
+  get_rt().cl_rt.create_extra_cq(result);
+  return result;
   }
 
 

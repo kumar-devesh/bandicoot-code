@@ -48,7 +48,7 @@
 //  of this software, even if advised of the possibility of such damage.
 
 #include <bandicoot>
-#include "catch.hpp"
+#include "../catch.hpp"
 #include "def_lapack_test.hpp"
 
 using namespace coot;
@@ -102,11 +102,7 @@ TEST_CASE("magma_dlarfb_1", "[larfb]")
 
   double tol = 30 * std::numeric_limits<double>::epsilon();
 
-  // TODO: can we reuse this?
-  magma_queue_t queue = NULL;
-  magma_device_t cdev;
-  magma_getdevice( &cdev );
-  magma_queue_create( cdev, &queue );
+  magma_queue_t queue = magma_queue_create();
 
   for (int itest = 0; itest < 10; ++itest)
     {

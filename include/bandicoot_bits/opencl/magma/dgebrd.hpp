@@ -123,11 +123,7 @@ magma_dgebrd
     return *info;
     }
 
-  // TODO: can we reuse this?
-  magma_queue_t queue = NULL;
-  magma_device_t cdev;
-  magma_getdevice( &cdev );
-  magma_queue_create( cdev, &queue );
+  magma_queue_t queue = magma_queue_create();
 
   double *work2;
   magma_int_t lwork2 = std::max(m,n);

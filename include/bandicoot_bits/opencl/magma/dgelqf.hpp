@@ -110,11 +110,7 @@ magma_dgelqf
   maxn = magma_roundup( n, 32 );
   maxdim = std::max( maxm, maxn );
 
-  // TODO: can this be reused?
-  magma_queue_t queue = NULL;
-  magma_device_t cdev;
-  magma_getdevice( &cdev );
-  magma_queue_create( cdev, &queue );
+  magma_queue_t queue = magma_queue_create();
 
   // copy to GPU and transpose
   if (maxdim*maxdim < 2*maxm*maxn)
@@ -244,11 +240,7 @@ magma_dgelqf_gpu
 
   magma_int_t lddat = maxn;
 
-  // TODO: can we reuse this?
-  magma_queue_t queue;
-  magma_device_t cdev;
-  magma_getdevice( &cdev );
-  magma_queue_create( cdev, &queue );
+  magma_queue_t queue = magma_queue_create();
 
   if (m == n)
     {

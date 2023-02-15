@@ -43,6 +43,9 @@ In general a series of changes are needed:
    particular CPU LAPACK function doesn't exist, add it to
    `bandicoot_bits/def_lapack.hpp` or `bandicoot_bits/def_blas.hpp`.
 
+ * Replace anything that creates a `magma_queue_t` and populates it with the
+   simpler call `magma_queue_t queue = magma_queue_create()` (or similar).
+
  * If you are an overachiever, you can match the style to the rest of the
    bandicoot codebase.
 

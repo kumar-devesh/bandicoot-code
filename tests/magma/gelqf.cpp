@@ -75,11 +75,7 @@ TEST_CASE("magma_dgelqf_1", "[gelqf]")
   magmaDouble_ptr d_A;
   magma_int_t M, N, n2, lda, ldda, lwork, info, min_mn, nb;
 
-  // TODO: can we reuse this?
-  magma_queue_t queue = NULL;
-  magma_device_t cdev;
-  magma_getdevice( &cdev );
-  magma_queue_create( cdev, &queue );
+  magma_queue_t queue = magma_queue_create();
 
   double tol = 30 * std::numeric_limits<double>::epsilon();
 

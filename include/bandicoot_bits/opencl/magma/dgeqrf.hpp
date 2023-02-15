@@ -178,10 +178,8 @@ magma_dgeqrf_gpu
   std::memset( R, 0, nb*nb*sizeof(double) );
 
   magma_queue_t queues[2];
-  magma_device_t cdev;
-  magma_getdevice( &cdev );
-  magma_queue_create( cdev, &queues[0] );
-  magma_queue_create( cdev, &queues[1] );
+  queues[0] = magma_queue_create();
+  queues[1] = magma_queue_create();
 
   if ( nb > 1 && nb < minmn )
     {
@@ -403,10 +401,8 @@ magma_dgeqrf
   dT_offset = n*ldda + nb*lddwork;
 
   magma_queue_t queues[2];
-  magma_device_t cdev;
-  magma_getdevice( &cdev );
-  magma_queue_create( cdev, &queues[0] );
-  magma_queue_create( cdev, &queues[1] );
+  queues[0] = magma_queue_create();
+  queues[1] = magma_queue_create();
 
   if ( (nb > 1) && (nb < min_mn) )
     {

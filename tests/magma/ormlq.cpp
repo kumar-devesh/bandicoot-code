@@ -79,11 +79,7 @@ TEST_CASE("magma_dormlq_1", "[ormlq]")
   magma_side_t  side [] = { MagmaLeft,       MagmaRight   };
   magma_trans_t trans[] = { MagmaTrans, MagmaNoTrans };
 
-  // TODO: can we reuse this?
-  magma_queue_t queue = NULL;
-  magma_device_t cdev;
-  magma_getdevice( &cdev );
-  magma_queue_create( cdev, &queue );
+  magma_queue_t queue = magma_queue_create();
 
   for( int itest = 0; itest < 10; ++itest )
     {

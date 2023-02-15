@@ -181,11 +181,7 @@ magma_dormlq
       }
     T2 = T + nb*nb;
 
-    // TODO: can we reuse this?
-    magma_queue_t queue;
-    magma_device_t cdev;
-    magma_getdevice( &cdev );
-    magma_queue_create( cdev, &queue );
+    magma_queue_t queue = magma_queue_create();
 
     /* Copy matrix C from the CPU to the GPU */
     magma_dsetmatrix( m, n, C, ldc, dC, dC_offset, lddc, queue );

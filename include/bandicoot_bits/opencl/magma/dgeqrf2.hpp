@@ -130,10 +130,8 @@ magma_dgeqrf2_gpu
   hwork = work + ldwork*nb;
 
   magma_queue_t queues[2];
-  magma_device_t cdev;
-  magma_getdevice( &cdev );
-  magma_queue_create( cdev, &queues[0] );
-  magma_queue_create( cdev, &queues[1] );
+  queues[0] = magma_queue_create();
+  queues[1] = magma_queue_create();
 
   if ( nb > 1 && nb < minmn )
     {

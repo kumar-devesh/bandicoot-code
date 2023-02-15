@@ -86,7 +86,6 @@ magma_dorglq
   // Local variables
   bool lquery;
   magma_int_t i, ib, ki, ldda, lddwork, lwkopt, mib, nb, n_i;
-  magma_queue_t queue = NULL;
   magmaDouble_ptr dA = NULL;
   double* work_local = NULL;
 
@@ -158,9 +157,7 @@ magma_dorglq
   dT = dA;
   dT_offset = ldda*n + n*nb + lddwork*nb;
 
-  magma_device_t cdev;
-  magma_getdevice( &cdev );
-  magma_queue_create( cdev, &queue );
+  magma_queue_t queue = magma_queue_create();
 
   magmablas_dlaset( MagmaFull, m, n, std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN(), dA, 0, ldda, queue );
 

@@ -150,10 +150,7 @@ magma_dormqr
   else
     {
     /* Use hybrid CPU-GPU code */
-    magma_queue_t queue;
-    magma_device_t cdev;
-    magma_getdevice( &cdev );
-    magma_queue_create( cdev, &queue );
+    magma_queue_t queue = magma_queue_create();
 
     /* Allocate work space on the GPU.
      * nw*nb  for dwork (m or n) by nb

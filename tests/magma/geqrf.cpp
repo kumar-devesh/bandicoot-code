@@ -185,11 +185,7 @@ TEST_CASE("magma_geqrf2_1", "[geqrf]")
 
   double tol = 30 * std::numeric_limits<double>::epsilon();
 
-  // TODO: can we reuse this?
-  magma_queue_t queue = NULL;
-  magma_device_t cdev;
-  magma_getdevice( &cdev );
-  magma_queue_create( cdev, &queue );
+  magma_queue_t queue = magma_queue_create();
 
   for (int itest = 0; itest < 10; ++itest)
     {

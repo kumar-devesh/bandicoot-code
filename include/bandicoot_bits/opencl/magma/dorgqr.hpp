@@ -148,10 +148,7 @@ magma_dorgqr
   work_T = work + n*nb;
   work_V = work + n*nb + nb*nb;
 
-  // TODO: can we reuse this?
-  magma_device_t cdev;
-  magma_getdevice( &cdev );
-  magma_queue_create( cdev, &queue );
+  magma_queue_t queue = magma_queue_create();
 
   // Use unblocked code for the last or only block.
   if (kk < n)

@@ -72,11 +72,7 @@ TEST_CASE("magma_dorgqr2_1", "[orgqr2]")
   magma_int_t n2, lda, ldda, lwork, min_mn, nb, info;
   magma_int_t ione     = 1;
 
-  // TODO: can we reuse this?
-  magma_queue_t queue = NULL;
-  magma_device_t cdev;
-  magma_getdevice( &cdev );
-  magma_queue_create( cdev, &queue );
+  magma_queue_t queue = magma_queue_create();
 
   double tol = 30 * std::numeric_limits<double>::epsilon();
 

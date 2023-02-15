@@ -72,11 +72,7 @@ TEST_CASE("magma_dormqr_1", "[ormqr]")
   magma_int_t nb, ldc, lda, lwork, lwork_max;
   double *C, *R, *A, *W, *tau;
 
-  // TODO: can we reuse this?
-  magma_queue_t queue = NULL;
-  magma_device_t cdev;
-  magma_getdevice( &cdev );
-  magma_queue_create( cdev, &queue );
+  magma_queue_t queue = magma_queue_create();
 
   // need slightly looser bound (60*eps instead of 30*eps) for some tests
   double tol = 60 * std::numeric_limits<double>::epsilon();
