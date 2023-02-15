@@ -227,6 +227,19 @@
   #define coot_cgelqf cgelqf
   #define coot_zgelqf zgelqf
 
+  #define coot_slamch slamch
+  #define coot_dlamch dlamch
+
+  #define coot_slascl slascl
+  #define coot_dlascl dlascl
+  #define coot_clascl clascl
+  #define coot_zlascl zlascl
+
+  #define coot_sbdsqr sbdsqr
+  #define coot_dbdsqr dbdsqr
+  #define coot_cbdsqr cbdsqr
+  #define coot_zbdsqr zbdsqr
+
 #else
 
   #define coot_sgetrf SGETRF
@@ -437,6 +450,19 @@
   #define coot_dgelqf DGELQF
   #define coot_cgelqf CGELQF
   #define coot_zgelqf ZGELQF
+
+  #define coot_slamch SLAMCH
+  #define coot_dlamch DLAMCH
+
+  #define coot_slascl SLASCL
+  #define coot_dlascl DLASCL
+  #define coot_clascl CLASCL
+  #define coot_zlascl ZLASCL
+
+  #define coot_sbdsqr SBDSQR
+  #define coot_dbdsqr DBDSQR
+  #define coot_cbdsqr CBDSQR
+  #define coot_zbdsqr ZBDSQR
 
 #endif
 
@@ -714,4 +740,20 @@ extern "C"
   void coot_fortran(coot_dgelqf)(const blas_int* M, const blas_int* N, double* A, const blas_int* lda, double* tau, double* work, const blas_int* lwork, blas_int* info);
   void coot_fortran(coot_cgelqf)(const blas_int* M, const blas_int* N, void*   A, const blas_int* lda, void*   tau, void*   work, const blas_int* lwork, blas_int* info);
   void coot_fortran(coot_zgelqf)(const blas_int* M, const blas_int* N, void*   A, const blas_int* lda, void*   tau, void*   work, const blas_int* lwork, blas_int* info);
+
+  // get machine parameters
+  float  coot_fortran(coot_slamch)(const char* cmach);
+  double coot_fortran(coot_dlamch)(const char* cmach);
+
+  // scale matrix by a scalar
+  void coot_fortran(coot_slascl)(const char* type, const blas_int* kl, const blas_int* ku, const float*  cfrom, const float*  cto, const blas_int* m, const blas_int* n, float*  a, const blas_int* lda, blas_int* info);
+  void coot_fortran(coot_dlascl)(const char* type, const blas_int* kl, const blas_int* ku, const double* cfrom, const double* cto, const blas_int* m, const blas_int* n, double* a, const blas_int* lda, blas_int* info);
+  void coot_fortran(coot_clascl)(const char* type, const blas_int* kl, const blas_int* ku, const void*   cfrom, const void*   cto, const blas_int* m, const blas_int* n, void*   a, const blas_int* lda, blas_int* info);
+  void coot_fortran(coot_zlascl)(const char* type, const blas_int* kl, const blas_int* ku, const void*   cfrom, const void*   cto, const blas_int* m, const blas_int* n, void*   a, const blas_int* lda, blas_int* info);
+
+  // compute singular values of bidiagonal matrix
+  void coot_fortran(coot_sbdsqr)(const char* uplo, const blas_int* n, const blas_int* ncvt, const blas_int* nru, const blas_int* ncc, float*  d, float*  e, float*  vt, const blas_int* ldvt, float*  u, const blas_int* ldu, float*  c, const blas_int* ldc, float*  work, blas_int* info);
+  void coot_fortran(coot_dbdsqr)(const char* uplo, const blas_int* n, const blas_int* ncvt, const blas_int* nru, const blas_int* ncc, double* d, double* e, double* vt, const blas_int* ldvt, double* u, const blas_int* ldu, double* c, const blas_int* ldc, double* work, blas_int* info);
+  void coot_fortran(coot_cbdsqr)(const char* uplo, const blas_int* n, const blas_int* ncvt, const blas_int* nru, const blas_int* ncc, float*  d, float*  e, void*   vt, const blas_int* ldvt, void*   u, const blas_int* ldu, void*   c, const blas_int* ldc, float* work, blas_int* info);
+  void coot_fortran(coot_zbdsqr)(const char* uplo, const blas_int* n, const blas_int* ncvt, const blas_int* nru, const blas_int* ncc, double* d, double* e, void*   vt, const blas_int* ldvt, void*   u, const blas_int* ldu, void*   c, const blas_int* ldc, double*  work, blas_int* info);
   }

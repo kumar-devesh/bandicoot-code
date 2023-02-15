@@ -116,6 +116,16 @@ typedef enum {
 } magma_diag_t;
 
 typedef enum {
+    MagmaNoVec         = 301,  /* geev, syev, gesvd */
+    MagmaVec           = 302,  /* geev, syev */
+    MagmaIVec          = 303,  /* stedc */
+    MagmaAllVec        = 304,  /* gesvd, trevc */
+    MagmaSomeVec       = 305,  /* gesvd, trevc */
+    MagmaOverwriteVec  = 306,  /* gesvd */
+    MagmaBacktransVec  = 307   /* trevc */
+} magma_vec_t;
+
+typedef enum {
     MagmaForward       = 391,  /* larfb */
     MagmaBackward      = 392
 } magma_direct_t;

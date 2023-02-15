@@ -360,6 +360,7 @@ namespace coot
     //#include "bandicoot_bits/opencl/magma27_sormqr.hpp"
     //#include "bandicoot_bits/opencl/magma27_sormlq.hpp"
     //#include "bandicoot_bits/opencl/magma27_sormbr.hpp"
+    //#include "bandicoot_bits/opencl/magma27_sgesvd.hpp"
 
     #include "bandicoot_bits/opencl/magma27_dlabrd.hpp"
     #include "bandicoot_bits/opencl/magma27_dgebrd.hpp"
@@ -372,6 +373,7 @@ namespace coot
     #include "bandicoot_bits/opencl/magma27_dormqr.hpp"
     #include "bandicoot_bits/opencl/magma27_dormlq.hpp"
     #include "bandicoot_bits/opencl/magma27_dormbr.hpp"
+    #include "bandicoot_bits/opencl/magma27_dgesvd.hpp"
   #endif
 
   //

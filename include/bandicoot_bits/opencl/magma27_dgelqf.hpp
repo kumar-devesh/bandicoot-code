@@ -56,6 +56,135 @@
 
 inline
 magma_int_t
+magma_dgelqf
+  (
+  magma_int_t m, magma_int_t n,
+  double *A,    magma_int_t lda,   double *tau,
+  double *work, magma_int_t lwork,
+  magma_int_t *info
+  )
+  {
+  /* Constants */
+  const double c_one = MAGMA_D_ONE;
+
+  /* Local variables */
+  magmaDouble_ptr dA=NULL, dAT=NULL;
+  size_t dAT_offset;
+  magma_int_t min_mn, maxm, maxn, maxdim, nb;
+  magma_int_t iinfo, ldda, lddat;
+
+  /* Function Body */
+  *info = 0;
+  nb = magma_get_dgelqf_nb( m, n );
+  min_mn = std::min( m, n );
+
+  work[0] = magma_dmake_lwork( m*nb );
+  bool lquery = (lwork == -1);
+  if (m < 0)
+    *info = -1;
+  else if (n < 0)
+    *info = -2;
+  else if (lda < std::max(1,m))
+    *info = -4;
+  else if (lwork < std::max(1,m) && ! lquery)
+    *info = -7;
+
+  if (*info != 0)
+    {
+    //magma_xerbla( __func__, -(*info) );
+    return *info;
+    }
+  else if (lquery)
+    {
+    return *info;
+    }
+
+  /* Quick return if possible */
+  if (min_mn == 0)
+    {
+    work[0] = c_one;
+    return *info;
+    }
+
+  maxm = magma_roundup( m, 32 );
+  maxn = magma_roundup( n, 32 );
+  maxdim = std::max( maxm, maxn );
+
+  // TODO: can this be reused?
+  magma_queue_t queue = NULL;
+  magma_device_t cdev;
+  magma_getdevice( &cdev );
+  magma_queue_create( cdev, &queue );
+
+  // copy to GPU and transpose
+  if (maxdim*maxdim < 2*maxm*maxn)
+    {
+    // close to square, do everything in-place
+    ldda  = maxdim;
+    lddat = maxdim;
+
+    if (MAGMA_SUCCESS != magma_dmalloc( &dA, maxdim*maxdim ))
+      {
+      *info = MAGMA_ERR_DEVICE_ALLOC;
+      goto cleanup;
+      }
+
+    magma_dsetmatrix( m, n, A, lda, dA, 0, ldda, queue );
+    dAT = dA;
+    dAT_offset = 0;
+    magmablas_dtranspose_inplace( lddat, dAT, dAT_offset, lddat, queue );
+    }
+  else
+    {
+    // rectangular, do everything out-of-place
+    ldda  = maxm;
+    lddat = maxn;
+
+    if (MAGMA_SUCCESS != magma_dmalloc( &dA, 2*maxn*maxm ))
+      {
+      *info = MAGMA_ERR_DEVICE_ALLOC;
+      goto cleanup;
+      }
+
+    magma_dsetmatrix( m, n, A, lda, dA, 0, ldda, queue );
+
+    dAT = dA;
+    dAT_offset = maxn * maxm;
+    magmablas_dtranspose( m, n, dA, 0, ldda, dAT, dAT_offset, lddat, queue );
+    }
+
+    // factor QR
+    magma_queue_sync(queue);
+    magma_dgeqrf2_gpu( n, m, dAT, dAT_offset, lddat, tau, &iinfo );
+    assert( iinfo >= 0 );
+    if ( iinfo > 0 )
+      {
+      *info = iinfo;
+      }
+
+    // undo transpose
+    if (maxdim*maxdim < 2*maxm*maxn)
+      {
+      magmablas_dtranspose_inplace( lddat, dAT, dAT_offset, lddat, queue );
+      magma_dgetmatrix( m, n, dA, 0, ldda, A, lda, queue );
+      }
+    else
+      {
+      magmablas_dtranspose( n, m, dAT, dAT_offset, lddat, dA, 0, ldda, queue );
+      magma_dgetmatrix( m, n, dA, 0, ldda, A, lda, queue );
+      }
+
+cleanup:
+  magma_queue_destroy( queue );
+  magma_free( dA );
+
+  return *info;
+  }
+
+
+
+inline
+magma_int_t
 magma_dgelqf_gpu
   (
   magma_int_t m,
