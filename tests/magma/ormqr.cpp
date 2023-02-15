@@ -48,7 +48,7 @@
 //  of this software, even if advised of the possibility of such damage.
 
 #include <bandicoot>
-#include "catch.hpp"
+#include "../catch.hpp"
 #include "def_lapack_test.hpp"
 
 using namespace coot;
@@ -57,7 +57,7 @@ using namespace coot;
 
 #if defined(COOT_USE_OPENCL)
 
-TEST_CASE("magma_dormlq_1", "[ormlq]")
+TEST_CASE("magma_dormqr_1", "[ormqr]")
   {
   if (get_rt().backend != CL_BACKEND)
     {
@@ -67,17 +67,10 @@ TEST_CASE("magma_dormlq_1", "[ormlq]")
   double Cnorm, error, work[1];
   double c_neg_one = MAGMA_D_NEG_ONE;
   magma_int_t ione = 1;
-  magma_int_t nn, m, n, k, size, info;
+  magma_int_t mm, m, n, k, size, info;
   magma_int_t ISEED[4] = {0,0,0,1};
-  magma_int_t nb, ldc, lda, lwork, lwork_max, ldda;
+  magma_int_t nb, ldc, lda, lwork, lwork_max;
   double *C, *R, *A, *W, *tau;
-  magmaDouble_ptr dA;
-
-  double tol = 60 * std::numeric_limits<double>::epsilon();
-
-  // test all combinations of input parameters
-  magma_side_t  side [] = { MagmaLeft,       MagmaRight   };
-  magma_trans_t trans[] = { MagmaTrans, MagmaNoTrans };
 
   // TODO: can we reuse this?
   magma_queue_t queue = NULL;
@@ -85,63 +78,76 @@ TEST_CASE("magma_dormlq_1", "[ormlq]")
   magma_getdevice( &cdev );
   magma_queue_create( cdev, &queue );
 
-  for( int itest = 0; itest < 10; ++itest )
+  // need slightly looser bound (60*eps instead of 30*eps) for some tests
+  double tol = 60 * std::numeric_limits<double>::epsilon();
+
+  // test all combinations of input parameters
+  magma_side_t  side [] = { MagmaLeft,       MagmaRight   };
+  magma_trans_t trans[] = { MagmaTrans, MagmaNoTrans };
+
+  for ( int itest = 0; itest < 5; ++itest )
     {
-    for( int iside = 0; iside < 2; ++iside )
+    for ( int iside = 0; iside < 2; ++iside )
       {
-      for( int itran = 0; itran < 2; ++itran )
+      for ( int itran = 0; itran < 2; ++itran )
         {
         m = 128 * (itest + 1) + 64;
         n = 128 * (itest + 1) + 64;
         k = 128 * (itest + 1) + 64;
-        nb  = magma_get_dgelqf_nb( m, n );
+        nb  = magma_get_dgeqrf_nb( m, n );
         ldc = m;
-        // A is k x nn == k x m (left) or k x n (right)
-        nn = (side[iside] == MagmaLeft ? m : n);
-        lda = k;
-        ldda = magma_roundup( k, 32 );
+        // A is mm x k == m x k (left) or n x k (right)
+        mm = (side[iside] == MagmaLeft ? m : n);
+        lda = mm;
 
-        // need at least 2*nb*nb for gelqf
+        // need at least 2*nb*nb for geqrf
         lwork_max = std::max( std::max( m*nb, n*nb ), 2*nb*nb );
-        // this rounds it up slightly if needed to agree with lwork query
+        // this rounds it up slightly if needed to agree with lwork query below
         lwork_max = magma_int_t( double( magma_dmake_lwork( lwork_max )));
 
         REQUIRE( magma_dmalloc_cpu( &C,   ldc*n ) == MAGMA_SUCCESS );
         REQUIRE( magma_dmalloc_cpu( &R,   ldc*n ) == MAGMA_SUCCESS );
-        REQUIRE( magma_dmalloc_cpu( &A,   lda*nn ) == MAGMA_SUCCESS );
+        REQUIRE( magma_dmalloc_cpu( &A,   lda*k ) == MAGMA_SUCCESS );
         REQUIRE( magma_dmalloc_cpu( &W,   lwork_max ) == MAGMA_SUCCESS );
         REQUIRE( magma_dmalloc_cpu( &tau, k ) == MAGMA_SUCCESS );
-        REQUIRE( magma_dmalloc( &dA, ldda * n) == MAGMA_SUCCESS );
 
         // C is full, m x n
         size = ldc*n;
         coot_fortran(coot_dlarnv)( &ione, ISEED, &size, C );
-        coot_fortran(coot_dlacpy)( "F", &m, &n, C, &ldc, R, &ldc );
+        coot_fortran(coot_dlacpy)( "Full", &m, &n, C, &ldc, R, &ldc );
 
-        // By default the matrix used is random uniform; we'll use Armadillo
-        // to do that.
-        arma::Mat<double> A_alias(A, lda, nn, false, true);
+        // A is mm x k.  Here we use uniform random values.
+        arma::Mat<double> A_alias(A, lda, k, false, true);
         A_alias.randu();
 
-        // compute LQ factorization to get Householder vectors in A, tau
-        magma_dsetmatrix( k, nn, A, lda, dA, 0, ldda, queue );
-        magma_dgelqf_gpu( k, nn, dA, 0, ldda, tau, W, lwork_max, &info );
-        magma_dgetmatrix( k, nn, dA, 0, ldda, A, lda, queue );
+        // compute QR factorization to get Householder vectors in A, tau
+        // (adapted to use GPU version from original test)
+        magmaDouble_ptr dA, dT;
+        magma_int_t dt_size = ( 2 * std::min(n, k) + magma_roundup( std::max(m, n), 32) ) * nb;
+        magma_int_t ldda = magma_roundup( m, 32 );
+        REQUIRE( magma_dmalloc( &dA, ldda * k ) == MAGMA_SUCCESS );
+        REQUIRE( magma_dmalloc( &dT, dt_size ) == MAGMA_SUCCESS );
+        magma_dsetmatrix( mm, k, A, lda, dA, 0, ldda, queue );
+        magma_dgeqrf_gpu( mm, k, dA, 0, lda, tau, dT, 0, &info );
+        magma_dgetmatrix( mm, k, dA, 0, ldda, A, lda, queue );
+        magma_free( dA );
+        magma_free( dT );
+
         if (info != 0)
           {
-          std::cerr << "magma_dgelqf() returned error " << info << ": " << magma::error_as_string(info) << std::endl;
+          std::cerr << "magma_dgeqrf() returned error " << info << ": " << magma::error_as_string(info) << std::endl;
           }
         REQUIRE( info == 0 );
 
         /* =====================================================================
            Performs operation using LAPACK
            =================================================================== */
-        coot_fortran(coot_dormlq)( lapack_side_const( side[iside] ), lapack_trans_const( trans[itran] ),
+        coot_fortran(coot_dormqr)( lapack_side_const( side[iside] ), lapack_trans_const( trans[itran] ),
                           &m, &n, &k,
                           A, &lda, tau, C, &ldc, W, &lwork_max, &info );
         if (info != 0)
           {
-          std::cerr << "dormlq returned error " << info << ": " << magma::error_as_string(info) << std::endl;
+          std::cerr << "dormqr() returned error code " << info << ": " << magma::error_as_string(info) << std::endl;
           }
         REQUIRE( info == 0 );
 
@@ -150,26 +156,27 @@ TEST_CASE("magma_dormlq_1", "[ormlq]")
            =================================================================== */
         // query for workspace size
         lwork = -1;
-        magma_dormlq( side[iside], trans[itran],
+        magma_dormqr( side[iside], trans[itran],
                       m, n, k,
                       A, lda, tau, R, ldc, W, lwork, &info );
         if (info != 0)
           {
-          std::cerr << "magma_dormlq (lwork query) returned error " << info << ": " << magma::error_as_string(info) << std::endl;
+          std::cerr << "magma_dormqr (lwork query) returned error " << info << ": " << magma::error_as_string(info) << std::endl;
           }
         REQUIRE( info == 0 );
         lwork = (magma_int_t) W[0];
         if ( lwork < 0 || lwork > lwork_max )
           {
-          std::cerr << "warning: optimal lwork " << lwork << " > allocated lwork_max " << lwork_max << std::endl;
+          std::cerr << "magma_dormqr: optimal lwork " << lwork << " > allocated lwork_max " << lwork_max << std::endl;
+          lwork = lwork_max;
           }
 
-        magma_dormlq( side[iside], trans[itran],
+        magma_dormqr( side[iside], trans[itran],
                       m, n, k,
                       A, lda, tau, R, ldc, W, lwork, &info );
         if (info != 0)
           {
-          std::cerr << "magma_dormlq returned error " << info << ": " << magma::error_as_string(info) << std::endl;
+          std::cerr << "magma_dormqr returned error " << info << ": " << magma::error_as_string(info) << std::endl;
           }
         REQUIRE( info == 0 );
 
@@ -188,7 +195,6 @@ TEST_CASE("magma_dormlq_1", "[ormlq]")
         magma_free_cpu( A );
         magma_free_cpu( W );
         magma_free_cpu( tau );
-        magma_free( dA );
         }
       }
     }

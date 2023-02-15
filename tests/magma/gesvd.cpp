@@ -48,7 +48,7 @@
 //  of this software, even if advised of the possibility of such damage.
 
 #include <bandicoot>
-#include "catch.hpp"
+#include "../catch.hpp"
 #include "def_lapack_test.hpp"
 
 using namespace coot;
