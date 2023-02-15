@@ -1535,36 +1535,3 @@ coot_rt_t::clamp(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const eT1 min_va
     coot_stop_runtime_error("coot_rt::clamp(): unknown backend");
     }
   }
-
-
-
-template<typename eT>
-inline
-eT
-coot_rt_t::larfg(const dev_mem_t<eT> x, const uword n_elem)
-  {
-  coot_extra_debug_sigprint();
-
-  if (get_rt().backend == CL_BACKEND)
-    {
-    #if defined(COOT_USE_OPENCL)
-    return opencl::larfg(x, n_elem);
-    #else
-    coot_stop_runtime_error("coot_rt::larfg(): OpenCL backend not enabled");
-    #endif
-    }
-  else if (get_rt().backend == CUDA_BACKEND)
-    {
-    #if defined(COOT_USE_CUDA)
-    return cuda::larfg(x, n_elem);
-    #else
-    coot_stop_runtime_error("coot_rt::larfg(): CUDA backend not enabled");
-    #endif
-    }
-  else
-    {
-    coot_stop_runtime_error("coot_rt::larfg(): unknown backend");
-    }
-
-  return eT(0); // fix warning
-  }

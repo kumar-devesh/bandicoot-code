@@ -174,11 +174,6 @@ class coot_rt_t
   template<typename eT1, typename eT2>
   static inline void clamp(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const eT1 min_val, const eT1 max_val, const uword n_elem);
 
-  // LAPACK-style utility functions
-
-  template<typename eT>
-  static inline eT larfg(const dev_mem_t<eT> x, const uword n_elem);
-
   static inline void synchronise();
 
   // RC-TODO: unified interface for some other operations?

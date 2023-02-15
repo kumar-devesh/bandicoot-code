@@ -266,7 +266,6 @@ namespace coot
     #include "bandicoot_bits/opencl/clamp.hpp"
     #include "bandicoot_bits/opencl/svd.hpp"
 //    #include "bandicoot_bits/opencl/eig.hpp"
-    #include "bandicoot_bits/opencl/lapack/larfg.hpp"
     }
   #endif
 
@@ -299,14 +298,8 @@ namespace coot
     #include "bandicoot_bits/cuda/clamp.hpp"
     #include "bandicoot_bits/cuda/svd.hpp"
 //    #include "bandicoot_bits/cuda/eig.hpp"
-    #include "bandicoot_bits/cuda/lapack/larfg.hpp"
     }
   #endif
-
-  namespace lapack
-    {
-    #include "bandicoot_bits/lapack/larfg.hpp"
-    }
 
   #include "bandicoot_bits/coot_rt_meat.hpp"
 
