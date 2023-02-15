@@ -164,6 +164,8 @@ typedef cl_command_queue  magma_queue_t;
 typedef cl_event          magma_event_t;
 typedef cl_device_id      magma_device_t;
 
+
+
 /// For integers x >= 0, y > 0, returns ceil( x/y ).
 /// For x == 0, this is 0.
 inline magma_int_t magma_ceildiv(magma_int_t x, magma_int_t y)
