@@ -306,7 +306,7 @@ magma_sgetvector(magma_int_t n,
                  float* hy_dst,               magma_int_t incy,
                  magma_queue_t queue)
   {
-  magma_sgetmatrix(n, 1, dx_src, dx_offset, incx, hy_dst, incy, queue);
+  magma_sgetmatrix(1, n, dx_src, dx_offset, incx, hy_dst, incy, queue);
   }
 
 
@@ -318,7 +318,7 @@ magma_ssetvector(magma_int_t m,
                  magmaFloat_ptr dy_dst, size_t dy_offset, magma_int_t incy,
                  magma_queue_t queue)
   {
-  magma_ssetmatrix(m, 1, hx_src, incx, dy_dst, dy_offset, incy, queue);
+  magma_ssetmatrix(1, m, hx_src, incx, dy_dst, dy_offset, incy, queue);
   }
 
 
