@@ -49,70 +49,86 @@
 
 
 
-// Adaptations of magmablas_* functions to use existing bandicoot backend functionality.
-
-// Make sure these match the definitions in kernel_src.hpp!
-#define MAGMABLAS_BLK_X 64
-#define MAGMABLAS_BLK_Y 32
-
-#define MAGMABLAS_TRANS_NX 32
-#define MAGMABLAS_TRANS_NY 8
-#define MAGMABLAS_TRANS_NB 32
-#define MAGMABLAS_TRANS_INPLACE_NB 16
-
-
+// Put 0s in the upper triangular part of a panel and 1s on the diagonal.
+// Stores previous values in work array, to be restored later with magma_sq_to_panel().
 
 inline
 void
-magmablas_slaset(magma_uplo_t uplo, magma_int_t m, magma_int_t n, float offdiag, float diag, magmaFloat_ptr dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue);
+magma_spanel_to_q(magma_uplo_t uplo, magma_int_t ib, float *A, magma_int_t lda, float *work)
+  {
+  magma_int_t i, j, k = 0;
+  float *col;
+  float c_zero = MAGMA_D_ZERO;
+  float c_one  = MAGMA_D_ONE;
+
+  if (uplo == MagmaUpper)
+    {
+    for (i = 0; i < ib; ++i)
+      {
+      col = A + i*lda;
+      for (j = 0; j < i; ++j)
+        {
+        work[k] = col[j];
+        col [j] = c_zero;
+        ++k;
+        }
+
+        work[k] = col[i];
+        col [j] = c_one;
+        ++k;
+        }
+    }
+  else
+    {
+    for (i=0; i < ib; ++i)
+      {
+      col = A + i*lda;
+      work[k] = col[i];
+      col [i] = c_one;
+      ++k;
+      for (j=i+1; j < ib; ++j)
+        {
+        work[k] = col[j];
+        col [j] = c_zero;
+        ++k;
+        }
+      }
+    }
+  }
 
 
+
+// Restores a panel, after call to magma_spanel_to_q().
 
 inline
 void
-magmablas_dlaset(magma_uplo_t uplo, magma_int_t m, magma_int_t n, double offdiag, double diag, magmaDouble_ptr dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue);
+magma_sq_to_panel(magma_uplo_t uplo, magma_int_t ib, float *A, magma_int_t lda, float *work)
+  {
+  magma_int_t i, j, k = 0;
+  float *col;
 
-
-
-template<typename eT>
-inline
-void
-magmablas_run_laset_kernel(const opencl::magma_real_kernel_id::enum_id num, magma_uplo_t uplo, magma_int_t m, magma_int_t n, eT offdiag, eT diag, cl_mem dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue);
-
-
-
-inline
-void
-magmablas_stranspose(magma_int_t m, magma_int_t n, magmaFloat_const_ptr dA, size_t dA_offset, magma_int_t ldda, magmaFloat_ptr dAT, size_t dAT_offset, magma_int_t lddat, magma_queue_t queue);
-
-
-
-inline
-void
-magmablas_dtranspose(magma_int_t m, magma_int_t n, magmaDouble_const_ptr dA, size_t dA_offset, magma_int_t ldda, magmaDouble_ptr dAT, size_t dAT_offset, magma_int_t lddat, magma_queue_t queue);
-
-
-
-template<typename eT>
-inline
-void
-magmablas_transpose(magma_int_t m, magma_int_t n, cl_mem dA, size_t dA_offset, magma_int_t ldda, cl_mem dAT, size_t dAT_offset, magma_int_t lddat, magma_queue_t queue);
-
-
-
-inline
-void
-magmablas_stranspose_inplace(magma_int_t n, magmaFloat_ptr dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue);
-
-
-
-inline
-void
-magmablas_dtranspose_inplace(magma_int_t n, magmaDouble_ptr dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue);
-
-
-
-template<typename eT>
-inline
-void
-magmablas_transpose_inplace(magma_int_t n, cl_mem dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue);
+  if (uplo == MagmaUpper)
+    {
+    for (i = 0; i < ib; ++i)
+      {
+      col = A + i*lda;
+      for (j = 0; j <= i; ++j)
+        {
+        col[j] = work[k];
+        ++k;
+        }
+      }
+    }
+  else
+    {
+    for (i = 0; i < ib; ++i)
+      {
+      col = A + i*lda;
+      for (j = i; j < ib; ++j)
+        {
+        col[j] = work[k];
+        ++k;
+        }
+      }
+    }
+  }

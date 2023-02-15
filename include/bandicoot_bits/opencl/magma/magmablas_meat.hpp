@@ -53,6 +53,61 @@
 
 inline
 void
+magmablas_slaset
+  (
+  magma_uplo_t uplo,
+  magma_int_t m,
+  magma_int_t n,
+  float offdiag,
+  float diag,
+  magmaFloat_ptr dA,
+  size_t dA_offset,
+  magma_int_t ldda,
+  magma_queue_t queue
+  )
+  {
+  magma_int_t info = 0;
+  if (uplo != MagmaLower && uplo != MagmaUpper && uplo != MagmaFull)
+    info = -1;
+  else if ( m < 0 )
+    info = -2;
+  else if ( n < 0 )
+    info = -3;
+  else if ( ldda < std::max(1,m) )
+    info = -7;
+
+  if (info != 0)
+    {
+    // magma_xerbla( __func__, -(info) );
+    return;  //info;
+    }
+
+  if (m == 0 || n == 0)
+    {
+    return;
+    }
+
+  opencl::magma_real_kernel_id::enum_id num;
+  if (uplo == MagmaLower)
+    {
+    num = opencl::magma_real_kernel_id::laset_lower;
+    }
+  else if (uplo == MagmaUpper)
+    {
+    num = opencl::magma_real_kernel_id::laset_upper;
+    }
+  else
+    {
+    num = opencl::magma_real_kernel_id::laset_full;
+    }
+
+  magmablas_run_laset_kernel(num, uplo, m, n, offdiag, diag, dA, dA_offset, ldda, queue);
+  }
+
+
+
+inline
+void
 magmablas_dlaset
   (
   magma_uplo_t uplo,
@@ -154,6 +209,26 @@ magmablas_run_laset_kernel
 
 inline
 void
+magmablas_stranspose
+  (
+  magma_int_t m,
+  magma_int_t n,
+  magmaFloat_const_ptr dA,
+  size_t dA_offset,
+  magma_int_t ldda,
+  magmaFloat_ptr dAT,
+  size_t dAT_offset,
+  magma_int_t lddat,
+  magma_queue_t queue
+  )
+  {
+  magmablas_transpose<float>(m, n, dA, dA_offset, ldda, dAT, dAT_offset, lddat, queue);
+  }
+
+
+
+inline
+void
 magmablas_dtranspose
   (
   magma_int_t m,
@@ -235,6 +310,22 @@ magmablas_transpose
 
   status = clEnqueueNDRangeKernel(queue, k, 2, NULL, grid, threads, 0, NULL, NULL);
   coot_check_runtime_error(status, "coot::opencl::magmablas_transpose(): couldn't execute kernel");
+  }
+
+
+
+inline
+void
+magmablas_stranspose_inplace
+  (
+  magma_int_t n,
+  magmaFloat_ptr dA,
+  size_t dA_offset,
+  magma_int_t ldda,
+  magma_queue_t queue
+  )
+  {
+  magmablas_transpose_inplace<float>(n, dA, dA_offset, ldda, queue);
   }
 
 
