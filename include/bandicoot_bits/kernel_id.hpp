@@ -159,7 +159,18 @@ struct oneway_real_kernel_id
   {
   enum enum_id
     {
-
+    vec_norm_1,
+    vec_norm_1_small,
+    vec_norm_2,
+    vec_norm_2_small,
+    vec_norm_2_robust,
+    vec_norm_2_robust_small,
+    vec_norm_k,
+    vec_norm_k_small,
+    vec_norm_min,
+    vec_norm_min_small,
+    //
+    invalid_kernel
     };
 
 
@@ -171,6 +182,17 @@ struct oneway_real_kernel_id
     // NOTE: the order and names of kernels in "names" must match the order and names in the kernel_id enum
 
     std::vector<std::string> names;
+
+    names.push_back("vec_norm_1");
+    names.push_back("vec_norm_1_small");
+    names.push_back("vec_norm_2");
+    names.push_back("vec_norm_2_small");
+    names.push_back("vec_norm_2_robust");
+    names.push_back("vec_norm_2_robust_small");
+    names.push_back("vec_norm_k");
+    names.push_back("vec_norm_k_small");
+    names.push_back("vec_norm_min");
+    names.push_back("vec_norm_min_small");
 
     return names;
     }

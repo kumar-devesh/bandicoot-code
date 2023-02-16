@@ -1,4 +1,4 @@
-// Copyright 2019 Ryan Curtin (http://www.ratml.org/)
+// Copyright 2023 Ryan Curtin (http://www.ratml.org/)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,11 +12,13 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
+// this kernel is technically incorrect if the size is not a factor of 2!
 __global__
 void
-COOT_FN(PREFIX,max_abs_small)(const eT1* in_mem,
-                              const UWORD n_elem,
-                              eT1* out_mem)
+COOT_FN(PREFIX,vec_norm_k)(const eT1* in_mem,
+                           const UWORD n_elem,
+                           eT1* out_mem,
+                           const UWORD k)
   {
   eT1* aux_mem = (eT1*) aux_shared_mem;
 
@@ -24,33 +26,36 @@ COOT_FN(PREFIX,max_abs_small)(const eT1* in_mem,
   UWORD i = blockIdx.x * (blockDim.x * 2) + threadIdx.x;
   const UWORD grid_size = blockDim.x * 2 * gridDim.x;
 
-  if (i < n_elem)
-    {
-    aux_mem[tid] = ET1_ABS(in_mem[i]);
-    }
-  if (i + blockDim.x < n_elem)
-    {
-    aux_mem[tid] = max(aux_mem[tid], ET1_ABS(in_mem[i]));
-    }
-  i += grid_size;
+  aux_mem[tid] = 0;
 
   while (i + blockDim.x < n_elem)
     {
-    aux_mem[tid] = max(aux_mem[tid], ET1_ABS(in_mem[i]));
-    aux_mem[tid] = max(aux_mem[tid], ET1_ABS(in_mem[i + blockDim.x]));
+    // copy to local shared memory
+    const eT1 v1 = pow(in_mem[i], eT1(k));
+    const eT1 v2 = pow(in_mem[i + blockDim.x], eT1(k));
+    aux_mem[tid] += v1 + v2;
     i += grid_size;
     }
   if (i < n_elem)
     {
-    aux_mem[tid] = max(aux_mem[tid], ET1_ABS(in_mem[i]));
+    const eT1 v = pow(in_mem[i], eT1(k));
+    aux_mem[tid] += v;
     }
+  __syncthreads();
 
-  for (UWORD s = blockDim.x / 2; s > 0; s >>= 1)
+  for (UWORD s = blockDim.x / 2; s > 32; s >>= 1)
     {
     if (tid < s)
       {
-      aux_mem[tid] = max(aux_mem[tid], aux_mem[tid + s]);
+      aux_mem[tid] += aux_mem[tid + s];
       }
+    __syncthreads();
+  }
+
+  if (tid < 32) // unroll last warp's worth of work
+    {
+    // Since we are just accumulating, we can use the accu_warp_reduce utility function.
+    COOT_FN(PREFIX,accu_warp_reduce)(aux_mem, tid);
     }
 
   if (tid == 0)

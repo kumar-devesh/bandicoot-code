@@ -1,4 +1,4 @@
-// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2023 Ryan Curtin (http://www.ratml.org)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,12 +12,24 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
+
+
+// Forward declarations we may need.
+void COOT_FN(PREFIX,accu_wavefront_reduce_other)(__local volatile eT1* data, UWORD tid);
+void COOT_FN(PREFIX,accu_wavefront_reduce_8)(__local volatile eT1* data, UWORD tid);
+void COOT_FN(PREFIX,accu_wavefront_reduce_16)(__local volatile eT1* data, UWORD tid);
+void COOT_FN(PREFIX,accu_wavefront_reduce_32)(__local volatile eT1* data, UWORD tid);
+void COOT_FN(PREFIX,accu_wavefront_reduce_64)(__local volatile eT1* data, UWORD tid);
+void COOT_FN(PREFIX,accu_wavefront_reduce_128)(__local volatile eT1* data, UWORD tid);
+
+
+
 __kernel
 void
-COOT_FN(PREFIX,accu)(__global const eT1* in_mem,
-                     const UWORD n_elem,
-                     __global eT1* out_mem,
-                     __local volatile eT1* aux_mem)
+COOT_FN(PREFIX,vec_norm_1)(__global const eT1* in_mem,
+                           const UWORD n_elem,
+                           __global eT1* out_mem,
+                           __local volatile eT1* aux_mem)
   {
   const UWORD tid = get_local_id(0);
   UWORD i = get_group_id(0) * (get_local_size(0) * 2) + tid;
@@ -27,12 +39,12 @@ COOT_FN(PREFIX,accu)(__global const eT1* in_mem,
 
   while (i + get_local_size(0) < n_elem)
     {
-    aux_mem[tid] += in_mem[i] + in_mem[i + get_local_size(0)];
+    aux_mem[tid] += ET1_ABS(in_mem[i]) + ET1_ABS(in_mem[i + get_local_size(0)]);
     i += grid_size;
     }
   if (i < n_elem)
     {
-    aux_mem[tid] += in_mem[i];
+    aux_mem[tid] += ET1_ABS(in_mem[i]);
     }
   barrier(CLK_LOCAL_MEM_FENCE);
 

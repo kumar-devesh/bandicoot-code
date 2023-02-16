@@ -174,6 +174,18 @@ class coot_rt_t
   template<typename eT1, typename eT2>
   static inline void clamp(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const eT1 min_val, const eT1 max_val, const uword n_elem);
 
+  template<typename eT>
+  static inline eT vec_norm_1(dev_mem_t<eT> mem, const uword n_elem);
+
+  template<typename eT>
+  static inline eT vec_norm_2(dev_mem_t<eT> mem, const uword n_elem);
+
+  template<typename eT>
+  static inline eT vec_norm_k(dev_mem_t<eT> mem, const uword n_elem, const uword k);
+
+  template<typename eT>
+  static inline eT vec_norm_min(dev_mem_t<eT> mem, const uword n_elem);
+
   static inline void synchronise();
 
   // RC-TODO: unified interface for some other operations?
