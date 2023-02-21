@@ -159,8 +159,6 @@ struct oneway_real_kernel_id
   {
   enum enum_id
     {
-    larfg = 0,
-    //
     vec_norm_1,
     vec_norm_1_small,
     vec_norm_2,
@@ -184,8 +182,6 @@ struct oneway_real_kernel_id
     // NOTE: the order and names of kernels in "names" must match the order and names in the kernel_id enum
 
     std::vector<std::string> names;
-
-    names.push_back("larfg");
 
     names.push_back("vec_norm_1");
     names.push_back("vec_norm_1_small");

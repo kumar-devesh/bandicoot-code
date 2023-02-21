@@ -33,6 +33,9 @@ struct kernel_src
   static inline const std::string&  get_threeway_source();
   static inline       std::string  init_threeway_source();
 
+  static inline const std::string&  get_magma_real_source();
+  static inline       std::string  init_magma_real_source();
+
   static inline const std::string&  get_src_epilogue();
   };
 
@@ -83,6 +86,14 @@ kernel_src::get_src_preamble()
   "inline bool coot_is_fp_long() { return false; } \n"
   "inline bool coot_is_fp_float() { return true; } \n"
   "inline bool coot_is_fp_double() { return true; } \n"
+  "\n"
+  // MAGMA-specific macros.
+  "#define MAGMA_BLK_X 64 \n"
+  "#define MAGMA_BLK_Y 32 \n"
+  "#define MAGMA_TRANS_NX 32 \n"
+  "#define MAGMA_TRANS_NY 8 \n"
+  "#define MAGMA_TRANS_NB 32 \n"
+  "#define MAGMA_TRANS_INPLACE_NB 16 \n"
   ;
 
   return source;
@@ -313,6 +324,37 @@ kernel_src::init_threeway_source()
   for (const std::string& kernel_name : threeway_kernel_id::get_names())
     {
     std::string filename = "threeway/" + kernel_name + ".cl";
+    source += read_file(filename);
+    }
+
+  return source;
+  }
+
+
+
+inline
+const std::string&
+kernel_src::get_magma_real_source()
+  {
+  static const std::string source = init_magma_real_source();
+
+  return source;
+  }
+
+
+
+inline
+std::string
+kernel_src::init_magma_real_source()
+  {
+  // NOTE: kernel names must match the list in the kernel_id struct
+
+  std::string source = "";
+
+  // Load each file for each kernel.
+  for (const std::string& kernel_name : magma_real_kernel_id::get_names())
+    {
+    std::string filename = "magma_real/" + kernel_name + ".cl";
     source += read_file(filename);
     }
 

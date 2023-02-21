@@ -116,6 +116,16 @@ namespace coot
   #include "bandicoot_bits/dev_mem_t.hpp"
   #include "bandicoot_bits/distr_param.hpp"
 
+
+
+  //
+  // low-level debugging and memory handling functions
+
+  #include "bandicoot_bits/debug.hpp"
+  #include "bandicoot_bits/cpu_memory.hpp"
+
+
+
   //
   // runtime
 
@@ -135,6 +145,7 @@ namespace coot
   #if defined(COOT_USE_OPENCL)
   namespace opencl
     {
+    #include "bandicoot_bits/opencl/magma_kernel_id.hpp"
     #include "bandicoot_bits/opencl/runtime_bones.hpp"
     #include "bandicoot_bits/opencl/kernel_src.hpp"
     #include "bandicoot_bits/opencl/error.hpp"
@@ -144,7 +155,19 @@ namespace coot
     #include "bandicoot_bits/opencl/generic_reduce_bones.hpp"
     }
 
-  #include "bandicoot_bits/opencl/magma_bones.hpp"
+  #include "bandicoot_bits/opencl/magma/magma_types.hpp"
+  #include "bandicoot_bits/opencl/magma/magmablas_bones.hpp"
+
+  namespace magma
+    {
+    #include "bandicoot_bits/opencl/magma.hpp"
+    }
+
+  namespace opencl
+    {
+    #include "bandicoot_bits/opencl/debug.hpp"
+    }
+
   #endif
 
   #if defined(COOT_USE_CUDA)
@@ -154,14 +177,8 @@ namespace coot
     #include "bandicoot_bits/cuda/kernel_src.hpp"
     #include "bandicoot_bits/cuda/error.hpp"
     #include "bandicoot_bits/cuda/type_to_dev_string.hpp"
+    #include "bandicoot_bits/cuda/cuda_data_type.hpp"
     #include "bandicoot_bits/cuda/generic_reduce_bones.hpp"
-    }
-  #endif
-
-  #if defined(COOT_USE_OPENCL)
-  namespace magma
-    {
-    #include "bandicoot_bits/opencl/magma.hpp"
     }
   #endif
 
@@ -208,11 +225,6 @@ namespace coot
 
   #include "bandicoot_bits/wall_clock_bones.hpp"
 
-  //
-  // low-level debugging and memory handling functions
-
-  #include "bandicoot_bits/debug.hpp"
-  #include "bandicoot_bits/cpu_memory.hpp"
 
 
   //
@@ -220,7 +232,8 @@ namespace coot
 
   #include "bandicoot_bits/coot_cmath.hpp"
 
-  // definitions for LAPACK functions
+  // definitions for LAPACK and BLAS functions
+  #include "bandicoot_bits/def_blas.hpp"
   #include "bandicoot_bits/def_lapack.hpp"
 
   //
@@ -237,36 +250,79 @@ namespace coot
     }
 
   #if defined(COOT_USE_OPENCL)
-  namespace opencl
-    {
-    #include "bandicoot_bits/opencl/debug.hpp"
-    #include "bandicoot_bits/opencl/runtime_meat.hpp"
-    #include "bandicoot_bits/opencl/generic_reduce_meat.hpp"
-    #include "bandicoot_bits/opencl/inplace_op.hpp"
-    #include "bandicoot_bits/opencl/array_op.hpp"
-    #include "bandicoot_bits/opencl/mat_val_proxy.hpp"
-    #include "bandicoot_bits/opencl/random_meat.hpp"
-    #include "bandicoot_bits/opencl/eop_core_meat.hpp"
-    #include "bandicoot_bits/opencl/accu.hpp"
-    #include "bandicoot_bits/opencl/chol.hpp"
-    #include "bandicoot_bits/opencl/copy_meat.hpp"
-    #include "bandicoot_bits/opencl/trace.hpp"
-    #include "bandicoot_bits/opencl/eye.hpp"
-    #include "bandicoot_bits/opencl/gemm.hpp"
-    #include "bandicoot_bits/opencl/gemv.hpp"
-    #include "bandicoot_bits/opencl/sum.hpp"
-    #include "bandicoot_bits/opencl/dot.hpp"
-    #include "bandicoot_bits/opencl/min.hpp"
-    #include "bandicoot_bits/opencl/max.hpp"
-    #include "bandicoot_bits/opencl/max_abs.hpp"
-    #include "bandicoot_bits/opencl/repmat.hpp"
-    #include "bandicoot_bits/opencl/linspace.hpp"
-    #include "bandicoot_bits/opencl/trans.hpp"
-    #include "bandicoot_bits/opencl/clamp.hpp"
-    #include "bandicoot_bits/opencl/norm.hpp"
-//    #include "bandicoot_bits/opencl/eig.hpp"
-    #include "bandicoot_bits/opencl/lapack/larfg.hpp"
-    }
+
+    //
+    // include ported magma functionality
+    // NOTE: magma uses rather dubious coding techniques
+    //
+
+    #include "bandicoot_bits/opencl/magma/magma_support.hpp"
+
+    #include "bandicoot_bits/opencl/magma/spanel_to_q.hpp"
+    #include "bandicoot_bits/opencl/magma/dpanel_to_q.hpp"
+    #include "bandicoot_bits/opencl/magma/magmablas_meat.hpp"
+
+    #include "bandicoot_bits/opencl/magma/slarfb.hpp"
+    #include "bandicoot_bits/opencl/magma/sorgqr.hpp"
+    #include "bandicoot_bits/opencl/magma/slabrd.hpp"
+    #include "bandicoot_bits/opencl/magma/sgebrd.hpp"
+    #include "bandicoot_bits/opencl/magma/sgeqrf.hpp"
+    #include "bandicoot_bits/opencl/magma/sgeqrf2.hpp"
+    #include "bandicoot_bits/opencl/magma/sorglq.hpp"
+    #include "bandicoot_bits/opencl/magma/sgelqf.hpp"
+    #include "bandicoot_bits/opencl/magma/sorgqr2.hpp"
+    #include "bandicoot_bits/opencl/magma/sorgbr.hpp"
+    #include "bandicoot_bits/opencl/magma/sormqr.hpp"
+    #include "bandicoot_bits/opencl/magma/sormlq.hpp"
+    #include "bandicoot_bits/opencl/magma/sormbr.hpp"
+    #include "bandicoot_bits/opencl/magma/sgesvd.hpp"
+    #include "bandicoot_bits/opencl/magma/spotrf.hpp"
+
+    #include "bandicoot_bits/opencl/magma/dlarfb.hpp"
+    #include "bandicoot_bits/opencl/magma/dorgqr.hpp"
+    #include "bandicoot_bits/opencl/magma/dlabrd.hpp"
+    #include "bandicoot_bits/opencl/magma/dgebrd.hpp"
+    #include "bandicoot_bits/opencl/magma/dgeqrf.hpp"
+    #include "bandicoot_bits/opencl/magma/dgeqrf2.hpp"
+    #include "bandicoot_bits/opencl/magma/dorglq.hpp"
+    #include "bandicoot_bits/opencl/magma/dgelqf.hpp"
+    #include "bandicoot_bits/opencl/magma/dorgqr2.hpp"
+    #include "bandicoot_bits/opencl/magma/dorgbr.hpp"
+    #include "bandicoot_bits/opencl/magma/dormqr.hpp"
+    #include "bandicoot_bits/opencl/magma/dormlq.hpp"
+    #include "bandicoot_bits/opencl/magma/dormbr.hpp"
+    #include "bandicoot_bits/opencl/magma/dgesvd.hpp"
+    #include "bandicoot_bits/opencl/magma/dpotrf.hpp"
+
+    namespace opencl
+      {
+      #include "bandicoot_bits/opencl/runtime_meat.hpp"
+      #include "bandicoot_bits/opencl/generic_reduce_meat.hpp"
+      #include "bandicoot_bits/opencl/inplace_op.hpp"
+      #include "bandicoot_bits/opencl/array_op.hpp"
+      #include "bandicoot_bits/opencl/mat_val_proxy.hpp"
+      #include "bandicoot_bits/opencl/random_meat.hpp"
+      #include "bandicoot_bits/opencl/eop_core_meat.hpp"
+      #include "bandicoot_bits/opencl/accu.hpp"
+      #include "bandicoot_bits/opencl/chol.hpp"
+      #include "bandicoot_bits/opencl/copy_meat.hpp"
+      #include "bandicoot_bits/opencl/trace.hpp"
+      #include "bandicoot_bits/opencl/eye.hpp"
+      #include "bandicoot_bits/opencl/gemm.hpp"
+      #include "bandicoot_bits/opencl/gemv.hpp"
+      #include "bandicoot_bits/opencl/sum.hpp"
+      #include "bandicoot_bits/opencl/dot.hpp"
+      #include "bandicoot_bits/opencl/min.hpp"
+      #include "bandicoot_bits/opencl/max.hpp"
+      #include "bandicoot_bits/opencl/max_abs.hpp"
+      #include "bandicoot_bits/opencl/repmat.hpp"
+      #include "bandicoot_bits/opencl/linspace.hpp"
+      #include "bandicoot_bits/opencl/trans.hpp"
+      #include "bandicoot_bits/opencl/clamp.hpp"
+      #include "bandicoot_bits/opencl/norm.hpp"
+      #include "bandicoot_bits/opencl/svd.hpp"
+//      #include "bandicoot_bits/opencl/eig.hpp"
+      }
   #endif
 
   #if defined(COOT_USE_CUDA)
@@ -298,15 +354,10 @@ namespace coot
     #include "bandicoot_bits/cuda/trans.hpp"
     #include "bandicoot_bits/cuda/clamp.hpp"
     #include "bandicoot_bits/cuda/norm.hpp"
+    #include "bandicoot_bits/cuda/svd.hpp"
 //    #include "bandicoot_bits/cuda/eig.hpp"
-    #include "bandicoot_bits/cuda/lapack/larfg.hpp"
     }
   #endif
-
-  namespace lapack
-    {
-    #include "bandicoot_bits/lapack/larfg.hpp"
-    }
 
   #include "bandicoot_bits/coot_rt_meat.hpp"
 
@@ -329,22 +380,7 @@ namespace coot
   #include "bandicoot_bits/operator_div.hpp"
   //#include "bandicoot_bits/operator_ostream.hpp"
 
-  //
-  // magma related
-  // NOTE: magma uses rather dubious coding techniques
 
-  #if defined(COOT_USE_OPENCL)
-    //#include "bandicoot_bits/opencl/magma13_support.hpp"
-    //#include "bandicoot_bits/opencl/magma13_dpotrf.hpp"
-
-    #include "bandicoot_bits/opencl/magma22_support.hpp"
-
-    #include "bandicoot_bits/opencl/magma22_dlarfb.hpp"
-    #include "bandicoot_bits/opencl/magma22_dgeqrf.hpp"
-
-    #include "bandicoot_bits/opencl/magma22_spotrf.hpp"
-    #include "bandicoot_bits/opencl/magma22_dpotrf.hpp"
-  #endif
 
   //
   // user accessible functions
@@ -373,6 +409,7 @@ namespace coot
   #include "bandicoot_bits/fn_vectorise.hpp"
   #include "bandicoot_bits/fn_clamp.hpp"
   #include "bandicoot_bits/fn_norm.hpp"
+  #include "bandicoot_bits/fn_svd.hpp"
 
 
   //
