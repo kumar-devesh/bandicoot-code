@@ -16,11 +16,75 @@
 
 template<typename T1>
 coot_warn_unused
-inline
-typename enable_if2< is_coot_type<T1>::value, typename T1::elem_type >::result
-max(const T1& X, const uword dim = 0)
+coot_inline
+const Op<T1, op_max>
+max
+  (
+  const T1& X,
+  const uword dim = 0,
+  const typename enable_if< is_coot_type<T1>::value       == true  >::result* junk1 = 0,
+  const typename enable_if< resolves_to_vector<T1>::value == false >::result* junk2 = 0
+  )
   {
   coot_extra_debug_sigprint();
+  coot_ignore(junk1);
+  coot_ignore(junk2);
 
-  return op_max::apply(Op<T1, op_max>(X, dim, 0));
+  return Op<T1, op_max>(X, dim, 0);
+  }
+
+
+
+template<typename T1>
+coot_warn_unused
+coot_inline
+const Op<T1, op_max>
+max
+  (
+  const T1& X,
+  const uword dim,
+  const typename enable_if< resolves_to_vector<T1>::value == true >::result* junk = 0
+  )
+  {
+  coot_extra_debug_sigprint();
+  coot_ignore(junk);
+
+  return Op<T1, op_max>(X, dim, 0);
+  }
+
+
+
+template<typename T1>
+coot_warn_unused
+inline
+typename T1::elem_type
+max
+  (
+  const T1& X,
+  const coot_empty_class junk1 = coot_empty_class(),
+  const typename enable_if< resolves_to_vector<T1>::value == true >::result* junk2 = 0
+  )
+  {
+  coot_extra_debug_sigprint();
+  coot_ignore(junk1);
+  coot_ignore(junk2);
+
+  return op_max::apply_direct(X);
+  }
+
+
+
+template<typename T1>
+coot_warn_unused
+inline
+typename T1::elem_type
+max
+  (
+  const Op<T1, op_max>& in
+  )
+  {
+  coot_extra_debug_sigprint();
+  coot_extra_debug_print("max(): two consecutive max() calls detected");
+
+  return op_max::apply_direct(in.m);
   }
