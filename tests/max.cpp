@@ -17,9 +17,10 @@
 
 using namespace coot;
 
-template<typename eT>
-void test_max_small()
+TEMPLATE_TEST_CASE("max_small", "[max]", float, double, u32, s32, u64, s64)
   {
+  typedef TestType eT;
+
   Col<eT> x(16);
   for (uword i = 0; i < 16; ++i)
     x[i] = i + 1;
@@ -31,21 +32,10 @@ void test_max_small()
 
 
 
-TEST_CASE("max_small")
+TEMPLATE_TEST_CASE("max_1", "[max]", float, double, u32, s32, u64, s64)
   {
-  test_max_small<double>();
-  test_max_small<float>();
-  test_max_small<u32>();
-  test_max_small<s32>();
-  test_max_small<u64>();
-  test_max_small<s64>();
-  }
+  typedef TestType eT;
 
-
-
-template<typename eT>
-void test_max_1()
-  {
   Col<eT> x(6400);
   for (uword i = 0; i < 6400; ++i)
     x[i] = i + 1;
@@ -57,21 +47,10 @@ void test_max_1()
 
 
 
-TEST_CASE("max_1")
+TEMPLATE_TEST_CASE("max_strange_size", "[max]", float, double, u32, s32, u64, s64)
   {
-  test_max_1<double>();
-  test_max_1<float>();
-  test_max_1<u32>();
-  test_max_1<s32>();
-  test_max_1<u64>();
-  test_max_1<s64>();
-  }
+  typedef TestType eT;
 
-
-
-template<typename eT>
-void test_max_strange_size()
-  {
   Col<eT> x(608);
 
   for(uword i = 0; i < 608; ++i)
@@ -84,21 +63,10 @@ void test_max_strange_size()
 
 
 
-TEST_CASE("max_strange_size")
+TEMPLATE_TEST_CASE("max_large", "[max]", float, double, u32, s32, u64, s64)
   {
-  test_max_strange_size<double>();
-  test_max_strange_size<float>();
-  test_max_strange_size<u32>();
-  test_max_strange_size<s32>();
-  test_max_strange_size<u64>();
-  test_max_strange_size<s64>();
-  }
+  typedef TestType eT;
 
-
-
-template<typename eT>
-void test_max_large()
-  {
   arma::Col<eT> cpu_x = arma::conv_to<arma::Col<eT>>::from(arma::randu<arma::Col<double>>(100000) * 10.0);
   cpu_x.randu();
   Col<eT> x(cpu_x);
@@ -110,21 +78,10 @@ void test_max_large()
   }
 
 
-
-TEST_CASE("max_large")
+TEMPLATE_TEST_CASE("max_2", "[max]", float, double)
   {
-  test_max_large<double>();
-  test_max_large<float>();
-  test_max_large<u32>();
-  test_max_large<s32>();
-  test_max_large<u64>();
-  test_max_large<s64>();
-  }
+  typedef TestType eT;
 
-
-template<typename eT>
-void test_max_2()
-  {
   Col<eT> x(50);
   x.randu();
   x += eT(1);
@@ -137,8 +94,250 @@ void test_max_2()
 
 
 
-TEST_CASE("max_2")
+TEMPLATE_TEST_CASE("max_colwise_1", "[max]", float, double, u32, s32, u64, s64)
   {
-  test_max_2<double>();
-  test_max_2<float>();
+  typedef TestType eT;
+
+  Mat<eT> x(10, 10);
+  for (uword c = 0; c < 10; ++c)
+    {
+    for (uword r = 0; r < 10; ++r)
+      {
+      x(r, c) = c;
+      }
+    }
+
+  Mat<eT> s = max(x, 0);
+
+  REQUIRE( s.n_rows == 1  );
+  REQUIRE( s.n_cols == 10 );
+  for (uword c = 0; c < 10; ++c)
+    {
+    REQUIRE( eT(s[c]) == Approx(eT(c)) );
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("max_colwise_2", "[max]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x(10, 10);
+  for (uword c = 0; c < 10; ++c)
+    {
+    for (uword r = 0; r < 10; ++r)
+      {
+      x(r, c) = r;
+      }
+    }
+
+  Mat<eT> s = max(x, 0);
+
+  REQUIRE( s.n_rows == 1  );
+  REQUIRE( s.n_cols == 10 );
+  for (uword c = 0; c < 10; ++c)
+    {
+    REQUIRE( eT(s[c]) == Approx(eT(9)) );
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("max_rowwise_1", "[max]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x(10, 10);
+  for (uword c = 0; c < 10; ++c)
+    {
+    for (uword r = 0; r < 10; ++r)
+      {
+      x(r, c) = c;
+      }
+    }
+
+  Mat<eT> s = max(x, 1);
+
+  REQUIRE( s.n_rows == 10 );
+  REQUIRE( s.n_cols == 1  );
+  for (uword r = 0; r < 10; ++r)
+    {
+    REQUIRE( eT(s[r]) == Approx(eT(9)) );
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("max_rowwise_2", "[max]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x(10, 10);
+  for (uword c = 0; c < 10; ++c)
+    {
+    for (uword r = 0; r < 10; ++r)
+      {
+      x(r, c) = r;
+      }
+    }
+
+  Mat<eT> s = max(x, 1);
+
+  REQUIRE( s.n_rows == 10 );
+  REQUIRE( s.n_cols == 1  );
+  for (uword r = 0; r < 10; ++r)
+    {
+    REQUIRE( eT(s[r]) == Approx(eT(r)) );
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("subview_max_colwise_1", "[max]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x(10, 10);
+  for (uword c = 0; c < 10; ++c)
+    {
+    for (uword r = 0; r < 10; ++r)
+      {
+      x(r, c) = c;
+      }
+    }
+
+  Mat<eT> s = max(x.submat(1, 1, 8, 8), 0);
+
+  REQUIRE( s.n_rows == 1 );
+  REQUIRE( s.n_cols == 8 );
+  for (uword c = 0; c < 8; ++c)
+    {
+    REQUIRE( eT(s[c]) == Approx(eT(c + 1)) );
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("subview_max_colwise_2", "[max]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x(10, 10);
+  for (uword c = 0; c < 10; ++c)
+    {
+    for (uword r = 0; r < 10; ++r)
+      {
+      x(r, c) = r;
+      }
+    }
+
+  Mat<eT> s = max(x.submat(1, 1, 8, 8), 0);
+
+  REQUIRE( s.n_rows == 1 );
+  REQUIRE( s.n_cols == 8 );
+  for (uword c = 0; c < 8; ++c)
+    {
+    REQUIRE( eT(s[c]) == Approx(eT(8)) );
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("subview_max_colwise_full", "[max]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x(10, 10);
+  for (uword c = 0; c < 10; ++c)
+    {
+    for (uword r = 0; r < 10; ++r)
+      {
+      x(r, c) = c;
+      }
+    }
+
+  Mat<eT> s = max(x.submat(0, 0, 9, 9), 0);
+
+  REQUIRE( s.n_rows == 1  );
+  REQUIRE( s.n_cols == 10 );
+  for (uword c = 0; c < 10; ++c)
+    {
+    REQUIRE( eT(s[c]) == Approx(eT(c)) );
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("subview_max_rowwise_1", "[max]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x(10, 10);
+  for (uword c = 0; c < 10; ++c)
+    {
+    for (uword r = 0; r < 10; ++r)
+      {
+      x(r, c) = c;
+      }
+    }
+
+  Mat<eT> s = max(x.submat(1, 1, 8, 8), 1);
+
+  REQUIRE( s.n_rows == 8 );
+  REQUIRE( s.n_cols == 1 );
+  for (uword r = 0; r < 8; ++r)
+    {
+    REQUIRE( eT(s[r]) == Approx(eT(8)) );
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("subview_max_rowwise_2", "[max]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x(10, 10);
+  for (uword c = 0; c < 10; ++c)
+    {
+    for (uword r = 0; r < 10; ++r)
+      {
+      x(r, c) = r;
+      }
+    }
+
+  Mat<eT> s = max(x.submat(1, 1, 8, 8), 1);
+
+  REQUIRE( s.n_rows == 8 );
+  REQUIRE( s.n_cols == 1 );
+  for (uword r = 0; r < 8; ++r)
+    {
+    REQUIRE( eT(s[r]) == Approx(eT(r + 1)) );
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("subview_max_rowwise_full", "[max]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x(10, 10);
+  for (uword c = 0; c < 10; ++c)
+    {
+    for (uword r = 0; r < 10; ++r)
+      {
+      x(r, c) = r;
+      }
+    }
+
+  Mat<eT> s = max(x.submat(0, 0, 9, 9), 1);
+
+  REQUIRE( s.n_rows == 10 );
+  REQUIRE( s.n_cols == 1  );
+  for (uword r = 0; r < 10; ++r)
+    {
+    REQUIRE( eT(s[r]) == Approx(eT(r)) );
+    }
   }
