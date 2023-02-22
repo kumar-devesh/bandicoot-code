@@ -61,14 +61,10 @@ norm
     }
   else
     {
-    std::cout << "TODO: implement matrix norm\n";
-    if(k == uword(2))  { return op_norm::vec_norm_2(U.M); }
-  /*   const quasi_unwrap<typename Proxy<T1>::stored_type> U(P.Q); */
+    if(k == uword(1))  { return op_norm::mat_norm_1(U.M); }
+    if(k == uword(2))  { return op_norm::mat_norm_2(U.M); }
 
-  /*   if(k == uword(1))  { return op_norm::mat_norm_1(U.M); } */
-  /*   if(k == uword(2))  { return op_norm::mat_norm_2(U.M); } */
-
-  /*   arma_stop_logic_error("norm(): unsupported matrix norm type"); */
+    coot_stop_logic_error("norm(): unsupported matrix norm type");
     }
 
   return T(0);
@@ -114,17 +110,15 @@ norm
     }
   else
     {
-  /*   if( (sig == 'i') || (sig == 'I') || (sig == '+') )   // inf norm */
-  /*     { */
-  /*     const quasi_unwrap<typename Proxy<T1>::stored_type> U(P.Q); */
-
-  /*     return op_norm::mat_norm_inf(U.M); */
-  /*     } */
-  /*   else */
-  /*   if( (sig == 'f') || (sig == 'F') ) */
-  /*     { */
-  /*     return op_norm::vec_norm_2(P); */
-  /*     } */
+    if( (sig == 'i') || (sig == 'I') || (sig == '+') )   // inf norm
+      {
+      return op_norm::mat_norm_inf(U.M);
+      }
+    else
+    if( (sig == 'f') || (sig == 'F') )
+      {
+      return op_norm::vec_norm_2(U.M);
+      }
 
     coot_stop_logic_error("norm(): unsupported matrix norm type");
     }

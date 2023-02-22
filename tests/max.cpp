@@ -94,6 +94,32 @@ TEMPLATE_TEST_CASE("max_2", "[max]", float, double)
 
 
 
+// This was found to be failing for the CUDA backend.
+// TODO: fix this!
+TEMPLATE_TEST_CASE("max_3", "[max]", float, double)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x(10, 1);
+  x[0] = 4.7394;
+  x[1] = 4.7299;
+  x[2] = 6.2287;
+  x[3] = 4.5893;
+  x[4] = 4.4460;
+  x[5] = 4.7376;
+  x[6] = 4.7432;
+  x[7] = 3.8152;
+  x[8] = 4.1442;
+  x[9] = 5.2339;
+
+  eT max_val = max(max(x));
+
+  REQUIRE( max_val == Approx(6.2287) );
+  }
+
+
+
+
 TEMPLATE_TEST_CASE("max_colwise_1", "[max]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
