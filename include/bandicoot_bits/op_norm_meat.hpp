@@ -35,7 +35,10 @@ eT
 op_norm::vec_norm_1(const subview<eT>& X)
   {
   coot_extra_debug_sigprint();
-  // TODO: implement
+  // TODO: a better implementation would be much more efficient and avoid this
+  // extraction.
+  Mat<eT> tmp(X);
+  return vec_norm_1(tmp);
   }
 
 
@@ -57,7 +60,10 @@ eT
 op_norm::vec_norm_2(const subview<eT>& X)
   {
   coot_extra_debug_sigprint();
-  // TODO: implement
+  // TODO: a better implementation would be much more efficient and avoid this
+  // extraction.
+  Mat<eT> tmp(X);
+  return vec_norm_2(tmp);
   }
 
 
@@ -79,7 +85,10 @@ eT
 op_norm::vec_norm_k(const subview<eT>& X, const uword k)
   {
   coot_extra_debug_sigprint();
-  // TODO: implement
+  // TODO: a better implementation would be much more efficient and avoid this
+  // extraction.
+  Mat<eT> tmp(X);
+  return vec_norm_k(tmp, k);
   }
 
 
@@ -101,7 +110,10 @@ eT
 op_norm::vec_norm_min(const subview<eT>& X)
   {
   coot_extra_debug_sigprint();
-  // TODO: implement
+  // TODO: a better implementation would be much more efficient and avoid this
+  // extraction.
+  Mat<eT> tmp(X);
+  return vec_norm_min(tmp);
   }
 
 
@@ -123,7 +135,10 @@ eT
 op_norm::vec_norm_max(const subview<eT>& X)
   {
   coot_extra_debug_sigprint();
-  // TODO: implement
+  // TODO: a better implementation would be much more efficient and avoid this
+  // extraction.
+  Mat<eT> tmp(X);
+  return vec_norm_max(tmp);
   }
 
 
@@ -148,7 +163,10 @@ eT
 op_norm::mat_norm_1(const subview<eT>& X)
   {
   coot_extra_debug_sigprint();
-  // TODO: implement
+  // TODO: a better implementation would be much more efficient and avoid this
+  // extraction.
+  Mat<eT> tmp(X);
+  return mat_norm_1(tmp);
   }
 
 
@@ -180,7 +198,10 @@ eT
 op_norm::mat_norm_2(const subview<eT>& X)
   {
   coot_extra_debug_sigprint();
-  // TODO: implement
+  // TODO: a better implementation would be much more efficient and avoid this
+  // extraction.
+  Mat<eT> tmp(X);
+  return mat_norm_2(tmp);
   }
 
 
@@ -205,5 +226,8 @@ eT
 op_norm::mat_norm_inf(const subview<eT>& X)
   {
   coot_extra_debug_sigprint();
-  // TODO: implement
+  // TODO: a better implementation would be much more efficient and avoid this
+  // extraction.
+  Mat<eT> tmp(X);
+  return mat_norm_inf(tmp);
   }
