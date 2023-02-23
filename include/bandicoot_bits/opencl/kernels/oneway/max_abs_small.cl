@@ -23,6 +23,10 @@ COOT_FN(PREFIX,max_abs_small)(__global const eT1* in_mem,
   UWORD i = get_group_id(0) * (get_local_size(0) * 2) + tid;
   const UWORD grid_size = get_local_size(0) * 2 * get_num_groups(0);
 
+  // Make sure all auxiliary memory is initialized to something that won't
+  // screw up the final reduce.
+  aux_mem[tid] = COOT_FN(coot_type_max_,eT1)();
+
   if (i < n_elem)
     {
     aux_mem[tid] = ET1_ABS(in_mem[i]);
