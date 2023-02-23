@@ -84,6 +84,9 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
   // Initialize cuBLAS.
   cublasCreate(&cublas_handle);
 
+  cusolverStatus_t status = cusolverDnCreate(&cusolver_handle);
+  coot_check_cusolver_error(status, "coot::cuda::chol(): cusolverDnCreate() failed");
+
   valid = true;
 
   return true;
@@ -273,6 +276,8 @@ runtime_t::~runtime_t()
 
     // Clean up cuBLAS handle.
     cublasDestroy(cublas_handle);
+    // Clean up cuSolver handle.
+    cusolverDnDestroy(cusolver_handle);
     }
   }
 

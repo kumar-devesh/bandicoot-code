@@ -28,11 +28,7 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
 
   // The cuSolverDN library provides a potrf() implementation.  ...and its own entirely separate error code type.
 
-  cusolverDnHandle_t handle = NULL;
-
-  cusolverStatus_t status = cusolverDnCreate(&handle);
-  coot_check_cusolver_error(status, "coot::cuda::chol(): cusolverDnCreate() failed");
-
+  cusolverStatus_t status;
   cudaError_t status2;
 
   // This is an additional error code for cusolverDn; but it is an error code on the device...
@@ -43,7 +39,7 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
   if (std::is_same<eT, float>::value)
     {
     int workspace_size = 0;
-    status = cusolverDnSpotrf_bufferSize(handle,
+    status = cusolverDnSpotrf_bufferSize(get_rt().cuda_rt.cusolver_handle,
                                          CUBLAS_FILL_MODE_UPPER,
                                          (int) n_rows,
                                          (float*) mem.cuda_mem_ptr,
@@ -56,7 +52,7 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
     status2 = cudaMalloc((void**) &workspace_mem, sizeof(float) * workspace_size);
     coot_check_cuda_error(status2, "coot::cuda::chol(): couldn't cudaMalloc() workspace memory");
 
-    status = cusolverDnSpotrf(handle,
+    status = cusolverDnSpotrf(get_rt().cuda_rt.cusolver_handle,
                               CUBLAS_FILL_MODE_UPPER,
                               (int) n_rows,
                               (float*) mem.cuda_mem_ptr,
@@ -75,7 +71,7 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
   else if (std::is_same<eT, double>::value)
     {
     int workspace_size = 0;
-    status = cusolverDnDpotrf_bufferSize(handle,
+    status = cusolverDnDpotrf_bufferSize(get_rt().cuda_rt.cusolver_handle,
                                          CUBLAS_FILL_MODE_UPPER,
                                          (int) n_rows,
                                          (double*) mem.cuda_mem_ptr,
@@ -88,7 +84,7 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
     status2 = cudaMalloc((void**) &workspace_mem, sizeof(double) * workspace_size);
     coot_check_cuda_error(status2, "coot::cuda::chol(): couldn't cudaMalloc() workspace memory");
 
-    status = cusolverDnDpotrf(handle,
+    status = cusolverDnDpotrf(get_rt().cuda_rt.cusolver_handle,
                               CUBLAS_FILL_MODE_UPPER,
                               (int) n_rows,
                               (double*) mem.cuda_mem_ptr,
@@ -135,8 +131,6 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
       0);
 
   coot_check_cuda_error(result, "coot::cuda::chol(): cuLaunchKernel() failed for kernel ltri_set_zero");
-
-  cusolverDnDestroy(handle);
 
   return true;
   }

@@ -59,12 +59,13 @@ struct runtime_t
 
   // use CURAND_ORDERING_PSEUDO_SEEDED with XORWOW / CURAND_ORDERING_PSEUDO_BEST
   // We use XORWOW for uniform distributions, and Philox for normal distributions.
-  coot_aligned curandGenerator_t xorwow_rand;
-  coot_aligned curandGenerator_t philox_rand;
+  coot_aligned curandGenerator_t  xorwow_rand;
+  coot_aligned curandGenerator_t  philox_rand;
 
-  coot_aligned cudaDeviceProp    dev_prop;
+  coot_aligned cudaDeviceProp     dev_prop;
 
-  coot_aligned cublasHandle_t    cublas_handle;
+  coot_aligned cublasHandle_t     cublas_handle;
+  coot_aligned cusolverDnHandle_t cusolver_handle;
 
   // TODO: is it necessary to have a lock() and unlock()?
   // since all CUdevice and CUcontext are are pointers, I don't think we need to specifically lock them
