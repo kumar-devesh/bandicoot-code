@@ -73,6 +73,9 @@ class coot_rt_t
   template<typename eT>
   static inline void inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const uword M_n_rows, const oneway_kernel_id::enum_id num);
 
+  template<typename eT>
+  static inline void inplace_op_diag(dev_mem_t<eT> dest, const eT val, const sword k, const uword n_rows, const uword n_cols, const uword n_elem);
+
   template<typename eT1, typename eT2>
   static inline void inplace_op_subview(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword M_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const twoway_kernel_id::enum_id num, const char* identifier);
 
