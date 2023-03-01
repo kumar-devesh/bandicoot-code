@@ -93,9 +93,9 @@ class diagview : public Base< eT, diagview<eT> >
 
   /* inline void clamp(const eT min_val, const eT max_val); */
 
-  /* inline void fill(const eT val); */
-  /* inline void zeros(); */
-  /* inline void ones(); */
+  inline void fill(const eT val);
+  inline void zeros();
+  inline void ones();
   /* inline void randu(); */
   /* inline void randn(); */
 

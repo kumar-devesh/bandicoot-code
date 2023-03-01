@@ -127,20 +127,6 @@ diagview<eT>::diagview(const Mat<eT>& in_m, const uword in_row_offset, const uwo
 template<typename eT>
 inline
 void
-diagview<eT>::operator=(const eT val)
-  {
-  coot_extra_debug_sigprint();
-
-  Mat<eT>& t_m = const_cast< Mat<eT>& >(m);
-
-  coot_rt_t::inplace_op_diag(t_m.get_dev_mem(false), mem_offset, val, t_m.n_rows, n_elem, oneway_kernel_id::diag_inplace_set_scalar);
-  }
-
-
-
-template<typename eT>
-inline
-void
 diagview<eT>::operator+=(const eT val)
   {
   coot_extra_debug_sigprint();
@@ -924,46 +910,41 @@ diagview<eT>::operator/=(const eT val)
 
 
 
-/* template<typename eT> */
-/* inline */
-/* void */
-/* diagview<eT>::fill(const eT val) */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
+template<typename eT>
+inline
+void
+diagview<eT>::fill(const eT val)
+  {
+  coot_extra_debug_sigprint();
 
-/*   Mat<eT>& x = const_cast< Mat<eT>& >(m); */
+  Mat<eT>& t_m = const_cast< Mat<eT>& >(m);
 
-/*   const uword local_n_elem = n_elem; */
-
-/*   for(uword ii=0; ii < local_n_elem; ++ii) */
-/*     { */
-/*     x.at(ii+row_offset, ii+col_offset) = val; */
-/*     } */
-/*   } */
+  coot_rt_t::inplace_op_diag(t_m.get_dev_mem(false), mem_offset, val, t_m.n_rows, n_elem, oneway_kernel_id::diag_inplace_set_scalar);
+  }
 
 
 
-/* template<typename eT> */
-/* inline */
-/* void */
-/* diagview<eT>::zeros() */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
+template<typename eT>
+inline
+void
+diagview<eT>::zeros()
+  {
+  coot_extra_debug_sigprint();
 
-/*   (*this).fill(eT(0)); */
-/*   } */
+  (*this).fill(eT(0));
+  }
 
 
 
-/* template<typename eT> */
-/* inline */
-/* void */
-/* diagview<eT>::ones() */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
+template<typename eT>
+inline
+void
+diagview<eT>::ones()
+  {
+  coot_extra_debug_sigprint();
 
-/*   (*this).fill(eT(1)); */
-/*   } */
+  (*this).fill(eT(1));
+  }
 
 
 
