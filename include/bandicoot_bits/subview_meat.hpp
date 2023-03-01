@@ -385,7 +385,7 @@ subview<eT>::operator/=(const mtOp<eT, T1, mtop_conv_to>& x)
 template<typename eT>
 coot_inline
 diagview<eT>
-diag(const sword in_id = 0)
+subview<eT>::diag(const sword in_id)
   {
   coot_extra_debug_sigprint();
 
@@ -408,7 +408,7 @@ diag(const sword in_id = 0)
 template<typename eT>
 coot_inline
 const diagview<eT>
-diag(const sword in_id = 0) const
+subview<eT>::diag(const sword in_id) const
   {
   coot_extra_debug_sigprint();
 
