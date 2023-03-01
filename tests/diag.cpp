@@ -458,9 +458,110 @@ TEMPLATE_TEST_CASE("subview_off_diag_div", "[diag]", float, double, u32, s32, u6
 
 // Test main diagonal extraction.
 
+TEMPLATE_TEST_CASE("main_diag_extract", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
+  arma::Mat<eT> x_cpu(x);
+
+  Col<eT> y = x.diag();
+  arma::Col<eT> y_cpu = x_cpu.diag();
+
+  arma::Col<eT> y2_cpu(y);
+
+  REQUIRE( arma::approx_equal(y_cpu, y2_cpu, "absdiff", 1e-5) );
+  }
+
+
+
 // Test off-diagonal extraction.
+
+TEMPLATE_TEST_CASE("off_diag_extract", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
+  arma::Mat<eT> x_cpu(x);
+
+  for (sword k = -19; k < 20; ++k)
+    {
+    Col<eT> y = x.diag(k);
+    arma::Col<eT> y_cpu = x_cpu.diag(k);
+
+    arma::Col<eT> y2_cpu(y);
+
+    REQUIRE( arma::approx_equal(y_cpu, y2_cpu, "absdiff", 1e-5) );
+    }
+  }
+
+
 
 // Test subview main diagonal extraction.
 
+TEMPLATE_TEST_CASE("subview_main_diag_extract", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
+  arma::Mat<eT> x_cpu(x);
+
+  Col<eT> y = x.submat(2, 2, 11, 11).diag();
+  arma::Col<eT> y_cpu = x_cpu.submat(2, 2, 11, 11).diag();
+
+  arma::Col<eT> y2_cpu(y);
+
+  REQUIRE( arma::approx_equal(y_cpu, y2_cpu, "absdiff", 1e-5) );
+  }
+
+
+
 // Test subview off-diagonal extraction.
 
+TEMPLATE_TEST_CASE("subview_off_diag_extract", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
+  arma::Mat<eT> x_cpu(x);
+
+  for (sword k = -9; k < 10; ++k)
+    {
+    Col<eT> y = x.submat(2, 2, 11, 11).diag(k);
+    arma::Col<eT> y_cpu = x_cpu.submat(2, 2, 11, 11).diag(k);
+
+    arma::Col<eT> y2_cpu(y);
+
+    REQUIRE( arma::approx_equal(y_cpu, y2_cpu, "absdiff", 1e-5) );
+    }
+  }
+
+
+
+// Test non-square diagonal size.
+
+TEMPLATE_TEST_CASE("non_square_diag", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(20, 10, distr_param(0, 100));
+
+  REQUIRE( x.diag().n_elem == 10 );
+  REQUIRE( x.diag(-5).n_elem == 10 );
+  REQUIRE( x.diag(5).n_elem == 5 );
+  }
+
+
+
+// Test non-square subview diagonal size.
+
+TEMPLATE_TEST_CASE("non_square_subview_diag", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
+
+  REQUIRE( x.submat(2, 2, 7, 11).diag().n_elem == 6 );
+  REQUIRE( x.submat(2, 2, 7, 11).diag(4).n_elem == 6 );
+  REQUIRE( x.submat(2, 2, 7, 11).diag(-4).n_elem == 2 );
+  }
