@@ -197,6 +197,7 @@ namespace coot
   #include "bandicoot_bits/Col_bones.hpp"
   #include "bandicoot_bits/SizeMat_bones.hpp"
   #include "bandicoot_bits/subview_bones.hpp"
+  #include "bandicoot_bits/diagview_bones.hpp"
 
   #include "bandicoot_bits/arrayops_bones.hpp"
   #include "bandicoot_bits/eOp_bones.hpp"
@@ -428,6 +429,7 @@ namespace coot
   #include "bandicoot_bits/Col_meat.hpp"
   #include "bandicoot_bits/SizeMat_meat.hpp"
   #include "bandicoot_bits/subview_meat.hpp"
+  #include "bandicoot_bits/diagview_meat.hpp"
 
   #include "bandicoot_bits/arrayops_meat.hpp"
   #include "bandicoot_bits/eOp_meat.hpp"

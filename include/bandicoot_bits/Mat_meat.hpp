@@ -1252,6 +1252,52 @@ Mat<eT>::operator/=(const Glue<T1, T2, glue_type>& X)
 
 
 template<typename eT>
+coot_inline
+diagview<eT>
+Mat<eT>::diag(const sword in_id)
+  {
+  coot_extra_debug_sigprint();
+
+  const uword row_offset = (in_id < 0) ? uword(-in_id) : 0;
+  const uword col_offset = (in_id > 0) ? uword( in_id) : 0;
+
+  coot_debug_check_bounds
+      (
+      ((row_offset > 0) && (row_offset >= n_rows)) || ((col_offset > 0) && (col_offset >= n_cols)),
+      "Mat::diag(): requested diagonal out of bounds"
+      );
+
+  const uword len = (std::min)(n_rows - row_offset, n_cols - col_offset);
+
+  return diagview<eT>(*this, row_offset, col_offset, len);
+  }
+
+
+
+template<typename eT>
+coot_inline
+const diagview<eT>
+Mat<eT>::diag(const sword in_id) const
+  {
+  coot_extra_debug_sigprint();
+
+  const uword row_offset = (in_id < 0) ? uword(-in_id) : 0;
+  const uword col_offset = (in_id > 0) ? uword( in_id) : 0;
+
+  coot_debug_check_bounds
+      (
+      ((row_offset > 0) && (row_offset >= n_rows)) || ((col_offset > 0) && (col_offset >= n_cols)),
+      "Mat::diag(): requested diagonal out of bounds"
+      );
+
+  const uword len = (std::min)(n_rows - row_offset, n_cols - col_offset);
+
+  return diagview<eT>(*this, row_offset, col_offset, len);
+  }
+
+
+
+template<typename eT>
 inline
 const Mat<eT>&
 Mat<eT>::clamp(const eT min_val, const eT max_val)
