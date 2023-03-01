@@ -31,14 +31,14 @@ COOT_FN(PREFIX,vec_norm_k)(const eT1* in_mem,
   while (i + blockDim.x < n_elem)
     {
     // copy to local shared memory
-    const eT1 v1 = pow(in_mem[i], eT1(k));
-    const eT1 v2 = pow(in_mem[i + blockDim.x], eT1(k));
+    const eT1 v1 = pow(in_mem[i], (eT1) k);
+    const eT1 v2 = pow(in_mem[i + blockDim.x], (eT1) k);
     aux_mem[tid] += v1 + v2;
     i += grid_size;
     }
   if (i < n_elem)
     {
-    const eT1 v = pow(in_mem[i], eT1(k));
+    const eT1 v = pow(in_mem[i], (eT1) k);
     aux_mem[tid] += v;
     }
   __syncthreads();

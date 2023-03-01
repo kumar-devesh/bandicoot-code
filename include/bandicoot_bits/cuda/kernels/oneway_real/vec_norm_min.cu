@@ -28,6 +28,10 @@ COOT_FN(PREFIX,vec_norm_min)(const eT1* in_mem,
   UWORD i = blockIdx.x * (blockDim.x * 2) + threadIdx.x;
   const UWORD grid_size = blockDim.x * 2 * gridDim.x;
 
+  // Make sure all auxiliary memory is initialized to something that won't
+  // screw up the final reduce.
+  aux_mem[tid] = coot_type_max((eT1) 0);
+
   if (i < n_elem)
     {
     aux_mem[tid] = abs(in_mem[i]);

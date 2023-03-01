@@ -30,9 +30,9 @@ COOT_FN(PREFIX,equ_array_trunc_exp_post)(eT2* out,
     if (coot_is_fp(val))
       {
       const fp_eT1 fp_val = (fp_eT1) val;
-      if (fp_val >= log(COOT_FN(coot_type_max_,fp_eT1)()))
+      if (fp_val >= log(coot_type_max((fp_eT1) 0)))
         {
-        out[i] = (eT2) ((eT1) COOT_FN(coot_type_max_,fp_eT1)());
+        out[i] = (eT2) ((eT1) coot_type_max((fp_eT1) 0));
         }
       else
         {
@@ -42,9 +42,9 @@ COOT_FN(PREFIX,equ_array_trunc_exp_post)(eT2* out,
     else
       {
       const double fp_val = (double) val;
-      if (fp_val >= log(coot_type_max_double()))
+      if (fp_val >= log(coot_type_max((double) 0)))
         {
-        out[i] = (eT2) ((eT1) coot_type_max_double());
+        out[i] = (eT2) ((eT1) coot_type_max((double) 0));
         }
       else
         {
