@@ -137,8 +137,9 @@ inplace_op_diag(dev_mem_t<eT> dest, const uword mem_offset, const eT val, const 
 
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(num);
 
+  eT* start_mem = dest.cuda_mem_ptr + mem_offset;
   const void* args[] = {
-      &(dest.cuda_mem_ptr + mem_offset + first_elem),
+      &start_mem,
       &val,
       (uword*) &n_rows,
       (uword*) &len };

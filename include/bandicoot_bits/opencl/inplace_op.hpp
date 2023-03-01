@@ -134,7 +134,7 @@ inplace_op_diag(dev_mem_t<eT> dest, const uword mem_offset, const eT val, const 
   {
   coot_extra_debug_sigprint();
 
-  if (n_elem == 0) { return; }
+  if (len == 0) { return; }
 
   runtime_t::cq_guard guard;
 
@@ -142,7 +142,7 @@ inplace_op_diag(dev_mem_t<eT> dest, const uword mem_offset, const eT val, const 
 
   cl_int status = 0;
 
-  runtime_t::adapt_uword cl_dest_offset(first_elem);
+  runtime_t::adapt_uword cl_dest_offset(mem_offset);
   runtime_t::adapt_uword cl_n_rows(n_rows);
   runtime_t::adapt_uword cl_len(len);
 
