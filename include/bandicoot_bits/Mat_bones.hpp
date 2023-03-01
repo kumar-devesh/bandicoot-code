@@ -85,7 +85,7 @@ class Mat : public Base< eT, Mat<eT> >
   inline const Mat& operator%=(const subview<eT>& X);
   inline const Mat& operator/=(const subview<eT>& X);
 
-  inline                   Mat(const diagview<eT>& X); // TODO: implement!
+  inline                   Mat(const diagview<eT>& X);
   inline const Mat& operator= (const diagview<eT>& X);
   inline const Mat& operator+=(const diagview<eT>& X);
   inline const Mat& operator-=(const diagview<eT>& X);

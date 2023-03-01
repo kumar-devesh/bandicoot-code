@@ -546,40 +546,21 @@ diagview<eT>::operator/=(const eT val)
 
 
 
-/* //! extract a diagonal and store it as a column vector */
-/* template<typename eT> */
-/* inline */
-/* void */
-/* diagview<eT>::extract(Mat<eT>& out, const diagview<eT>& in) */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
+//! extract a diagonal and store it as a column vector
+template<typename eT>
+inline
+void
+diagview<eT>::extract(Mat<eT>& out, const diagview<eT>& in)
+  {
+  coot_extra_debug_sigprint();
 
-/*   // NOTE: we're assuming that the matrix has already been set to the correct size and there is no aliasing; */
-/*   // size setting and alias checking is done by either the Mat contructor or operator=() */
+  // NOTE: we're assuming that the matrix has already been set to the correct size and there is no aliasing;
+  // size setting and alias checking is done by either the Mat contructor or operator=()
 
-/*   const Mat<eT>& in_m = in.m; */
+  const Mat<eT>& in_m = in.m;
 
-/*   const uword in_n_elem     = in.n_elem; */
-/*   const uword in_row_offset = in.row_offset; */
-/*   const uword in_col_offset = in.col_offset; */
-
-/*   eT* out_mem = out.memptr(); */
-
-/*   uword i,j; */
-/*   for(i=0, j=1; j < in_n_elem; i+=2, j+=2) */
-/*     { */
-/*     const eT tmp_i = in_m.at( i + in_row_offset, i + in_col_offset ); */
-/*     const eT tmp_j = in_m.at( j + in_row_offset, j + in_col_offset ); */
-
-/*     out_mem[i] = tmp_i; */
-/*     out_mem[j] = tmp_j; */
-/*     } */
-
-/*   if(i < in_n_elem) */
-/*     { */
-/*     out_mem[i] = in_m.at( i + in_row_offset, i + in_col_offset ); */
-/*     } */
-/*   } */
+  coot_rt_t::extract_diag(out.get_dev_mem(false), in_m.get_dev_mem(false), in.mem_offset, in_m.n_rows, in.n_elem);
+  }
 
 
 

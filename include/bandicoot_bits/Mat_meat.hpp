@@ -570,9 +570,9 @@ Mat<eT>::operator*=(const subview<eT>& X)
   {
   coot_extra_debug_sigprint();
 
-  // TODO
-
-  return *this;
+  // TODO: improve this implementation (maybe?)
+  Mat<eT> tmp(X);
+  return operator*=(tmp);
   }
 
 
@@ -603,6 +603,117 @@ Mat<eT>::operator/=(const subview<eT>& X)
   coot_debug_assert_same_size(n_rows, n_cols, X.n_rows, X.n_cols, "Mat::operator/=");
 
   subview<eT>::div_inplace(*this, X);
+
+  return *this;
+  }
+
+
+
+template<typename eT>
+inline
+Mat<eT>::Mat(const diagview<eT>& X)
+  : n_rows   (X.n_rows)
+  , n_cols   (X.n_cols)
+  , n_elem   (X.n_elem)
+  , vec_state(0)
+  , mem_state(0)
+  {
+  coot_extra_debug_sigprint_this(this);
+
+  diagview<eT>::extract(*this, X);
+  }
+
+
+
+template<typename eT>
+inline
+const Mat<eT>&
+Mat<eT>::operator=(const diagview<eT>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  const bool alias = (this == &(X.m));
+
+  if (alias == false)
+    {
+    init(X.n_rows, X.n_cols);
+    diagview<eT>::extract(*this, X);
+    }
+  else
+    {
+    Mat<eT> tmp(X);
+    steal_mem(tmp);
+    }
+
+  return *this;
+  }
+
+
+
+template<typename eT>
+inline
+const Mat<eT>&
+Mat<eT>::operator+=(const diagview<eT>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  // TODO
+
+  return *this;
+  }
+
+
+
+template<typename eT>
+inline
+const Mat<eT>&
+Mat<eT>::operator-=(const diagview<eT>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  // TODO
+
+  return *this;
+  }
+
+
+
+template<typename eT>
+inline
+const Mat<eT>&
+Mat<eT>::operator*=(const diagview<eT>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  // TODO
+
+  return *this;
+  }
+
+
+
+template<typename eT>
+inline
+const Mat<eT>&
+Mat<eT>::operator%=(const diagview<eT>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  // TODO
+
+  return *this;
+  }
+
+
+
+template<typename eT>
+inline
+const Mat<eT>&
+Mat<eT>::operator/=(const diagview<eT>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  // TODO
 
   return *this;
   }

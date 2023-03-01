@@ -99,7 +99,7 @@ class diagview : public Base< eT, diagview<eT> >
   /* inline void randu(); */
   /* inline void randn(); */
 
-  /* inline static void extract(Mat<eT>& out, const diagview& in); */
+  inline static void extract(Mat<eT>& out, const diagview& in);
 
   /* inline static void  plus_inplace(Mat<eT>& out, const diagview& in); */
   /* inline static void minus_inplace(Mat<eT>& out, const diagview& in); */
@@ -110,6 +110,3 @@ class diagview : public Base< eT, diagview<eT> >
   friend class Mat<eT>;
   friend class subview<eT>;
   };
-
-
-//! @}
