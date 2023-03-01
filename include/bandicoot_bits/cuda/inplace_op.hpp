@@ -129,46 +129,21 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_row1, const
 template<typename eT>
 inline
 void
-inplace_op_diag(dev_mem_t<eT> dest, const eT val, const sword diag_id, const uword n_rows, const uword n_cols, oneway_kernel_id::enum_id num)
+inplace_op_diag(dev_mem_t<eT> dest, const uword mem_offset, const eT val, const uword n_rows, const uword len, oneway_kernel_id::enum_id num)
   {
   coot_extra_debug_sigprint();
 
-  if (n_elem == 0) { return; }
-
-  // We might not be looking at the main diagonal, but instead a different
-  // diagonal specified by `diag_id`.  We can still use all the same kernels,
-  // though; we just have to "pretend" that we're looking at a submatrix of the
-  // original matrix.
-  const uword first_elem = 0;
-  uword effective_n_rows = n_rows;
-  uword effective_n_cols = n_cols;
-  if (diag_id > 0)
-    {
-    // Pretend that we're looking at the top-right submatrix.
-    first_elem = n_rows * diag_id;
-    effective_n_cols -= diag_id;
-    }
-  else if (diag_id < 0)
-    {
-    // Pretend that we're looking at the lower-left submatrix.
-    first_elem = diag_id;
-    effective_n_rows -= diag_id;
-    }
-  // The variable name here is a little bit of a misnomer; really the goal is to
-  // represent the number of elements in the array that are a part of `dest`,
-  // when starting from `first_elem`.
-  const uword effective_n_elem = n_elem - first_elem;
+  if (len == 0) { return; }
 
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(num);
 
   const void* args[] = {
-      &(dest.cuda_mem_ptr + first_elem),
+      &(dest.cuda_mem_ptr + mem_offset + first_elem),
       &val,
-      (uword*) &effective_n_rows,
-      (uword*) &effective_n_cols,
-      (uword*) &effective_n_elem };
+      (uword*) &n_rows,
+      (uword*) &len };
 
-  const kernel_dims dims = one_dimensional_grid_dims(std::min(effective_n_rows, effective_n_cols));
+  const kernel_dims dims = one_dimensional_grid_dims(len);
 
   CUresult result = cuLaunchKernel(
       kernel,

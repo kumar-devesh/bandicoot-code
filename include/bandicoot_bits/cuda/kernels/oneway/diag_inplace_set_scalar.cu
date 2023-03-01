@@ -17,13 +17,12 @@ void
 COOT_FN(PREFIX,diag_inplace_set_scalar)(eT1* out,
                                         const eT1 val,
                                         const UWORD n_rows,
-                                        const UWORD n_cols,
-                                        const UWORD n_elem)
+                                        const UWORD len)
   {
   const UWORD tid = blockIdx.x * blockDim.x + threadIdx.x;
-  const UWORD i = tid + tid * n_rows;
-  if (i < n_elem)
+  if (tid < len)
     {
+    const UWORD i = (n_rows + 1) * tid;
     out[i] = val;
     }
   }

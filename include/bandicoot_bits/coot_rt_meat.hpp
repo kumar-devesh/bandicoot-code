@@ -436,14 +436,14 @@ coot_rt_t::inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_
 template<typename eT>
 inline
 void
-coot_rt_t::inplace_op_diag(dev_mem_t<eT> dest, const eT val, const sword k, const uword n_rows, const uword n_cols, const uword n_elem)
+coot_rt_t::inplace_op_diag(dev_mem_t<eT> dest, const uword mem_offset, const eT val, const uword n_rows, const uword len)
   {
   coot_extra_debug_sigprint();
 
   if (get_rt().backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
-    opencl::inplace_op_diag(dest, val, k, n_rows, n_cols, n_elem);
+    opencl::inplace_op_diag(dest, mem_offset, val, n_rows, len);
     #else
     coot_stop_runtime_error("coot_rt::inplace_op_diag(): OpenCL backend not enabled");
     #endif
@@ -451,7 +451,7 @@ coot_rt_t::inplace_op_diag(dev_mem_t<eT> dest, const eT val, const sword k, cons
   else if (get_rt().backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    cuda::inplace_op_diag(dest, val, k, n_rows, n_cols, n_elem);
+    cuda::inplace_op_diag(dest, mem_offset, val, n_rows, len);
     #else
     coot_stop_runtime_error("coot_rt::inplace_op_diag(): CUDA backend not enabled");
     #endif

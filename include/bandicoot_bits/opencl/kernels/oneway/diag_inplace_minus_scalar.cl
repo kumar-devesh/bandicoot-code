@@ -18,13 +18,12 @@ COOT_FN(PREFIX,diag_inplace_minus_scalar)(__global eT1* out,
                                           const UWORD out_offset,
                                           const eT1 val,
                                           const UWORD n_rows,
-                                          const UWORD n_cols,
-                                          const UWORD n_elem)
+                                          const UWORD len)
   {
   const UWORD tid = get_global_id(0);
-  const UWORD i = tid + tid * n_rows;
-  if(i < n_elem)
+  if (tid < len)
     {
+    const UWORD i = (n_rows + 1) * tid;
     out[i + out_offset] -= val;
     }
   }
