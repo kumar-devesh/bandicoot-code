@@ -176,3 +176,82 @@ TEMPLATE_TEST_CASE("large_norm", "[norm]", double, float)
   REQUIRE( norm(x, "inf") == Approx(norm(x_cpu, "inf")).epsilon(0.01) );
   REQUIRE( norm(x, "fro") == Approx(norm(x_cpu, "fro")).epsilon(0.01) );
   }
+
+
+
+// Compute matrix norms of small random matrix.
+TEMPLATE_TEST_CASE("small_matrix_norm", "[norm]", double, float)
+  {
+  Mat<TestType> x = randu<Mat<TestType>>(10, 10);
+  arma::Mat<TestType> x_cpu(x);
+
+  REQUIRE( norm(x, 1) == Approx(norm(x_cpu, 1)).epsilon(0.01) );
+  REQUIRE( norm(x, 2) == Approx(norm(x_cpu, 2)).epsilon(0.01) );
+  REQUIRE( norm(x, "inf") == Approx(norm(x_cpu, "inf")).epsilon(0.01) );
+  REQUIRE( norm(x, "fro") == Approx(norm(x_cpu, "fro")).epsilon(0.01) );
+  }
+
+
+
+// Compute matrix norms of large random matrix.
+TEMPLATE_TEST_CASE("large_matrix_norm", "[norm]", double, float)
+  {
+  Mat<TestType> x = randu<Mat<TestType>>(1000, 1000);
+  arma::Mat<TestType> x_cpu(x);
+
+  REQUIRE( norm(x, 1) == Approx(norm(x_cpu, 1)).epsilon(0.01) );
+  REQUIRE( norm(x, 2) == Approx(norm(x_cpu, 2)).epsilon(0.01) );
+  REQUIRE( norm(x, "inf") == Approx(norm(x_cpu, "inf")).epsilon(0.01) );
+  REQUIRE( norm(x, "fro") == Approx(norm(x_cpu, "fro")).epsilon(0.01) );
+  }
+
+
+
+// Compute matrix norms of tall, skinny matrix.
+TEMPLATE_TEST_CASE("tall_matrix_norm", "[norm]", double, float)
+  {
+  Mat<TestType> x = randn<Mat<TestType>>(1000, 10);
+  arma::Mat<TestType> x_cpu(x);
+
+  REQUIRE( norm(x, 1) == Approx(norm(x_cpu, 1)).epsilon(0.01) );
+  REQUIRE( norm(x, 2) == Approx(norm(x_cpu, 2)).epsilon(0.01) );
+  REQUIRE( norm(x, "inf") == Approx(norm(x_cpu, "inf")).epsilon(0.01) );
+  REQUIRE( norm(x, "fro") == Approx(norm(x_cpu, "fro")).epsilon(0.01) );
+  }
+
+
+
+// Compute matrix norms of short, wide matrix.
+TEMPLATE_TEST_CASE("wide_matrix_norm", "[norm]", double, float)
+  {
+  Mat<TestType> x = randn<Mat<TestType>>(10, 1000);
+  arma::Mat<TestType> x_cpu(x);
+
+  REQUIRE( norm(x, 1) == Approx(norm(x_cpu, 1)).epsilon(0.01) );
+  REQUIRE( norm(x, 2) == Approx(norm(x_cpu, 2)).epsilon(0.01) );
+  REQUIRE( norm(x, "inf") == Approx(norm(x_cpu, "inf")).epsilon(0.01) );
+  REQUIRE( norm(x, "fro") == Approx(norm(x_cpu, "fro")).epsilon(0.01) );
+  }
+
+
+
+// Compute matrix norms of empty matrix.
+TEMPLATE_TEST_CASE("empty_matrix_norm", "[norm]", double, float)
+  {
+  Mat<TestType> x;
+
+  REQUIRE( norm(x, 1) == Approx(TestType(0)).margin(1e-6) );
+  REQUIRE( norm(x, 2) == Approx(TestType(0)).margin(1e-6) );
+  REQUIRE( norm(x, "inf") == Approx(TestType(0)).margin(1e-6) );
+  REQUIRE( norm(x, "fro") == Approx(TestType(0)).margin(1e-6) );
+  }
+
+
+
+// Ensure invalid norm type throws an exception.
+TEMPLATE_TEST_CASE("invalid_matrix_norm", "[norm]", double, float)
+  {
+  Mat<TestType> x = randu<Mat<TestType>>(10, 10);
+
+  REQUIRE_THROWS( norm(x, "-inf") );
+  }

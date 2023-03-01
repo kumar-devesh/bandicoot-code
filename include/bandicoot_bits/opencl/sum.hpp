@@ -21,7 +21,7 @@ sum_colwise(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword n_rows, cons
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::sum_colwise(): opencl runtime not valid" );
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::sum_colwise(): OpenCL runtime not valid" );
 
   runtime_t::cq_guard guard;
 
@@ -55,7 +55,7 @@ sum_rowwise(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword n_rows, cons
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::sum_colwise(): opencl runtime not valid" );
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::sum_rowwise(): OpenCL runtime not valid" );
 
   runtime_t::cq_guard guard;
 
@@ -89,7 +89,7 @@ sum_colwise_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword M_n_
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::sum_colwise(): opencl runtime not valid" );
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::sum_colwise_subview(): OpenCL runtime not valid" );
 
   runtime_t::cq_guard guard;
 
@@ -131,7 +131,7 @@ sum_rowwise_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword M_n_
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::sum_colwise(): opencl runtime not valid" );
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::sum_rowwise_subview(): OpenCL runtime not valid" );
 
   runtime_t::cq_guard guard;
 
