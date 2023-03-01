@@ -22,7 +22,7 @@ COOT_FN(PREFIX,diag_inplace_minus_scalar)(eT1* out,
   const UWORD tid = blockIdx.x * blockDim.x + threadIdx.x;
   if (tid < len)
     {
-    const UWORD offset = (n_rows + 1) * tid;
+    const UWORD i = (n_rows + 1) * tid;
     out[i] -= val;
     }
   }
