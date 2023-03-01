@@ -34,6 +34,8 @@ template<typename eT> class subview_col;
 template<typename eT> class subview_row;
 template<typename eT> class subview_cube;
 
+template<typename eT> class diagview;
+
 
 class SizeMat;
 class SizeCube;
