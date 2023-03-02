@@ -709,3 +709,111 @@ TEMPLATE_TEST_CASE("diagview_set_alias", "[diag]", float, double, u32, s32, u64,
     REQUIRE( arma::approx_equal( x3_cpu, x2_cpu, "absdiff", 1e-5 ) );
     }
   }
+
+
+
+TEMPLATE_TEST_CASE("diagview_copy", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(50, 50, distr_param(0, 100));
+  Mat<eT> y = randi<Mat<eT>>(50, 50, distr_param(100, 200));
+
+  arma::Mat<eT> x_cpu(x);
+  arma::Mat<eT> y_cpu(y);
+
+  for (sword k = -49; k < 50; ++k)
+    {
+    x.diag(k) = y.diag(k);
+    x_cpu.diag(k) = y_cpu.diag(k);
+
+    arma::Mat<eT> x2_cpu(x);
+
+    REQUIRE( arma::approx_equal( x_cpu, x2_cpu, "absdiff", 1e-5 ) );
+    }
+  }
+
+
+
+// Test in-place vector operations on diagonals.
+
+TEMPLATE_TEST_CASE("diag_inplace_plus_vector", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 50));
+  arma::Mat<eT> x_cpu(x);
+
+  Col<eT> y = randi<Mat<eT>>(x.diag().n_elem, distr_param(51, 100));
+  arma::Col<eT> y_cpu(y);
+
+  x.diag() += y;
+  x_cpu.diag() += y_cpu;
+
+  arma::Mat<eT> x2_cpu(x);
+
+  REQUIRE( arma::approx_equal( x2_cpu, x_cpu, "absdiff", 1e-5) );
+  }
+
+
+
+
+TEMPLATE_TEST_CASE("diag_inplace_minus_vector", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(200, 300));
+  arma::Mat<eT> x_cpu(x);
+
+  Col<eT> y = randi<Mat<eT>>(x.diag().n_elem, distr_param(51, 100));
+  arma::Col<eT> y_cpu(y);
+
+  x.diag() -= y;
+  x_cpu.diag() -= y_cpu;
+
+  arma::Mat<eT> x2_cpu(x);
+
+  REQUIRE( arma::approx_equal( x2_cpu, x_cpu, "absdiff", 1e-5) );
+  }
+
+
+
+
+TEMPLATE_TEST_CASE("diag_inplace_schur_vector", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 50));
+  arma::Mat<eT> x_cpu(x);
+
+  Col<eT> y = randi<Mat<eT>>(x.diag().n_elem, distr_param(51, 100));
+  arma::Col<eT> y_cpu(y);
+
+  x.diag() %= y;
+  x_cpu.diag() %= y_cpu;
+
+  arma::Mat<eT> x2_cpu(x);
+
+  REQUIRE( arma::approx_equal( x2_cpu, x_cpu, "absdiff", 1e-5) );
+  }
+
+
+
+
+TEMPLATE_TEST_CASE("diag_inplace_div_vector", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(500, 600));
+  arma::Mat<eT> x_cpu(x);
+
+  Col<eT> y = randi<Mat<eT>>(x.diag().n_elem, distr_param(5, 10));
+  arma::Col<eT> y_cpu(y);
+
+  x.diag() /= y;
+  x_cpu.diag() /= y_cpu;
+
+  arma::Mat<eT> x2_cpu(x);
+
+  REQUIRE( arma::approx_equal( x2_cpu, x_cpu, "absdiff", 1e-5) );
+  }

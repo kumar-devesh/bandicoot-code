@@ -55,7 +55,7 @@ class diagview : public Base< eT, diagview<eT> >
   /* inline  diagview(const diagview&  in); */
   /* inline  diagview(      diagview&& in); */
 
-  /* inline void operator=(const diagview& x); */
+  inline void operator=(const diagview& x);
 
   inline void operator+=(const eT val);
   inline void operator-=(const eT val);
@@ -63,14 +63,13 @@ class diagview : public Base< eT, diagview<eT> >
   inline void operator/=(const eT val);
 
   inline void operator= (const Mat<eT>& x);
-
   inline void operator= (const subview<eT>& x);
 
   template<typename T1> inline void operator= (const Base<eT,T1>& x);
-  /* template<typename T1> inline void operator+=(const Base<eT,T1>& x); */
-  /* template<typename T1> inline void operator-=(const Base<eT,T1>& x); */
-  /* template<typename T1> inline void operator%=(const Base<eT,T1>& x); */
-  /* template<typename T1> inline void operator/=(const Base<eT,T1>& x); */
+  template<typename T1> inline void operator+=(const Base<eT,T1>& x);
+  template<typename T1> inline void operator-=(const Base<eT,T1>& x);
+  template<typename T1> inline void operator%=(const Base<eT,T1>& x);
+  template<typename T1> inline void operator/=(const Base<eT,T1>& x);
 
 
   inline coot_warn_unused MatValProxy<eT>  operator[](const uword ii);
