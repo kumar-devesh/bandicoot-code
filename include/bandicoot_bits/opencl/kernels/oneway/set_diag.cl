@@ -24,6 +24,6 @@ COOT_FN(PREFIX,set_diag)(__global eT1* out,
   if (tid < len)
     {
     const UWORD i = (n_rows + 1) * tid;
-    out[i + out_offset] = out[tid];
+    out[i + out_offset] = in[tid];
     }
   }
