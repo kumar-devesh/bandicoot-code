@@ -68,6 +68,9 @@ class coot_rt_t
   static inline void extract_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword in_mem_offset, const uword n_rows, const uword len);
 
   template<typename eT>
+  static inline void set_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword in_mem_offset, const uword n_rows, const uword len);
+
+  template<typename eT>
   static inline void inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, const oneway_kernel_id::enum_id num);
 
   template<typename eT1, typename eT2>

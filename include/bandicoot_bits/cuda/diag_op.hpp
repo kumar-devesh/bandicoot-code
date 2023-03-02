@@ -47,3 +47,39 @@ extract_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword mem_offset, 
 
   coot_check_cuda_error( result, "coot::cuda::extract_diag(): cuLaunchKernel() failed");
   }
+
+
+
+/**
+ * Set a diagonal in a matrix to the values in a given vector.
+ */
+template<typename eT>
+inline
+void
+set_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword mem_offset, const uword n_rows, const uword len)
+  {
+  coot_extra_debug_sigprint();
+
+  if (len == 0) { return; }
+
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::set_diag);
+
+  eT* start_mem = out.cuda_mem_ptr + mem_offset;
+  const void* args[] = {
+      &start_mem,
+      &(in.cuda_mem_ptr),
+      (uword*) &n_rows,
+      (uword*) &len };
+
+  const kernel_dims dims = one_dimensional_grid_dims(len);
+
+  CUresult result = cuLaunchKernel(
+      kernel,
+      dims.d[0], dims.d[1], dims.d[2],
+      dims.d[3], dims.d[4], dims.d[5],
+      0, NULL,
+      (void**) args,
+      0);
+
+  coot_check_cuda_error( result, "coot::cuda::set_diag(): cuLaunchKernel() failed" );
+  }

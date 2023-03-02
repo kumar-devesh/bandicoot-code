@@ -74,6 +74,7 @@ struct oneway_kernel_id
     diag_inplace_mod_scalar,
     //
     extract_diag,
+    set_diag,
     //
     inplace_set_eye,
     linspace,
@@ -131,6 +132,7 @@ struct oneway_kernel_id
     names.push_back("diag_inplace_mod_scalar");
 
     names.push_back("extract_diag");
+    names.push_back("set_diag");
 
     names.push_back("inplace_set_eye");
     names.push_back("linspace");

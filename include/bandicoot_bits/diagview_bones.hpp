@@ -62,7 +62,11 @@ class diagview : public Base< eT, diagview<eT> >
   inline void operator*=(const eT val);
   inline void operator/=(const eT val);
 
-  /* template<typename T1> inline void operator= (const Base<eT,T1>& x); */
+  inline void operator= (const Mat<eT>& x);
+
+  inline void operator= (const subview<eT>& x);
+
+  template<typename T1> inline void operator= (const Base<eT,T1>& x);
   /* template<typename T1> inline void operator+=(const Base<eT,T1>& x); */
   /* template<typename T1> inline void operator-=(const Base<eT,T1>& x); */
   /* template<typename T1> inline void operator%=(const Base<eT,T1>& x); */
@@ -89,7 +93,7 @@ class diagview : public Base< eT, diagview<eT> >
 
   /* inline void clean(const pod_type threshold); */
 
-  /* inline void clamp(const eT min_val, const eT max_val); */
+  inline void clamp(const eT min_val, const eT max_val);
 
   inline void fill(const eT val);
   inline void zeros();

@@ -640,3 +640,72 @@ TEMPLATE_TEST_CASE("element_access_subview_diag", "[diag]", float, double, u32, 
       }
     }
   }
+
+
+
+// Test diagview::clamp().
+
+TEMPLATE_TEST_CASE("diagview_clamp", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(500, 500, distr_param(0, 10));
+  x.diag().clamp(3, 5);
+
+  for (uword i = 0; i < 500; ++i)
+    {
+    REQUIRE( eT(x.diag()[i]) >= eT(3) );
+    REQUIRE( eT(x.diag()[i]) <= eT(5) );
+    }
+  }
+
+
+
+// Test setting diagonals.
+
+TEMPLATE_TEST_CASE("diagview_set", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(500, 500, distr_param(0, 100));
+  arma::Mat<eT> x_cpu(x);
+
+  for (sword k = -19; k < 20; ++k)
+    {
+    Mat<eT> x2(x);
+    arma::Mat<eT> x2_cpu(x_cpu);
+
+    Col<eT> y = randi<Col<eT>>(x2.diag(k).n_elem, distr_param(200, 300));
+    arma::Col<eT> y_cpu(y);
+
+    x2.diag(k) = y;
+    x2_cpu.diag(k) = y_cpu;
+
+    arma::Mat<eT> x3_cpu(x2);
+
+    REQUIRE( arma::approx_equal( x3_cpu, x2_cpu, "absdiff", 1e-5 ) );
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("diagview_set_alias", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(500, 500, distr_param(0, 100));
+  arma::Mat<eT> x_cpu(x);
+
+  for (sword k = -19; k < 20; ++k)
+    {
+    Mat<eT> x2(x);
+    arma::Mat<eT> x2_cpu(x_cpu);
+
+    x2.diag(k) = x2.submat(0, 0, x2.diag(k).n_elem - 1, 0);
+    x2_cpu.diag(k) = x2_cpu.submat(0, 0, x2_cpu.diag(k).n_elem - 1, 0);
+
+    arma::Mat<eT> x3_cpu(x2);
+
+    REQUIRE( arma::approx_equal( x3_cpu, x2_cpu, "absdiff", 1e-5 ) );
+    }
+  }

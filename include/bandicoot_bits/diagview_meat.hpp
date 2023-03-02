@@ -180,77 +180,74 @@ diagview<eT>::operator/=(const eT val)
 
 
 
-/* //! set a diagonal of our matrix using data from a foreign object */
-/* template<typename eT> */
-/* template<typename T1> */
-/* inline */
-/* void */
-/* diagview<eT>::operator= (const Base<eT,T1>& o) */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
+//! set a diagonal of our matrix using data from a foreign object */
+template<typename eT>
+inline
+void
+diagview<eT>::operator= (const Mat<eT>& o)
+  {
+  coot_extra_debug_sigprint();
 
-/*   diagview<eT>& d = *this; */
+  Mat<eT>& t_m = const_cast< Mat<eT>& >(m);
 
-/*   Mat<eT>& d_m = const_cast< Mat<eT>& >(d.m); */
+  coot_debug_check
+    (
+    ( (n_elem != o.n_elem) || ((o.n_rows != 1) && (o.n_cols != 1)) ),
+    "diagview: given object has incompatible size"
+    );
 
-/*   const uword d_n_elem     = d.n_elem; */
-/*   const uword d_row_offset = d.row_offset; */
-/*   const uword d_col_offset = d.col_offset; */
+  const bool is_alias = (&o == &t_m);
 
-/*   const Proxy<T1> P( o.get_ref() ); */
+  if (is_alias)
+    {
+    coot_extra_debug_print("aliasing detected");
 
-/*   arma_debug_check */
-/*     ( */
-/*     ( (d_n_elem != P.get_n_elem()) || ((P.get_n_rows() != 1) && (P.get_n_cols() != 1)) ), */
-/*     "diagview: given object has incompatible size" */
-/*     ); */
+    Mat<eT> tmp(o);
+    coot_rt_t::set_diag(t_m.get_dev_mem(false), tmp.get_dev_mem(false), mem_offset, m.n_rows, n_elem);
+    }
+  else
+    {
+    coot_rt_t::set_diag(t_m.get_dev_mem(false), o.get_dev_mem(false), mem_offset, m.n_rows, n_elem);
+    }
+  }
 
-/*   const bool is_alias = P.is_alias(d_m); */
 
-/*   if(is_alias)  { arma_extra_debug_print("aliasing detected"); } */
 
-/*   if( (is_Mat<typename Proxy<T1>::stored_type>::value) || (Proxy<T1>::use_at) || (is_alias) ) */
-/*     { */
-/*     const unwrap_check<typename Proxy<T1>::stored_type> tmp(P.Q, is_alias); */
-/*     const Mat<eT>& x = tmp.M; */
+template<typename eT>
+inline
+void
+diagview<eT>::operator= (const subview<eT>& o)
+  {
+  coot_extra_debug_sigprint();
 
-/*     const eT* x_mem = x.memptr(); */
+  Mat<eT>& t_m = const_cast< Mat<eT>& >(m);
 
-/*     uword ii,jj; */
-/*     for(ii=0, jj=1; jj < d_n_elem; ii+=2, jj+=2) */
-/*       { */
-/*       const eT tmp_i = x_mem[ii]; */
-/*       const eT tmp_j = x_mem[jj]; */
+  coot_debug_check
+    (
+    ( (n_elem != o.n_elem) || ((o.n_rows != 1) && (o.n_cols != 1)) ),
+    "diagview: given object has incompatible size"
+    );
 
-/*       d_m.at( ii + d_row_offset,  ii + d_col_offset) = tmp_i; */
-/*       d_m.at( jj + d_row_offset,  jj + d_col_offset) = tmp_j; */
-/*       } */
+  // All subviews must be extracted.
+  Mat<eT> tmp(o);
+  coot_rt_t::set_diag(t_m.get_dev_mem(false), tmp.get_dev_mem(false), mem_offset, m.n_rows, n_elem);
+  }
 
-/*     if(ii < d_n_elem) */
-/*       { */
-/*       d_m.at( ii + d_row_offset,  ii + d_col_offset) = x_mem[ii]; */
-/*       } */
-/*     } */
-/*   else */
-/*     { */
-/*     typename Proxy<T1>::ea_type Pea = P.get_ea(); */
 
-/*     uword ii,jj; */
-/*     for(ii=0, jj=1; jj < d_n_elem; ii+=2, jj+=2) */
-/*       { */
-/*       const eT tmp_i = Pea[ii]; */
-/*       const eT tmp_j = Pea[jj]; */
 
-/*       d_m.at( ii + d_row_offset,  ii + d_col_offset) = tmp_i; */
-/*       d_m.at( jj + d_row_offset,  jj + d_col_offset) = tmp_j; */
-/*       } */
+template<typename eT>
+template<typename T1>
+inline
+void
+diagview<eT>::operator= (const Base<eT,T1>& o)
+  {
+  coot_extra_debug_sigprint();
 
-/*     if(ii < d_n_elem) */
-/*       { */
-/*       d_m.at( ii + d_row_offset,  ii + d_col_offset) = Pea[ii]; */
-/*       } */
-/*     } */
-/*   } */
+  Mat<eT>& t_m = const_cast< Mat<eT>& >(m);
+  const unwrap<T1> U( o.get_ref() );
+
+  operator=(U.M);
+  }
 
 
 
@@ -885,19 +882,20 @@ diagview<eT>::operator()(const uword row, const uword col) const
 
 
 
-/* template<typename eT> */
-/* inline */
-/* void */
-/* diagview<eT>::clamp(const eT min_val, const eT max_val) */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
+template<typename eT>
+inline
+void
+diagview<eT>::clamp(const eT min_val, const eT max_val)
+  {
+  coot_extra_debug_sigprint();
 
-/*   Mat<eT> tmp(*this); */
+  // TODO: a dedicated implementation could be possible
+  Mat<eT> tmp(*this);
 
-/*   tmp.clamp(min_val, max_val); */
+  tmp.clamp(min_val, max_val);
 
-/*   (*this).operator=(tmp); */
-/*   } */
+  (*this).operator=(tmp);
+  }
 
 
 
