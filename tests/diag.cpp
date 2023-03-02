@@ -590,3 +590,53 @@ TEMPLATE_TEST_CASE("extract_diag_into_subview", "[diag]", float, double, u32, s3
 
   REQUIRE( arma::approx_equal(y_col_cpu, x_diag_cpu, "absdiff", 1e-5) );
   }
+
+
+
+// Test element access in diagonals.
+
+TEMPLATE_TEST_CASE("element_access_diag", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
+  arma::Mat<eT> x_cpu(x);
+
+  for (sword k = -19; k < 20; ++k)
+    {
+    REQUIRE( x.diag(k).n_elem == x_cpu.diag(k).n_elem );
+    for (uword i = 0; i < x.diag(k).n_elem; ++i)
+      {
+      REQUIRE ( eT(x.diag(k)[i])       == Approx(eT(x_cpu.diag(k)[i])) );
+      REQUIRE ( eT(x.diag(k)(i))       == Approx(eT(x_cpu.diag(k)(i))) );
+      REQUIRE ( eT(x.diag(k).at(i))    == Approx(eT(x_cpu.diag(k).at(i))) );
+      REQUIRE ( eT(x.diag(k)(i, 0))    == Approx(eT(x_cpu.diag(k)(i, 0))) );
+      REQUIRE ( eT(x.diag(k).at(i, 0)) == Approx(eT(x_cpu.diag(k).at(i, 0))) );
+      }
+    }
+  }
+
+
+
+// Test element access in a subview's diagonal.
+
+TEMPLATE_TEST_CASE("element_access_subview_diag", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
+  arma::Mat<eT> x_cpu(x);
+
+  for (sword k = -9; k < 10; ++k)
+    {
+    REQUIRE( x.submat(2, 2, 11, 11).diag(k).n_elem == x_cpu.submat(2, 2, 11, 11).diag(k).n_elem );
+    for (uword i = 0; i < x.submat(2, 2, 11, 11).diag(k).n_elem; ++i)
+      {
+      REQUIRE ( eT(x.submat(2, 2, 11, 11).diag(k)[i])       == Approx(eT(x_cpu.submat(2, 2, 11, 11).diag(k)[i])) );
+      REQUIRE ( eT(x.submat(2, 2, 11, 11).diag(k)(i))       == Approx(eT(x_cpu.submat(2, 2, 11, 11).diag(k)(i))) );
+      REQUIRE ( eT(x.submat(2, 2, 11, 11).diag(k).at(i))    == Approx(eT(x_cpu.submat(2, 2, 11, 11).diag(k).at(i))) );
+      REQUIRE ( eT(x.submat(2, 2, 11, 11).diag(k)(i, 0))    == Approx(eT(x_cpu.submat(2, 2, 11, 11).diag(k)(i, 0))) );
+      REQUIRE ( eT(x.submat(2, 2, 11, 11).diag(k).at(i, 0)) == Approx(eT(x_cpu.submat(2, 2, 11, 11).diag(k).at(i, 0))) );
+      }
+    }
+  }

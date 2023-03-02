@@ -708,121 +708,131 @@ diagview<eT>::extract(Mat<eT>& out, const diagview<eT>& in)
 
 
 
-/* template<typename eT> */
-/* arma_inline */
-/* eT */
-/* diagview<eT>::at_alt(const uword ii) const */
-/*   { */
-/*   return m.at(ii+row_offset, ii+col_offset); */
-/*   } */
+template<typename eT>
+inline
+coot_warn_unused
+MatValProxy<eT>
+diagview<eT>::operator[](const uword ii)
+  {
+  const uword index = mem_offset + ii * (m.n_rows + 1);
+  return (const_cast< Mat<eT>& >(m)).at(index);
+  }
 
 
 
-/* template<typename eT> */
-/* arma_inline */
-/* eT& */
-/* diagview<eT>::operator[](const uword ii) */
-/*   { */
-/*   return (const_cast< Mat<eT>& >(m)).at(ii+row_offset, ii+col_offset); */
-/*   } */
+template<typename eT>
+inline
+coot_warn_unused
+eT
+diagview<eT>::operator[](const uword ii) const
+  {
+  const uword index = mem_offset + ii * (m.n_rows + 1);
+  return m.at(index);
+  }
 
 
 
-/* template<typename eT> */
-/* arma_inline */
-/* eT */
-/* diagview<eT>::operator[](const uword ii) const */
-/*   { */
-/*   return m.at(ii+row_offset, ii+col_offset); */
-/*   } */
+template<typename eT>
+inline
+coot_warn_unused
+MatValProxy<eT>
+diagview<eT>::at(const uword ii)
+  {
+  const uword index = mem_offset + ii * (m.n_rows + 1);
+  return (const_cast< Mat<eT>& >(m)).at(index);
+  }
 
 
 
-/* template<typename eT> */
-/* arma_inline */
-/* eT& */
-/* diagview<eT>::at(const uword ii) */
-/*   { */
-/*   return (const_cast< Mat<eT>& >(m)).at(ii+row_offset, ii+col_offset); */
-/*   } */
+template<typename eT>
+inline
+coot_warn_unused
+eT
+diagview<eT>::at(const uword ii) const
+  {
+  const uword index = mem_offset + ii * (m.n_rows + 1);
+  return m.at(index);
+  }
 
 
 
-/* template<typename eT> */
-/* arma_inline */
-/* eT */
-/* diagview<eT>::at(const uword ii) const */
-/*   { */
-/*   return m.at(ii+row_offset, ii+col_offset); */
-/*   } */
+template<typename eT>
+inline
+coot_warn_unused
+MatValProxy<eT>
+diagview<eT>::operator()(const uword ii)
+  {
+  coot_debug_check_bounds( (ii >= n_elem), "diagview::operator(): out of bounds" );
+
+  const uword index = mem_offset + ii * (m.n_rows + 1);
+  return (const_cast< Mat<eT>& >(m)).at(index);
+  }
 
 
 
-/* template<typename eT> */
-/* arma_inline */
-/* eT& */
-/* diagview<eT>::operator()(const uword ii) */
-/*   { */
-/*   arma_debug_check_bounds( (ii >= n_elem), "diagview::operator(): out of bounds" ); */
+template<typename eT>
+inline
+coot_warn_unused
+eT
+diagview<eT>::operator()(const uword ii) const
+  {
+  coot_debug_check_bounds( (ii >= n_elem), "diagview::operator(): out of bounds" );
 
-/*   return (const_cast< Mat<eT>& >(m)).at(ii+row_offset, ii+col_offset); */
-/*   } */
-
-
-
-/* template<typename eT> */
-/* arma_inline */
-/* eT */
-/* diagview<eT>::operator()(const uword ii) const */
-/*   { */
-/*   arma_debug_check_bounds( (ii >= n_elem), "diagview::operator(): out of bounds" ); */
-
-/*   return m.at(ii+row_offset, ii+col_offset); */
-/*   } */
+  const uword index = mem_offset + ii * (m.n_rows + 1);
+  return m.at(index);
+  }
 
 
 
-/* template<typename eT> */
-/* arma_inline */
-/* eT& */
-/* diagview<eT>::at(const uword row, const uword) */
-/*   { */
-/*   return (const_cast< Mat<eT>& >(m)).at(row+row_offset, row+col_offset); */
-/*   } */
+template<typename eT>
+inline
+coot_warn_unused
+MatValProxy<eT>
+diagview<eT>::at(const uword row, const uword)
+  {
+  const uword index = mem_offset + row * (m.n_rows + 1);
+  return (const_cast< Mat<eT>& >(m)).at(index);
+  }
 
 
 
-/* template<typename eT> */
-/* arma_inline */
-/* eT */
-/* diagview<eT>::at(const uword row, const uword) const */
-/*   { */
-/*   return m.at(row+row_offset, row+col_offset); */
-/*   } */
+template<typename eT>
+inline
+coot_warn_unused
+eT
+diagview<eT>::at(const uword row, const uword) const
+  {
+  const uword index = mem_offset + row * (m.n_rows + 1);
+  return m.at(index);
+  }
 
 
 
-/* template<typename eT> */
-/* arma_inline */
-/* eT& */
-/* diagview<eT>::operator()(const uword row, const uword col) */
-/*   { */
-/*   arma_debug_check_bounds( ((row >= n_elem) || (col > 0)), "diagview::operator(): out of bounds" ); */
+template<typename eT>
+inline
+coot_warn_unused
+MatValProxy<eT>
+diagview<eT>::operator()(const uword row, const uword col)
+  {
+  coot_debug_check_bounds( ((row >= n_elem) || (col > 0)), "diagview::operator(): out of bounds" );
 
-/*   return (const_cast< Mat<eT>& >(m)).at(row+row_offset, row+col_offset); */
-/*   } */
+  const uword index = mem_offset + row * (m.n_rows + 1);
+  return (const_cast< Mat<eT>& >(m)).at(index);
+  }
 
 
 
-/* template<typename eT> */
-/* arma_inline */
-/* eT */
-/* diagview<eT>::operator()(const uword row, const uword col) const */
-/*   { */
-/*   arma_debug_check_bounds( ((row >= n_elem) || (col > 0)), "diagview::operator(): out of bounds" ); */
+template<typename eT>
+inline
+coot_warn_unused
+eT
+diagview<eT>::operator()(const uword row, const uword col) const
+  {
+  coot_debug_check_bounds( ((row >= n_elem) || (col > 0)), "diagview::operator(): out of bounds" );
 
-/*   return m.at(row+row_offset, row+col_offset); */
-/*   } */
+  const uword index = mem_offset + row * (m.n_rows + 1);
+  return m.at(index);
+  }
 
 
 

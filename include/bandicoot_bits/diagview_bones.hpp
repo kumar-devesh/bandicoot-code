@@ -69,22 +69,20 @@ class diagview : public Base< eT, diagview<eT> >
   /* template<typename T1> inline void operator/=(const Base<eT,T1>& x); */
 
 
-  /* arma_inline eT  at_alt    (const uword ii) const; */
+  inline coot_warn_unused MatValProxy<eT>  operator[](const uword ii);
+  inline coot_warn_unused eT               operator[](const uword ii) const;
 
-  /* arma_inline eT& operator[](const uword ii); */
-  /* arma_inline eT  operator[](const uword ii) const; */
+  inline coot_warn_unused MatValProxy<eT>          at(const uword ii);
+  inline coot_warn_unused eT                       at(const uword ii) const;
 
-  /* arma_inline eT&         at(const uword ii); */
-  /* arma_inline eT          at(const uword ii) const; */
+  inline coot_warn_unused MatValProxy<eT>  operator()(const uword ii);
+  inline coot_warn_unused eT               operator()(const uword ii) const;
 
-  /* arma_inline eT& operator()(const uword ii); */
-  /* arma_inline eT  operator()(const uword ii) const; */
+  inline coot_warn_unused MatValProxy<eT>          at(const uword in_n_row, const uword);
+  inline coot_warn_unused eT                       at(const uword in_n_row, const uword) const;
 
-  /* arma_inline eT&         at(const uword in_n_row, const uword); */
-  /* arma_inline eT          at(const uword in_n_row, const uword) const; */
-
-  /* arma_inline eT& operator()(const uword in_n_row, const uword in_n_col); */
-  /* arma_inline eT  operator()(const uword in_n_row, const uword in_n_col) const; */
+  inline coot_warn_unused MatValProxy<eT>  operator()(const uword in_n_row, const uword in_n_col);
+  inline coot_warn_unused eT               operator()(const uword in_n_row, const uword in_n_col) const;
 
 
   /* inline void replace(const eT old_val, const eT new_val); */
