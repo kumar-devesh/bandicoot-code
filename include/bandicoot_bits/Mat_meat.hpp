@@ -612,13 +612,15 @@ Mat<eT>::operator/=(const subview<eT>& X)
 template<typename eT>
 inline
 Mat<eT>::Mat(const diagview<eT>& X)
-  : n_rows   (X.n_rows)
-  , n_cols   (X.n_cols)
-  , n_elem   (X.n_elem)
+  : n_rows   (0)
+  , n_cols   (0)
+  , n_elem   (0)
   , vec_state(0)
   , mem_state(0)
   {
   coot_extra_debug_sigprint_this(this);
+
+  init(X.n_rows, X.n_cols);
 
   diagview<eT>::extract(*this, X);
   }
