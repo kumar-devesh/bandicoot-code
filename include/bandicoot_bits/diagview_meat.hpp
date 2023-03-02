@@ -678,38 +678,28 @@ diagview<eT>::ones()
 
 
 
-/* template<typename eT> */
-/* inline */
-/* void */
-/* diagview<eT>::randu() */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
+template<typename eT>
+inline
+void
+diagview<eT>::randu()
+  {
+  coot_extra_debug_sigprint();
 
-/*   Mat<eT>& x = const_cast< Mat<eT>& >(m); */
-
-/*   const uword local_n_elem = n_elem; */
-
-/*   for(uword ii=0; ii < local_n_elem; ++ii) */
-/*     { */
-/*     x.at(ii+row_offset, ii+col_offset) = eT(arma_rng::randu<eT>()); */
-/*     } */
-/*   } */
+  Col<eT> r;
+  r.randu(n_elem);
+  operator=(r);
+  }
 
 
 
-/* template<typename eT> */
-/* inline */
-/* void */
-/* diagview<eT>::randn() */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
+template<typename eT>
+inline
+void
+diagview<eT>::randn()
+  {
+  coot_extra_debug_sigprint();
 
-/*   Mat<eT>& x = const_cast< Mat<eT>& >(m); */
-
-/*   const uword local_n_elem = n_elem; */
-
-/*   for(uword ii=0; ii < local_n_elem; ++ii) */
-/*     { */
-/*     x.at(ii+row_offset, ii+col_offset) = eT(arma_rng::randn<eT>()); */
-/*     } */
-/*   } */
+  Col<eT> r;
+  r.randn(n_elem);
+  operator=(r);
+  }

@@ -817,3 +817,65 @@ TEMPLATE_TEST_CASE("diag_inplace_div_vector", "[diag]", float, double, u32, s32,
 
   REQUIRE( arma::approx_equal( x2_cpu, x_cpu, "absdiff", 1e-5) );
   }
+
+
+
+// Test random number generation.
+
+TEMPLATE_TEST_CASE("diag_randu", "[diag]", float, double)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(200, 200, distr_param(500, 600));
+  x.diag().randu();
+
+  arma::Mat<eT> x_cpu(x);
+
+  for (uword c = 0; c < 200; ++c)
+    {
+    for (uword r = 0; r < 200; ++r)
+      {
+      if ( c == r )
+        {
+        REQUIRE( x_cpu(r, c) >= eT(0) );
+        REQUIRE( x_cpu(r, c) <= eT(1) );
+        }
+      else
+        {
+        REQUIRE( x_cpu(r, c) >= eT(500) );
+        REQUIRE( x_cpu(r, c) <= eT(600) );
+        }
+      }
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("diag_randn", "[diag]", float, double)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(200, 200, distr_param(500, 600));
+  x.diag().randn();
+
+  arma::Mat<eT> x_cpu(x);
+
+  for (uword c = 0; c < 200; ++c)
+    {
+    for (uword r = 0; r < 200; ++r)
+      {
+      if ( c == r )
+        {
+        // Don't want to make too many assumptions about what the randn results
+        // will be... but given a unit-variance zero-mean Gaussian, it should be
+        // less than 25...
+        REQUIRE( std::abs(x_cpu(r, c)) <= eT(25) );
+        }
+      else
+        {
+        REQUIRE( x_cpu(r, c) >= eT(500) );
+        REQUIRE( x_cpu(r, c) <= eT(600) );
+        }
+      }
+    }
+  }
