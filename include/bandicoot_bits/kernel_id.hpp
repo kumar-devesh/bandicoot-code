@@ -75,6 +75,7 @@ struct oneway_kernel_id
     //
     extract_diag,
     set_diag,
+    copy_diag,
     //
     inplace_set_eye,
     linspace,
@@ -133,6 +134,7 @@ struct oneway_kernel_id
 
     names.push_back("extract_diag");
     names.push_back("set_diag");
+    names.push_back("copy_diag");
 
     names.push_back("inplace_set_eye");
     names.push_back("linspace");
