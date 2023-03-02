@@ -565,3 +565,28 @@ TEMPLATE_TEST_CASE("non_square_subview_diag", "[diag]", float, double, u32, s32,
   REQUIRE( x.submat(2, 2, 7, 11).diag(4).n_elem == 6 );
   REQUIRE( x.submat(2, 2, 7, 11).diag(-4).n_elem == 2 );
   }
+
+
+
+// Test extraction of diagonal into subview.
+
+TEMPLATE_TEST_CASE("extract_diag_into_subview", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(10, 10, distr_param(0, 100));
+  Mat<eT> y = randi<Mat<eT>>(20, 20, distr_param(0, 100));
+
+  arma::Mat<eT> x_cpu(x);
+  arma::Mat<eT> y_cpu(y);
+
+  y.submat(0, 0, 9, 0) = x.diag();
+
+  Col<eT> x_diag = x.diag();
+  arma::Col<eT> x_diag_cpu(x_diag);
+
+  Col<eT> y_col = y.submat(0, 0, 9, 0);
+  arma::Col<eT> y_col_cpu(y_col);
+
+  REQUIRE( arma::approx_equal(y_col_cpu, x_diag_cpu, "absdiff", 1e-5) );
+  }
