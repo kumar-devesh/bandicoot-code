@@ -82,6 +82,8 @@ class op_vectorise_col;
 class op_vectorise_row;
 class op_vectorise_all;
 class op_clamp;
+class op_diagmat;
+class op_diagmat2;
 
 class mtop_conv_to;
 

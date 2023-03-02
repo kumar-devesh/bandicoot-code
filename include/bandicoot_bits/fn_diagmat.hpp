@@ -1,4 +1,4 @@
-// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2023 Ryan Curtin (http://www.ratml.org)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,34 +14,41 @@
 
 
 
+//! interpret a matrix or a vector as a diagonal matrix (ie. off-diagonal entries are zero)
 template<typename T1>
 coot_warn_unused
-inline
-typename T1::elem_type
-trace(const Base<typename T1::elem_type, T1>& X)
+coot_inline
+typename
+enable_if2
+  <
+  is_coot_type<T1>::value,
+  const Op<T1, op_diagmat>
+  >::result
+diagmat(const T1& X)
   {
   coot_extra_debug_sigprint();
 
-  typedef typename T1::elem_type eT;
-
-  const unwrap<T1>   U(X.get_ref());
-  const Mat<eT>& A = U.M;
-
-  if(A.n_elem == 0)  { return eT(0); }
-
-  return coot_rt_t::trace(A.get_dev_mem(false), A.n_rows, A.n_cols);
+  return Op<T1, op_diagmat>(X);
   }
 
 
 
-// trace(diagmat): just sum the elements
+//! create a matrix with the k-th diagonal set to the given vector
 template<typename T1>
 coot_warn_unused
-inline
-typename T1::elem_type
-trace(const Op<T1, op_diagmat>& X)
+coot_inline
+typename
+enable_if2
+  <
+  is_coot_type<T1>::value,
+  const Op<T1, op_diagmat2>
+  >::result
+diagmat(const T1& X, const sword k)
   {
   coot_extra_debug_sigprint();
 
-  return accu(X.m);
+  const uword a = (std::abs)(k);
+  const uword b = (k < 0) ? 1 : 0;
+
+  return Op<T1, op_diagmat2>(X, a, b);
   }
