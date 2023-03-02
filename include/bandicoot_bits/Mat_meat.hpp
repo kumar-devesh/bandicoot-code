@@ -659,9 +659,9 @@ Mat<eT>::operator+=(const diagview<eT>& X)
   {
   coot_extra_debug_sigprint();
 
-  // TODO
-
-  return *this;
+  // Extract the diagview, and then add.
+  Mat<eT> diag(X);
+  return operator+=(diag);
   }
 
 
@@ -673,9 +673,9 @@ Mat<eT>::operator-=(const diagview<eT>& X)
   {
   coot_extra_debug_sigprint();
 
-  // TODO
-
-  return *this;
+  // Extract the diagview, and then subtract.
+  Mat<eT> diag(X);
+  return operator-=(diag);
   }
 
 
@@ -687,9 +687,9 @@ Mat<eT>::operator*=(const diagview<eT>& X)
   {
   coot_extra_debug_sigprint();
 
-  // TODO
-
-  return *this;
+  // Extract the diagview, and then multiply.
+  Mat<eT> diag(X);
+  return operator*=(diag);
   }
 
 
@@ -701,9 +701,9 @@ Mat<eT>::operator%=(const diagview<eT>& X)
   {
   coot_extra_debug_sigprint();
 
-  // TODO
-
-  return *this;
+  // Extract the diagview, and then multiply.
+  Mat<eT> diag(X);
+  return operator%=(diag);
   }
 
 
@@ -715,9 +715,9 @@ Mat<eT>::operator/=(const diagview<eT>& X)
   {
   coot_extra_debug_sigprint();
 
-  // TODO
-
-  return *this;
+  // Extract the diagview, and then divide.
+  Mat<eT> diag(X);
+  return operator/=(diag);
   }
 
 

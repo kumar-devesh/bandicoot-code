@@ -879,3 +879,105 @@ TEMPLATE_TEST_CASE("diag_randn", "[diag]", float, double)
       }
     }
   }
+
+
+
+// Test diagonal in-place operations on matrices.
+
+TEMPLATE_TEST_CASE("mat_inplace_diag_plus", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(30, 30, distr_param(0, 100));
+  Col<eT> y = randi<Col<eT>>(30, distr_param(200, 300));
+
+  arma::Mat<eT> x_cpu(x);
+  arma::Col<eT> y_cpu(y);
+
+  y += x.diag();
+  y_cpu += x_cpu.diag();
+
+  arma::Mat<eT> y2_cpu(y);
+
+  REQUIRE( arma::approx_equal( y2_cpu, y_cpu, "absdiff", 1e-5 ) );
+  }
+
+
+
+TEMPLATE_TEST_CASE("mat_inplace_diag_minus", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(30, 30, distr_param(0, 100));
+  Col<eT> y = randi<Col<eT>>(30, distr_param(200, 300));
+
+  arma::Mat<eT> x_cpu(x);
+  arma::Col<eT> y_cpu(y);
+
+  y -= x.diag();
+  y_cpu -= x_cpu.diag();
+
+  arma::Mat<eT> y2_cpu(y);
+
+  REQUIRE( arma::approx_equal( y2_cpu, y_cpu, "absdiff", 1e-5 ) );
+  }
+
+
+
+TEMPLATE_TEST_CASE("mat_inplace_diag_schur", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(30, 30, distr_param(0, 100));
+  Col<eT> y = randi<Col<eT>>(30, distr_param(200, 300));
+
+  arma::Mat<eT> x_cpu(x);
+  arma::Col<eT> y_cpu(y);
+
+  y %= x.diag();
+  y_cpu %= x_cpu.diag();
+
+  arma::Mat<eT> y2_cpu(y);
+
+  REQUIRE( arma::approx_equal( y2_cpu, y_cpu, "absdiff", 1e-5 ) );
+  }
+
+
+
+TEMPLATE_TEST_CASE("mat_inplace_diag_div", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(30, 30, distr_param(5, 10));
+  Col<eT> y = randi<Col<eT>>(30, distr_param(100, 200));
+
+  arma::Mat<eT> x_cpu(x);
+  arma::Col<eT> y_cpu(y);
+
+  y /= x.diag();
+  y_cpu /= x_cpu.diag();
+
+  arma::Mat<eT> y2_cpu(y);
+
+  REQUIRE( arma::approx_equal( y2_cpu, y_cpu, "absdiff", 1e-5 ) );
+  }
+
+
+
+TEMPLATE_TEST_CASE("mat_inplace_diag_mul", "[diag]", float, double)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(30, 30, distr_param(0, 10));
+  Mat<eT> y = randi<Mat<eT>>(30, 30, distr_param(0, 10));
+
+  arma::Mat<eT> x_cpu(x);
+  arma::Mat<eT> y_cpu(y);
+
+  x *= y.diag();
+  x_cpu *= y_cpu.diag();
+
+  arma::Mat<eT> x2_cpu(x);
+
+  REQUIRE( arma::approx_equal( x2_cpu, x_cpu, "absdiff", 1e-5 ) );
+  }
