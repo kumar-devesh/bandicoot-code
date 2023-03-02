@@ -52,8 +52,8 @@ class diagview : public Base< eT, diagview<eT> >
   inline ~diagview();
   inline  diagview() = delete;
 
-  /* inline  diagview(const diagview&  in); */
-  /* inline  diagview(      diagview&& in); */
+  inline  diagview(const diagview&  in);
+  inline  diagview(      diagview&& in);
 
   inline void operator=(const diagview& x);
 
@@ -101,11 +101,6 @@ class diagview : public Base< eT, diagview<eT> >
   inline void randn();
 
   inline static void extract(Mat<eT>& out, const diagview& in);
-
-  /* inline static void  plus_inplace(Mat<eT>& out, const diagview& in); */
-  /* inline static void minus_inplace(Mat<eT>& out, const diagview& in); */
-  /* inline static void schur_inplace(Mat<eT>& out, const diagview& in); */
-  /* inline static void   div_inplace(Mat<eT>& out, const diagview& in); */
 
 
   friend class Mat<eT>;

@@ -40,38 +40,35 @@ diagview<eT>::diagview(const Mat<eT>& in_m, const uword in_row_offset, const uwo
 
 
 
-/* template<typename eT> */
-/* inline */
-/* diagview<eT>::diagview(const diagview<eT>& in) */
-/*   : m         (in.m         ) */
-/*   , row_offset(in.row_offset) */
-/*   , col_offset(in.col_offset) */
-/*   , n_rows    (in.n_rows    ) */
-/*   , n_elem    (in.n_elem    ) */
-/*   { */
-/*   arma_extra_debug_sigprint(arma_str::format("this = %x   in = %x") % this % &in); */
-/*   } */
+template<typename eT>
+inline
+diagview<eT>::diagview(const diagview<eT>& in)
+  : m         (in.m         )
+  , mem_offset(in.mem_offset)
+  , n_rows    (in.n_rows    )
+  , n_elem    (in.n_elem    )
+  {
+  coot_extra_debug_sigprint(coot_str::format("this = %x   in = %x") % this % &in);
+  }
 
 
 
-/* template<typename eT> */
-/* inline */
-/* diagview<eT>::diagview(diagview<eT>&& in) */
-/*   : m         (in.m         ) */
-/*   , row_offset(in.row_offset) */
-/*   , col_offset(in.col_offset) */
-/*   , n_rows    (in.n_rows    ) */
-/*   , n_elem    (in.n_elem    ) */
-/*   { */
-/*   arma_extra_debug_sigprint(arma_str::format("this = %x   in = %x") % this % &in); */
+template<typename eT>
+inline
+diagview<eT>::diagview(diagview<eT>&& in)
+  : m         (in.m         )
+  , mem_offset(in.mem_offset)
+  , n_rows    (in.n_rows    )
+  , n_elem    (in.n_elem    )
+  {
+  coot_extra_debug_sigprint(coot_str::format("this = %x   in = %x") % this % &in);
 
-/*   // for paranoia */
+  // for paranoia
 
-/*   access::rw(in.row_offset) = 0; */
-/*   access::rw(in.col_offset) = 0; */
-/*   access::rw(in.n_rows    ) = 0; */
-/*   access::rw(in.n_elem    ) = 0; */
-/*   } */
+  access::rw(in.mem_offset) = 0;
+  access::rw(in.n_rows    ) = 0;
+  access::rw(in.n_elem    ) = 0;
+  }
 
 
 
@@ -299,150 +296,6 @@ diagview<eT>::extract(Mat<eT>& out, const diagview<eT>& in)
 
   coot_rt_t::extract_diag(out.get_dev_mem(false), in_m.get_dev_mem(false), in.mem_offset, in_m.n_rows, in.n_elem);
   }
-
-
-
-/* //! X += Y.diag() */
-/* template<typename eT> */
-/* inline */
-/* void */
-/* diagview<eT>::plus_inplace(Mat<eT>& out, const diagview<eT>& in) */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
-
-/*   arma_debug_assert_same_size(out.n_rows, out.n_cols, in.n_rows, in.n_cols, "addition"); */
-
-/*   const Mat<eT>& in_m = in.m; */
-
-/*   const uword in_n_elem     = in.n_elem; */
-/*   const uword in_row_offset = in.row_offset; */
-/*   const uword in_col_offset = in.col_offset; */
-
-/*   eT* out_mem = out.memptr(); */
-
-/*   uword i,j; */
-/*   for(i=0, j=1; j < in_n_elem; i+=2, j+=2) */
-/*     { */
-/*     const eT tmp_i = in_m.at( i + in_row_offset, i + in_col_offset ); */
-/*     const eT tmp_j = in_m.at( j + in_row_offset, j + in_col_offset ); */
-
-/*     out_mem[i] += tmp_i; */
-/*     out_mem[j] += tmp_j; */
-/*     } */
-
-/*   if(i < in_n_elem) */
-/*     { */
-/*     out_mem[i] += in_m.at( i + in_row_offset, i + in_col_offset ); */
-/*     } */
-/*   } */
-
-
-
-/* //! X -= Y.diag() */
-/* template<typename eT> */
-/* inline */
-/* void */
-/* diagview<eT>::minus_inplace(Mat<eT>& out, const diagview<eT>& in) */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
-
-/*   arma_debug_assert_same_size(out.n_rows, out.n_cols, in.n_rows, in.n_cols, "subtraction"); */
-
-/*   const Mat<eT>& in_m = in.m; */
-
-/*   const uword in_n_elem     = in.n_elem; */
-/*   const uword in_row_offset = in.row_offset; */
-/*   const uword in_col_offset = in.col_offset; */
-
-/*   eT* out_mem = out.memptr(); */
-
-/*   uword i,j; */
-/*   for(i=0, j=1; j < in_n_elem; i+=2, j+=2) */
-/*     { */
-/*     const eT tmp_i = in_m.at( i + in_row_offset, i + in_col_offset ); */
-/*     const eT tmp_j = in_m.at( j + in_row_offset, j + in_col_offset ); */
-
-/*     out_mem[i] -= tmp_i; */
-/*     out_mem[j] -= tmp_j; */
-/*     } */
-
-/*   if(i < in_n_elem) */
-/*     { */
-/*     out_mem[i] -= in_m.at( i + in_row_offset, i + in_col_offset ); */
-/*     } */
-/*   } */
-
-
-
-/* //! X %= Y.diag() */
-/* template<typename eT> */
-/* inline */
-/* void */
-/* diagview<eT>::schur_inplace(Mat<eT>& out, const diagview<eT>& in) */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
-
-/*   arma_debug_assert_same_size(out.n_rows, out.n_cols, in.n_rows, in.n_cols, "element-wise multiplication"); */
-
-/*   const Mat<eT>& in_m = in.m; */
-
-/*   const uword in_n_elem     = in.n_elem; */
-/*   const uword in_row_offset = in.row_offset; */
-/*   const uword in_col_offset = in.col_offset; */
-
-/*   eT* out_mem = out.memptr(); */
-
-/*   uword i,j; */
-/*   for(i=0, j=1; j < in_n_elem; i+=2, j+=2) */
-/*     { */
-/*     const eT tmp_i = in_m.at( i + in_row_offset, i + in_col_offset ); */
-/*     const eT tmp_j = in_m.at( j + in_row_offset, j + in_col_offset ); */
-
-/*     out_mem[i] *= tmp_i; */
-/*     out_mem[j] *= tmp_j; */
-/*     } */
-
-/*   if(i < in_n_elem) */
-/*     { */
-/*     out_mem[i] *= in_m.at( i + in_row_offset, i + in_col_offset ); */
-/*     } */
-/*   } */
-
-
-
-/* //! X /= Y.diag() */
-/* template<typename eT> */
-/* inline */
-/* void */
-/* diagview<eT>::div_inplace(Mat<eT>& out, const diagview<eT>& in) */
-/*   { */
-/*   arma_extra_debug_sigprint(); */
-
-/*   arma_debug_assert_same_size(out.n_rows, out.n_cols, in.n_rows, in.n_cols, "element-wise division"); */
-
-/*   const Mat<eT>& in_m = in.m; */
-
-/*   const uword in_n_elem     = in.n_elem; */
-/*   const uword in_row_offset = in.row_offset; */
-/*   const uword in_col_offset = in.col_offset; */
-
-/*   eT* out_mem = out.memptr(); */
-
-/*   uword i,j; */
-/*   for(i=0, j=1; j < in_n_elem; i+=2, j+=2) */
-/*     { */
-/*     const eT tmp_i = in_m.at( i + in_row_offset, i + in_col_offset ); */
-/*     const eT tmp_j = in_m.at( j + in_row_offset, j + in_col_offset ); */
-
-/*     out_mem[i] /= tmp_i; */
-/*     out_mem[j] /= tmp_j; */
-/*     } */
-
-/*   if(i < in_n_elem) */
-/*     { */
-/*     out_mem[i] /= in_m.at( i + in_row_offset, i + in_col_offset ); */
-/*     } */
-/*   } */
 
 
 
