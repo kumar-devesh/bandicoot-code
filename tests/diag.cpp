@@ -981,3 +981,142 @@ TEMPLATE_TEST_CASE("mat_inplace_diag_mul", "[diag]", float, double)
 
   REQUIRE( arma::approx_equal( x2_cpu, x_cpu, "absdiff", 1e-5 ) );
   }
+
+
+
+// Test bare diagmat.
+
+TEMPLATE_TEST_CASE("diagmat", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Col<eT> y = randi<Col<eT>>(50, distr_param(10, 20));
+  Mat<eT> x = diagmat(y);
+
+  REQUIRE( x.n_rows == 50 );
+  REQUIRE( x.n_cols == 50 );
+
+  arma::Col<eT> y_cpu(y);
+  arma::Mat<eT> x_cpu(x);
+
+  for (uword c = 0; c < 50; ++c)
+    {
+    for (uword r = 0; r < 50; ++r)
+      {
+      if ( r == c )
+        {
+        REQUIRE( x_cpu(r, c) == Approx(y_cpu(r)) );
+        }
+      else
+        {
+        REQUIRE( x_cpu(r, c) == Approx(eT(0)).margin(1e-5) );
+        }
+      }
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("diagmat2", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Col<eT> y = randi<Col<eT>>(50, distr_param(10, 20));
+
+  for (sword k = -4; k < 5; ++k)
+    {
+    Mat<eT> x = diagmat(y, k);
+
+    REQUIRE( x.n_rows == 50 + uword(std::abs(k)) );
+    REQUIRE( x.n_cols == 50 + uword(std::abs(k)) );
+
+    arma::Col<eT> y_cpu(y);
+    arma::Mat<eT> x_cpu(x);
+
+    for (uword c = 0; c < 50; ++c)
+      {
+      for (uword r = 0; r < 50; ++r)
+        {
+        if ( k < 0 )
+          {
+          if ( (r >= uword(std::abs(k))) && (r - uword(std::abs(k))) == c )
+            {
+            REQUIRE( x_cpu(r, c) == Approx(y_cpu(c)) );
+            }
+          else
+            {
+            REQUIRE( x_cpu(r, c) == Approx(eT(0)).margin(1e-5) );
+            }
+          }
+        else
+          {
+          if ( (c >= uword(std::abs(k))) && (c - uword(std::abs(k))) == r )
+            {
+            REQUIRE( x_cpu(r, c) == Approx(y_cpu(r)) );
+            }
+          else
+            {
+            REQUIRE( x_cpu(r, c) == Approx(eT(0)).margin(1e-5) );
+            }
+          }
+        }
+      }
+    }
+  }
+
+
+
+// Test diagmat into submatrix.
+
+TEMPLATE_TEST_CASE("diagmat_submatrix", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(10, 10, distr_param(10, 20));
+  Col<eT> y = randi<Col<eT>>(8, distr_param(50, 60));
+
+  x.submat(1, 1, 8, 8) = diagmat(y);
+
+  REQUIRE( x.n_rows == 10 );
+  REQUIRE( x.n_cols == 10 );
+
+  arma::Mat<eT> x_cpu(x);
+
+  for (uword c = 0; c < 10; ++c)
+    {
+    for (uword r = 0; r < 10; ++r)
+      {
+      if ( r == 0 || r == 9 || c == 0 || c == 9 )
+        {
+        REQUIRE( eT(x_cpu(r, c)) >= eT(10) );
+        REQUIRE( eT(x_cpu(r, c)) <= eT(20) );
+        }
+      else if ( r == c )
+        {
+        REQUIRE( eT(x_cpu(r, c)) >= eT(50) );
+        REQUIRE( eT(x_cpu(r, c)) <= eT(60) );
+        }
+      else
+        {
+        REQUIRE( eT(x_cpu(r, c)) == Approx(eT(0)).margin(1e-5) );
+        }
+      }
+    }
+  }
+
+
+
+// Test trace(diagmat).
+
+TEMPLATE_TEST_CASE("diagmat_trace", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Col<eT> y = randi<Col<eT>>(10, distr_param(10, 20));
+
+  REQUIRE( trace(diagmat(y)) == Approx(accu(y)) );
+  }
+
+// Test diagmat(A) * B
+
+// Test A * diagmat(B)
