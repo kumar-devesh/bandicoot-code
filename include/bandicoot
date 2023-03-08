@@ -115,7 +115,7 @@ namespace coot
   #include "bandicoot_bits/constants.hpp"
   #include "bandicoot_bits/dev_mem_t.hpp"
   #include "bandicoot_bits/distr_param.hpp"
-
+  
 
 
   //
@@ -323,6 +323,7 @@ namespace coot
       #include "bandicoot_bits/opencl/trans.hpp"
       #include "bandicoot_bits/opencl/clamp.hpp"
       #include "bandicoot_bits/opencl/norm.hpp"
+      #include "bandicoot_bits/opencl/mul_diag.hpp"
       #include "bandicoot_bits/opencl/svd.hpp"
 //      #include "bandicoot_bits/opencl/eig.hpp"
       }
@@ -358,6 +359,7 @@ namespace coot
     #include "bandicoot_bits/cuda/trans.hpp"
     #include "bandicoot_bits/cuda/clamp.hpp"
     #include "bandicoot_bits/cuda/norm.hpp"
+    #include "bandicoot_bits/cuda/mul_diag.hpp"
     #include "bandicoot_bits/cuda/svd.hpp"
 //    #include "bandicoot_bits/cuda/eig.hpp"
     }
@@ -371,6 +373,7 @@ namespace coot
   #include "bandicoot_bits/no_conv_unwrap.hpp"
   #include "bandicoot_bits/unwrap.hpp"
   #include "bandicoot_bits/SizeProxy.hpp"
+  #include "bandicoot_bits/strip.hpp"
 
 
 
