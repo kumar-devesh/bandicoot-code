@@ -1119,4 +1119,270 @@ TEMPLATE_TEST_CASE("diagmat_trace", "[diag]", float, double, u32, s32, u64, s64)
 
 // Test diagmat(A) * B
 
+TEMPLATE_TEST_CASE("diagmat_times_1", "[diag]", float, double)
+  {
+  typedef TestType eT;
+
+  Col<eT> a_diag = randi<Col<eT>>(10, distr_param(10, 20));
+  Mat<eT> b = randi<Mat<eT>>(10, 20, distr_param(10, 20));
+
+  Mat<eT> c1 = diagmat(a_diag) * b;
+  Mat<eT> c2 = diagmat(trans(a_diag)) * b;
+  Mat<eT> c3 = trans(diagmat(a_diag)) * b;
+
+  Mat<eT> a_ref(10, 10);
+  a_ref.zeros();
+  a_ref.diag() = a_diag;
+
+  Mat<eT> c_ref = a_ref * b;
+
+  REQUIRE( c1.n_rows == 10 );
+  REQUIRE( c1.n_cols == 20 );
+  REQUIRE( c2.n_rows == 10 );
+  REQUIRE( c2.n_cols == 20 );
+  REQUIRE( c3.n_rows == 10 );
+  REQUIRE( c3.n_cols == 20 );
+
+  arma::Mat<eT> c1_cpu(c1);
+  arma::Mat<eT> c2_cpu(c2);
+  arma::Mat<eT> c3_cpu(c3);
+  arma::Mat<eT> c_ref_cpu(c_ref);
+
+  REQUIRE( arma::approx_equal(c1_cpu, c_ref_cpu, "reldiff", 1e-6) );
+  REQUIRE( arma::approx_equal(c2_cpu, c_ref_cpu, "reldiff", 1e-6) );
+  REQUIRE( arma::approx_equal(c3_cpu, c_ref_cpu, "reldiff", 1e-6) );
+  }
+
+
+
+// Test diagmat(A) * B'
+
+TEMPLATE_TEST_CASE("diagmat_times_2", "[diag]", float, double)
+  {
+  typedef TestType eT;
+
+  Col<eT> a_diag = randi<Col<eT>>(10, distr_param(10, 20));
+  Mat<eT> b = randi<Mat<eT>>(20, 10, distr_param(10, 20));
+
+  Mat<eT> c1 = diagmat(a_diag) * trans(b);
+  Mat<eT> c2 = diagmat(trans(a_diag)) * trans(b);
+  Mat<eT> c3 = trans(diagmat(a_diag)) * trans(b);
+
+  Mat<eT> a_ref(10, 10);
+  a_ref.zeros();
+  a_ref.diag() = a_diag;
+
+  Mat<eT> c_ref = a_ref * trans(b);
+
+  REQUIRE( c1.n_rows == 10 );
+  REQUIRE( c1.n_cols == 20 );
+  REQUIRE( c2.n_rows == 10 );
+  REQUIRE( c2.n_cols == 20 );
+  REQUIRE( c3.n_rows == 10 );
+  REQUIRE( c3.n_cols == 20 );
+
+  arma::Mat<eT> c1_cpu(c1);
+  arma::Mat<eT> c2_cpu(c2);
+  arma::Mat<eT> c3_cpu(c3);
+  arma::Mat<eT> c_ref_cpu(c_ref);
+
+  REQUIRE( arma::approx_equal(c1_cpu, c_ref_cpu, "reldiff", 1e-6) );
+  REQUIRE( arma::approx_equal(c2_cpu, c_ref_cpu, "reldiff", 1e-6) );
+  REQUIRE( arma::approx_equal(c3_cpu, c_ref_cpu, "reldiff", 1e-6) );
+  }
+
+
+
+// Test diagmat(a * A) * (b * B')
+
+TEMPLATE_TEST_CASE("diagmat_times_3", "[diag]", float, double)
+  {
+  typedef TestType eT;
+
+  Col<eT> a_diag = randi<Col<eT>>(10, distr_param(10, 20));
+  Mat<eT> b = randi<Mat<eT>>(20, 10, distr_param(10, 20));
+
+  Mat<eT> c1 = diagmat(3 * a_diag) * (5 * trans(b));
+  Mat<eT> c2 = (3 * diagmat(trans(a_diag))) * (5 * trans(b));
+  Mat<eT> c3 = trans(diagmat(3 * a_diag)) * (5 * trans(b));
+
+  Mat<eT> a_ref(10, 10);
+  a_ref.zeros();
+  a_ref.diag() = a_diag;
+
+  Mat<eT> c_ref = (3 * a_ref) * (5 * trans(b));
+
+  REQUIRE( c1.n_rows == 10 );
+  REQUIRE( c1.n_cols == 20 );
+  REQUIRE( c2.n_rows == 10 );
+  REQUIRE( c2.n_cols == 20 );
+  REQUIRE( c3.n_rows == 10 );
+  REQUIRE( c3.n_cols == 20 );
+
+  arma::Mat<eT> c1_cpu(c1);
+  arma::Mat<eT> c2_cpu(c2);
+  arma::Mat<eT> c3_cpu(c3);
+  arma::Mat<eT> c_ref_cpu(c_ref);
+
+  REQUIRE( arma::approx_equal(c1_cpu, c_ref_cpu, "reldiff", 1e-6) );
+  REQUIRE( arma::approx_equal(c2_cpu, c_ref_cpu, "reldiff", 1e-6) );
+  REQUIRE( arma::approx_equal(c3_cpu, c_ref_cpu, "reldiff", 1e-6) );
+  }
+
+
+
 // Test A * diagmat(B)
+
+TEMPLATE_TEST_CASE("diagmat_times_4", "[diag]", float, double)
+  {
+  typedef TestType eT;
+
+  Mat<eT> a = randi<Mat<eT>>(20, 10, distr_param(10, 20));
+  Col<eT> b_diag = randi<Col<eT>>(10, distr_param(10, 20));
+
+  Mat<eT> c1 = a * diagmat(b_diag);
+  Mat<eT> c2 = a * diagmat(trans(b_diag));
+  Mat<eT> c3 = a * trans(diagmat(b_diag));
+
+  Mat<eT> b_ref(10, 10);
+  b_ref.zeros();
+  b_ref.diag() = b_diag;
+
+  Mat<eT> c_ref = a * b_ref;
+
+  REQUIRE( c1.n_rows == 20 );
+  REQUIRE( c1.n_cols == 10 );
+  REQUIRE( c2.n_rows == 20 );
+  REQUIRE( c2.n_cols == 10 );
+  REQUIRE( c3.n_rows == 20 );
+  REQUIRE( c3.n_cols == 10 );
+
+  arma::Mat<eT> c1_cpu(c1);
+  arma::Mat<eT> c2_cpu(c2);
+  arma::Mat<eT> c3_cpu(c3);
+  arma::Mat<eT> c_ref_cpu(c_ref);
+
+  REQUIRE( arma::approx_equal(c1_cpu, c_ref_cpu, "reldiff", 1e-6) );
+  REQUIRE( arma::approx_equal(c2_cpu, c_ref_cpu, "reldiff", 1e-6) );
+  REQUIRE( arma::approx_equal(c3_cpu, c_ref_cpu, "reldiff", 1e-6) );
+  }
+
+
+
+// Test A' * diagmat(B)
+
+TEMPLATE_TEST_CASE("diagmat_times_5", "[diag]", float, double)
+  {
+  typedef TestType eT;
+
+  Mat<eT> a = randi<Mat<eT>>(10, 20, distr_param(10, 20));
+  Col<eT> b_diag = randi<Col<eT>>(10, distr_param(10, 20));
+
+  Mat<eT> c1 = trans(a) * diagmat(b_diag);
+  Mat<eT> c2 = trans(a) * diagmat(trans(b_diag));
+  Mat<eT> c3 = trans(a) * trans(diagmat(b_diag));
+
+  Mat<eT> b_ref(10, 10);
+  b_ref.zeros();
+  b_ref.diag() = b_diag;
+
+  Mat<eT> c_ref = trans(a) * b_ref;
+
+  REQUIRE( c1.n_rows == 20 );
+  REQUIRE( c1.n_cols == 10 );
+  REQUIRE( c2.n_rows == 20 );
+  REQUIRE( c2.n_cols == 10 );
+  REQUIRE( c3.n_rows == 20 );
+  REQUIRE( c3.n_cols == 10 );
+
+  arma::Mat<eT> c1_cpu(c1);
+  arma::Mat<eT> c2_cpu(c2);
+  arma::Mat<eT> c3_cpu(c3);
+  arma::Mat<eT> c_ref_cpu(c_ref);
+
+  REQUIRE( arma::approx_equal(c1_cpu, c_ref_cpu, "reldiff", 1e-6) );
+  REQUIRE( arma::approx_equal(c2_cpu, c_ref_cpu, "reldiff", 1e-6) );
+  REQUIRE( arma::approx_equal(c3_cpu, c_ref_cpu, "reldiff", 1e-6) );
+  }
+
+
+
+// Test (a * A') * (b * diagmat(B))
+
+TEMPLATE_TEST_CASE("diagmat_times_6", "[diag]", float, double)
+  {
+  typedef TestType eT;
+
+  Mat<eT> a = randi<Mat<eT>>(10, 20, distr_param(10, 20));
+  Col<eT> b_diag = randi<Col<eT>>(10, distr_param(10, 20));
+
+  Mat<eT> c1 = (2 * trans(a)) * (6 * diagmat(b_diag));
+  Mat<eT> c2 = (2 * trans(a)) * (6 * diagmat(trans(b_diag)));
+  Mat<eT> c3 = (2 * trans(a)) * (6 * trans(diagmat(b_diag)));
+
+  Mat<eT> b_ref(10, 10);
+  b_ref.zeros();
+  b_ref.diag() = b_diag;
+
+  Mat<eT> c_ref = (2 * trans(a)) * (6 * b_ref);
+
+  REQUIRE( c1.n_rows == 20 );
+  REQUIRE( c1.n_cols == 10 );
+  REQUIRE( c2.n_rows == 20 );
+  REQUIRE( c2.n_cols == 10 );
+  REQUIRE( c3.n_rows == 20 );
+  REQUIRE( c3.n_cols == 10 );
+
+  arma::Mat<eT> c1_cpu(c1);
+  arma::Mat<eT> c2_cpu(c2);
+  arma::Mat<eT> c3_cpu(c3);
+  arma::Mat<eT> c_ref_cpu(c_ref);
+
+  REQUIRE( arma::approx_equal(c1_cpu, c_ref_cpu, "reldiff", 1e-6) );
+  REQUIRE( arma::approx_equal(c2_cpu, c_ref_cpu, "reldiff", 1e-6) );
+  REQUIRE( arma::approx_equal(c3_cpu, c_ref_cpu, "reldiff", 1e-6) );
+  }
+
+
+
+// Test diagmat(A) * diagmat(B)
+
+TEMPLATE_TEST_CASE("diagmat_times_7", "[diag]", float, double)
+  {
+  typedef TestType eT;
+
+  Col<eT> a_diag = randi<Mat<eT>>(10, distr_param(10, 20));
+  Col<eT> b_diag = randi<Mat<eT>>(10, distr_param(20, 30));
+
+  Mat<eT> c1 = diagmat(a_diag) * diagmat(b_diag);
+  Mat<eT> c2 = diagmat(trans(a_diag)) * diagmat(trans(b_diag));
+  Mat<eT> c3 = trans(diagmat(a_diag)) * trans(diagmat(b_diag));
+
+  Mat<eT> a_ref(10, 10);
+  a_ref.zeros();
+  a_ref.diag() = a_diag;
+  Mat<eT> b_ref(10, 10);
+  b_ref.zeros();
+  b_ref.diag() = b_diag;
+
+  Mat<eT> c_ref = a_ref * b_ref;
+
+  REQUIRE( c1.n_rows == 10 );
+  REQUIRE( c1.n_cols == 10 );
+  REQUIRE( c2.n_rows == 10 );
+  REQUIRE( c2.n_cols == 10 );
+  REQUIRE( c3.n_rows == 10 );
+  REQUIRE( c3.n_cols == 10 );
+
+  arma::Mat<eT> c1_cpu(c1);
+  arma::Mat<eT> c2_cpu(c2);
+  arma::Mat<eT> c3_cpu(c3);
+  arma::Mat<eT> c_ref_cpu(c_ref);
+
+  REQUIRE( arma::approx_equal(c1_cpu, c_ref_cpu, "reldiff", 1e-6) );
+  REQUIRE( arma::approx_equal(c2_cpu, c_ref_cpu, "reldiff", 1e-6) );
+  REQUIRE( arma::approx_equal(c3_cpu, c_ref_cpu, "reldiff", 1e-6) );
+  }
+
+
+// diagmat2(trans())
