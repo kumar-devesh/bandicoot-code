@@ -39,6 +39,7 @@ test-opencl:
   script: |
     cd tests
     make clean && BACKEND=CL_BACKEND make -j2
+    clinfo
     export CUDA_VISIBLE_DEVICES=0
     ./main
     export CUDA_VISIBLE_DEVICES=1
