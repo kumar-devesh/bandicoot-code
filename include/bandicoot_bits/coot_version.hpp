@@ -15,7 +15,7 @@
 
 #define COOT_VERSION_MAJOR 0
 #define COOT_VERSION_MINOR 100
-#define COOT_VERSION_PATCH 11
+#define COOT_VERSION_PATCH 13
 #define COOT_VERSION_NOTE  "unstable development version"
 
 
