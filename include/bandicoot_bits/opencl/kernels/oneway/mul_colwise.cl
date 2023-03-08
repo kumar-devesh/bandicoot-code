@@ -12,6 +12,7 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
+// multiply each column in `in` by the corresponding value in `A`
 __kernel
 void
 COOT_FN(PREFIX,mul_colwise)(__global eT1* out,

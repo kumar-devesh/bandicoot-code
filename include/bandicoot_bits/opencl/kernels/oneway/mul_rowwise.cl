@@ -12,6 +12,7 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
+// multiply each row in `in` by the corresponding value in `A`
 __kernel
 void
 COOT_FN(PREFIX,mul_rowwise)(__global eT1* out,
@@ -24,10 +25,10 @@ COOT_FN(PREFIX,mul_rowwise)(__global eT1* out,
   const UWORD row = get_global_id(0);
   if(row < n_rows)
     {
-    const eT1 val = alpha * A[col];
+    const eT1 val = alpha * A[row];
 
     #pragma unroll
-    for(UWORD i = 0; i < n_rows; ++i)
+    for(UWORD i = 0; i < n_cols; ++i)
       {
       const UWORD offset = i * n_rows + row;
       out[offset] = val * in[offset];
