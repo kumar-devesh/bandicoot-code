@@ -27,7 +27,7 @@ COOT_FN(PREFIX,equ_array_trunc_exp_post)(__global eT2* out,
     {
     // To match Armadillo, we always use `double` as the intermediate type for any non-floating point type.
     const eT1 val = A[i];
-    if (COOT_FN(coot_is_fp_,eT1))
+    if (COOT_FN(coot_is_fp_,eT1)())
       {
       const fp_eT1 fp_val = (fp_eT1) val;
       if (fp_val >= log(COOT_FN(coot_type_max_,fp_eT1)()))

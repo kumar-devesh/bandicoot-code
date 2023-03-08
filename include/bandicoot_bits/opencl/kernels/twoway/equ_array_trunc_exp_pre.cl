@@ -27,7 +27,7 @@ COOT_FN(PREFIX,equ_array_trunc_exp_pre)(__global eT2* out,
     {
     // To imitate Armadillo's behavior exactly, if the type is not floating-point, we convert to double.
     const eT2 val = (eT2) A[i];
-    if (COOT_FN(coot_is_fp_,eT2))
+    if (COOT_FN(coot_is_fp_,eT2)())
       {
       const fp_eT2 fp_val = (fp_eT2) val;
       if (fp_val >= log(COOT_FN(coot_type_max_,fp_eT2)()))
