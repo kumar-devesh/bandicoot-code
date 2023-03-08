@@ -77,6 +77,11 @@ struct oneway_kernel_id
     set_diag,
     copy_diag,
     //
+    mul_colwise,
+    mul_rowwise,
+    mul_colwise_trans,
+    mul_rowwise_trans,
+    //
     inplace_set_eye,
     linspace,
     //
@@ -135,6 +140,11 @@ struct oneway_kernel_id
     names.push_back("extract_diag");
     names.push_back("set_diag");
     names.push_back("copy_diag");
+
+    names.push_back("mul_colwise");
+    names.push_back("mul_rowwise");
+    names.push_back("mul_colwise_trans");
+    names.push_back("mul_rowwise_trans");
 
     names.push_back("inplace_set_eye");
     names.push_back("linspace");

@@ -1380,6 +1380,37 @@ coot_rt_t::gemv(dev_mem_t<eT> y_mem, const dev_mem_t<eT> A_mem, const uword A_n_
 
 
 
+template<typename eT>
+inline
+void
+coot_rt_t::mul_diag(dev_mem_t<eT> C_mem, const uword C_n_rows, const uword C_n_cols, const eT alpha, const dev_mem_t<eT> A_mem, const bool A_is_diag, const bool A_trans, const dev_mem_t<eT> B_mem, const bool B_is_diag, const bool B_trans)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    opencl::mul_diag(C_mem, C_n_rows, C_n_cols, alpha, A_mem, A_is_diag, A_trans, B_mem, B_is_diag, B_trans);
+    #else
+    coot_stop_runtime_error("coot_rt::mul_diag(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    cuda::mul_diag(C_mem, C_n_rows, C_n_cols, alpha, A_mem, A_is_diag, A_trans, B_mem, B_is_diag, B_trans);
+    #else
+    coot_stop_runtime_error("coot_rt::mul_diag(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::mul_diag(): unknown backend");
+    }
+  }
+
+
+
 template<typename eT1, typename eT2>
 inline
 void

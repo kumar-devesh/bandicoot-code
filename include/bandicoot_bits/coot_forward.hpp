@@ -100,6 +100,7 @@ class eglue_schur;
 class eglue_div;
 
 class glue_times;
+class glue_times_diag;
 
 class glue_mixed_plus;
 class glue_mixed_minus;
