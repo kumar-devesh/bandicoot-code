@@ -38,7 +38,7 @@ generic_reduce(const dev_mem_t<eT> mem,
   {
   // Do first pass, hand off to appropriate smaller reduce if needed.
   // The first pass will use the first kernel; subsequent passes use the second kernel.
-  const size_t n_elem_per_thread = std::ceil(n_elem / (2 * std::ceil(std::log2(n_elem))));
+  const size_t n_elem_per_thread = std::ceil(n_elem / std::max(1.0, (2 * std::ceil(std::log2(n_elem)))));
   const size_t mtpb = (size_t) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock;
 
   // Compute size of auxiliary memory.
@@ -149,7 +149,7 @@ generic_reduce_inner(const dev_mem_t<eT> mem,
                      dev_mem_t<eT> second_aux_mem)
   {
   const size_t mtpb = (size_t) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock;
-  const size_t max_num_threads = std::ceil(n_elem / (2 * std::ceil(std::log2(n_elem))));
+  const size_t max_num_threads = std::ceil(n_elem / std::max(1.0, (2 * std::ceil(std::log2(n_elem)))));
 
   if (max_num_threads <= mtpb)
     {
