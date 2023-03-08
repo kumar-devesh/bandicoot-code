@@ -220,6 +220,7 @@ namespace coot
   #include "bandicoot_bits/op_clamp_bones.hpp"
   #include "bandicoot_bits/op_norm_bones.hpp"
   #include "bandicoot_bits/op_diagmat_bones.hpp"
+  #include "bandicoot_bits/op_diagvec_bones.hpp"
 
   #include "bandicoot_bits/mtop_conv_to_bones.hpp"
 
@@ -418,6 +419,7 @@ namespace coot
   #include "bandicoot_bits/fn_norm.hpp"
   #include "bandicoot_bits/fn_svd.hpp"
   #include "bandicoot_bits/fn_diagmat.hpp"
+  #include "bandicoot_bits/fn_diagvec.hpp"
 
 
   //
@@ -459,6 +461,7 @@ namespace coot
   #include "bandicoot_bits/op_clamp_meat.hpp"
   #include "bandicoot_bits/op_norm_meat.hpp"
   #include "bandicoot_bits/op_diagmat_meat.hpp"
+  #include "bandicoot_bits/op_diagvec_meat.hpp"
 
   #include "bandicoot_bits/mtop_conv_to_meat.hpp"
 
