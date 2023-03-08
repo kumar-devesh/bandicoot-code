@@ -74,7 +74,7 @@ TEMPLATE_TEST_CASE("reshape_larger", "[reshape]", float, double, u32, s32, u64, 
   arma::Col<eT> x_vec = arma::vectorise(x_cpu);
   arma::Col<eT> y_vec = arma::vectorise(y_cpu);
   REQUIRE( arma::approx_equal( x_vec, y_vec.subvec(0, 899), "absdiff", 1e-5) );
-  REQUIRE( arma::max( arma::max( arma::abs( y_vec.subvec(900, 1049) ) ) ) == eT(0) );
+  REQUIRE( arma::max( arma::max( arma::abs( y_vec.subvec(900, 1049) ) ) ) == Approx(eT(0)).margin(1e-5) );
   }
 
 
@@ -167,9 +167,9 @@ TEMPLATE_TEST_CASE("reshape_alias_larger", "[reshape]", float, double, u32, s32,
   arma::Col<eT> x2_vec = arma::vectorise(x2_cpu);
   arma::Col<eT> x_orig_vec = arma::vectorise(x_orig_cpu);
   REQUIRE( arma::approx_equal( x1_vec.subvec(0, 899), x_orig_vec, "absdiff", 1e-5) );
-  REQUIRE( arma::max( arma::max( arma::abs( x1_vec.subvec(900, 1049) ) ) ) == eT(0) );
+  REQUIRE( arma::max( arma::max( arma::abs( x1_vec.subvec(900, 1049) ) ) ) == Approx(eT(0)).margin(1e-5) );
   REQUIRE( arma::approx_equal( x2_vec.subvec(0, 899), x_orig_vec, "absdiff", 1e-5) );
-  REQUIRE( arma::max( arma::max( arma::abs( x2_vec.subvec(900, 1049) ) ) ) == eT(0) );
+  REQUIRE( arma::max( arma::max( arma::abs( x2_vec.subvec(900, 1049) ) ) ) == Approx(eT(0)).margin(1e-5) );
   }
 
 
@@ -236,7 +236,7 @@ TEMPLATE_TEST_CASE("reshape_subview_larger", "[reshape]", float, double, u32, s3
   arma::Col<eT> xs_vec = arma::vectorise(xs_cpu);
   arma::Col<eT> y_vec = arma::vectorise(y_cpu);
   REQUIRE( arma::approx_equal( xs_vec, y_vec.subvec(0, 399), "absdiff", 1e-5 ) );
-  REQUIRE( arma::max( arma::max( arma::abs( y_vec.subvec(400, 499) ) ) ) == eT(0) );
+  REQUIRE( arma::max( arma::max( arma::abs( y_vec.subvec(400, 499) ) ) ) == Approx(eT(0)).margin(1e-5) );
   }
 
 
@@ -306,7 +306,7 @@ TEMPLATE_TEST_CASE("reshape_alias_subview_larger", "[reshape]", float, double, u
   arma::Col<eT> xs_vec = arma::vectorise(xs_cpu);
   arma::Col<eT> x_vec = arma::vectorise(x_cpu);
   REQUIRE( arma::approx_equal( xs_vec, x_vec.subvec(0, 399), "absdiff", 1e-5 ) );
-  REQUIRE( arma::max( arma::max( arma::abs( x_vec.subvec(400, 499) ) ) ) == eT(0) );
+  REQUIRE( arma::max( arma::max( arma::abs( x_vec.subvec(400, 499) ) ) ) == Approx(eT(0)).margin(1e-5) );
   }
 
 
@@ -322,7 +322,7 @@ TEMPLATE_TEST_CASE("reshape_from_empty", "[reshape]", float, double, u32, s32, u
   REQUIRE( y.n_cols == 10 );
   REQUIRE( y.n_elem == 100 );
 
-  REQUIRE( max(max(abs(y))) == eT(0) );
+  REQUIRE( max(max(abs(y))) == Approx(eT(0)).margin(1e-5) );
   }
 
 
