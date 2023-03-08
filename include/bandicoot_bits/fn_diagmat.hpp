@@ -52,3 +52,87 @@ diagmat(const T1& X, const sword k)
 
   return Op<T1, op_diagmat2>(X, a, b);
   }
+
+
+
+// simplification: wrap transposes into diagmat
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename
+enable_if2
+  <
+  is_coot_type<T1>::value,
+  const Op<T1, op_diagmat>
+  >::result
+diagmat(const Op<T1, op_htrans>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  return Op<T1, op_diagmat>(X.m);
+  }
+
+
+
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename
+enable_if2
+  <
+  is_coot_type<T1>::value,
+  const Op<T1, op_diagmat2>
+  >::result
+diagmat(const Op<T1, op_htrans>& X, const sword k)
+  {
+  coot_extra_debug_sigprint();
+
+  const uword a = (std::abs)(k);
+  const uword b = (k < 0) ? 1 : 0;
+
+  return Op<T1, op_diagmat2>(X.m, a, b);
+  }
+
+
+
+// simplification: diagmat(scalar * Base.t()) -> diagmat(scalar * Base)
+// this gives a form that partial_unwrap will be able to better handle
+
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename
+enable_if2
+  <
+  is_coot_type<T1>::value,
+  const Op<eOp<T1, eop_scalar_times>, op_diagmat>
+  >::result
+diagmat(const Op<T1, op_htrans2>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  eOp<T1, eop_scalar_times> inner(X.m, X.aux);
+  return Op<eOp<T1, eop_scalar_times>, op_diagmat>(inner);
+  }
+
+
+
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename
+enable_if2
+  <
+  is_coot_type<T1>::value,
+  const Op<eOp<T1, eop_scalar_times>, op_diagmat2>
+  >::result
+diagmat(const Op<T1, op_htrans2>& X, const sword k)
+  {
+  coot_extra_debug_sigprint();
+
+  const uword a = (std::abs)(k);
+  const uword b = (k < 0) ? 1 : 0;
+
+  eOp<T1, eop_scalar_times> inner(X.m, X.aux);
+  return Op<eOp<T1, eop_scalar_times>, op_diagmat2>(inner, a, b);
+  }
