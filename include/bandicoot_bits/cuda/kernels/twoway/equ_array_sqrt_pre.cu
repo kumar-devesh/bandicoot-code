@@ -25,6 +25,6 @@ COOT_FN(PREFIX,equ_array_sqrt_pre)(eT2* out,
   const UWORD i = blockIdx.x * blockDim.x + threadIdx.x;
   if(i < N)
     {
-    out[i] = (eT2) sqrt((fp_eT2) A[i]);
+    out[i] = (eT2) sqrt((fp_eT2) ((eT2) A[i]));
     }
   }
