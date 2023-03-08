@@ -38,10 +38,11 @@ generic_reduce(const dev_mem_t<eT> mem,
   {
   // Do first pass, hand off to appropriate smaller reduce if needed.
   // The first pass will use the first kernel; subsequent passes use the second kernel.
+  const size_t n_elem_per_thread = std::ceil(n_elem / (2 * std::ceil(std::log2(n_elem))));
   const size_t mtpb = (size_t) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock;
 
   // Compute size of auxiliary memory.
-  const size_t first_aux_mem_size = (n_elem + mtpb - 1) / mtpb;
+  const size_t first_aux_mem_size = (n_elem_per_thread + mtpb - 1) / mtpb;
   const size_t second_aux_mem_size = (first_aux_mem_size == 1) ? 0 : (first_aux_mem_size + mtpb - 1) / mtpb;
   const size_t aux_mem_size = first_aux_mem_size + second_aux_mem_size;
   Col<eT> aux_mem(aux_mem_size);
@@ -148,12 +149,14 @@ generic_reduce_inner(const dev_mem_t<eT> mem,
                      dev_mem_t<eT> second_aux_mem)
   {
   const size_t mtpb = (size_t) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock;
+  const size_t max_num_threads = std::ceil(n_elem / (2 * std::ceil(std::log2(n_elem))));
 
-  if (n_elem <= mtpb)
+  if (max_num_threads <= mtpb)
     {
     // If the data is small enough, we can do the work in a single pass.
     generic_reduce_inner_small(mem,
                                n_elem,
+                               max_num_threads,
                                aux_mem,
                                kernel_name,
                                first_kernel,
@@ -164,7 +167,7 @@ generic_reduce_inner(const dev_mem_t<eT> mem,
   else
     {
     // Here, we will have to do multiple reduces.
-    const size_t block_size = (n_elem + mtpb - 1) / mtpb;
+    const size_t block_size = (max_num_threads + mtpb - 1) / mtpb;
 
     const void* args[3 + sizeof...(A1)];
     args[0] = &mem.cuda_mem_ptr;
@@ -206,6 +209,7 @@ inline
 void
 generic_reduce_inner_small(const dev_mem_t<eT> mem,
                            const uword n_elem,
+                           const uword max_num_threads,
                            dev_mem_t<eT> aux_mem, // must have at least one element
                            const char* kernel_name,
                            CUfunction& kernel,
@@ -213,7 +217,7 @@ generic_reduce_inner_small(const dev_mem_t<eT> mem,
                            const std::tuple<Args...>& kernel_extra_args)
   {
   // TODO: can this be made more efficient?
-  const uword num_threads = (uword) std::pow(2.0f, std::ceil(std::log2((float) n_elem)));
+  const uword pow2_num_threads = (uword) std::pow(2.0f, std::ceil(std::log2((float) max_num_threads)));
 
   const void* args[3 + sizeof...(Args)];
   args[0] = &mem.cuda_mem_ptr;
@@ -222,9 +226,9 @@ generic_reduce_inner_small(const dev_mem_t<eT> mem,
   unpack_args<sizeof...(Args), Args...>::apply(args, kernel_extra_args);
 
   CUresult result = cuLaunchKernel(
-      num_threads <= 32 ? kernel_small : kernel, // if we have fewer threads than a single warp, we can use a more optimized version of the kernel
-      1, 1, 1, num_threads, 1, 1,
-      2 * num_threads * sizeof(eT), // shared mem should have size equal to number of threads times 2
+      pow2_num_threads <= 32 ? kernel_small : kernel, // if we have fewer threads than a single warp, we can use a more optimized version of the kernel
+      1, 1, 1, pow2_num_threads, 1, 1,
+      2 * pow2_num_threads * sizeof(eT), // shared mem should have size equal to number of threads times 2
       NULL,
       (void**) args,
       0);
