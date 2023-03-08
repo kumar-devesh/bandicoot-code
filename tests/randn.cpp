@@ -217,6 +217,7 @@ void test_randn_distr(const double mu = 0.0, const double sd = 1.0, const size_t
     }
 
   arma::Row<size_t> bin_counts(60);
+  bin_counts.zeros();
   size_t left_tail_count = 0;
   size_t right_tail_count = 0;
   arma::Row<eT> f_cpu(f);
