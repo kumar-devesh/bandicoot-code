@@ -1351,8 +1351,8 @@ TEMPLATE_TEST_CASE("diagmat_times_7", "[diag]", float, double)
   {
   typedef TestType eT;
 
-  Col<eT> a_diag = randi<Mat<eT>>(10, distr_param(10, 20));
-  Col<eT> b_diag = randi<Mat<eT>>(10, distr_param(20, 30));
+  Col<eT> a_diag = randi<Col<eT>>(10, distr_param(10, 20));
+  Col<eT> b_diag = randi<Col<eT>>(10, distr_param(20, 30));
 
   Mat<eT> c1 = diagmat(a_diag) * diagmat(b_diag);
   Mat<eT> c2 = diagmat(trans(a_diag)) * diagmat(trans(b_diag));
@@ -1386,3 +1386,209 @@ TEMPLATE_TEST_CASE("diagmat_times_7", "[diag]", float, double)
 
 
 // diagmat2(trans())
+
+TEMPLATE_TEST_CASE("diagmat2_trans", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Col<eT> x = randi<Col<eT>>(50, distr_param(10, 20));
+
+  Mat<eT> y1 = diagmat(trans(x), 3);
+  Mat<eT> y1_ref = diagmat(x, 3);
+
+  Mat<eT> y2 = diagmat(trans(x), -3);
+  Mat<eT> y2_ref = diagmat(x, -3);
+
+  REQUIRE( y1.n_rows == y1_ref.n_rows );
+  REQUIRE( y1.n_cols == y1_ref.n_cols );
+  REQUIRE( y1.n_elem == y1_ref.n_elem );
+
+  REQUIRE( y2.n_rows == y2_ref.n_rows );
+  REQUIRE( y2.n_cols == y2_ref.n_cols );
+  REQUIRE( y2.n_elem == y2_ref.n_elem );
+
+  arma::Mat<eT> y1_cpu(y1);
+  arma::Mat<eT> y1_cpu_ref(y1_ref);
+  arma::Mat<eT> y2_cpu(y2);
+  arma::Mat<eT> y2_cpu_ref(y2_ref);
+
+  REQUIRE( arma::approx_equal(y1_cpu, y1_cpu_ref, "reldiff", 1e-6) );
+  REQUIRE( arma::approx_equal(y2_cpu, y2_cpu_ref, "reldiff", 1e-6) );
+  }
+
+
+
+
+// diagvec(mat)
+
+TEMPLATE_TEST_CASE("diagvec_mat", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(50, 50, distr_param(10, 20));
+  Col<eT> y1 = diagvec(x);
+  Col<eT> y2 = x.diag();
+
+  REQUIRE( y1.n_elem == y2.n_elem );
+
+  arma::Col<eT> y1_cpu(y1);
+  arma::Col<eT> y2_cpu(y2);
+
+  REQUIRE( arma::approx_equal(y1_cpu, y2_cpu, "reldiff", 1e-6) );
+  }
+
+
+
+// diagvec(subview)
+
+TEMPLATE_TEST_CASE("diagvec_subview", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(50, 50, distr_param(10, 20));
+  Col<eT> y1 = diagvec(x.submat(11, 11, 30, 30));
+  Col<eT> y2 = x.submat(11, 11, 30, 30).diag();
+
+  REQUIRE( y1.n_elem == y2.n_elem );
+
+  arma::Col<eT> y1_cpu(y1);
+  arma::Col<eT> y2_cpu(y2);
+
+  REQUIRE( arma::approx_equal(y1_cpu, y2_cpu, "reldiff", 1e-6) );
+  }
+
+
+
+// diagvec(op)
+
+TEMPLATE_TEST_CASE("diagvec_op", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(50, 50, distr_param(10, 20));
+
+  Col<eT> y1 = diagvec(trans(x) + 3);
+  Mat<eT> x2 = trans(x) + 3;
+  Col<eT> y2 = x2.diag();
+
+  REQUIRE( y1.n_elem == y2.n_elem );
+
+  arma::Col<eT> y1_cpu(y1);
+  arma::Col<eT> y2_cpu(y2);
+
+  REQUIRE( arma::approx_equal(y1_cpu, y2_cpu, "reldiff", 1e-6) );
+  }
+
+
+
+// diagvec(mat alias)
+
+TEMPLATE_TEST_CASE("diagvec_mat_alias", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(50, 50, distr_param(10, 20));
+  Mat<eT> x2 = x.diag();
+  x = diagvec(x);
+
+  REQUIRE( x.n_elem == x2.n_elem );
+
+  arma::Mat<eT> x_cpu(x);
+  arma::Mat<eT> x2_cpu(x2);
+
+  REQUIRE( arma::approx_equal(x_cpu, x2_cpu, "reldiff", 1e-6) );
+  }
+
+
+
+// diagvec(mat, k)
+
+TEMPLATE_TEST_CASE("diagvec_k_mat", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(50, 50, distr_param(10, 20));
+  for (sword k = -49; k < 50; ++k)
+    {
+    Col<eT> y1 = diagvec(x, k);
+    Col<eT> y2 = x.diag(k);
+
+    REQUIRE( y1.n_elem == y2.n_elem );
+
+    arma::Col<eT> y1_cpu(y1);
+    arma::Col<eT> y2_cpu(y2);
+
+    REQUIRE( arma::approx_equal(y1_cpu, y2_cpu, "reldiff", 1e-6) );
+    }
+  }
+
+
+
+// diagvec(subview, k)
+
+TEMPLATE_TEST_CASE("diagvec_k_subview", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(50, 50, distr_param(10, 20));
+  for (sword k = -19; k < 20; ++k)
+    {
+    Col<eT> y1 = diagvec(x.submat(11, 11, 30, 30), k);
+    Col<eT> y2 = x.submat(11, 11, 30, 30).diag(k);
+
+    REQUIRE( y1.n_elem == y2.n_elem );
+
+    arma::Col<eT> y1_cpu(y1);
+    arma::Col<eT> y2_cpu(y2);
+
+    REQUIRE( arma::approx_equal(y1_cpu, y2_cpu, "reldiff", 1e-6) );
+    }
+  }
+
+
+
+// diagvec(op, k)
+
+TEMPLATE_TEST_CASE("diagvec_k_op", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(50, 50, distr_param(10, 20));
+  for (sword k = -49; k < 50; ++k)
+    {
+    Mat<eT> x2 = trans(x) * 4;
+
+    Col<eT> y1 = diagvec(trans(x) * 4, k);
+    Col<eT> y2 = x2.diag(k);
+
+    REQUIRE( y1.n_elem == y2.n_elem );
+
+    arma::Col<eT> y1_cpu(y1);
+    arma::Col<eT> y2_cpu(y2);
+
+    REQUIRE( arma::approx_equal(y1_cpu, y2_cpu, "reldiff", 1e-6) );
+    }
+  }
+
+
+
+// diagvec(mat alias, k)
+
+TEMPLATE_TEST_CASE("diagvec_k_mat_alias", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  for (sword k = -49; k < 50; ++k)
+    {
+    Mat<eT> x = randi<Mat<eT>>(50, 50, distr_param(10, 20));
+    Mat<eT> x2 = x.diag(k);
+    x = diagvec(x, k);
+
+    REQUIRE( x.n_elem == x2.n_elem );
+
+    arma::Mat<eT> x_cpu(x);
+    arma::Mat<eT> x2_cpu(x2);
+
+    REQUIRE( arma::approx_equal(x_cpu, x2_cpu, "reldiff", 1e-6) );
+    }
+  }
