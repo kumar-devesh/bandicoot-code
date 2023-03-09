@@ -41,6 +41,9 @@ struct runtime_t
   template<typename eT1>
   inline const CUfunction& get_kernel(const oneway_real_kernel_id::enum_id num);
 
+  template<typename eT1>
+  inline const CUfunction& get_kernel(const oneway_integral_kernel_id::enum_id num);
+
   template<typename eT2, typename eT1>
   inline const CUfunction& get_kernel(const twoway_kernel_id::enum_id num);
 
@@ -89,6 +92,7 @@ struct runtime_t
   coot_aligned std::vector<CUfunction>                                                                   zeroway_kernels;
   coot_aligned rt_common::kernels_t<std::vector<CUfunction>>                                             oneway_kernels;
   coot_aligned rt_common::kernels_t<std::vector<CUfunction>>                                             oneway_real_kernels;
+  coot_aligned rt_common::kernels_t<std::vector<CUfunction>>                                             oneway_integral_kernels;
   coot_aligned rt_common::kernels_t<rt_common::kernels_t<std::vector<CUfunction>>>                       twoway_kernels;
   coot_aligned rt_common::kernels_t<rt_common::kernels_t<rt_common::kernels_t<std::vector<CUfunction>>>> threeway_kernels;
 

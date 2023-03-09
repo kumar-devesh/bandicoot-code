@@ -279,6 +279,61 @@ get_one_elem_real_kernel_src(kernels_t<std::vector<KernelType>>& kernels,
 template<typename KernelType>
 inline
 void
+init_one_elem_integral_kernel_map(kernels_t<std::vector<KernelType>>& kernels,
+                                  std::vector<std::pair<std::string, KernelType*>>& name_map,
+                                  const std::vector<std::string>& kernel_names,
+                                  const std::string& prefix)
+  {
+  kernels.u32_kernels.resize(kernel_names.size());
+  kernels.s32_kernels.resize(kernel_names.size());
+  kernels.u64_kernels.resize(kernel_names.size());
+  kernels.s64_kernels.resize(kernel_names.size());
+
+  for (size_t j = 0; j < kernel_names.size(); ++j)
+    {
+    name_map.push_back(std::make_pair(prefix + "u32_" + kernel_names[j], &kernels.u32_kernels.at(j)));
+    }
+  for (size_t j = 0; j < kernel_names.size(); ++j)
+    {
+    name_map.push_back(std::make_pair(prefix + "s32_" + kernel_names[j], &kernels.s32_kernels.at(j)));
+    }
+  for (size_t j = 0; j < kernel_names.size(); ++j)
+    {
+    name_map.push_back(std::make_pair(prefix + "u64_" + kernel_names[j], &kernels.u64_kernels.at(j)));
+    }
+  for (size_t j = 0; j < kernel_names.size(); ++j)
+    {
+    name_map.push_back(std::make_pair(prefix + "s64_" + kernel_names[j], &kernels.s64_kernels.at(j)));
+    }
+  }
+
+
+
+template<typename KernelType, typename TypeMapper, typename higher_eT1, typename higher_eT2>
+inline
+std::string
+get_one_elem_integral_kernel_src(kernels_t<std::vector<KernelType>>& kernels,
+                                 const std::string& source,
+                                 const std::vector<std::string>& kernel_names,
+                                 const std::string& prefix,
+                                 std::vector<std::pair<std::string, KernelType*>>& name_map,
+                                 const TypeMapper& type_map)
+  {
+  const std::string u32_src = substitute_types<TypeMapper, u32, higher_eT1, higher_eT2>(source, prefix + "u32_", type_map);
+  const std::string s32_src = substitute_types<TypeMapper, s32, higher_eT1, higher_eT2>(source, prefix + "s32_", type_map);
+  const std::string u64_src = substitute_types<TypeMapper, u32, higher_eT1, higher_eT2>(source, prefix + "u64_", type_map);
+  const std::string s64_src = substitute_types<TypeMapper, s32, higher_eT1, higher_eT2>(source, prefix + "s64_", type_map);
+
+  init_one_elem_integral_kernel_map(kernels, name_map, kernel_names, prefix);
+
+  return u32_src + s32_src + u64_src + s64_src;
+  }
+
+
+
+template<typename KernelType>
+inline
+void
 init_two_elem_kernel_map(kernels_t<kernels_t<std::vector<KernelType>>>& kernels,
                          std::vector<std::pair<std::string, KernelType*>>& name_map,
                          const std::vector<std::string>& kernel_names,
