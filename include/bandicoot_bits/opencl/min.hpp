@@ -27,90 +27,160 @@ min(dev_mem_t<eT> mem, const uword n_elem)
 
   coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::min(): OpenCL runtime not valid" );
 
-  cl_int status = 0;
-
   cl_kernel k = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::min);
   cl_kernel k_small = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::min_small);
 
-  // Compute workgroup sizes.  We use CL_KERNEL_WORK_GROUP_SIZE as an upper bound, which
-  // depends on the compiled kernel.  I assume that the results for k will be identical to k_small.
-  size_t kernel_wg_size;
-  status = clGetKernelWorkGroupInfo(k, get_rt().cl_rt.get_device(), CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &kernel_wg_size, NULL);
-  coot_check_cl_error(status, "accu()");
+  return generic_reduce(mem, n_elem, "min", k, k_small, std::make_tuple(/* no extra args */));
+  }
 
-  const size_t k1_work_dim       = 1;
-  const size_t k1_work_offset    = 0;
-  const uword wavefront_size = get_rt().cl_rt.get_wavefront_size();
 
-  uword total_num_threads = std::ceil(n_elem / (2 * std::ceil(std::log2(n_elem))));
-  uword local_group_size = std::min(kernel_wg_size, total_num_threads);
 
-  // Create auxiliary memory.
-  const uword aux_size = std::ceil((total_num_threads + (local_group_size - 1)) / local_group_size);
-  Mat<eT> aux(aux_size, 1);
-  aux.zeros();
-  Mat<eT> aux2;
-  if (aux_size > 1)
-    {
-    const uword aux2_size = std::ceil((aux_size + (local_group_size - 1)) / local_group_size);
-    aux2.zeros(aux2_size, 1);
-    }
+template<typename eT1, typename eT2>
+inline
+void
+min_colwise(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword n_rows, const uword n_cols, const bool post_conv_apply)
+  {
+  coot_extra_debug_sigprint();
+
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::min_colwise(): OpenCL runtime not valid" );
 
   runtime_t::cq_guard guard;
 
-  dev_mem_t<eT> aux_mem = aux.get_dev_mem(false);
-  dev_mem_t<eT> aux_mem2 = aux2.get_dev_mem(false);
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT2, eT1>(post_conv_apply ? twoway_kernel_id::min_colwise_conv_post : twoway_kernel_id::min_colwise_conv_pre);
 
-  uword in_n_elem = n_elem;
-  Mat<eT>* out = &aux;
+  cl_int status = 0;
 
-  dev_mem_t<eT>* in_mem = &mem;
-  dev_mem_t<eT>* out_mem = &aux_mem;
+  runtime_t::adapt_uword A_n_rows(n_rows);
+  runtime_t::adapt_uword A_n_cols(n_cols);
 
-  do
-    {
-    runtime_t::adapt_uword dev_n_elem(in_n_elem);
+  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &(out.cl_mem_ptr));
+  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &(A.cl_mem_ptr)  );
+  status |= clSetKernelArg(kernel, 2, A_n_rows.size,  A_n_rows.addr    );
+  status |= clSetKernelArg(kernel, 3, A_n_cols.size,  A_n_cols.addr    );
 
-    // We need to round total_num_threads up to the next power of 2.  (The kernel assumes this.)
-    const uword pow2_group_size = (uword) std::pow(2.0f, std::ceil(std::log2((float) local_group_size)));
-    const uword pow2_total_num_threads = (total_num_threads % pow2_group_size == 0) ? total_num_threads : ((total_num_threads / pow2_group_size) + 1) * pow2_group_size;
+  const size_t k1_work_dim       = 1;
+  const size_t k1_work_offset[1] = { 0              };
+  const size_t k1_work_size[1]   = { size_t(n_cols) };
 
-    // If the number of threads is less than the wavefront size, we need to use the small kernel.
-    cl_kernel* k_use = (pow2_group_size <= wavefront_size) ? &k_small : &k;
+  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
 
-    status |= clSetKernelArg(*k_use, 0, sizeof(cl_mem),               &(in_mem->cl_mem_ptr));
-    status |= clSetKernelArg(*k_use, 1, dev_n_elem.size,              dev_n_elem.addr);
-    status |= clSetKernelArg(*k_use, 2, sizeof(cl_mem),               &(out_mem->cl_mem_ptr));
-    status |= clSetKernelArg(*k_use, 3, sizeof(eT) * pow2_group_size, NULL);
+  coot_check_cl_error(status, "coot::opencl::min_colwise(): failed to run kernel");
+  }
 
-    status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), *k_use, k1_work_dim, &k1_work_offset, &pow2_total_num_threads, &pow2_group_size, 0, NULL, NULL);
 
-    coot_check_cl_error(status, "accu()");
 
-    if (total_num_threads <= local_group_size)
-      {
-      break;
-      }
+template<typename eT1, typename eT2>
+inline
+void
+min_rowwise(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword n_rows, const uword n_cols, const bool post_conv_apply)
+  {
+  coot_extra_debug_sigprint();
 
-    // Set the input, number of elements, and auxiliary memory correctly for subsequent runs.
-    in_n_elem = out->n_elem;
-    if (in_mem == &mem)
-      {
-      in_mem = &aux_mem;
-      out_mem = &aux_mem2;
-      out = &aux2;
-      }
-    else
-      {
-      std::swap(in_mem, out_mem);
-      out = (out == &aux) ? &aux2 : &aux;
-      }
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::min_rowwise(): OpenCL runtime not valid" );
 
-    // Now, compute sizes for the next iteration.
-    total_num_threads = std::ceil(in_n_elem / (2 * std::ceil(std::log2(in_n_elem))));
-    local_group_size = std::min(kernel_wg_size, total_num_threads);
+  runtime_t::cq_guard guard;
 
-    } while (true); // The loop terminates in the middle.
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT2, eT1>(post_conv_apply ? twoway_kernel_id::min_rowwise_conv_post : twoway_kernel_id::min_rowwise_conv_pre);
 
-  return eT((*out)[0]);
+  cl_int status = 0;
+
+  runtime_t::adapt_uword A_n_rows(n_rows);
+  runtime_t::adapt_uword A_n_cols(n_cols);
+
+  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &(out.cl_mem_ptr));
+  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &(A.cl_mem_ptr)  );
+  status |= clSetKernelArg(kernel, 2, A_n_rows.size,  A_n_rows.addr    );
+  status |= clSetKernelArg(kernel, 3, A_n_cols.size,  A_n_cols.addr    );
+
+  const size_t k1_work_dim       = 1;
+  const size_t k1_work_offset[1] = { 0              };
+  const size_t k1_work_size[1]   = { size_t(n_rows) };
+
+  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+
+  coot_check_cl_error(status, "coot::opencl::min_rowwise(): failed to run kernel");
+  }
+
+
+
+template<typename eT1, typename eT2>
+inline
+void
+min_colwise_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword M_n_rows, const uword start_row, const uword start_col, const uword n_rows, const uword n_cols, const bool post_conv_apply)
+  {
+  coot_extra_debug_sigprint();
+
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::min_colwise_subview(): OpenCL runtime not valid" );
+
+  runtime_t::cq_guard guard;
+
+  cl_kernel k1 = get_rt().cl_rt.get_kernel<eT2, eT1>(post_conv_apply ? twoway_kernel_id::submat_min_colwise_conv_post : twoway_kernel_id::submat_min_colwise_conv_pre);
+
+  cl_int status = 0;
+
+  runtime_t::adapt_uword sv_m_n_rows(M_n_rows);
+
+  runtime_t::adapt_uword cl_start_row(start_row);
+  runtime_t::adapt_uword cl_start_col(start_col);
+
+  runtime_t::adapt_uword sub_n_rows(n_rows);
+  runtime_t::adapt_uword sub_n_cols(n_cols);
+
+  status |= clSetKernelArg(k1, 0,    sizeof(cl_mem),  &(out.cl_mem_ptr));
+  status |= clSetKernelArg(k1, 1,    sizeof(cl_mem),  &(A.cl_mem_ptr)  );
+  status |= clSetKernelArg(k1, 2,  sv_m_n_rows.size,  sv_m_n_rows.addr );
+  status |= clSetKernelArg(k1, 3, cl_start_row.size, cl_start_row.addr );
+  status |= clSetKernelArg(k1, 4, cl_start_col.size, cl_start_col.addr );
+  status |= clSetKernelArg(k1, 5,   sub_n_rows.size,   sub_n_rows.addr );
+  status |= clSetKernelArg(k1, 6,   sub_n_cols.size,   sub_n_cols.addr );
+
+  const size_t k1_work_dim       = 1;
+  const size_t k1_work_offset[1] = { 0              };
+  const size_t k1_work_size[1]   = { size_t(n_cols) };
+
+  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), k1, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+
+  coot_check_cl_error(status, "coot::opencl::min_colwise_subview(): failed to run kernel");
+  }
+
+
+
+template<typename eT1, typename eT2>
+inline
+void
+min_rowwise_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword M_n_rows, const uword start_row, const uword start_col, const uword n_rows, const uword n_cols, const bool post_conv_apply)
+  {
+  coot_extra_debug_sigprint();
+
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::min_rowwise_subview(): OpenCL runtime not valid" );
+
+  runtime_t::cq_guard guard;
+
+  cl_kernel k1 = get_rt().cl_rt.get_kernel<eT2, eT1>(post_conv_apply ? twoway_kernel_id::submat_min_rowwise_conv_post : twoway_kernel_id::submat_min_rowwise_conv_pre);
+
+  cl_int status = 0;
+
+  runtime_t::adapt_uword sv_m_n_rows(M_n_rows);
+
+  runtime_t::adapt_uword cl_start_row(start_row);
+  runtime_t::adapt_uword cl_start_col(start_col);
+
+  runtime_t::adapt_uword sub_n_rows(n_rows);
+  runtime_t::adapt_uword sub_n_cols(n_cols);
+
+  status |= clSetKernelArg(k1, 0,    sizeof(cl_mem),  &(out.cl_mem_ptr));
+  status |= clSetKernelArg(k1, 1,    sizeof(cl_mem),  &(A.cl_mem_ptr)  );
+  status |= clSetKernelArg(k1, 2,  sv_m_n_rows.size,  sv_m_n_rows.addr );
+  status |= clSetKernelArg(k1, 3, cl_start_row.size, cl_start_row.addr );
+  status |= clSetKernelArg(k1, 4, cl_start_col.size, cl_start_col.addr );
+  status |= clSetKernelArg(k1, 5,   sub_n_rows.size,   sub_n_rows.addr );
+  status |= clSetKernelArg(k1, 6,   sub_n_cols.size,   sub_n_cols.addr );
+
+  const size_t k1_work_dim       = 1;
+  const size_t k1_work_offset[1] = { 0              };
+  const size_t k1_work_size[1]   = { size_t(n_rows) };
+
+  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), k1, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+
+  coot_check_cl_error(status, "coot::opencl::min_rowwise_subview(): failed to run kernel");
   }

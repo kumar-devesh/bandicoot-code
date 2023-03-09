@@ -116,6 +116,9 @@ class coot_rt_t
   static inline bool chol(dev_mem_t<eT> out, const uword n_rows);
 
   template<typename eT>
+  static inline std::tuple<bool, std::string> svd(dev_mem_t<eT> U, dev_mem_t<eT> S, dev_mem_t<eT> V, dev_mem_t<eT> A, const uword n_rows, const uword n_cols, const bool compute_u_vt);
+
+  template<typename eT>
   static inline void copy_from_dev_mem(eT* dest, const dev_mem_t<eT> src, const uword N);
 
   template<typename eT>
@@ -156,6 +159,30 @@ class coot_rt_t
   template<typename eT1, typename eT2>
   static inline void sum_rowwise_subview(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword A_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const bool post_conv_apply);
 
+  template<typename eT1, typename eT2>
+  static inline void min_colwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply);
+
+  template<typename eT1, typename eT2>
+  static inline void min_rowwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply);
+
+  template<typename eT1, typename eT2>
+  static inline void min_colwise_subview(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword A_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const bool post_conv_apply);
+
+  template<typename eT1, typename eT2>
+  static inline void min_rowwise_subview(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword A_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const bool post_conv_apply);
+
+  template<typename eT1, typename eT2>
+  static inline void max_colwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply);
+
+  template<typename eT1, typename eT2>
+  static inline void max_rowwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply);
+
+  template<typename eT1, typename eT2>
+  static inline void max_colwise_subview(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword A_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const bool post_conv_apply);
+
+  template<typename eT1, typename eT2>
+  static inline void max_rowwise_subview(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword A_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const bool post_conv_apply);
+
   template<typename eT>
   static inline eT trace(const dev_mem_t<eT> mem, const uword n_rows, const uword n_cols);
 
@@ -171,10 +198,17 @@ class coot_rt_t
   template<typename eT1, typename eT2>
   static inline void clamp(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const eT1 min_val, const eT1 max_val, const uword n_elem);
 
-  // LAPACK-style utility functions
+  template<typename eT>
+  static inline eT vec_norm_1(dev_mem_t<eT> mem, const uword n_elem);
 
   template<typename eT>
-  static inline eT larfg(const dev_mem_t<eT> x, const uword n_elem);
+  static inline eT vec_norm_2(dev_mem_t<eT> mem, const uword n_elem);
+
+  template<typename eT>
+  static inline eT vec_norm_k(dev_mem_t<eT> mem, const uword n_elem, const uword k);
+
+  template<typename eT>
+  static inline eT vec_norm_min(dev_mem_t<eT> mem, const uword n_elem);
 
   static inline void synchronise();
 

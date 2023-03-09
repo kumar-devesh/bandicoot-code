@@ -652,6 +652,7 @@ runtime_t::load_cached_kernels(const std::string& unique_host_device_id, const s
   rt_common::init_one_elem_kernel_map(oneway_kernels, name_map, oneway_kernel_id::get_names(), "");
   rt_common::init_two_elem_kernel_map(twoway_kernels, name_map, twoway_kernel_id::get_names(), "");
   rt_common::init_three_elem_kernel_map(threeway_kernels, name_map, threeway_kernel_id::get_names(), "");
+  rt_common::init_one_elem_real_kernel_map(magma_real_kernels, name_map, magma_real_kernel_id::get_names(), "");
 
   return create_kernels(name_map, prog_holder, "");
   }
@@ -674,6 +675,7 @@ runtime_t::compile_kernels(const std::string& unique_host_id)
       rt_common::get_one_elem_kernel_src(oneway_kernels, kernel_src::get_oneway_source(), oneway_kernel_id::get_names(), "", name_map, type_map) +
       rt_common::get_two_elem_kernel_src(twoway_kernels, kernel_src::get_twoway_source(), twoway_kernel_id::get_names(), "", name_map, type_map) +
       rt_common::get_three_elem_kernel_src(threeway_kernels, kernel_src::get_threeway_source(), threeway_kernel_id::get_names(), name_map, type_map) +
+      rt_common::get_one_elem_real_kernel_src(magma_real_kernels, kernel_src::get_magma_real_source(), magma_real_kernel_id::get_names(), "", name_map, type_map) +
       kernel_src::get_src_epilogue();
 
   cl_int status;
@@ -1039,6 +1041,16 @@ const cl_kernel&
 runtime_t::get_kernel(const threeway_kernel_id::enum_id num)
   {
   return get_kernel<eT1, eT2, eT3>(threeway_kernels, num);
+  }
+
+
+
+template<typename eT>
+inline
+const cl_kernel&
+runtime_t::get_kernel(const magma_real_kernel_id::enum_id num)
+  {
+  return get_kernel<eT>(magma_real_kernels, num);
   }
 
 

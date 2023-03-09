@@ -99,6 +99,9 @@ class runtime_t
   template<typename eT3, typename eT2, typename eT1>
   inline const cl_kernel& get_kernel(const threeway_kernel_id::enum_id num);
 
+  template<typename eT>
+  inline const cl_kernel& get_kernel(const magma_real_kernel_id::enum_id num);
+
   // Get random number generator.
 
   template<typename eT> cl_mem get_xorwow_state() const;
@@ -129,6 +132,7 @@ class runtime_t
   coot_aligned rt_common::kernels_t<std::vector<cl_kernel>>                                             oneway_real_kernels;
   coot_aligned rt_common::kernels_t<rt_common::kernels_t<std::vector<cl_kernel>>>                       twoway_kernels;
   coot_aligned rt_common::kernels_t<rt_common::kernels_t<rt_common::kernels_t<std::vector<cl_kernel>>>> threeway_kernels;
+  coot_aligned rt_common::kernels_t<std::vector<cl_kernel>>                                             magma_real_kernels;
 
   // Internally-held RNG state.
   coot_aligned cl_mem   xorwow32_state;
@@ -218,5 +222,5 @@ class runtime_t::adapt_uword
   coot_aligned u64    val64;
   coot_aligned u32    val32;
 
-  inline adapt_uword(const uword val);
+  inline adapt_uword(const uword val = 0); // default value needed for allocating several at once
   };

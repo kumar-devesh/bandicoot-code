@@ -26,6 +26,16 @@ get_cuda_src_preamble()
   snprintf(u32_max, 32, "%llu", (unsigned long long) std::numeric_limits<u32>::max());
   snprintf(u64_max, 32, "%llu", (unsigned long long) std::numeric_limits<u64>::max());
 
+  char s32_min[32];
+  char s64_min[32];
+  snprintf(s32_min, 32, "%llu", (unsigned long long) std::numeric_limits<u32>::min());
+  snprintf(s64_min, 32, "%llu", (unsigned long long) std::numeric_limits<u64>::min());
+
+  char s32_max[32];
+  char s64_max[32];
+  snprintf(s32_max, 32, "%llu", (unsigned long long) std::numeric_limits<u32>::max());
+  snprintf(s64_max, 32, "%llu", (unsigned long long) std::numeric_limits<u64>::max());
+
   std::string source = \
 
   "#define uint unsigned int\n"
@@ -41,20 +51,29 @@ get_cuda_src_preamble()
   "__device__ inline bool coot_is_fp(const float) { return true; } \n"
   "__device__ inline bool coot_is_fp(const double) { return true; } \n"
   "\n"
+  // Utility functions to return the correct min/max value for a given type.
+  // These constants are not defined in the CUDA compilation environment so we use the host's version.
+  "__device__ inline uint   coot_type_min(const uint)   { return 0; } \n"
+  "__device__ inline int    coot_type_min(const int)    { return " + std::string(s32_min) + "; } \n"
+  "__device__ inline size_t coot_type_min(const size_t) { return 0; } \n"
+  "__device__ inline long   coot_type_min(const long)   { return " + std::string(s64_min) + "; } \n"
+  "__device__ inline float  coot_type_min(const float)  { return " STR2(FLT_MIN) "; } \n"
+  "__device__ inline double coot_type_min(const double) { return " STR2(DBL_MIN) "; } \n"
+  "\n"
+  "__device__ inline uint   coot_type_max(const uint)   { return " + std::string(u32_max) + "; } \n"
+  "__device__ inline int    coot_type_max(const int)    { return " + std::string(s32_min) + "; } \n"
+  "__device__ inline size_t coot_type_max(const size_t) { return " + std::string(u64_max) + "; } \n"
+  "__device__ inline long   coot_type_max(const long)   { return " + std::string(s64_max) + "; } \n"
+  "__device__ inline float  coot_type_max(const float)  { return " STR2(FLT_MAX) "; } \n"
+  "__device__ inline double coot_type_max(const double) { return " STR2(DBL_MAX) "; } \n"
+  "\n"
   "extern \"C\" {\n"
   "\n"
   "extern __shared__ char aux_shared_mem[]; \n" // this may be used in some kernels
   "\n"
   // u32 maps to "unsigned int", so we have to avoid ever using that name.
-  "__device__ inline int coot_type_max_u_float() { return " + std::string(u32_max) + "; } \n"
+  "__device__ inline int  coot_type_max_u_float()  { return " + std::string(u32_max) + "; } \n"
   "__device__ inline long coot_type_max_u_double() { return " + std::string(u64_max) + "; } \n"
-  "\n"
-  // Utility functions to return the correct min/max value for a given type.
-  // These constants are not defined in the CUDA compilation environment so we use the host's version.
-  "__device__ inline float coot_type_min_float() { return " STR2(FLT_MIN) "; } \n"
-  "__device__ inline double coot_type_min_double() { return " STR2(DBL_MIN) "; } \n"
-  "__device__ inline float coot_type_max_float() { return " STR2(FLT_MAX) "; } \n"
-  "__device__ inline double coot_type_max_double() { return " STR2(DBL_MAX) "; } \n"
   "\n"
   ;
 

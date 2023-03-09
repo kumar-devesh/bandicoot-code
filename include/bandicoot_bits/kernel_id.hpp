@@ -159,7 +159,18 @@ struct oneway_real_kernel_id
   {
   enum enum_id
     {
-    larfg = 0
+    vec_norm_1,
+    vec_norm_1_small,
+    vec_norm_2,
+    vec_norm_2_small,
+    vec_norm_2_robust,
+    vec_norm_2_robust_small,
+    vec_norm_k,
+    vec_norm_k_small,
+    vec_norm_min,
+    vec_norm_min_small,
+    //
+    invalid_kernel
     };
 
 
@@ -172,7 +183,16 @@ struct oneway_real_kernel_id
 
     std::vector<std::string> names;
 
-    names.push_back("larfg");
+    names.push_back("vec_norm_1");
+    names.push_back("vec_norm_1_small");
+    names.push_back("vec_norm_2");
+    names.push_back("vec_norm_2_small");
+    names.push_back("vec_norm_2_robust");
+    names.push_back("vec_norm_2_robust_small");
+    names.push_back("vec_norm_k");
+    names.push_back("vec_norm_k_small");
+    names.push_back("vec_norm_min");
+    names.push_back("vec_norm_min_small");
 
     return names;
     }
@@ -295,6 +315,22 @@ struct twoway_kernel_id
     submat_sum_rowwise_conv_pre,
     submat_sum_colwise_conv_post,
     submat_sum_rowwise_conv_post,
+    min_colwise_conv_pre,
+    min_rowwise_conv_pre,
+    min_colwise_conv_post,
+    min_rowwise_conv_post,
+    submat_min_colwise_conv_pre,
+    submat_min_rowwise_conv_pre,
+    submat_min_colwise_conv_post,
+    submat_min_rowwise_conv_post,
+    max_colwise_conv_pre,
+    max_rowwise_conv_pre,
+    max_colwise_conv_post,
+    max_rowwise_conv_post,
+    submat_max_colwise_conv_pre,
+    submat_max_rowwise_conv_pre,
+    submat_max_colwise_conv_post,
+    submat_max_rowwise_conv_post,
     //
     dot,
     dot_small,
@@ -416,6 +452,22 @@ struct twoway_kernel_id
     names.push_back("submat_sum_rowwise_conv_pre");
     names.push_back("submat_sum_colwise_conv_post");
     names.push_back("submat_sum_rowwise_conv_post");
+    names.push_back("min_colwise_conv_pre");
+    names.push_back("min_rowwise_conv_pre");
+    names.push_back("min_colwise_conv_post");
+    names.push_back("min_rowwise_conv_post");
+    names.push_back("submat_min_colwise_conv_pre");
+    names.push_back("submat_min_rowwise_conv_pre");
+    names.push_back("submat_min_colwise_conv_post");
+    names.push_back("submat_min_rowwise_conv_post");
+    names.push_back("max_colwise_conv_pre");
+    names.push_back("max_rowwise_conv_pre");
+    names.push_back("max_colwise_conv_post");
+    names.push_back("max_rowwise_conv_post");
+    names.push_back("submat_max_colwise_conv_pre");
+    names.push_back("submat_max_rowwise_conv_pre");
+    names.push_back("submat_max_colwise_conv_post");
+    names.push_back("submat_max_rowwise_conv_post");
 
     names.push_back("dot");
     names.push_back("dot_small");

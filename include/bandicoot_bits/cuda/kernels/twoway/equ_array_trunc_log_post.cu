@@ -32,11 +32,11 @@ COOT_FN(PREFIX,equ_array_trunc_log_post)(eT2* out,
       const fp_eT1 fp_val = (fp_eT1) val;
       if (fp_val <= (fp_eT1) 0)
         {
-        out[i] = (eT2) log(COOT_FN(coot_type_min_,fp_eT1)());
+        out[i] = (eT2) log(coot_type_min((fp_eT1) 0));
         }
       else if (isinf(fp_val))
         {
-        out[i] = (eT2) log(COOT_FN(coot_type_max_,fp_eT1)());
+        out[i] = (eT2) log(coot_type_max((fp_eT1) 0));
         }
       else
         {
@@ -48,11 +48,11 @@ COOT_FN(PREFIX,equ_array_trunc_log_post)(eT2* out,
       const double fp_val = (double) val;
       if (fp_val <= (fp_eT1) 0)
         {
-        out[i] = (eT2) log(coot_type_min_double());
+        out[i] = (eT2) log(coot_type_min((double) 0));
         }
       else if (isinf(fp_val))
         {
-        out[i] = (eT2) log(coot_type_max_double());
+        out[i] = (eT2) log(coot_type_max((double) 0));
         }
       else
         {

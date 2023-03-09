@@ -15,7 +15,7 @@
 
 
 /**
- * Compute the minimum of all elements in `mem`.
+ * Compute the maximum of all elements in `mem`.
  * This is basically identical to `accu()`.
  */
 template<typename eT>
@@ -98,4 +98,130 @@ max(dev_mem_t<eT> mem, const uword n_elem)
     } while (true);
 
   return eT((*out)[0]);
+  }
+
+
+
+template<typename eT1, typename eT2>
+inline
+void
+max_colwise(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword n_rows, const uword n_cols, const bool post_conv_apply)
+  {
+  coot_extra_debug_sigprint();
+
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT2, eT1>(post_conv_apply ? twoway_kernel_id::max_colwise_conv_post : twoway_kernel_id::max_colwise_conv_pre);
+
+  const void* args[] = {
+      &(out.cuda_mem_ptr),
+      &(A.cuda_mem_ptr),
+      (uword*) &n_rows,
+      (uword*) &n_cols };
+
+  const kernel_dims dims = one_dimensional_grid_dims(n_cols);
+
+  CUresult result = cuLaunchKernel(
+      kernel,
+      dims.d[0], dims.d[1], dims.d[2],
+      dims.d[3], dims.d[4], dims.d[5],
+      0, NULL,
+      (void**) args,
+      0);
+
+  coot_check_cuda_error(result, "coot::cuda::max_colwise(): cuLaunchKernel() failed");
+  }
+
+
+
+template<typename eT1, typename eT2>
+inline
+void
+max_rowwise(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword n_rows, const uword n_cols, const bool post_conv_apply)
+  {
+  coot_extra_debug_sigprint();
+
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT2, eT1>(post_conv_apply ? twoway_kernel_id::max_rowwise_conv_post : twoway_kernel_id::max_rowwise_conv_pre);
+
+  const void* args[] = {
+      &(out.cuda_mem_ptr),
+      &(A.cuda_mem_ptr),
+      (uword*) &n_rows,
+      (uword*) &n_cols };
+
+  const kernel_dims dims = one_dimensional_grid_dims(n_rows);
+
+  CUresult result = cuLaunchKernel(
+      kernel,
+      dims.d[0], dims.d[1], dims.d[2],
+      dims.d[3], dims.d[4], dims.d[5],
+      0, NULL,
+      (void**) args,
+      0);
+
+  coot_check_cuda_error(result, "coot::cuda::max_rowwise(): cuLaunchKernel() failed");
+  }
+
+
+
+template<typename eT1, typename eT2>
+inline
+void
+max_colwise_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword M_n_rows, const uword start_row, const uword start_col, const uword n_rows, const uword n_cols, const bool post_conv_apply)
+  {
+  coot_extra_debug_sigprint();
+
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT2, eT1>(post_conv_apply ? twoway_kernel_id::submat_max_colwise_conv_post : twoway_kernel_id::submat_max_colwise_conv_pre);
+
+  const void* args[] = {
+      &(out.cuda_mem_ptr),
+      &(A.cuda_mem_ptr),
+      (uword*) &M_n_rows,
+      (uword*) &start_row,
+      (uword*) &start_col,
+      (uword*) &n_rows,
+      (uword*) &n_cols };
+
+  const kernel_dims dims = one_dimensional_grid_dims(n_cols);
+
+  CUresult result = cuLaunchKernel(
+      kernel,
+      dims.d[0], dims.d[1], dims.d[2],
+      dims.d[3], dims.d[4], dims.d[5],
+      0, NULL,
+      (void**) args,
+      0);
+
+  coot_check_cuda_error(result, "coot::cuda::max_colwise_subview(): cuLaunchKernel() failed");
+  }
+
+
+
+template<typename eT1, typename eT2>
+inline
+void
+max_rowwise_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword M_n_rows, const uword start_row, const uword start_col, const uword n_rows, const uword n_cols, const bool post_conv_apply)
+  {
+  coot_extra_debug_sigprint();
+
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT2, eT1>(post_conv_apply ? twoway_kernel_id::submat_max_rowwise_conv_post : twoway_kernel_id::submat_max_rowwise_conv_pre);
+
+  const void* args[] = {
+      &(out.cuda_mem_ptr),
+      &(A.cuda_mem_ptr),
+      (uword*) &M_n_rows,
+      (uword*) &start_row,
+      (uword*) &start_col,
+      (uword*) &n_rows,
+      (uword*) &n_cols };
+
+  const kernel_dims dims = one_dimensional_grid_dims(n_rows);
+
+  CUresult result = cuLaunchKernel(
+      kernel,
+      dims.d[0], dims.d[1], dims.d[2],
+      dims.d[3], dims.d[4], dims.d[5],
+      0, NULL,
+      (void**) args,
+      0);
+
+  coot_check_cuda_error(result, "coot::cuda::max_rowwise_subview(): cuLaunchKernel() failed");
   }

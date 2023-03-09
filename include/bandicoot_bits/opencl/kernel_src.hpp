@@ -33,6 +33,9 @@ struct kernel_src
   static inline const std::string&  get_threeway_source();
   static inline       std::string  init_threeway_source();
 
+  static inline const std::string&  get_magma_real_source();
+  static inline       std::string  init_magma_real_source();
+
   static inline const std::string&  get_src_epilogue();
   };
 
@@ -46,6 +49,16 @@ kernel_src::get_src_preamble()
   char u64_max[32];
   snprintf(u32_max, 32, "%llu", (unsigned long long) std::numeric_limits<u32>::max());
   snprintf(u64_max, 32, "%llu", (unsigned long long) std::numeric_limits<u64>::max());
+
+  char s32_min[32];
+  char s64_min[32];
+  snprintf(s32_min, 32, "%llu", (unsigned long long) std::numeric_limits<s32>::min());
+  snprintf(s64_min, 32, "%llu", (unsigned long long) std::numeric_limits<s64>::min());
+
+  char s32_max[32];
+  char s64_max[32];
+  snprintf(s32_max, 32, "%llu", (unsigned long long) std::numeric_limits<s32>::max());
+  snprintf(s64_max, 32, "%llu", (unsigned long long) std::numeric_limits<s64>::max());
 
   static const std::string source = \
 
@@ -69,8 +82,15 @@ kernel_src::get_src_preamble()
   "#define COOT_FN_3(ARG1,ARG2,ARG3) COOT_FN_3_2(ARG1,ARG2,ARG3) \n"
   "\n"
   // Utility functions to return the correct min/max value for a given type.
+  "inline uint coot_type_min_uint() { return 0; } \n"
+  "inline ulong coot_type_min_ulong() { return 0; } \n"
   "inline uint coot_type_max_uint() { return " + std::string(u32_max) + "; } \n"
   "inline ulong coot_type_max_ulong() { return " + std::string(u64_max) + "; } \n"
+  "\n"
+  "inline int coot_type_min_int() { return " + std::string(s32_min) + "; } \n"
+  "inline long coot_type_min_long() { return " + std::string(s64_min) + "; } \n"
+  "inline int coot_type_max_int() { return " + std::string(s32_max) + "; } \n"
+  "inline long coot_type_max_long() { return " + std::string(s64_max) + "; } \n"
   "\n"
   "inline float coot_type_min_float() { return FLT_MIN; } \n"
   "inline double coot_type_min_double() { return DBL_MIN; } \n"
@@ -83,6 +103,14 @@ kernel_src::get_src_preamble()
   "inline bool coot_is_fp_long() { return false; } \n"
   "inline bool coot_is_fp_float() { return true; } \n"
   "inline bool coot_is_fp_double() { return true; } \n"
+  "\n"
+  // MAGMA-specific macros.
+  "#define MAGMA_BLK_X 64 \n"
+  "#define MAGMA_BLK_Y 32 \n"
+  "#define MAGMA_TRANS_NX 32 \n"
+  "#define MAGMA_TRANS_NY 8 \n"
+  "#define MAGMA_TRANS_NB 32 \n"
+  "#define MAGMA_TRANS_INPLACE_NB 16 \n"
   ;
 
   return source;
@@ -313,6 +341,37 @@ kernel_src::init_threeway_source()
   for (const std::string& kernel_name : threeway_kernel_id::get_names())
     {
     std::string filename = "threeway/" + kernel_name + ".cl";
+    source += read_file(filename);
+    }
+
+  return source;
+  }
+
+
+
+inline
+const std::string&
+kernel_src::get_magma_real_source()
+  {
+  static const std::string source = init_magma_real_source();
+
+  return source;
+  }
+
+
+
+inline
+std::string
+kernel_src::init_magma_real_source()
+  {
+  // NOTE: kernel names must match the list in the kernel_id struct
+
+  std::string source = "";
+
+  // Load each file for each kernel.
+  for (const std::string& kernel_name : magma_real_kernel_id::get_names())
+    {
+    std::string filename = "magma_real/" + kernel_name + ".cl";
     source += read_file(filename);
     }
 
