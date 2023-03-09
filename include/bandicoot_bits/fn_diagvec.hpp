@@ -32,7 +32,6 @@ diagvec(const T1& X, const sword k = 0)
   {
   coot_extra_debug_sigprint();
 
-  // TODO: inspect
   const uword a = (std::abs)(k);
   const uword b = (k < 0) ? 1 : 0;
 
