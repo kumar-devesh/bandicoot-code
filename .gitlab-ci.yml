@@ -42,6 +42,8 @@ test-opencl:
     echo "run clinfo"
     clinfo
     export CUDA_VISIBLE_DEVICES=0
+    ./main -r xml -v normal "[clamp]"
+    echo "ran clamp tests only"
     ./main -r xml -v normal
     export CUDA_VISIBLE_DEVICES=1
     ./main -r xml -v normal
