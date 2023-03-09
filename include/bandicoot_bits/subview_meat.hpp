@@ -305,7 +305,7 @@ subview<eT>::inplace_op(const mtOp<eT, T1, mtop_conv_to>& x, twoway_kernel_id::e
   coot_extra_debug_sigprint();
 
   // Avoid explicitly performing the conv_to so we can incorporate it into our operation here.
-  const no_conv_unwrap<T1>   U(x.m.Q);
+  const no_conv_unwrap<T1>   U(x.q);
   const Mat<typename T1::elem_type>& X = U.M;
 
   coot_assert_same_size(n_rows, n_cols, X.n_rows, X.n_cols, identifier);

@@ -26,17 +26,10 @@ class mtOp : public Base< out_eT, mtOp<out_eT, T1, mtop_type> >
   static const bool is_row = T1::is_row;
   static const bool is_col = T1::is_col;
 
-  // Note that instantiation of an object will never happen here---mtOps aren't formed
-  // unless it is possible to do any delayed evaluation.
-  coot_aligned const SizeProxy<T1> m;
   const T1& q;
 
   inline         ~mtOp();
   inline explicit mtOp(const T1& in_m);
-
-  coot_inline uword get_n_rows() const;
-  coot_inline uword get_n_cols() const;
-  coot_inline uword get_n_elem() const;
   };
 
 
@@ -92,14 +85,3 @@ struct mtop_holder_type<mtOp<out_eT, Op<T1, op_htrans2>, mtop_type>>
   {
   typedef const mtOp<out_eT, Op<T1, op_htrans2>, mtop_type>& result;
   };
-
-
-
-template<typename out_eT, typename T1, typename mtop_type> inline uword dispatch_mtop_get_n_rows(const mtOp<out_eT, T1, mtop_type>& Q);
-template<typename out_eT>                                  inline uword dispatch_mtop_get_n_rows(const Mat<out_eT>& Q);
-
-template<typename out_eT, typename T1, typename mtop_type> inline uword dispatch_mtop_get_n_cols(const mtOp<out_eT, T1, mtop_type>& Q);
-template<typename out_eT>                                  inline uword dispatch_mtop_get_n_cols(const Mat<out_eT>& Q);
-
-template<typename out_eT, typename T1, typename mtop_type> inline uword dispatch_mtop_get_n_elem(const mtOp<out_eT, T1, mtop_type>& Q);
-template<typename out_eT>                                  inline uword dispatch_mtop_get_n_elem(const Mat<out_eT>& Q);

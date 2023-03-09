@@ -299,17 +299,19 @@ class SizeProxy< mtOp<out_eT, T1, mtop_type> >
   static const bool is_row = mtOp<out_eT, T1, mtop_type>::is_row;
   static const bool is_col = mtOp<out_eT, T1, mtop_type>::is_col;
 
+  coot_aligned const SizeProxy<T1> S;
   coot_aligned const mtOp<out_eT, T1, mtop_type>& Q;
 
   inline explicit SizeProxy(const mtOp<out_eT, T1, mtop_type>& A)
-    : Q(A)
+    : S(A.q)
+    , Q(A)
     {
     coot_extra_debug_sigprint();
     }
 
-  coot_aligned uword get_n_rows() const { return Q.get_n_rows(); }
-  coot_aligned uword get_n_cols() const { return Q.get_n_cols(); }
-  coot_aligned uword get_n_elem() const { return Q.get_n_elem(); }
+  coot_aligned uword get_n_rows() const { return mtop_type::compute_n_rows(Q, S.get_n_rows(), S.get_n_cols()); }
+  coot_aligned uword get_n_cols() const { return mtop_type::compute_n_cols(Q, S.get_n_rows(), S.get_n_cols()); }
+  coot_aligned uword get_n_elem() const { return mtop_type::compute_n_elem(Q, S.get_n_rows(), S.get_n_cols()); }
   };
 
 
