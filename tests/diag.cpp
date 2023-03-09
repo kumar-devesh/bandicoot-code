@@ -1117,6 +1117,8 @@ TEMPLATE_TEST_CASE("diagmat_trace", "[diag]", float, double, u32, s32, u64, s64)
   REQUIRE( trace(diagmat(y)) == Approx(accu(y)) );
   }
 
+
+
 // Test diagmat(A) * B
 
 TEMPLATE_TEST_CASE("diagmat_times_1", "[diag]", float, double)
