@@ -26,9 +26,9 @@
 
 
 
-template<typename eT, typename... A1, typename... A2>
+template<typename eT, typename aux_eT, typename... A1, typename... A2>
 inline
-eT
+aux_eT
 generic_reduce(const dev_mem_t<eT> mem,
                const uword n_elem,
                const char* kernel_name,
@@ -41,9 +41,9 @@ generic_reduce(const dev_mem_t<eT> mem,
 
 
 
-template<typename eT, typename... Args>
+template<typename eT, typename aux_eT, typename... Args>
 inline
-eT
+aux_eT
 generic_reduce(const dev_mem_t<eT> mem,
                const uword n_elem,
                const char* kernel_name,
@@ -53,12 +53,12 @@ generic_reduce(const dev_mem_t<eT> mem,
 
 
 
-template<typename eT, typename... A1, typename... A2>
+template<typename eT, typename aux_eT, typename... A1, typename... A2>
 inline
 bool
 generic_reduce_inner(const dev_mem_t<eT> mem,
                      const uword n_elem,
-                     dev_mem_t<eT> aux_mem,
+                     dev_mem_t<aux_eT> aux_mem,
                      const char* kernel_name,
                      const size_t kernel_wg_size,
                      cl_kernel& first_kernel,
@@ -67,16 +67,16 @@ generic_reduce_inner(const dev_mem_t<eT> mem,
                      cl_kernel& second_kernel,
                      cl_kernel& second_kernel_small,
                      const std::tuple<A2...>& second_kernel_extra_args,
-                     dev_mem_t<eT> second_aux_mem);
+                     dev_mem_t<aux_eT> second_aux_mem);
 
 
 
-template<typename eT, typename... Args>
+template<typename eT, typename aux_eT, typename... Args>
 inline
 void
 generic_reduce_inner_small(const dev_mem_t<eT> mem,
                            const uword n_elem,
-                           dev_mem_t<eT> aux_mem,
+                           dev_mem_t<aux_eT> aux_mem,
                            const char* kernel_name,
                            const size_t kernel_wg_size,
                            cl_kernel& kernel,
