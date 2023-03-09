@@ -17,6 +17,11 @@
 
 using namespace coot;
 
+TEMPLATE_TEST_CASE("clamp_empty", "[clamp]", double, float, u32, s32, u64, s64)
+  {
+  std::cout << "clamp empty, don't do anything\n";
+  }
+
 TEMPLATE_TEST_CASE("clamp_basic", "[clamp]", double, float, u32, s32, u64, s64)
   {
   std::cout << "enter test\n";
