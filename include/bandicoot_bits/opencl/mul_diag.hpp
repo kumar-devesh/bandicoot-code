@@ -49,7 +49,7 @@ mul_diag
     diag_arg_ptr = A_mem.cl_mem_ptr;
     mat_arg_ptr  = B_mem.cl_mem_ptr;
 
-    global_work_size = C_n_rows;
+    global_work_size = C_n_cols;
     }
   else if (!A_is_diag && !A_trans && B_is_diag)
     {
@@ -59,7 +59,7 @@ mul_diag
     diag_arg_ptr = B_mem.cl_mem_ptr;
     mat_arg_ptr  = A_mem.cl_mem_ptr;
 
-    global_work_size = C_n_cols;
+    global_work_size = C_n_rows;
     }
   else if (A_is_diag && !B_is_diag && B_trans)
     {
