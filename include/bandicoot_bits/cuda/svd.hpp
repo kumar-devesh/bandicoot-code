@@ -44,15 +44,7 @@ svd(dev_mem_t<eT> U,
     return std::make_tuple(false, "n_rows must be greater than or equal to n_cols");
     }
 
-  // TODO: put handle into runtime
-  cusolverDnHandle_t handle = NULL;
-
-  cusolverStatus_t status = cusolverDnCreate(&handle);
-  if (status != CUSOLVER_STATUS_SUCCESS)
-    {
-    return std::make_tuple(false, "cusolverDnCreate() failed: " + error_as_string(status));
-    }
-
+  cusolverStatus_t status;
   cudaError_t status2;
 
   const char jobuvt = (compute_u_vt) ? 'A' : 'N';
@@ -61,7 +53,7 @@ svd(dev_mem_t<eT> U,
   size_t device_buffer_size;
   size_t host_buffer_size;
 
-  status = cusolverDnXgesvd_bufferSize(handle,
+  status = cusolverDnXgesvd_bufferSize(get_rt().cuda_rt.cusolver_handle,
                                        NULL, // it appears to be possible to pass NULL for the parameters
                                        jobuvt,
                                        jobuvt,
@@ -104,7 +96,7 @@ svd(dev_mem_t<eT> U,
     return std::make_tuple(false, "couldn't cudaMalloc() status value: " + error_as_string(status2));
     }
 
-  status = cusolverDnXgesvd(handle,
+  status = cusolverDnXgesvd(get_rt().cuda_rt.cusolver_handle,
                             NULL, // it appears to be possible to pass NULL for the parameters
                             jobuvt,
                             jobuvt,
