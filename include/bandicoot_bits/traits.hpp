@@ -688,7 +688,7 @@ template<typename T1>
 struct resolves_to_vector_default { static const bool value = false;                    };
 
 template<typename T1>
-struct resolves_to_vector_test    { static const bool value = T1::is_col || T1::is_row; };
+struct resolves_to_vector_test    { static const bool value = T1::is_col || T1::is_row || T1::is_xvec; };
 
 
 template<typename T1, bool condition>
@@ -748,3 +748,17 @@ struct resolves_to_colvector_redirect<T1, true>  { typedef resolves_to_colvector
 
 template<typename T1>
 struct resolves_to_colvector : public resolves_to_colvector_redirect<T1, is_coot_type<T1>::value>::result {};
+
+
+
+template<typename T>
+struct has_nested_op_traits
+  {
+  typedef char yes[1];
+  typedef char  no[2];
+
+  template<typename X> static yes& check(typename X::template traits<void>*);
+  template<typename>   static  no& check(...);
+
+  static constexpr bool value = ( sizeof(check<T>(0)) == sizeof(yes) );
+  };

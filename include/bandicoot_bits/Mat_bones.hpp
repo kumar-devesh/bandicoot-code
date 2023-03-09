@@ -30,6 +30,7 @@ class Mat : public Base< eT, Mat<eT> >
 
   static const bool is_col = false;
   static const bool is_row = false;
+  static const bool is_xvec = false;
 
 
   private:

@@ -15,7 +15,9 @@
 
 
 template<typename out_eT, typename T1, typename mtop_type>
-class mtOp : public Base< out_eT, mtOp<out_eT, T1, mtop_type> >
+class mtOp
+  : public Base< out_eT, mtOp<out_eT, T1, mtop_type> >
+  , public Op_traits<T1, mtop_type, has_nested_op_traits<mtop_type>::value>
   {
   public:
 

@@ -26,6 +26,7 @@ class Row : public Mat<eT>
 
   static const bool is_col = false;
   static const bool is_row = true;
+  static const bool is_xvec = true;
 
   inline          Row();
   inline explicit Row(const uword N);

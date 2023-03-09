@@ -106,6 +106,7 @@ namespace coot
   #include "bandicoot_bits/coot_version.hpp"
   #include "bandicoot_bits/coot_config.hpp"
   #include "bandicoot_bits/traits.hpp"
+  #include "bandicoot_bits/op_traits.hpp"
   #include "bandicoot_bits/promote_type.hpp"
   #include "bandicoot_bits/uint_type.hpp"
   #include "bandicoot_bits/upgrade_val.hpp"

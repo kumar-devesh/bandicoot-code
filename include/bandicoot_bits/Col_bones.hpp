@@ -26,6 +26,7 @@ class Col : public Mat<eT>
 
   static const bool is_col = true;
   static const bool is_row = false;
+  static const bool is_xvec = true;
 
   inline          Col();
   inline explicit Col(const uword N);

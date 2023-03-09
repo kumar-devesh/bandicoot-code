@@ -15,6 +15,7 @@
 
 
 class op_strans
+  : public traits_op_passthru_trans
   {
   public:
 

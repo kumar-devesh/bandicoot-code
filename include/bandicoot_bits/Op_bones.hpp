@@ -14,8 +14,36 @@
 
 
 
+template<typename T1, typename op_type, bool condition>
+struct Op_traits {};
+
+
+
+
 template<typename T1, typename op_type>
-class Op : public Base< typename T1::elem_type, Op<T1, op_type> >
+struct Op_traits<T1, op_type, true>
+  {
+  static constexpr bool is_row  = op_type::template traits<T1>::is_row;
+  static constexpr bool is_col  = op_type::template traits<T1>::is_col;
+  static constexpr bool is_xvec = op_type::template traits<T1>::is_xvec;
+  };
+
+
+
+template<typename T1, typename op_type>
+struct Op_traits<T1, op_type, false>
+  {
+  static constexpr bool is_row  = false;
+  static constexpr bool is_col  = false;
+  static constexpr bool is_xvec = false;
+  };
+
+
+
+template<typename T1, typename op_type>
+class Op
+  : public Base< typename T1::elem_type, Op<T1, op_type> >
+  , public Op_traits<T1, op_type, has_nested_op_traits<op_type>::value>
   {
   public:
 
@@ -38,8 +66,4 @@ class Op : public Base< typename T1::elem_type, Op<T1, op_type> >
   coot_aligned       uword     aux_uword_a;
   coot_aligned       uword     aux_uword_b;
   coot_aligned       uword     aux_uword_c;
-
-  static const bool is_row = false; // TODO: expand
-  static const bool is_col = false; // TODO: expand
-  static const bool is_vec = (is_row || is_col) || (is_same_type<op_type, op_sum>::yes);
   };
