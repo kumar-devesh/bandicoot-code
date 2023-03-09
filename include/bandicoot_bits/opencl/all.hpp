@@ -20,8 +20,25 @@ inline
 bool
 all_vec(const dev_mem_t<eT1> mem, const uword n_elem, const eT2 val, const twoway_kernel_id::enum_id num, const twoway_kernel_id::enum_id num_small)
   {
+  coot_extra_debug_sigprint();
 
-  // TODO
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::all_vec(): OpenCL runtime not valid" );
 
-  return false;
+  cl_kernel k = get_rt().cl_rt.get_kernel<eT1, eT2>(num);
+  cl_kernel k_small = get_rt().cl_rt.get_kernel<eT1, eT2>(num_small);
+  // Second (and later) passes use the "and" reduction.
+  cl_kernel second_k = get_rt().cl_rt.get_kernel<u32>(oneway_integral_kernel_id::and_reduce);
+  cl_kernel second_k_small = get_rt().cl_rt.get_kernel<u32>(oneway_integral_kernel_id::and_reduce_small);
+
+  u32 result = generic_reduce<eT1, u32>(mem,
+                                        n_elem,
+                                        "all",
+                                        k,
+                                        k_small,
+                                        std::make_tuple(val),
+                                        second_k,
+                                        second_k_small,
+                                        std::make_tuple(/* no extra args for second pass */));
+
+  return (result == 0) ? false : true;
   }
