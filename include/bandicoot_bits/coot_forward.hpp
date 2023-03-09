@@ -84,6 +84,7 @@ class op_vectorise_all;
 class op_clamp;
 
 class mtop_conv_to;
+class mtop_all;
 
 class eop_scalar_plus;
 class eop_neg;

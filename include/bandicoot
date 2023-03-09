@@ -221,6 +221,7 @@ namespace coot
   #include "bandicoot_bits/op_norm_bones.hpp"
 
   #include "bandicoot_bits/mtop_conv_to_bones.hpp"
+  #include "bandicoot_bits/mtop_all_bones.hpp"
 
   #include "bandicoot_bits/glue_times_bones.hpp"
 
@@ -321,6 +322,7 @@ namespace coot
       #include "bandicoot_bits/opencl/trans.hpp"
       #include "bandicoot_bits/opencl/clamp.hpp"
       #include "bandicoot_bits/opencl/norm.hpp"
+      #include "bandicoot_bits/opencl/all.hpp"
       #include "bandicoot_bits/opencl/svd.hpp"
 //      #include "bandicoot_bits/opencl/eig.hpp"
       }
@@ -355,6 +357,7 @@ namespace coot
     #include "bandicoot_bits/cuda/trans.hpp"
     #include "bandicoot_bits/cuda/clamp.hpp"
     #include "bandicoot_bits/cuda/norm.hpp"
+    #include "bandicoot_bits/cuda/all.hpp"
     #include "bandicoot_bits/cuda/svd.hpp"
 //    #include "bandicoot_bits/cuda/eig.hpp"
     }
@@ -410,6 +413,7 @@ namespace coot
   #include "bandicoot_bits/fn_vectorise.hpp"
   #include "bandicoot_bits/fn_clamp.hpp"
   #include "bandicoot_bits/fn_norm.hpp"
+  #include "bandicoot_bits/fn_all.hpp"
   #include "bandicoot_bits/fn_svd.hpp"
 
 
@@ -452,6 +456,7 @@ namespace coot
   #include "bandicoot_bits/op_norm_meat.hpp"
 
   #include "bandicoot_bits/mtop_conv_to_meat.hpp"
+  #include "bandicoot_bits/mtop_all_meat.hpp"
 
   #include "bandicoot_bits/glue_times_meat.hpp"
 
