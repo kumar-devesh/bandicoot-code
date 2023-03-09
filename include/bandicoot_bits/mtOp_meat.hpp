@@ -16,8 +16,9 @@
 
 template<typename out_eT, typename T1, typename mtop_type>
 inline
-mtOp<out_eT, T1, mtop_type>::mtOp(const T1& in_m)
+mtOp<out_eT, T1, mtop_type>::mtOp(const T1& in_m, const uword in_aux_uword)
   : q(in_m)
+  , aux_uword(in_aux_uword)
   {
   coot_extra_debug_sigprint();
   }

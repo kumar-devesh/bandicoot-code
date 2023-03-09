@@ -29,7 +29,8 @@ class mtOp
   static const bool is_col = T1::is_col;
 
   const T1& q;
+  const uword aux_uword;
 
   inline         ~mtOp();
-  inline explicit mtOp(const T1& in_m);
+  inline explicit mtOp(const T1& in_m, const uword aux_uword = 0);
   };
