@@ -24,3 +24,13 @@ min(const T1& X, const uword dim = 0)
 
   return op_min::apply(Op<T1, op_min>(X, dim, 0));
   }
+
+
+
+coot_warn_unused
+inline
+uword
+min(const SizeMat& s)
+  {
+  return (std::min)(s.n_rows, s.n_cols);
+  }

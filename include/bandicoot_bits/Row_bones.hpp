@@ -30,6 +30,7 @@ class Row : public Mat<eT>
   inline          Row();
   inline explicit Row(const uword N);
   inline explicit Row(const uword in_rows, const uword in_cols);
+  inline explicit Row(const SizeMat& s);
 
   inline                  Row(const Row& X);
   inline const Row& operator=(const Row& X);
@@ -59,6 +60,9 @@ class Row : public Mat<eT>
 
   coot_inline       subview_row<eT> subvec(const uword in_col1, const uword in_col2);
   coot_inline const subview_row<eT> subvec(const uword in_col1, const uword in_col2) const;
+
+  coot_inline       subview_row<eT> subvec(const uword start_col, const SizeMat& s);
+  coot_inline const subview_row<eT> subvec(const uword start_col, const SizeMat& s) const;
 
   #ifdef COOT_EXTRA_ROW_BONES
     #include COOT_INCFILE_WRAP(COOT_EXTRA_ROW_BONES)

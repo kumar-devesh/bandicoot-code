@@ -36,7 +36,7 @@ template<typename eT> class subview_cube;
 
 
 class SizeMat;
-class SizeCube;
+// class SizeCube;
 
 class coot_empty_class {};
 

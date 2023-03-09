@@ -24,3 +24,13 @@ max(const T1& X, const uword dim = 0)
 
   return op_max::apply(Op<T1, op_max>(X, dim, 0));
   }
+
+
+
+coot_warn_unused
+inline
+uword
+max(const SizeMat& s)
+  {
+  return (std::max)(s.n_rows, s.n_cols);
+  }
