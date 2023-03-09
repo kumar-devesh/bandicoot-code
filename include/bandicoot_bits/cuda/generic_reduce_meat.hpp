@@ -20,12 +20,12 @@
 // and the first three arguments should be:
 //  - const eT1* mem
 //  - const UWORD n_elem
-//  - eT1* out_mem
+//  - aux_eT* out_mem
 // Additional arguments are fine, so long as those first three are the same.
 
-template<typename eT, typename... A1, typename... A2>
+template<typename eT, typename aux_eT, typename... A1, typename... A2>
 inline
-eT
+aux_eT
 generic_reduce(const dev_mem_t<eT> mem,
                const uword n_elem,
                const char* kernel_name,
@@ -44,11 +44,11 @@ generic_reduce(const dev_mem_t<eT> mem,
   const size_t first_aux_mem_size = (n_elem + mtpb - 1) / mtpb;
   const size_t second_aux_mem_size = (first_aux_mem_size == 1) ? 0 : (first_aux_mem_size + mtpb - 1) / mtpb;
   const size_t aux_mem_size = first_aux_mem_size + second_aux_mem_size;
-  Col<eT> aux_mem(aux_mem_size);
+  Col<aux_eT> aux_mem(aux_mem_size);
 
-  dev_mem_t<eT> aux_mem_ptr = aux_mem.get_dev_mem(false);
+  dev_mem_t<aux_eT> aux_mem_ptr = aux_mem.get_dev_mem(false);
   // Create offset for secondary buffer.
-  dev_mem_t<eT> second_aux_mem_ptr = aux_mem_ptr;
+  dev_mem_t<aux_eT> second_aux_mem_ptr = aux_mem_ptr;
   second_aux_mem_ptr.cuda_mem_ptr += first_aux_mem_size;
   const bool first_buffer = generic_reduce_inner(mem,
                                                  n_elem,
@@ -61,15 +61,15 @@ generic_reduce(const dev_mem_t<eT> mem,
                                                  second_kernel_small,
                                                  second_kernel_extra_args,
                                                  second_aux_mem_ptr);
-  return first_buffer ? eT(aux_mem[0]) : eT(aux_mem[first_aux_mem_size]);
+  return first_buffer ? aux_eT(aux_mem[0]) : aux_eT(aux_mem[first_aux_mem_size]);
   }
 
 
 
 // This version uses the same kernel for all reduce passes.
-template<typename eT, typename... Args>
+template<typename eT, typename aux_eT, typename... Args>
 inline
-eT
+aux_eT
 generic_reduce(const dev_mem_t<eT> mem,
                const uword n_elem,
                const char* kernel_name,
@@ -77,15 +77,15 @@ generic_reduce(const dev_mem_t<eT> mem,
                CUfunction& kernel_small,
                const std::tuple<Args...>& kernel_extra_args)
   {
-  return generic_reduce(mem,
-                        n_elem,
-                        kernel_name,
-                        kernel,
-                        kernel_small,
-                        kernel_extra_args,
-                        kernel,
-                        kernel_small,
-                        kernel_extra_args);
+  return generic_reduce<eT, aux_eT>(mem,
+                                    n_elem,
+                                    kernel_name,
+                                    kernel,
+                                    kernel_small,
+                                    kernel_extra_args,
+                                    kernel,
+                                    kernel_small,
+                                    kernel_extra_args);
   }
 
 
@@ -132,12 +132,12 @@ unpack_args<0, Args...>
 
 
 
-template<typename eT, typename... A1, typename... A2>
+template<typename eT, typename aux_eT, typename... A1, typename... A2>
 inline
 bool
 generic_reduce_inner(const dev_mem_t<eT> mem,
                      const uword n_elem,
-                     dev_mem_t<eT> aux_mem,
+                     dev_mem_t<aux_eT> aux_mem,
                      const char* kernel_name,
                      CUfunction& first_kernel,
                      CUfunction& first_kernel_small,
@@ -145,7 +145,7 @@ generic_reduce_inner(const dev_mem_t<eT> mem,
                      CUfunction& second_kernel,
                      CUfunction& second_kernel_small,
                      const std::tuple<A2...>& second_kernel_extra_args,
-                     dev_mem_t<eT> second_aux_mem)
+                     dev_mem_t<aux_eT> second_aux_mem)
   {
   const size_t mtpb = (size_t) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock;
 
@@ -175,7 +175,7 @@ generic_reduce_inner(const dev_mem_t<eT> mem,
     CUresult result = cuLaunchKernel(
         first_kernel,
         block_size, 1, 1, mtpb, 1, 1,
-        2 * mtpb * sizeof(eT), // shared mem should have size equal to number of threads times 2
+        2 * mtpb * sizeof(aux_eT), // shared mem should have size equal to number of threads times 2
         NULL,
         (void**) args,
         0);
@@ -201,12 +201,12 @@ generic_reduce_inner(const dev_mem_t<eT> mem,
 
 
 
-template<typename eT, typename... Args>
+template<typename eT, typename aux_eT, typename... Args>
 inline
 void
 generic_reduce_inner_small(const dev_mem_t<eT> mem,
                            const uword n_elem,
-                           dev_mem_t<eT> aux_mem, // must have at least one element
+                           dev_mem_t<aux_eT> aux_mem, // must have at least one element
                            const char* kernel_name,
                            CUfunction& kernel,
                            CUfunction& kernel_small, // for 32 threads or fewer
@@ -224,7 +224,7 @@ generic_reduce_inner_small(const dev_mem_t<eT> mem,
   CUresult result = cuLaunchKernel(
       num_threads <= 32 ? kernel_small : kernel, // if we have fewer threads than a single warp, we can use a more optimized version of the kernel
       1, 1, 1, num_threads, 1, 1,
-      2 * num_threads * sizeof(eT), // shared mem should have size equal to number of threads times 2
+      2 * num_threads * sizeof(aux_eT), // shared mem should have size equal to number of threads times 2
       NULL,
       (void**) args,
       0);

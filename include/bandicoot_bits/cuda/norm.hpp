@@ -28,15 +28,15 @@ vec_norm_1(dev_mem_t<eT> mem, const uword n_elem, const typename coot_real_only<
   CUfunction accu_kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu);
   CUfunction accu_kernel_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu_small);
 
-  const eT result = generic_reduce(mem,
-                                   n_elem,
-                                   "vec_norm_1",
-                                   kernel,
-                                   kernel_small,
-                                   std::make_tuple(/* no extra args */),
-                                   accu_kernel,
-                                   accu_kernel_small,
-                                   std::make_tuple(/* no extra args */));
+  const eT result = generic_reduce<eT, eT>(mem,
+                                           n_elem,
+                                           "vec_norm_1",
+                                           kernel,
+                                           kernel_small,
+                                           std::make_tuple(/* no extra args */),
+                                           accu_kernel,
+                                           accu_kernel_small,
+                                           std::make_tuple(/* no extra args */));
   return result;
   }
 
@@ -95,15 +95,15 @@ vec_norm_k(dev_mem_t<eT> mem, const uword n_elem, const uword k, const typename 
   CUfunction accu_kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu);
   CUfunction accu_kernel_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu_small);
 
-  const eT result = generic_reduce(mem,
-                                   n_elem,
-                                   "vec_norm_k",
-                                   kernel,
-                                   kernel_small,
-                                   std::make_tuple(k),
-                                   accu_kernel,
-                                   accu_kernel_small,
-                                   std::make_tuple(/* no extra args */));
+  const eT result = generic_reduce<eT, eT>(mem,
+                                           n_elem,
+                                           "vec_norm_k",
+                                           kernel,
+                                           kernel_small,
+                                           std::make_tuple(k),
+                                           accu_kernel,
+                                           accu_kernel_small,
+                                           std::make_tuple(/* no extra args */));
 
   // The kernel returns just the accumulated result, so we still need to take the k'th root.
   return std::pow(result, eT(1.0) / eT(k));
@@ -126,15 +126,15 @@ vec_norm_min(dev_mem_t<eT> mem, const uword n_elem, const typename coot_real_onl
   CUfunction min_kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::min);
   CUfunction min_kernel_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::min_small);
 
-  const eT result = generic_reduce(mem,
-                                   n_elem,
-                                   "vec_norm_min",
-                                   kernel,
-                                   kernel_small,
-                                   std::make_tuple(/* no extra args */),
-                                   min_kernel,
-                                   min_kernel_small,
-                                   std::make_tuple(/* no extra args */));
+  const eT result = generic_reduce<eT, eT>(mem,
+                                           n_elem,
+                                           "vec_norm_min",
+                                           kernel,
+                                           kernel_small,
+                                           std::make_tuple(/* no extra args */),
+                                           min_kernel,
+                                           min_kernel_small,
+                                           std::make_tuple(/* no extra args */));
   return result;
   }
 
