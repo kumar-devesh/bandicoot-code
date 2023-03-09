@@ -224,7 +224,14 @@ TEST_CASE("sizemat_resize", "[size]")
 // use SizeMat with reshape
 TEST_CASE("sizemat_reshape", "[size]")
   {
-  // TODO
+  mat X(30, 40);
+  X.ones();
+
+  mat Y = reshape(X, SizeMat(20, 15));
+
+  REQUIRE( Y.n_rows == 20 );
+  REQUIRE( Y.n_cols == 15 );
+  REQUIRE( Y.n_elem == 300 );
   }
 
 
