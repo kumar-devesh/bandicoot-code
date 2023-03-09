@@ -72,7 +72,7 @@ diagview<eT>::diagview(diagview<eT>&& in)
 
 
 
-//! set a diagonal of our matrix using a diagonal from a foreign matrix */
+//! set a diagonal of our matrix using a diagonal from a foreign matrix
 template<typename eT>
 inline
 void
@@ -146,7 +146,7 @@ diagview<eT>::operator/=(const eT val)
 
 
 
-//! set a diagonal of our matrix using data from a foreign object */
+//! set a diagonal of our matrix using data from a foreign object
 template<typename eT>
 inline
 void
