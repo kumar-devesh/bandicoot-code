@@ -97,7 +97,7 @@ coot_stop_logic_error(const T1& x)
 
 
 
-//! print a message to get_cerr_stream() and throw logic_error exception
+//! print a message to get_cerr_stream() and throw out_of_range exception
 template<typename T1>
 coot_cold
 coot_noinline
