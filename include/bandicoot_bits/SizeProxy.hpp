@@ -311,7 +311,7 @@ class SizeProxy< mtOp<out_eT, T1, mtop_type> >
 
   coot_aligned uword get_n_rows() const { return mtop_type::compute_n_rows(Q, S.get_n_rows(), S.get_n_cols()); }
   coot_aligned uword get_n_cols() const { return mtop_type::compute_n_cols(Q, S.get_n_rows(), S.get_n_cols()); }
-  coot_aligned uword get_n_elem() const { return mtop_type::compute_n_elem(Q, S.get_n_rows(), S.get_n_cols()); }
+  coot_aligned uword get_n_elem() const { return get_n_rows() * get_n_cols(); }
   };
 
 

@@ -176,14 +176,3 @@ mtop_conv_to::compute_n_cols(const mtOp<out_eT, T1, mtop_conv_to>& X, const uwor
   // mtop_conv_to does not change the size of the input.
   return in_n_cols;
   }
-
-
-
-template<typename out_eT, typename T1>
-inline
-uword
-mtop_conv_to::compute_n_elem(const mtOp<out_eT, T1, mtop_conv_to>& X, const uword in_n_rows, const uword in_n_cols)
-  {
-  // mtop_conv_to does not change the size of the input.
-  return (in_n_rows * in_n_cols);
-  }

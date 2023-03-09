@@ -44,5 +44,4 @@ class mtop_conv_to
   // Compute the sizes of the output.
   template<typename out_eT, typename T1> static inline uword compute_n_rows(const mtOp<out_eT, T1, mtop_conv_to>& X, const uword in_n_rows, const uword in_n_cols);
   template<typename out_eT, typename T1> static inline uword compute_n_cols(const mtOp<out_eT, T1, mtop_conv_to>& X, const uword in_n_rows, const uword in_n_cols);
-  template<typename out_eT, typename T1> static inline uword compute_n_elem(const mtOp<out_eT, T1, mtop_conv_to>& X, const uword in_n_rows, const uword in_n_cols);
   };
