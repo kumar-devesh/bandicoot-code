@@ -15,6 +15,7 @@
 
 
 class mtop_conv_to
+  : public traits_op_default
   {
   public:
 
