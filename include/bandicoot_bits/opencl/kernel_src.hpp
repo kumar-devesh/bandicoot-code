@@ -27,6 +27,9 @@ struct kernel_src
   static inline const std::string&  get_oneway_real_source();
   static inline       std::string  init_oneway_real_source();
 
+  static inline const std::string&  get_oneway_integral_source();
+  static inline       std::string  init_oneway_integral_source();
+
   static inline const std::string&  get_twoway_source();
   static inline       std::string  init_twoway_source();
 
@@ -248,7 +251,6 @@ inline
 const std::string&
 kernel_src::get_oneway_real_source()
   {
-  // TODO
   static const std::string source = init_oneway_real_source();
 
   return source;
@@ -268,6 +270,48 @@ kernel_src::init_oneway_real_source()
   for (const std::string& kernel_name : oneway_real_kernel_id::get_names())
     {
     std::string filename = "oneway_real/" + kernel_name + ".cl";
+    source += read_file(filename);
+    }
+
+  return source;
+  }
+
+
+
+inline
+const std::string&
+kernel_src::get_oneway_integral_source()
+  {
+  static const std::string source = init_oneway_integral_source();
+
+  return source;
+  }
+
+
+
+inline
+std::string
+kernel_src::init_oneway_integral_source()
+  {
+  // NOTE: kernel names must match the list in the kernel_id struct
+
+  std::vector<std::string> aux_function_filenames = {
+      "and_wavefront_reduce.cl",
+  };
+
+  std::string source = "";
+
+  // First, load any auxiliary functions (e.g. device-specific functions).
+  for (const std::string& filename : aux_function_filenames)
+    {
+    std::string full_filename = "oneway_integral/" + filename;
+    source += read_file(full_filename);
+    }
+
+  // Load each file for each kernel.
+  for (const std::string& kernel_name : oneway_integral_kernel_id::get_names())
+    {
+    std::string filename = "oneway_integral/" + kernel_name + ".cl";
     source += read_file(filename);
     }
 
