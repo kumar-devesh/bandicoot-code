@@ -95,7 +95,7 @@ diagmat(const Op<T1, op_htrans>& X, const sword k)
 
 
 
-// simplification: diagmat(scalar * Base.t()) -> diagmat(scalar * Base)
+// simplification: diagmat(scalar * Base.t()) -> diagmat(htrans2(Base))
 // this gives a form that partial_unwrap will be able to better handle
 
 template<typename T1>
