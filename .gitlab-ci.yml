@@ -42,8 +42,8 @@ test-opencl:
     echo "run clinfo"
     clinfo
     export CUDA_VISIBLE_DEVICES=0
-    ./main -d yes
+    ./main -r xml -v normal
     export CUDA_VISIBLE_DEVICES=1
-    ./main -d yes
+    ./main -r xml -v normal
     export CUDA_VISIBLE_DEVICES=3
-    ./main -d yes
+    ./main -r xml -v normal
