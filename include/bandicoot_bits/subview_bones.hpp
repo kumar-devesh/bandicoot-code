@@ -80,6 +80,9 @@ class subview : public Base<eT, subview<eT> >
   template<typename eT1> inline static void schur_inplace(Mat<eT1>& out, const subview& in);
   template<typename eT1> inline static void   div_inplace(Mat<eT1>& out, const subview& in);
 
+  coot_inline       diagview<eT> diag(const sword in_id = 0);
+  coot_inline const diagview<eT> diag(const sword in_id = 0) const;
+
   inline void clamp(const eT min_val, const eT max_val);
 
   inline void fill(const eT val);

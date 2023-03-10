@@ -76,7 +76,7 @@ coot_inline
 typename
 enable_if2
   <
-  is_coot_type<T1>::value && is_coot_type<T2>::value && is_same_type<typename T1::elem_type, typename T2::elem_type>::value,
+  is_coot_type<T1>::value && is_coot_type<T2>::value && is_same_type<typename T1::elem_type, typename T2::elem_type>::value && !(resolves_to_diagmat<T1>::value || resolves_to_diagmat<T2>::value),
   const Glue<T1, T2, glue_times>
   >::result
 operator*
@@ -112,4 +112,26 @@ operator*
   promote_type<eT1,eT2>::check();
 
   return Glue<T1, T2, glue_mixed_times>( X, Y );
+  }
+
+
+
+// Base * diagmat, diagmat * Base, diagmat * diagmat
+template<typename T1, typename T2>
+coot_inline
+typename
+enable_if2
+  <
+  (is_coot_type<T1>::value && is_same_type<typename T1::elem_type, typename T2::elem_type>::value && (resolves_to_diagmat<T1>::value || resolves_to_diagmat<T2>::value)),
+  const Glue<T1, T2, glue_times_diag>
+  >::result
+operator*
+  (
+  const T1& X,
+  const T2& Y
+  )
+  {
+  coot_extra_debug_sigprint();
+
+  return Glue<T1, T2, glue_times_diag>(X, Y);
   }

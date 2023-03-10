@@ -97,6 +97,25 @@ coot_stop_logic_error(const T1& x)
 
 
 
+//! print a message to get_cerr_stream() and throw out_of_range exception
+template<typename T1>
+coot_cold
+coot_noinline
+static
+void
+coot_stop_bounds_error(const T1& x)
+  {
+  #if defined(COOT_PRINT_ERRORS)
+    {
+    get_cerr_stream() << "\nerror: " << x << std::endl;
+    }
+  #endif
+
+  throw std::out_of_range( std::string(x) );
+  }
+
+
+
 // print a message to get_cerr_stream() and throw bad_alloc exception
 template<typename T1>
 coot_cold
@@ -382,6 +401,15 @@ coot_check_runtime_error(const bool state, const T1& x)
   if(state)  { coot_stop_runtime_error(x); }
   }
 
+template<typename T1>
+coot_hot
+inline
+void
+coot_check_bounds(const bool state, const T1& x)
+  {
+  if(state)  { coot_stop_bounds_error( std::string(x) ); }
+  }
+
 
 
 //
@@ -580,6 +608,7 @@ coot_assert_blas_size(const T1& A, const T2& B)
   #define coot_debug_print                   true ? (void)0 : coot_print
   #define coot_debug_warn                    true ? (void)0 : coot_warn
   #define coot_debug_check                   true ? (void)0 : coot_check
+  #define coot_debug_check_bounds            true ? (void)0 : coot_check_bounds
   #define coot_debug_assert_same_size        true ? (void)0 : coot_assert_same_size
   #define coot_debug_assert_mul_size         true ? (void)0 : coot_assert_mul_size
   #define coot_debug_assert_trans_mul_size   true ? (void)0 : coot_assert_trans_mul_size
@@ -590,6 +619,7 @@ coot_assert_blas_size(const T1& A, const T2& B)
   #define coot_debug_print                 coot_print
   #define coot_debug_warn                  coot_warn
   #define coot_debug_check                 coot_check
+  #define coot_debug_check_bounds          coot_check_bounds
   #define coot_debug_assert_same_size      coot_assert_same_size
   #define coot_debug_assert_mul_size       coot_assert_mul_size
   #define coot_debug_assert_trans_mul_size coot_assert_trans_mul_size

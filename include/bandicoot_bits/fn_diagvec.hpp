@@ -1,4 +1,4 @@
-// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2023 Ryan Curtin (http://www.ratml.org)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,34 +14,26 @@
 
 
 
+// Note that Armadillo has also an op_diagvec2 class that handles diagonals that
+// are not the main diagonal; but, that gives us no extra optimization
+// opportunities for Bandicoot, so we only use op_diagvec here to capture both
+// cases.
+
 template<typename T1>
 coot_warn_unused
-inline
-typename T1::elem_type
-trace(const Base<typename T1::elem_type, T1>& X)
+coot_inline
+typename
+enable_if2
+  <
+  is_coot_type<T1>::value,
+  const Op<T1, op_diagvec>
+  >::result
+diagvec(const T1& X, const sword k = 0)
   {
   coot_extra_debug_sigprint();
 
-  typedef typename T1::elem_type eT;
+  const uword a = (std::abs)(k);
+  const uword b = (k < 0) ? 1 : 0;
 
-  const unwrap<T1>   U(X.get_ref());
-  const Mat<eT>& A = U.M;
-
-  if(A.n_elem == 0)  { return eT(0); }
-
-  return coot_rt_t::trace(A.get_dev_mem(false), A.n_rows, A.n_cols);
-  }
-
-
-
-// trace(diagmat): just sum the elements
-template<typename T1>
-coot_warn_unused
-inline
-typename T1::elem_type
-trace(const Op<T1, op_diagmat>& X)
-  {
-  coot_extra_debug_sigprint();
-
-  return accu(X.m);
+  return Op<T1, op_diagvec>(X, a, b);
   }

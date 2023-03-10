@@ -48,3 +48,28 @@ strans
 
   return Op<T1, op_htrans>(X.get_ref());
   }
+
+
+
+// simplification for non-complex diagmats
+
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename
+enable_if2
+  <
+  is_coot_type<T1>::value,
+  const Op<T1, op_diagmat>
+  >::result
+strans
+  (
+  const Op<T1, op_diagmat>& X,
+  const typename coot_not_cx<typename T1::elem_type>::result* junk = 0
+  )
+  {
+  coot_extra_debug_sigprint();
+  coot_ignore(junk);
+
+  return X;
+  }
