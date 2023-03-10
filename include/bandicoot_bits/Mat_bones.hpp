@@ -85,6 +85,14 @@ class Mat : public Base< eT, Mat<eT> >
   inline const Mat& operator%=(const subview<eT>& X);
   inline const Mat& operator/=(const subview<eT>& X);
 
+  inline                   Mat(const diagview<eT>& X);
+  inline const Mat& operator= (const diagview<eT>& X);
+  inline const Mat& operator+=(const diagview<eT>& X);
+  inline const Mat& operator-=(const diagview<eT>& X);
+  inline const Mat& operator*=(const diagview<eT>& X);
+  inline const Mat& operator%=(const diagview<eT>& X);
+  inline const Mat& operator/=(const diagview<eT>& X);
+
   template<typename T1, typename eop_type> inline                   Mat(const eOp<T1, eop_type>& X);
   template<typename T1, typename eop_type> inline const Mat& operator= (const eOp<T1, eop_type>& X);
   template<typename T1, typename eop_type> inline const Mat& operator+=(const eOp<T1, eop_type>& X);
@@ -124,6 +132,9 @@ class Mat : public Base< eT, Mat<eT> >
   template<typename T1, typename T2, typename glue_type> inline const Mat& operator*=(const Glue<T1, T2, glue_type>& X);
   template<typename T1, typename T2, typename glue_type> inline const Mat& operator%=(const Glue<T1, T2, glue_type>& X);
   template<typename T1, typename T2, typename glue_type> inline const Mat& operator/=(const Glue<T1, T2, glue_type>& X);
+
+  coot_inline       diagview<eT> diag(const sword in_id = 0);
+  coot_inline const diagview<eT> diag(const sword in_id = 0) const;
 
   inline const Mat& clamp(const eT min_val, const eT max_val);
 

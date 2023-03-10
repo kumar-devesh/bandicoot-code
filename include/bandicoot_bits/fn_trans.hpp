@@ -37,3 +37,41 @@ htrans(const Base<typename T1::elem_type,T1>& X)
 
   return Op<T1, op_htrans>(X.get_ref());
   }
+
+
+
+// simplification: trans(diagmat()) does nothing
+
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename
+enable_if2
+  <
+  is_coot_type<T1>::value,
+  const Op<T1, op_diagmat>
+  >::result
+trans(const Op<T1, op_diagmat>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  return X;
+  }
+
+
+
+template<typename T1>
+coot_warn_unused
+coot_inline
+typename
+enable_if2
+  <
+  is_coot_type<T1>::value,
+  const Op<T1, op_diagmat>
+  >::result
+htrans(const Op<T1, op_diagmat>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  return X;
+  }

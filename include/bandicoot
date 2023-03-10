@@ -115,7 +115,7 @@ namespace coot
   #include "bandicoot_bits/constants.hpp"
   #include "bandicoot_bits/dev_mem_t.hpp"
   #include "bandicoot_bits/distr_param.hpp"
-
+  
 
 
   //
@@ -197,6 +197,7 @@ namespace coot
   #include "bandicoot_bits/Col_bones.hpp"
   #include "bandicoot_bits/SizeMat_bones.hpp"
   #include "bandicoot_bits/subview_bones.hpp"
+  #include "bandicoot_bits/diagview_bones.hpp"
 
   #include "bandicoot_bits/arrayops_bones.hpp"
   #include "bandicoot_bits/eOp_bones.hpp"
@@ -219,6 +220,8 @@ namespace coot
   #include "bandicoot_bits/op_vectorise_bones.hpp"
   #include "bandicoot_bits/op_clamp_bones.hpp"
   #include "bandicoot_bits/op_norm_bones.hpp"
+  #include "bandicoot_bits/op_diagmat_bones.hpp"
+  #include "bandicoot_bits/op_diagvec_bones.hpp"
 
   #include "bandicoot_bits/mtop_conv_to_bones.hpp"
 
@@ -301,6 +304,7 @@ namespace coot
       #include "bandicoot_bits/opencl/generic_reduce_meat.hpp"
       #include "bandicoot_bits/opencl/inplace_op.hpp"
       #include "bandicoot_bits/opencl/array_op.hpp"
+      #include "bandicoot_bits/opencl/diag_op.hpp"
       #include "bandicoot_bits/opencl/mat_val_proxy.hpp"
       #include "bandicoot_bits/opencl/random_meat.hpp"
       #include "bandicoot_bits/opencl/eop_core_meat.hpp"
@@ -321,6 +325,7 @@ namespace coot
       #include "bandicoot_bits/opencl/trans.hpp"
       #include "bandicoot_bits/opencl/clamp.hpp"
       #include "bandicoot_bits/opencl/norm.hpp"
+      #include "bandicoot_bits/opencl/mul_diag.hpp"
       #include "bandicoot_bits/opencl/svd.hpp"
 //      #include "bandicoot_bits/opencl/eig.hpp"
       }
@@ -335,6 +340,7 @@ namespace coot
     #include "bandicoot_bits/cuda/generic_reduce_meat.hpp"
     #include "bandicoot_bits/cuda/inplace_op.hpp"
     #include "bandicoot_bits/cuda/array_op.hpp"
+    #include "bandicoot_bits/cuda/diag_op.hpp"
     #include "bandicoot_bits/cuda/mat_val_proxy.hpp"
     #include "bandicoot_bits/cuda/random_meat.hpp"
     #include "bandicoot_bits/cuda/eop_core_meat.hpp"
@@ -355,6 +361,7 @@ namespace coot
     #include "bandicoot_bits/cuda/trans.hpp"
     #include "bandicoot_bits/cuda/clamp.hpp"
     #include "bandicoot_bits/cuda/norm.hpp"
+    #include "bandicoot_bits/cuda/mul_diag.hpp"
     #include "bandicoot_bits/cuda/svd.hpp"
 //    #include "bandicoot_bits/cuda/eig.hpp"
     }
@@ -368,6 +375,7 @@ namespace coot
   #include "bandicoot_bits/no_conv_unwrap.hpp"
   #include "bandicoot_bits/unwrap.hpp"
   #include "bandicoot_bits/SizeProxy.hpp"
+  #include "bandicoot_bits/strip.hpp"
 
 
 
@@ -412,6 +420,8 @@ namespace coot
   #include "bandicoot_bits/fn_clamp.hpp"
   #include "bandicoot_bits/fn_norm.hpp"
   #include "bandicoot_bits/fn_svd.hpp"
+  #include "bandicoot_bits/fn_diagmat.hpp"
+  #include "bandicoot_bits/fn_diagvec.hpp"
 
 
   //
@@ -430,6 +440,7 @@ namespace coot
   #include "bandicoot_bits/Col_meat.hpp"
   #include "bandicoot_bits/SizeMat_meat.hpp"
   #include "bandicoot_bits/subview_meat.hpp"
+  #include "bandicoot_bits/diagview_meat.hpp"
 
   #include "bandicoot_bits/arrayops_meat.hpp"
   #include "bandicoot_bits/eOp_meat.hpp"
@@ -452,6 +463,8 @@ namespace coot
   #include "bandicoot_bits/op_vectorise_meat.hpp"
   #include "bandicoot_bits/op_clamp_meat.hpp"
   #include "bandicoot_bits/op_norm_meat.hpp"
+  #include "bandicoot_bits/op_diagmat_meat.hpp"
+  #include "bandicoot_bits/op_diagvec_meat.hpp"
 
   #include "bandicoot_bits/mtop_conv_to_meat.hpp"
 

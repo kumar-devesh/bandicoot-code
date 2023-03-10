@@ -36,14 +36,13 @@ inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, oneway_k
   status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &(dest.cl_mem_ptr) );
   status |= clSetKernelArg(kernel, 1, sizeof(eT),     &val               );
   status |= clSetKernelArg(kernel, 2, N.size,         N.addr             );
+  coot_check_cl_error(status, "coot::opencl::inplace_op_scalar(): couldn't set kernel arguments");
 
   const size_t global_work_size[1] = { size_t(n_elem) };
 
-  coot_extra_debug_print("clEnqueueNDRangeKernel()");
-
   status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, global_work_size, NULL, 0, NULL, NULL);
 
-  coot_check_runtime_error( (status != 0), "coot::opencl::inplace_op_scalar(): couldn't execute kernel" );
+  coot_check_cl_error(status, "coot::opencl::inplace_op_scalar(): couldn't execute kernel");
   }
 
 
@@ -70,14 +69,13 @@ inplace_op_array(dev_mem_t<eT2> dest, dev_mem_t<eT1> src, const uword n_elem, tw
   status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &(dest.cl_mem_ptr)  );
   status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &(src.cl_mem_ptr)   );
   status |= clSetKernelArg(kernel, 2, N.size,         N.addr              );
+  coot_check_cl_error(status, "coot::opencl::inplace_op_array(): couldn't set kernel arguments");
 
   const size_t global_work_size[1] = { size_t(n_elem) };
 
-  coot_extra_debug_print("clEnqueueNDRangeKernel()");
-
   status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, global_work_size, NULL, 0, NULL, NULL);
 
-  coot_check_runtime_error( (status != 0), "coot::opencl::inplace_op_array(): couldn't execute kernel");
+  coot_check_cl_error(status, "coot::opencl::inplace_op_array(): couldn't execute kernel");
   }
 
 
@@ -112,6 +110,7 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_row1, const
   status |= clSetKernelArg(kernel, 2,  m_end_row.size, m_end_row.addr);
   status |= clSetKernelArg(kernel, 3,  m_end_col.size, m_end_col.addr);
   status |= clSetKernelArg(kernel, 4, m_n_rows_a.size, m_n_rows_a.addr);
+  coot_check_cl_error(status, "coot::opencl::inplace_op_subview(): couldn't set kernel arguments");
 
   size_t global_work_offset[2] = { size_t(aux_row1), size_t(aux_col1) }; // starting point in parent matrix
   size_t global_work_size[2]   = { size_t(n_rows),   size_t(n_cols)   }; // size of submatrix
@@ -119,7 +118,46 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_row1, const
   // NOTE: Clover / Mesa 13.0.4 can't handle offsets
   status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 2, global_work_offset, global_work_size, NULL, 0, NULL, NULL);
 
-  coot_check_runtime_error( (status != 0), "coot::opencl::inplace_op_subview(): couldn't execute kernel" );
+  coot_check_cl_error(status, "coot::opencl::inplace_op_subview(): couldn't execute kernel");
+  }
+
+
+
+/**
+ * Run an OpenCL kernel that performs an in-place scalar operation on a diagonal
+ * of a matrix.
+ */
+template<typename eT>
+inline
+void
+inplace_op_diag(dev_mem_t<eT> dest, const uword mem_offset, const eT val, const uword n_rows, const uword len, oneway_kernel_id::enum_id num)
+  {
+  coot_extra_debug_sigprint();
+
+  if (len == 0) { return; }
+
+  runtime_t::cq_guard guard;
+
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(num);
+
+  cl_int status = 0;
+
+  runtime_t::adapt_uword cl_dest_offset(mem_offset);
+  runtime_t::adapt_uword cl_n_rows(n_rows);
+  runtime_t::adapt_uword cl_len(len);
+
+  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem),      &(dest.cl_mem_ptr));
+  status |= clSetKernelArg(kernel, 1, cl_dest_offset.size, cl_dest_offset.addr);
+  status |= clSetKernelArg(kernel, 2, sizeof(eT),          &val);
+  status |= clSetKernelArg(kernel, 3, cl_n_rows.size,      cl_n_rows.addr);
+  status |= clSetKernelArg(kernel, 4, cl_len.size,         cl_len.addr);
+  coot_check_cl_error(status, "coot::opencl::inplace_op_diag(): couldn't set kernel arguments");
+
+  const size_t global_work_size[1] = { size_t(len) };
+
+  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, global_work_size, NULL, 0, NULL, NULL);
+
+  coot_check_cl_error(status, "coot::opencl::inplace_op_diag(): failed to run kernel");
   }
 
 

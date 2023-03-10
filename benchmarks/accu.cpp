@@ -111,60 +111,51 @@ void run_benchmarks(const uword elem,
 
 int main(int argc, char** argv)
   {
-  /* if (argc != 5) */
-  /*   { */
-  /*   std::cerr << "Usage: " << argv[0] << " device_name trials elem out_csv" << std::endl; */
-  /*   exit(1); */
-  /*   } */
+  if (argc != 5)
+    {
+    std::cerr << "Usage: " << argv[0] << " device_name trials elem out_csv" << std::endl;
+    exit(1);
+    }
 
-  /* const char* device_name = argv[1]; */
-  /* const size_t trials = (size_t) atoi(argv[2]); */
-  /* const uword elem = (uword) atoi(argv[3]); */
-  /* const char* out_csv = argv[4]; */
+  const char* device_name = argv[1];
+  const size_t trials = (size_t) atoi(argv[2]);
+  const uword elem = (uword) atoi(argv[3]);
+  const char* out_csv = argv[4];
 
-  /* wall_clock c; */
+  wall_clock c;
 
-  /* std::cout << "accu: element accumulation benchmark comparison\n"; */
-  /* std::cout << "  bandicoot version " << coot::coot_version::as_string() << '\n'; */
-  /* std::cout << "  armadillo version " << arma::arma_version::as_string() << '\n'; */
-  /* std::cout << '\n'; */
+  std::cout << "accu: element accumulation benchmark comparison\n";
+  std::cout << "  bandicoot version " << coot::coot_version::as_string() << '\n';
+  std::cout << "  armadillo version " << arma::arma_version::as_string() << '\n';
+  std::cout << '\n';
 
   // Time initialization.
-  /* c.tic(); */
+  c.tic();
   coot::get_rt().init(true);
-  /* coot::get_rt().cuda_rt.init(false, 0, 0, true); */
-  /* double time = c.toc(); */
-  /* std::cout << "bandicoot initialization time: " << time << "s\n"; */
+  coot::get_rt().cuda_rt.init(false, 0, 0, true);
+  double time = c.toc();
+  std::cout << "bandicoot initialization time: " << time << "s\n";
 
-  get_rt().backend = CUDA_BACKEND;
-  /* std::ofstream out_file(out_csv, std::ios_base::app); */
-  /* if (!out_file.is_open()) */
-  /*   { */
-  /*   std::cerr << "failed to open " << out_csv << "!\n"; */
-  /*   exit(1); */
-  /*   } */
-  coot::mat x;
-  x.set_size(10, 10);
-  x.fill(3);
+  std::ofstream out_file(out_csv, std::ios_base::app);
+  if (!out_file.is_open())
+    {
+    std::cerr << "failed to open " << out_csv << "!\n";
+    exit(1);
+    }
 
-  coot::mat y = coot::pow(x, 2.0);
+  run_benchmarks<arma::Mat<s32>>(elem, false, trials, "accu", device_name, "cpu", "int32", out_file);
+  run_benchmarks<coot::Mat<s32>>(elem, false, trials, "accu", device_name, "opencl", "int32", out_file);
+  run_benchmarks<coot::Mat<s32>>(elem, true, trials, "accu", device_name, "cuda", "int32", out_file);
 
-  y.print();
+  run_benchmarks<arma::Mat<s64>>(elem, false, trials, "accu", device_name, "cpu", "int64", out_file);
+  run_benchmarks<coot::Mat<s64>>(elem, false, trials, "accu", device_name, "opencl", "int64", out_file);
+  run_benchmarks<coot::Mat<s64>>(elem, true, trials, "accu", device_name, "cuda", "int64", out_file);
 
+  run_benchmarks<arma::fmat>(elem, false, trials, "accu", device_name, "cpu", "float", out_file);
+  run_benchmarks<coot::fmat>(elem, false, trials, "accu", device_name, "opencl", "float", out_file);
+  run_benchmarks<coot::fmat>(elem, true, trials, "accu", device_name, "cuda", "float", out_file);
 
-  /* run_benchmarks<arma::Mat<s32>>(elem, false, trials, "accu", device_name, "cpu", "int32", out_file); */
-  /* run_benchmarks<coot::Mat<s32>>(elem, false, trials, "accu", device_name, "opencl", "int32", out_file); */
-  /* run_benchmarks<coot::Mat<s32>>(elem, true, trials, "accu", device_name, "cuda", "int32", out_file); */
-
-  /* run_benchmarks<arma::Mat<s64>>(elem, false, trials, "accu", device_name, "cpu", "int64", out_file); */
-  /* run_benchmarks<coot::Mat<s64>>(elem, false, trials, "accu", device_name, "opencl", "int64", out_file); */
-  /* run_benchmarks<coot::Mat<s64>>(elem, true, trials, "accu", device_name, "cuda", "int64", out_file); */
-
-  /* run_benchmarks<arma::fmat>(elem, false, trials, "accu", device_name, "cpu", "float", out_file); */
-  /* run_benchmarks<coot::fmat>(elem, false, trials, "accu", device_name, "opencl", "float", out_file); */
-  /* run_benchmarks<coot::fmat>(elem, true, trials, "accu", device_name, "cuda", "float", out_file); */
-
-  /* run_benchmarks<arma::mat>(elem, false, trials, "accu", device_name, "cpu", "double", out_file); */
-  /* run_benchmarks<coot::mat>(elem, false, trials, "accu", device_name, "opencl", "double", out_file); */
-  /* run_benchmarks<coot::mat>(elem, true, trials, "accu", device_name, "cuda", "double", out_file); */
+  run_benchmarks<arma::mat>(elem, false, trials, "accu", device_name, "cpu", "double", out_file);
+  run_benchmarks<coot::mat>(elem, false, trials, "accu", device_name, "opencl", "double", out_file);
+  run_benchmarks<coot::mat>(elem, true, trials, "accu", device_name, "cuda", "double", out_file);
   }

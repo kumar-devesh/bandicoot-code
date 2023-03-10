@@ -570,9 +570,9 @@ Mat<eT>::operator*=(const subview<eT>& X)
   {
   coot_extra_debug_sigprint();
 
-  // TODO
-
-  return *this;
+  // TODO: improve this implementation (maybe?)
+  Mat<eT> tmp(X);
+  return operator*=(tmp);
   }
 
 
@@ -605,6 +605,119 @@ Mat<eT>::operator/=(const subview<eT>& X)
   subview<eT>::div_inplace(*this, X);
 
   return *this;
+  }
+
+
+
+template<typename eT>
+inline
+Mat<eT>::Mat(const diagview<eT>& X)
+  : n_rows   (0)
+  , n_cols   (0)
+  , n_elem   (0)
+  , vec_state(0)
+  , mem_state(0)
+  {
+  coot_extra_debug_sigprint_this(this);
+
+  init(X.n_rows, X.n_cols);
+
+  diagview<eT>::extract(*this, X);
+  }
+
+
+
+template<typename eT>
+inline
+const Mat<eT>&
+Mat<eT>::operator=(const diagview<eT>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  const bool alias = (this == &(X.m));
+
+  if (alias == false)
+    {
+    init(X.n_rows, X.n_cols);
+    diagview<eT>::extract(*this, X);
+    }
+  else
+    {
+    Mat<eT> tmp(X);
+    steal_mem(tmp);
+    }
+
+  return *this;
+  }
+
+
+
+template<typename eT>
+inline
+const Mat<eT>&
+Mat<eT>::operator+=(const diagview<eT>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  // Extract the diagview, and then add.
+  Mat<eT> diag(X);
+  return operator+=(diag);
+  }
+
+
+
+template<typename eT>
+inline
+const Mat<eT>&
+Mat<eT>::operator-=(const diagview<eT>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  // Extract the diagview, and then subtract.
+  Mat<eT> diag(X);
+  return operator-=(diag);
+  }
+
+
+
+template<typename eT>
+inline
+const Mat<eT>&
+Mat<eT>::operator*=(const diagview<eT>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  // Extract the diagview, and then multiply.
+  Mat<eT> diag(X);
+  return operator*=(diag);
+  }
+
+
+
+template<typename eT>
+inline
+const Mat<eT>&
+Mat<eT>::operator%=(const diagview<eT>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  // Extract the diagview, and then multiply.
+  Mat<eT> diag(X);
+  return operator%=(diag);
+  }
+
+
+
+template<typename eT>
+inline
+const Mat<eT>&
+Mat<eT>::operator/=(const diagview<eT>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  // Extract the diagview, and then divide.
+  Mat<eT> diag(X);
+  return operator/=(diag);
   }
 
 
@@ -1247,6 +1360,52 @@ Mat<eT>::operator/=(const Glue<T1, T2, glue_type>& X)
   const Mat<eT> m(X);
 
   return (*this).operator/=(m);
+  }
+
+
+
+template<typename eT>
+coot_inline
+diagview<eT>
+Mat<eT>::diag(const sword in_id)
+  {
+  coot_extra_debug_sigprint();
+
+  const uword row_offset = (in_id < 0) ? uword(-in_id) : 0;
+  const uword col_offset = (in_id > 0) ? uword( in_id) : 0;
+
+  coot_debug_check_bounds
+      (
+      ((row_offset > 0) && (row_offset >= n_rows)) || ((col_offset > 0) && (col_offset >= n_cols)),
+      "Mat::diag(): requested diagonal out of bounds"
+      );
+
+  const uword len = (std::min)(n_rows - row_offset, n_cols - col_offset);
+
+  return diagview<eT>(*this, row_offset, col_offset, len);
+  }
+
+
+
+template<typename eT>
+coot_inline
+const diagview<eT>
+Mat<eT>::diag(const sword in_id) const
+  {
+  coot_extra_debug_sigprint();
+
+  const uword row_offset = (in_id < 0) ? uword(-in_id) : 0;
+  const uword col_offset = (in_id > 0) ? uword( in_id) : 0;
+
+  coot_debug_check_bounds
+      (
+      ((row_offset > 0) && (row_offset >= n_rows)) || ((col_offset > 0) && (col_offset >= n_cols)),
+      "Mat::diag(): requested diagonal out of bounds"
+      );
+
+  const uword len = (std::min)(n_rows - row_offset, n_cols - col_offset);
+
+  return diagview<eT>(*this, row_offset, col_offset, len);
   }
 
 
