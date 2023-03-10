@@ -494,3 +494,95 @@ glue_times::compute_n_cols(const Glue<T1, T2, glue_times>& glue, const uword A_n
   coot_ignore(B_n_rows);
   return B_n_cols;
   }
+
+
+
+// glue_times_diag
+
+template<typename out_eT, typename T1, typename T2>
+inline
+void
+glue_times_diag::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_times_diag>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  strip_diagmat<T1> s1(X.A);
+  strip_diagmat<T2> s2(X.B);
+
+  // partially unwrap arguments for matrix multiplication
+  typedef typename strip_diagmat<T1>::stored_type ST1;
+  typedef typename strip_diagmat<T2>::stored_type ST2;
+  partial_unwrap<ST1> p1(s1.M);
+  partial_unwrap<ST2> p2(s2.M);
+
+  constexpr bool A_diag = s1.do_diagmat;
+  constexpr bool B_diag = s2.do_diagmat;
+  constexpr bool A_trans = p1.do_trans;
+  constexpr bool B_trans = p2.do_trans;
+  const uword A_n_elem = p1.M.n_elem;
+  const uword A_n_rows = (A_diag) ? A_n_elem : p1.M.n_rows;
+  const uword A_n_cols = (A_diag) ? A_n_elem : p1.M.n_cols;
+  const uword B_n_elem = p2.M.n_elem;
+  const uword B_n_rows = (B_diag) ? B_n_elem : p2.M.n_rows;
+  const uword B_n_cols = (B_diag) ? B_n_elem : p2.M.n_cols;
+  const uword C_n_rows = (A_trans) ? A_n_cols : A_n_rows;
+  const uword C_n_cols = (B_trans) ? B_n_rows : B_n_cols;
+
+  coot_debug_assert_trans_mul_size<A_trans, B_trans>(A_n_rows, A_n_cols, B_n_rows, B_n_cols, "matrix multiplication");
+
+  const out_eT alpha = (p1.get_val() == out_eT(1) && p2.get_val() == out_eT(1)) ? out_eT(1) : p1.get_val() * p2.get_val();
+
+  out.zeros(C_n_rows, C_n_cols);
+
+  if (A_diag && B_diag)
+    {
+    // diagmat(A) * diagmat(B)
+
+    // In this case, we can do an elementwise multiplication of the diagonal
+    // vectors, and create a new diagonal matrix.
+    Col<out_eT> tmp(A_n_elem);
+    coot_rt_t::array_op(tmp.get_dev_mem(false), A_n_elem, p1.M.get_dev_mem(false), p2.M.get_dev_mem(false), threeway_kernel_id::equ_array_mul_array);
+    if (alpha != out_eT(1))
+      {
+      coot_rt_t::inplace_op_scalar(tmp.get_dev_mem(false), alpha, A_n_elem, oneway_kernel_id::inplace_mul_scalar);
+      }
+
+    coot_rt_t::set_diag(out.get_dev_mem(false), tmp.get_dev_mem(false), 0, A_n_rows, A_n_elem);
+    }
+  else if (!A_diag && !B_diag)
+    {
+    coot_stop_runtime_error("glue_times_diag::apply(): neither matrix to be multiplied is a diagonal matrix");
+    }
+  else
+    {
+    coot_rt_t::mul_diag(out.get_dev_mem(false), C_n_rows, C_n_cols, alpha, p1.M.get_dev_mem(false), A_diag, A_trans, p2.M.get_dev_mem(false), B_diag, B_trans);
+    }
+  }
+
+
+
+template<typename T1, typename T2>
+inline
+uword
+glue_times_diag::compute_n_rows(const Glue<T1, T2, glue_times_diag>& glue, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols)
+  {
+  coot_ignore(glue);
+  coot_ignore(A_n_cols);
+  coot_ignore(B_n_rows);
+  coot_ignore(B_n_cols);
+  return A_n_rows;
+  }
+
+
+
+template<typename T1, typename T2>
+inline
+uword
+glue_times_diag::compute_n_cols(const Glue<T1, T2, glue_times_diag>& glue, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols)
+  {
+  coot_ignore(glue);
+  coot_ignore(A_n_rows);
+  coot_ignore(A_n_cols);
+  coot_ignore(B_n_rows);
+  return B_n_cols;
+  }
