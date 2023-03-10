@@ -69,6 +69,8 @@ mtop_conv_to::apply(Mat<out_eT>& out, const mtOp<out_eT, eOp<T1, eop_type>, mtop
   {
   coot_extra_debug_sigprint();
 
+  out.set_size(X.q.m.get_n_rows(), X.q.m.get_n_cols());
+
   // Apply the operation specifically into the different output type.
   eop_type::apply(out, X.q);
   }
@@ -81,6 +83,8 @@ void
 mtop_conv_to::apply(Mat<out_eT>& out, const mtOp<out_eT, eGlue<T1, T2, eglue_type>, mtop_conv_to>& X)
   {
   coot_extra_debug_sigprint();
+
+  out.set_size(X.q.get_n_rows(), X.q.get_n_cols());
 
   // Apply the operation specifically into the different output type.
   eglue_type::apply(out, X.q);
