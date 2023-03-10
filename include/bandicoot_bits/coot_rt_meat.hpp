@@ -1004,6 +1004,37 @@ coot_rt_t::all_vec(const dev_mem_t<eT1> mem, const uword n_elem, const eT2 val, 
 
 
 
+template<typename eT1, typename eT2>
+inline
+void
+coot_rt_t::all(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> in_mem, const uword n_rows, const uword n_cols, const eT2 val, const twoway_kernel_id::enum_id num, const bool colwise)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::all(out_mem, in_mem, n_rows, n_cols, val, num, colwise);
+    #else
+    coot_stop_runtime_error("coot_rt::all(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::all(out_mem, in_mem, n_rows, n_cols, val, num, colwise);
+    #else
+    coot_stop_runtime_error("coot_rt::all(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::all(): CUDA backend not enabled");
+    }
+  }
+
+
+
 template<typename eT>
 inline
 bool

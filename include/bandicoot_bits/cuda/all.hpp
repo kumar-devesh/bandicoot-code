@@ -41,3 +41,36 @@ all_vec(const dev_mem_t<eT1> mem, const uword n_elem, const eT2 val, const twowa
                                         std::make_tuple(/* no extra args for second pass */));
   return (result == 0) ? false : true;
   }
+
+
+
+template<typename eT1, typename eT2>
+inline
+void
+all(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> in_mem, const uword n_rows, const uword n_cols, const eT2 val, const twoway_kernel_id::enum_id num, const bool colwise)
+  {
+  coot_extra_debug_sigprint();
+
+  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "coot::cuda::all(): CUDA runtime not valid" );
+
+  CUfunction k = get_rt().cuda_rt.get_kernel<eT1, eT2>(num);
+
+  const void* args[] = {
+      &(out_mem.cuda_mem_ptr),
+      &(in_mem.cuda_mem_ptr),
+      (eT2*) &val,
+      (uword*) &n_rows,
+      (uword*) &n_cols };
+
+  const kernel_dims dims = one_dimensional_grid_dims(colwise ? n_cols : n_rows);
+
+  CUresult result = cuLaunchKernel(
+      k,
+      dims.d[0], dims.d[1], dims.d[2],
+      dims.d[3], dims.d[4], dims.d[5],
+      0, NULL,
+      (void**) args,
+      0);
+
+  coot_check_cuda_error(result, "coot::cuda::all(): cuLaunchKernel() failed");
+  }
