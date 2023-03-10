@@ -24,6 +24,8 @@ mtop_conv_to::apply(Mat<out_eT>& out, const mtOp<out_eT, T1, mtop_conv_to>& X)
   // Unwrap the inner operation fully.
   const unwrap<T1> U(X.q);
 
+  out.set_size(U.M.n_rows, U.M.n_cols);
+
   arrayops::copy(out.get_dev_mem(false), U.M.get_dev_mem(false), U.M.n_elem);
   }
 
@@ -37,6 +39,8 @@ mtop_conv_to::apply(Mat<out_eT>& out, const mtOp<out_eT, subview<in_eT>, mtop_co
   coot_extra_debug_sigprint();
 
   const subview<in_eT>& U(X.q);
+
+  out.set_size(U.n_rows, U.n_cols);
 
   arrayops::copy_subview(out.get_dev_mem(false), U.m.get_dev_mem(false), U.aux_row1, U.aux_col1, U.m.n_rows, U.m.n_cols, U.n_rows, U.n_cols);
   }
