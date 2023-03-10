@@ -21,7 +21,8 @@ arrayops::copy(dev_mem_t<out_eT> dest, dev_mem_t<in_eT> src, const uword n_elem)
   {
   coot_extra_debug_sigprint();
 
-  coot_rt_t::copy_array(dest, src, n_elem);
+  if (n_elem > 0)
+    coot_rt_t::copy_array(dest, src, n_elem);
   }
 
 
@@ -33,7 +34,8 @@ arrayops::copy_subview(dev_mem_t<out_eT> dest, dev_mem_t<in_eT> src, const uword
   {
   coot_extra_debug_sigprint();
 
-  coot_rt_t::copy_subview(dest, src, aux_row1, aux_col1, M_n_rows, M_n_cols, n_rows, n_cols);
+  if (n_rows != 0 && n_cols != 0)
+    coot_rt_t::copy_subview(dest, src, aux_row1, aux_col1, M_n_rows, M_n_cols, n_rows, n_cols);
   }
 
 
@@ -63,7 +65,6 @@ arrayops::inplace_plus_scalar(dev_mem_t<eT> dest, const eT val, const uword n_el
 
 
 template<typename eT>
-
 inline
 void
 arrayops::inplace_minus_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem)
@@ -76,7 +77,6 @@ arrayops::inplace_minus_scalar(dev_mem_t<eT> dest, const eT val, const uword n_e
 
 
 template<typename eT>
-
 inline
 void
 arrayops::inplace_mul_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem)
@@ -89,7 +89,6 @@ arrayops::inplace_mul_scalar(dev_mem_t<eT> dest, const eT val, const uword n_ele
 
 
 template<typename eT>
-
 inline
 void
 arrayops::inplace_div_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem)

@@ -38,7 +38,7 @@ COOT_FN(PREFIX,vec_norm_min)(const eT1* in_mem,
     }
   if (i + blockDim.x < n_elem)
     {
-    aux_mem[tid] = min(aux_mem[tid], abs(in_mem[i]));
+    aux_mem[tid] = min(aux_mem[tid], abs(in_mem[i + blockDim.x]));
     }
   i += grid_size;
 

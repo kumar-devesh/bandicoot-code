@@ -123,6 +123,43 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_row1, const
 
 
 /**
+ * Run a CUDA kernel that performs an in-place scalar operation on a diagonal of
+ * a matrix.
+ */
+template<typename eT>
+inline
+void
+inplace_op_diag(dev_mem_t<eT> dest, const uword mem_offset, const eT val, const uword n_rows, const uword len, oneway_kernel_id::enum_id num)
+  {
+  coot_extra_debug_sigprint();
+
+  if (len == 0) { return; }
+
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(num);
+
+  eT* start_mem = dest.cuda_mem_ptr + mem_offset;
+  const void* args[] = {
+      &start_mem,
+      &val,
+      (uword*) &n_rows,
+      (uword*) &len };
+
+  const kernel_dims dims = one_dimensional_grid_dims(len);
+
+  CUresult result = cuLaunchKernel(
+      kernel,
+      dims.d[0], dims.d[1], dims.d[2],
+      dims.d[3], dims.d[4], dims.d[5],
+      0, NULL,
+      (void**) args,
+      0);
+
+  coot_check_cuda_error( result, "coot::cuda::inplace_op_diag(): cuLaunchKernel() failed");
+  }
+
+
+
+/**
  * Run a CUDA kernel on a subview where the operation involves another matrix.
  */
 template<typename eT1, typename eT2>
