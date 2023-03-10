@@ -199,9 +199,6 @@ TEST_CASE("all_alias", "[all]")
   arma::Mat<uword> x_cpu(x);
   arma::Mat<uword> x2_cpu(x2);
 
-  x_cpu.print("x_cpu");
-  x_cpu.print("x2_cpu");
-
   for (size_t i = 0; i < 50; ++i)
     {
     if (i == 0 || i == 11 || i == 42)
