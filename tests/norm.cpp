@@ -176,3 +176,173 @@ TEMPLATE_TEST_CASE("large_norm", "[norm]", double, float)
   REQUIRE( norm(x, "inf") == Approx(norm(x_cpu, "inf")).epsilon(0.01) );
   REQUIRE( norm(x, "fro") == Approx(norm(x_cpu, "fro")).epsilon(0.01) );
   }
+
+
+
+// Compute matrix norms of small random matrix.
+TEMPLATE_TEST_CASE("small_matrix_norm", "[norm]", double, float)
+  {
+  Mat<TestType> x = randu<Mat<TestType>>(10, 10);
+  arma::Mat<TestType> x_cpu(x);
+
+  REQUIRE( norm(x, 1) == Approx(norm(x_cpu, 1)).epsilon(0.01) );
+  REQUIRE( norm(x, 2) == Approx(norm(x_cpu, 2)).epsilon(0.01) );
+  REQUIRE( norm(x, "inf") == Approx(norm(x_cpu, "inf")).epsilon(0.01) );
+  REQUIRE( norm(x, "fro") == Approx(norm(x_cpu, "fro")).epsilon(0.01) );
+  }
+
+
+
+// Compute matrix norms of large random matrix.
+TEMPLATE_TEST_CASE("large_matrix_norm", "[norm]", double, float)
+  {
+  Mat<TestType> x = randu<Mat<TestType>>(1000, 1000);
+  arma::Mat<TestType> x_cpu(x);
+
+  REQUIRE( norm(x, 1) == Approx(norm(x_cpu, 1)).epsilon(0.01) );
+  REQUIRE( norm(x, 2) == Approx(norm(x_cpu, 2)).epsilon(0.01) );
+  REQUIRE( norm(x, "inf") == Approx(norm(x_cpu, "inf")).epsilon(0.01) );
+  REQUIRE( norm(x, "fro") == Approx(norm(x_cpu, "fro")).epsilon(0.01) );
+  }
+
+
+
+// Compute matrix norms of tall, skinny matrix.
+TEMPLATE_TEST_CASE("tall_matrix_norm", "[norm]", double, float)
+  {
+  Mat<TestType> x = randn<Mat<TestType>>(1000, 10);
+  arma::Mat<TestType> x_cpu(x);
+
+  REQUIRE( norm(x, 1) == Approx(norm(x_cpu, 1)).epsilon(0.01) );
+  REQUIRE( norm(x, 2) == Approx(norm(x_cpu, 2)).epsilon(0.01) );
+  REQUIRE( norm(x, "inf") == Approx(norm(x_cpu, "inf")).epsilon(0.01) );
+  REQUIRE( norm(x, "fro") == Approx(norm(x_cpu, "fro")).epsilon(0.01) );
+  }
+
+
+
+// Compute matrix norms of short, wide matrix.
+TEMPLATE_TEST_CASE("wide_matrix_norm", "[norm]", double, float)
+  {
+  Mat<TestType> x = randn<Mat<TestType>>(10, 1000);
+  arma::Mat<TestType> x_cpu(x);
+
+  REQUIRE( norm(x, 1) == Approx(norm(x_cpu, 1)).epsilon(0.01) );
+  REQUIRE( norm(x, 2) == Approx(norm(x_cpu, 2)).epsilon(0.01) );
+  REQUIRE( norm(x, "inf") == Approx(norm(x_cpu, "inf")).epsilon(0.01) );
+  REQUIRE( norm(x, "fro") == Approx(norm(x_cpu, "fro")).epsilon(0.01) );
+  }
+
+
+
+// Compute matrix norms of empty matrix.
+TEMPLATE_TEST_CASE("empty_matrix_norm", "[norm]", double, float)
+  {
+  Mat<TestType> x;
+
+  REQUIRE( norm(x, 1) == Approx(TestType(0)).margin(1e-6) );
+  REQUIRE( norm(x, 2) == Approx(TestType(0)).margin(1e-6) );
+  REQUIRE( norm(x, "inf") == Approx(TestType(0)).margin(1e-6) );
+  REQUIRE( norm(x, "fro") == Approx(TestType(0)).margin(1e-6) );
+  }
+
+
+
+// Ensure invalid norm type throws an exception.
+TEMPLATE_TEST_CASE("invalid_matrix_norm", "[norm]", double, float)
+  {
+  Mat<TestType> x = randu<Mat<TestType>>(10, 10);
+
+  REQUIRE_THROWS( norm(x, "-inf") );
+  }
+
+
+
+// Test subview norms over a single column.
+TEMPLATE_TEST_CASE("subview_col_norm", "[norm]", double, float)
+  {
+  Mat<TestType> x = randu<Mat<TestType>>(250, 250);
+  arma::Mat<TestType> x_cpu(x);
+
+  REQUIRE( norm(x.submat(10, 10, 10, 150), 1)      == Approx(norm(x_cpu.submat(10, 10, 10, 150), 1))      );
+  REQUIRE( norm(x.submat(10, 10, 10, 150), 2)      == Approx(norm(x_cpu.submat(10, 10, 10, 150), 2))      );
+  REQUIRE( norm(x.submat(10, 10, 10, 150), 3)      == Approx(norm(x_cpu.submat(10, 10, 10, 150), 3))      );
+  REQUIRE( norm(x.submat(10, 10, 10, 150), 5)      == Approx(norm(x_cpu.submat(10, 10, 10, 150), 5))      );
+  REQUIRE( norm(x.submat(10, 10, 10, 150), 10)     == Approx(norm(x_cpu.submat(10, 10, 10, 150), 10))     );
+  REQUIRE( norm(x.submat(10, 10, 10, 150), "inf")  == Approx(norm(x_cpu.submat(10, 10, 10, 150), "inf"))  );
+  REQUIRE( norm(x.submat(10, 10, 10, 150), "-inf") == Approx(norm(x_cpu.submat(10, 10, 10, 150), "-inf")) );
+  REQUIRE( norm(x.submat(10, 10, 10, 150), "fro")  == Approx(norm(x_cpu.submat(10, 10, 10, 150), "fro"))  );
+  }
+
+
+
+// Test subview norms over a single row.
+TEMPLATE_TEST_CASE("subview_row_norm", "[norm]", double, float)
+  {
+  Mat<TestType> x = randu<Mat<TestType>>(250, 250);
+  arma::Mat<TestType> x_cpu(x);
+
+  REQUIRE( norm(x.submat(10, 10, 150, 10), 1)      == Approx(norm(x_cpu.submat(10, 10, 150, 10), 1))      );
+  REQUIRE( norm(x.submat(10, 10, 150, 10), 2)      == Approx(norm(x_cpu.submat(10, 10, 150, 10), 2))      );
+  REQUIRE( norm(x.submat(10, 10, 150, 10), 3)      == Approx(norm(x_cpu.submat(10, 10, 150, 10), 3))      );
+  REQUIRE( norm(x.submat(10, 10, 150, 10), 5)      == Approx(norm(x_cpu.submat(10, 10, 150, 10), 5))      );
+  REQUIRE( norm(x.submat(10, 10, 150, 10), 10)     == Approx(norm(x_cpu.submat(10, 10, 150, 10), 10))     );
+  REQUIRE( norm(x.submat(10, 10, 150, 10), "inf")  == Approx(norm(x_cpu.submat(10, 10, 150, 10), "inf"))  );
+  REQUIRE( norm(x.submat(10, 10, 150, 10), "-inf") == Approx(norm(x_cpu.submat(10, 10, 150, 10), "-inf")) );
+  REQUIRE( norm(x.submat(10, 10, 150, 10), "fro")  == Approx(norm(x_cpu.submat(10, 10, 150, 10), "fro"))  );
+  }
+
+
+
+// Test subview norms over a vectorised subview.
+TEMPLATE_TEST_CASE("subview_vectorised_norm", "[norm]", double, float)
+  {
+  Mat<TestType> x = randu<Mat<TestType>>(250, 250);
+  arma::Mat<TestType> x_cpu(x);
+
+  REQUIRE( norm(vectorise(x.submat(10, 10, 150, 150)), 1)      == Approx(norm(vectorise(x_cpu.submat(10, 10, 150, 150)), 1))      );
+  REQUIRE( norm(vectorise(x.submat(10, 10, 150, 150)), 2)      == Approx(norm(vectorise(x_cpu.submat(10, 10, 150, 150)), 2))      );
+  REQUIRE( norm(vectorise(x.submat(10, 10, 150, 150)), 3)      == Approx(norm(vectorise(x_cpu.submat(10, 10, 150, 150)), 3))      );
+  REQUIRE( norm(vectorise(x.submat(10, 10, 150, 150)), 5)      == Approx(norm(vectorise(x_cpu.submat(10, 10, 150, 150)), 5))      );
+  REQUIRE( norm(vectorise(x.submat(10, 10, 150, 150)), 10)     == Approx(norm(vectorise(x_cpu.submat(10, 10, 150, 150)), 10))     );
+  REQUIRE( norm(vectorise(x.submat(10, 10, 150, 150)), "inf")  == Approx(norm(vectorise(x_cpu.submat(10, 10, 150, 150)), "inf"))  );
+  REQUIRE( norm(vectorise(x.submat(10, 10, 150, 150)), "-inf") == Approx(norm(vectorise(x_cpu.submat(10, 10, 150, 150)), "-inf")) );
+  REQUIRE( norm(vectorise(x.submat(10, 10, 150, 150)), "fro")  == Approx(norm(vectorise(x_cpu.submat(10, 10, 150, 150)), "fro"))  );
+  }
+
+
+
+// Test subview matrix norms.
+TEMPLATE_TEST_CASE("subview_matrix_norm", "[norm]", double, float)
+  {
+  Mat<TestType> x = randu<Mat<TestType>>(250, 250);
+  arma::Mat<TestType> x_cpu(x);
+
+  REQUIRE( norm(x.submat(10, 10, 150, 150), 1)     == Approx(norm(x_cpu.submat(10, 10, 150, 150), 1)) );
+  REQUIRE( norm(x.submat(10, 10, 150, 150), 2)     == Approx(norm(x_cpu.submat(10, 10, 150, 150), 2)) );
+  REQUIRE( norm(x.submat(10, 10, 150, 150), "inf") == Approx(norm(x_cpu.submat(10, 10, 150, 150), "inf")) );
+  REQUIRE( norm(x.submat(10, 10, 150, 150), "fro") == Approx(norm(x_cpu.submat(10, 10, 150, 150), "fro")) );
+  }
+
+
+
+// Test subview norms when the subview is the size of the full matrix.
+TEMPLATE_TEST_CASE("full_subview_matrix_norm", "[norm]", double, float)
+  {
+  Mat<TestType> x = randu<Mat<TestType>>(250, 250);
+  arma::Mat<TestType> x_cpu(x);
+
+  REQUIRE( norm(x.submat(0, 0, 249, 249), 1)     == Approx(norm(x_cpu.submat(0, 0, 249, 249), 1)) );
+  REQUIRE( norm(x.submat(0, 0, 249, 249), 2)     == Approx(norm(x_cpu.submat(0, 0, 249, 249), 2)) );
+  REQUIRE( norm(x.submat(0, 0, 249, 249), "inf") == Approx(norm(x_cpu.submat(0, 0, 249, 249), "inf")) );
+  REQUIRE( norm(x.submat(0, 0, 249, 249), "fro") == Approx(norm(x_cpu.submat(0, 0, 249, 249), "fro")) );
+  }
+
+
+
+TEST_CASE("subview_norm_1", "[norm]")
+  {
+  mat x = randu<mat>(10, 10);
+  arma::mat x_cpu(x);
+  REQUIRE( norm(x.submat(1, 1, 5, 1), "-inf") == Approx(norm(x_cpu.submat(1, 1, 5, 1), "-inf")) );
+  }

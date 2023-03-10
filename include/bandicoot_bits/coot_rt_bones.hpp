@@ -159,6 +159,30 @@ class coot_rt_t
   template<typename eT1, typename eT2>
   static inline void sum_rowwise_subview(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword A_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const bool post_conv_apply);
 
+  template<typename eT1, typename eT2>
+  static inline void min_colwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply);
+
+  template<typename eT1, typename eT2>
+  static inline void min_rowwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply);
+
+  template<typename eT1, typename eT2>
+  static inline void min_colwise_subview(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword A_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const bool post_conv_apply);
+
+  template<typename eT1, typename eT2>
+  static inline void min_rowwise_subview(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword A_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const bool post_conv_apply);
+
+  template<typename eT1, typename eT2>
+  static inline void max_colwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply);
+
+  template<typename eT1, typename eT2>
+  static inline void max_rowwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply);
+
+  template<typename eT1, typename eT2>
+  static inline void max_colwise_subview(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword A_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const bool post_conv_apply);
+
+  template<typename eT1, typename eT2>
+  static inline void max_rowwise_subview(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword A_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const bool post_conv_apply);
+
   template<typename eT>
   static inline eT trace(const dev_mem_t<eT> mem, const uword n_rows, const uword n_cols);
 

@@ -17,9 +17,10 @@
 
 using namespace coot;
 
-template<typename eT>
-void test_min_small()
+TEMPLATE_TEST_CASE("min_small", "[min]", float, double, u32, s32, u64, s64)
   {
+  typedef TestType eT;
+
   Col<eT> x(16);
   for (uword i = 0; i < 16; ++i)
     x[i] = i + 1;
@@ -31,21 +32,10 @@ void test_min_small()
 
 
 
-TEST_CASE("min_small")
+TEMPLATE_TEST_CASE("min_1", "[min]", float, double, u32, s32, u64, s64)
   {
-  test_min_small<double>();
-  test_min_small<float>();
-  test_min_small<u32>();
-  test_min_small<s32>();
-  test_min_small<u64>();
-  test_min_small<s64>();
-  }
+  typedef TestType eT;
 
-
-
-template<typename eT>
-void test_min_1()
-  {
   Col<eT> x(6400);
   for (uword i = 0; i < 6400; ++i)
     x[i] = (6400 - i);
@@ -57,21 +47,10 @@ void test_min_1()
 
 
 
-TEST_CASE("min_1")
+TEMPLATE_TEST_CASE("min_strange_size", "[min]", float, double, u32, s32, u64, s64)
   {
-  test_min_1<double>();
-  test_min_1<float>();
-  test_min_1<u32>();
-  test_min_1<s32>();
-  test_min_1<u64>();
-  test_min_1<s64>();
-  }
+  typedef TestType eT;
 
-
-
-template<typename eT>
-void test_min_strange_size()
-  {
   Col<eT> x(608);
 
   for(uword i = 0; i < 608; ++i)
@@ -84,21 +63,10 @@ void test_min_strange_size()
 
 
 
-TEST_CASE("min_strange_size")
+TEMPLATE_TEST_CASE("min_large", "[min]", float, double, u32, s32, u64, s64)
   {
-  test_min_strange_size<double>();
-  test_min_strange_size<float>();
-  test_min_strange_size<u32>();
-  test_min_strange_size<s32>();
-  test_min_strange_size<u64>();
-  test_min_strange_size<s64>();
-  }
+  typedef TestType eT;
 
-
-
-template<typename eT>
-void test_min_large()
-  {
   arma::Col<eT> cpu_x = arma::conv_to<arma::Col<eT>>::from(arma::randu<arma::Col<double>>(100000) * 10.0);
   cpu_x.randu();
   Col<eT> x(cpu_x);
@@ -111,20 +79,10 @@ void test_min_large()
 
 
 
-TEST_CASE("min_large")
+TEMPLATE_TEST_CASE("min_2", "[min]", float, double)
   {
-  test_min_large<double>();
-  test_min_large<float>();
-  test_min_large<u32>();
-  test_min_large<s32>();
-  test_min_large<u64>();
-  test_min_large<s64>();
-  }
+  typedef TestType eT;
 
-
-template<typename eT>
-void test_min_2()
-  {
   Col<eT> x(50);
   x.randu();
   x += eT(1);
@@ -137,8 +95,250 @@ void test_min_2()
 
 
 
-TEST_CASE("min_2")
+TEMPLATE_TEST_CASE("min_colwise_1", "[min]", float, double, u32, s32, u64, s64)
   {
-  test_min_2<double>();
-  test_min_2<float>();
+  typedef TestType eT;
+
+  Mat<eT> x(10, 10);
+  for (uword c = 0; c < 10; ++c)
+    {
+    for (uword r = 0; r < 10; ++r)
+      {
+      x(r, c) = c;
+      }
+    }
+
+  Mat<eT> s = min(x, 0);
+
+  REQUIRE( s.n_rows == 1  );
+  REQUIRE( s.n_cols == 10 );
+  for (uword c = 0; c < 10; ++c)
+    {
+    REQUIRE( eT(s[c]) == Approx(eT(c)) );
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("min_colwise_2", "[min]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x(10, 10);
+  for (uword c = 0; c < 10; ++c)
+    {
+    for (uword r = 0; r < 10; ++r)
+      {
+      x(r, c) = r;
+      }
+    }
+
+  Mat<eT> s = min(x, 0);
+
+  REQUIRE( s.n_rows == 1  );
+  REQUIRE( s.n_cols == 10 );
+  for (uword c = 0; c < 10; ++c)
+    {
+    REQUIRE( eT(s[c]) == Approx(eT(0)) );
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("min_rowwise_1", "[min]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x(10, 10);
+  for (uword c = 0; c < 10; ++c)
+    {
+    for (uword r = 0; r < 10; ++r)
+      {
+      x(r, c) = c;
+      }
+    }
+
+  Mat<eT> s = min(x, 1);
+
+  REQUIRE( s.n_rows == 10 );
+  REQUIRE( s.n_cols == 1  );
+  for (uword r = 0; r < 10; ++r)
+    {
+    REQUIRE( eT(s[r]) == Approx(eT(0)) );
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("min_rowwise_2", "[min]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x(10, 10);
+  for (uword c = 0; c < 10; ++c)
+    {
+    for (uword r = 0; r < 10; ++r)
+      {
+      x(r, c) = r;
+      }
+    }
+
+  Mat<eT> s = min(x, 1);
+
+  REQUIRE( s.n_rows == 10 );
+  REQUIRE( s.n_cols == 1  );
+  for (uword r = 0; r < 10; ++r)
+    {
+    REQUIRE( eT(s[r]) == Approx(eT(r)) );
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("subview_min_colwise_1", "[min]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x(10, 10);
+  for (uword c = 0; c < 10; ++c)
+    {
+    for (uword r = 0; r < 10; ++r)
+      {
+      x(r, c) = c;
+      }
+    }
+
+  Mat<eT> s = min(x.submat(1, 1, 8, 8), 0);
+
+  REQUIRE( s.n_rows == 1 );
+  REQUIRE( s.n_cols == 8 );
+  for (uword c = 0; c < 8; ++c)
+    {
+    REQUIRE( eT(s[c]) == Approx(eT(c + 1)) );
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("subview_min_colwise_2", "[min]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x(10, 10);
+  for (uword c = 0; c < 10; ++c)
+    {
+    for (uword r = 0; r < 10; ++r)
+      {
+      x(r, c) = r;
+      }
+    }
+
+  Mat<eT> s = min(x.submat(1, 1, 8, 8), 0);
+
+  REQUIRE( s.n_rows == 1 );
+  REQUIRE( s.n_cols == 8 );
+  for (uword c = 0; c < 8; ++c)
+    {
+    REQUIRE( eT(s[c]) == Approx(eT(1)) );
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("subview_min_colwise_full", "[min]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x(10, 10);
+  for (uword c = 0; c < 10; ++c)
+    {
+    for (uword r = 0; r < 10; ++r)
+      {
+      x(r, c) = c;
+      }
+    }
+
+  Mat<eT> s = min(x.submat(0, 0, 9, 9), 0);
+
+  REQUIRE( s.n_rows == 1  );
+  REQUIRE( s.n_cols == 10 );
+  for (uword c = 0; c < 10; ++c)
+    {
+    REQUIRE( eT(s[c]) == Approx(eT(c)) );
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("subview_min_rowwise_1", "[min]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x(10, 10);
+  for (uword c = 0; c < 10; ++c)
+    {
+    for (uword r = 0; r < 10; ++r)
+      {
+      x(r, c) = c;
+      }
+    }
+
+  Mat<eT> s = min(x.submat(1, 1, 8, 8), 1);
+
+  REQUIRE( s.n_rows == 8 );
+  REQUIRE( s.n_cols == 1 );
+  for (uword r = 0; r < 8; ++r)
+    {
+    REQUIRE( eT(s[r]) == Approx(eT(1)) );
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("subview_min_rowwise_2", "[min]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x(10, 10);
+  for (uword c = 0; c < 10; ++c)
+    {
+    for (uword r = 0; r < 10; ++r)
+      {
+      x(r, c) = r;
+      }
+    }
+
+  Mat<eT> s = min(x.submat(1, 1, 8, 8), 1);
+
+  REQUIRE( s.n_rows == 8 );
+  REQUIRE( s.n_cols == 1 );
+  for (uword r = 0; r < 8; ++r)
+    {
+    REQUIRE( eT(s[r]) == Approx(eT(r + 1)) );
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("subview_min_rowwise_full", "[min]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x(10, 10);
+  for (uword c = 0; c < 10; ++c)
+    {
+    for (uword r = 0; r < 10; ++r)
+      {
+      x(r, c) = r;
+      }
+    }
+
+  Mat<eT> s = min(x.submat(0, 0, 9, 9), 1);
+
+  REQUIRE( s.n_rows == 10 );
+  REQUIRE( s.n_cols == 1  );
+  for (uword r = 0; r < 10; ++r)
+    {
+    REQUIRE( eT(s[r]) == Approx(eT(r)) );
+    }
   }

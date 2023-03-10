@@ -50,6 +50,16 @@ kernel_src::get_src_preamble()
   snprintf(u32_max, 32, "%llu", (unsigned long long) std::numeric_limits<u32>::max());
   snprintf(u64_max, 32, "%llu", (unsigned long long) std::numeric_limits<u64>::max());
 
+  char s32_min[32];
+  char s64_min[32];
+  snprintf(s32_min, 32, "%llu", (unsigned long long) std::numeric_limits<s32>::min());
+  snprintf(s64_min, 32, "%llu", (unsigned long long) std::numeric_limits<s64>::min());
+
+  char s32_max[32];
+  char s64_max[32];
+  snprintf(s32_max, 32, "%llu", (unsigned long long) std::numeric_limits<s32>::max());
+  snprintf(s64_max, 32, "%llu", (unsigned long long) std::numeric_limits<s64>::max());
+
   static const std::string source = \
 
   "#ifdef cl_khr_pragma_unroll \n"
@@ -72,8 +82,15 @@ kernel_src::get_src_preamble()
   "#define COOT_FN_3(ARG1,ARG2,ARG3) COOT_FN_3_2(ARG1,ARG2,ARG3) \n"
   "\n"
   // Utility functions to return the correct min/max value for a given type.
+  "inline uint coot_type_min_uint() { return 0; } \n"
+  "inline ulong coot_type_min_ulong() { return 0; } \n"
   "inline uint coot_type_max_uint() { return " + std::string(u32_max) + "; } \n"
   "inline ulong coot_type_max_ulong() { return " + std::string(u64_max) + "; } \n"
+  "\n"
+  "inline int coot_type_min_int() { return " + std::string(s32_min) + "; } \n"
+  "inline long coot_type_min_long() { return " + std::string(s64_min) + "; } \n"
+  "inline int coot_type_max_int() { return " + std::string(s32_max) + "; } \n"
+  "inline long coot_type_max_long() { return " + std::string(s64_max) + "; } \n"
   "\n"
   "inline float coot_type_min_float() { return FLT_MIN; } \n"
   "inline double coot_type_min_double() { return DBL_MIN; } \n"

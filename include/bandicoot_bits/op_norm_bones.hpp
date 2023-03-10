@@ -44,8 +44,12 @@ class op_norm
   template<typename eT> inline static eT vec_norm_max(const Mat<eT>& X);
   template<typename eT> inline static eT vec_norm_max(const subview<eT>& X);
 
-  /* template<typename eT> inline static typename get_pod_type<eT>::result mat_norm_1(const Mat<eT>& X); */
-  /* template<typename eT> inline static typename get_pod_type<eT>::result mat_norm_2(const Mat<eT>& X); */
+  template<typename eT> inline static eT mat_norm_1(const Mat<eT>& X);
+  template<typename eT> inline static eT mat_norm_1(const subview<eT>& X);
 
-  /* template<typename eT> inline static typename get_pod_type<eT>::result mat_norm_inf(const Mat<eT>& X); */
+  template<typename eT> inline static eT mat_norm_2(const Mat<eT>& X);
+  template<typename eT> inline static eT mat_norm_2(const subview<eT>& X);
+
+  template<typename eT> inline static eT mat_norm_inf(const Mat<eT>& X);
+  template<typename eT> inline static eT mat_norm_inf(const subview<eT>& X);
   };

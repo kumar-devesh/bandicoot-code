@@ -14,25 +14,195 @@
 
 
 
-template<typename T1>
+template<typename eT2, typename T1>
 inline
-typename T1::elem_type
-op_max::apply(const Op<T1, op_max>& in)
+void
+op_max::apply(Mat<eT2>& out, const Op<T1, op_max>& in)
   {
   coot_extra_debug_sigprint();
 
-  if (resolves_to_vector<T1>::value)
-    {
-    const unwrap<T1> U(in.m);
-    const Mat<typename T1::elem_type>& A = U.M;
+  const uword dim = in.aux_uword_a;
 
-    return coot_rt_t::max(A.get_dev_mem(false), A.n_elem);
+  coot_debug_check( (dim > 1), "max(): parameter 'dim' must be 0 or 1" );
+
+  // We have to consider type conversion carefully here.  If eT2 != T1::elem_type, then
+  // the original operation was mtOp<eT2, Op<T1, op_max>, mtop_conv_to>, and so we want to
+  // perform the conversion *after* computing the max.
+  //
+  // On the other hand, T1 may be a conversion, giving the operation
+  // Op<mtOp<T1::elem_type, T1, mtop_conv_to>, op_max>.  In this situation, we want to perform
+  // the conversion *before* computing the max.  We can detect this condition if no_conv_unwrap
+  // holds a different type than eT2.
+
+  // We can't perform two conversions though, so we'll greedily select the 'post' conversion if
+  // it is happening.
+
+  if (is_same_type<eT2, typename T1::elem_type>::no)
+    {
+    // This is a post-max conversion, so unwrap fully.
+    const unwrap<T1> U(in.m);
+
+    op_max::apply_noalias(out, U.M, dim, true);
     }
   else
     {
-    // TODO: implement kernels that do row-wise or column-wise max...
-    throw std::invalid_argument("max(): not yet implemented for anything other than vectors... sorry!");
+    // This is a pre-max conversion (or no conversion at all), so use a no-conv unwrap, which will
+    // avoid performing a type conversion.
+    const no_conv_unwrap<T1> U(in.m);
+
+    // However, since there may be no conversion, we now have to consider aliases too.
+    if (U.is_alias(out) == false)
+      {
+      op_max::apply_noalias(out, U.M, dim, false);
+      }
+    else
+      {
+      Mat<eT2> tmp;
+
+      op_max::apply_noalias(tmp, U.M, dim, false);
+
+      out.steal_mem(tmp);
+      }
     }
+  }
+
+
+
+template<typename eT>
+inline
+void
+op_max::apply(Mat<eT>& out, const Op<subview<eT>, op_max>& in)
+  {
+  coot_extra_debug_sigprint();
+
+  const uword dim = in.aux_uword_a;
+
+  coot_debug_check( (dim > 1), "max(): parameter 'dim' must be 0 or 1" );
+
+  if(&out != &(in.m.m))
+    {
+    // There are no type conversions here, so set post_conv_apply to false.
+    op_max::apply_noalias(out, in.m, dim, false);
+    }
+  else
+    {
+    Mat<eT> tmp;
+
+    op_max::apply_noalias(tmp, in.m, dim, false);
+
+    out.steal_mem(tmp);
+    }
+  }
+
+
+
+template<typename out_eT, typename in_eT>
+inline
+void
+op_max::apply_noalias(Mat<out_eT>& out, const Mat<in_eT>& A, const uword dim, const bool post_conv_apply)
+  {
+  coot_extra_debug_sigprint();
+
+  if(dim == 0)
+    {
+    out.set_size(1, A.n_cols);
+    }
+  else
+  if(dim == 1)
+    {
+    out.set_size(A.n_rows, 1);
+    }
+
+  if(A.n_elem == 0)
+    {
+    out.zeros();
+    return;
+    }
+
+
+  if(dim == 0)
+    {
+    coot_rt_t::max_colwise(out.get_dev_mem(false), A.get_dev_mem(false), A.n_rows, A.n_cols, post_conv_apply);
+    }
+  else
+  if(dim == 1)
+    {
+    coot_rt_t::max_rowwise(out.get_dev_mem(false), A.get_dev_mem(false), A.n_rows, A.n_cols, post_conv_apply);
+    }
+  }
+
+
+
+template<typename out_eT, typename in_eT>
+inline
+void
+op_max::apply_noalias(Mat<out_eT>& out, const subview<in_eT>& sv, const uword dim, const bool post_conv_apply)
+  {
+  coot_extra_debug_sigprint();
+
+  if(dim == 0)
+    {
+    out.set_size(1, sv.n_cols);
+    }
+  else
+  if(dim == 1)
+    {
+    out.set_size(sv.n_rows, 1);
+    }
+
+  if(sv.n_elem == 0)
+    {
+    out.zeros();
+    return;
+    }
+
+
+  if(dim == 0)
+    {
+    coot_rt_t::max_colwise_subview(out.get_dev_mem(false), sv.m.get_dev_mem(false), sv.m.n_rows, sv.aux_row1, sv.aux_col1, sv.n_rows, sv.n_cols, post_conv_apply);
+    }
+  else
+  if(dim == 1)
+    {
+    coot_rt_t::max_rowwise_subview(out.get_dev_mem(false), sv.m.get_dev_mem(false), sv.m.n_rows, sv.aux_row1, sv.aux_col1, sv.n_rows, sv.n_cols, post_conv_apply);
+    }
+  }
+
+
+
+template<typename T1>
+inline
+uword
+op_max::compute_n_rows(const Op<T1, op_max>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(in_n_cols);
+  return (op.aux_uword_a == 0) ? 1 : in_n_rows;
+  }
+
+
+
+template<typename T1>
+inline
+uword
+op_max::compute_n_cols(const Op<T1, op_max>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(in_n_rows);
+  return (op.aux_uword_a == 0) ? in_n_cols : 1;
+  }
+
+
+
+template<typename T1>
+inline
+typename T1::elem_type
+op_max::apply_direct(const T1& in)
+  {
+  coot_extra_debug_sigprint();
+
+  const unwrap<T1> U(in);
+  const Mat<typename T1::elem_type>& A = U.M;
+
+  return coot_rt_t::max(A.get_dev_mem(false), A.n_elem);
   }
 
 
@@ -41,20 +211,12 @@ op_max::apply(const Op<T1, op_max>& in)
 template<typename T1>
 inline
 typename T1::elem_type
-op_max::apply(const Op<eOp<T1, eop_abs>, op_max>& in)
+op_max::apply_direct(const eOp<T1, eop_abs>& in)
   {
   coot_extra_debug_sigprint();
 
-  if (resolves_to_vector<T1>::value)
-    {
-    const unwrap<T1> U(in.m.m);
-    const Mat<typename T1::elem_type>& A = U.M;
+  const unwrap<T1> U(in.m);
+  const Mat<typename T1::elem_type>& A = U.M;
 
-    return coot_rt_t::max_abs(A.get_dev_mem(false), A.n_elem);
-    }
-  else
-    {
-    // TODO: implement kernels that do row-wise or column-wise max...
-    throw std::invalid_argument("max(): not yet implemented for anything other than vectors... sorry!");
-    }
+  return coot_rt_t::max_abs(A.get_dev_mem(false), A.n_elem);
   }

@@ -18,9 +18,32 @@ class op_max
   {
   public:
 
-  template<typename T1>
-  inline static typename T1::elem_type apply(const Op<T1, op_max>& in);
+  //
+  // for use in delayed operations
+  //
+
+  template<typename eT2, typename T1>
+  inline static void apply(Mat<eT2>& out, const Op<T1, op_max>& in);
+
+  template<typename eT>
+  inline static void apply(Mat<eT>& out, const Op<subview<eT>, op_max>& in);
+
+  template<typename out_eT, typename in_eT>
+  inline static void apply_noalias(Mat<out_eT>& out, const Mat<in_eT>& A, const uword dim, const bool post_conv_apply);
+
+  template<typename out_eT, typename in_eT>
+  inline static void apply_noalias(Mat<out_eT>& out, const subview<in_eT>& sv, const uword dim, const bool post_conv_apply);
+
+  template<typename T1> inline static uword compute_n_rows(const Op<T1, op_max>& op, const uword in_n_rows, const uword in_n_cols);
+  template<typename T1> inline static uword compute_n_cols(const Op<T1, op_max>& op, const uword in_n_rows, const uword in_n_cols);
+
+  //
+  // for use in direct operations
+  //
 
   template<typename T1>
-  inline static typename T1::elem_type apply(const Op<eOp<T1, eop_abs>, op_max>& in);
+  inline static typename T1::elem_type apply_direct(const T1& in);
+
+  template<typename T1>
+  inline static typename T1::elem_type apply_direct(const eOp<T1, eop_abs>& in);
   };

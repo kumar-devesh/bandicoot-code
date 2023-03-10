@@ -35,7 +35,10 @@ eT
 op_norm::vec_norm_1(const subview<eT>& X)
   {
   coot_extra_debug_sigprint();
-  // TODO: implement
+  // TODO: a better implementation would be much more efficient and avoid this
+  // extraction.
+  Mat<eT> tmp(X);
+  return vec_norm_1(tmp);
   }
 
 
@@ -57,7 +60,10 @@ eT
 op_norm::vec_norm_2(const subview<eT>& X)
   {
   coot_extra_debug_sigprint();
-  // TODO: implement
+  // TODO: a better implementation would be much more efficient and avoid this
+  // extraction.
+  Mat<eT> tmp(X);
+  return vec_norm_2(tmp);
   }
 
 
@@ -79,7 +85,10 @@ eT
 op_norm::vec_norm_k(const subview<eT>& X, const uword k)
   {
   coot_extra_debug_sigprint();
-  // TODO: implement
+  // TODO: a better implementation would be much more efficient and avoid this
+  // extraction.
+  Mat<eT> tmp(X);
+  return vec_norm_k(tmp, k);
   }
 
 
@@ -101,7 +110,10 @@ eT
 op_norm::vec_norm_min(const subview<eT>& X)
   {
   coot_extra_debug_sigprint();
-  // TODO: implement
+  // TODO: a better implementation would be much more efficient and avoid this
+  // extraction.
+  Mat<eT> tmp(X);
+  return vec_norm_min(tmp);
   }
 
 
@@ -123,5 +135,99 @@ eT
 op_norm::vec_norm_max(const subview<eT>& X)
   {
   coot_extra_debug_sigprint();
-  // TODO: implement
+  // TODO: a better implementation would be much more efficient and avoid this
+  // extraction.
+  Mat<eT> tmp(X);
+  return vec_norm_max(tmp);
+  }
+
+
+
+template<typename eT>
+inline
+eT
+op_norm::mat_norm_1(const Mat<eT>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  // TODO: a dedicated implementation could be faster
+  Mat<eT> result = max( sum( abs(X), 0 ), 1 );
+  return eT(result[0]);
+  }
+
+
+
+template<typename eT>
+inline
+eT
+op_norm::mat_norm_1(const subview<eT>& X)
+  {
+  coot_extra_debug_sigprint();
+  // TODO: a better implementation would be much more efficient and avoid this
+  // extraction.
+  Mat<eT> tmp(X);
+  return mat_norm_1(tmp);
+  }
+
+
+
+template<typename eT>
+inline
+eT
+op_norm::mat_norm_2(const Mat<eT>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  // TODO: once is_finite() is implemented, handle this warning
+//  if (X.is_finite() == false)
+//    {
+//    coot_warn("norm(): given matrix has non-finite elements");
+//    }
+
+  Col<eT> s;
+  svd(s, X);
+
+  return (s.n_elem > 0) ? s[0] : eT(0);
+  }
+
+
+
+template<typename eT>
+inline
+eT
+op_norm::mat_norm_2(const subview<eT>& X)
+  {
+  coot_extra_debug_sigprint();
+  // TODO: a better implementation would be much more efficient and avoid this
+  // extraction.
+  Mat<eT> tmp(X);
+  return mat_norm_2(tmp);
+  }
+
+
+
+template<typename eT>
+inline
+eT
+op_norm::mat_norm_inf(const Mat<eT>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  // TODO: a dedicated implementation could be faster
+  Mat<eT> result = max( sum( abs(X), 1 ), 0 );
+  return eT(result[0]);
+  }
+
+
+
+template<typename eT>
+inline
+eT
+op_norm::mat_norm_inf(const subview<eT>& X)
+  {
+  coot_extra_debug_sigprint();
+  // TODO: a better implementation would be much more efficient and avoid this
+  // extraction.
+  Mat<eT> tmp(X);
+  return mat_norm_inf(tmp);
   }
