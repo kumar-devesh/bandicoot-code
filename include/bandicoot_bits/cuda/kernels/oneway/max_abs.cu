@@ -35,7 +35,7 @@ COOT_FN(PREFIX,max_abs)(const eT1* in_mem,
     }
   if (i + blockDim.x < n_elem)
     {
-    aux_mem[tid] = max(aux_mem[tid], ET1_ABS(in_mem[i]));
+    aux_mem[tid] = max(aux_mem[tid], ET1_ABS(in_mem[i + blockDim.x]));
     }
   i += grid_size;
 
