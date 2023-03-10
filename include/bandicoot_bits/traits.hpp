@@ -749,6 +749,38 @@ struct resolves_to_colvector_redirect<T1, true>  { typedef resolves_to_colvector
 template<typename T1>
 struct resolves_to_colvector : public resolves_to_colvector_redirect<T1, is_coot_type<T1>::value>::result {};
 
+//
+
+template<typename T1>
+struct resolves_to_diagmat
+  {
+  static constexpr bool value = false;
+  };
+
+template<typename T1>
+struct resolves_to_diagmat< Op<T1, op_diagmat> >
+  {
+  static constexpr bool value = true;
+  };
+
+template<typename T1, typename eop_type>
+struct resolves_to_diagmat< eOp<Op<T1, op_diagmat>, eop_type> >
+  {
+  static constexpr bool value = true;
+  };
+
+template<typename T1>
+struct resolves_to_diagmat< Op<Op<T1, op_diagmat>, op_htrans> >
+  {
+  static constexpr bool value = true;
+  };
+
+template<typename T1>
+struct resolves_to_diagmat< Op<Op<T1, op_diagmat>, op_htrans2> >
+  {
+  static constexpr bool value = true;
+  };
+
 
 
 template<typename T>

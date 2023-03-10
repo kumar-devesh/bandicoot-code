@@ -66,6 +66,22 @@ struct oneway_kernel_id
     submat_inplace_mul_scalar,
     submat_inplace_div_scalar,
     //
+    diag_inplace_set_scalar,
+    diag_inplace_plus_scalar,
+    diag_inplace_minus_scalar,
+    diag_inplace_mul_scalar,
+    diag_inplace_div_scalar,
+    diag_inplace_mod_scalar,
+    //
+    extract_diag,
+    set_diag,
+    copy_diag,
+    //
+    mul_colwise,
+    mul_rowwise,
+    mul_colwise_trans,
+    mul_rowwise_trans,
+    //
     inplace_set_eye,
     linspace,
     //
@@ -113,6 +129,22 @@ struct oneway_kernel_id
     names.push_back("submat_inplace_minus_scalar");
     names.push_back("submat_inplace_mul_scalar");
     names.push_back("submat_inplace_div_scalar");
+
+    names.push_back("diag_inplace_set_scalar");
+    names.push_back("diag_inplace_plus_scalar");
+    names.push_back("diag_inplace_minus_scalar");
+    names.push_back("diag_inplace_mul_scalar");
+    names.push_back("diag_inplace_div_scalar");
+    names.push_back("diag_inplace_mod_scalar");
+
+    names.push_back("extract_diag");
+    names.push_back("set_diag");
+    names.push_back("copy_diag");
+
+    names.push_back("mul_colwise");
+    names.push_back("mul_rowwise");
+    names.push_back("mul_colwise_trans");
+    names.push_back("mul_rowwise_trans");
 
     names.push_back("inplace_set_eye");
     names.push_back("linspace");

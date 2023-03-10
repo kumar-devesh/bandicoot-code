@@ -73,6 +73,7 @@ inline
 void
 generic_reduce_inner_small(const dev_mem_t<eT> mem,
                            const uword n_elem,
+                           const uword max_num_threads,
                            dev_mem_t<aux_eT> aux_mem, // must have at least one element
                            const char* kernel_name,
                            CUfunction& kernel,

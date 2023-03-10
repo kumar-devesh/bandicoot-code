@@ -65,6 +65,15 @@ class coot_rt_t
   static inline void copy_subview(dev_mem_t<out_eT> dest, dev_mem_t<in_eT> src, const uword aux_row1, const uword aux_col1, const uword M_n_rows, const uword M_n_cols, const uword n_rows, const uword n_cols);
 
   template<typename eT>
+  static inline void extract_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword in_mem_offset, const uword n_rows, const uword len);
+
+  template<typename eT>
+  static inline void set_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword in_mem_offset, const uword n_rows, const uword len);
+
+  template<typename eT>
+  static inline void copy_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword out_mem_offset, const uword in_mem_offset, const uword out_n_rows, const uword in_n_rows, const uword len);
+
+  template<typename eT>
   static inline void inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, const oneway_kernel_id::enum_id num);
 
   template<typename eT1, typename eT2>
@@ -72,6 +81,9 @@ class coot_rt_t
 
   template<typename eT>
   static inline void inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const uword M_n_rows, const oneway_kernel_id::enum_id num);
+
+  template<typename eT>
+  static inline void inplace_op_diag(dev_mem_t<eT> dest, const uword mem_offset, const eT val, const uword n_rows, const uword len, const oneway_kernel_id::enum_id num);
 
   template<typename eT1, typename eT2>
   static inline void inplace_op_subview(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword M_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const twoway_kernel_id::enum_id num, const char* identifier);
@@ -149,6 +161,9 @@ class coot_rt_t
 
   template<typename eT, const bool do_trans_A>
   static inline void gemv(dev_mem_t<eT> y_mem, const dev_mem_t<eT> A_mem, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<eT> x_mem, const eT alpha, const eT beta);
+
+  template<typename eT>
+  static inline void mul_diag(dev_mem_t<eT> C_mem, const uword C_n_rows, const uword C_n_cols, const eT alpha, const dev_mem_t<eT> A_mem, const bool A_is_diag, const bool A_trans, const dev_mem_t<eT> B_mem, const bool B_is_diag, const bool B_trans);
 
   template<typename eT1, typename eT2>
   static inline void sum_colwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply);

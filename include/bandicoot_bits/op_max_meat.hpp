@@ -215,7 +215,7 @@ op_max::apply_direct(const eOp<T1, eop_abs>& in)
   {
   coot_extra_debug_sigprint();
 
-  const unwrap<T1> U(in.m);
+  const unwrap<T1> U(in.m.Q);
   const Mat<typename T1::elem_type>& A = U.M;
 
   return coot_rt_t::max_abs(A.get_dev_mem(false), A.n_elem);

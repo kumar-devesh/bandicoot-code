@@ -31,3 +31,17 @@ trace(const Base<typename T1::elem_type, T1>& X)
 
   return coot_rt_t::trace(A.get_dev_mem(false), A.n_rows, A.n_cols);
   }
+
+
+
+// trace(diagmat): just sum the elements
+template<typename T1>
+coot_warn_unused
+inline
+typename T1::elem_type
+trace(const Op<T1, op_diagmat>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  return accu(X.m);
+  }

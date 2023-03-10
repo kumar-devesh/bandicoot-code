@@ -34,6 +34,8 @@ template<typename eT> class subview_col;
 template<typename eT> class subview_row;
 template<typename eT> class subview_cube;
 
+template<typename eT> class diagview;
+
 
 class SizeMat;
 class SizeCube;
@@ -82,6 +84,9 @@ class op_vectorise_col;
 class op_vectorise_row;
 class op_vectorise_all;
 class op_clamp;
+class op_diagmat;
+class op_diagmat2;
+class op_diagvec;
 
 class mtop_conv_to;
 class mtop_all;
@@ -99,6 +104,7 @@ class eglue_schur;
 class eglue_div;
 
 class glue_times;
+class glue_times_diag;
 
 class glue_mixed_plus;
 class glue_mixed_minus;
