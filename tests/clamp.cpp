@@ -27,8 +27,8 @@ TEMPLATE_TEST_CASE("clamp_basic", "[clamp]", double, float, u32, s32, u64, s64)
   std::cout << "enter test\n";
   Mat<TestType> x = randi<Mat<TestType>>(40, 50, distr_param(0, 50));
   std::cout << "created x\n";
-//  Mat<TestType> y = clamp(x, TestType(10), TestType(20));
-//  std::cout << "did clamp operation\n";
+  Mat<TestType> y = clamp(x, TestType(10), TestType(20));
+  std::cout << "did clamp operation\n";
 
 //  REQUIRE( y.n_rows == x.n_rows );
 //  REQUIRE( y.n_cols == x.n_cols );
