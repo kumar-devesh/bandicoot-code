@@ -57,13 +57,13 @@ op_clamp::apply_direct(Mat<eT>& out, const Mat<eT>& X, const eT min_val, const e
     {
     Mat<eT> tmp;
     tmp.set_size(X.n_rows, X.n_cols);
-    coot_rt_t::clamp(tmp.get_dev_mem(false), X.get_dev_mem(false), min_val, max_val, X.n_elem);
+//    coot_rt_t::clamp(tmp.get_dev_mem(false), X.get_dev_mem(false), min_val, max_val, X.n_elem);
     out.steal_mem(tmp);
     }
   else
     {
     out.set_size(X.n_rows, X.n_cols);
-    coot_rt_t::clamp(out.get_dev_mem(false), X.get_dev_mem(false), min_val, max_val, X.n_elem);
+//    coot_rt_t::clamp(out.get_dev_mem(false), X.get_dev_mem(false), min_val, max_val, X.n_elem);
     }
   }
 
@@ -82,7 +82,7 @@ op_clamp::apply_direct(Mat<out_eT>& out, const Mat<in_eT>& X, const in_eT min_va
     return;
     }
 
-  coot_rt_t::clamp(out.get_dev_mem(false), X.get_dev_mem(false), min_val, max_val, X.n_elem);
+//  coot_rt_t::clamp(out.get_dev_mem(false), X.get_dev_mem(false), min_val, max_val, X.n_elem);
   }
 
 
