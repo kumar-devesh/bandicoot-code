@@ -38,9 +38,11 @@ clamp(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const eT1 min_val, const eT
   status |= clSetKernelArg(kernel, 2, sizeof(eT1),       &min_val);
   status |= clSetKernelArg(kernel, 3, sizeof(eT1),       &max_val);
   status |= clSetKernelArg(kernel, 4, local_n_elem.size, local_n_elem.addr);
+  coot_check_runtime_error( (status != 0), "coot::opencl::clamp(): couldn't set input arguments");
 
   size_t global_work_size = size_t(n_elem);
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 2, NULL, &global_work_size, NULL, 0, NULL, NULL);
+  std::cout << "global_work_size is " << global_work_size << "\n";
+//  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 2, NULL, &global_work_size, NULL, 0, NULL, NULL);
 
   coot_check_runtime_error( (status != 0), "coot::opencl::clamp(): couldn't execute kernel");
   }
