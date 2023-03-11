@@ -24,8 +24,8 @@ all_vec(const dev_mem_t<eT1> mem, const uword n_elem, const eT2 val, const twowa
 
   coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "coot::cuda::all_vec(): CUDA runtime not valid" );
 
-  CUfunction k = get_rt().cuda_rt.get_kernel<eT1, eT2>(num);
-  CUfunction k_small = get_rt().cuda_rt.get_kernel<eT1, eT2>(num_small);
+  CUfunction k = get_rt().cuda_rt.get_kernel<eT2, eT1>(num);
+  CUfunction k_small = get_rt().cuda_rt.get_kernel<eT2, eT1>(num_small);
   // Second (and later) passes use the "and" reduction.
   CUfunction second_k = get_rt().cuda_rt.get_kernel<u32>(oneway_integral_kernel_id::and_reduce);
   CUfunction second_k_small = get_rt().cuda_rt.get_kernel<u32>(oneway_integral_kernel_id::and_reduce_small);
@@ -53,7 +53,7 @@ all(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> in_mem, const uword n_rows, c
 
   coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "coot::cuda::all(): CUDA runtime not valid" );
 
-  CUfunction k = get_rt().cuda_rt.get_kernel<eT1, eT2>(num);
+  CUfunction k = get_rt().cuda_rt.get_kernel<eT2, eT1>(num);
 
   const void* args[] = {
       &(out_mem.cuda_mem_ptr),
