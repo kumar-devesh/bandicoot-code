@@ -42,22 +42,59 @@ mtop_all::apply(Mat<uword>& out, const mtOp<uword, T1, mtop_all>& in)
     return;
     }
 
-  apply_direct(out, U.M, dim);
+  typedef typename T1::elem_type eT;
+  apply_direct<eT, eT>(out, U.M, dim);
   }
 
 
 
+// special handling of a conversion linked with an all()
+template<typename T1, typename eT2>
 inline
 void
-mtop_all::apply_direct(Mat<uword>& out, const Mat<uword>& in, const uword dim)
+mtop_all::apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1, mtop_conv_to>, mtop_all>& in)
   {
   coot_extra_debug_sigprint();
 
-  if (&out == &in)
+  const uword dim = in.aux_uword;
+
+  coot_debug_check( (dim > 1), "all(): parameter 'dim' must be 0 or 1" );
+
+  unwrap<T1> U(in.q.q);
+
+  // Shortcut if the input is empty.
+  if (U.M.n_elem == 0)
+    {
+    if (dim == 0)
+      {
+      out.set_size(1, 0);
+      }
+    else
+      {
+      out.set_size(0, 1);
+      }
+
+    return;
+    }
+
+  typedef typename T1::elem_type eT;
+  apply_direct<eT, eT2>(out, U.M, dim);
+  }
+
+
+
+template<typename eT, typename eT2>
+inline
+void
+mtop_all::apply_direct(Mat<uword>& out, const Mat<eT>& in, const uword dim)
+  {
+  coot_extra_debug_sigprint();
+
+  if (((void*) &out) == (void*) &in)
     {
     // For aliases, we have to output into a temporary matrix.
     Mat<uword> tmp;
-    apply_direct(tmp, in, dim);
+    apply_direct<eT, eT2>(tmp, in, dim);
     out.steal_mem(tmp);
     return;
     }
@@ -65,39 +102,18 @@ mtop_all::apply_direct(Mat<uword>& out, const Mat<uword>& in, const uword dim)
   if (dim == 0)
     {
     out.set_size(1, in.n_cols);
-    coot_rt_t::all(out.get_dev_mem(false), in.get_dev_mem(false), in.n_rows, in.n_cols, uword(0), twoway_kernel_id::rel_all_neq_colwise, true);
+    coot_rt_t::all(out.get_dev_mem(false), in.get_dev_mem(false), in.n_rows, in.n_cols, eT2(0), twoway_kernel_id::rel_all_neq_colwise, true);
     }
   else
     {
     out.set_size(in.n_rows, 1);
-    coot_rt_t::all(out.get_dev_mem(false), in.get_dev_mem(false), in.n_rows, in.n_cols, uword(0), twoway_kernel_id::rel_all_neq_rowwise, false);
+    coot_rt_t::all(out.get_dev_mem(false), in.get_dev_mem(false), in.n_rows, in.n_cols, eT2(0), twoway_kernel_id::rel_all_neq_rowwise, false);
     }
   }
 
 
 
-template<typename eT>
-inline
-void
-mtop_all::apply_direct(Mat<uword>& out, const Mat<eT>& in, const uword dim)
-  {
-  coot_extra_debug_sigprint();
-
-  if (dim == 0)
-    {
-    out.set_size(1, in.n_cols);
-    coot_rt_t::all(out.get_dev_mem(false), in.get_dev_mem(false), in.n_rows, in.n_cols, eT(0), twoway_kernel_id::rel_all_neq_colwise, true);
-    }
-  else
-    {
-    out.set_size(in.n_rows, 1);
-    coot_rt_t::all(out.get_dev_mem(false), in.get_dev_mem(false), in.n_rows, in.n_cols, eT(0), twoway_kernel_id::rel_all_neq_rowwise, false);
-    }
-  }
-
-
-
-template<typename eT>
+template<typename eT, typename eT2>
 inline
 void
 mtop_all::apply_direct(Mat<uword>& out, const subview<eT>& in, const uword dim)
@@ -106,7 +122,7 @@ mtop_all::apply_direct(Mat<uword>& out, const subview<eT>& in, const uword dim)
 
   // Subviews must be extracted beforehand, and then we use the regular Mat implementation.
   Mat<eT> tmp(in);
-  apply_direct(out, tmp, dim);
+  apply_direct<eT, eT2>(out, tmp, dim);
   }
 
 
@@ -135,6 +151,20 @@ mtop_all::all_vec(const mtOp<out_eT, T1, mtop_all>& X)
 
   // Apply to inner operation.
   return all_vec(X.q);
+  }
+
+
+
+template<typename eT2, typename T1>
+inline
+bool
+mtop_all::all_vec(const mtOp<eT2, T1, mtop_conv_to>& op)
+  {
+  coot_extra_debug_sigprint();
+
+  unwrap<T1> U(op.q);
+
+  return coot_rt_t::all_vec(U.M.get_dev_mem(false), U.M.n_elem, eT2(0), twoway_kernel_id::rel_all_neq, twoway_kernel_id::rel_all_neq_small);
   }
 
 
