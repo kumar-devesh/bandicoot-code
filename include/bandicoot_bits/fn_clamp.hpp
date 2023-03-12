@@ -30,7 +30,6 @@ enable_if2
 clamp(const T1& X, const typename T1::elem_type min_val, const typename T1::elem_type max_val)
   {
   coot_extra_debug_sigprint();
-  std::cout << "in the clamp operation!\n";
 
   // junk argument required for two-aux-val constructor
   return Op<T1, op_clamp>(X, '\0', min_val, max_val);

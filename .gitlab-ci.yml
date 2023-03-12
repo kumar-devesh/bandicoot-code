@@ -39,13 +39,9 @@ test-opencl:
   script: |
     cd tests
     make clean && BACKEND=CL_BACKEND make -j2
-    echo "run clinfo"
-    clinfo
     export CUDA_VISIBLE_DEVICES=0
-    ./main -r xml -v normal "[clamp]"
-    echo "ran clamp tests only"
-    ./main -r xml -v normal
+    ./main
     export CUDA_VISIBLE_DEVICES=1
-    ./main -r xml -v normal
+    ./main
     export CUDA_VISIBLE_DEVICES=3
-    ./main -r xml -v normal
+    ./main
