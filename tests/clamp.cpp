@@ -17,29 +17,19 @@
 
 using namespace coot;
 
-TEMPLATE_TEST_CASE("clamp_empty", "[clamp]", double, float, u32, s32, u64, s64)
-  {
-  std::cout << "clamp empty, don't do anything\n";
-  }
-
 TEMPLATE_TEST_CASE("clamp_basic", "[clamp]", double, float, u32, s32, u64, s64)
   {
-  std::cout << "enter test\n";
   Mat<TestType> x = randi<Mat<TestType>>(40, 50, distr_param(0, 50));
-  std::cout << "created x\n";
   Mat<TestType> y = clamp(x, TestType(10), TestType(20));
-  std::cout << "did clamp operation\n";
 
-//  REQUIRE( y.n_rows == x.n_rows );
-//  REQUIRE( y.n_cols == x.n_cols );
-//  std::cout << "checked size\n";
+  REQUIRE( y.n_rows == x.n_rows );
+  REQUIRE( y.n_cols == x.n_cols );
 
-//  for (uword i = 0; i < y.n_elem; ++i)
-//    {
-//    REQUIRE( TestType(y[i]) >= TestType(10) );
-//    REQUIRE( TestType(y[i]) <= TestType(20) );
-//    std::cout << "checked element " << i << "\n";
-//    }
+  for (uword i = 0; i < y.n_elem; ++i)
+    {
+    REQUIRE( TestType(y[i]) >= TestType(10) );
+    REQUIRE( TestType(y[i]) <= TestType(20) );
+    }
   }
 
 
