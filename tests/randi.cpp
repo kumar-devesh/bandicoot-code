@@ -141,7 +141,8 @@ void test_randi_distr(int lo, int hi)
   // They are already binned, so the empirically observed probability of each value is (1 / (hi - lo)).
 
   Row<eT> f = randi<Row<eT>>(10000, distr_param(lo, hi));
-  arma::Row<size_t> bin_counts(hi - lo + 1, arma::fill::zeros);
+  arma::Row<size_t> bin_counts(hi - lo + 1);
+  bin_counts.zeros();
   arma::Row<eT> f_cpu(f);
   for (uword i = 0; i < 10000; ++i)
     {
@@ -151,6 +152,8 @@ void test_randi_distr(int lo, int hi)
 
   // Each bin contains the sum of samples of n = 10k Bernoulli trials with p = (1 / (hi - lo)).
   // These bounds are computed in the same way as the randn() tests.
+
+  bin_counts.print("bin_counts for randi");
 
   arma::rowvec log_facts(10001);
   for (uword i = 2; i < 10001; ++i)
