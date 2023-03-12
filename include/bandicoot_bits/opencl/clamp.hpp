@@ -42,7 +42,7 @@ clamp(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const eT1 min_val, const eT
 
   size_t global_work_size = size_t(n_elem);
   std::cout << "global_work_size is " << global_work_size << "\n";
-//  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 2, NULL, &global_work_size, NULL, 0, NULL, NULL);
+  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
 
   coot_check_runtime_error( (status != 0), "coot::opencl::clamp(): couldn't execute kernel");
   }
