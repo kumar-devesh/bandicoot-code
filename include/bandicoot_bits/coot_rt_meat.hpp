@@ -251,6 +251,36 @@ coot_rt_t::release_memory(dev_mem_t<eT> dev_mem)
 
 inline
 void
+coot_rt_t::set_rng_seed(const u64 seed)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #ifdef COOT_USE_OPENCL
+    get_rt().cl_rt.set_rng_seed(seed);
+    #else
+    coot_stop_runtime_error("coot_rt::set_rng_seed(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #ifdef COOT_USE_CUDA
+    get_rt().cuda_rt.set_rng_seed(seed);
+    #else
+    coot_stop_runtime_error("coot_rt::set_rng_seed(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::set_rng_seed(): unknown backend");
+    }
+  }
+
+
+
+inline
+void
 coot_rt_t::synchronise()
   {
   coot_extra_debug_sigprint();
