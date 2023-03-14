@@ -1059,7 +1059,7 @@ coot_rt_t::all(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> in_mem, const uwor
     }
   else
     {
-    coot_stop_runtime_error("coot_rt::all(): CUDA backend not enabled");
+    coot_stop_runtime_error("coot_rt::all(): unknown backend");
     }
   }
 
