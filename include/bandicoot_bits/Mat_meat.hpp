@@ -1039,7 +1039,6 @@ Mat<eT>::operator=(const mtOp<eT, T1, mtop_type>& X)
   coot_extra_debug_sigprint();
 
   SizeProxy<mtOp<eT, T1, mtop_type>> S(X);
-  set_size(S.get_n_rows(), S.get_n_cols());
 
   mtop_type::apply(*this, X);
 

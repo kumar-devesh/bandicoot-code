@@ -42,3 +42,38 @@ all_vec(const dev_mem_t<eT1> mem, const uword n_elem, const eT2 val, const twowa
 
   return (result == 0) ? false : true;
   }
+
+
+
+template<typename eT1, typename eT2>
+inline
+void
+all(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> in_mem, const uword n_rows, const uword n_cols, const eT2 val, const twoway_kernel_id::enum_id num, const bool colwise)
+  {
+  coot_extra_debug_sigprint();
+
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::all(): OpenCL runtime not valid" );
+
+  runtime_t::cq_guard guard;
+
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT1, eT2>(num);
+
+  cl_int status = 0;
+
+  runtime_t::adapt_uword A_n_rows(n_rows);
+  runtime_t::adapt_uword A_n_cols(n_cols);
+
+  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &(out_mem.cl_mem_ptr));
+  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &(in_mem.cl_mem_ptr) );
+  status |= clSetKernelArg(kernel, 2, sizeof(eT2),    &val                 );
+  status |= clSetKernelArg(kernel, 3, A_n_rows.size,  A_n_rows.addr        );
+  status |= clSetKernelArg(kernel, 4, A_n_cols.size,  A_n_cols.addr        );
+  coot_check_cl_error(status, "coot::opencl::all(): failed to set kernel arguments");
+
+  const size_t k1_work_dim       = 1;
+  const size_t k1_work_offset[1] = { 0                            };
+  const size_t k1_work_size[1]   = { (colwise ? n_cols : n_rows ) };
+
+  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+  coot_check_cl_error(status, "coot::opencl::all(): failed to run kernel");
+  }

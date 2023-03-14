@@ -419,6 +419,8 @@ struct twoway_kernel_id
     //
     rel_all_neq,
     rel_all_neq_small,
+    rel_all_neq_colwise,
+    rel_all_neq_rowwise,
     //
     invalid_kernel
     };
@@ -559,6 +561,8 @@ struct twoway_kernel_id
 
     names.push_back("rel_all_neq");
     names.push_back("rel_all_neq_small");
+    names.push_back("rel_all_neq_colwise");
+    names.push_back("rel_all_neq_rowwise");
 
     return names;
     }

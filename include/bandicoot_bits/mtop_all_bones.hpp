@@ -19,11 +19,15 @@ class mtop_all
   {
   public:
 
-  template<typename out_eT, typename T1> inline static void apply(Mat<out_eT>& out, const mtOp<out_eT, T1, mtop_all>& in);
+  template<typename T1> inline static void apply(Mat<uword>& out, const mtOp<uword, T1, mtop_all>& in);
 
-  template<typename T1> static inline bool all_vec(T1& X);
+                        inline static void apply_direct(Mat<uword>& out, const Mat<uword>& in,  const uword dim);
+  template<typename eT> inline static void apply_direct(Mat<uword>& out, const Mat<eT>& in,     const uword dim);
+  template<typename eT> inline static void apply_direct(Mat<uword>& out, const subview<eT>& in, const uword dim);
+
+  template<typename T1> inline static bool all_vec(T1& X);
   // for nested applications
-  template<typename out_eT, typename T1> static inline bool all_vec(const mtOp<out_eT, T1, mtop_all>& op);
+  template<typename out_eT, typename T1> inline static bool all_vec(const mtOp<out_eT, T1, mtop_all>& op);
 
   template<typename out_eT, typename T1> inline static uword compute_n_rows(const mtOp<out_eT, T1, mtop_all>& op, const uword in_n_rows, const uword in_n_cols);
   template<typename out_eT, typename T1> inline static uword compute_n_cols(const mtOp<out_eT, T1, mtop_all>& op, const uword in_n_rows, const uword in_n_cols);
