@@ -153,10 +153,9 @@ void test_randi_distr(int lo, int hi)
   // Each bin contains the sum of samples of n = 10k Bernoulli trials with p = (1 / (hi - lo)).
   // These bounds are computed in the same way as the randn() tests.
 
-  bin_counts.print("bin_counts for randi");
-
   arma::rowvec log_facts(10001);
   log_facts[0] = 0.0;
+  log_facts[1] = 0.0;
   for (uword i = 2; i < 10001; ++i)
     {
     log_facts[i] = log_facts[i - 1] + std::log(i);

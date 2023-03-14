@@ -240,8 +240,6 @@ void test_randn_distr(const double mu = 0.0, const double sd = 1.0, const size_t
       }
     }
 
-  bin_counts.print("bin_counts for randn");
-
   // Bin i contains the count of points that fell into a range between [mu - (3 - 0.1 * i) * sd, mu - (3 - 0.1 * (i + 1)) * sd).
   // (For convenience call this range [a, b).)
   // The probability a single sample falls into this bin is (cdf(b) - cdf(a)).
@@ -253,6 +251,7 @@ void test_randn_distr(const double mu = 0.0, const double sd = 1.0, const size_t
   // First compute some convenience values we'll use later.
   arma::rowvec log_facts(50001); // log_facts[i] = log(i!)
   log_facts[0] = 0.0;
+  log_facts[1] = 0.0;
   for (uword i = 2; i < 50001; ++i)
     {
     log_facts[i] = log_facts[i - 1] + std::log(i);
