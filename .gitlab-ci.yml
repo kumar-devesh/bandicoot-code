@@ -29,7 +29,7 @@ test-cuda:
     ./main
     export CUDA_VISIBLE_DEVICES=1
     ./main
-    export CUDA_VISIBLE_DEVICES=3
+    export CUDA_VISIBLE_DEVICES=2
     ./main
 
 test-opencl:
