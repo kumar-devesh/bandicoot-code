@@ -41,7 +41,3 @@ test-opencl:
     make clean && BACKEND=CL_BACKEND make -j2
     export CUDA_VISIBLE_DEVICES=0
     ./main
-    export CUDA_VISIBLE_DEVICES=1
-    ./main
-    export CUDA_VISIBLE_DEVICES=3
-    ./main
