@@ -64,6 +64,23 @@ Mat<eT>::Mat(const uword in_n_rows, const uword in_n_cols)
 
 template<typename eT>
 inline
+Mat<eT>::Mat(const SizeMat& s)
+  : n_rows    (0)
+  , n_cols    (0)
+  , n_elem    (0)
+  , vec_state (0)
+  , mem_state (0)
+  , dev_mem({ NULL })
+  {
+  coot_extra_debug_sigprint_this(this);
+
+  init(s.n_rows, s.n_cols);
+  }
+
+
+
+template<typename eT>
+inline
 Mat<eT>::Mat(dev_mem_t<eT> aux_dev_mem, const uword in_n_rows, const uword in_n_cols)
   : n_rows    (in_n_rows)
   , n_cols    (in_n_cols)
@@ -1713,6 +1730,18 @@ Mat<eT>::set_size(const uword new_n_rows, const uword new_n_cols)
 template<typename eT>
 inline
 void
+Mat<eT>::set_size(const SizeMat& s)
+  {
+  coot_extra_debug_sigprint();
+
+  init(s.n_rows, s.n_cols);
+  }
+
+
+
+template<typename eT>
+inline
+void
 Mat<eT>::resize(const uword new_n_elem)
   {
   coot_extra_debug_sigprint();
@@ -1739,11 +1768,43 @@ Mat<eT>::resize(const uword new_n_elem)
 template<typename eT>
 inline
 void
+Mat<eT>::reshape(const uword new_n_rows, const uword new_n_cols)
+  {
+  coot_extra_debug_sigprint();
+
+  if (new_n_rows == 0 || new_n_cols == 0)
+    {
+    // Shortcut: just clear the memory.
+    set_size(new_n_rows, new_n_cols);
+    }
+  else
+    {
+    op_reshape::apply_direct(*this, *this, new_n_rows, new_n_cols);
+    }
+  }
+
+
+
+template<typename eT>
+inline
+void
 Mat<eT>::resize(const uword new_n_rows, const uword new_n_cols)
   {
   coot_extra_debug_sigprint();
 
   op_resize::apply_mat_inplace((*this), new_n_rows, new_n_cols);
+  }
+
+
+
+template<typename eT>
+inline
+void
+Mat<eT>::resize(const SizeMat& s)
+  {
+  coot_extra_debug_sigprint();
+
+  op_resize::apply_mat_inplace((*this), s.n_rows, s.n_cols);
   }
 
 

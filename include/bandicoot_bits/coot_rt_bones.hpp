@@ -58,6 +58,8 @@ class coot_rt_t
   template<typename eT>
   static inline void release_memory(dev_mem_t<eT> dev_mem);
 
+  static inline void set_rng_seed(const u64 seed);
+
   template<typename out_eT, typename in_eT>
   static inline void copy_array(dev_mem_t<out_eT> dest, dev_mem_t<in_eT> src, const uword n_elem);
 

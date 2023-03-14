@@ -141,7 +141,8 @@ void test_randi_distr(int lo, int hi)
   // They are already binned, so the empirically observed probability of each value is (1 / (hi - lo)).
 
   Row<eT> f = randi<Row<eT>>(10000, distr_param(lo, hi));
-  arma::Row<size_t> bin_counts(hi - lo + 1, arma::fill::zeros);
+  arma::Row<size_t> bin_counts(hi - lo + 1);
+  bin_counts.zeros();
   arma::Row<eT> f_cpu(f);
   for (uword i = 0; i < 10000; ++i)
     {
@@ -153,6 +154,8 @@ void test_randi_distr(int lo, int hi)
   // These bounds are computed in the same way as the randn() tests.
 
   arma::rowvec log_facts(10001);
+  log_facts[0] = 0.0;
+  log_facts[1] = 0.0;
   for (uword i = 2; i < 10001; ++i)
     {
     log_facts[i] = log_facts[i - 1] + std::log(i);

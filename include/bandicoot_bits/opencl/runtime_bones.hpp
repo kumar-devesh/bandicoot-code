@@ -111,6 +111,8 @@ class runtime_t
   inline cl_mem get_philox_state() const;
   inline size_t get_num_rng_threads() const;
 
+  inline void set_rng_seed(const u64 seed);
+
   class program_wrapper;
   class cq_guard;
   class adapt_uword;

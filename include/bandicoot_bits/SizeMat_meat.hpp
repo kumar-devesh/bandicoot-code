@@ -1,4 +1,4 @@
-// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2023 Ryan Curtin (http://www.ratml.org/)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ------------------------------------------------------------------------
+
 
 
 inline
@@ -27,8 +28,8 @@ inline
 uword
 SizeMat::operator[](const uword dim) const
   {
-  if(dim == 0)  { return n_rows; }
-  if(dim == 1)  { return n_cols; }
+  if (dim == 0)  { return n_rows; }
+  if (dim == 1)  { return n_cols; }
 
   return uword(1);
   }
@@ -39,10 +40,8 @@ inline
 uword
 SizeMat::operator()(const uword dim) const
   {
-  if(dim == 0)  { return n_rows; }
-  if(dim == 1)  { return n_cols; }
-
-  coot_debug_check(true, "size(): index out of bounds");
+  if (dim == 0)  { return n_rows; }
+  if (dim == 1)  { return n_cols; }
 
   return uword(1);
   }
@@ -53,9 +52,8 @@ inline
 bool
 SizeMat::operator==(const SizeMat& s) const
   {
-  if(n_rows != s.n_rows)  { return false; }
-
-  if(n_cols != s.n_cols)  { return false; }
+  if (n_rows != s.n_rows)  { return false; }
+  if (n_cols != s.n_cols)  { return false; }
 
   return true;
   }
@@ -66,9 +64,8 @@ inline
 bool
 SizeMat::operator!=(const SizeMat& s) const
   {
-  if(n_rows != s.n_rows)  { return true; }
-
-  if(n_cols != s.n_cols)  { return true; }
+  if (n_rows != s.n_rows)  { return true; }
+  if (n_cols != s.n_cols)  { return true; }
 
   return false;
   }
@@ -112,7 +109,7 @@ SizeMat::operator-(const uword val) const
   const uword out_n_rows = (n_rows > val) ? (n_rows - val) : uword(0);
   const uword out_n_cols = (n_cols > val) ? (n_cols - val) : uword(0);
 
-  return SizeMat(out_n_rows, out_n_cols);
+  return SizeMat( out_n_rows, out_n_cols );
   }
 
 

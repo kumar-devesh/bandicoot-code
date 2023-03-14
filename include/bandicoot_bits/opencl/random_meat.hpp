@@ -22,7 +22,7 @@ template<> struct preferred_rng<u64> { typedef std::mt19937_64 result; };
 template<typename eT>
 inline
 void
-init_xorwow_state(cl_mem xorwow_state, const size_t num_rng_threads)
+init_xorwow_state(cl_mem xorwow_state, const size_t num_rng_threads, const u64 seed)
   {
   coot_extra_debug_sigprint();
 
@@ -31,7 +31,8 @@ init_xorwow_state(cl_mem xorwow_state, const size_t num_rng_threads)
   // Since the states are relatively small, and we only do the seeding once, we'll initialize the values on the CPU, then copy them over.
   // We ensure that all values are odd.
   arma::Row<eT> cpu_state(6 * num_rng_threads, arma::fill::none);
-  typename preferred_rng<eT>::result rng;
+  const eT trunc_seed = eT(seed);
+  typename preferred_rng<eT>::result rng(trunc_seed);
   for (size_t i = 0; i < cpu_state.n_elem; ++i)
     {
     eT val = rng();
@@ -50,7 +51,7 @@ init_xorwow_state(cl_mem xorwow_state, const size_t num_rng_threads)
 
 inline
 void
-init_philox_state(cl_mem philox_state, const size_t num_rng_threads)
+init_philox_state(cl_mem philox_state, const size_t num_rng_threads, const u64 seed)
   {
   coot_extra_debug_sigprint();
 
@@ -59,7 +60,8 @@ init_philox_state(cl_mem philox_state, const size_t num_rng_threads)
   // Since the states are small, we seed on the CPU, and then transfer the memory.
   // For now we always initialize the counters to 0.  (TODO: should this be an option?)
   arma::Row<u32> cpu_state(6 * num_rng_threads, arma::fill::zeros);
-  preferred_rng<u32>::result rng;
+  const u32 trunc_seed = u32(seed);
+  preferred_rng<u32>::result rng(trunc_seed);
   for (size_t i = 0; i < num_rng_threads; ++i)
     {
     cpu_state[6 * i + 4] = rng();

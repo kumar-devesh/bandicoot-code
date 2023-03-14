@@ -91,3 +91,12 @@ inline void coot_rng::fill_randi(dev_mem_t<eT> dest, const uword n, const distr_
 
   coot_rt_t::fill_randi(dest, n, a, b);
   }
+
+
+
+inline
+void
+coot_rng::set_seed(const u64 seed)
+  {
+  coot_rt_t::set_rng_seed(seed);
+  }
