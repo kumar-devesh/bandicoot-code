@@ -23,9 +23,9 @@
 //  - eT1* out_mem
 // Additional arguments are fine, so long as those first three are the same.
 
-template<typename eT, typename... A1, typename... A2>
+template<typename eT, typename aux_eT, typename... A1, typename... A2>
 inline
-eT
+aux_eT
 generic_reduce(const dev_mem_t<eT> mem,
                const uword n_elem,
                const char* kernel_name,
@@ -39,9 +39,9 @@ generic_reduce(const dev_mem_t<eT> mem,
 
 
 // This version uses the same kernel for all reduce passes.
-template<typename eT, typename... Args>
+template<typename eT, typename aux_eT, typename... Args>
 inline
-eT
+aux_eT
 generic_reduce(const dev_mem_t<eT> mem,
                const uword n_elem,
                const char* kernel_name,
@@ -51,12 +51,12 @@ generic_reduce(const dev_mem_t<eT> mem,
 
 
 
-template<typename eT, typename... A1, typename... A2>
+template<typename eT, typename aux_eT, typename... A1, typename... A2>
 inline
 bool
 generic_reduce_inner(const dev_mem_t<eT> mem,
                      const uword n_elem,
-                     dev_mem_t<eT> aux_mem,
+                     dev_mem_t<aux_eT> aux_mem,
                      const char* kernel_name,
                      CUfunction& first_kernel,
                      CUfunction& first_kernel_small,
@@ -64,17 +64,17 @@ generic_reduce_inner(const dev_mem_t<eT> mem,
                      CUfunction& second_kernel,
                      CUfunction& second_kernel_small,
                      const std::tuple<A2...>& second_kernel_extra_args,
-                     dev_mem_t<eT> second_aux_mem);
+                     dev_mem_t<aux_eT> second_aux_mem);
 
 
 
-template<typename eT, typename... Args>
+template<typename eT, typename aux_eT, typename... Args>
 inline
 void
 generic_reduce_inner_small(const dev_mem_t<eT> mem,
                            const uword n_elem,
                            const uword max_num_threads,
-                           dev_mem_t<eT> aux_mem, // must have at least one element
+                           dev_mem_t<aux_eT> aux_mem, // must have at least one element
                            const char* kernel_name,
                            CUfunction& kernel,
                            CUfunction& kernel_small, // for 32 threads or fewer

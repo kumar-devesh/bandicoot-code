@@ -15,6 +15,7 @@
 
 
 class op_htrans
+  : public traits_op_passthru_trans
   {
   public:
 
@@ -32,6 +33,7 @@ class op_htrans
 
 
 class op_htrans2 // scalar * X.t()
+  : public traits_op_passthru_trans
   {
   public:
 

@@ -29,7 +29,7 @@ accu(dev_mem_t<eT> mem, const uword n_elem)
   cl_kernel k = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu);
   cl_kernel k_small = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::accu_small);
 
-  return generic_reduce(mem, n_elem, "accu", k, k_small, std::make_tuple(/* no extra args */));
+  return generic_reduce<eT, eT>(mem, n_elem, "accu", k, k_small, std::make_tuple(/* no extra args */));
   }
 
 

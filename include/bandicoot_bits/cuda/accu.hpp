@@ -29,7 +29,7 @@ accu(dev_mem_t<eT> mem, const uword n_elem)
   CUfunction k = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu);
   CUfunction k_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu_small);
 
-  return generic_reduce(mem, n_elem, "accu", k, k_small, std::make_tuple(/* no extra args */));
+  return generic_reduce<eT, eT>(mem, n_elem, "accu", k, k_small, std::make_tuple(/* no extra args */));
   }
 
 

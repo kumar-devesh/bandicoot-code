@@ -15,7 +15,9 @@
 
 
 template<typename out_eT, typename T1, typename mtop_type>
-class mtOp : public Base< out_eT, mtOp<out_eT, T1, mtop_type> >
+class mtOp
+  : public Base< out_eT, mtOp<out_eT, T1, mtop_type> >
+  , public Op_traits<T1, mtop_type, has_nested_op_traits<mtop_type>::value>
   {
   public:
 
@@ -26,80 +28,9 @@ class mtOp : public Base< out_eT, mtOp<out_eT, T1, mtop_type> >
   static const bool is_row = T1::is_row;
   static const bool is_col = T1::is_col;
 
-  // Note that instantiation of an object will never happen here---mtOps aren't formed
-  // unless it is possible to do any delayed evaluation.
-  coot_aligned const SizeProxy<T1> m;
   const T1& q;
+  const uword aux_uword;
 
   inline         ~mtOp();
-  inline explicit mtOp(const T1& in_m);
-
-  coot_inline uword get_n_rows() const;
-  coot_inline uword get_n_cols() const;
-  coot_inline uword get_n_elem() const;
+  inline explicit mtOp(const T1& in_m, const uword aux_uword = 0);
   };
-
-
-
-// Utilities to determine what should be held in a SizeProxy.
-// Specifically this controls whether (and how) something is unwrapped in order to compute its size.
-template<typename T>
-struct mtop_holder_type
-  {
-  // This should never happen.
-  };
-
-
-
-template<typename out_eT, typename T1, typename mtop_type>
-struct mtop_holder_type<mtOp<out_eT, T1, mtop_type>>
-  {
-  // By default, don't do any unwrapping.
-  typedef const mtOp<out_eT, T1, mtop_type>& result;
-  };
-
-
-
-template<typename out_eT, typename T1, typename op_type, typename mtop_type>
-struct mtop_holder_type<mtOp<out_eT, Op<T1, op_type>, mtop_type>>
-  {
-  // For an Op, we can't know its size without unwrapping it.
-  typedef Mat<out_eT> result;
-  };
-
-
-
-template<typename out_eT, typename T1, typename T2, typename glue_type, typename mtop_type>
-struct mtop_holder_type<mtOp<out_eT, Glue<T1, T2, glue_type>, mtop_type>>
-  {
-  // For a Glue, we can't know its size without unwrapping it.
-  typedef Mat<out_eT> result;
-  };
-
-
-
-// For op_htrans, we actually *can* know the size.
-template<typename out_eT, typename T1, typename mtop_type>
-struct mtop_holder_type<mtOp<out_eT, Op<T1, op_htrans>, mtop_type>>
-  {
-  typedef const mtOp<out_eT, Op<T1, op_htrans>, mtop_type>& result;
-  };
-
-
-
-template<typename out_eT, typename T1, typename mtop_type>
-struct mtop_holder_type<mtOp<out_eT, Op<T1, op_htrans2>, mtop_type>>
-  {
-  typedef const mtOp<out_eT, Op<T1, op_htrans2>, mtop_type>& result;
-  };
-
-
-
-template<typename out_eT, typename T1, typename mtop_type> inline uword dispatch_mtop_get_n_rows(const mtOp<out_eT, T1, mtop_type>& Q);
-template<typename out_eT>                                  inline uword dispatch_mtop_get_n_rows(const Mat<out_eT>& Q);
-
-template<typename out_eT, typename T1, typename mtop_type> inline uword dispatch_mtop_get_n_cols(const mtOp<out_eT, T1, mtop_type>& Q);
-template<typename out_eT>                                  inline uword dispatch_mtop_get_n_cols(const Mat<out_eT>& Q);
-
-template<typename out_eT, typename T1, typename mtop_type> inline uword dispatch_mtop_get_n_elem(const mtOp<out_eT, T1, mtop_type>& Q);
-template<typename out_eT>                                  inline uword dispatch_mtop_get_n_elem(const Mat<out_eT>& Q);

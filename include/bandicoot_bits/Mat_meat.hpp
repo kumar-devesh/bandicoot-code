@@ -1038,7 +1038,8 @@ Mat<eT>::operator=(const mtOp<eT, T1, mtop_type>& X)
   {
   coot_extra_debug_sigprint();
 
-  set_size(X.get_n_rows(), X.get_n_cols());
+  SizeProxy<mtOp<eT, T1, mtop_type>> S(X);
+  set_size(S.get_n_rows(), S.get_n_cols());
 
   mtop_type::apply(*this, X);
 
@@ -1055,7 +1056,8 @@ Mat<eT>::operator+=(const mtOp<eT, T1, mtop_type>& X)
   {
   coot_extra_debug_sigprint();
 
-  coot_assert_same_size(n_rows, n_cols, X.get_n_rows(), X.get_n_cols(), "Mat::operator+=");
+  SizeProxy<mtOp<eT, T1, mtop_type>> S(X);
+  coot_assert_same_size(n_rows, n_cols, S.get_n_rows(), S.get_n_cols(), "Mat::operator+=");
 
   mtop_type::apply_inplace_plus(*this, X);
 
@@ -1072,7 +1074,8 @@ Mat<eT>::operator-=(const mtOp<eT, T1, mtop_type>& X)
   {
   coot_extra_debug_sigprint();
 
-  coot_assert_same_size(n_rows, n_cols, X.get_n_rows(), X.get_n_cols(), "Mat::operator-=");
+  SizeProxy<mtOp<eT, T1, mtop_type>> S(X);
+  coot_assert_same_size(n_rows, n_cols, S.get_n_rows(), S.get_n_cols(), "Mat::operator-=");
 
   mtop_type::apply_inplace_minus(*this, X);
 
@@ -1089,7 +1092,8 @@ Mat<eT>::operator*=(const mtOp<eT, T1, mtop_type>& X)
   {
   coot_extra_debug_sigprint();
 
-  coot_assert_same_size(n_rows, n_cols, X.get_n_rows(), X.get_n_cols(), "Mat::operator*=");
+  SizeProxy<mtOp<eT, T1, mtop_type>> S(X);
+  coot_assert_same_size(n_rows, n_cols, S.get_n_rows(), S.get_n_cols(), "Mat::operator*=");
 
   mtop_type::apply_inplace_times(*this, X);
 
@@ -1106,7 +1110,8 @@ Mat<eT>::operator%=(const mtOp<eT, T1, mtop_type>& X)
   {
   coot_extra_debug_sigprint();
 
-  coot_assert_same_size(n_rows, n_cols, X.get_n_rows(), X.get_n_cols(), "Mat::operator%=");
+  SizeProxy<mtOp<eT, T1, mtop_type>> S(X);
+  coot_assert_same_size(n_rows, n_cols, S.get_n_rows(), S.get_n_cols(), "Mat::operator%=");
 
   mtop_type::apply_inplace_schur(*this, X);
 
@@ -1123,7 +1128,8 @@ Mat<eT>::operator/=(const mtOp<eT, T1, mtop_type>& X)
   {
   coot_extra_debug_sigprint();
 
-  coot_assert_same_size(n_rows, n_cols, X.get_n_rows(), X.get_n_cols(), "Mat::operator/=");
+  SizeProxy<mtOp<eT, T1, mtop_type>> S(X);
+  coot_assert_same_size(n_rows, n_cols, S.get_n_rows(), S.get_n_cols(), "Mat::operator/=");
 
   mtop_type::apply_inplace_div(*this, X);
 

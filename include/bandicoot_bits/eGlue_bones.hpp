@@ -24,6 +24,7 @@ class eGlue : public Base< typename T1::elem_type, eGlue<T1, T2, eglue_type> >
 
   static const bool is_col = (T1::is_col || T2::is_col);
   static const bool is_row = (T1::is_row || T2::is_row);
+  static const bool is_xvec = (is_col || is_row);
 
   const SizeProxy<T1> A;
   const SizeProxy<T2> B;

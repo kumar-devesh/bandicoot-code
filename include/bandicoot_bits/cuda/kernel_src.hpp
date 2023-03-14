@@ -195,6 +195,35 @@ get_cuda_oneway_real_kernel_src()
 
 inline
 std::string
+get_cuda_oneway_integral_kernel_src()
+  {
+  std::string result = "";
+
+  std::vector<std::string> aux_function_filenames = {
+      "and_warp_reduce.cu"
+  };
+
+  // First, load any auxiliary functions (e.g. device-specific functions).
+  for (const std::string& filename : aux_function_filenames)
+    {
+    std::string full_filename = "oneway_integral/" + filename;
+    result += read_file(full_filename);
+    }
+
+  // Now, load each file for each kernel.
+  for (const std::string& kernel_name : oneway_integral_kernel_id::get_names())
+    {
+    std::string filename = "oneway_integral/" + kernel_name + ".cu";
+    result += read_file(filename);
+    }
+
+  return result;
+  }
+
+
+
+inline
+std::string
 get_cuda_twoway_kernel_src()
   {
   // NOTE: kernel names must match the list in the kernel_id struct

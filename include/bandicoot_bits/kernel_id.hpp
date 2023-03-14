@@ -244,6 +244,49 @@ struct oneway_real_kernel_id
 
 
 
+// These kernels should only be used with integral types (u32/s32/u64/s64/etc.).
+struct oneway_integral_kernel_id
+  {
+  enum enum_id
+    {
+    and_reduce,
+    and_reduce_small,
+    //
+    invalid_kernel
+    };
+
+
+
+  static
+  inline
+  std::vector<std::string>
+  init_names()
+    {
+    // NOTE: the order and names of kernels in "names" must match the order and names in the kernel_id enum
+
+    std::vector<std::string> names;
+
+    names.push_back("and_reduce");
+    names.push_back("and_reduce_small");
+
+    return names;
+    }
+
+
+
+  static
+  inline
+  const std::vector<std::string>&
+  get_names()
+    {
+    static const std::vector<std::string> names = init_names();
+
+    return names;
+    }
+  };
+
+
+
 struct twoway_kernel_id
   {
   enum enum_id
@@ -373,6 +416,9 @@ struct twoway_kernel_id
     //
     htrans,
     strans,
+    //
+    rel_all_neq,
+    rel_all_neq_small,
     //
     invalid_kernel
     };
@@ -510,6 +556,9 @@ struct twoway_kernel_id
 
     names.push_back("htrans");
     names.push_back("strans");
+
+    names.push_back("rel_all_neq");
+    names.push_back("rel_all_neq_small");
 
     return names;
     }

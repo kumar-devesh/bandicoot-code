@@ -93,6 +93,9 @@ class runtime_t
   template<typename eT1>
   inline const cl_kernel& get_kernel(const oneway_real_kernel_id::enum_id num);
 
+  template<typename eT1>
+  inline const cl_kernel& get_kernel(const oneway_integral_kernel_id::enum_id num);
+
   template<typename eT2, typename eT1>
   inline const cl_kernel& get_kernel(const twoway_kernel_id::enum_id num);
 
@@ -132,6 +135,7 @@ class runtime_t
   coot_aligned std::vector<cl_kernel>                                                                   zeroway_kernels;
   coot_aligned rt_common::kernels_t<std::vector<cl_kernel>>                                             oneway_kernels;
   coot_aligned rt_common::kernels_t<std::vector<cl_kernel>>                                             oneway_real_kernels;
+  coot_aligned rt_common::kernels_t<std::vector<cl_kernel>>                                             oneway_integral_kernels;
   coot_aligned rt_common::kernels_t<rt_common::kernels_t<std::vector<cl_kernel>>>                       twoway_kernels;
   coot_aligned rt_common::kernels_t<rt_common::kernels_t<rt_common::kernels_t<std::vector<cl_kernel>>>> threeway_kernels;
   coot_aligned rt_common::kernels_t<std::vector<cl_kernel>>                                             magma_real_kernels;

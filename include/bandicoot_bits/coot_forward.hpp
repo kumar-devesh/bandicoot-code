@@ -48,6 +48,8 @@ template<const bool, const bool, const bool>             class gemv;
 
 template<                 typename eT, typename gen_type> class  Gen;
 
+template<typename, typename, bool> class Op_traits;
+
 template<typename T1, typename  op_type> class   Op;
 template<typename T1, typename eop_type> class  eOp;
 
@@ -88,6 +90,7 @@ class op_diagmat2;
 class op_diagvec;
 
 class mtop_conv_to;
+class mtop_all;
 
 class eop_scalar_plus;
 class eop_neg;

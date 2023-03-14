@@ -19,6 +19,7 @@
 
 
 class op_vectorise_col
+  : public traits_op_col
   {
   public:
 
@@ -35,6 +36,7 @@ class op_vectorise_col
 
 
 class op_vectorise_all
+  : public traits_op_xvec
   {
   public:
 
@@ -47,6 +49,7 @@ class op_vectorise_all
 
 
 class op_vectorise_row
+  : public traits_op_row
   {
   public:
 

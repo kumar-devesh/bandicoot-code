@@ -25,6 +25,7 @@ class eOp : public Base< typename T1::elem_type, eOp<T1, eop_type> >
 
   static const bool is_row = T1::is_row;
   static const bool is_col = T1::is_col;
+  static const bool is_xvec = T1::is_xvec;
 
   coot_aligned const SizeProxy<T1> m;
 

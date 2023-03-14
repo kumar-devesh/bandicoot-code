@@ -26,6 +26,7 @@
 //
 // So, as a result, there are a couple functions not implemented here: apply(), compute_n_rows(), compute_n_cols().
 class op_norm
+  : public traits_op_default
   {
   public:
 

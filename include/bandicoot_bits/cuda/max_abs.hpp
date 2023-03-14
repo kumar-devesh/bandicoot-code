@@ -30,5 +30,5 @@ max_abs(dev_mem_t<eT> mem, const uword n_elem)
   CUfunction k = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::max);
   CUfunction k_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::max_small);
 
-  return generic_reduce(mem, n_elem, "max_abs", k, k_small, std::make_tuple(/* no extra args */));
+  return generic_reduce<eT, eT>(mem, n_elem, "max_abs", k, k_small, std::make_tuple(/* no extra args */));
   }

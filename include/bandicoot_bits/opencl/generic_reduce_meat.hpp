@@ -143,9 +143,9 @@ set_extra_args<0, Args...>
 
 
 
-template<typename eT, typename... A1, typename... A2>
+template<typename eT, typename aux_eT, typename... A1, typename... A2>
 inline
-eT
+aux_eT
 generic_reduce(const dev_mem_t<eT> mem,
                const uword n_elem,
                const char* kernel_name,
@@ -169,13 +169,13 @@ generic_reduce(const dev_mem_t<eT> mem,
   // Create auxiliary memory.
   const uword first_aux_size = std::ceil((total_num_threads + (local_group_size - 1)) / local_group_size);
   const uword second_aux_size = (first_aux_size == 1) ? 0 : std::ceil((first_aux_size + (local_group_size - 1)) / local_group_size);
-  Col<eT> first_aux(first_aux_size);
-  Col<eT> second_aux(second_aux_size);
+  Col<aux_eT> first_aux(first_aux_size);
+  Col<aux_eT> second_aux(second_aux_size);
 
-  dev_mem_t<eT> first_aux_mem_ptr = first_aux.get_dev_mem(false);
+  dev_mem_t<aux_eT> first_aux_mem_ptr = first_aux.get_dev_mem(false);
   // Just use the first pointer if there is no need for secondary auxiliary
   // space.
-  dev_mem_t<eT> second_aux_mem_ptr = (second_aux_size == 0) ? first_aux_mem_ptr : second_aux.get_dev_mem(false);;
+  dev_mem_t<aux_eT> second_aux_mem_ptr = (second_aux_size == 0) ? first_aux_mem_ptr : second_aux.get_dev_mem(false);;
 
   const bool first_buffer = generic_reduce_inner(mem,
                                                  n_elem,
@@ -189,14 +189,14 @@ generic_reduce(const dev_mem_t<eT> mem,
                                                  second_kernel_small,
                                                  second_kernel_extra_args,
                                                  second_aux_mem_ptr);
-  return (first_buffer) ? eT(first_aux[0]) : eT(second_aux[0]);
+  return (first_buffer) ? aux_eT(first_aux[0]) : aux_eT(second_aux[0]);
   }
 
 
 
-template<typename eT, typename... Args>
+template<typename eT, typename aux_eT, typename... Args>
 inline
-eT
+aux_eT
 generic_reduce(const dev_mem_t<eT> mem,
                const uword n_elem,
                const char* kernel_name,
@@ -204,25 +204,25 @@ generic_reduce(const dev_mem_t<eT> mem,
                cl_kernel& kernel_small,
                const std::tuple<Args...>& kernel_extra_args)
   {
-  return generic_reduce(mem,
-                        n_elem,
-                        kernel_name,
-                        kernel,
-                        kernel_small,
-                        kernel_extra_args,
-                        kernel,
-                        kernel_small,
-                        kernel_extra_args);
+  return generic_reduce<eT, aux_eT>(mem,
+                                    n_elem,
+                                    kernel_name,
+                                    kernel,
+                                    kernel_small,
+                                    kernel_extra_args,
+                                    kernel,
+                                    kernel_small,
+                                    kernel_extra_args);
   }
 
 
 
-template<typename eT, typename... A1, typename... A2>
+template<typename eT, typename aux_eT, typename... A1, typename... A2>
 inline
 bool
 generic_reduce_inner(const dev_mem_t<eT> mem,
                      const uword n_elem,
-                     dev_mem_t<eT> aux_mem,
+                     dev_mem_t<aux_eT> aux_mem,
                      const char* kernel_name,
                      const size_t kernel_wg_size,
                      cl_kernel& first_kernel,
@@ -231,7 +231,7 @@ generic_reduce_inner(const dev_mem_t<eT> mem,
                      cl_kernel& second_kernel,
                      cl_kernel& second_kernel_small,
                      const std::tuple<A2...>& second_kernel_extra_args,
-                     dev_mem_t<eT> second_aux_mem)
+                     dev_mem_t<aux_eT> second_aux_mem)
   {
   const uword total_num_threads = std::ceil(n_elem / std::max(1.0, (2 * std::ceil(std::log2(n_elem)))));
 
@@ -267,10 +267,10 @@ generic_reduce_inner(const dev_mem_t<eT> mem,
     const uword pow2_total_num_threads = (total_num_threads % pow2_group_size == 0) ? total_num_threads : ((total_num_threads / pow2_group_size) + 1) * pow2_group_size;
 
     cl_int status;
-    status  = clSetKernelArg(first_kernel, 0, sizeof(cl_mem),               &mem.cl_mem_ptr);
-    status |= clSetKernelArg(first_kernel, 1, dev_n_elem.size,              dev_n_elem.addr);
-    status |= clSetKernelArg(first_kernel, 2, sizeof(cl_mem),               &aux_mem.cl_mem_ptr);
-    status |= clSetKernelArg(first_kernel, 3, sizeof(eT) * pow2_group_size, NULL);
+    status  = clSetKernelArg(first_kernel, 0, sizeof(cl_mem),                   &mem.cl_mem_ptr);
+    status |= clSetKernelArg(first_kernel, 1, dev_n_elem.size,                  dev_n_elem.addr);
+    status |= clSetKernelArg(first_kernel, 2, sizeof(cl_mem),                   &aux_mem.cl_mem_ptr);
+    status |= clSetKernelArg(first_kernel, 3, sizeof(aux_eT) * pow2_group_size, NULL);
 
     // If we have any uwords in extra_args, we need to allocate adapt_uwords for them, which will be filled in set_extra_args().
     constexpr const uword num_uwords = count_uwords<void, A1...>();
@@ -301,12 +301,12 @@ generic_reduce_inner(const dev_mem_t<eT> mem,
 
 
 
-template<typename eT, typename... Args>
+template<typename eT, typename aux_eT, typename... Args>
 inline
 void
 generic_reduce_inner_small(const dev_mem_t<eT> mem,
                            const uword n_elem,
-                           dev_mem_t<eT> aux_mem,
+                           dev_mem_t<aux_eT> aux_mem,
                            const char* kernel_name,
                            const size_t kernel_wg_size,
                            cl_kernel& kernel,
@@ -330,10 +330,10 @@ generic_reduce_inner_small(const dev_mem_t<eT> mem,
   cl_kernel* k_use = (pow2_group_size <= wavefront_size) ? &kernel_small : &kernel;
 
   cl_int status;
-  status  = clSetKernelArg(*k_use, 0, sizeof(cl_mem),               &mem.cl_mem_ptr);
-  status |= clSetKernelArg(*k_use, 1, dev_n_elem.size,              dev_n_elem.addr);
-  status |= clSetKernelArg(*k_use, 2, sizeof(cl_mem),               &aux_mem.cl_mem_ptr);
-  status |= clSetKernelArg(*k_use, 3, sizeof(eT) * pow2_group_size, NULL);
+  status  = clSetKernelArg(*k_use, 0, sizeof(cl_mem),                   &mem.cl_mem_ptr);
+  status |= clSetKernelArg(*k_use, 1, dev_n_elem.size,                  dev_n_elem.addr);
+  status |= clSetKernelArg(*k_use, 2, sizeof(cl_mem),                   &aux_mem.cl_mem_ptr);
+  status |= clSetKernelArg(*k_use, 3, sizeof(aux_eT) * pow2_group_size, NULL);
 
   // If we have any uwords in extra_args, we need to allocate adapt_uwords for them, which will be filled in set_extra_args().
   constexpr const uword num_uwords = count_uwords<void, Args...>();

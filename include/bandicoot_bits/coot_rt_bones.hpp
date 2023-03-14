@@ -126,6 +126,9 @@ class coot_rt_t
   template<typename eT>
   static inline eT max_abs(const dev_mem_t<eT> mem, const uword n_elem);
 
+  template<typename eT1, typename eT2>
+  static inline bool all_vec(const dev_mem_t<eT1> mem, const uword n_elem, const eT2 val, const twoway_kernel_id::enum_id num, const twoway_kernel_id::enum_id num_small);
+
   template<typename eT>
   static inline bool chol(dev_mem_t<eT> out, const uword n_rows);
 

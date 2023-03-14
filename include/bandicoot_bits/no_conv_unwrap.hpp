@@ -128,7 +128,7 @@ struct no_conv_unwrap< mtOp<out_eT, Mat< in_eT >, mtop_conv_to> >
 
   inline
   no_conv_unwrap(const mtOp<out_eT, Mat<in_eT>, mtop_conv_to>& A)
-    : M(A.m.Q)
+    : M(A.q)
     {
     coot_extra_debug_sigprint();
     }
@@ -151,7 +151,7 @@ struct no_conv_unwrap< mtOp<out_eT, Col< in_eT >, mtop_conv_to> >
 
   inline
   no_conv_unwrap(const mtOp<out_eT, Col<in_eT>, mtop_conv_to>& A)
-    : M(A.m.Q)
+    : M(A.q)
     {
     coot_extra_debug_sigprint();
     }
@@ -174,7 +174,7 @@ struct no_conv_unwrap< mtOp<out_eT, Row< in_eT >, mtop_conv_to> >
 
   inline
   no_conv_unwrap(const mtOp<out_eT, Row<in_eT>, mtop_conv_to>& A)
-    : M(A.m.Q)
+    : M(A.q)
     {
     coot_extra_debug_sigprint();
     }

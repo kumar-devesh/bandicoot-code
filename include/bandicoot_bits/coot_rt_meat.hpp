@@ -1001,6 +1001,39 @@ coot_rt_t::max_abs(const dev_mem_t<eT> mem, const uword n_elem)
 
 
 
+template<typename eT1, typename eT2>
+inline
+bool
+coot_rt_t::all_vec(const dev_mem_t<eT1> mem, const uword n_elem, const eT2 val, const twoway_kernel_id::enum_id num, const twoway_kernel_id::enum_id num_small)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::all_vec(mem, n_elem, val, num, num_small);
+    #else
+    coot_stop_runtime_error("coot_rt::all_vec(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::all_vec(mem, n_elem, val, num, num_small);
+    #else
+    coot_stop_runtime_error("coot_rt::all_vec(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::all_vec(): unknown backend");
+    }
+
+  return false; // stop compilation warnings
+  }
+
+
+
 template<typename eT>
 inline
 bool

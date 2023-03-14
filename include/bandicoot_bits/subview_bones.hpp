@@ -25,6 +25,7 @@ class subview : public Base<eT, subview<eT> >
 
   static const bool is_row = false;
   static const bool is_col = false;
+  static const bool is_xvec = false;
 
   const uword aux_row1;
   const uword aux_col1;
@@ -116,6 +117,7 @@ class subview_col : public subview<eT>
 
   static const bool is_row = false;
   static const bool is_col = true;
+  static const bool is_xvec = true;
 
   coot_inline uword get_n_cols() const;
 
@@ -154,6 +156,7 @@ class subview_row : public subview<eT>
 
   static const bool is_row = true;
   static const bool is_col = false;
+  static const bool is_xvec = true;
 
   coot_inline uword get_n_rows() const;
 

@@ -121,13 +121,13 @@ eop_core<eop_type>::apply(Mat<eT>& out, const eOp<mtOp<eT, eOp<T2, eop_type>, mt
 
   typedef typename T2::elem_type in_eT;
 
-  in_eT aux_in  = X.m.Q.m.Q.aux;
+  in_eT aux_in  = X.m.Q.q.aux;
      eT aux_out = X.aux;
 
   // Pretend that we're doing the conversion after the operation.
   const twoway_kernel_id::enum_id kernel_num = eop_type::kernel_conv_post;
 
-  const unwrap<T2> U(X.m.Q.m.Q.m.Q);
+  const unwrap<T2> U(X.m.Q.q.m.Q);
   const Mat<in_eT>& A = U.M;
 
   dev_mem_t<eT>    out_dev_mem = out.get_dev_mem(false);

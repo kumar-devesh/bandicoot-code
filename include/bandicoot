@@ -106,6 +106,7 @@ namespace coot
   #include "bandicoot_bits/coot_version.hpp"
   #include "bandicoot_bits/coot_config.hpp"
   #include "bandicoot_bits/traits.hpp"
+  #include "bandicoot_bits/op_traits.hpp"
   #include "bandicoot_bits/promote_type.hpp"
   #include "bandicoot_bits/uint_type.hpp"
   #include "bandicoot_bits/upgrade_val.hpp"
@@ -224,6 +225,7 @@ namespace coot
   #include "bandicoot_bits/op_diagvec_bones.hpp"
 
   #include "bandicoot_bits/mtop_conv_to_bones.hpp"
+  #include "bandicoot_bits/mtop_all_bones.hpp"
 
   #include "bandicoot_bits/glue_times_bones.hpp"
 
@@ -326,6 +328,7 @@ namespace coot
       #include "bandicoot_bits/opencl/clamp.hpp"
       #include "bandicoot_bits/opencl/norm.hpp"
       #include "bandicoot_bits/opencl/mul_diag.hpp"
+      #include "bandicoot_bits/opencl/all.hpp"
       #include "bandicoot_bits/opencl/svd.hpp"
 //      #include "bandicoot_bits/opencl/eig.hpp"
       }
@@ -362,6 +365,7 @@ namespace coot
     #include "bandicoot_bits/cuda/clamp.hpp"
     #include "bandicoot_bits/cuda/norm.hpp"
     #include "bandicoot_bits/cuda/mul_diag.hpp"
+    #include "bandicoot_bits/cuda/all.hpp"
     #include "bandicoot_bits/cuda/svd.hpp"
 //    #include "bandicoot_bits/cuda/eig.hpp"
     }
@@ -420,6 +424,7 @@ namespace coot
   #include "bandicoot_bits/fn_clamp.hpp"
   #include "bandicoot_bits/fn_size.hpp"
   #include "bandicoot_bits/fn_norm.hpp"
+  #include "bandicoot_bits/fn_all.hpp"
   #include "bandicoot_bits/fn_svd.hpp"
   #include "bandicoot_bits/fn_diagmat.hpp"
   #include "bandicoot_bits/fn_diagvec.hpp"
@@ -468,6 +473,7 @@ namespace coot
   #include "bandicoot_bits/op_diagvec_meat.hpp"
 
   #include "bandicoot_bits/mtop_conv_to_meat.hpp"
+  #include "bandicoot_bits/mtop_all_meat.hpp"
 
   #include "bandicoot_bits/glue_times_meat.hpp"
 
