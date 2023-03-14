@@ -129,7 +129,7 @@ op_vectorise_all::apply(Mat<out_eT>& out, const Op<T1,op_vectorise_all>& in)
       op_vectorise_row::apply_direct(out, in.m);
       }
     }
-  };
+  }
 
 
 

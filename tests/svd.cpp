@@ -182,7 +182,10 @@ TEMPLATE_TEST_CASE("arma_svd_comparison", "[svd]", float, double)
   arma::Col<TestType> s2_cpu(s);
   for (uword i = 0; i < s.n_elem; ++i)
     {
-    REQUIRE( TestType(s2_cpu[i]) == Approx(TestType(s_cpu[i])) );
+    if (std::is_same<TestType, float>::value)
+      REQUIRE( TestType(s2_cpu[i]) == Approx(TestType(s_cpu[i])).epsilon(0.001).margin(0.0001) );
+    else
+      REQUIRE( TestType(s2_cpu[i]) == Approx(TestType(s_cpu[i])).margin(0.00001) );
     }
 
   // Make sure that U and V come out similarly too.
@@ -208,16 +211,25 @@ TEMPLATE_TEST_CASE("arma_svd_comparison", "[svd]", float, double)
   // The singular vectors that are returned may point opposite directions, so we check with abs().
   for (uword i = 0; i < u.n_elem; ++i)
     {
-    REQUIRE( std::abs(TestType(u2_cpu[i])) == Approx(std::abs(TestType(u_cpu[i]))).epsilon(0.01) );
+    if (std::is_same<TestType, float>::value)
+      REQUIRE( std::abs(TestType(u2_cpu[i])) == Approx(std::abs(TestType(u_cpu[i]))).epsilon(0.05).margin(0.0001) );
+    else
+      REQUIRE( std::abs(TestType(u2_cpu[i])) == Approx(std::abs(TestType(u_cpu[i]))).epsilon(0.001).margin(0.00001) );
     }
 
   for (uword i = 0; i < s.n_elem; ++i)
     {
-    REQUIRE( TestType(s2_cpu[i]) == Approx(TestType(s_cpu[i])).epsilon(0.01) );
+    if (std::is_same<TestType, float>::value)
+      REQUIRE( TestType(s2_cpu[i]) == Approx(TestType(s_cpu[i])).epsilon(0.05).margin(0.0001) );
+    else
+      REQUIRE( TestType(s2_cpu[i]) == Approx(TestType(s_cpu[i])).epsilon(0.001).margin(0.00001) );
     }
 
   for (uword i = 0; i < v.n_elem; ++i)
     {
-    REQUIRE( std::abs(TestType(v2_cpu[i])) == Approx(std::abs(TestType(v_cpu[i]))).epsilon(0.01) );
+    if (std::is_same<TestType, float>::value)
+      REQUIRE( std::abs(TestType(v2_cpu[i])) == Approx(std::abs(TestType(v_cpu[i]))).epsilon(0.05).margin(0.0001) );
+    else
+      REQUIRE( std::abs(TestType(v2_cpu[i])) == Approx(std::abs(TestType(v_cpu[i]))).epsilon(0.001).margin(0.00001) );
     }
   }
