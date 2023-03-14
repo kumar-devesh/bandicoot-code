@@ -1733,6 +1733,26 @@ Mat<eT>::resize(const uword new_n_elem)
 template<typename eT>
 inline
 void
+Mat<eT>::reshape(const uword new_n_rows, const uword new_n_cols)
+  {
+  coot_extra_debug_sigprint();
+
+  if (new_n_rows == 0 || new_n_cols == 0)
+    {
+    // Shortcut: just clear the memory.
+    set_size(new_n_rows, new_n_cols);
+    }
+  else
+    {
+    op_reshape::apply_direct(*this, *this, new_n_rows, new_n_cols);
+    }
+  }
+
+
+
+template<typename eT>
+inline
+void
 Mat<eT>::resize(const uword new_n_rows, const uword new_n_cols)
   {
   coot_extra_debug_sigprint();

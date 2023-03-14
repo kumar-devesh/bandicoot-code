@@ -78,6 +78,7 @@ class op_htrans;
 class op_htrans2;
 class op_repmat;
 class op_resize;
+class op_reshape;
 class op_vectorise_col;
 class op_vectorise_row;
 class op_vectorise_all;

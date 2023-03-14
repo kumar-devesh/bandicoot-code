@@ -1,4 +1,4 @@
-// Copyright 2019 Ryan Curtin (http://www.ratml.org/)
+// Copyright 2023 Ryan Curtin (http://www.ratml.org/)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,19 +12,18 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-__global__
-void
-COOT_FN(PREFIX,equ_array_sqrt_pre)(eT2* out,
-                                   const eT1* A,
-                                   const eT1 val_pre,
-                                   const eT2 val_post,
-                                   const UWORD N)
+
+
+template<typename T1>
+coot_warn_unused
+inline
+typename enable_if2<
+  is_coot_type<T1>::value,
+  const Op<T1, op_reshape>
+>::result
+reshape(const T1& x, const uword in_n_rows, const uword in_n_cols)
   {
-  (void)(val_pre);
-  (void)(val_post);
-  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x;
-  if(i < N)
-    {
-    out[i] = (eT2) sqrt((fp_eT2) ((eT2) A[i]));
-    }
+  coot_extra_debug_sigprint();
+
+  return Op<T1, op_reshape>(x, in_n_rows, in_n_cols);
   }
