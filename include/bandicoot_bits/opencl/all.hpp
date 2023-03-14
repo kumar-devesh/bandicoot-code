@@ -24,8 +24,8 @@ all_vec(const dev_mem_t<eT1> mem, const uword n_elem, const eT2 val, const twowa
 
   coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::all_vec(): OpenCL runtime not valid" );
 
-  cl_kernel k = get_rt().cl_rt.get_kernel<eT1, eT2>(num);
-  cl_kernel k_small = get_rt().cl_rt.get_kernel<eT1, eT2>(num_small);
+  cl_kernel k = get_rt().cl_rt.get_kernel<eT2, eT1>(num);
+  cl_kernel k_small = get_rt().cl_rt.get_kernel<eT2, eT1>(num_small);
   // Second (and later) passes use the "and" reduction.
   cl_kernel second_k = get_rt().cl_rt.get_kernel<u32>(oneway_integral_kernel_id::and_reduce);
   cl_kernel second_k_small = get_rt().cl_rt.get_kernel<u32>(oneway_integral_kernel_id::and_reduce_small);
@@ -56,7 +56,7 @@ all(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> in_mem, const uword n_rows, c
 
   runtime_t::cq_guard guard;
 
-  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT1, eT2>(num);
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT2, eT1>(num);
 
   cl_int status = 0;
 

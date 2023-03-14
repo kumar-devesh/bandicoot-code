@@ -466,3 +466,195 @@ TEMPLATE_TEST_CASE("all_mat_expr_rowwise", "[all]", float, double, u32, s32, u64
       }
     }
   }
+
+
+
+TEMPLATE_TEST_CASE(
+  "all_vec_conv_to",
+  "[all]",
+  (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
+  {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  Col<eT1> x = randi<Col<eT1>>(1000, distr_param(10, 20));
+
+  REQUIRE ( all(conv_to<Col<eT2>>::from(x)) == true );
+
+  x[12] = eT1(0);
+
+  REQUIRE ( all(conv_to<Col<eT2>>::from(x)) == false );
+  }
+
+
+
+TEMPLATE_TEST_CASE(
+  "all_vec_conv_to_matrix",
+  "[all]",
+  (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
+  {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  Mat<eT1> x = randi<Mat<eT1>>(500, 500, distr_param(10, 20));
+
+  REQUIRE( all(all(conv_to<Mat<eT2>>::from(x))) == true );
+
+  x[15] = eT1(0);
+
+  REQUIRE( all(all(conv_to<Mat<eT2>>::from(x))) == false );
+  }
+
+
+
+TEMPLATE_TEST_CASE(
+  "all_conv_to",
+  "[all]",
+  (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
+  {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  Mat<eT1> x = randi<Mat<eT1>>(10000, 500, distr_param(10, 30));
+  x.col(10).zeros();
+  x.col(50).zeros();
+  x.col(477).zeros();
+
+  Row<uword> y = all(conv_to<Mat<eT2>>::from(x));
+  Row<uword> y2 = all(conv_to<Mat<eT2>>::from(x));
+
+  REQUIRE( y.n_rows == 1 );
+  REQUIRE( y.n_cols == 500 );
+  REQUIRE( y.n_elem == 500 );
+
+  REQUIRE( y2.n_rows == 1 );
+  REQUIRE( y2.n_cols == 500 );
+  REQUIRE( y2.n_elem == 500 );
+
+  arma::Row<uword> y_cpu(y);
+  arma::Row<uword> y2_cpu(y2);
+
+  for (size_t i = 0; i < 500; ++i)
+    {
+    if (i == 10 || i == 50 || i == 477)
+      {
+      REQUIRE( y_cpu[i] == 0 );
+      REQUIRE( y2_cpu[i] == 0 );
+      }
+    else
+      {
+      REQUIRE( y_cpu[i] == 1 );
+      REQUIRE( y2_cpu[i] == 1 );
+      }
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE(
+  "all_conv_to_rowwise",
+  "[all]",
+  (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
+  {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  Mat<eT1> x = randi<Mat<eT1>>(500, 10000, distr_param(10, 30));
+  x.row(10).zeros();
+  x.row(50).zeros();
+  x.row(477).zeros();
+
+  Col<uword> y = all(conv_to<Mat<eT2>>::from(x), 1);
+
+  REQUIRE( y.n_rows == 500 );
+  REQUIRE( y.n_cols == 1 );
+  REQUIRE( y.n_elem == 500 );
+
+  arma::Col<uword> y_cpu(y);
+
+  for (size_t i = 0; i < 500; ++i)
+    {
+    if (i == 10 || i == 50 || i == 477)
+      {
+      REQUIRE( y_cpu[i] == 0 );
+      }
+    else
+      {
+      REQUIRE( y_cpu[i] == 1 );
+      }
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE(
+  "all_conv_to_eop",
+  "[all]",
+  (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
+  {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  Mat<eT1> x = randi<Mat<eT1>>(10000, 500, distr_param(10, 30));
+  x.col(10).ones();
+  x.col(50).ones();
+  x.col(477).ones();
+
+  Row<uword> y = all(conv_to<Mat<eT2>>::from(2 * x - 2));
+  Row<uword> y2 = all(conv_to<Mat<eT2>>::from(2 * x - 2), 0);
+
+  REQUIRE( y.n_rows == 1 );
+  REQUIRE( y.n_cols == 500 );
+  REQUIRE( y.n_elem == 500 );
+
+  REQUIRE( y2.n_rows == 1 );
+  REQUIRE( y2.n_cols == 500 );
+  REQUIRE( y2.n_elem == 500 );
+
+  arma::Row<uword> y_cpu(y);
+  arma::Row<uword> y2_cpu(y2);
+
+  for (size_t i = 0; i < 500; ++i)
+    {
+    if (i == 10 || i == 50 || i == 477)
+      {
+      REQUIRE( y_cpu[i] == 0 );
+      REQUIRE( y2_cpu[i] == 0 );
+      }
+    else
+      {
+      REQUIRE( y_cpu[i] == 1 );
+      REQUIRE( y2_cpu[i] == 1 );
+      }
+    }
+  }
