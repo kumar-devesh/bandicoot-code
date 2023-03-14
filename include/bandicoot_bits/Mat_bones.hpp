@@ -43,6 +43,7 @@ class Mat : public Base< eT, Mat<eT> >
   inline  Mat();
 
   inline explicit Mat(const uword in_rows, const uword in_cols);
+  inline explicit Mat(const SizeMat& s);
 
   inline Mat(dev_mem_t<eT> aux_dev_mem, const uword in_rows, const uword in_cols);
 
@@ -162,9 +163,11 @@ class Mat : public Base< eT, Mat<eT> >
   inline void reset();
   inline void set_size(const uword new_n_elem);
   inline void set_size(const uword new_n_rows, const uword new_n_cols);
+  inline void set_size(const SizeMat& s);
 
   inline void   resize(const uword new_n_elem);
   inline void   resize(const uword new_n_rows, const uword new_n_cols);
+  inline void   resize(const SizeMat& s);
 
   inline void  reshape(const uword new_n_rows, const uword new_n_cols);
 

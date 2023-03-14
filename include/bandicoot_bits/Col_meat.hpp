@@ -53,6 +53,19 @@ Col<eT>::Col(const uword in_rows, const uword in_cols)
 
 template<typename eT>
 inline
+Col<eT>::Col(const SizeMat& s)
+  : Mat<eT>()
+  {
+  coot_extra_debug_sigprint();
+
+  access::rw(Mat<eT>::vec_state) = 1;
+  Mat<eT>::init(s.n_rows, s.n_cols);
+  }
+
+
+
+template<typename eT>
+inline
 Col<eT>::Col(const Col<eT>& X)
   : Mat<eT>(X.n_rows, 1)
   {
@@ -274,6 +287,38 @@ Col<eT>::subvec(const uword in_row1, const uword in_row2) const
   const uword subview_n_rows = in_row2 - in_row1 + 1;
 
   return subview_col<eT>(*this, 0, in_row1, subview_n_rows);
+  }
+
+
+
+template<typename eT>
+coot_inline
+subview_col<eT>
+Col<eT>::subvec(const uword start_row, const SizeMat& s)
+  {
+  coot_extra_debug_sigprint();
+
+  coot_debug_check( (s.n_cols != 1), "Col::subvec(): given size does not specify a column vector" );
+
+  coot_debug_check_bounds( ( (start_row >= Mat<eT>::n_rows) || ((start_row + s.n_rows) > Mat<eT>::n_rows) ), "Col::subvec(): size out of bounds" );
+
+  return subview_col<eT>(*this, 0, start_row, s.n_rows);
+  }
+
+
+
+template<typename eT>
+coot_inline
+const subview_col<eT>
+Col<eT>::subvec(const uword start_row, const SizeMat& s) const
+  {
+  coot_extra_debug_sigprint();
+
+  coot_debug_check( (s.n_cols != 1), "Col::subvec(): given size does not specify a column vector" );
+
+  coot_debug_check_bounds( ( (start_row >= Mat<eT>::n_rows) || ((start_row + s.n_rows) > Mat<eT>::n_rows) ), "Col::subvec(): size out of bounds" );
+
+  return subview_col<eT>(*this, 0, start_row, s.n_rows);
   }
 
 

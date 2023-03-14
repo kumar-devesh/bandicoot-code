@@ -38,7 +38,7 @@ template<typename eT> class diagview;
 
 
 class SizeMat;
-class SizeCube;
+// class SizeCube;
 
 class coot_empty_class {};
 

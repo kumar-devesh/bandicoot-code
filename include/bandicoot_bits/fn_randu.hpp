@@ -59,3 +59,17 @@ randu(const uword n_elem, const typename coot_Mat_Col_Row_only<T>::result* junk 
   coot_rng::fill_randu(out.get_dev_mem(false), out.n_elem);
   return out;
   }
+
+
+
+template<typename T>
+coot_warn_unused
+inline
+T
+randu(const SizeMat& s, const typename coot_Mat_Col_Row_only<T>::result* junk = nullptr)
+  {
+  coot_extra_debug_sigprint();
+  coot_ignore(junk);
+
+  return randu<T>(s.n_rows, s.n_cols);
+  }

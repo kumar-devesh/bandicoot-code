@@ -59,3 +59,17 @@ randi(const uword n_elem, const distr_param& param = distr_param(), const typena
 
   return randi<T>(n_rows, n_cols, param);
   }
+
+
+
+template<typename T>
+coot_warn_unused
+inline
+T
+randi(const SizeMat& s, const distr_param& param = distr_param(), const typename coot_Mat_Col_Row_only<T>::result* junk = nullptr)
+  {
+  coot_extra_debug_sigprint();
+  coot_ignore(junk);
+
+  return randi<T>(s.n_rows, s.n_cols, param);
+  }

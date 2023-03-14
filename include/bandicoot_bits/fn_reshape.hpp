@@ -27,3 +27,19 @@ reshape(const T1& x, const uword in_n_rows, const uword in_n_cols)
 
   return Op<T1, op_reshape>(x, in_n_rows, in_n_cols);
   }
+
+
+
+template<typename T1>
+coot_warn_unused
+inline
+typename enable_if2<
+  is_coot_type<T1>::value,
+  const Op<T1, op_reshape>
+>::result
+reshape(const T1& x, const SizeMat& s)
+  {
+  coot_extra_debug_sigprint();
+
+  return Op<T1, op_reshape>(x, s.n_rows, s.n_cols);
+  }

@@ -418,6 +418,7 @@ namespace coot
   #include "bandicoot_bits/fn_linspace.hpp"
   #include "bandicoot_bits/fn_vectorise.hpp"
   #include "bandicoot_bits/fn_clamp.hpp"
+  #include "bandicoot_bits/fn_size.hpp"
   #include "bandicoot_bits/fn_norm.hpp"
   #include "bandicoot_bits/fn_svd.hpp"
   #include "bandicoot_bits/fn_diagmat.hpp"
