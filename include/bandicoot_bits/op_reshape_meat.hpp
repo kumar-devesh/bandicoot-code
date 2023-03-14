@@ -41,7 +41,7 @@ op_reshape::apply(Mat<out_eT>& out, const Op<mtOp<out_eT, T1, mtop_conv_to>, op_
   {
   coot_extra_debug_sigprint();
 
-  Op<T1, op_reshape> op_tmp(in.m.m.Q, in.aux_uword_a, in.aux_uword_b);
+  Op<T1, op_reshape> op_tmp(in.m.q, in.aux_uword_a, in.aux_uword_b);
   op_reshape::apply(out, op_tmp);
   }
 
