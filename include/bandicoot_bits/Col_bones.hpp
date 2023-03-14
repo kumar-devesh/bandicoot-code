@@ -31,6 +31,7 @@ class Col : public Mat<eT>
   inline          Col();
   inline explicit Col(const uword N);
   inline explicit Col(const uword in_rows, const uword in_cols);
+  inline explicit Col(const SizeMat& s);
 
   inline                  Col(const Col& X);
   inline const Col& operator=(const Col& X);
@@ -60,6 +61,9 @@ class Col : public Mat<eT>
 
   coot_inline       subview_col<eT> subvec(const uword in_row1, const uword in_row2);
   coot_inline const subview_col<eT> subvec(const uword in_row1, const uword in_row2) const;
+
+  coot_inline       subview_col<eT> subvec(const uword start_row, const SizeMat& s);
+  coot_inline const subview_col<eT> subvec(const uword start_row, const SizeMat& s) const;
 
   #ifdef COOT_EXTRA_COL_BONES
     #include COOT_INCFILE_WRAP(COOT_EXTRA_COL_BONES)

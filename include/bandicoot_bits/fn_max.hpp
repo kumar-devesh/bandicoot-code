@@ -88,3 +88,13 @@ max
 
   return op_max::apply_direct(in.m);
   }
+
+
+
+coot_warn_unused
+inline
+uword
+max(const SizeMat& s)
+  {
+  return (std::max)(s.n_rows, s.n_cols);
+  }

@@ -416,3 +416,18 @@ runtime_t::synchronise()
   {
   cuCtxSynchronize();
   }
+
+
+
+inline
+void
+runtime_t::set_rng_seed(const u64 seed)
+  {
+  coot_extra_debug_sigprint();
+
+  curandStatus_t status = curandSetPseudoRandomGeneratorSeed(xorwow_rand, seed);
+  coot_check_curand_error(status, "cuda::set_rng_seed(): curandSetPseudoRandomGeneratorSeed() failed");
+
+  status = curandSetPseudoRandomGeneratorSeed(philox_rand, seed);
+  coot_check_curand_error(status, "cuda::set_rng_seed(): curandSetPseudoRandomGeneratorSeed() failed");
+  }
