@@ -1143,6 +1143,20 @@ runtime_t::get_num_rng_threads() const
 
 
 
+inline
+void
+runtime_t::set_rng_seed(const u64 seed)
+  {
+  coot_extra_debug_sigprint();
+
+  // reset RNG memory with correct seed
+  init_xorwow_state<u32>(xorwow32_state, num_rng_threads);
+  init_xorwow_state<u64>(xorwow64_state, num_rng_threads);
+  init_philox_state(philox_state, num_rng_threads);
+  }
+
+
+
 //
 // program_wrapper
 

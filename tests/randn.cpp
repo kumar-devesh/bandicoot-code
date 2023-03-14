@@ -217,6 +217,7 @@ void test_randn_distr(const double mu = 0.0, const double sd = 1.0, const size_t
     }
 
   arma::Row<size_t> bin_counts(60);
+  bin_counts.zeros();
   size_t left_tail_count = 0;
   size_t right_tail_count = 0;
   arma::Row<eT> f_cpu(f);
@@ -249,6 +250,8 @@ void test_randn_distr(const double mu = 0.0, const double sd = 1.0, const size_t
 
   // First compute some convenience values we'll use later.
   arma::rowvec log_facts(50001); // log_facts[i] = log(i!)
+  log_facts[0] = 0.0;
+  log_facts[1] = 0.0;
   for (uword i = 2; i < 50001; ++i)
     {
     log_facts[i] = log_facts[i - 1] + std::log(i);

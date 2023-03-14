@@ -192,6 +192,7 @@ void test_randu_distr()
 
   Row<eT> f = randu<Row<eT>>(10000);
   arma::Row<size_t> bin_counts(5);
+  bin_counts.zeros();
   arma::Row<eT> f_cpu(f);
   for (size_t i = 0; i < 10000; ++i)
     {

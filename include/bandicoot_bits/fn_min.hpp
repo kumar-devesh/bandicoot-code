@@ -88,3 +88,13 @@ min
 
   return op_min::apply_direct(in.m);
   }
+
+
+
+coot_warn_unused
+inline
+uword
+min(const SizeMat& s)
+  {
+  return (std::min)(s.n_rows, s.n_cols);
+  }
