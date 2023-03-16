@@ -21,7 +21,7 @@ mtop_all::apply(Mat<uword>& out, const mtOp<uword, T1, mtop_all>& in)
   {
   coot_extra_debug_sigprint();
 
-  const uword dim = in.aux_uword;
+  const uword dim = in.aux_uword_a;
 
   coot_debug_check( (dim > 1), "all(): parameter 'dim' must be 0 or 1" );
 
@@ -56,7 +56,7 @@ mtop_all::apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1, mtop_conv_to>, 
   {
   coot_extra_debug_sigprint();
 
-  const uword dim = in.aux_uword;
+  const uword dim = in.aux_uword_a;
 
   coot_debug_check( (dim > 1), "all(): parameter 'dim' must be 0 or 1" );
 
@@ -174,7 +174,7 @@ inline
 uword
 mtop_all::compute_n_rows(const mtOp<out_eT, T1, mtop_all>& op, const uword in_n_rows, const uword in_n_cols)
   {
-  return (op.aux_uword == 0) ? 1 : in_n_rows;
+  return (op.aux_uword_a == 0) ? 1 : in_n_rows;
   }
 
 
@@ -184,5 +184,5 @@ inline
 uword
 mtop_all::compute_n_cols(const mtOp<out_eT, T1, mtop_all>& op, const uword in_n_rows, const uword in_n_cols)
   {
-  return (op.aux_uword == 0) ? in_n_cols : 1;
+  return (op.aux_uword_a == 0) ? in_n_cols : 1;
   }

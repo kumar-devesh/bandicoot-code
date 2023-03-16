@@ -16,9 +16,24 @@
 
 template<typename out_eT, typename T1, typename mtop_type>
 inline
-mtOp<out_eT, T1, mtop_type>::mtOp(const T1& in_m, const uword in_aux_uword)
+mtOp<out_eT, T1, mtop_type>::mtOp(const T1& in_m, const uword in_aux_uword_a, const uword in_aux_uword_b)
   : q(in_m)
-  , aux_uword(in_aux_uword)
+  , aux(out_eT(0))
+  , aux_uword_a(in_aux_uword_a)
+  , aux_uword_b(in_aux_uword_b)
+  {
+  coot_extra_debug_sigprint();
+  }
+
+
+
+template<typename out_eT, typename T1, typename mtop_type>
+inline
+mtOp<out_eT, T1, mtop_type>::mtOp(const T1& in_m, const typename T1::elem_type aux_in)
+  : q(in_m)
+  , aux(aux_in)
+  , aux_uword_a(0)
+  , aux_uword_b(0)
   {
   coot_extra_debug_sigprint();
   }
