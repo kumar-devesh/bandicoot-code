@@ -25,9 +25,6 @@ class mtOp
   typedef typename T1::elem_type                   in_elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
 
-  static const bool is_row = T1::is_row;
-  static const bool is_col = T1::is_col;
-
   const T1& q;
   const typename T1::elem_type aux;
   const uword                  aux_uword_a;
