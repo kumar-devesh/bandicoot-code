@@ -370,3 +370,352 @@ TEST_CASE("empty_relational_test", "[relational]")
   }
 
 // conv_to tests
+// TODO
+
+//
+// relational array operations
+//
+
+
+
+TEMPLATE_TEST_CASE("simple_array_relational_op", "[relational]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> X(3, 3);
+  Mat<eT> Y(3, 3);
+
+  for (uword i = 0; i < 9; ++i)
+    {
+    X[i] = eT(i);
+    Y[i] = eT(8 - i);
+    }
+
+  umat z1 = X < Y;
+  umat z2 = Y < X;
+  umat z3 = X > Y;
+  umat z4 = Y > X;
+  umat z5 = X <= Y;
+  umat z6 = Y <= X;
+  umat z7 = X >= Y;
+  umat z8 = Y >= X;
+  umat z9 = X == Y;
+  umat z10 = Y == X;
+  umat z11 = X != Y;
+  umat z12 = Y != X;
+  umat z13 = X && Y;
+  umat z14 = Y && X;
+  umat z15 = X || Y;
+  umat z16 = Y || X;
+
+  REQUIRE( z1.n_rows == 3 );
+  REQUIRE( z1.n_cols == 3 );
+  REQUIRE( z1.n_elem == 9 );
+  REQUIRE( z2.n_rows == 3 );
+  REQUIRE( z2.n_cols == 3 );
+  REQUIRE( z2.n_elem == 9 );
+  REQUIRE( z3.n_rows == 3 );
+  REQUIRE( z3.n_cols == 3 );
+  REQUIRE( z3.n_elem == 9 );
+  REQUIRE( z4.n_rows == 3 );
+  REQUIRE( z4.n_cols == 3 );
+  REQUIRE( z4.n_elem == 9 );
+  REQUIRE( z5.n_rows == 3 );
+  REQUIRE( z5.n_cols == 3 );
+  REQUIRE( z5.n_elem == 9 );
+  REQUIRE( z6.n_rows == 3 );
+  REQUIRE( z6.n_cols == 3 );
+  REQUIRE( z6.n_elem == 9 );
+  REQUIRE( z7.n_rows == 3 );
+  REQUIRE( z7.n_cols == 3 );
+  REQUIRE( z7.n_elem == 9 );
+  REQUIRE( z8.n_rows == 3 );
+  REQUIRE( z8.n_cols == 3 );
+  REQUIRE( z8.n_elem == 9 );
+  REQUIRE( z9.n_rows == 3 );
+  REQUIRE( z9.n_cols == 3 );
+  REQUIRE( z9.n_elem == 9 );
+  REQUIRE( z10.n_rows == 3 );
+  REQUIRE( z10.n_cols == 3 );
+  REQUIRE( z10.n_elem == 9 );
+  REQUIRE( z11.n_rows == 3 );
+  REQUIRE( z11.n_cols == 3 );
+  REQUIRE( z11.n_elem == 9 );
+  REQUIRE( z12.n_rows == 3 );
+  REQUIRE( z12.n_cols == 3 );
+  REQUIRE( z12.n_elem == 9 );
+  REQUIRE( z13.n_rows == 3 );
+  REQUIRE( z13.n_cols == 3 );
+  REQUIRE( z13.n_elem == 9 );
+  REQUIRE( z14.n_rows == 3 );
+  REQUIRE( z14.n_cols == 3 );
+  REQUIRE( z14.n_elem == 9 );
+  REQUIRE( z15.n_rows == 3 );
+  REQUIRE( z15.n_cols == 3 );
+  REQUIRE( z15.n_elem == 9 );
+  REQUIRE( z16.n_rows == 3 );
+  REQUIRE( z16.n_cols == 3 );
+  REQUIRE( z16.n_elem == 9 );
+
+  for (uword i = 0; i < 9; ++i)
+    {
+    REQUIRE( uword(z1[i]) == (X[i] < Y[i]) );
+    REQUIRE( uword(z2[i]) == (Y[i] < X[i]) );
+    REQUIRE( uword(z3[i]) == (X[i] > Y[i]) );
+    REQUIRE( uword(z4[i]) == (Y[i] > X[i]) );
+    REQUIRE( uword(z5[i]) == (X[i] <= Y[i]) );
+    REQUIRE( uword(z6[i]) == (Y[i] <= X[i]) );
+    REQUIRE( uword(z7[i]) == (X[i] >= Y[i]) );
+    REQUIRE( uword(z8[i]) == (Y[i] >= X[i]) );
+    REQUIRE( uword(z9[i]) == (X[i] == Y[i]) );
+    REQUIRE( uword(z10[i]) == (Y[i] == X[i]) );
+    REQUIRE( uword(z11[i]) == (X[i] != Y[i]) );
+    REQUIRE( uword(z12[i]) == (Y[i] != X[i]) );
+    REQUIRE( uword(z13[i]) == (X[i] && Y[i]) );
+    REQUIRE( uword(z14[i]) == (Y[i] && X[i]) );
+    REQUIRE( uword(z15[i]) == (X[i] || Y[i]) );
+    REQUIRE( uword(z16[i]) == (Y[i] || X[i]) );
+    }
+  }
+
+
+
+// large array test
+
+TEMPLATE_TEST_CASE("large_relational_array_test", "[relational]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> X = randi<Mat<eT>>(100, 100, distr_param(1, 100));
+  Mat<eT> Y = randi<Mat<eT>>(100, 100, distr_param(1, 100));
+
+  arma::Mat<eT> X_cpu(X);
+  arma::Mat<eT> Y_cpu(Y);
+
+  umat z = X < Y;
+  arma::Mat<uword> z_cpu_ref = arma::conv_to<arma::Mat<uword>>::from(X_cpu < Y_cpu);
+  arma::Mat<uword> z_cpu(z);
+
+  REQUIRE( arma::all( arma::all( z_cpu == z_cpu_ref ) ) );
+
+  z = Y < X;
+  z_cpu_ref = arma::conv_to<arma::Mat<uword>>::from(Y_cpu < X_cpu);
+  z_cpu = arma::Mat<uword>(z);
+
+  REQUIRE( arma::all( arma::all( z_cpu == z_cpu_ref ) ) );
+
+  z = X > Y;
+  z_cpu_ref = arma::conv_to<arma::Mat<uword>>::from(X_cpu > Y_cpu);
+  z_cpu = arma::Mat<uword>(z);
+
+  REQUIRE( arma::all( arma::all( z_cpu == z_cpu_ref ) ) );
+
+  z = Y > X;
+  z_cpu_ref = arma::conv_to<arma::Mat<uword>>::from(Y_cpu > X_cpu);
+  z_cpu = arma::Mat<uword>(z);
+
+  REQUIRE( arma::all( arma::all( z_cpu == z_cpu_ref ) ) );
+
+  z = X <= Y;
+  z_cpu_ref = arma::conv_to<arma::Mat<uword>>::from(X_cpu <= Y_cpu);
+  z_cpu = arma::Mat<uword>(z);
+
+  REQUIRE( arma::all( arma::all( z_cpu == z_cpu_ref ) ) );
+
+  z = Y <= X;
+  z_cpu_ref = arma::conv_to<arma::Mat<uword>>::from(Y_cpu <= X_cpu);
+  z_cpu = arma::Mat<uword>(z);
+
+  REQUIRE( arma::all( arma::all( z_cpu == z_cpu_ref ) ) );
+
+  z = X >= Y;
+  z_cpu_ref = arma::conv_to<arma::Mat<uword>>::from(X_cpu >= Y_cpu);
+  z_cpu = arma::Mat<uword>(z);
+
+  REQUIRE( arma::all( arma::all( z_cpu == z_cpu_ref ) ) );
+
+  z = Y >= X;
+  z_cpu_ref = arma::conv_to<arma::Mat<uword>>::from(Y_cpu >= X_cpu);
+  z_cpu = arma::Mat<uword>(z);
+
+  REQUIRE( arma::all( arma::all( z_cpu == z_cpu_ref ) ) );
+
+  z = X == Y;
+  z_cpu_ref = arma::conv_to<arma::Mat<uword>>::from(X_cpu == Y_cpu);
+  z_cpu = arma::Mat<uword>(z);
+
+  REQUIRE( arma::all( arma::all( z_cpu == z_cpu_ref ) ) );
+
+  z = Y == X;
+  z_cpu_ref = arma::conv_to<arma::Mat<uword>>::from(Y_cpu == X_cpu);
+  z_cpu = arma::Mat<uword>(z);
+
+  REQUIRE( arma::all( arma::all( z_cpu == z_cpu_ref ) ) );
+
+  z = X != Y;
+  z_cpu_ref = arma::conv_to<arma::Mat<uword>>::from(X_cpu != Y_cpu);
+  z_cpu = arma::Mat<uword>(z);
+
+  REQUIRE( arma::all( arma::all( z_cpu == z_cpu_ref ) ) );
+
+  z = Y != X;
+  z_cpu_ref = arma::conv_to<arma::Mat<uword>>::from(Y_cpu != X_cpu);
+  z_cpu = arma::Mat<uword>(z);
+
+  REQUIRE( arma::all( arma::all( z_cpu == z_cpu_ref ) ) );
+
+  z = X && Y;
+  z_cpu_ref = arma::conv_to<arma::Mat<uword>>::from(X_cpu && Y_cpu);
+  z_cpu = arma::Mat<uword>(z);
+
+  REQUIRE( arma::all( arma::all( z_cpu == z_cpu_ref ) ) );
+
+  z = Y && X;
+  z_cpu_ref = arma::conv_to<arma::Mat<uword>>::from(Y_cpu && X_cpu);
+  z_cpu = arma::Mat<uword>(z);
+
+  REQUIRE( arma::all( arma::all( z_cpu == z_cpu_ref ) ) );
+
+  z = X || Y;
+  z_cpu_ref = arma::conv_to<arma::Mat<uword>>::from(X_cpu || Y_cpu);
+  z_cpu = arma::Mat<uword>(z);
+
+  REQUIRE( arma::all( arma::all( z_cpu == z_cpu_ref ) ) );
+
+  z = Y || X;
+  z_cpu_ref = arma::conv_to<arma::Mat<uword>>::from(Y_cpu || X_cpu);
+  z_cpu = arma::Mat<uword>(z);
+
+  REQUIRE( arma::all( arma::all( z_cpu == z_cpu_ref ) ) );
+  }
+
+
+
+TEST_CASE("empty_relational_array_op", "[relational]")
+  {
+  mat x;
+  mat y;
+
+  umat z1 = x < y;
+  umat z2 = y < x;
+  umat z3 = x > y;
+  umat z4 = y > x;
+  umat z5 = x <= y;
+  umat z6 = y <= x;
+  umat z7 = x >= y;
+  umat z8 = y >= x;
+  umat z9 = x == y;
+  umat z10 = y == x;
+  umat z11 = x != y;
+  umat z12 = y != x;
+  umat z13 = x && y;
+  umat z14 = y && x;
+  umat z15 = x || y;
+  umat z16 = y || x;
+
+  REQUIRE( z1.n_rows == 0 );
+  REQUIRE( z1.n_cols == 0 );
+  REQUIRE( z1.n_elem == 0 );
+
+  REQUIRE( z2.n_rows == 0 );
+  REQUIRE( z2.n_cols == 0 );
+  REQUIRE( z2.n_elem == 0 );
+
+  REQUIRE( z3.n_rows == 0 );
+  REQUIRE( z3.n_cols == 0 );
+  REQUIRE( z3.n_elem == 0 );
+
+  REQUIRE( z4.n_rows == 0 );
+  REQUIRE( z4.n_cols == 0 );
+  REQUIRE( z4.n_elem == 0 );
+
+  REQUIRE( z5.n_rows == 0 );
+  REQUIRE( z5.n_cols == 0 );
+  REQUIRE( z5.n_elem == 0 );
+
+  REQUIRE( z6.n_rows == 0 );
+  REQUIRE( z6.n_cols == 0 );
+  REQUIRE( z6.n_elem == 0 );
+
+  REQUIRE( z7.n_rows == 0 );
+  REQUIRE( z7.n_cols == 0 );
+  REQUIRE( z7.n_elem == 0 );
+
+  REQUIRE( z8.n_rows == 0 );
+  REQUIRE( z8.n_cols == 0 );
+  REQUIRE( z8.n_elem == 0 );
+
+  REQUIRE( z9.n_rows == 0 );
+  REQUIRE( z9.n_cols == 0 );
+  REQUIRE( z9.n_elem == 0 );
+
+  REQUIRE( z10.n_rows == 0 );
+  REQUIRE( z10.n_cols == 0 );
+  REQUIRE( z10.n_elem == 0 );
+
+  REQUIRE( z11.n_rows == 0 );
+  REQUIRE( z11.n_cols == 0 );
+  REQUIRE( z11.n_elem == 0 );
+
+  REQUIRE( z12.n_rows == 0 );
+  REQUIRE( z12.n_cols == 0 );
+  REQUIRE( z12.n_elem == 0 );
+
+  REQUIRE( z13.n_rows == 0 );
+  REQUIRE( z13.n_cols == 0 );
+  REQUIRE( z13.n_elem == 0 );
+
+  REQUIRE( z14.n_rows == 0 );
+  REQUIRE( z14.n_cols == 0 );
+  REQUIRE( z14.n_elem == 0 );
+
+  REQUIRE( z15.n_rows == 0 );
+  REQUIRE( z15.n_cols == 0 );
+  REQUIRE( z15.n_elem == 0 );
+
+  REQUIRE( z16.n_rows == 0 );
+  REQUIRE( z16.n_cols == 0 );
+  REQUIRE( z16.n_elem == 0 );
+  }
+
+
+
+TEST_CASE("alias_relational_array_op", "[relational]")
+  {
+  umat x = randi<umat>(10, 10, distr_param(1, 20));
+  umat y = randi<umat>(10, 10, distr_param(1, 20));
+
+  umat x_orig(x);
+  umat y_orig(y);
+
+  x = x < y;
+  umat z = x_orig < y_orig;
+
+  REQUIRE( x.n_rows == 10 );
+  REQUIRE( x.n_cols == 10 );
+  REQUIRE( x.n_elem == 100 );
+
+  arma::Mat<uword> x_cpu(x);
+  arma::Mat<uword> z_cpu(z);
+
+  REQUIRE( arma::all( arma::all( x_cpu == z_cpu ) ) );
+
+  x = x_orig;
+  y = x > y;
+
+  z = x_orig > y_orig;
+
+  REQUIRE( y.n_rows == 10 );
+  REQUIRE( y.n_cols == 10 );
+  REQUIRE( y.n_elem == 100 );
+
+  arma::Mat<uword> y_cpu(y);
+  z_cpu = arma::Mat<uword>(z);
+
+  REQUIRE( arma::all( arma::all( y_cpu == z_cpu ) ) );
+  }
+
+
+
+// conv_to tests
+// TODO
