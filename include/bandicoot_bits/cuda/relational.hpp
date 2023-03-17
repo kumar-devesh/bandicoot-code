@@ -46,3 +46,37 @@ relational_scalar_op(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> in_mem, cons
 
   coot_check_cuda_error(result, "coot::cuda::relational_scalar_op() (" + name + "): cuLaunchKernel() failed");
   }
+
+
+
+template<typename eT1, typename eT2>
+inline
+void
+relational_array_op(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> X_mem, const dev_mem_t<eT2> Y_mem, const uword n_elem, const twoway_kernel_id::enum_id num, const std::string& name)
+  {
+  coot_extra_debug_sigprint();
+
+  // Shortcut: if there is nothing to do, return.
+  if (n_elem == 0)
+    return;
+
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT2, eT1>(num);
+
+  const void* args[] = {
+      &(out_mem.cuda_mem_ptr),
+      &(X_mem.cuda_mem_ptr),
+      &(Y_mem.cuda_mem_ptr),
+      (uword*) &n_elem };
+
+  const kernel_dims dims = one_dimensional_grid_dims(n_elem);
+
+  CUresult result = cuLaunchKernel(
+      kernel,
+      dims.d[0], dims.d[1], dims.d[2],
+      dims.d[3], dims.d[4], dims.d[5],
+      0, NULL,
+      (void**) args,
+      0);
+
+  coot_check_cuda_error(result, "coot::cuda::relational_array_op() (" + name + "): cuLaunchKernel() failed");
+  }

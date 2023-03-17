@@ -423,12 +423,14 @@ struct twoway_kernel_id
     rel_lteq_scalar,
     rel_eq_scalar,
     rel_neq_scalar,
-    //rel_gt_array,
-    //rel_lt_array,
-    //rel_gteq_array,
-    //rel_lteq_array,
-    //rel_eq_array,
-    //rel_neq_array,
+    rel_gt_array,
+    rel_lt_array,
+    rel_gteq_array,
+    rel_lteq_array,
+    rel_eq_array,
+    rel_neq_array,
+    rel_and_array,
+    rel_or_array,
     rel_all_neq,
     rel_all_neq_small,
     rel_all_neq_colwise,
@@ -577,12 +579,14 @@ struct twoway_kernel_id
     names.push_back("rel_lteq_scalar");
     names.push_back("rel_eq_scalar");
     names.push_back("rel_neq_scalar");
-    //names.push_back("rel_gt_array");
-    //names.push_back("rel_lt_array");
-    //names.push_back("rel_gteq_array");
-    //names.push_back("rel_lteq_array");
-    //names.push_back("rel_eq_array");
-    //names.push_back("rel_neq_array");
+    names.push_back("rel_gt_array");
+    names.push_back("rel_lt_array");
+    names.push_back("rel_gteq_array");
+    names.push_back("rel_lteq_array");
+    names.push_back("rel_eq_array");
+    names.push_back("rel_neq_array");
+    names.push_back("rel_and_array");
+    names.push_back("rel_or_array");
     names.push_back("rel_all_neq");
     names.push_back("rel_all_neq_small");
     names.push_back("rel_all_neq_colwise");

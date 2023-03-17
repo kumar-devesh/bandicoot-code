@@ -135,6 +135,9 @@ class coot_rt_t
   template<typename eT1, typename eT2>
   static inline void relational_scalar_op(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> in_mem, const uword n_elem, const eT2 val, const twoway_kernel_id::enum_id num, const std::string& name);
 
+  template<typename eT1, typename eT2>
+  static inline void relational_array_op(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> X_mem, const dev_mem_t<eT2> Y_mem, const uword n_elem, const twoway_kernel_id::enum_id num, const std::string& name);
+
   template<typename eT>
   static inline bool chol(dev_mem_t<eT> out, const uword n_rows);
 
