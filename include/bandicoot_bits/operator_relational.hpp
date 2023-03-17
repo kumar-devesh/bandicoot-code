@@ -20,6 +20,176 @@
 // >= : gteq
 // == : eq
 // != : noteq
+// && : and
+// || : or
+
+
+
+template<typename T1, typename T2>
+inline
+typename
+enable_if2
+  <
+  (is_coot_type<T1>::value && is_coot_type<T2>::value),
+  const mtGlue<uword, T1, T2, mtglue_rel_lt>
+  >::result
+operator<
+  (
+  const T1& X,
+  const T2& Y
+  )
+  {
+  coot_extra_debug_sigprint();
+
+  return mtGlue<uword, T1, T2, mtglue_rel_lt>( X, Y );
+  }
+
+
+
+template<typename T1, typename T2>
+inline
+typename
+enable_if2
+  <
+  (is_coot_type<T1>::value && is_coot_type<T2>::value),
+  const mtGlue<uword, T1, T2, mtglue_rel_gt>
+  >::result
+operator>
+  (
+  const T1& X,
+  const T2& Y
+  )
+  {
+  coot_extra_debug_sigprint();
+
+  return mtGlue<uword, T1, T2, mtglue_rel_gt>( X, Y );
+  }
+
+
+
+template<typename T1, typename T2>
+inline
+typename
+enable_if2
+  <
+  (is_coot_type<T1>::value && is_coot_type<T2>::value),
+  const mtGlue<uword, T1, T2, mtglue_rel_lteq>
+  >::result
+operator<=
+  (
+  const T1& X,
+  const T2& Y
+  )
+  {
+  coot_extra_debug_sigprint();
+
+  return mtGlue<uword, T1, T2, mtglue_rel_lteq>( X, Y );
+  }
+
+
+
+template<typename T1, typename T2>
+inline
+typename
+enable_if2
+  <
+  (is_coot_type<T1>::value && is_coot_type<T2>::value),
+  const mtGlue<uword, T1, T2, mtglue_rel_gteq>
+  >::result
+operator>=
+  (
+  const T1& X,
+  const T2& Y
+  )
+  {
+  coot_extra_debug_sigprint();
+
+  return mtGlue<uword, T1, T2, mtglue_rel_gteq>( X, Y );
+  }
+
+
+
+template<typename T1, typename T2>
+inline
+typename
+enable_if2
+  <
+  (is_coot_type<T1>::value && is_coot_type<T2>::value),
+  const mtGlue<uword, T1, T2, mtglue_rel_eq>
+  >::result
+operator==
+  (
+  const T1& X,
+  const T2& Y
+  )
+  {
+  coot_extra_debug_sigprint();
+
+  return mtGlue<uword, T1, T2, mtglue_rel_eq>( X, Y );
+  }
+
+
+
+template<typename T1, typename T2>
+inline
+typename
+enable_if2
+  <
+  (is_coot_type<T1>::value && is_coot_type<T2>::value),
+  const mtGlue<uword, T1, T2, mtglue_rel_noteq>
+  >::result
+operator!=
+  (
+  const T1& X,
+  const T2& Y
+  )
+  {
+  coot_extra_debug_sigprint();
+
+  return mtGlue<uword, T1, T2, mtglue_rel_noteq>( X, Y );
+  }
+
+
+
+template<typename T1, typename T2>
+inline
+typename
+enable_if2
+  <
+  (is_coot_type<T1>::value && is_coot_type<T2>::value),
+  const mtGlue<uword, T1, T2, mtglue_rel_and>
+  >::result
+operator&&
+  (
+  const T1& X,
+  const T2& Y
+  )
+  {
+  coot_extra_debug_sigprint();
+
+  return mtGlue<uword, T1, T2, mtglue_rel_and>( X, Y );
+  }
+
+
+
+template<typename T1, typename T2>
+inline
+typename
+enable_if2
+  <
+  (is_coot_type<T1>::value && is_coot_type<T2>::value),
+  const mtGlue<uword, T1, T2, mtglue_rel_or>
+  >::result
+operator||
+  (
+  const T1& X,
+  const T2& Y
+  )
+  {
+  coot_extra_debug_sigprint();
+
+  return mtGlue<uword, T1, T2, mtglue_rel_or>( X, Y );
+  }
 
 
 
