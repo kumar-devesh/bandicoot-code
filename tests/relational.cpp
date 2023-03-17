@@ -369,8 +369,122 @@ TEST_CASE("empty_relational_test", "[relational]")
   REQUIRE( y12.n_elem == 0 );
   }
 
-// conv_to tests
-// TODO
+
+
+TEMPLATE_TEST_CASE(
+  "relational_conv_to_scalar",
+  "[relational]",
+  (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>))
+  {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  Mat<eT> x = randi<Mat<eT>>(10, 10, distr_param(1, 50));
+  Mat<eT> x_conv = conv_to<Mat<eT2>>::from(x);
+
+  umat y = conv_to<Mat<eT2>>::from(x) < eT2(25);
+  umat y_ref = x_conv < eT2(25);
+
+  arma::Mat<uword> y_cpu(y);
+  arma::Mat<uword> y_ref_cpu(y_ref);
+
+  REQUIRE( arma::all( arma::all( y_cpu == y_ref_cpu ) ) );
+
+  y = eT2(25) < conv_to<Mat<eT2>::from(x);
+  y_ref = eT2(25) < x_conv;
+
+  y_cpu = arma::Mat<uword>(y);
+  y_ref_cpu = arma::Mat<uword>(y_ref);
+
+  REQUIRE( arma::all( arma::all( y_cpu == y_ref_cpu ) ) );
+
+  y = conv_to<Mat<eT2>::from(x) > eT2(25);
+  y_ref = x_conv > eT2(25);
+
+  y_cpu = arma::Mat<uword>(y);
+  y_ref_cpu = arma::Mat<uword>(y_ref);
+
+  REQUIRE( arma::all( arma::all( y_cpu == y_ref_cpu ) ) );
+
+  y = eT2(25) > conv_to<Mat<eT2>::from(x);
+  y_ref = eT2(25) > x_conv;
+
+  y_cpu = arma::Mat<uword>(y);
+  y_ref_cpu = arma::Mat<uword>(y_ref);
+
+  REQUIRE( arma::all( arma::all( y_cpu == y_ref_cpu ) ) );
+
+  y = conv_to<Mat<eT2>::from(x) <= eT2(25);
+  y_ref = x_conv <= eT2(25);
+
+  y_cpu = arma::Mat<uword>(y);
+  y_ref_cpu = arma::Mat<uword>(y_ref);
+
+  REQUIRE( arma::all( arma::all( y_cpu == y_ref_cpu ) ) );
+
+  y = eT2(25) <= conv_to<Mat<eT2>::from(x);
+  y_ref = eT2(25) <= x_conv;
+
+  y_cpu = arma::Mat<uword>(y);
+  y_ref_cpu = arma::Mat<uword>(y_ref);
+
+  REQUIRE( arma::all( arma::all( y_cpu == y_ref_cpu ) ) );
+
+  y = conv_to<Mat<eT2>::from(x) >= eT2(25);
+  y_ref = x_conv >= eT2(25);
+
+  y_cpu = arma::Mat<uword>(y);
+  y_ref_cpu = arma::Mat<uword>(y_ref);
+
+  REQUIRE( arma::all( arma::all( y_cpu == y_ref_cpu ) ) );
+
+  y = eT2(25) >= conv_to<Mat<eT2>::from(x);
+  y_ref = eT2(25) >= x_conv;
+
+  y_cpu = arma::Mat<uword>(y);
+  y_ref_cpu = arma::Mat<uword>(y_ref);
+
+  REQUIRE( arma::all( arma::all( y_cpu == y_ref_cpu ) ) );
+
+  y = conv_to<Mat<eT2>::from(x) == eT2(25);
+  y_ref = x_conv == eT2(25);
+
+  y_cpu = arma::Mat<uword>(y);
+  y_ref_cpu = arma::Mat<uword>(y_ref);
+
+  REQUIRE( arma::all( arma::all( y_cpu == y_ref_cpu ) ) );
+
+  y = eT2(25) == conv_to<Mat<eT2>::from(x);
+  y_ref = eT2(25) == x_conv;
+
+  y_cpu = arma::Mat<uword>(y);
+  y_ref_cpu = arma::Mat<uword>(y_ref);
+
+  REQUIRE( arma::all( arma::all( y_cpu == y_ref_cpu ) ) );
+
+  y = conv_to<Mat<eT2>::from(x) != eT2(25);
+  y_ref = x_conv != eT2(25);
+
+  y_cpu = arma::Mat<uword>(y);
+  y_ref_cpu = arma::Mat<uword>(y_ref);
+
+  REQUIRE( arma::all( arma::all( y_cpu == y_ref_cpu ) ) );
+
+  y = eT2(25) != conv_to<Mat<eT2>::from(x);
+  y_ref = eT2(25) != x_conv;
+
+  y_cpu = arma::Mat<uword>(y);
+  y_ref_cpu = arma::Mat<uword>(y_ref);
+
+  REQUIRE( arma::all( arma::all( y_cpu == y_ref_cpu ) ) );
+  }
+
+
 
 //
 // relational array operations
@@ -714,8 +828,3 @@ TEST_CASE("alias_relational_array_op", "[relational]")
 
   REQUIRE( arma::all( arma::all( y_cpu == z_cpu ) ) );
   }
-
-
-
-// conv_to tests
-// TODO
