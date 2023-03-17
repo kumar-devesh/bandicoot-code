@@ -114,6 +114,10 @@ class mtop_rel_lteq_post
   template<typename T1>
   inline static void apply(Mat<uword>& out, const mtOp<uword, T1, mtop_rel_lteq_post> &X);
 
+  // specialization for conversions, to avoid computing the conversion
+  template<typename eT2, typename T1>
+  inline static void apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1, mtop_conv_to>, mtop_rel_lteq_post>& X);
+
   template<typename T1> inline static uword compute_n_rows(const mtOp<uword, T1, mtop_rel_lteq_post>& op, const uword in_n_rows, const uword in_n_cols);
   template<typename T1> inline static uword compute_n_cols(const mtOp<uword, T1, mtop_rel_lteq_post>& op, const uword in_n_rows, const uword in_n_cols);
   };
@@ -127,6 +131,10 @@ class mtop_rel_gteq_pre
 
   template<typename T1>
   inline static void apply(Mat<uword>& out, const mtOp<uword, T1, mtop_rel_gteq_pre>& X);
+
+  // specialization for conversions, to avoid computing the conversion
+  template<typename eT2, typename T1>
+  inline static void apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1, mtop_conv_to>, mtop_rel_gteq_pre>& X);
 
   template<typename T1> inline static uword compute_n_rows(const mtOp<uword, T1, mtop_rel_gteq_pre>& op, const uword in_n_rows, const uword in_n_cols);
   template<typename T1> inline static uword compute_n_cols(const mtOp<uword, T1, mtop_rel_gteq_pre>& op, const uword in_n_rows, const uword in_n_cols);
@@ -142,6 +150,10 @@ class mtop_rel_gteq_post
   template<typename T1>
   inline static void apply(Mat<uword>& out, const mtOp<uword, T1, mtop_rel_gteq_post>& X);
 
+  // specialization for conversions, to avoid computing the conversion
+  template<typename eT2, typename T1>
+  inline static void apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1, mtop_conv_to>, mtop_rel_gteq_post>& X);
+
   template<typename T1> inline static uword compute_n_rows(const mtOp<uword, T1, mtop_rel_gteq_post>& op, const uword in_n_rows, const uword in_n_cols);
   template<typename T1> inline static uword compute_n_cols(const mtOp<uword, T1, mtop_rel_gteq_post>& op, const uword in_n_rows, const uword in_n_cols);
   };
@@ -156,6 +168,10 @@ class mtop_rel_eq
   template<typename T1>
   inline static void apply(Mat<uword>& out, const mtOp<uword, T1, mtop_rel_eq>& X);
 
+  // specialization for conversions, to avoid computing the conversion
+  template<typename eT2, typename T1>
+  inline static void apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1, mtop_conv_to>, mtop_rel_eq>& X);
+
   template<typename T1> inline static uword compute_n_rows(const mtOp<uword, T1, mtop_rel_eq>& op, const uword in_n_rows, const uword in_n_cols);
   template<typename T1> inline static uword compute_n_cols(const mtOp<uword, T1, mtop_rel_eq>& op, const uword in_n_rows, const uword in_n_cols);
   };
@@ -169,6 +185,10 @@ class mtop_rel_noteq
 
   template<typename T1>
   inline static void apply(Mat<uword>& out, const mtOp<uword, T1, mtop_rel_noteq>& X);
+
+  // specialization for conversions, to avoid computing the conversion
+  template<typename eT2, typename T1>
+  inline static void apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1, mtop_conv_to>, mtop_rel_noteq>& X);
 
   template<typename T1> inline static uword compute_n_rows(const mtOp<uword, T1, mtop_rel_noteq>& op, const uword in_n_rows, const uword in_n_cols);
   template<typename T1> inline static uword compute_n_cols(const mtOp<uword, T1, mtop_rel_noteq>& op, const uword in_n_rows, const uword in_n_cols);
