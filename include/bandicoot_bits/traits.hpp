@@ -224,6 +224,18 @@ struct is_eGlue< const eGlue<T1, T2, eglue_type> >
   { static const bool value = true; };
 
 
+template<typename T>
+struct is_mtGlue
+  { static const bool value = false; };
+
+template<typename out_eT, typename T1, typename T2, typename mtglue_type>
+struct is_mtGlue< mtGlue<out_eT, T1, T2, mtglue_type> >
+  { static const bool value = true; };
+
+template<typename out_eT, typename T1, typename T2, typename mtglue_type>
+struct is_mtGlue< const mtGlue<out_eT, T1, T2, mtglue_type> >
+  { static const bool value = true; };
+
 
 //
 //
@@ -309,6 +321,7 @@ struct is_coot_type
   || is_eOp<T1>::value
   || is_eGlue<T1>::value
   || is_mtOp<T1>::value
+  || is_mtGlue<T1>::value
   || is_subview<T1>::value
   ;
   };
