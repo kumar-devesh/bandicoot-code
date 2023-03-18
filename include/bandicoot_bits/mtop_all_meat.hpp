@@ -86,18 +86,21 @@ mtop_all::apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1, mtop_conv_to>, 
 template<typename T1, typename mtop_type>
 inline
 void
-mtop_all::apply(Mat<uword>& out, const mtOp<uword, mtOp<uword, T1, mtop_type>, mtop_all>& in)
+mtop_all::apply(Mat<uword>& out,
+                const mtOp<uword, mtOp<uword, T1, mtop_type>, mtop_all>& in,
+                const typename enable_if<is_same_type<mtop_type, mtop_conv_to>::no>::result* junk)
   {
   coot_extra_debug_sigprint();
+  coot_ignore(junk);
+
+  typedef typename T1::elem_type eT;
 
   const uword dim = in.aux_uword_a;
 
   coot_debug_check( (dim > 1), "all(): parameter 'dim' must be 0 or 1" );
 
-  typedef typename T1::elem_type eT;
-
   // all( X != 0 ) --> all( X )
-  const bool opt1 = (is_same_type<mtop_type, mtop_rel_neq>::yes) && (in.q.aux == eT(0));
+  const bool opt1 = (is_same_type<mtop_type, mtop_rel_noteq>::yes) && (in.q.aux == eT(0));
   // all( X >  0 ) --> all( X ) if eT is an unsigned integral type
   const bool opt2 = (is_same_type<mtop_type, mtop_rel_gt_post>::yes) && (is_signed<eT>::value == false) && (in.q.aux == eT(0));
   // all( 0 <  X ) --> all( X ) if eT is an unsigned integral type
@@ -111,7 +114,24 @@ mtop_all::apply(Mat<uword>& out, const mtOp<uword, mtOp<uword, T1, mtop_type>, m
   if (opt1 || opt2 || opt3)
     {
     // Just call all() directly on the inner object.
-    mtop_all::apply(out, in.q.q);
+    unwrap<T1> U(in.q.q);
+
+    // Shortcut if the input is empty.
+    if (U.M.n_elem == 0)
+      {
+      if (dim == 0)
+        {
+        out.set_size(1, 0);
+        }
+      else
+        {
+        out.set_size(0, 1);
+        }
+
+      return;
+      }
+
+    apply_direct<eT, eT>(out, U.M, dim);
     return;
     }
   else if (opt4 || opt5)
@@ -144,12 +164,11 @@ mtop_all::apply(Mat<uword>& out, const mtOp<uword, mtOp<uword, T1, mtop_type>, m
       {
       out.set_size(0, 1);
       }
-
+  
     return;
     }
 
-  typedef typename T1::elem_type eT;
-  apply_direct<eT, eT>(out, U.M, dim);
+  apply_direct<uword, uword>(out, U.M, dim);
   }
 
 
@@ -243,46 +262,50 @@ mtop_all::all_vec(const mtOp<eT2, T1, mtop_conv_to>& op)
 template<typename T1, typename mtop_type>
 inline
 bool
-mtop_all::all_vec(const mtOp<uword, T1, mtop_type>& in)
+mtop_all::all_vec(const mtOp<uword, T1, mtop_type>& in,
+                  const typename enable_if<is_same_type<mtop_type, mtop_all>::no>::result* junk1,
+                  const typename enable_if<is_same_type<mtop_type, mtop_conv_to>::no>::result* junk2)
   {
   coot_extra_debug_sigprint();
+  coot_ignore(junk1);
+  coot_ignore(junk2);
 
   typedef typename T1::elem_type eT;
 
   // all( X != 0 ) --> all( X )
-  const bool opt1 = (is_same_type<mtop_type, mtop_rel_neq>::yes) && (in.q.aux == eT(0));
+  const bool opt1 = (is_same_type<mtop_type, mtop_rel_noteq>::yes) && (in.aux == eT(0));
   // all( X >  0 ) --> all( X ) if eT is an unsigned integral type
-  const bool opt2 = (is_same_type<mtop_type, mtop_rel_gt_post>::yes) && (is_signed<eT>::value == false) && (in.q.aux == eT(0))
+  const bool opt2 = (is_same_type<mtop_type, mtop_rel_gt_post>::yes) && (is_signed<eT>::value == false) && (in.aux == eT(0));
   // all( 0 <  X ) --> all( X ) if eT is an unsigned integral type
-  const bool opt3 = (is_same_type<mtop_type, mtop_rel_lt_pre>::yes) && (is_signed<eT>::value == false) && (in.q.aux == eT(0))
+  const bool opt3 = (is_same_type<mtop_type, mtop_rel_lt_pre>::yes) && (is_signed<eT>::value == false) && (in.aux == eT(0));
 
   // all( X == 0 ) --> !all( X )
-  const bool opt4 = (is_same_type<mtop_type, mtop_rel_eq>::yes) && (in.q.aux == eT(0));
+  const bool opt4 = (is_same_type<mtop_type, mtop_rel_eq>::yes) && (in.aux == eT(0));
   // all( X <= 0 ) --> !all( X ) if eT is an unsigned integral type
-  const bool opt5 = (is_same_type<mtop_type, mtop_rel_lteq_post>::yes) && (is_signed<eT>::value == false) && (in.q.aux == eT(0));
+  const bool opt5 = (is_same_type<mtop_type, mtop_rel_lteq_post>::yes) && (is_signed<eT>::value == false) && (in.aux == eT(0));
   // all( 0 >= X ) --> !all( X ) if eT is an unsigned integral type
-  const bool opt6 = (is_same_type<mtop_type, mtop_rel_gteq_pre>::yes) && (is_signed<eT>::value == false) && (in.q.aux == eT(0));
+  const bool opt6 = (is_same_type<mtop_type, mtop_rel_gteq_pre>::yes) && (is_signed<eT>::value == false) && (in.aux == eT(0));
 
   // all( X < 0 ) --> false if eT is an unsigned integral type
-  const bool opt7 = (is_same_type<mtop_type, mtop_rel_lt_post>::yes) && (is_signed<eT>::value == false) && (in.q.aux == eT(0));
+  const bool opt7 = (is_same_type<mtop_type, mtop_rel_lt_post>::yes) && (is_signed<eT>::value == false) && (in.aux == eT(0));
   // all( 0 > X ) --> false if eT is an unsigned integral type
-  const bool opt8 = (is_same_type<mtop_type, mtop_rel_gt_pre>::yes) && (is_signed<eT>::value == false) && (in.q.aux == eT(0));
+  const bool opt8 = (is_same_type<mtop_type, mtop_rel_gt_pre>::yes) && (is_signed<eT>::value == false) && (in.aux == eT(0));
 
   if (opt1 || opt2 || opt3)
     {
     return all_vec(in.q);
     }
-  else if (opt4 || opt5 || opt6)
-    {
-    return !all_vec(in.q);
-    }
+  //else if (opt4 || opt5 || opt6)
+  //  {
+  //  return !mtop_any::any_vec(in.q);
+  //  }
   else if (opt7 || opt8)
     {
     return false;
     }
 
   // No optimization possible.
-  unwrap<mtOp<uword, T1, mtop_type>> U(X);
+  unwrap<mtOp<uword, T1, mtop_type>> U(in);
 
   return coot_rt_t::all_vec(U.M.get_dev_mem(false), U.M.n_elem, eT(0), twoway_kernel_id::rel_all_neq, twoway_kernel_id::rel_all_neq_small);
   }
