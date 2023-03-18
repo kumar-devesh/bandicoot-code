@@ -50,7 +50,7 @@ mtop_rel_lt_pre::apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1, mtop_con
   typedef typename T1::elem_type eT1;
   unwrap<T1> U(X.q.q);
   extract_subview<typename unwrap<T1>::stored_type> E(U.M);
-  copy_alias<eT> C(E.M, out);
+  copy_alias<eT1> C(E.M, out);
 
   out.set_size(C.M.n_rows, C.M.n_cols);
   coot_rt_t::relational_scalar_op(out.get_dev_mem(false), C.M.get_dev_mem(false), C.M.n_elem, eT2(X.aux), twoway_kernel_id::rel_gt_scalar, "operator<");
@@ -116,7 +116,7 @@ mtop_rel_lt_post::apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1, mtop_co
   typedef typename T1::elem_type eT1;
   unwrap<T1> U(X.q.q);
   extract_subview<typename unwrap<T1>::stored_type> E(U.M);
-  copy_alias<eT> C(E.M, out);
+  copy_alias<eT1> C(E.M, out);
 
   out.set_size(C.M.n_rows, C.M.n_cols);
   coot_rt_t::relational_scalar_op(out.get_dev_mem(false), C.M.get_dev_mem(false), C.M.n_elem, eT2(X.aux), twoway_kernel_id::rel_lt_scalar, "operator<");
@@ -184,7 +184,7 @@ mtop_rel_gt_pre::apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1, mtop_con
   typedef typename T1::elem_type eT1;
   unwrap<T1> U(X.q.q);
   extract_subview<typename unwrap<T1>::stored_type> E(U.M);
-  copy_alias<eT> C(E.M, out);
+  copy_alias<eT1> C(E.M, out);
 
   out.set_size(C.M.n_rows, C.M.n_cols);
   coot_rt_t::relational_scalar_op(out.get_dev_mem(false), C.M.get_dev_mem(false), C.M.n_elem, eT2(X.aux), twoway_kernel_id::rel_lt_scalar, "operator>");
@@ -250,7 +250,7 @@ mtop_rel_gt_post::apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1, mtop_co
   typedef typename T1::elem_type eT1;
   unwrap<T1> U(X.q.q);
   extract_subview<typename unwrap<T1>::stored_type> E(U.M);
-  copy_alias<eT> C(E.M, out);
+  copy_alias<eT1> C(E.M, out);
 
   out.set_size(C.M.n_rows, C.M.n_cols);
   coot_rt_t::relational_scalar_op(out.get_dev_mem(false), C.M.get_dev_mem(false), C.M.n_elem, eT2(X.aux), twoway_kernel_id::rel_gt_scalar, "operator>");
@@ -318,7 +318,7 @@ mtop_rel_lteq_pre::apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1, mtop_c
   typedef typename T1::elem_type eT1;
   unwrap<T1> U(X.q.q);
   extract_subview<typename unwrap<T1>::stored_type> E(U.M);
-  copy_alias<eT> C(E.M, out);
+  copy_alias<eT1> C(E.M, out);
 
   out.set_size(C.M.n_rows, C.M.n_cols);
   coot_rt_t::relational_scalar_op(out.get_dev_mem(false), C.M.get_dev_mem(false), C.M.n_elem, eT2(X.aux), twoway_kernel_id::rel_gteq_scalar, "operator<=");
@@ -375,8 +375,8 @@ mtop_rel_lteq_post::apply(Mat<uword>& out, const mtOp<uword, T1, mtop_rel_lteq_p
 template<typename eT2, typename T1>
 inline
 void
-mtop_rel_lt_post::apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1,
-mtop_conv_to>, mtop_rel_lt_post>& X)
+mtop_rel_lteq_post::apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1,
+mtop_conv_to>, mtop_rel_lteq_post>& X)
   {
   coot_extra_debug_sigprint();
 
@@ -385,7 +385,7 @@ mtop_conv_to>, mtop_rel_lt_post>& X)
   typedef typename T1::elem_type eT1;
   unwrap<T1> U(X.q.q);
   extract_subview<typename unwrap<T1>::stored_type> E(U.M);
-  copy_alias<eT> C(E.M, out);
+  copy_alias<eT1> C(E.M, out);
 
   out.set_size(C.M.n_rows, C.M.n_cols);
   coot_rt_t::relational_scalar_op(out.get_dev_mem(false), C.M.get_dev_mem(false), C.M.n_elem, eT2(X.aux), twoway_kernel_id::rel_lteq_scalar, "operator<=");
@@ -444,7 +444,7 @@ mtop_rel_gteq_pre::apply(Mat<uword>& out, const mtOp<uword, T1, mtop_rel_gteq_pr
 template<typename eT2, typename T1>
 inline
 void
-mtop_rel_gt_pre::apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1, mtop_conv_to>, mtop_rel_gteq_pre>& X)
+mtop_rel_gteq_pre::apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1, mtop_conv_to>, mtop_rel_gteq_pre>& X)
   {
   coot_extra_debug_sigprint();
 
@@ -454,7 +454,7 @@ mtop_rel_gt_pre::apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1, mtop_con
   typedef typename T1::elem_type eT1;
   unwrap<T1> U(X.q.q);
   extract_subview<typename unwrap<T1>::stored_type> E(U.M);
-  copy_alias<eT> C(E.M, out);
+  copy_alias<eT1> C(E.M, out);
 
   out.set_size(C.M.n_rows, C.M.n_cols);
   coot_rt_t::relational_scalar_op(out.get_dev_mem(false), C.M.get_dev_mem(false), C.M.n_elem, eT2(X.aux), twoway_kernel_id::rel_lteq_scalar, "operator>=");
@@ -520,7 +520,7 @@ mtop_rel_gteq_post::apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1, mtop_
   typedef typename T1::elem_type eT1;
   unwrap<T1> U(X.q.q);
   extract_subview<typename unwrap<T1>::stored_type> E(U.M);
-  copy_alias<eT> C(E.M, out);
+  copy_alias<eT1> C(E.M, out);
 
   out.set_size(C.M.n_rows, C.M.n_cols);
   coot_rt_t::relational_scalar_op(out.get_dev_mem(false), C.M.get_dev_mem(false), C.M.n_elem, eT2(X.aux), twoway_kernel_id::rel_gteq_scalar, "operator>=");
@@ -586,7 +586,7 @@ mtop_rel_eq::apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1, mtop_conv_to
   typedef typename T1::elem_type eT1;
   unwrap<T1> U(X.q.q);
   extract_subview<typename unwrap<T1>::stored_type> E(U.M);
-  copy_alias<eT> C(E.M, out);
+  copy_alias<eT1> C(E.M, out);
 
   out.set_size(C.M.n_rows, C.M.n_cols);
   coot_rt_t::relational_scalar_op(out.get_dev_mem(false), C.M.get_dev_mem(false), C.M.n_elem, eT2(X.aux), twoway_kernel_id::rel_eq_scalar, "operator==");
@@ -652,10 +652,10 @@ mtop_rel_noteq::apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1, mtop_conv
   typedef typename T1::elem_type eT1;
   unwrap<T1> U(X.q.q);
   extract_subview<typename unwrap<T1>::stored_type> E(U.M);
-  copy_alias<eT> C(E.M, out);
+  copy_alias<eT1> C(E.M, out);
 
   out.set_size(C.M.n_rows, C.M.n_cols);
-  coot_rt_t::relational_scalar_op(out.get_dev_mem(false), C.M.get_dev_mem(false), C.M.n_elem, eT2(X.aux), twoway_kernel_id::rel_eq_scalar, "operator!=");
+  coot_rt_t::relational_scalar_op(out.get_dev_mem(false), C.M.get_dev_mem(false), C.M.n_elem, eT2(X.aux), twoway_kernel_id::rel_neq_scalar, "operator!=");
   }
 
 

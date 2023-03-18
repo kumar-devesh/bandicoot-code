@@ -384,8 +384,8 @@ TEMPLATE_TEST_CASE(
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
-  Mat<eT> x = randi<Mat<eT>>(10, 10, distr_param(1, 50));
-  Mat<eT> x_conv = conv_to<Mat<eT2>>::from(x);
+  Mat<eT1> x = randi<Mat<eT1>>(10, 10, distr_param(1, 50));
+  Mat<eT2> x_conv = conv_to<Mat<eT2>>::from(x);
 
   umat y = conv_to<Mat<eT2>>::from(x) < eT2(25);
   umat y_ref = x_conv < eT2(25);
@@ -395,7 +395,7 @@ TEMPLATE_TEST_CASE(
 
   REQUIRE( arma::all( arma::all( y_cpu == y_ref_cpu ) ) );
 
-  y = eT2(25) < conv_to<Mat<eT2>::from(x);
+  y = eT2(25) < conv_to<Mat<eT2>>::from(x);
   y_ref = eT2(25) < x_conv;
 
   y_cpu = arma::Mat<uword>(y);
@@ -403,7 +403,7 @@ TEMPLATE_TEST_CASE(
 
   REQUIRE( arma::all( arma::all( y_cpu == y_ref_cpu ) ) );
 
-  y = conv_to<Mat<eT2>::from(x) > eT2(25);
+  y = conv_to<Mat<eT2>>::from(x) > eT2(25);
   y_ref = x_conv > eT2(25);
 
   y_cpu = arma::Mat<uword>(y);
@@ -411,7 +411,7 @@ TEMPLATE_TEST_CASE(
 
   REQUIRE( arma::all( arma::all( y_cpu == y_ref_cpu ) ) );
 
-  y = eT2(25) > conv_to<Mat<eT2>::from(x);
+  y = eT2(25) > conv_to<Mat<eT2>>::from(x);
   y_ref = eT2(25) > x_conv;
 
   y_cpu = arma::Mat<uword>(y);
@@ -419,7 +419,7 @@ TEMPLATE_TEST_CASE(
 
   REQUIRE( arma::all( arma::all( y_cpu == y_ref_cpu ) ) );
 
-  y = conv_to<Mat<eT2>::from(x) <= eT2(25);
+  y = conv_to<Mat<eT2>>::from(x) <= eT2(25);
   y_ref = x_conv <= eT2(25);
 
   y_cpu = arma::Mat<uword>(y);
@@ -427,7 +427,7 @@ TEMPLATE_TEST_CASE(
 
   REQUIRE( arma::all( arma::all( y_cpu == y_ref_cpu ) ) );
 
-  y = eT2(25) <= conv_to<Mat<eT2>::from(x);
+  y = eT2(25) <= conv_to<Mat<eT2>>::from(x);
   y_ref = eT2(25) <= x_conv;
 
   y_cpu = arma::Mat<uword>(y);
@@ -435,7 +435,7 @@ TEMPLATE_TEST_CASE(
 
   REQUIRE( arma::all( arma::all( y_cpu == y_ref_cpu ) ) );
 
-  y = conv_to<Mat<eT2>::from(x) >= eT2(25);
+  y = conv_to<Mat<eT2>>::from(x) >= eT2(25);
   y_ref = x_conv >= eT2(25);
 
   y_cpu = arma::Mat<uword>(y);
@@ -443,7 +443,7 @@ TEMPLATE_TEST_CASE(
 
   REQUIRE( arma::all( arma::all( y_cpu == y_ref_cpu ) ) );
 
-  y = eT2(25) >= conv_to<Mat<eT2>::from(x);
+  y = eT2(25) >= conv_to<Mat<eT2>>::from(x);
   y_ref = eT2(25) >= x_conv;
 
   y_cpu = arma::Mat<uword>(y);
@@ -451,7 +451,7 @@ TEMPLATE_TEST_CASE(
 
   REQUIRE( arma::all( arma::all( y_cpu == y_ref_cpu ) ) );
 
-  y = conv_to<Mat<eT2>::from(x) == eT2(25);
+  y = conv_to<Mat<eT2>>::from(x) == eT2(25);
   y_ref = x_conv == eT2(25);
 
   y_cpu = arma::Mat<uword>(y);
@@ -459,7 +459,7 @@ TEMPLATE_TEST_CASE(
 
   REQUIRE( arma::all( arma::all( y_cpu == y_ref_cpu ) ) );
 
-  y = eT2(25) == conv_to<Mat<eT2>::from(x);
+  y = eT2(25) == conv_to<Mat<eT2>>::from(x);
   y_ref = eT2(25) == x_conv;
 
   y_cpu = arma::Mat<uword>(y);
@@ -467,7 +467,7 @@ TEMPLATE_TEST_CASE(
 
   REQUIRE( arma::all( arma::all( y_cpu == y_ref_cpu ) ) );
 
-  y = conv_to<Mat<eT2>::from(x) != eT2(25);
+  y = conv_to<Mat<eT2>>::from(x) != eT2(25);
   y_ref = x_conv != eT2(25);
 
   y_cpu = arma::Mat<uword>(y);
@@ -475,7 +475,7 @@ TEMPLATE_TEST_CASE(
 
   REQUIRE( arma::all( arma::all( y_cpu == y_ref_cpu ) ) );
 
-  y = eT2(25) != conv_to<Mat<eT2>::from(x);
+  y = eT2(25) != conv_to<Mat<eT2>>::from(x);
   y_ref = eT2(25) != x_conv;
 
   y_cpu = arma::Mat<uword>(y);

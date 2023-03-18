@@ -668,7 +668,7 @@ TEMPLATE_TEST_CASE("all_relational_expressions", "[all]", float, double, u32, s3
   {
   typedef TestType eT;
 
-  Mat<eT> x = randi<Mat<eT>>(10, 10, distr_param(0, 5));
+  Mat<eT> X = randi<Mat<eT>>(10, 10, distr_param(0, 5));
 
   umat y11 = all(X < 0);
   umat y12 = all(X < 0, 0);
@@ -808,7 +808,7 @@ TEMPLATE_TEST_CASE("all_vec_relational_op", "[relational]", float, double, u32, 
 
   Col<eT> x = randi<Col<eT>>(500, distr_param(0, 3));
 
-  Col<eT> z = (x < 0);
+  uvec z = (x < 0);
   REQUIRE( all(x < 0) == all(z) );
   z = (0 < x);
   REQUIRE( all(0 < x) == all(z) );
