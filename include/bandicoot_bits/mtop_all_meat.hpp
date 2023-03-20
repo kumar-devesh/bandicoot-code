@@ -279,11 +279,11 @@ mtop_all::all_vec(const mtOp<uword, T1, mtop_type>& in,
   // all( 0 <  X ) --> all( X ) if eT is an unsigned integral type
   const bool opt3 = (is_same_type<mtop_type, mtop_rel_lt_pre>::yes) && (is_signed<eT>::value == false) && (in.aux == eT(0));
 
-  // all( X == 0 ) --> !all( X )
+  // all( X == 0 ) --> !any( X )
   const bool opt4 = (is_same_type<mtop_type, mtop_rel_eq>::yes) && (in.aux == eT(0));
-  // all( X <= 0 ) --> !all( X ) if eT is an unsigned integral type
+  // all( X <= 0 ) --> !any( X ) if eT is an unsigned integral type
   const bool opt5 = (is_same_type<mtop_type, mtop_rel_lteq_post>::yes) && (is_signed<eT>::value == false) && (in.aux == eT(0));
-  // all( 0 >= X ) --> !all( X ) if eT is an unsigned integral type
+  // all( 0 >= X ) --> !any( X ) if eT is an unsigned integral type
   const bool opt6 = (is_same_type<mtop_type, mtop_rel_gteq_pre>::yes) && (is_signed<eT>::value == false) && (in.aux == eT(0));
 
   // all( X < 0 ) --> false if eT is an unsigned integral type
@@ -295,10 +295,10 @@ mtop_all::all_vec(const mtOp<uword, T1, mtop_type>& in,
     {
     return all_vec(in.q);
     }
-  //else if (opt4 || opt5 || opt6)
-  //  {
-  //  return !mtop_any::any_vec(in.q);
-  //  }
+  else if (opt4 || opt5 || opt6)
+    {
+    return !mtop_any::any_vec(in.q);
+    }
   else if (opt7 || opt8)
     {
     return false;
