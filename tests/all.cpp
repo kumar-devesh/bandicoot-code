@@ -802,7 +802,7 @@ TEMPLATE_TEST_CASE("all_relational_expressions", "[all]", float, double, u32, s3
 // Test special optimizations for some relational expressions.
 // (We also test the unoptimized cases just to make sure nothing is wrong.)
 
-TEMPLATE_TEST_CASE("all_vec_relational_op", "[relational]", float, double, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("all_vec_relational_op", "[all]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
