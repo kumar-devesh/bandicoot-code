@@ -56,7 +56,7 @@ COOT_FN(PREFIX,rel_any_neq)(__global const eT1* X, // will be casted to eT2 befo
 
   if (tid < WAVEFRONT_SIZE)
     {
-    COOT_FN(u32_and_wavefront_reduce_,WAVEFRONT_SIZE_NAME)(aux_mem, tid);
+    COOT_FN(u32_or_wavefront_reduce_,WAVEFRONT_SIZE_NAME)(aux_mem, tid);
     }
 
   if (tid == 0)
