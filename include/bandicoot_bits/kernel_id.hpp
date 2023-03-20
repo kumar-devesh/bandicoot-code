@@ -251,6 +251,8 @@ struct oneway_integral_kernel_id
     {
     and_reduce,
     and_reduce_small,
+    or_reduce,
+    or_reduce_small,
     //
     invalid_kernel
     };
@@ -268,6 +270,8 @@ struct oneway_integral_kernel_id
 
     names.push_back("and_reduce");
     names.push_back("and_reduce_small");
+    names.push_back("or_reduce");
+    names.push_back("or_reduce_small");
 
     return names;
     }
@@ -435,6 +439,10 @@ struct twoway_kernel_id
     rel_all_neq_small,
     rel_all_neq_colwise,
     rel_all_neq_rowwise,
+    rel_any_neq,
+    rel_any_neq_small,
+    rel_any_neq_colwise,
+    rel_any_neq_rowwise,
     //
     invalid_kernel
     };
@@ -591,6 +599,10 @@ struct twoway_kernel_id
     names.push_back("rel_all_neq_small");
     names.push_back("rel_all_neq_colwise");
     names.push_back("rel_all_neq_rowwise");
+    names.push_back("rel_any_neq");
+    names.push_back("rel_any_neq_small");
+    names.push_back("rel_any_neq_colwise");
+    names.push_back("rel_any_neq_rowwise");
 
     return names;
     }

@@ -19,34 +19,30 @@ class mtop_any
   {
   public:
 
-  template<typename T1>               inline static void apply(Mat<uword>& out,
-const mtOp<uword, T1, mtop_any>& in);
+  template<typename T1>               inline static void apply(Mat<uword>& out, const mtOp<uword, T1, mtop_any>& in);
   // special handling of a conversion linked with an any()
-  template<typename T1, typename eT2> inline static void apply(Mat<uword>& out,
-const mtOp<uword, mtOp<eT2, T1, mtop_conv_to>, mtop_any>& in);
-  // special handling of an all() on a relational operation
+  template<typename T1, typename eT2> inline static void apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1, mtop_conv_to>, mtop_any>& in);
+  // special handling of an any() on a relational operation
   // (we just try to apply some simple optimizations to reduce it to a single kernel)
-  template<typename T1, typename mtop_type> inline static void
-apply(Mat<uword>& out, const mtOp<uword, mtOp<uword, T1, mtop_type>, mtop_all>& in);
+  template<typename T1, typename mtop_type> inline static void apply(Mat<uword>& out,
+                                                                     const mtOp<uword, mtOp<uword, T1, mtop_type>, mtop_any>& in,
+                                                                     const typename enable_if<is_same_type<mtop_type, mtop_conv_to>::no>::result* junk = 0);
 
-                        inline static void apply_direct(Mat<uword>& out, const Mat<uword>& in,  const uword dim);
-  template<typename eT> inline static void apply_direct(Mat<uword>& out, const Mat<eT>& in,     const uword dim);
-  template<typename eT> inline static void apply_direct(Mat<uword>& out, const subview<eT>& in, const uword dim);
-
-  // for special handling of conversions linked with an all()
-  template<typename eT2>              inline static void apply_direct(Mat<uword>& out, const Mat<uword>& in,  const uword dim);
+  // for special handling of conversions linked with an any()
   template<typename eT, typename eT2> inline static void apply_direct(Mat<uword>& out, const Mat<eT>& in,     const uword dim);
   template<typename eT, typename eT2> inline static void apply_direct(Mat<uword>& out, const subview<eT>& in, const uword dim);
 
-  template<typename T1> inline static bool all_vec(T1& X);
+  template<typename T1> inline static bool any_vec(T1& X);
   // for nested applications
-  template<typename out_eT, typename T1> inline static bool all_vec(const mtOp<out_eT, T1, mtop_all>& op);
+  template<typename out_eT, typename T1> inline static bool any_vec(const mtOp<out_eT, T1, mtop_any>& op);
   // for applications with conversions
-  template<typename eT2, typename T1>    inline static bool all_vec(const mtOp<eT2, T1, mtop_conv_to>& op);
-  // special handling of an all() on a relational operation
+  template<typename eT2, typename T1>    inline static bool any_vec(const mtOp<eT2, T1, mtop_conv_to>& op);
+  // special handling of an any() on a relational operation
   // (we just try to apply some simple optimizations to reduce it to a single kernel)
-  template<typename T1, typename mtop_type> inline static bool all_vec(const mtOp<uword, T1, mtop_type>& in);
+  template<typename T1, typename mtop_type> inline static bool any_vec(const mtOp<uword, T1, mtop_type>& in,
+                                                                       const typename enable_if<is_same_type<mtop_type, mtop_any>::no>::result* junk1 = 0,
+                                                                       const typename enable_if<is_same_type<mtop_type, mtop_conv_to>::no>::result* junk2 = 0);
 
-  template<typename out_eT, typename T1> inline static uword compute_n_rows(const mtOp<out_eT, T1, mtop_all>& op, const uword in_n_rows, const uword in_n_cols);
-  template<typename out_eT, typename T1> inline static uword compute_n_cols(const mtOp<out_eT, T1, mtop_all>& op, const uword in_n_rows, const uword in_n_cols);
+  template<typename out_eT, typename T1> inline static uword compute_n_rows(const mtOp<out_eT, T1, mtop_any>& op, const uword in_n_rows, const uword in_n_cols);
+  template<typename out_eT, typename T1> inline static uword compute_n_cols(const mtOp<out_eT, T1, mtop_any>& op, const uword in_n_rows, const uword in_n_cols);
   };
