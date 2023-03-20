@@ -28,16 +28,6 @@ COOT_FN(PREFIX,and_reduce_small)(const eT1* in_mem,
   // screw up the final reduce.
   aux_mem[tid] = ~((eT1) 0); // all bits to 1
 
-  if (i < n_elem)
-    {
-    aux_mem[tid] &= in_mem[i];
-    }
-  if (i + blockDim.x < n_elem)
-    {
-    aux_mem[tid] &= in_mem[i + blockDim.x];
-    }
-  i += grid_size;
-
   while (i + blockDim.x < n_elem)
     {
     aux_mem[tid] &= in_mem[i];

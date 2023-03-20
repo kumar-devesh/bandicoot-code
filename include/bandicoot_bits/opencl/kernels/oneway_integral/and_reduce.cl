@@ -27,16 +27,6 @@ COOT_FN(PREFIX,and_reduce)(__global const eT1* in_mem,
   // screw up the final reduce.
   aux_mem[tid] = ~((eT1) 0);
 
-  if (i < n_elem)
-    {
-    aux_mem[tid] &= in_mem[i];
-    }
-  if (i + get_local_size(0) < n_elem)
-    {
-    aux_mem[tid] &= in_mem[i + get_local_size(0)];
-    }
-  i += grid_size;
-
   while (i + get_local_size(0) < n_elem)
     {
     aux_mem[tid] &= in_mem[i];
