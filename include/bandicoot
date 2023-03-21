@@ -223,6 +223,7 @@ namespace coot
   #include "bandicoot_bits/op_norm_bones.hpp"
   #include "bandicoot_bits/op_diagmat_bones.hpp"
   #include "bandicoot_bits/op_diagvec_bones.hpp"
+  #include "bandicoot_bits/op_normalise_bones.hpp"
 
   #include "bandicoot_bits/mtop_conv_to_bones.hpp"
   #include "bandicoot_bits/mtop_all_bones.hpp"
@@ -380,6 +381,7 @@ namespace coot
   #include "bandicoot_bits/unwrap.hpp"
   #include "bandicoot_bits/SizeProxy.hpp"
   #include "bandicoot_bits/strip.hpp"
+  #include "bandicoot_bits/extract_subview.hpp"
 
 
 
@@ -428,6 +430,7 @@ namespace coot
   #include "bandicoot_bits/fn_svd.hpp"
   #include "bandicoot_bits/fn_diagmat.hpp"
   #include "bandicoot_bits/fn_diagvec.hpp"
+  #include "bandicoot_bits/fn_normalise.hpp"
 
 
   //
@@ -471,6 +474,7 @@ namespace coot
   #include "bandicoot_bits/op_norm_meat.hpp"
   #include "bandicoot_bits/op_diagmat_meat.hpp"
   #include "bandicoot_bits/op_diagvec_meat.hpp"
+  #include "bandicoot_bits/op_normalise_meat.hpp"
 
   #include "bandicoot_bits/mtop_conv_to_meat.hpp"
   #include "bandicoot_bits/mtop_all_meat.hpp"
