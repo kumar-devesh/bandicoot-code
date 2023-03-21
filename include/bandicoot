@@ -438,6 +438,11 @@ namespace coot
   #include "bandicoot_bits/fn_svd.hpp"
   #include "bandicoot_bits/fn_diagmat.hpp"
   #include "bandicoot_bits/fn_diagvec.hpp"
+  #include "bandicoot_bits/fn_mean.hpp"
+  #include "bandicoot_bits/fn_median.hpp"
+  #include "bandicoot_bits/fn_stddev.hpp"
+  #include "bandicoot_bits/fn_var.hpp"
+  #include "bandicoot_bits/fn_range.hpp"
 
 
   //
