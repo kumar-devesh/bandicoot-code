@@ -41,7 +41,7 @@ all(const T1& X)
   {
   coot_extra_debug_sigprint();
 
-  return mtOp<uword, T1, mtop_all>(X, 0);
+  return mtOp<uword, T1, mtop_all>(X, 0, 0);
   }
 
 
@@ -58,7 +58,7 @@ all(const T1& X, const uword dim)
   {
   coot_extra_debug_sigprint();
 
-  return mtOp<uword, T1, mtop_all>(X, dim);
+  return mtOp<uword, T1, mtop_all>(X, dim, 0);
   }
 
 

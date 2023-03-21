@@ -135,6 +135,14 @@ class Mat : public Base< eT, Mat<eT> >
   template<typename T1, typename T2, typename glue_type> inline const Mat& operator%=(const Glue<T1, T2, glue_type>& X);
   template<typename T1, typename T2, typename glue_type> inline const Mat& operator/=(const Glue<T1, T2, glue_type>& X);
 
+  template<typename T1, typename T2, typename mtglue_type> inline                   Mat(const mtGlue<eT, T1, T2, mtglue_type>& X);
+  template<typename T1, typename T2, typename mtglue_type> inline const Mat& operator= (const mtGlue<eT, T1, T2, mtglue_type>& X);
+  template<typename T1, typename T2, typename mtglue_type> inline const Mat& operator+=(const mtGlue<eT, T1, T2, mtglue_type>& X);
+  template<typename T1, typename T2, typename mtglue_type> inline const Mat& operator-=(const mtGlue<eT, T1, T2, mtglue_type>& X);
+  template<typename T1, typename T2, typename mtglue_type> inline const Mat& operator*=(const mtGlue<eT, T1, T2, mtglue_type>& X);
+  template<typename T1, typename T2, typename mtglue_type> inline const Mat& operator%=(const mtGlue<eT, T1, T2, mtglue_type>& X);
+  template<typename T1, typename T2, typename mtglue_type> inline const Mat& operator/=(const mtGlue<eT, T1, T2, mtglue_type>& X);
+
   coot_inline       diagview<eT> diag(const sword in_id = 0);
   coot_inline const diagview<eT> diag(const sword in_id = 0) const;
 

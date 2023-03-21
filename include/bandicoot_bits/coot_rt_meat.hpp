@@ -1065,6 +1065,68 @@ coot_rt_t::all(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> in_mem, const uwor
 
 
 
+template<typename eT1, typename eT2>
+inline
+void
+coot_rt_t::relational_scalar_op(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> in_mem, const uword n_elem, const eT2 val, const twoway_kernel_id::enum_id num, const std::string& name)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::relational_scalar_op(out_mem, in_mem, n_elem, val, num, name);
+    #else
+    coot_stop_runtime_error("coot_rt::relational_scalar_op(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::relational_scalar_op(out_mem, in_mem, n_elem, val, num, name);
+    #else
+    coot_stop_runtime_error("coot_rt::relational_scalar_op(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::relational_scalar_op(): unknown backend");
+    }
+  }
+
+
+
+template<typename eT1, typename eT2>
+inline
+void
+coot_rt_t::relational_array_op(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> X_mem, const dev_mem_t<eT2> Y_mem, const uword n_elem, const twoway_kernel_id::enum_id num, const std::string& name)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::relational_array_op(out_mem, X_mem, Y_mem, n_elem, num, name);
+    #else
+    coot_stop_runtime_error("coot_rt::relational_array_op(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::relational_array_op(out_mem, X_mem, Y_mem, n_elem, num, name);
+    #else
+    coot_stop_runtime_error("coot_rt::relational_array_op(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::relational_array_op(): unknown backend");
+    }
+  }
+
+
+
 template<typename eT>
 inline
 bool

@@ -58,6 +58,8 @@ template<typename out_eT, typename T1, typename mtop_type> class mtOp;
 template<typename T1, typename T2, typename  glue_type> class   Glue;
 template<typename T1, typename T2, typename eglue_type> class  eGlue;
 
+template<typename out_eT, typename T1, typename T2, typename mtglue_type> class mtGlue;
+
 template<                 typename eT, typename gen_type> class  GenCube;
 
 template<                 typename T1, typename  op_type> class   OpCube;
@@ -91,6 +93,16 @@ class op_diagvec;
 
 class mtop_conv_to;
 class mtop_all;
+class mtop_rel_lt_pre;
+class mtop_rel_lt_post;
+class mtop_rel_gt_pre;
+class mtop_rel_gt_post;
+class mtop_rel_lteq_pre;
+class mtop_rel_lteq_post;
+class mtop_rel_gteq_pre;
+class mtop_rel_gteq_post;
+class mtop_rel_eq;
+class mtop_rel_noteq;
 
 class eop_scalar_plus;
 class eop_neg;
@@ -112,6 +124,15 @@ class glue_mixed_minus;
 class glue_mixed_schur;
 class glue_mixed_div;
 class glue_mixed_times;
+
+class mtglue_rel_lt;
+class mtglue_rel_gt;
+class mtglue_rel_lteq;
+class mtglue_rel_gteq;
+class mtglue_rel_eq;
+class mtglue_rel_noteq;
+class mtglue_rel_and;
+class mtglue_rel_or;
 
 namespace fill
   {

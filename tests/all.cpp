@@ -658,3 +658,174 @@ TEMPLATE_TEST_CASE(
       }
     }
   }
+
+
+
+// Test special optimizations for some relational expressions.
+// (We also test the unoptimized cases just to make sure nothing is wrong.)
+
+TEMPLATE_TEST_CASE("all_relational_expressions", "[all]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> X = randi<Mat<eT>>(10, 10, distr_param(0, 5));
+
+  umat y11 = all(X < 0);
+  umat y12 = all(X < 0, 0);
+  umat y13 = all(X < 0, 1);
+
+  umat z = X < 0;
+  umat y21 = all(z);
+  umat y22 = all(z, 0);
+  umat y23 = all(z, 1);
+
+  REQUIRE( all(all(y11 == y21)) );
+  REQUIRE( all(all(y12 == y22)) );
+  REQUIRE( all(all(y13 == y23)) );
+
+  y11 = all(0 < X);
+  y12 = all(0 < X, 0);
+  y13 = all(0 < X, 1);
+
+  z = 0 < X;
+  y21 = all(z);
+  y22 = all(z, 0);
+  y23 = all(z, 1);
+
+  REQUIRE( all(all(y11 == y21)) );
+  REQUIRE( all(all(y12 == y22)) );
+  REQUIRE( all(all(y13 == y23)) );
+
+  y11 = all(X > 0);
+  y12 = all(X > 0, 0);
+  y13 = all(X > 0, 1);
+
+  z = X > 0;
+  y21 = all(z);
+  y22 = all(z, 0);
+  y23 = all(z, 1);
+
+  REQUIRE( all(all(y11 == y21)) );
+  REQUIRE( all(all(y12 == y22)) );
+  REQUIRE( all(all(y13 == y23)) );
+
+  y11 = all(0 > X);
+  y12 = all(0 > X, 0);
+  y13 = all(0 > X, 1);
+
+  z = 0 > X;
+  y21 = all(z);
+  y22 = all(z, 0);
+  y23 = all(z, 1);
+
+  REQUIRE( all(all(y11 == y21)) );
+  REQUIRE( all(all(y12 == y22)) );
+  REQUIRE( all(all(y13 == y23)) );
+
+  y11 = all(X <= 0);
+  y12 = all(X <= 0, 0);
+  y13 = all(X <= 0, 1);
+
+  z = X <= 0;
+  y21 = all(z);
+  y22 = all(z, 0);
+  y23 = all(z, 1);
+
+  REQUIRE( all(all(y11 == y21)) );
+  REQUIRE( all(all(y12 == y22)) );
+  REQUIRE( all(all(y13 == y23)) );
+
+  y11 = all(0 <= X);
+  y12 = all(0 <= X, 0);
+  y13 = all(0 <= X, 1);
+
+  z = 0 <= X;
+  y21 = all(z);
+  y22 = all(z, 0);
+  y23 = all(z, 1);
+
+  REQUIRE( all(all(y11 == y21)) );
+  REQUIRE( all(all(y12 == y22)) );
+  REQUIRE( all(all(y13 == y23)) );
+
+  y11 = all(X >= 0);
+  y12 = all(X >= 0, 0);
+  y13 = all(X >= 0, 1);
+
+  z = X >= 0;
+  y21 = all(z);
+  y22 = all(z, 0);
+  y23 = all(z, 1);
+
+  REQUIRE( all(all(y11 == y21)) );
+  REQUIRE( all(all(y12 == y22)) );
+  REQUIRE( all(all(y13 == y23)) );
+
+  y11 = all(0 >= X);
+  y12 = all(0 >= X, 0);
+  y13 = all(0 >= X, 1);
+
+  z = 0 >= X;
+  y21 = all(z);
+  y22 = all(z, 0);
+  y23 = all(z, 1);
+
+  REQUIRE( all(all(y11 == y21)) );
+  REQUIRE( all(all(y12 == y22)) );
+  REQUIRE( all(all(y13 == y23)) );
+
+  y11 = all(X == 0);
+  y12 = all(X == 0, 0);
+  y13 = all(X == 0, 1);
+
+  z = X == 0;
+  y21 = all(z);
+  y22 = all(z, 0);
+  y23 = all(z, 1);
+
+  REQUIRE( all(all(y11 == y21)) );
+  REQUIRE( all(all(y12 == y22)) );
+  REQUIRE( all(all(y13 == y23)) );
+
+  y11 = all(X != 0);
+  y12 = all(X != 0, 0);
+  y13 = all(X != 0, 1);
+
+  z = X != 0;
+  y21 = all(z);
+  y22 = all(z, 0);
+  y23 = all(z, 1);
+  }
+
+
+
+// Test special optimizations for some relational expressions.
+// (We also test the unoptimized cases just to make sure nothing is wrong.)
+
+TEMPLATE_TEST_CASE("all_vec_relational_op", "[relational]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Col<eT> x = randi<Col<eT>>(500, distr_param(0, 3));
+
+  uvec z = (x < 0);
+  REQUIRE( all(x < 0) == all(z) );
+  z = (0 < x);
+  REQUIRE( all(0 < x) == all(z) );
+  z = (x > 0);
+  REQUIRE( all(x > 0) == all(z) );
+  z = (0 > x);
+  REQUIRE( all(0 > x) == all(z) );
+  z = (x <= 0);
+  REQUIRE( all(x <= 0) == all(z) );
+  z = (0 <= x);
+  REQUIRE( all(0 <= x) == all(z) );
+  z = (x >= 0);
+  REQUIRE( all(x >= 0) == all(z) );
+  z = (0 >= x);
+  REQUIRE( all(0 >= x) == all(z) );
+  z = (x == 0);
+  REQUIRE( all(x == 0) == all(z) );
+  z = (x != 0);
+  REQUIRE( all(x != 0) == all(z) );
+  }

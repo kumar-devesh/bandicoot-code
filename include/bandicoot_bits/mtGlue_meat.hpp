@@ -14,35 +14,20 @@
 
 
 
-template<typename out_eT, typename T1, typename mtop_type>
+template<typename out_eT, typename T1, typename T2, typename mtglue_type>
 inline
-mtOp<out_eT, T1, mtop_type>::mtOp(const T1& in_m, const uword in_aux_uword_a, const uword in_aux_uword_b)
-  : q(in_m)
-  , aux(out_eT(0))
-  , aux_uword_a(in_aux_uword_a)
-  , aux_uword_b(in_aux_uword_b)
+mtGlue<out_eT, T1, T2, mtglue_type>::mtGlue(const T1& in_A, const T2& in_B)
+  : A(in_A)
+  , B(in_B)
   {
   coot_extra_debug_sigprint();
   }
 
 
 
-template<typename out_eT, typename T1, typename mtop_type>
+template<typename out_eT, typename T1, typename T2, typename mtglue_type>
 inline
-mtOp<out_eT, T1, mtop_type>::mtOp(const T1& in_m, const typename T1::elem_type aux_in)
-  : q(in_m)
-  , aux(aux_in)
-  , aux_uword_a(0)
-  , aux_uword_b(0)
-  {
-  coot_extra_debug_sigprint();
-  }
-
-
-
-template<typename out_eT, typename T1, typename mtop_type>
-inline
-mtOp<out_eT, T1, mtop_type>::~mtOp()
+mtGlue<out_eT, T1, T2, mtglue_type>::~mtGlue()
   {
   coot_extra_debug_sigprint();
   }
