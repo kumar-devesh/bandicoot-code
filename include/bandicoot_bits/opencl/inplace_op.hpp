@@ -24,6 +24,9 @@ inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, oneway_k
   {
   coot_extra_debug_sigprint();
 
+  if (n_elem == 0)
+    return;
+
   // Get kernel.
   cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(num);
 

@@ -17,77 +17,81 @@
 
 using namespace coot;
 
-TEMPLATE_TEST_CASE("all_vec_simple", "[all]", float, double, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("any_vec_simple", "[any]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
-  Col<eT> x = randi<Col<eT>>(50, distr_param(3, 5));
+  Col<eT> x(50);
+  x.zeros();
 
-  REQUIRE( all(x) == true );
+  REQUIRE( any(x) == false );
 
   for (uword i = 0; i < 50; ++i)
     {
     Col<eT> y(x);
-    y[i] = eT(0);
+    y[i] = eT(1);
 
-    REQUIRE( all(y) == false );
+    REQUIRE( any(y) == true );
     }
   }
 
 
 
-TEMPLATE_TEST_CASE("all_vec_large", "[all]", float, double, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("any_vec_large", "[any]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
-  Col<eT> x = randi<Col<eT>>(100000, distr_param(3, 5));
+  Col<eT> x(100000);
+  x.zeros();
 
-  REQUIRE( all(x) == true );
+  REQUIRE( any(x) == false );
 
   for (uword i = 0; i < 100; ++i)
     {
     Col<eT> y(x);
     Col<eT> rand_index = randi<Col<eT>>(1, distr_param(0, 99999));
 
-    y[rand_index[0]] = (eT) 0;
+    y[rand_index[0]] = (eT) 1;
 
-    REQUIRE( all(y) == false );
+    REQUIRE( any(y) == true );
     }
   }
 
 
 
-TEMPLATE_TEST_CASE("all_vec_mat", "[all]", float, double, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("any_vec_mat", "[any]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
-  Mat<eT> x = randi<Mat<eT>>(50, 50, distr_param(3, 5));
+  Mat<eT> x(50, 50);
+  x.zeros();
 
-  REQUIRE( all(all(x)) == true );
+  REQUIRE( any(any(x)) == false );
 
   for (uword i = 0; i < 50; ++i)
     {
     Mat<eT> y(x);
     Col<eT> rand_index = randi<Col<eT>>(1, distr_param(0, 2499));
-    y[rand_index[0]] = (eT) 0;
+    y[rand_index[0]] = (eT) 1;
 
-    REQUIRE( all(all(y)) == false );
+    REQUIRE( any(any(y)) == true );
     }
   }
 
 
 
-TEMPLATE_TEST_CASE("all_mat", "[all]", float, double, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("any_mat", "[any]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
-  Mat<eT> x = randi<Mat<eT>>(10000, 500, distr_param(10, 30));
-  x.col(10).zeros();
-  x.col(50).zeros();
-  x.col(477).zeros();
+  Mat<eT> x(10000, 500);
+  x.zeros();
+  x(3, 10) = eT(1);
+  x(44, 50) = eT(1);
+  x(1419, 477) = eT(1);
 
-  urowvec y = all(x);
-  urowvec y2 = all(x, 0);
+  urowvec y = any(x);
+  urowvec y2 = any(x, 0);
 
   REQUIRE( y.n_rows == 1 );
   REQUIRE( y.n_cols == 500 );
@@ -104,32 +108,33 @@ TEMPLATE_TEST_CASE("all_mat", "[all]", float, double, u32, s32, u64, s64)
     {
     if (i == 10 || i == 50 || i == 477)
       {
-      REQUIRE( y_cpu[i] == 0 );
-      REQUIRE( y2_cpu[i] == 0 );
+      REQUIRE( y_cpu[i] == 1 );
+      REQUIRE( y2_cpu[i] == 1 );
       }
     else
       {
-      REQUIRE( y_cpu[i] == 1 );
-      REQUIRE( y2_cpu[i] == 1 );
+      REQUIRE( y_cpu[i] == 0 );
+      REQUIRE( y2_cpu[i] == 0 );
       }
     }
   }
 
 
 
-TEMPLATE_TEST_CASE("all_mat_large", "[all]", float, double, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("any_mat_large", "[any]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
-  Mat<eT> x = randi<Mat<eT>>(100, 50000, distr_param(10, 30));
-  x.col(10).zeros();
-  x.col(50).zeros();
-  x.col(477).zeros();
-  x.col(1132).zeros();
-  x.col(49999).zeros();
+  Mat<eT> x(100, 50000);
+  x.zeros();
+  x(11, 10) = eT(1);
+  x(44, 50) = eT(1);
+  x(3, 477) = eT(1);
+  x(0, 1132) = eT(1);
+  x(99, 49999) = eT(1);
 
-  urowvec y = all(x);
-  urowvec y2 = all(x, 0);
+  urowvec y = any(x);
+  urowvec y2 = any(x, 0);
 
   REQUIRE( y.n_rows == 1 );
   REQUIRE( y.n_cols == 50000 );
@@ -146,25 +151,25 @@ TEMPLATE_TEST_CASE("all_mat_large", "[all]", float, double, u32, s32, u64, s64)
     {
     if (i == 10 || i == 50 || i == 477 || i == 1132 || i == 49999)
       {
-      REQUIRE( y_cpu[i] == 0 );
-      REQUIRE( y2_cpu[i] == 0 );
+      REQUIRE( y_cpu[i] == 1 );
+      REQUIRE( y2_cpu[i] == 1 );
       }
     else
       {
-      REQUIRE( y_cpu[i] == 1 );
-      REQUIRE( y2_cpu[i] == 1 );
+      REQUIRE( y_cpu[i] == 0 );
+      REQUIRE( y2_cpu[i] == 0 );
       }
     }
   }
 
 
 
-TEST_CASE("all_empty", "[all]")
+TEST_CASE("any_empty", "[any]")
   {
   mat x;
 
-  urowvec y = all(x);
-  urowvec y2 = all(x, 0);
+  urowvec y = any(x);
+  urowvec y2 = any(x, 0);
 
   REQUIRE( y.n_rows == 1 );
   REQUIRE( y.n_cols == 0 );
@@ -177,16 +182,17 @@ TEST_CASE("all_empty", "[all]")
 
 
 
-TEST_CASE("all_alias", "[all]")
+TEST_CASE("any_alias", "[any]")
   {
-  umat x = randi<umat>(50, 50, distr_param(3, 5));
-  x.col(0).zeros();
-  x.col(11).zeros();
-  x.col(42).zeros();
+  umat x(50, 50);
+  x.zeros();
+  x.col(0).ones();
+  x.col(11).ones();
+  x.col(42).ones();
   umat x2 = x;
 
-  x = all(x);
-  x2 = all(x2, 0);
+  x = any(x);
+  x2 = any(x2, 0);
 
   REQUIRE( x.n_rows == 1 );
   REQUIRE( x.n_cols == 50 );
@@ -203,29 +209,30 @@ TEST_CASE("all_alias", "[all]")
     {
     if (i == 0 || i == 11 || i == 42)
       {
-      REQUIRE( x_cpu[i] == 0 );
-      REQUIRE( x2_cpu[i] == 0 );
+      REQUIRE( x_cpu[i] == 1 );
+      REQUIRE( x2_cpu[i] == 1 );
       }
     else
       {
-      REQUIRE( x_cpu[i] == 1 );
-      REQUIRE( x2_cpu[i] == 1 );
+      REQUIRE( x_cpu[i] == 0 );
+      REQUIRE( x2_cpu[i] == 0 );
       }
     }
   }
 
 
 
-TEMPLATE_TEST_CASE("all_mat_rowwise", "[all]", float, double, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("any_mat_rowwise", "[any]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
-  Mat<eT> x = randi<Mat<eT>>(500, 10000, distr_param(10, 30));
-  x.row(10).zeros();
-  x.row(50).zeros();
-  x.row(477).zeros();
+  Mat<eT> x(500, 10000);
+  x.zeros();
+  x.row(10).ones();
+  x.row(50).ones();
+  x.row(477).ones();
 
-  uvec y = all(x, 1);
+  uvec y = any(x, 1);
 
   REQUIRE( y.n_rows == 500 );
   REQUIRE( y.n_cols == 1 );
@@ -237,29 +244,30 @@ TEMPLATE_TEST_CASE("all_mat_rowwise", "[all]", float, double, u32, s32, u64, s64
     {
     if (i == 10 || i == 50 || i == 477)
       {
-      REQUIRE( y_cpu[i] == 0 );
+      REQUIRE( y_cpu[i] == 1 );
       }
     else
       {
-      REQUIRE( y_cpu[i] == 1 );
+      REQUIRE( y_cpu[i] == 0 );
       }
     }
   }
 
 
 
-TEMPLATE_TEST_CASE("all_mat_rowwise_large", "[all]", float, double, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("any_mat_rowwise_large", "[any]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
-  Mat<eT> x = randi<Mat<eT>>(50000, 100, distr_param(10, 30));
-  x.row(10).zeros();
-  x.row(50).zeros();
-  x.row(477).zeros();
-  x.row(1132).zeros();
-  x.row(49999).zeros();
+  Mat<eT> x(50000, 100);
+  x.zeros();
+  x(10, 3) = eT(1);
+  x(50, 1) = eT(1);
+  x(477, 56) = eT(1);
+  x(1132, 99) = eT(1);
+  x(49999, 0) = eT(1);
 
-  uvec y = all(x, 1);
+  uvec y = any(x, 1);
 
   REQUIRE( y.n_rows == 50000 );
   REQUIRE( y.n_cols == 1 );
@@ -271,21 +279,21 @@ TEMPLATE_TEST_CASE("all_mat_rowwise_large", "[all]", float, double, u32, s32, u6
     {
     if (i == 10 || i == 50 || i == 477 || i == 1132 || i == 49999)
       {
-      REQUIRE( y_cpu[i] == 0 );
+      REQUIRE( y_cpu[i] == 1 );
       }
     else
       {
-      REQUIRE( y_cpu[i] == 1 );
+      REQUIRE( y_cpu[i] == 0 );
       }
     }
   }
 
 
 
-TEST_CASE("all_rowwise_empty", "[all]")
+TEST_CASE("any_rowwise_empty", "[any]")
   {
   mat x;
-  uvec y = all(x, 1);
+  uvec y = any(x, 1);
 
   REQUIRE( y.n_rows == 0 );
   REQUIRE( y.n_cols == 1 );
@@ -294,14 +302,15 @@ TEST_CASE("all_rowwise_empty", "[all]")
 
 
 
-TEST_CASE("all_rowwise_alias", "[all]")
+TEST_CASE("any_rowwise_alias", "[any]")
   {
-  umat x = randi<umat>(50, 50, distr_param(3, 5));
-  x.row(0).zeros();
-  x.row(11).zeros();
-  x.row(42).zeros();
+  umat x(50, 50);
+  x.zeros();
+  x.row(0).ones();
+  x.row(11).ones();
+  x.row(42).ones();
 
-  x = all(x, 1);
+  x = any(x, 1);
 
   REQUIRE( x.n_rows == 50 );
   REQUIRE( x.n_cols == 1 );
@@ -313,11 +322,11 @@ TEST_CASE("all_rowwise_alias", "[all]")
     {
     if (i == 0 || i == 11 || i == 42)
       {
-      REQUIRE( x_cpu[i] == 0 );
+      REQUIRE( x_cpu[i] == 1 );
       }
     else
       {
-      REQUIRE( x_cpu[i] == 1 );
+      REQUIRE( x_cpu[i] == 0 );
       }
     }
 
@@ -325,16 +334,19 @@ TEST_CASE("all_rowwise_alias", "[all]")
 
 
 
-TEMPLATE_TEST_CASE("all_mat_subview", "[all]", float, double, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("any_mat_subview", "[any]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
-  Mat<eT> x = randi<Mat<eT>>(100, 100, distr_param(10, 20));
-  x.col(5).zeros();
-  x.col(15).zeros();
+  Mat<eT> x(100, 100);
+  x.zeros();
+  x(0, 0) = eT(1);
+  x(99, 99) = eT(1);
+  x.col(5).ones();
+  x.col(15).ones();
 
-  urowvec y = all(x.submat(4, 4, 20, 20));
-  urowvec y2 = all(x.submat(4, 4, 20, 20), 0);
+  urowvec y = any(x.submat(4, 4, 20, 20));
+  urowvec y2 = any(x.submat(4, 4, 20, 20), 0);
 
   REQUIRE( y.n_rows == 1 );
   REQUIRE( y.n_cols == 17 );
@@ -351,28 +363,31 @@ TEMPLATE_TEST_CASE("all_mat_subview", "[all]", float, double, u32, s32, u64, s64
     {
     if (i == 1 || i == 11)
       {
-      REQUIRE( y_cpu[i] == 0 );
-      REQUIRE( y2_cpu[i] == 0 );
+      REQUIRE( y_cpu[i] == 1 );
+      REQUIRE( y2_cpu[i] == 1 );
       }
     else
       {
-      REQUIRE( y_cpu[i] == 1 );
-      REQUIRE( y2_cpu[i] == 1 );
+      REQUIRE( y_cpu[i] == 0 );
+      REQUIRE( y2_cpu[i] == 0 );
       }
     }
   }
 
 
 
-TEMPLATE_TEST_CASE("all_mat_rowwise_subview", "[all]", float, double, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("any_mat_rowwise_subview", "[any]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
-  Mat<eT> x = randi<Mat<eT>>(100, 100, distr_param(10, 20));
-  x.row(5).zeros();
-  x.row(15).zeros();
+  Mat<eT> x(100, 100);
+  x.zeros();
+  x(0, 0) = eT(1);
+  x(99, 99) = eT(1);
+  x.row(5).ones();
+  x.row(15).ones();
 
-  uvec y = all(x.submat(4, 4, 20, 20), 1);
+  uvec y = any(x.submat(4, 4, 20, 20), 1);
 
   REQUIRE( y.n_rows == 17 );
   REQUIRE( y.n_cols == 1 );
@@ -384,29 +399,30 @@ TEMPLATE_TEST_CASE("all_mat_rowwise_subview", "[all]", float, double, u32, s32, 
     {
     if (i == 1 || i == 11)
       {
-      REQUIRE( y_cpu[i] == 0 );
+      REQUIRE( y_cpu[i] == 1 );
       }
     else
       {
-      REQUIRE( y_cpu[i] == 1 );
+      REQUIRE( y_cpu[i] == 0 );
       }
     }
   }
 
 
 
-TEMPLATE_TEST_CASE("all_mat_expr", "[all]", float, double, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("any_mat_expr", "[any]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
-  Mat<eT> x = randi<Mat<eT>>(100, 100, distr_param(10, 20));
+  Mat<eT> x(100, 100);
+  x.zeros();
   Mat<eT> y = x;
-  y.col(1).zeros();
-  y.col(10).zeros();
-  y.col(50).zeros();
+  y.col(1).ones();
+  y.col(10).ones();
+  y.col(50).ones();
 
-  urowvec z = all(2 * (x - y));
-  urowvec z2 = all(2 * (x - y), 0);
+  urowvec z = any(2 * (x - y));
+  urowvec z2 = any(2 * (x - y), 0);
 
   REQUIRE( z.n_rows == 1 );
   REQUIRE( z.n_cols == 100 );
@@ -436,17 +452,18 @@ TEMPLATE_TEST_CASE("all_mat_expr", "[all]", float, double, u32, s32, u64, s64)
 
 
 
-TEMPLATE_TEST_CASE("all_mat_expr_rowwise", "[all]", float, double, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("any_mat_expr_rowwise", "[any]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
-  Mat<eT> x = randi<Mat<eT>>(100, 100, distr_param(10, 20));
+  Mat<eT> x(100, 100);
+  x.zeros();
   Mat<eT> y = x;
-  y.row(1).zeros();
-  y.row(10).zeros();
-  y.row(50).zeros();
+  y.row(1).ones();
+  y.row(10).ones();
+  y.row(50).ones();
 
-  uvec z = all(2 * (x - y), 1);
+  uvec z = any(2 * (x - y), 1);
 
   REQUIRE( z.n_rows == 100 );
   REQUIRE( z.n_cols == 1 );
@@ -470,8 +487,8 @@ TEMPLATE_TEST_CASE("all_mat_expr_rowwise", "[all]", float, double, u32, s32, u64
 
 
 TEMPLATE_TEST_CASE(
-  "all_vec_conv_to",
-  "[all]",
+  "any_vec_conv_to",
+  "[any]",
   (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
   (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
   (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
@@ -485,18 +502,18 @@ TEMPLATE_TEST_CASE(
 
   Col<eT1> x = randi<Col<eT1>>(1000, distr_param(10, 20));
 
-  REQUIRE ( all(conv_to<Col<eT2>>::from(x)) == true );
+  REQUIRE ( any(conv_to<Col<eT2>>::from(x)) == true );
 
-  x[12] = eT1(0);
+  x.zeros();
 
-  REQUIRE ( all(conv_to<Col<eT2>>::from(x)) == false );
+  REQUIRE ( any(conv_to<Col<eT2>>::from(x)) == false );
   }
 
 
 
 TEMPLATE_TEST_CASE(
-  "all_vec_conv_to_matrix",
-  "[all]",
+  "any_vec_conv_to_matrix",
+  "[any]",
   (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
   (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
   (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
@@ -510,18 +527,18 @@ TEMPLATE_TEST_CASE(
 
   Mat<eT1> x = randi<Mat<eT1>>(500, 500, distr_param(10, 20));
 
-  REQUIRE( all(all(conv_to<Mat<eT2>>::from(x))) == true );
+  REQUIRE( any(any(conv_to<Mat<eT2>>::from(x))) == true );
 
-  x[15] = eT1(0);
+  x.zeros();
 
-  REQUIRE( all(all(conv_to<Mat<eT2>>::from(x))) == false );
+  REQUIRE( any(any(conv_to<Mat<eT2>>::from(x))) == false );
   }
 
 
 
 TEMPLATE_TEST_CASE(
-  "all_conv_to",
-  "[all]",
+  "any_conv_to",
+  "[any]",
   (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
   (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
   (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
@@ -533,13 +550,14 @@ TEMPLATE_TEST_CASE(
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
-  Mat<eT1> x = randi<Mat<eT1>>(10000, 500, distr_param(10, 30));
-  x.col(10).zeros();
-  x.col(50).zeros();
-  x.col(477).zeros();
+  Mat<eT1> x(500, 500);
+  x.zeros();
+  x.col(10).ones();
+  x.col(50).ones();
+  x.col(477).ones();
 
-  Row<uword> y = all(conv_to<Mat<eT2>>::from(x));
-  Row<uword> y2 = all(conv_to<Mat<eT2>>::from(x));
+  Row<uword> y = any(conv_to<Mat<eT2>>::from(x));
+  Row<uword> y2 = any(conv_to<Mat<eT2>>::from(x));
 
   REQUIRE( y.n_rows == 1 );
   REQUIRE( y.n_cols == 500 );
@@ -556,13 +574,13 @@ TEMPLATE_TEST_CASE(
     {
     if (i == 10 || i == 50 || i == 477)
       {
-      REQUIRE( y_cpu[i] == 0 );
-      REQUIRE( y2_cpu[i] == 0 );
+      REQUIRE( y_cpu[i] == 1 );
+      REQUIRE( y2_cpu[i] == 1 );
       }
     else
       {
-      REQUIRE( y_cpu[i] == 1 );
-      REQUIRE( y2_cpu[i] == 1 );
+      REQUIRE( y_cpu[i] == 0 );
+      REQUIRE( y2_cpu[i] == 0 );
       }
     }
   }
@@ -570,8 +588,8 @@ TEMPLATE_TEST_CASE(
 
 
 TEMPLATE_TEST_CASE(
-  "all_conv_to_rowwise",
-  "[all]",
+  "any_conv_to_rowwise",
+  "[any]",
   (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
   (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
   (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
@@ -583,12 +601,13 @@ TEMPLATE_TEST_CASE(
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
-  Mat<eT1> x = randi<Mat<eT1>>(500, 10000, distr_param(10, 30));
-  x.row(10).zeros();
-  x.row(50).zeros();
-  x.row(477).zeros();
+  Mat<eT1> x(500, 10000);
+  x.zeros();
+  x.row(10).ones();
+  x.row(50).ones();
+  x.row(477).ones();
 
-  Col<uword> y = all(conv_to<Mat<eT2>>::from(x), 1);
+  Col<uword> y = any(conv_to<Mat<eT2>>::from(x), 1);
 
   REQUIRE( y.n_rows == 500 );
   REQUIRE( y.n_cols == 1 );
@@ -600,11 +619,11 @@ TEMPLATE_TEST_CASE(
     {
     if (i == 10 || i == 50 || i == 477)
       {
-      REQUIRE( y_cpu[i] == 0 );
+      REQUIRE( y_cpu[i] == 1 );
       }
     else
       {
-      REQUIRE( y_cpu[i] == 1 );
+      REQUIRE( y_cpu[i] == 0 );
       }
     }
   }
@@ -612,8 +631,8 @@ TEMPLATE_TEST_CASE(
 
 
 TEMPLATE_TEST_CASE(
-  "all_conv_to_eop",
-  "[all]",
+  "any_conv_to_eop",
+  "[any]",
   (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
   (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
   (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
@@ -625,13 +644,14 @@ TEMPLATE_TEST_CASE(
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
-  Mat<eT1> x = randi<Mat<eT1>>(10000, 500, distr_param(10, 30));
+  Mat<eT1> x(10000, 500);
+  x.zeros();
   x.col(10).ones();
   x.col(50).ones();
   x.col(477).ones();
 
-  Row<uword> y = all(conv_to<Mat<eT2>>::from(2 * x - 2));
-  Row<uword> y2 = all(conv_to<Mat<eT2>>::from(2 * x - 2), 0);
+  Row<uword> y = any(conv_to<Mat<eT2>>::from(2 - 2 * x));
+  Row<uword> y2 = any(conv_to<Mat<eT2>>::from(2 - 2 * x), 0);
 
   REQUIRE( y.n_rows == 1 );
   REQUIRE( y.n_cols == 500 );
@@ -664,137 +684,137 @@ TEMPLATE_TEST_CASE(
 // Test special optimizations for some relational expressions.
 // (We also test the unoptimized cases just to make sure nothing is wrong.)
 
-TEMPLATE_TEST_CASE("all_relational_expressions", "[all]", float, double, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("any_relational_expressions", "[any]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
-  Mat<eT> X = randi<Mat<eT>>(10, 10, distr_param(0, 5));
+  Mat<eT> X = randi<Mat<eT>>(10, 10, distr_param(0, 2));
 
-  umat y11 = all(X < 0);
-  umat y12 = all(X < 0, 0);
-  umat y13 = all(X < 0, 1);
+  umat y11 = any(X < 0);
+  umat y12 = any(X < 0, 0);
+  umat y13 = any(X < 0, 1);
 
   umat z = X < 0;
-  umat y21 = all(z);
-  umat y22 = all(z, 0);
-  umat y23 = all(z, 1);
+  umat y21 = any(z);
+  umat y22 = any(z, 0);
+  umat y23 = any(z, 1);
 
-  REQUIRE( all(all(y11 == y21)) );
-  REQUIRE( all(all(y12 == y22)) );
-  REQUIRE( all(all(y13 == y23)) );
+  REQUIRE( any(any(y11 == y21)) );
+  REQUIRE( any(any(y12 == y22)) );
+  REQUIRE( any(any(y13 == y23)) );
 
-  y11 = all(0 < X);
-  y12 = all(0 < X, 0);
-  y13 = all(0 < X, 1);
+  y11 = any(0 < X);
+  y12 = any(0 < X, 0);
+  y13 = any(0 < X, 1);
 
   z = 0 < X;
-  y21 = all(z);
-  y22 = all(z, 0);
-  y23 = all(z, 1);
+  y21 = any(z);
+  y22 = any(z, 0);
+  y23 = any(z, 1);
 
-  REQUIRE( all(all(y11 == y21)) );
-  REQUIRE( all(all(y12 == y22)) );
-  REQUIRE( all(all(y13 == y23)) );
+  REQUIRE( any(any(y11 == y21)) );
+  REQUIRE( any(any(y12 == y22)) );
+  REQUIRE( any(any(y13 == y23)) );
 
-  y11 = all(X > 0);
-  y12 = all(X > 0, 0);
-  y13 = all(X > 0, 1);
+  y11 = any(X > 0);
+  y12 = any(X > 0, 0);
+  y13 = any(X > 0, 1);
 
   z = X > 0;
-  y21 = all(z);
-  y22 = all(z, 0);
-  y23 = all(z, 1);
+  y21 = any(z);
+  y22 = any(z, 0);
+  y23 = any(z, 1);
 
-  REQUIRE( all(all(y11 == y21)) );
-  REQUIRE( all(all(y12 == y22)) );
-  REQUIRE( all(all(y13 == y23)) );
+  REQUIRE( any(any(y11 == y21)) );
+  REQUIRE( any(any(y12 == y22)) );
+  REQUIRE( any(any(y13 == y23)) );
 
-  y11 = all(0 > X);
-  y12 = all(0 > X, 0);
-  y13 = all(0 > X, 1);
+  y11 = any(0 > X);
+  y12 = any(0 > X, 0);
+  y13 = any(0 > X, 1);
 
   z = 0 > X;
-  y21 = all(z);
-  y22 = all(z, 0);
-  y23 = all(z, 1);
+  y21 = any(z);
+  y22 = any(z, 0);
+  y23 = any(z, 1);
 
-  REQUIRE( all(all(y11 == y21)) );
-  REQUIRE( all(all(y12 == y22)) );
-  REQUIRE( all(all(y13 == y23)) );
+  REQUIRE( any(any(y11 == y21)) );
+  REQUIRE( any(any(y12 == y22)) );
+  REQUIRE( any(any(y13 == y23)) );
 
-  y11 = all(X <= 0);
-  y12 = all(X <= 0, 0);
-  y13 = all(X <= 0, 1);
+  y11 = any(X <= 0);
+  y12 = any(X <= 0, 0);
+  y13 = any(X <= 0, 1);
 
   z = X <= 0;
-  y21 = all(z);
-  y22 = all(z, 0);
-  y23 = all(z, 1);
+  y21 = any(z);
+  y22 = any(z, 0);
+  y23 = any(z, 1);
 
-  REQUIRE( all(all(y11 == y21)) );
-  REQUIRE( all(all(y12 == y22)) );
-  REQUIRE( all(all(y13 == y23)) );
+  REQUIRE( any(any(y11 == y21)) );
+  REQUIRE( any(any(y12 == y22)) );
+  REQUIRE( any(any(y13 == y23)) );
 
-  y11 = all(0 <= X);
-  y12 = all(0 <= X, 0);
-  y13 = all(0 <= X, 1);
+  y11 = any(0 <= X);
+  y12 = any(0 <= X, 0);
+  y13 = any(0 <= X, 1);
 
   z = 0 <= X;
-  y21 = all(z);
-  y22 = all(z, 0);
-  y23 = all(z, 1);
+  y21 = any(z);
+  y22 = any(z, 0);
+  y23 = any(z, 1);
 
-  REQUIRE( all(all(y11 == y21)) );
-  REQUIRE( all(all(y12 == y22)) );
-  REQUIRE( all(all(y13 == y23)) );
+  REQUIRE( any(any(y11 == y21)) );
+  REQUIRE( any(any(y12 == y22)) );
+  REQUIRE( any(any(y13 == y23)) );
 
-  y11 = all(X >= 0);
-  y12 = all(X >= 0, 0);
-  y13 = all(X >= 0, 1);
+  y11 = any(X >= 0);
+  y12 = any(X >= 0, 0);
+  y13 = any(X >= 0, 1);
 
   z = X >= 0;
-  y21 = all(z);
-  y22 = all(z, 0);
-  y23 = all(z, 1);
+  y21 = any(z);
+  y22 = any(z, 0);
+  y23 = any(z, 1);
 
-  REQUIRE( all(all(y11 == y21)) );
-  REQUIRE( all(all(y12 == y22)) );
-  REQUIRE( all(all(y13 == y23)) );
+  REQUIRE( any(any(y11 == y21)) );
+  REQUIRE( any(any(y12 == y22)) );
+  REQUIRE( any(any(y13 == y23)) );
 
-  y11 = all(0 >= X);
-  y12 = all(0 >= X, 0);
-  y13 = all(0 >= X, 1);
+  y11 = any(0 >= X);
+  y12 = any(0 >= X, 0);
+  y13 = any(0 >= X, 1);
 
   z = 0 >= X;
-  y21 = all(z);
-  y22 = all(z, 0);
-  y23 = all(z, 1);
+  y21 = any(z);
+  y22 = any(z, 0);
+  y23 = any(z, 1);
 
-  REQUIRE( all(all(y11 == y21)) );
-  REQUIRE( all(all(y12 == y22)) );
-  REQUIRE( all(all(y13 == y23)) );
+  REQUIRE( any(any(y11 == y21)) );
+  REQUIRE( any(any(y12 == y22)) );
+  REQUIRE( any(any(y13 == y23)) );
 
-  y11 = all(X == 0);
-  y12 = all(X == 0, 0);
-  y13 = all(X == 0, 1);
+  y11 = any(X == 0);
+  y12 = any(X == 0, 0);
+  y13 = any(X == 0, 1);
 
   z = X == 0;
-  y21 = all(z);
-  y22 = all(z, 0);
-  y23 = all(z, 1);
+  y21 = any(z);
+  y22 = any(z, 0);
+  y23 = any(z, 1);
 
-  REQUIRE( all(all(y11 == y21)) );
-  REQUIRE( all(all(y12 == y22)) );
-  REQUIRE( all(all(y13 == y23)) );
+  REQUIRE( any(any(y11 == y21)) );
+  REQUIRE( any(any(y12 == y22)) );
+  REQUIRE( any(any(y13 == y23)) );
 
-  y11 = all(X != 0);
-  y12 = all(X != 0, 0);
-  y13 = all(X != 0, 1);
+  y11 = any(X != 0);
+  y12 = any(X != 0, 0);
+  y13 = any(X != 0, 1);
 
   z = X != 0;
-  y21 = all(z);
-  y22 = all(z, 0);
-  y23 = all(z, 1);
+  y21 = any(z);
+  y22 = any(z, 0);
+  y23 = any(z, 1);
   }
 
 
@@ -802,30 +822,30 @@ TEMPLATE_TEST_CASE("all_relational_expressions", "[all]", float, double, u32, s3
 // Test special optimizations for some relational expressions.
 // (We also test the unoptimized cases just to make sure nothing is wrong.)
 
-TEMPLATE_TEST_CASE("all_vec_relational_op", "[all]", float, double, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("any_vec_relational_op", "[any]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
-  Col<eT> x = randi<Col<eT>>(500, distr_param(0, 3));
+  Col<eT> x = randi<Col<eT>>(500, distr_param(0, 2));
 
   uvec z = (x < 0);
-  REQUIRE( all(x < 0) == all(z) );
+  REQUIRE( any(x < 0) == any(z) );
   z = (0 < x);
-  REQUIRE( all(0 < x) == all(z) );
+  REQUIRE( any(0 < x) == any(z) );
   z = (x > 0);
-  REQUIRE( all(x > 0) == all(z) );
+  REQUIRE( any(x > 0) == any(z) );
   z = (0 > x);
-  REQUIRE( all(0 > x) == all(z) );
+  REQUIRE( any(0 > x) == any(z) );
   z = (x <= 0);
-  REQUIRE( all(x <= 0) == all(z) );
+  REQUIRE( any(x <= 0) == any(z) );
   z = (0 <= x);
-  REQUIRE( all(0 <= x) == all(z) );
+  REQUIRE( any(0 <= x) == any(z) );
   z = (x >= 0);
-  REQUIRE( all(x >= 0) == all(z) );
+  REQUIRE( any(x >= 0) == any(z) );
   z = (0 >= x);
-  REQUIRE( all(0 >= x) == all(z) );
+  REQUIRE( any(0 >= x) == any(z) );
   z = (x == 0);
-  REQUIRE( all(x == 0) == all(z) );
+  REQUIRE( any(x == 0) == any(z) );
   z = (x != 0);
-  REQUIRE( all(x != 0) == all(z) );
+  REQUIRE( any(x != 0) == any(z) );
   }

@@ -1,4 +1,4 @@
-// Copyright 2023 Ryan Curtin (https://www.ratml.org/)
+// Copyright 2023 Ryan Curtin (http://www.ratml.org)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,47 +14,46 @@
 
 __kernel
 void
-COOT_FN(PREFIX,and_reduce)(__global const eT1* in_mem,
-                           const UWORD n_elem,
-                           __global eT1* out_mem,
-                           __local volatile eT1* aux_mem)
+COOT_FN(PREFIX,rel_any_neq_small)(__global const eT1* X,
+                                  const UWORD n_elem,
+                                  __global uint* out,
+                                  __local volatile uint* aux_mem,
+                                  const eT2 val)
   {
   const UWORD tid = get_local_id(0);
   UWORD i = get_group_id(0) * (get_local_size(0) * 2) + tid;
   const UWORD grid_size = get_local_size(0) * 2 * get_num_groups(0);
 
-  // Make sure all auxiliary memory is initialized to something that won't
-  // screw up the final reduce.
-  aux_mem[tid] = ~((eT1) 0);
+  aux_mem[tid] = 0;
 
   while (i + get_local_size(0) < n_elem)
     {
-    aux_mem[tid] &= in_mem[i];
-    aux_mem[tid] &= in_mem[i + get_local_size(0)];
+    const eT2 val1 = (eT2) X[i];
+    const eT2 val2 = (eT2) X[i + get_local_size(0)];
+
+    aux_mem[tid] |= (val1 != val);
+    aux_mem[tid] |= (val2 != val);
+    if (aux_mem[tid] == 1)
+      break;
     i += grid_size;
     }
-  if (i < n_elem)
-    {
-    aux_mem[tid] &= in_mem[i];
-    }
-  barrier(CLK_LOCAL_MEM_FENCE);
 
-  for (UWORD s = get_local_size(0) / 2; s > WAVEFRONT_SIZE; s >>= 1)
+  if (i < n_elem && aux_mem[tid] == 0)
+    {
+    const eT2 val1 = (eT2) X[i];
+    aux_mem[tid] |= (val1 != val);
+    }
+
+  for (UWORD s = get_local_size(0) / 2; s > 0; s >>= 1)
     {
     if (tid < s)
       {
-      aux_mem[tid] &= aux_mem[tid + s];
+      aux_mem[tid] |= aux_mem[tid + s];
       }
-    barrier(CLK_LOCAL_MEM_FENCE);
-    }
-
-  if (tid < WAVEFRONT_SIZE)
-    {
-    COOT_FN_3(PREFIX,and_wavefront_reduce_,WAVEFRONT_SIZE_NAME)(aux_mem, tid);
     }
 
   if (tid == 0)
     {
-    out_mem[get_group_id(0)] = aux_mem[0];
+    out[get_group_id(0)] = aux_mem[0];
     }
   }
