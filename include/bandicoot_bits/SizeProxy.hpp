@@ -13,8 +13,8 @@
 // ------------------------------------------------------------------------
 
 
-// The SizeProxy class is meant, for now, to provide an interface to partially unwrap types for eOp and eGlue,
-// so that the sizes of the operand can be known when the eOp or eGlue is created.  Operations should never be
+// The SizeProxy class is meant, for now, to provide an interface to partially unwrap types for operations,
+// so that the sizes of the operand(s) can be known when the operations are created.  Operations should never be
 // unwrapped when a SizeProxy is created.  (If you want to audit this, check the stored_type for each struct
 // specialization.)  The underlying object Q should be used for any actual operations.
 //
@@ -343,5 +343,37 @@ class SizeProxy< Glue<T1, T2, glue_type> >
   // Each glue_type must implement compute_n_rows() and compute_n_cols()
   coot_aligned uword get_n_rows() const { return glue_type::compute_n_rows(Q, S1.get_n_rows(), S1.get_n_cols(), S2.get_n_rows(), S2.get_n_cols()); }
   coot_aligned uword get_n_cols() const { return glue_type::compute_n_cols(Q, S1.get_n_rows(), S1.get_n_cols(), S2.get_n_rows(), S2.get_n_cols()); }
+  coot_aligned uword get_n_elem() const { return get_n_rows() * get_n_cols(); }
+  };
+
+
+
+template<typename out_eT, typename T1, typename T2, typename mtglue_type>
+class SizeProxy< mtGlue<out_eT, T1, T2, mtglue_type> >
+  {
+  public:
+
+  typedef out_eT                                   elem_type;
+  typedef typename get_pod_type<elem_type>::result pod_type;
+  typedef mtGlue<out_eT, T1, T2, mtglue_type>      stored_type;
+
+  static const bool is_row = mtGlue<out_eT, T1, T2, mtglue_type>::is_row;
+  static const bool is_col = mtGlue<out_eT, T1, T2, mtglue_type>::is_col;
+
+  coot_aligned const SizeProxy<T1> S1;
+  coot_aligned const SizeProxy<T2> S2;
+  coot_aligned const mtGlue<out_eT, T1, T2, mtglue_type>& Q;
+
+  inline explicit SizeProxy(const mtGlue<out_eT, T1, T2, mtglue_type>& A)
+    : S1(A.A)
+    , S2(A.B)
+    , Q(A)
+    {
+    coot_extra_debug_sigprint();
+    }
+
+  // Each mtglue_type must implement compute_n_rows() and compute_n_cols()
+  coot_aligned uword get_n_rows() const { return mtglue_type::compute_n_rows(Q, S1.get_n_rows(), S1.get_n_cols(), S2.get_n_rows(), S2.get_n_cols()); }
+  coot_aligned uword get_n_cols() const { return mtglue_type::compute_n_cols(Q, S1.get_n_rows(), S1.get_n_cols(), S2.get_n_rows(), S2.get_n_cols()); }
   coot_aligned uword get_n_elem() const { return get_n_rows() * get_n_cols(); }
   };

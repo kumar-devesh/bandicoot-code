@@ -1387,6 +1387,115 @@ Mat<eT>::operator/=(const Glue<T1, T2, glue_type>& X)
 
 
 template<typename eT>
+template<typename T1, typename T2, typename mtglue_type>
+inline
+Mat<eT>::Mat(const mtGlue<eT, T1, T2, mtglue_type>& X)
+  : n_rows   (0)
+  , n_cols   (0)
+  , n_elem   (0)
+  , vec_state(0)
+  , mem_state(0)
+  {
+  coot_extra_debug_sigprint_this(this);
+
+  (*this).operator=(X);
+  }
+
+
+
+template<typename eT>
+template<typename T1, typename T2, typename mtglue_type>
+inline
+const Mat<eT>&
+Mat<eT>::operator=(const mtGlue<eT, T1, T2, mtglue_type>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  mtglue_type::apply(*this, X);
+
+  return *this;
+  }
+
+
+
+template<typename eT>
+template<typename T1, typename T2, typename mtglue_type>
+inline
+const Mat<eT>&
+Mat<eT>::operator+=(const mtGlue<eT, T1, T2, mtglue_type>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  const Mat<eT> m(X);
+
+  return (*this).operator+=(m);
+  }
+
+
+
+template<typename eT>
+template<typename T1, typename T2, typename mtglue_type>
+inline
+const Mat<eT>&
+Mat<eT>::operator-=(const mtGlue<eT, T1, T2, mtglue_type>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  const Mat<eT> m(X);
+
+  return (*this).operator-=(m);
+  }
+
+
+
+template<typename eT>
+template<typename T1, typename T2, typename mtglue_type>
+inline
+const Mat<eT>&
+Mat<eT>::operator*=(const mtGlue<eT, T1, T2, mtglue_type>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  Mat<eT> tmp = (*this) * X;
+
+  (*this).steal_mem(tmp);
+
+  return *this;
+  }
+
+
+
+template<typename eT>
+template<typename T1, typename T2, typename mtglue_type>
+inline
+const Mat<eT>&
+Mat<eT>::operator%=(const mtGlue<eT, T1, T2, mtglue_type>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  const Mat<eT> m(X);
+
+  return (*this).operator%=(m);
+  }
+
+
+
+template<typename eT>
+template<typename T1, typename T2, typename mtglue_type>
+inline
+const Mat<eT>&
+Mat<eT>::operator/=(const mtGlue<eT, T1, T2, mtglue_type>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  const Mat<eT> m(X);
+
+  return (*this).operator/=(m);
+  }
+
+
+
+template<typename eT>
 coot_inline
 diagview<eT>
 Mat<eT>::diag(const sword in_id)

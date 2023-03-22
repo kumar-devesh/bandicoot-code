@@ -1065,6 +1065,132 @@ coot_rt_t::all(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> in_mem, const uwor
 
 
 
+template<typename eT1, typename eT2>
+inline
+bool
+coot_rt_t::any_vec(const dev_mem_t<eT1> mem, const uword n_elem, const eT2 val, const twoway_kernel_id::enum_id num, const twoway_kernel_id::enum_id num_small)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::any_vec(mem, n_elem, val, num, num_small);
+    #else
+    coot_stop_runtime_error("coot_rt::any_vec(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::any_vec(mem, n_elem, val, num, num_small);
+    #else
+    coot_stop_runtime_error("coot_rt::any_vec(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::any_vec(): unknown backend");
+    }
+
+  return false; // stop compilation warnings
+  }
+
+
+
+template<typename eT1, typename eT2>
+inline
+void
+coot_rt_t::any(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> in_mem, const uword n_rows, const uword n_cols, const eT2 val, const twoway_kernel_id::enum_id num, const bool colwise)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::any(out_mem, in_mem, n_rows, n_cols, val, num, colwise);
+    #else
+    coot_stop_runtime_error("coot_rt::any(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::any(out_mem, in_mem, n_rows, n_cols, val, num, colwise);
+    #else
+    coot_stop_runtime_error("coot_rt::any(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::any(): unknown backend");
+    }
+  }
+
+
+
+template<typename eT1, typename eT2>
+inline
+void
+coot_rt_t::relational_scalar_op(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> in_mem, const uword n_elem, const eT2 val, const twoway_kernel_id::enum_id num, const std::string& name)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::relational_scalar_op(out_mem, in_mem, n_elem, val, num, name);
+    #else
+    coot_stop_runtime_error("coot_rt::relational_scalar_op(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::relational_scalar_op(out_mem, in_mem, n_elem, val, num, name);
+    #else
+    coot_stop_runtime_error("coot_rt::relational_scalar_op(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::relational_scalar_op(): unknown backend");
+    }
+  }
+
+
+
+template<typename eT1, typename eT2>
+inline
+void
+coot_rt_t::relational_array_op(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> X_mem, const dev_mem_t<eT2> Y_mem, const uword n_elem, const twoway_kernel_id::enum_id num, const std::string& name)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::relational_array_op(out_mem, X_mem, Y_mem, n_elem, num, name);
+    #else
+    coot_stop_runtime_error("coot_rt::relational_array_op(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::relational_array_op(out_mem, X_mem, Y_mem, n_elem, num, name);
+    #else
+    coot_stop_runtime_error("coot_rt::relational_array_op(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::relational_array_op(): unknown backend");
+    }
+  }
+
+
+
 template<typename eT>
 inline
 bool

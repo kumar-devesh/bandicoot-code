@@ -136,6 +136,26 @@ struct unwrap< mtOp<out_eT, T1, mtop_conv_to> >
 
 
 
+template<typename out_eT, typename T1, typename T2, typename mtglue_type>
+struct unwrap< mtGlue<out_eT, T1, T2, mtglue_type> >
+  {
+  typedef Mat<out_eT> stored_type;
+
+  inline
+  unwrap(const mtGlue<out_eT, T1, T2, mtglue_type>& A)
+    : M(A)
+    {
+    coot_extra_debug_sigprint();
+    }
+
+  Mat<out_eT> M;
+
+  template<typename eT2>
+  coot_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
+  };
+
+
+
 //
 //
 //
