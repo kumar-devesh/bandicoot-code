@@ -225,6 +225,11 @@ namespace coot
   #include "bandicoot_bits/op_norm_bones.hpp"
   #include "bandicoot_bits/op_diagmat_bones.hpp"
   #include "bandicoot_bits/op_diagvec_bones.hpp"
+  #include "bandicoot_bits/op_mean_bones.hpp"
+  #include "bandicoot_bits/op_median_bones.hpp"
+  #include "bandicoot_bits/op_var_bones.hpp"
+  #include "bandicoot_bits/op_stddev_bones.hpp"
+  #include "bandicoot_bits/op_range_bones.hpp"
 
   #include "bandicoot_bits/mtop_conv_to_bones.hpp"
   #include "bandicoot_bits/mtop_all_bones.hpp"
@@ -487,6 +492,11 @@ namespace coot
   #include "bandicoot_bits/op_norm_meat.hpp"
   #include "bandicoot_bits/op_diagmat_meat.hpp"
   #include "bandicoot_bits/op_diagvec_meat.hpp"
+  #include "bandicoot_bits/op_mean_meat.hpp"
+  #include "bandicoot_bits/op_median_meat.hpp"
+  #include "bandicoot_bits/op_var_meat.hpp"
+  #include "bandicoot_bits/op_stddev_meat.hpp"
+  #include "bandicoot_bits/op_range_meat.hpp"
 
   #include "bandicoot_bits/mtop_conv_to_meat.hpp"
   #include "bandicoot_bits/mtop_all_meat.hpp"
