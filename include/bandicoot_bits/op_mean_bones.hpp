@@ -21,9 +21,13 @@ class op_mean
   template<typename out_eT, typename T1> inline static void apply(Mat<out_eT>& out, const Op<T1, op_mean>& in);
   template<typename eT, typename T1>     inline static void apply(Mat<eT>& out,     const Op<mtOp<eT, T1, mtop_conv_to>, op_mean>& in);
 
-  template<typename out_eT, typename in_eT> inline static void apply_direct(Mat<out_eT>& out, const Mat<in_eT>& in);
+  template<typename out_eT, typename in_eT> inline static void apply_direct(Mat<out_eT>& out, const Mat<in_eT>& in, const uword dim, const bool post_conv_apply);
+  template<typename out_eT, typename in_eT> inline static void apply_direct(Mat<out_eT>& out, const subview<in_eT>& in, const uword dim, const bool post_conv_apply);
 
   template<typename T1> inline static typename T1::elem_type mean_all(const T1& X);
+
+  template<typename eT> inline static eT mean_all_direct(const Mat<eT>& M);
+  template<typename eT> inline static eT mean_all_direct(const subview<eT>& M);
 
   template<typename T1> inline static uword compute_n_rows(const Op<T1, op_mean>& op, const uword in_n_rows, const uword in_n_cols);
   template<typename T1> inline static uword compute_n_cols(const Op<T1, op_mean>& op, const uword in_n_rows, const uword in_n_cols);

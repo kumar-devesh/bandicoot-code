@@ -239,6 +239,30 @@ class coot_rt_t
   template<typename eT>
   static inline eT vec_norm_min(dev_mem_t<eT> mem, const uword n_elem);
 
+  template<typename eT1, typename eT2>
+  static inline void mean(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword n_rows, const uword n_cols, const uword dim, const bool post_conv_apply);
+
+  template<typename eT1, typename eT2>
+  static inline void mean_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword M_n_rows, const uword start_row, const uword start_col, const uword n_rows, const uword n_cols, const uword dim, const bool post_conv_apply);
+
+  template<typename eT1, typename eT2>
+  static inline void median(dev_mem_t<eT2> out, dev_mem_t<eT1> in, const uword n_rows, const uword n_cols, const uword dim);
+
+  template<typename eT>
+  static inline eT median_vec(dev_mem_t<eT> mem, const uword n_elem);
+
+  template<typename eT>
+  static inline void var(dev_mem_t<eT> out, const dev_mem_t<eT> in, const dev_mem_t<eT> means, const uword n_rows, const uword n_cols, const uword dim, const uword norm_type);
+
+  template<typename eT>
+  static inline void var_subview(dev_mem_t<eT> out, const dev_mem_t<eT> in, const dev_mem_t<eT> means, const uword M_n_rows, const uword M_n_cols, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const uword dim, const uword norm_type);
+
+  template<typename eT>
+  static inline eT var_vec(const dev_mem_t<eT> mem, const eT mean, const uword n_elem, const uword norm_type);
+
+  template<typename eT>
+  static inline eT var_vec_subview(const dev_mem_t<eT> mem, const eT mean, const uword M_n_rows, const uword M_n_cols, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const uword norm_type);
+
   static inline void synchronise();
 
   // RC-TODO: unified interface for some other operations?

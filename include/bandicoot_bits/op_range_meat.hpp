@@ -28,8 +28,8 @@ op_range::apply(Mat<out_eT>& out, const Op<T1, op_range>& in)
   extract_subview<typename T1::stored_type> E(U.M);
   copy_alias<eT> C(E.M);
 
-  const uword dim = op.aux_uword_a;
-  apply_direct(out, C.M, dim);
+  const uword dim = in.aux_uword_a;
+  apply_direct(out, C.M, dim, true);
   }
 
 
@@ -41,14 +41,12 @@ op_range::apply(Mat<eT>& out, const Op<mtOp<eT, T1, mtop_conv_to>, op_range>& in
   {
   coot_extra_debug_sigprint();
 
-  typedef typename T1::elem_type in_eT;
-
   unwrap<T1> U(in.m.q);
   extract_subview<typename T1::stored_type> E(U.M);
   // Aliases aren't possible for a type change.
 
-  const uword dim = op.aux_uword_a;
-  apply_direct(out, E.M, dim);
+  const uword dim = in.aux_uword_a;
+  apply_direct(out, E.M, dim, false);
   }
 
 
@@ -56,7 +54,7 @@ op_range::apply(Mat<eT>& out, const Op<mtOp<eT, T1, mtop_conv_to>, op_range>& in
 template<typename out_eT, typename in_eT>
 inline
 void
-op_range::apply_direct(Mat<out_eT>& out, const Mat<in_eT>& in, const uword dim)
+op_range::apply_direct(Mat<out_eT>& out, const Mat<in_eT>& in, const uword dim, const bool post_conv_apply)
   {
   coot_extra_debug_sigprint();
 
@@ -79,10 +77,20 @@ op_range::apply_direct(Mat<out_eT>& out, const Mat<in_eT>& in, const uword dim)
   mins.set_size(out.n_rows, out.n_cols);
   maxs.set_size(out.n_rows, out.n_cols);
 
-  // mins = min(in, dim)
-  coot_rt_t::min(mins.get_dev_mem(false), in.get_dev_mem(false), in.n_rows, in.n_cols, dim);
-  // maxs = max(in, dim)
-  coot_rt_t::max(maxs.get_dev_mem(false), in.get_dev_mem(false), in.n_rows, in.n_cols, dim);
+  if (dim == 0)
+    {
+    // mins = min(in, dim)
+    coot_rt_t::min_colwise(mins.get_dev_mem(false), in.get_dev_mem(false), in.n_rows, in.n_cols, post_conv_apply);
+    // maxs = max(in, dim)
+    coot_rt_t::max_colwise(maxs.get_dev_mem(false), in.get_dev_mem(false), in.n_rows, in.n_cols, post_conv_apply);
+    }
+  else
+    {
+    // mins = min(in, dim)
+    coot_rt_t::min_rowwise(mins.get_dev_mem(false), in.get_dev_mem(false), in.n_rows, in.n_cols, post_conv_apply);
+    // maxs = max(in, dim)
+    coot_rt_t::max_rowwise(maxs.get_dev_mem(false), in.get_dev_mem(false), in.n_rows, in.n_cols, post_conv_apply);
+    }
   // out = maxs - mins
   coot_rt_t::array_op(out.get_dev_mem(false), out.n_elem, maxs.get_dev_mem(false), mins.get_dev_mem(false), threeway_kernel_id::equ_array_minus_array);
   }
@@ -123,7 +131,7 @@ op_range::compute_n_rows(const Op<T1, op_range>& op, const uword in_n_rows, cons
   const uword dim = op.aux_uword_a;
   if (dim == 0)
     {
-    return std::min(in_n_rows, 1); // either 0 or 1
+    return std::min(in_n_rows, uword(1)); // either 0 or 1
     }
   else
     {
@@ -147,6 +155,6 @@ op_range::compute_n_cols(const Op<T1, op_range>& op, const uword in_n_rows, cons
     }
   else
     {
-    return std::min(in_n_cols, 1); // either 0 or 1
+    return std::min(in_n_cols, uword(1)); // either 0 or 1
     }
   }

@@ -23,32 +23,32 @@ op_median::apply(Mat<out_eT>& out, const Op<T1, op_median>& in)
 
   typedef typename T1::elem_type eT;
 
+  // Note that T1 cannot be a Mat, Row, or Col---the next overload of apply() handles that.
+  // Specifically that means that a new Mat is going to be created during the unwrap<> process.
   unwrap<T1> U(in.m);
-  // The kernels we have don't operate on subviews, or aliases.
+  // The kernels we have don't operate on subviews.
   extract_subview<typename T1::stored_type> E(U.M);
-  copy_alias<eT> C(E.M);
 
-  const uword dim = op.aux_uword_a;
-  apply_direct(out, C.M, dim);
+  const uword dim = in.aux_uword_a;
+  // We can drop the `const` from E.M because we know that the held matrix is a temporary and thus we can reuse it.
+  // TODO: this const-cast seems unsafe in some situations!
+  apply_direct(out, const_cast<Mat<eT>&>(E.M), dim);
   }
 
 
 
-template<typename eT, typename T1>
+template<typename out_eT, typename eT>
 inline
 void
-op_median::apply(Mat<eT>& out, const Op<mtOp<eT, T1, mtop_conv_to>, op_median>& in)
+op_median::apply(Mat<out_eT>& out, const Op<Mat<eT>, op_median>& in)
   {
   coot_extra_debug_sigprint();
 
-  typedef typename T1::elem_type in_eT;
+  // No unwrapping is necessary, but we do need to copy the input to a temporary matrix, since median() will destroy (sort) the input matrix.
+  Mat<eT> tmp(in.m);
 
-  unwrap<T1> U(in.m.q);
-  extract_subview<typename T1::stored_type> E(U.M);
-  // Aliases aren't possible for a type change.
-
-  const uword dim = op.aux_uword_a;
-  apply_direct(out, E.M, dim);
+  const uword dim = in.aux_uword_a;
+  apply_direct(out, tmp, dim);
   }
 
 
@@ -56,7 +56,7 @@ op_median::apply(Mat<eT>& out, const Op<mtOp<eT, T1, mtop_conv_to>, op_median>& 
 template<typename out_eT, typename in_eT>
 inline
 void
-op_median::apply_direct(Mat<out_eT>& out, const Mat<in_eT>& in, const uword dim)
+op_median::apply_direct(Mat<out_eT>& out, Mat<in_eT>& in, const uword dim)
   {
   coot_extra_debug_sigprint();
 
@@ -88,15 +88,37 @@ op_median::median_all(const T1& X)
   coot_extra_debug_sigprint();
 
   typedef typename T1::elem_type eT;
-  unwrap<T1> U(X.get_ref());
-  const Mat<eT>& M = U.M;
+//  unwrap<T1> U(X.get_ref()); // This will cause the creation of a new matrix, which we will use as a temporary.
+//  typename unwrap<T1>::stored_type& M = const_cast<typename unwrap<T1>::stored_type&>(U.M);
+  Mat<eT> M(X.get_ref());
 
   if (M.n_elem == 0)
     {
     return eT(0);
     }
 
-  return coot_rt_t::median_vec(M.get_dev_mem(false), M.n_elem);
+  eT result = coot_rt_t::median_vec(M.get_dev_mem(false), M.n_elem);
+  return result;
+  }
+
+
+
+template<typename eT>
+inline
+eT
+op_median::median_all(const Mat<eT>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  if (X.n_elem == 0)
+    {
+    return eT(0);
+    }
+
+  // We need to copy the matrix to a temporary, so that we can sort and compute the median.
+  Mat<eT> tmp(X);
+  eT result = coot_rt_t::median_vec(tmp.get_dev_mem(false), tmp.n_elem);
+  return result;
   }
 
 
@@ -111,7 +133,7 @@ op_median::compute_n_rows(const Op<T1, op_median>& op, const uword in_n_rows, co
   const uword dim = op.aux_uword_a;
   if (dim == 0)
     {
-    return std::min(in_n_rows, 1); // either 0 or 1
+    return std::min(in_n_rows, uword(1)); // either 0 or 1
     }
   else
     {
@@ -135,6 +157,6 @@ op_median::compute_n_cols(const Op<T1, op_median>& op, const uword in_n_rows, co
     }
   else
     {
-    return std::min(in_n_cols, 1); // either 0 or 1
+    return std::min(in_n_cols, uword(1)); // either 0 or 1
     }
   }

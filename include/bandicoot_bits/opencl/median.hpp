@@ -13,11 +13,35 @@
 // ------------------------------------------------------------------------
 
 
-class op_stddev
-  : public traits_op_xvec
-  {
-  public:
 
-  // depends on op_var
-  template<typename out_eT, typename T1> inline static void apply(Mat<out_eT>& out, const Op<T1, op_stddev>& in);
-  };
+/**
+ * Compute the row-wise or column-wise mean of the input matrix, storing the result in the output matrix.
+ */
+template<typename eT2, typename eT1>
+inline
+void
+median(dev_mem_t<eT2> out, dev_mem_t<eT1> in, const uword n_rows, const uword n_cols, const uword dim)
+  {
+  coot_extra_debug_sigprint();
+
+  coot_ignore(out);
+  coot_ignore(in);
+  coot_ignore(n_rows);
+  coot_ignore(n_cols);
+  coot_ignore(dim);
+  }
+
+
+
+template<typename eT>
+inline
+eT
+median_vec(dev_mem_t<eT> mem, const uword n_elem)
+  {
+  coot_extra_debug_sigprint();
+
+  coot_ignore(mem);
+  coot_ignore(n_elem);
+
+  return eT(0);
+  }

@@ -12,12 +12,23 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-
-class op_stddev
-  : public traits_op_xvec
+__kernel
+void
+COOT_FN(PREFIX,mean_colwise_conv_pre)(__global eT2* out,
+                                      __global const eT1* A,
+                                      const UWORD A_n_rows,
+                                      const UWORD A_n_cols)
   {
-  public:
-
-  // depends on op_var
-  template<typename out_eT, typename T1> inline static void apply(Mat<out_eT>& out, const Op<T1, op_stddev>& in);
-  };
+  const UWORD col = get_global_id(0);
+  if(col < A_n_cols)
+    {
+    __global const eT1* colptr = &(A[ col*A_n_rows ]);
+    eT2 acc = (eT2) (0);
+    #pragma unroll
+    for(UWORD i = 0; i < A_n_rows; ++i)
+      {
+      acc += (eT2) (colptr[i]);
+      }
+    out[col] = (acc / (eT2) A_n_rows);
+    }
+  }

@@ -341,6 +341,9 @@ namespace coot
       #include "bandicoot_bits/opencl/all.hpp"
       #include "bandicoot_bits/opencl/relational.hpp"
       #include "bandicoot_bits/opencl/svd.hpp"
+      #include "bandicoot_bits/opencl/mean.hpp"
+      #include "bandicoot_bits/opencl/median.hpp"
+      #include "bandicoot_bits/opencl/var.hpp"
 //      #include "bandicoot_bits/opencl/eig.hpp"
       }
   #endif
@@ -379,6 +382,9 @@ namespace coot
     #include "bandicoot_bits/cuda/all.hpp"
     #include "bandicoot_bits/cuda/relational.hpp"
     #include "bandicoot_bits/cuda/svd.hpp"
+    #include "bandicoot_bits/cuda/mean.hpp"
+    #include "bandicoot_bits/cuda/median.hpp"
+    #include "bandicoot_bits/cuda/var.hpp"
 //    #include "bandicoot_bits/cuda/eig.hpp"
     }
   #endif

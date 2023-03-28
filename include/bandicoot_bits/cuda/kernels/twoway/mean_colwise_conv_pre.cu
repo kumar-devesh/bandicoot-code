@@ -1,4 +1,4 @@
-// Copyright 2023 Ryan Curtin (http://www.ratml.org)
+// Copyright 2023 Ryan Curtin (http://www.ratml.org/)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,12 +12,23 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-
-class op_stddev
-  : public traits_op_xvec
+__global__
+void
+COOT_FN(PREFIX,mean_colwise_conv_pre)(eT2* out,
+                                      const eT1* A,
+                                      const UWORD A_n_rows,
+                                      const UWORD A_n_cols)
   {
-  public:
+  const UWORD col = blockIdx.x * blockDim.x + threadIdx.x;
+  if(col < A_n_cols)
+    {
+    const eT1* colptr = &(A[ col*A_n_rows ]);
+    eT2 acc = (eT2) (0);
+    for (UWORD i = 0; i < A_n_rows; ++i)
+      {
+      acc += (eT2) (colptr[i]);
+      }
 
-  // depends on op_var
-  template<typename out_eT, typename T1> inline static void apply(Mat<out_eT>& out, const Op<T1, op_stddev>& in);
-  };
+    out[col] = (acc / (eT2) A_n_rows);
+    }
+  }

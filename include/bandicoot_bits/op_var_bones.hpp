@@ -21,9 +21,16 @@ class op_var
   template<typename out_eT, typename T1> inline static void apply(Mat<out_eT>& out, const Op<T1, op_var>& in);
   template<typename eT, typename T1>     inline static void apply(Mat<eT>& out,     const Op<mtOp<eT, T1, mtop_conv_to>, op_var>& in);
 
-  template<typename out_eT, typename in_eT> inline static void apply_direct(Mat<out_eT>& out, const Mat<in_eT>& in);
+  template<typename out_eT, typename in_eT> inline static void apply_direct(Mat<out_eT>& out, const Mat<in_eT>& in, const uword dim, const uword norm_type);
+  template<typename eT>                     inline static void apply_direct(Mat<eT>& out,     const Mat<eT>& in,    const uword dim, const uword norm_type);
 
-  template<typename T1> inline static typename T1::elem_type var_vec(const T1& X);
+  template<typename out_eT, typename in_eT> inline static void apply_direct(Mat<out_eT>& out, const subview<in_eT>& in, const uword dim, const uword norm_type);
+  template<typename eT>                     inline static void apply_direct(Mat<eT>& out,     const subview<eT>& in,    const uword dim, const uword norm_type);
+
+  template<typename T1> inline static typename T1::elem_type var_vec(const T1& X, const uword norm_type);
+
+  template<typename eT> inline static eT var_vec_direct(const Mat<eT>& X, const eT mean_val, const uword norm_type);
+  template<typename eT> inline static eT var_vec_direct(const subview<eT>& X, const eT mean_val, const uword norm_type);
 
   template<typename T1> inline static uword compute_n_rows(const Op<T1, op_var>& op, const uword in_n_rows, const uword in_n_cols);
   template<typename T1> inline static uword compute_n_cols(const Op<T1, op_var>& op, const uword in_n_rows, const uword in_n_cols);

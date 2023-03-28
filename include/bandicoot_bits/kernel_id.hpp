@@ -202,6 +202,19 @@ struct oneway_real_kernel_id
     vec_norm_min,
     vec_norm_min_small,
     //
+    radix_sort_colwise,
+    radix_sort_rowwise,
+    radix_sort,
+    //
+    var_colwise,
+    var_rowwise,
+    submat_var_colwise,
+    submat_var_rowwise,
+    var,
+    var_small,
+    submat_var,
+    submat_var_small,
+    //
     invalid_kernel
     };
 
@@ -225,6 +238,19 @@ struct oneway_real_kernel_id
     names.push_back("vec_norm_k_small");
     names.push_back("vec_norm_min");
     names.push_back("vec_norm_min_small");
+
+    names.push_back("radix_sort_colwise");
+    names.push_back("radix_sort_rowwise");
+    names.push_back("radix_sort");
+
+    names.push_back("var_colwise");
+    names.push_back("var_rowwise");
+    names.push_back("submat_var_colwise");
+    names.push_back("submat_var_rowwise");
+    names.push_back("var");
+    names.push_back("var_small");
+    names.push_back("submat_var");
+    names.push_back("submat_var_small");
 
     return names;
     }
@@ -406,6 +432,14 @@ struct twoway_kernel_id
     submat_max_rowwise_conv_pre,
     submat_max_colwise_conv_post,
     submat_max_rowwise_conv_post,
+    mean_colwise_conv_pre,
+    mean_rowwise_conv_pre,
+    mean_colwise_conv_post,
+    mean_rowwise_conv_post,
+    submat_mean_colwise_conv_pre,
+    submat_mean_rowwise_conv_pre,
+    submat_mean_colwise_conv_post,
+    submat_mean_rowwise_conv_post,
     //
     dot,
     dot_small,
@@ -562,6 +596,14 @@ struct twoway_kernel_id
     names.push_back("submat_max_rowwise_conv_pre");
     names.push_back("submat_max_colwise_conv_post");
     names.push_back("submat_max_rowwise_conv_post");
+    names.push_back("mean_colwise_conv_pre");
+    names.push_back("mean_rowwise_conv_pre");
+    names.push_back("mean_colwise_conv_post");
+    names.push_back("mean_rowwise_conv_post");
+    names.push_back("submat_mean_colwise_conv_pre");
+    names.push_back("submat_mean_rowwise_conv_pre");
+    names.push_back("submat_mean_colwise_conv_post");
+    names.push_back("submat_mean_rowwise_conv_post");
 
     names.push_back("dot");
     names.push_back("dot_small");

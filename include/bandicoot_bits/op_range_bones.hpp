@@ -21,7 +21,7 @@ class op_range
   template<typename out_eT, typename T1> inline static void apply(Mat<out_eT>& out, const Op<T1, op_range>& in);
   template<typename eT, typename T1>     inline static void apply(Mat<eT>& out,     const Op<mtOp<eT, T1, mtop_conv_to>, op_range>& in);
 
-  template<typename out_eT, typename in_eT> inline static void apply_direct(Mat<out_eT>& out, const Mat<in_eT>& in);
+  template<typename out_eT, typename in_eT> inline static void apply_direct(Mat<out_eT>& out, const Mat<in_eT>& in, const uword dim, const bool post_conv_apply);
 
   template<typename T1> inline static typename T1::elem_type range_vec(const T1& X);
 

@@ -2227,3 +2227,257 @@ coot_rt_t::vec_norm_min(const dev_mem_t<eT> mem, const uword n_elem)
 
   return eT(0); // fix warning
   }
+
+
+
+template<typename eT1, typename eT2>
+inline
+void
+coot_rt_t::mean(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword n_rows, const uword n_cols, const uword dim, const bool post_conv_apply)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    opencl::mean(out, in, n_rows, n_cols, dim, post_conv_apply);
+    #else
+    coot_stop_runtime_error("coot_rt::mean(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    cuda::mean(out, in, n_rows, n_cols, dim, post_conv_apply);
+    #else
+    coot_stop_runtime_error("coot_rt::mean(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::mean(): unknown backend");
+    }
+  }
+
+
+
+template<typename eT1, typename eT2>
+inline
+void
+coot_rt_t::mean_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword M_n_rows, const uword start_row, const uword start_col, const uword n_rows, const uword n_cols, const uword dim, const bool post_conv_apply)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    opencl::mean_subview(out, in, M_n_rows, start_row, start_col, n_rows, n_cols, dim, post_conv_apply);
+    #else
+    coot_stop_runtime_error("coot_rt::mean_subview(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    cuda::mean_subview(out, in, M_n_rows, start_row, start_col, n_rows, n_cols, dim, post_conv_apply);
+    #else
+    coot_stop_runtime_error("coot_rt::mean_subview(): CUDA backend not enabled"):
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::mean_subview(): unknown backend");
+    }
+  }
+
+
+
+template<typename eT1, typename eT2>
+inline
+void
+coot_rt_t::median(dev_mem_t<eT2> out, dev_mem_t<eT1> in, const uword n_rows, const uword n_cols, const uword dim)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    opencl::median(out, in, n_rows, n_cols, dim);
+    #else
+    coot_stop_runtime_error("coot_rt::median(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    cuda::median(out, in, n_rows, n_cols, dim);
+    #else
+    coot_stop_runtime_error("coot_rt::median(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::median(): unknown backend");
+    }
+  }
+
+
+
+template<typename eT>
+inline
+eT
+coot_rt_t::median_vec(dev_mem_t<eT> mem, const uword n_elem)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::median_vec(mem, n_elem);
+    #else
+    coot_stop_runtime_error("coot_rt::median_vec(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::median_vec(mem, n_elem);
+    #else
+    coot_stop_runtime_error("coot_rt::median_vec(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::median(): unknown backend");
+    }
+
+  return eT(0); // fix warning
+  }
+
+
+
+template<typename eT>
+inline
+void
+coot_rt_t::var(dev_mem_t<eT> out, const dev_mem_t<eT> in, const dev_mem_t<eT> means, const uword n_rows, const uword n_cols, const uword dim, const uword norm_type)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    opencl::var(out, in, means, n_rows, n_cols, dim, norm_type);
+    #else
+    coot_stop_runtime_error("coot_rt::var(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    cuda::var(out, in, means, n_rows, n_cols, dim, norm_type);
+    #else
+    coot_stop_runtime_error("coot_rt::var(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::var(): unknown backend");
+    }
+  }
+
+
+
+template<typename eT>
+inline
+void
+coot_rt_t::var_subview(dev_mem_t<eT> out, const dev_mem_t<eT> in, const dev_mem_t<eT> means, const uword M_n_rows, const uword M_n_cols, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const uword dim, const uword norm_type)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    opencl::var(out, in, means, M_n_rows, M_n_cols, aux_row1, aux_col1, n_rows, n_cols, dim, norm_type);
+    #else
+    coot_stop_runtime_error("coot_rt::var_subview(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    cuda::var(out, in, means, M_n_rows, M_n_cols, aux_row1, aux_col1, n_rows, n_cols, dim, norm_type);
+    #else
+    coot_stop_runtime_error("coot_rt::var_subview(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::var_subview(): unknown backend");
+    }
+  }
+
+
+
+template<typename eT>
+inline
+eT
+coot_rt_t::var_vec(const dev_mem_t<eT> mem, const eT mean, const uword n_elem, const uword norm_type)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::var_vec(mem, mean, n_elem, norm_type);
+    #else
+    coot_stop_runtime_error("coot_rt::var_vec(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::var_vec(mem, mean, n_elem, norm_type);
+    #else
+    coot_stop_runtime_error("coot_rt::var_vec(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::var_vec(): unknown backend");
+    }
+
+  return eT(0); // fix warning
+  }
+
+
+
+template<typename eT>
+inline
+eT
+coot_rt_t::var_vec_subview(const dev_mem_t<eT> mem, const eT mean, const uword M_n_rows, const uword M_n_cols, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const uword norm_type)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::var_vec_subview(mem, mean, M_n_rows, M_n_cols, aux_row1, aux_col1, n_rows, n_cols, norm_type);
+    #else
+    coot_stop_runtime_error("coot_rt::var_vec_subview(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::var_vec_subview(mem, mean, M_n_rows, M_n_cols, aux_row1, aux_col1, n_rows, n_cols, norm_type);
+    #else
+    coot_stop_runtime_error("coot_rt::var_vec_subview(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::var_vec_subview(): unknown backend");
+    }
+
+  return eT(0); // fix warning
+  }

@@ -28,30 +28,10 @@ op_stddev::apply(Mat<out_eT>& out, const Op<T1, op_stddev>& in)
   extract_subview<typename T1::stored_type> E(U.M);
   copy_alias<eT> C(E.M);
 
-  const uword dim = op.aux_uword_a;
-  // First compute the variance.
-  op_var::apply_direct(out, C.M, dim);
-  // Now take the square root.
-  coot_rt_t::eop_scalar(out.get_dev_mem(false), out.get_dev_mem(false), eT(0), eT(0), twoway_kernel_id::equ_array_sqrt_pre);
-  }
-
-
-
-template<typename eT, typename T1>
-inline
-void
-op_stddev::apply(Mat<eT>& out, const Op<mtOp<eT, T1, mtop_conv_to>, op_stddev>& in)
-  {
-  coot_extra_debug_sigprint();
-
-  typedef typename T1::elem_type in_eT;
-
-  unwrap<T1> U(in.m.q);
-  extract_subview<typename unwrap<T1>::stored_type> E(U.M);
-
   const uword dim = in.aux_uword_a;
+  const uword norm_type = in.aux_uword_b;
   // First compute the variance.
-  op_var::apply_direct(out, E.M, dim);
+  op_var::apply_direct(out, C.M, dim, norm_type);
   // Now take the square root.
-  coot_rt_t::eop_scalar(out.get_dev_mem(false), out.get_dev_mem(false), eT(0), eT(0), twoway_kernel_id::equ_array_sqrt_pre);
+  coot_rt_t::eop_scalar(out.get_dev_mem(false), out.get_dev_mem(false), out_eT(0), out_eT(0), twoway_kernel_id::equ_array_sqrt_pre);
   }
