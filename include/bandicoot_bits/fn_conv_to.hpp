@@ -17,7 +17,9 @@
 template<typename T2>
 struct conv_to
   {
-  // TODO: block this class for anything other than Mat, Row, and Col (and similar)
+  static_assert(       is_Mat<T2>::value ||       is_Row<T2>::value ||       is_Col<T2>::value ||
+                 arma::is_Mat<T2>::value || arma::is_Row<T2>::value || arma::is_Col<T2>::value,
+      "conv_to<T> can only be used with type T in the set { coot::Mat<eT>, coot::Row<eT>, coot::Col<eT>, arma::Mat<eT>, arma::Row<eT>, arma::Col<eT> }");
   typedef typename T2::elem_type out_eT;
 
   // Perform a conversion from one type to another.  This returns an mtOp,
@@ -27,7 +29,7 @@ struct conv_to
   inline
   static
   typename enable_if2<
-      !is_same_type<typename T1::elem_type, out_eT>::value,
+      !is_same_type<typename T1::elem_type, out_eT>::value && !arma::is_arma_type<T1>::value && !arma::is_arma_type<T2>::value,
       mtOp<out_eT, T1, mtop_conv_to>
   >::result
   from(const T1& in)
@@ -45,7 +47,7 @@ struct conv_to
   inline
   static
   typename enable_if2<
-      is_same_type<out_eT, typename T1::elem_type>::value,
+      is_same_type<out_eT, typename T1::elem_type>::value && !arma::is_arma_type<T1>::value && !arma::is_arma_type<T2>::value,
       T1
   >::result
   from(const T1& in)
@@ -64,14 +66,14 @@ struct conv_to
   inline
   static
   typename enable_if2<
-      is_same_type<typename T1::elem_type, out_eT>::no,
-      Mat<out_eT>
+      is_same_type<typename T1::elem_type, out_eT>::no && !arma::is_arma_type<T2>::value,
+      T2
   >::result
   from(const Op<T1, op_type>& in)
     {
     coot_extra_debug_sigprint();
 
-    Mat<out_eT> out;
+    T2 out; // must be Mat, Row, or Col
     op_type::apply(out, in);
 
     return out;
@@ -83,14 +85,14 @@ struct conv_to
   inline
   static
   typename enable_if2<
-      is_same_type<typename T1::elem_type, out_eT>::no,
-      Mat<out_eT>
+      is_same_type<typename T1::elem_type, out_eT>::no && !arma::is_arma_type<T2>::value,
+      T2
   >::result
   from(const Glue<T1, T3, glue_type>& in)
     {
     coot_extra_debug_sigprint();
 
-    Mat<out_eT> out;
+    T2 out; // must be Mat, Row, or Col
     glue_type::apply(out, in);
 
     return out;
@@ -103,7 +105,7 @@ struct conv_to
   inline
   static
   typename enable_if2<
-      is_same_type<typename T1::elem_type, out_eT>::no,
+      is_same_type<typename T1::elem_type, out_eT>::no && !arma::is_arma_type<T2>::value,
       mtOp<out_eT, Op<T1, op_htrans>, mtop_conv_to>
   >::result
   from(const Op<T1, op_htrans>& in)
@@ -119,7 +121,7 @@ struct conv_to
   inline
   static
   typename enable_if2<
-      is_same_type<typename T1::elem_type, out_eT>::no,
+      is_same_type<typename T1::elem_type, out_eT>::no && !arma::is_arma_type<T2>::value,
       mtOp<out_eT, Op<T1, op_htrans2>, mtop_conv_to>
   >::result
   from(const Op<T1, op_htrans2>& in)
@@ -127,5 +129,48 @@ struct conv_to
     coot_extra_debug_sigprint();
 
     return mtOp<out_eT, Op<T1, op_htrans2>, mtop_conv_to>(in);
+    }
+
+
+
+  // Conversions from Armadillo (could include Armadillo-Armadillo conversions).
+  template<typename T1>
+  inline
+  static
+  typename enable_if2<
+      arma::is_arma_type<T1>::value,
+      T2
+  >::result
+  from(const T1& in)
+    {
+    coot_extra_debug_sigprint();
+
+    arma::Mat<out_eT> M = arma::conv_to<arma::Mat<out_eT>>::from(in);
+    T2 out(M); // must be Mat, Row, or Col (either Bandicoot or Armadillo)
+
+    return out;
+    }
+
+
+
+  // Bandicoot to Armadillo conversion.
+  template<typename T1>
+  inline
+  static
+  typename enable_if2<
+      !arma::is_arma_type<T1>::value && arma::is_arma_type<T2>::value,
+      T2
+  >::result
+  from(const T1& in)
+    {
+    typedef typename T1::elem_type eT;
+
+    unwrap<T1> U(in);
+    extract_subview<typename unwrap<T1>::stored_type> E(U.M);
+    arma::Mat<eT> M(E.M);
+
+    T2 out = arma::conv_to<T2>::from(M);
+
+    return out;
     }
   };
