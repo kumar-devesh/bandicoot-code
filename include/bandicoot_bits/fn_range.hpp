@@ -63,5 +63,5 @@ range(const T1& X, const uword dim)
   {
   coot_extra_debug_sigprint();
 
-  return Op<T1, op_var>(X, dim, 0);
+  return Op<T1, op_range>(X, dim, 0);
   }
