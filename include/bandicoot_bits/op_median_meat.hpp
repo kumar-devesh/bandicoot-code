@@ -27,11 +27,10 @@ op_median::apply(Mat<out_eT>& out, const Op<T1, op_median>& in)
   // Specifically that means that a new Mat is going to be created during the unwrap<> process.
   unwrap<T1> U(in.m);
   // The kernels we have don't operate on subviews.
-  extract_subview<typename T1::stored_type> E(U.M);
+  extract_subview<typename unwrap<T1>::stored_type> E(U.M);
 
   const uword dim = in.aux_uword_a;
   // We can drop the `const` from E.M because we know that the held matrix is a temporary and thus we can reuse it.
-  // TODO: this const-cast seems unsafe in some situations!
   apply_direct(out, const_cast<Mat<eT>&>(E.M), dim);
   }
 
@@ -88,9 +87,8 @@ op_median::median_all(const T1& X)
   coot_extra_debug_sigprint();
 
   typedef typename T1::elem_type eT;
-//  unwrap<T1> U(X.get_ref()); // This will cause the creation of a new matrix, which we will use as a temporary.
-//  typename unwrap<T1>::stored_type& M = const_cast<typename unwrap<T1>::stored_type&>(U.M);
-  Mat<eT> M(X.get_ref());
+  unwrap<T1> U(X); // This will cause the creation of a new matrix, which we will use as a temporary.
+  typename unwrap<T1>::stored_type& M = const_cast<typename unwrap<T1>::stored_type&>(U.M);
 
   if (M.n_elem == 0)
     {
