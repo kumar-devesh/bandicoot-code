@@ -21,16 +21,12 @@ op_var::apply(Mat<out_eT>& out, const Op<T1, op_var>& in)
   {
   coot_extra_debug_sigprint();
 
-  typedef typename T1::elem_type eT;
-
-  unwrap<T1> U(in.m);
-  // The kernels we have don't operate on subviews, or aliases.
-  extract_subview<typename unwrap<T1>::stored_type> E(U.M);
-  copy_alias<eT> C(E.M, out);
-
   const uword norm_type = in.aux_uword_a;
   const uword dim = in.aux_uword_b;
-  apply_direct(out, C.M, dim, norm_type);
+
+  unwrap<T1> U(in.m);
+
+  apply_direct(out, U.M, dim, norm_type);
   }
 
 
@@ -77,7 +73,10 @@ op_var::apply_direct(Mat<eT>& out, const Mat<eT>& in, const uword dim, const uwo
   Mat<eT> mean;
   op_mean::apply_direct(mean, in, dim, false);
 
-  coot_rt_t::var(out.get_dev_mem(false), in.get_dev_mem(false), mean.get_dev_mem(false), in.n_rows, in.n_cols, dim, norm_type);
+  // Our kernel can't handle aliases.
+  copy_alias<eT> C(in, out);
+
+  coot_rt_t::var(out.get_dev_mem(false), C.M.get_dev_mem(false), mean.get_dev_mem(false), in.n_rows, in.n_cols, dim, norm_type);
   }
 
 
@@ -120,7 +119,7 @@ op_var::apply_direct(Mat<eT>& out, const subview<eT>& in, const uword dim, const
 
   // First, compute the mean.
   Mat<eT> mean;
-  op_mean::apply_direct(out, in, dim, false);
+  op_mean::apply_direct(mean, in, dim, false);
 
   coot_rt_t::var_subview(out.get_dev_mem(false), in.m.get_dev_mem(false), mean.get_dev_mem(false), in.m.n_rows, in.m.n_cols, in.aux_row1, in.aux_col1, in.n_rows, in.n_cols, dim, norm_type);
   }
