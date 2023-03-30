@@ -19,7 +19,6 @@ class op_var
   public:
 
   template<typename out_eT, typename T1> inline static void apply(Mat<out_eT>& out, const Op<T1, op_var>& in);
-  template<typename eT, typename T1>     inline static void apply(Mat<eT>& out,     const Op<mtOp<eT, T1, mtop_conv_to>, op_var>& in);
 
   template<typename out_eT, typename in_eT> inline static void apply_direct(Mat<out_eT>& out, const Mat<in_eT>& in, const uword dim, const uword norm_type);
   template<typename eT>                     inline static void apply_direct(Mat<eT>& out,     const Mat<eT>& in,    const uword dim, const uword norm_type);

@@ -24,7 +24,7 @@ var(dev_mem_t<eT> out, const dev_mem_t<eT> in, const dev_mem_t<eT> means, const 
   {
   coot_extra_debug_sigprint();
 
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>((dim == 0) ? oneway_real_kernel_id::var_colwise : oneway_real_kernel_id::var_rowwise);
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>((dim == 0) ? oneway_kernel_id::var_colwise : oneway_kernel_id::var_rowwise);
   const uword norm_correction = (norm_type == 0) ? 1 : 0;
 
   const void* args[] = {
@@ -57,7 +57,7 @@ var_subview(dev_mem_t<eT> out, const dev_mem_t<eT> in, const dev_mem_t<eT> means
   {
   coot_extra_debug_sigprint();
 
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(dim == 0 ? oneway_real_kernel_id::submat_var_colwise : oneway_real_kernel_id::submat_var_rowwise);
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(dim == 0 ? oneway_kernel_id::submat_var_colwise : oneway_kernel_id::submat_var_rowwise);
   const uword norm_correction = (norm_type == 0) ? 1 : 0;
 
   const void* args[] = {
@@ -93,10 +93,21 @@ var_vec(const dev_mem_t<eT> mem, const eT mean, const uword n_elem, const uword 
   {
   coot_extra_debug_sigprint();
 
-  CUfunction k = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::var);
-  CUfunction k_small = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::var_small);
+  CUfunction k = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::var);
+  CUfunction k_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::var_small);
 
-  const eT result = generic_reduce<eT, eT>(mem, n_elem, "var_vec", k, k_small, std::make_tuple(mean));
+  CUfunction accu_k = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu);
+  CUfunction accu_k_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::accu_small);
+
+  const eT result = generic_reduce<eT, eT>(mem,
+                                           n_elem,
+                                           "var_vec",
+                                           k,
+                                           k_small,
+                                           std::make_tuple(mean),
+                                           accu_k,
+                                           accu_k_small,
+                                           std::make_tuple(/* no extra args for second and later passes */));
   const uword norm_correction = (norm_type == 0) ? 1 : 0;
   return result / ((eT) (n_elem - norm_correction));
   }
@@ -111,8 +122,8 @@ var_vec_subview(const dev_mem_t<eT> mem, const eT mean, const uword M_n_rows, co
   coot_extra_debug_sigprint();
   coot_ignore(M_n_cols);
 
-  CUfunction k = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::submat_var);
-  CUfunction k_small = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::submat_var_small);
+  CUfunction k = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::submat_var);
+  CUfunction k_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::submat_var_small);
 
   const uword submat_n_elem = n_rows * n_cols;
 

@@ -25,11 +25,11 @@ op_var::apply(Mat<out_eT>& out, const Op<T1, op_var>& in)
 
   unwrap<T1> U(in.m);
   // The kernels we have don't operate on subviews, or aliases.
-  extract_subview<typename T1::stored_type> E(U.M);
+  extract_subview<typename unwrap<T1>::stored_type> E(U.M);
   copy_alias<eT> C(E.M, out);
 
-  const uword dim = in.aux_uword_a;
-  const uword norm_type = in.aux_uword_b;
+  const uword norm_type = in.aux_uword_a;
+  const uword dim = in.aux_uword_b;
   apply_direct(out, C.M, dim, norm_type);
   }
 
@@ -42,10 +42,11 @@ op_var::apply_direct(Mat<out_eT>& out, const Mat<in_eT>& in, const uword dim, co
   {
   coot_extra_debug_sigprint();
 
-  // We require a conversion of the input matrix because we do not have specialized kernels that combine a type conversion and variance computation.
-  Mat<out_eT> tmp(in.n_rows, in.n_cols);
-  coot_rt_t::copy_array(tmp.get_dev_mem(false), in.get_dev_mem(false), in.n_rows * in.n_cols);
-  apply_direct(out, tmp, dim, norm_type);
+  // We require a temporary for the output because we don't have any kernels that perform a conversion and variance computation at the same time.
+  Mat<in_eT> tmp;
+  apply_direct(tmp, in, dim, norm_type);
+  out.set_size(tmp.n_rows, tmp.n_cols);
+  coot_rt_t::copy_array(out.get_dev_mem(false), tmp.get_dev_mem(false), tmp.n_elem);
   }
 
 
@@ -134,14 +135,14 @@ op_var::var_vec(const T1& X, const uword norm_type)
   coot_extra_debug_sigprint();
 
   typedef typename T1::elem_type eT;
-  unwrap<T1> U(X.get_ref());
+  unwrap<T1> U(X);
   if (U.M.n_elem == 0)
     {
     return eT(0);
     }
 
   const eT mean_val = op_mean::mean_all_direct(U.M);
-  var_vec_direct(U.M, mean_val);
+  return var_vec_direct(U.M, mean_val, norm_type);
   }
 
 
@@ -175,7 +176,7 @@ op_var::compute_n_rows(const Op<T1, op_var>& op, const uword in_n_rows, const uw
   {
   coot_ignore(in_n_cols);
 
-  const uword dim = op.aux_uword_a;
+  const uword dim = op.aux_uword_b;
   if (dim == 0)
     {
     return std::min(in_n_rows, uword(1)); // either 0 or 1

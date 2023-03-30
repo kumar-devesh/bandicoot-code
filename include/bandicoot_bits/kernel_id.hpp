@@ -104,6 +104,15 @@ struct oneway_kernel_id
     inplace_philox_randn,
     inplace_xorwow_randi,
     //
+    var_colwise,
+    var_rowwise,
+    submat_var_colwise,
+    submat_var_rowwise,
+    var,
+    var_small,
+    submat_var,
+    submat_var_small,
+    //
     invalid_kernel
     };
 
@@ -168,6 +177,15 @@ struct oneway_kernel_id
     names.push_back("inplace_philox_randn");
     names.push_back("inplace_xorwow_randi");
 
+    names.push_back("var_colwise");
+    names.push_back("var_rowwise");
+    names.push_back("submat_var_colwise");
+    names.push_back("submat_var_rowwise");
+    names.push_back("var");
+    names.push_back("var_small");
+    names.push_back("submat_var");
+    names.push_back("submat_var_small");
+
     return names;
     }
 
@@ -206,15 +224,6 @@ struct oneway_real_kernel_id
     radix_sort_rowwise,
     radix_sort,
     //
-    var_colwise,
-    var_rowwise,
-    submat_var_colwise,
-    submat_var_rowwise,
-    var,
-    var_small,
-    submat_var,
-    submat_var_small,
-    //
     invalid_kernel
     };
 
@@ -242,15 +251,6 @@ struct oneway_real_kernel_id
     names.push_back("radix_sort_colwise");
     names.push_back("radix_sort_rowwise");
     names.push_back("radix_sort");
-
-    names.push_back("var_colwise");
-    names.push_back("var_rowwise");
-    names.push_back("submat_var_colwise");
-    names.push_back("submat_var_rowwise");
-    names.push_back("var");
-    names.push_back("var_small");
-    names.push_back("submat_var");
-    names.push_back("submat_var_small");
 
     return names;
     }
