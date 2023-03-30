@@ -323,6 +323,8 @@ struct is_coot_type
   || is_mtOp<T1>::value
   || is_mtGlue<T1>::value
   || is_subview<T1>::value
+  || is_subview_row<T1>::value
+  || is_subview_col<T1>::value
   ;
   };
 
