@@ -45,7 +45,6 @@ op_median::apply(Mat<out_eT>& out, const Op<Mat<eT>, op_median>& in)
 
   // No unwrapping is necessary, but we do need to copy the input to a temporary matrix, since median() will destroy (sort) the input matrix.
   Mat<eT> tmp(in.m);
-
   const uword dim = in.aux_uword_a;
   apply_direct(out, tmp, dim);
   }
@@ -88,15 +87,14 @@ op_median::median_all(const T1& X)
 
   typedef typename T1::elem_type eT;
   unwrap<T1> U(X); // This will cause the creation of a new matrix, which we will use as a temporary.
-  typename unwrap<T1>::stored_type& M = const_cast<typename unwrap<T1>::stored_type&>(U.M);
+  extract_subview<typename unwrap<T1>::stored_type> E(U.M);
 
-  if (M.n_elem == 0)
+  if (E.M.n_elem == 0)
     {
     return eT(0);
     }
 
-  eT result = coot_rt_t::median_vec(M.get_dev_mem(false), M.n_elem);
-  return result;
+  return coot_rt_t::median_vec(E.M.get_dev_mem(false), E.M.n_elem);
   }
 
 
@@ -115,8 +113,7 @@ op_median::median_all(const Mat<eT>& X)
 
   // We need to copy the matrix to a temporary, so that we can sort and compute the median.
   Mat<eT> tmp(X);
-  eT result = coot_rt_t::median_vec(tmp.get_dev_mem(false), tmp.n_elem);
-  return result;
+  return coot_rt_t::median_vec(tmp.get_dev_mem(false), tmp.n_elem);
   }
 
 

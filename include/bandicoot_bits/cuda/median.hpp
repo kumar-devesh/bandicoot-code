@@ -110,19 +110,39 @@ median(dev_mem_t<eT2> out, dev_mem_t<eT1> in, const uword n_rows, const uword n_
     {
     // Sort the data in each column.
     radix_sort_colwise(in, n_rows, n_cols);
-    // Get the middle element of each column.
-    const uword median_element = (n_rows / 2);
-    // Now extract that row into the output.
-    copy_subview(out, in, median_element, 0, n_rows, n_cols, 1, n_cols);
+    const uword middle_element = (n_rows / 2);
+
+    if (n_rows % 2 == 0)
+      {
+      // Even number of elements; we have to do a little extra processing.
+      sum_colwise_subview(out, in, n_rows, middle_element - 1, 0, 2, n_cols, true);
+      inplace_op_scalar(out, eT2(2), n_cols, oneway_kernel_id::inplace_div_scalar);
+      }
+    else
+      {
+      // Odd number of elements: the middle element is the result.
+      // Now extract that row into the output.
+      copy_subview(out, in, middle_element, 0, n_rows, n_cols, 1, n_cols);
+      }
     }
   else
     {
     // Sort the data in each row.
     radix_sort_rowwise(in, n_rows, n_cols);
-    // Get the middle element of each row.
-    const uword median_element = (n_cols / 2);
-    // Now extract that column into the output.
-    copy_subview(out, in, 0, median_element, n_rows, n_cols, n_rows, 1);
+    const uword middle_element = (n_cols / 2);
+
+    if (n_cols % 2 == 0)
+      {
+      // Even number of elements; we have to do a little extra processing.
+      sum_rowwise_subview(out, in, n_rows, 0, middle_element - 1, n_rows, 2, true);
+      inplace_op_scalar(out, eT2(2), n_rows, oneway_kernel_id::inplace_div_scalar);
+      }
+    else
+      {
+      // Odd number of elements: the middle element is the result.
+      // Now extract that column into the output.
+      copy_subview(out, in, 0, middle_element, n_rows, n_cols, n_rows, 1);
+      }
     }
   }
 
@@ -138,9 +158,15 @@ radix_sort(dev_mem_t<eT> A, const uword n_elem)
   {
   coot_extra_debug_sigprint();
 
+  // The kernel requires that all threads are in one block.
+  const size_t mtpb = (size_t) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock;
+  const size_t num_threads = std::min(mtpb, size_t(std::ceil(n_elem / std::max(1.0, (2 * std::ceil(std::log2(n_elem)))))));
+  // The number of threads needs to be a power of two.
+  const size_t pow2_num_threads = std::min(mtpb, (size_t) std::pow(2.0f, std::ceil(std::log2((float) num_threads))));
+
   // First, allocate temporary memory we will use during computation.
   dev_mem_t<eT> tmp_mem;
-  tmp_mem.cuda_mem_ptr = get_rt().cuda_rt.acquire_memory<eT>(n_elem);
+  tmp_mem.cuda_mem_ptr = get_rt().cuda_rt.acquire_memory<eT>(n_elem + 2 * pow2_num_threads);
 
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::radix_sort);
 
@@ -149,14 +175,10 @@ radix_sort(dev_mem_t<eT> A, const uword n_elem)
       &(tmp_mem.cuda_mem_ptr),
       (uword*) &n_elem };
 
-  // The kernel requires that all threads are in one block.
-  const size_t mtpb = (size_t) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock;
-  const size_t num_threads = std::min(mtpb, size_t(std::ceil(n_elem / std::max(1.0, (2 * std::ceil(std::log2(n_elem)))))));
-
   CUresult result = cuLaunchKernel(
       kernel,
-      1, 1, 1, num_threads, 1, 1,
-      2 * num_threads * sizeof(eT), // shared memory should have size equal to the number of threads times 2
+      1, 1, 1, pow2_num_threads, 1, 1,
+      2 * pow2_num_threads * sizeof(eT), // shared memory should have size equal to the number of threads times 2
       NULL,
       (void**) args,
       0);
@@ -181,6 +203,17 @@ median_vec(dev_mem_t<eT> in, const uword n_elem)
   // Sort the data.
   radix_sort(in, n_elem);
   // Now get the median element.
-  const uword median_element = n_elem / 2;
-  return get_val(in, median_element);
+  const uword middle_element = n_elem / 2;
+  if (n_elem % 2 == 0)
+    {
+    // Even number of elements: average the two middle elements.
+    eT val1 = get_val(in, middle_element - 1);
+    eT val2 = get_val(in, middle_element);
+    return (val1 + val2) / 2;
+    }
+  else
+    {
+    // Odd number of elements: the easy case.
+    return get_val(in, middle_element);
+    }
   }

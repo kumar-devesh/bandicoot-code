@@ -32,7 +32,7 @@ COOT_FN(PREFIX,radix_sort_colwise)(eT1* A,
     for (UWORD b = 0; b < 8 * sizeof(eT1) - 1; ++b)
       {
       // Since we are sorting bitwise, we should treat the data as unsigned integers to make bitwise operations easy.
-      uint_eT1* colptr = reinterpret_cast<uint_eT1*>(&unsorted_colptr[col * A_n_rows]);
+      uint_eT1* colptr = reinterpret_cast<uint_eT1*>(unsorted_colptr);
 
       counts[0] = 0; // holds the count of points with bit value 0
       counts[1] = 0; // holds the count of points with bit value 1
@@ -41,7 +41,7 @@ COOT_FN(PREFIX,radix_sort_colwise)(eT1* A,
 
       for (UWORD i = 0; i < A_n_rows; ++i)
         {
-        ++counts[(colptr[i] & mask) >> b];
+        ++counts[((colptr[i] & mask) >> b)];
         }
 
       counts[1] = counts[0]; // now holds the offset to put the next value at
@@ -63,7 +63,7 @@ COOT_FN(PREFIX,radix_sort_colwise)(eT1* A,
     // The last bit is different---it's the sign bit.
     // So, we can count the two bins in the same way.
     // But when we actually do the sorting, we have to reverse the order of the negative values.
-    uint_eT1* colptr = reinterpret_cast<uint_eT1*>(&unsorted_colptr[col * A_n_rows]);
+    uint_eT1* colptr = reinterpret_cast<uint_eT1*>(unsorted_colptr);
     counts[0] = 0;
     counts[1] = 0;
 
@@ -72,7 +72,7 @@ COOT_FN(PREFIX,radix_sort_colwise)(eT1* A,
 
     for (UWORD i = 0; i < A_n_rows; ++i)
       {
-      ++counts[(colptr[i] & mask) >> last_bit];
+      ++counts[((colptr[i] & mask) >> last_bit)];
       }
 
     // counts[0] now holds the number of positive points; counts[1] holds the number of negative points

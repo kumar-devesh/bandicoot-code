@@ -23,12 +23,11 @@ COOT_FN(PREFIX,radix_sort)(eT1* A,
   uint_eT1* aux_mem = (uint_eT1*) aux_shared_mem;
 
   const UWORD tid = threadIdx.x;
-  tmp_mem[tid] = 70;
 
   const UWORD num_threads = blockDim.x;
   const UWORD elems_per_thread = (n_elem + num_threads - 1) / num_threads; // this is ceil(n_elem / num_threads)
   const UWORD start_elem = tid * elems_per_thread;
-  const UWORD end_elem = (tid + 1) * elems_per_thread;
+  UWORD end_elem = min((tid + 1) * elems_per_thread, n_elem);
 
   UWORD local_counts[2];
 
@@ -36,6 +35,7 @@ COOT_FN(PREFIX,radix_sort)(eT1* A,
   eT1* sorted_memptr = tmp_mem;
 
   for (UWORD b = 0; b < 8 * sizeof(eT1) - 1; ++b)
+//  for (UWORD b = 0; b < 1; ++b)
     {
     // Step 1: count the number of elements with each bit value that belong to this thread.
     uint_eT1* memptr = reinterpret_cast<uint_eT1*>(unsorted_memptr);
@@ -90,7 +90,7 @@ COOT_FN(PREFIX,radix_sort)(eT1* A,
       }
 
     // Step 2b: down-sweep to build prefix sum.
-    for (UWORD s = 1; s < num_threads * 2; s *= 2)
+    for (UWORD s = 1; s <= num_threads; s *= 2)
       {
       offset >>= 1;
       if (tid < s)
@@ -182,7 +182,7 @@ COOT_FN(PREFIX,radix_sort)(eT1* A,
     }
 
   // Down-sweep to build prefix sum.
-  for (UWORD s = 1; s < num_threads * 2; s *= 2)
+  for (UWORD s = 1; s <= num_threads; s *= 2)
     {
     offset >>= 1;
     if (tid < s)
