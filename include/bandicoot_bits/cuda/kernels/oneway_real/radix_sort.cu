@@ -35,7 +35,6 @@ COOT_FN(PREFIX,radix_sort)(eT1* A,
   eT1* sorted_memptr = tmp_mem;
 
   for (UWORD b = 0; b < 8 * sizeof(eT1) - 1; ++b)
-//  for (UWORD b = 0; b < 1; ++b)
     {
     // Step 1: count the number of elements with each bit value that belong to this thread.
     uint_eT1* memptr = reinterpret_cast<uint_eT1*>(unsorted_memptr);
@@ -203,6 +202,9 @@ COOT_FN(PREFIX,radix_sort)(eT1* A,
   // Step 3: move points into the correct place.
   local_counts[0] = aux_mem[tid + num_threads]; // contains the first place we should put a 0 point (we will move upwards)
   local_counts[1] = aux_mem[num_threads] - aux_mem[tid]; // contains the first place we should put a 1 point (we will move downwards)
+  local_counts[1] = (local_counts[1] == 0) ? 0 : local_counts[1] - 1; // avoid underflow
+  tmp_mem[n_elem + 2 * tid] = local_counts[0];
+  tmp_mem[n_elem + 2 * tid + 1] = local_counts[1];
   i = start_elem;
   while (i + 1 < end_elem)
     {

@@ -166,7 +166,7 @@ radix_sort(dev_mem_t<eT> A, const uword n_elem)
 
   // First, allocate temporary memory we will use during computation.
   dev_mem_t<eT> tmp_mem;
-  tmp_mem.cuda_mem_ptr = get_rt().cuda_rt.acquire_memory<eT>(n_elem + 2 * pow2_num_threads);
+  tmp_mem.cuda_mem_ptr = get_rt().cuda_rt.acquire_memory<eT>(n_elem);
 
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::radix_sort);
 
