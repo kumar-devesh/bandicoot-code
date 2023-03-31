@@ -68,6 +68,7 @@ TEMPLATE_TEST_CASE("random_median_test", "[median]", float, double)
   REQUIRE( row_medians.n_elem == 500 );
 
   arma::Mat<eT> x_cpu(x);
+  arma::Col<eT> col1 = arma::sort(x_cpu.col(0));
 
   arma::Row<eT> col_medians_ref_cpu = arma::median(x_cpu, 0);
   arma::Col<eT> row_medians_ref_cpu = arma::median(x_cpu, 1);
@@ -91,16 +92,16 @@ TEMPLATE_TEST_CASE("simple_subview_median_test", "[median]", float, double)
   x.ones();
   for(uword c = 1; c < 11; ++c)
     {
-    x.col(c) *= (c + 2);
+    x.col(c) *= (c + 1);
     }
 
   Mat<eT> y(20, 25);
   y.zeros();
-  y.submat(5, 5, 19, 14) = x;
+  y.submat(5, 5, 19, 15) = x;
 
-  Row<eT> col_medians = median(y.submat(5, 5, 19, 14));
-  Row<eT> col_medians2 = median(y.submat(5, 5, 19, 14), 0);
-  Col<eT> row_medians = median(y.submat(5, 5, 19, 14), 1);
+  Row<eT> col_medians = median(y.submat(5, 5, 19, 15));
+  Row<eT> col_medians2 = median(y.submat(5, 5, 19, 15), 0);
+  Col<eT> row_medians = median(y.submat(5, 5, 19, 15), 1);
 
   REQUIRE( col_medians.n_elem == 11 );
   REQUIRE( col_medians2.n_elem == 11 );
@@ -170,7 +171,7 @@ TEMPLATE_TEST_CASE("simple_median_vec_test", "[median]", float, double)
   {
   typedef TestType eT;
 
-  Col<eT> x(1000);
+  Col<eT> x(500);
   x.ones();
 
   REQUIRE( eT(median(x)) == Approx(eT(1)) );
@@ -182,8 +183,9 @@ TEMPLATE_TEST_CASE("random_median_vec_test", "[median]", float, double)
   {
   typedef TestType eT;
 
-  Col<eT> x(100000);
+  Col<eT> x(8521);
   x.randu();
+  x -= 0.5;
 
   arma::Col<eT> x_cpu(x);
 
