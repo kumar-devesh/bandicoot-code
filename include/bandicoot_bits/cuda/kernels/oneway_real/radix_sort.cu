@@ -160,6 +160,7 @@ COOT_FN(PREFIX,radix_sort)(eT1* A,
   // swap these and perform a prefix sum, as with the rest of the bits
   aux_mem[tid              ] = local_counts[1];
   aux_mem[tid + num_threads] = local_counts[0];
+  __syncthreads();
 
   // Up-sweep total sum into final element.
   UWORD offset = 1;
@@ -179,6 +180,7 @@ COOT_FN(PREFIX,radix_sort)(eT1* A,
     {
     aux_mem[2 * num_threads - 1] = 0;
     }
+  __syncthreads();
 
   // Down-sweep to build prefix sum.
   for (UWORD s = 1; s <= num_threads; s *= 2)
@@ -203,8 +205,6 @@ COOT_FN(PREFIX,radix_sort)(eT1* A,
   local_counts[0] = aux_mem[tid + num_threads]; // contains the first place we should put a 0 point (we will move upwards)
   local_counts[1] = aux_mem[num_threads] - aux_mem[tid]; // contains the first place we should put a 1 point (we will move downwards)
   local_counts[1] = (local_counts[1] == 0) ? 0 : local_counts[1] - 1; // avoid underflow
-  tmp_mem[n_elem + 2 * tid] = local_counts[0];
-  tmp_mem[n_elem + 2 * tid + 1] = local_counts[1];
   i = start_elem;
   while (i + 1 < end_elem)
     {
