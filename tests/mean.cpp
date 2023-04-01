@@ -17,7 +17,7 @@
 
 using namespace coot;
 
-TEMPLATE_TEST_CASE("simple_mean_test", "[mean]", float, double)
+TEMPLATE_TEST_CASE("simple_mean_test", "[mean]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
@@ -82,7 +82,37 @@ TEMPLATE_TEST_CASE("random_mean_test", "[mean]", float, double)
 
 
 
-TEMPLATE_TEST_CASE("simple_subview_mean_test", "[mean]", float, double)
+TEMPLATE_TEST_CASE("random_mean_randi_test", "[mean]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(500, 700, distr_param(0, 50));
+
+  Row<eT> col_means = mean(x);
+  Row<eT> col_means2 = mean(x, 0);
+  Col<eT> row_means = mean(x, 1);
+
+  REQUIRE( col_means.n_elem == 700 );
+  REQUIRE( col_means2.n_elem == 700 );
+  REQUIRE( row_means.n_elem == 500 );
+
+  arma::Mat<eT> x_cpu(x);
+
+  arma::Row<eT> col_means_ref_cpu = arma::mean(x_cpu, 0);
+  arma::Col<eT> row_means_ref_cpu = arma::mean(x_cpu, 1);
+
+  arma::Row<eT> col_means_cpu(col_means);
+  arma::Row<eT> col_means2_cpu(col_means2);
+  arma::Col<eT> row_means_cpu(row_means);
+
+  REQUIRE( arma::approx_equal(col_means_cpu, col_means_ref_cpu, "reldiff", 1e-5) );
+  REQUIRE( arma::approx_equal(col_means2_cpu, col_means_ref_cpu, "reldiff", 1e-5) );
+  REQUIRE( arma::approx_equal(row_means_cpu, row_means_ref_cpu, "reldiff", 1e-5) );
+  }
+
+
+
+TEMPLATE_TEST_CASE("simple_subview_mean_test", "[mean]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
@@ -151,6 +181,36 @@ TEMPLATE_TEST_CASE("random_subview_mean_test", "[mean]", float, double)
 
 
 
+TEMPLATE_TEST_CASE("random_subview_mean_randi_test", "[mean]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x = randi<Mat<eT>>(500, 700, distr_param(0, 10));
+
+  Row<eT> col_means = mean(x.submat(10, 10, 490, 690));
+  Row<eT> col_means2 = mean(x.submat(10, 10, 490, 690), 0);
+  Col<eT> row_means = mean(x.submat(10, 10, 490, 690), 1);
+
+  REQUIRE( col_means.n_elem == 681 );
+  REQUIRE( col_means2.n_elem == 681 );
+  REQUIRE( row_means.n_elem == 481 );
+
+  arma::Mat<eT> x_cpu(x);
+
+  arma::Row<eT> col_means_ref_cpu = arma::mean(x_cpu.submat(10, 10, 490, 690), 0);
+  arma::Col<eT> row_means_ref_cpu = arma::mean(x_cpu.submat(10, 10, 490, 690), 1);
+
+  arma::Row<eT> col_means_cpu(col_means);
+  arma::Row<eT> col_means2_cpu(col_means2);
+  arma::Col<eT> row_means_cpu(row_means);
+
+  REQUIRE( arma::approx_equal(col_means_cpu, col_means_ref_cpu, "reldiff", 1e-5) );
+  REQUIRE( arma::approx_equal(col_means2_cpu, col_means_ref_cpu, "reldiff", 1e-5) );
+  REQUIRE( arma::approx_equal(row_means_cpu, row_means_ref_cpu, "reldiff", 1e-5) );
+  }
+
+
+
 TEST_CASE("empty_mean_test", "[mean]")
   {
   mat x;
@@ -165,7 +225,7 @@ TEST_CASE("empty_mean_test", "[mean]")
 
 
 
-TEMPLATE_TEST_CASE("simple_mean_vec_test", "[mean]", float, double)
+TEMPLATE_TEST_CASE("simple_mean_vec_test", "[mean]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
@@ -183,6 +243,22 @@ TEMPLATE_TEST_CASE("random_mean_vec_test", "[mean]", float, double)
 
   Col<eT> x(100000);
   x.randu();
+
+  arma::Col<eT> x_cpu(x);
+
+  const eT mean_val = mean(x);
+  const eT cpu_mean_val = arma::mean(x_cpu);
+
+  REQUIRE( mean_val == Approx(cpu_mean_val) );
+  }
+
+
+
+TEMPLATE_TEST_CASE("random_mean_vec_randi_test", "[mean]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Col<eT> x = randi<Col<eT>>(100000, distr_param(0, 100));
 
   arma::Col<eT> x_cpu(x);
 
