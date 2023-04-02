@@ -28,7 +28,7 @@ radix_sort_colwise(dev_mem_t<eT> A, const uword n_rows, const uword n_cols)
   dev_mem_t<eT> tmp_mem;
   tmp_mem.cuda_mem_ptr = get_rt().cuda_rt.acquire_memory<eT>(n_rows * n_cols);
 
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::radix_sort_colwise);
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::radix_sort_colwise);
 
   const void* args[] = {
       &(A.cuda_mem_ptr),
@@ -68,7 +68,7 @@ radix_sort_rowwise(dev_mem_t<eT> A, const uword n_rows, const uword n_cols)
   dev_mem_t<eT> tmp_mem;
   tmp_mem.cuda_mem_ptr = get_rt().cuda_rt.acquire_memory<eT>(n_rows * n_cols);
 
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::radix_sort_rowwise);
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::radix_sort_rowwise);
 
   const void* args[] = {
       &(A.cuda_mem_ptr),
@@ -168,7 +168,7 @@ radix_sort(dev_mem_t<eT> A, const uword n_elem)
   dev_mem_t<eT> tmp_mem;
   tmp_mem.cuda_mem_ptr = get_rt().cuda_rt.acquire_memory<eT>(n_elem);
 
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::radix_sort);
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::radix_sort);
 
   const void* args[] = {
       &(A.cuda_mem_ptr),

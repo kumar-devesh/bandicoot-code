@@ -113,6 +113,10 @@ struct oneway_kernel_id
     submat_var,
     submat_var_small,
     //
+    radix_sort_colwise,
+    radix_sort_rowwise,
+    radix_sort,
+    //
     invalid_kernel
     };
 
@@ -186,6 +190,10 @@ struct oneway_kernel_id
     names.push_back("submat_var");
     names.push_back("submat_var_small");
 
+    names.push_back("radix_sort_colwise");
+    names.push_back("radix_sort_rowwise");
+    names.push_back("radix_sort");
+
     return names;
     }
 
@@ -220,10 +228,6 @@ struct oneway_real_kernel_id
     vec_norm_min,
     vec_norm_min_small,
     //
-    radix_sort_colwise,
-    radix_sort_rowwise,
-    radix_sort,
-    //
     invalid_kernel
     };
 
@@ -247,10 +251,6 @@ struct oneway_real_kernel_id
     names.push_back("vec_norm_k_small");
     names.push_back("vec_norm_min");
     names.push_back("vec_norm_min_small");
-
-    names.push_back("radix_sort_colwise");
-    names.push_back("radix_sort_rowwise");
-    names.push_back("radix_sort");
 
     return names;
     }

@@ -51,6 +51,13 @@ get_cuda_src_preamble()
   "__device__ inline bool coot_is_fp(const float) { return true; } \n"
   "__device__ inline bool coot_is_fp(const double) { return true; } \n"
   "\n"
+  "__device__ inline bool coot_is_signed(const uint) { return false; } \n"
+  "__device__ inline bool coot_is_signed(const int) { return true; } \n"
+  "__device__ inline bool coot_is_signed(const size_t) { return false; } \n"
+  "__device__ inline bool coot_is_signed(const long) { return true; } \n"
+  "__device__ inline bool coot_is_signed(const float) { return true; } \n"
+  "__device__ inline bool coot_is_signed(const double) { return true; } \n"
+  "\n"
   // Utility functions to return the correct min/max value for a given type.
   // These constants are not defined in the CUDA compilation environment so we use the host's version.
   "__device__ inline uint   coot_type_min(const uint)   { return 0; } \n"

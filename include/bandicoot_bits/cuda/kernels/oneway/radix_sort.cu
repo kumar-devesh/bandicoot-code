@@ -34,7 +34,10 @@ COOT_FN(PREFIX,radix_sort)(eT1* A,
   eT1* unsorted_memptr = A;
   eT1* sorted_memptr = tmp_mem;
 
-  for (UWORD b = 0; b < 8 * sizeof(eT1) - 1; ++b)
+  // If the type is unsigned, all the work will be done the same way.
+  const UWORD max_bit = coot_is_signed((eT1) 0) ? 8 * sizeof(eT1) - 1 : 8 * sizeof(eT1);
+
+  for (UWORD b = 0; b < max_bit; ++b)
     {
     // Step 1: count the number of elements with each bit value that belong to this thread.
     uint_eT1* memptr = reinterpret_cast<uint_eT1*>(unsorted_memptr);
@@ -134,9 +137,16 @@ COOT_FN(PREFIX,radix_sort)(eT1* A,
     __syncthreads();
     }
 
-  // The last bit is different---it's the sign bit.
-  // So, we can count the two bins in the same way.
-  // But when we actually do the sorting, we have to reverse the order of the negative values.
+  // If the type is integral, we're now done---we don't have to handle a sign bit differently.
+  if (!coot_is_signed((eT1) 0))
+    {
+    return;
+    }
+
+  // Only signed types get here.
+  // In both cases, we have to put the 1-bit values before the 0-bit values.
+  // But, for floating point signed types, we need to reverse the order of the 1-bit points.
+  // So, we need a slightly different implementation for both cases.
   uint_eT1* memptr = reinterpret_cast<uint_eT1*>(unsorted_memptr);
   local_counts[0] = 0;
   local_counts[1] = 0;
@@ -197,41 +207,73 @@ COOT_FN(PREFIX,radix_sort)(eT1* A,
     __syncthreads();
     }
 
-  // Things are a little different for the last bit:
-  // For negative values, we have things sorted in reverse order, so we need to reverse that in our final swap pass.
-  // That means that thread 0's negative points go into the last slots, and the last thread's negative points go into the first slots.
-
   // Step 3: move points into the correct place.
-  local_counts[0] = aux_mem[tid + num_threads]; // contains the first place we should put a 0 point (we will move upwards)
-  local_counts[1] = aux_mem[num_threads] - aux_mem[tid]; // contains the first place we should put a 1 point (we will move downwards)
-  local_counts[1] = (local_counts[1] == 0) ? 0 : local_counts[1] - 1; // avoid underflow
-  i = start_elem;
-  while (i + 1 < end_elem)
+  // This is different for integral and floating point types.
+  if (coot_is_fp((eT1) 0))
     {
-    const eT1 val1 = unsorted_memptr[i];
-    const UWORD bit_val1 = ((memptr[i] & mask) >> last_bit);
-    const UWORD out_index1 = local_counts[bit_val1];
-    const int offset1 = (bit_val1 == 1) ? -1 : 1;
-    local_counts[bit_val1] += offset1; // decrements for negative values, increments for positive values
-    sorted_memptr[out_index1] = val1;
+    // Floating point implementation:
+    // For negative values, we have things sorted in reverse order, so we need to reverse that in our final swap pass.
+    // That means that thread 0's negative points go into the last slots, and the last thread's negative points go into the first slots.
+    local_counts[0] = aux_mem[tid + num_threads]; // contains the first place we should put a 0 point (we will move upwards)
+    local_counts[1] = aux_mem[num_threads] - aux_mem[tid]; // contains the first place we should put a 1 point (we will move downwards)
+    local_counts[1] = (local_counts[1] == 0) ? 0 : local_counts[1] - 1; // avoid underflow
+    i = start_elem;
+    while (i + 1 < end_elem)
+      {
+      const eT1 val1 = unsorted_memptr[i];
+      const UWORD bit_val1 = ((memptr[i] & mask) >> last_bit);
+      const UWORD out_index1 = local_counts[bit_val1];
+      const int offset1 = (bit_val1 == 1) ? -1 : 1;
+      local_counts[bit_val1] += offset1; // decrements for negative values, increments for positive values
+      sorted_memptr[out_index1] = val1;
 
-    const eT1 val2 = unsorted_memptr[i + 1];
-    const UWORD bit_val2 = ((memptr[i + 1] & mask) >> last_bit);
-    const UWORD out_index2 = local_counts[bit_val2];
-    const int offset2 = (bit_val2 == 1) ? -1 : 1;
-    local_counts[bit_val2] += offset2; // decrements for negative values, increments for positive values
-    sorted_memptr[out_index2] = val2;
+      const eT1 val2 = unsorted_memptr[i + 1];
+      const UWORD bit_val2 = ((memptr[i + 1] & mask) >> last_bit);
+      const UWORD out_index2 = local_counts[bit_val2];
+      const int offset2 = (bit_val2 == 1) ? -1 : 1;
+      local_counts[bit_val2] += offset2; // decrements for negative values, increments for positive values
+      sorted_memptr[out_index2] = val2;
 
-    i += 2;
+      i += 2;
+      }
+    if (i < end_elem)
+      {
+      const eT1 val = unsorted_memptr[i];
+      const UWORD bit_val = ((memptr[i] & mask) >> last_bit);
+      const UWORD out_index = local_counts[bit_val];
+      const int offset = (bit_val == 1) ? -1 : 1;
+      local_counts[bit_val] += offset; // decrements for negative values, increments for positive values
+      sorted_memptr[out_index] = val;
+      }
     }
-  if (i < end_elem)
+  else
     {
-    const eT1 val = unsorted_memptr[i];
-    const UWORD bit_val = ((memptr[i] & mask) >> last_bit);
-    const UWORD out_index = local_counts[bit_val];
-    const int offset = (bit_val == 1) ? -1 : 1;
-    local_counts[bit_val] += offset; // decrements for negative values, increments for positive values
-    sorted_memptr[out_index] = val;
+    // Signed integral implementation:
+    // Here, we have values in the right order, we just need to put the negative values ahead of the positive values.
+    local_counts[0] = aux_mem[tid + num_threads];
+    local_counts[1] = aux_mem[tid];
+    i = start_elem;
+    while (i + 1 < end_elem)
+      {
+      const eT1 val1 = unsorted_memptr[i];
+      const UWORD bit_val1 = ((memptr[i] & mask) >> last_bit);
+      const UWORD out_index1 = local_counts[bit_val1]++;
+      sorted_memptr[out_index1] = val1;
+
+      const eT1 val2 = unsorted_memptr[i + 1];
+      const UWORD bit_val2 = ((memptr[i + 1] & mask) >> last_bit);
+      const UWORD out_index2 = local_counts[bit_val2]++;
+      sorted_memptr[out_index2] = val2;
+
+      i += 2;
+      }
+    if (i < end_elem)
+      {
+      const eT1 val = unsorted_memptr[i];
+      const UWORD bit_val = ((memptr[i] & mask) >> last_bit);
+      const UWORD out_index = local_counts[bit_val]++;
+      sorted_memptr[out_index] = val;
+      }
     }
 
   // Since there are an even number of bits in every data type (or... well... I am going to assume that!), the sorted result is now in A.
