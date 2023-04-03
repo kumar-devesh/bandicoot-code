@@ -90,6 +90,7 @@ COOT_FN(PREFIX,radix_sort)(eT1* A,
       {
       aux_mem[2 * num_threads - 1] = 0;
       }
+    __syncthreads();
 
     // Step 2b: down-sweep to build prefix sum.
     for (UWORD s = 1; s <= num_threads; s *= 2)
