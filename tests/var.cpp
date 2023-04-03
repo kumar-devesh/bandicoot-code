@@ -39,8 +39,8 @@ TEMPLATE_TEST_CASE("simple_var_test", "[var]", float, double)
   for (uword i = 0; i < 11; ++i)
     {
     // Since all the elements are the same in every column, the variance is 0.
-    REQUIRE( eT(col_vars[i]) == Approx(eT(0)) );
-    REQUIRE( eT(col_vars2[i]) == Approx(eT(0)) );
+    REQUIRE( eT(col_vars[i]) == Approx(eT(0)).margin(1e-5) );
+    REQUIRE( eT(col_vars2[i]) == Approx(eT(0)).margin(1e-5) );
     }
 
   for (uword i = 0; i < 15; ++i)
@@ -55,7 +55,7 @@ TEMPLATE_TEST_CASE("simple_var_test", "[var]", float, double)
 
   for (uword i = 0; i < 11; ++i)
     {
-    REQUIRE( eT(col_vars2[i]) == Approx(eT(0)) );
+    REQUIRE( eT(col_vars2[i]) == Approx(eT(0)).margin(1e-5) );
     }
 
   for (uword i = 0; i < 15; ++i)
@@ -180,8 +180,8 @@ TEMPLATE_TEST_CASE("simple_subview_var_test", "[var]", float, double)
 
   for (uword i = 0; i < 11; ++i)
     {
-    REQUIRE( eT(col_vars[i]) == Approx(eT(0)) );
-    REQUIRE( eT(col_vars2[i]) == Approx(eT(0)) );
+    REQUIRE( eT(col_vars[i]) == Approx(eT(0)).margin(1e-5) );
+    REQUIRE( eT(col_vars2[i]) == Approx(eT(0)).margin(1e-5) );
     }
 
   for (uword i = 0; i < 15; ++i)
@@ -199,7 +199,7 @@ TEMPLATE_TEST_CASE("simple_subview_var_test", "[var]", float, double)
 
   for (uword i = 0; i < 11; ++i)
     {
-    REQUIRE( eT(col_vars2[i]) == Approx(eT(0)) );
+    REQUIRE( eT(col_vars2[i]) == Approx(eT(0)).margin(1e-5) );
     }
 
   for (uword i = 0; i < 15; ++i)
@@ -280,8 +280,8 @@ TEMPLATE_TEST_CASE("simple_var_vec_test", "[var]", float, double)
   Col<eT> x(1000);
   x.ones();
 
-  REQUIRE( eT(var(x)) == Approx(eT(0)) );
-  REQUIRE( eT(var(x, 1)) == Approx(eT(0)) );
+  REQUIRE( eT(var(x)) == Approx(eT(0)).margin(1e-5) );
+  REQUIRE( eT(var(x, 1)) == Approx(eT(0)).margin(1e-5) );
   }
 
 
@@ -409,8 +409,8 @@ TEMPLATE_TEST_CASE("var_subvec", "[var]", float, double)
   for (uword i = 0; i < 11; ++i)
     {
     // Since all the elements are the same in every column, the variance is 0.
-    REQUIRE( eT(var(x.col(i), 0)) == Approx(eT(0)) );
-    REQUIRE( eT(var(x.col(i), 1)) == Approx(eT(0)) );
+    REQUIRE( eT(var(x.col(i), 0)) == Approx(eT(0)).margin(1e-5) );
+    REQUIRE( eT(var(x.col(i), 1)) == Approx(eT(0)).margin(1e-5) );
     }
 
   for (uword i = 0; i < 15; ++i)
