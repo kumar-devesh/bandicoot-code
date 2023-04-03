@@ -304,6 +304,7 @@ kernel_src::init_oneway_integral_source()
 
   std::vector<std::string> aux_function_filenames = {
       "and_wavefront_reduce.cl",
+      "or_wavefront_reduce.cl"
   };
 
   std::string source = "";

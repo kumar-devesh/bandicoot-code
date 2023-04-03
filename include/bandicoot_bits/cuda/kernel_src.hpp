@@ -207,7 +207,8 @@ get_cuda_oneway_integral_kernel_src()
   std::string result = "";
 
   std::vector<std::string> aux_function_filenames = {
-      "and_warp_reduce.cu"
+      "and_warp_reduce.cu",
+      "or_warp_reduce.cu"
   };
 
   // First, load any auxiliary functions (e.g. device-specific functions).

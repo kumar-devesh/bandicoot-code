@@ -90,6 +90,8 @@ class op_clamp;
 class op_diagmat;
 class op_diagmat2;
 class op_diagvec;
+class op_normalise_vec;
+class op_normalise_mat;
 class op_mean;
 class op_median;
 class op_stddev;

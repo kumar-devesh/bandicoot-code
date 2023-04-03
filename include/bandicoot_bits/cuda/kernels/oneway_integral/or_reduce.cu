@@ -1,4 +1,4 @@
-// Copyright 2021 Ryan Curtin (http://www.ratml.org/)
+// Copyright 2023 Ryan Curtin (http://www.ratml.org/)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,11 +12,12 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
+// this kernel is technically incorrect if the size is not a factor of 2!
 __global__
 void
-COOT_FN(PREFIX,and_reduce_small)(const eT1* in_mem,
-                                 const UWORD n_elem,
-                                 eT1* out_mem)
+COOT_FN(PREFIX,or_reduce)(const eT1* in_mem,
+                          const UWORD n_elem,
+                          eT1* out_mem)
   {
   eT1* aux_mem = (eT1*) aux_shared_mem;
 
@@ -26,26 +27,34 @@ COOT_FN(PREFIX,and_reduce_small)(const eT1* in_mem,
 
   // Make sure all auxiliary memory is initialized to something that won't
   // screw up the final reduce.
-  aux_mem[tid] = ~((eT1) 0); // all bits to 1
+
+  aux_mem[tid] = (eT1) 0;
 
   while (i + blockDim.x < n_elem)
     {
-    aux_mem[tid] &= in_mem[i];
-    aux_mem[tid] &= in_mem[i + blockDim.x];
+    aux_mem[tid] |= in_mem[i];
+    aux_mem[tid] |= in_mem[i + blockDim.x];
     i += grid_size;
     }
   if (i < n_elem)
     {
-    aux_mem[tid] &= in_mem[i];
+    aux_mem[tid] |= in_mem[i];
     }
+  __syncthreads();
 
-  for (UWORD s = blockDim.x / 2; s > 0; s >>= 1)
+  for (UWORD s = blockDim.x / 2; s > 32; s >>= 1)
     {
     if (tid < s)
       {
-      aux_mem[tid] &= aux_mem[tid + s];
+      aux_mem[tid] |= aux_mem[tid + s];
       }
+    __syncthreads();
   }
+
+  if (tid < 32) // unroll last warp's worth of work
+    {
+    COOT_FN(PREFIX,or_warp_reduce)(aux_mem, tid);
+    }
 
   if (tid == 0)
     {

@@ -1,4 +1,4 @@
-// Copyright 2023 Ryan Curtin (https://www.ratml.org/)
+// Copyright 2023 Ryan Curtin (http://www.ratml.org/)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,42 +12,43 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-__kernel
+__global__
 void
-COOT_FN(PREFIX,and_reduce_small)(__global const eT1* in_mem,
-                                 const UWORD n_elem,
-                                 __global eT1* out_mem,
-                                 __local volatile eT1* aux_mem)
+COOT_FN(PREFIX,or_reduce_small)(const eT1* in_mem,
+                                const UWORD n_elem,
+                                eT1* out_mem)
   {
-  const UWORD tid = get_local_id(0);
-  UWORD i = get_group_id(0) * (get_local_size(0) * 2) + tid;
-  const UWORD grid_size = get_local_size(0) * 2 * get_num_groups(0);
+  eT1* aux_mem = (eT1*) aux_shared_mem;
+
+  const UWORD tid = threadIdx.x;
+  UWORD i = blockIdx.x * (blockDim.x * 2) + threadIdx.x;
+  const UWORD grid_size = blockDim.x * 2 * gridDim.x;
 
   // Make sure all auxiliary memory is initialized to something that won't
   // screw up the final reduce.
-  aux_mem[tid] = ~((eT1) 0);
+  aux_mem[tid] = (eT1) 0;
 
-  while (i + get_local_size(0) < n_elem)
+  while (i + blockDim.x < n_elem)
     {
-    aux_mem[tid] &= in_mem[i];
-    aux_mem[tid] &= in_mem[i + get_local_size(0)];
+    aux_mem[tid] |= in_mem[i];
+    aux_mem[tid] |= in_mem[i + blockDim.x];
     i += grid_size;
     }
   if (i < n_elem)
     {
-    aux_mem[tid] &= in_mem[i];
+    aux_mem[tid] |= in_mem[i];
     }
 
-  for (UWORD s = get_local_size(0) / 2; s > 0; s >>= 1)
+  for (UWORD s = blockDim.x / 2; s > 0; s >>= 1)
     {
     if (tid < s)
       {
-      aux_mem[tid] &= aux_mem[tid + s];
+      aux_mem[tid] |= aux_mem[tid + s];
       }
-    }
+  }
 
   if (tid == 0)
     {
-    out_mem[get_group_id(0)] = aux_mem[0];
+    out_mem[blockIdx.x] = aux_mem[0];
     }
   }

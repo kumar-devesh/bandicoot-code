@@ -17,13 +17,13 @@
 template<typename T1>
 inline
 void
-mtop_all::apply(Mat<uword>& out, const mtOp<uword, T1, mtop_all>& in)
+mtop_any::apply(Mat<uword>& out, const mtOp<uword, T1, mtop_any>& in)
   {
   coot_extra_debug_sigprint();
 
   const uword dim = in.aux_uword_a;
 
-  coot_debug_check( (dim > 1), "all(): parameter 'dim' must be 0 or 1" );
+  coot_debug_check( (dim > 1), "any(): parameter 'dim' must be 0 or 1" );
 
   unwrap<T1> U(in.q);
 
@@ -48,17 +48,17 @@ mtop_all::apply(Mat<uword>& out, const mtOp<uword, T1, mtop_all>& in)
 
 
 
-// special handling of a conversion linked with an all()
+// special handling of a conversion linked with an any()
 template<typename T1, typename eT2>
 inline
 void
-mtop_all::apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1, mtop_conv_to>, mtop_all>& in)
+mtop_any::apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1, mtop_conv_to>, mtop_any>& in)
   {
   coot_extra_debug_sigprint();
 
   const uword dim = in.aux_uword_a;
 
-  coot_debug_check( (dim > 1), "all(): parameter 'dim' must be 0 or 1" );
+  coot_debug_check( (dim > 1), "any(): parameter 'dim' must be 0 or 1" );
 
   unwrap<T1> U(in.q.q);
 
@@ -86,8 +86,8 @@ mtop_all::apply(Mat<uword>& out, const mtOp<uword, mtOp<eT2, T1, mtop_conv_to>, 
 template<typename T1, typename mtop_type>
 inline
 void
-mtop_all::apply(Mat<uword>& out,
-                const mtOp<uword, mtOp<uword, T1, mtop_type>, mtop_all>& in,
+mtop_any::apply(Mat<uword>& out,
+                const mtOp<uword, mtOp<uword, T1, mtop_type>, mtop_any>& in,
                 const typename enable_if<is_same_type<mtop_type, mtop_conv_to>::no>::result* junk)
   {
   coot_extra_debug_sigprint();
@@ -97,23 +97,23 @@ mtop_all::apply(Mat<uword>& out,
 
   const uword dim = in.aux_uword_a;
 
-  coot_debug_check( (dim > 1), "all(): parameter 'dim' must be 0 or 1" );
+  coot_debug_check( (dim > 1), "any(): parameter 'dim' must be 0 or 1" );
 
-  // all( X != 0 ) --> all( X )
+  // any( X != 0 ) --> any( X )
   const bool opt1 = (is_same_type<mtop_type, mtop_rel_noteq>::yes) && (in.q.aux == eT(0));
-  // all( X >  0 ) --> all( X ) if eT is an unsigned integral type
+  // any( X >  0 ) --> any( X ) if eT is an unsigned integral type
   const bool opt2 = (is_same_type<mtop_type, mtop_rel_gt_post>::yes) && (is_signed<eT>::value == false) && (in.q.aux == eT(0));
-  // all( 0 <  X ) --> all( X ) if eT is an unsigned integral type
+  // any( 0 <  X ) --> any( X ) if eT is an unsigned integral type
   const bool opt3 = (is_same_type<mtop_type, mtop_rel_lt_pre>::yes) && (is_signed<eT>::value == false) && (in.q.aux == eT(0));
 
-  // all( X <  0 ) --> zeros if eT is an unsigned integral type
+  // any( X <  0 ) --> zeros if eT is an unsigned integral type
   const bool opt4 = (is_same_type<mtop_type, mtop_rel_lt_post>::yes) && (is_signed<eT>::value == false) && (in.q.aux == eT(0));
-  // all( 0 >  X ) --> zeros if eT is an unsigned integral type
+  // any( 0 >  X ) --> zeros if eT is an unsigned integral type
   const bool opt5 = (is_same_type<mtop_type, mtop_rel_gt_pre>::yes) && (is_signed<eT>::value == false) && (in.q.aux == eT(0));
 
   if (opt1 || opt2 || opt3)
     {
-    // Just call all() directly on the inner object.
+    // Just call any() directly on the inner object.
     unwrap<T1> U(in.q.q);
 
     // Shortcut if the input is empty.
@@ -164,7 +164,7 @@ mtop_all::apply(Mat<uword>& out,
       {
       out.set_size(0, 1);
       }
-  
+
     return;
     }
 
@@ -176,7 +176,7 @@ mtop_all::apply(Mat<uword>& out,
 template<typename eT, typename eT2>
 inline
 void
-mtop_all::apply_direct(Mat<uword>& out, const Mat<eT>& in, const uword dim)
+mtop_any::apply_direct(Mat<uword>& out, const Mat<eT>& in, const uword dim)
   {
   coot_extra_debug_sigprint();
 
@@ -192,12 +192,12 @@ mtop_all::apply_direct(Mat<uword>& out, const Mat<eT>& in, const uword dim)
   if (dim == 0)
     {
     out.set_size(1, in.n_cols);
-    coot_rt_t::all(out.get_dev_mem(false), in.get_dev_mem(false), in.n_rows, in.n_cols, eT2(0), twoway_kernel_id::rel_all_neq_colwise, true);
+    coot_rt_t::any(out.get_dev_mem(false), in.get_dev_mem(false), in.n_rows, in.n_cols, eT2(0), twoway_kernel_id::rel_any_neq_colwise, true);
     }
   else
     {
     out.set_size(in.n_rows, 1);
-    coot_rt_t::all(out.get_dev_mem(false), in.get_dev_mem(false), in.n_rows, in.n_cols, eT2(0), twoway_kernel_id::rel_all_neq_rowwise, false);
+    coot_rt_t::any(out.get_dev_mem(false), in.get_dev_mem(false), in.n_rows, in.n_cols, eT2(0), twoway_kernel_id::rel_any_neq_rowwise, false);
     }
   }
 
@@ -206,7 +206,7 @@ mtop_all::apply_direct(Mat<uword>& out, const Mat<eT>& in, const uword dim)
 template<typename eT, typename eT2>
 inline
 void
-mtop_all::apply_direct(Mat<uword>& out, const subview<eT>& in, const uword dim)
+mtop_any::apply_direct(Mat<uword>& out, const subview<eT>& in, const uword dim)
   {
   coot_extra_debug_sigprint();
 
@@ -220,14 +220,14 @@ mtop_all::apply_direct(Mat<uword>& out, const subview<eT>& in, const uword dim)
 template<typename T1>
 inline
 bool
-mtop_all::all_vec(T1& X)
+mtop_any::any_vec(T1& X)
   {
   coot_extra_debug_sigprint();
 
   typedef typename T1::elem_type eT;
   unwrap<T1> U(X);
 
-  return coot_rt_t::all_vec(U.M.get_dev_mem(false), U.M.n_elem, eT(0), twoway_kernel_id::rel_all_neq, twoway_kernel_id::rel_all_neq_small);
+  return coot_rt_t::any_vec(U.M.get_dev_mem(false), U.M.n_elem, eT(0), twoway_kernel_id::rel_any_neq, twoway_kernel_id::rel_any_neq_small);
   }
 
 
@@ -235,12 +235,12 @@ mtop_all::all_vec(T1& X)
 template<typename out_eT, typename T1>
 inline
 bool
-mtop_all::all_vec(const mtOp<out_eT, T1, mtop_all>& X)
+mtop_any::any_vec(const mtOp<out_eT, T1, mtop_any>& X)
   {
   coot_extra_debug_sigprint();
 
   // Apply to inner operation.
-  return all_vec(X.q);
+  return any_vec(X.q);
   }
 
 
@@ -248,13 +248,13 @@ mtop_all::all_vec(const mtOp<out_eT, T1, mtop_all>& X)
 template<typename eT2, typename T1>
 inline
 bool
-mtop_all::all_vec(const mtOp<eT2, T1, mtop_conv_to>& op)
+mtop_any::any_vec(const mtOp<eT2, T1, mtop_conv_to>& op)
   {
   coot_extra_debug_sigprint();
 
   unwrap<T1> U(op.q);
 
-  return coot_rt_t::all_vec(U.M.get_dev_mem(false), U.M.n_elem, eT2(0), twoway_kernel_id::rel_all_neq, twoway_kernel_id::rel_all_neq_small);
+  return coot_rt_t::any_vec(U.M.get_dev_mem(false), U.M.n_elem, eT2(0), twoway_kernel_id::rel_any_neq, twoway_kernel_id::rel_any_neq_small);
   }
 
 
@@ -262,8 +262,8 @@ mtop_all::all_vec(const mtOp<eT2, T1, mtop_conv_to>& op)
 template<typename T1, typename mtop_type>
 inline
 bool
-mtop_all::all_vec(const mtOp<uword, T1, mtop_type>& in,
-                  const typename enable_if<is_same_type<mtop_type, mtop_all>::no>::result* junk1,
+mtop_any::any_vec(const mtOp<uword, T1, mtop_type>& in,
+                  const typename enable_if<is_same_type<mtop_type, mtop_any>::no>::result* junk1,
                   const typename enable_if<is_same_type<mtop_type, mtop_conv_to>::no>::result* junk2)
   {
   coot_extra_debug_sigprint();
@@ -272,32 +272,32 @@ mtop_all::all_vec(const mtOp<uword, T1, mtop_type>& in,
 
   typedef typename T1::elem_type eT;
 
-  // all( X != 0 ) --> all( X )
+  // any( X != 0 ) --> any( X )
   const bool opt1 = (is_same_type<mtop_type, mtop_rel_noteq>::yes) && (in.aux == eT(0));
-  // all( X >  0 ) --> all( X ) if eT is an unsigned integral type
+  // any( X >  0 ) --> any( X ) if eT is an unsigned integral type
   const bool opt2 = (is_same_type<mtop_type, mtop_rel_gt_post>::yes) && (is_signed<eT>::value == false) && (in.aux == eT(0));
-  // all( 0 <  X ) --> all( X ) if eT is an unsigned integral type
+  // any( 0 <  X ) --> any( X ) if eT is an unsigned integral type
   const bool opt3 = (is_same_type<mtop_type, mtop_rel_lt_pre>::yes) && (is_signed<eT>::value == false) && (in.aux == eT(0));
 
-  // all( X == 0 ) --> !any( X )
+  // any( X == 0 ) --> !all( X )
   const bool opt4 = (is_same_type<mtop_type, mtop_rel_eq>::yes) && (in.aux == eT(0));
-  // all( X <= 0 ) --> !any( X ) if eT is an unsigned integral type
+  // any( X <= 0 ) --> !all( X ) if eT is an unsigned integral type
   const bool opt5 = (is_same_type<mtop_type, mtop_rel_lteq_post>::yes) && (is_signed<eT>::value == false) && (in.aux == eT(0));
-  // all( 0 >= X ) --> !any( X ) if eT is an unsigned integral type
+  // any( 0 >= X ) --> !all( X ) if eT is an unsigned integral type
   const bool opt6 = (is_same_type<mtop_type, mtop_rel_gteq_pre>::yes) && (is_signed<eT>::value == false) && (in.aux == eT(0));
 
-  // all( X < 0 ) --> false if eT is an unsigned integral type
+  // any( X < 0 ) --> false if eT is an unsigned integral type
   const bool opt7 = (is_same_type<mtop_type, mtop_rel_lt_post>::yes) && (is_signed<eT>::value == false) && (in.aux == eT(0));
-  // all( 0 > X ) --> false if eT is an unsigned integral type
+  // any( 0 > X ) --> false if eT is an unsigned integral type
   const bool opt8 = (is_same_type<mtop_type, mtop_rel_gt_pre>::yes) && (is_signed<eT>::value == false) && (in.aux == eT(0));
 
   if (opt1 || opt2 || opt3)
     {
-    return all_vec(in.q);
+    return any_vec(in.q);
     }
   else if (opt4 || opt5 || opt6)
     {
-    return !mtop_any::any_vec(in.q);
+    return !mtop_all::all_vec(in.q);
     }
   else if (opt7 || opt8)
     {
@@ -307,7 +307,7 @@ mtop_all::all_vec(const mtOp<uword, T1, mtop_type>& in,
   // No optimization possible.
   unwrap<mtOp<uword, T1, mtop_type>> U(in);
 
-  return coot_rt_t::all_vec(U.M.get_dev_mem(false), U.M.n_elem, eT(0), twoway_kernel_id::rel_all_neq, twoway_kernel_id::rel_all_neq_small);
+  return coot_rt_t::any_vec(U.M.get_dev_mem(false), U.M.n_elem, eT(0), twoway_kernel_id::rel_any_neq, twoway_kernel_id::rel_any_neq_small);
   }
 
 
@@ -315,7 +315,7 @@ mtop_all::all_vec(const mtOp<uword, T1, mtop_type>& in,
 template<typename out_eT, typename T1>
 inline
 uword
-mtop_all::compute_n_rows(const mtOp<out_eT, T1, mtop_all>& op, const uword in_n_rows, const uword in_n_cols)
+mtop_any::compute_n_rows(const mtOp<out_eT, T1, mtop_any>& op, const uword in_n_rows, const uword in_n_cols)
   {
   return (op.aux_uword_a == 0) ? 1 : in_n_rows;
   }
@@ -325,7 +325,7 @@ mtop_all::compute_n_rows(const mtOp<out_eT, T1, mtop_all>& op, const uword in_n_
 template<typename out_eT, typename T1>
 inline
 uword
-mtop_all::compute_n_cols(const mtOp<out_eT, T1, mtop_all>& op, const uword in_n_rows, const uword in_n_cols)
+mtop_any::compute_n_cols(const mtOp<out_eT, T1, mtop_any>& op, const uword in_n_rows, const uword in_n_cols)
   {
   return (op.aux_uword_a == 0) ? in_n_cols : 1;
   }

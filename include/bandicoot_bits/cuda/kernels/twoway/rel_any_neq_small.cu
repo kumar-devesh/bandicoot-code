@@ -1,4 +1,4 @@
-// Copyright 2021 Ryan Curtin (http://www.ratml.org/)
+// Copyright 2023 Ryan Curtin (http://www.ratml.org/)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,41 +14,50 @@
 
 __global__
 void
-COOT_FN(PREFIX,and_reduce_small)(const eT1* in_mem,
-                                 const UWORD n_elem,
-                                 eT1* out_mem)
+COOT_FN(PREFIX,rel_any_neq_small)(const eT1* X, // will be casted to eT2 before comparison
+                                  const UWORD n_elem,
+                                  uint* out,
+                                  const eT2 val)
   {
-  eT1* aux_mem = (eT1*) aux_shared_mem;
+  uint* aux_mem = (uint*) aux_shared_mem;
 
   const UWORD tid = threadIdx.x;
   UWORD i = blockIdx.x * (blockDim.x * 2) + threadIdx.x;
   const UWORD grid_size = blockDim.x * 2 * gridDim.x;
 
-  // Make sure all auxiliary memory is initialized to something that won't
-  // screw up the final reduce.
-  aux_mem[tid] = ~((eT1) 0); // all bits to 1
+  aux_mem[tid] = 0;
 
   while (i + blockDim.x < n_elem)
     {
-    aux_mem[tid] &= in_mem[i];
-    aux_mem[tid] &= in_mem[i + blockDim.x];
+    // copy to local shared memory
+    const eT2 val1 = (eT2) X[i];
+    const eT2 val2 = (eT2) X[i + blockDim.x];
+
+    aux_mem[tid] |= (val1 != val);
+    aux_mem[tid] |= (val2 != val);
+    if (aux_mem[tid] == 1)
+      break;
+
     i += grid_size;
     }
-  if (i < n_elem)
+
+  if (i < n_elem && aux_mem[tid] == 0)
     {
-    aux_mem[tid] &= in_mem[i];
+    const eT2 val1 = (eT2) X[i];
+
+    aux_mem[tid] |= (val1 != val);
     }
 
   for (UWORD s = blockDim.x / 2; s > 0; s >>= 1)
     {
     if (tid < s)
       {
-      aux_mem[tid] &= aux_mem[tid + s];
+      aux_mem[tid] |= aux_mem[tid + s];
       }
-  }
+    }
 
   if (tid == 0)
     {
-    out_mem[blockIdx.x] = aux_mem[0];
+    out[blockIdx.x] = aux_mem[0];
     }
   }

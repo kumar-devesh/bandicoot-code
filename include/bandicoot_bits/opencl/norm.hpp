@@ -79,6 +79,11 @@ vec_norm_2(dev_mem_t<eT> mem, const uword n_elem, const typename coot_real_only<
     {
     // We detected overflow or underflow---try again.
     const eT max_elem = max_abs(mem, n_elem);
+    if (max_elem == eT(0))
+      {
+      // False alarm, the norm is actually zero.
+      return eT(0);
+      }
 
     cl_kernel robust_kernel = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::vec_norm_2_robust);
     cl_kernel robust_kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::vec_norm_2_robust_small);
