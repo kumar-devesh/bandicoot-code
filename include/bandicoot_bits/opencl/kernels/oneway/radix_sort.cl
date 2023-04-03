@@ -88,6 +88,7 @@ COOT_FN(PREFIX,radix_sort)(__global eT1* A,
       {
       aux_mem[2 * num_threads - 1] = 0;
       }
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     // Step 2b: down-sweep to build prefix sum.
     for (UWORD s = 1; s <= num_threads; s *= 2)
@@ -132,7 +133,7 @@ COOT_FN(PREFIX,radix_sort)(__global eT1* A,
     unsorted_memptr = sorted_memptr;
     sorted_memptr = tmp;
 
-    barrier(CLK_LOCAL_MEM_FENCE);
+    barrier(CLK_GLOBAL_MEM_FENCE);
     }
 
   // If the type is integral, we're now done---we don't have to handle a sign bit differently.

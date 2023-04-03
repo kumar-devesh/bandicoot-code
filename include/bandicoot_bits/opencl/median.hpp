@@ -182,10 +182,10 @@ radix_sort(dev_mem_t<eT> A, const uword n_elem)
 
   runtime_t::adapt_uword cl_n_elem(n_elem);
 
-  status |= clSetKernelArg(k, 0, sizeof(cl_mem),                 &(A.cl_mem_ptr));
-  status |= clSetKernelArg(k, 1, sizeof(cl_mem),                 &(tmp_mem.cl_mem_ptr));
-  status |= clSetKernelArg(k, 2, cl_n_elem.size,                 cl_n_elem.addr);
-  status |= clSetKernelArg(k, 3, sizeof(eT) * pow2_num_threads,  NULL);
+  status |= clSetKernelArg(k, 0, sizeof(cl_mem),                    &(A.cl_mem_ptr));
+  status |= clSetKernelArg(k, 1, sizeof(cl_mem),                    &(tmp_mem.cl_mem_ptr));
+  status |= clSetKernelArg(k, 2, cl_n_elem.size,                    cl_n_elem.addr);
+  status |= clSetKernelArg(k, 3, 2 * sizeof(eT) * pow2_num_threads, NULL);
 
   coot_check_cl_error(status, "coot::opencl::radix_sort(): failed to set kernel arguments");
 
@@ -210,8 +210,22 @@ median_vec(dev_mem_t<eT> mem, const uword n_elem)
   {
   coot_extra_debug_sigprint();
 
-  coot_ignore(mem);
-  coot_ignore(n_elem);
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::median_vec(): OpenCL runtime not valid" );
 
-  return eT(0);
+  // Sort the data.
+  radix_sort(mem, n_elem);
+  // Now get the median element.
+  const uword middle_element = n_elem / 2;
+  if (n_elem % 2 == 0)
+    {
+    // Even number of elements: average the two middle elements.
+    eT val1 = get_val(mem, middle_element - 1);
+    eT val2 = get_val(mem, middle_element);
+    return (val1 + val2) / 2;
+    }
+  else
+    {
+    // Odd number of elements: the easy case.
+    return get_val(mem, middle_element);
+    }
   }
