@@ -213,33 +213,59 @@ Mat<eT>::init(const uword new_n_rows, const uword new_n_cols)
 
   if( (n_rows == new_n_rows) && (n_cols == new_n_cols) )  { return; }
 
+  uword in_n_rows = new_n_rows;
+  uword in_n_cols = new_n_cols;
+
   // TODO: add handling of mem_state == 1  (ie. if memory is external...)
 
   // ensure that n_elem can hold the result of (n_rows * n_cols)
   coot_debug_check( ((double(new_n_rows)*double(new_n_cols)) > double(std::numeric_limits<uword>::max())), "Mat::init(): requested size is too large" );
 
-  const uword old_n_elem = n_elem;
-  const uword new_n_elem = new_n_rows*new_n_cols;
+  const uword t_vec_state = vec_state;
 
-  if(old_n_elem == new_n_elem)
+  bool err_state = false;
+  char* err_msg = nullptr;
+  const char* error_message_2 = "Mat::init(): requested size is not compatible with column vector layout";
+  const char* error_message_3 = "Mat::init(): requested size is not compatible with row vector layout";
+
+  if (vec_state > 0)
+    {
+    if ((in_n_rows == 0) && (in_n_cols == 0))
+      {
+      if (t_vec_state == 1) { in_n_cols = 1; }
+      if (t_vec_state == 2) { in_n_rows = 1; }
+      }
+    else
+      {
+      if (t_vec_state == 1) { coot_debug_set_error( err_state, err_msg, (in_n_cols != 1), error_message_2 ); }
+      if (t_vec_state == 2) { coot_debug_set_error( err_state, err_msg, (in_n_rows != 1), error_message_3 ); }
+      }
+    }
+
+  coot_debug_check( err_state, err_msg );
+
+  const uword old_n_elem = n_elem;
+  const uword in_n_elem = in_n_rows*in_n_cols;
+
+  if(old_n_elem == in_n_elem)
     {
     coot_extra_debug_print("Mat::init(): reusing memory");
-    access::rw(n_rows) = new_n_rows;
-    access::rw(n_cols) = new_n_cols;
+    access::rw(n_rows) = in_n_rows;
+    access::rw(n_cols) = in_n_cols;
     }
-  else  // condition: old_n_elem != new_n_elem
+  else  // condition: old_n_elem != in_n_elem
     {
-    if(new_n_elem == 0)
+    if(in_n_elem == 0)
       {
       coot_extra_debug_print("Mat::init(): releasing memory");
       cleanup();
       }
     else
-    if(new_n_elem < old_n_elem)
+    if(in_n_elem < old_n_elem)
       {
       coot_extra_debug_print("Mat::init(): reusing memory");
       }
-    else  // condition: new_n_elem > old_n_elem
+    else  // condition: in_n_elem > old_n_elem
       {
       if(old_n_elem > 0)
         {
@@ -248,12 +274,12 @@ Mat<eT>::init(const uword new_n_rows, const uword new_n_cols)
         }
 
       coot_extra_debug_print("Mat::init(): acquiring memory");
-      dev_mem = get_rt().acquire_memory<eT>(new_n_elem);
+      dev_mem = get_rt().acquire_memory<eT>(in_n_elem);
       }
 
-    access::rw(n_rows) = new_n_rows;
-    access::rw(n_cols) = new_n_cols;
-    access::rw(n_elem) = new_n_elem;
+    access::rw(n_rows) = in_n_rows;
+    access::rw(n_cols) = in_n_cols;
+    access::rw(n_elem) = in_n_elem;
     }
   }
 
