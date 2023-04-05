@@ -33,7 +33,7 @@ op_vectorise_col::apply(Mat<out_eT>& out, const Op<T1,op_vectorise_col>& in)
 template<typename out_eT, typename T1>
 inline
 void
-op_vectorise_col::apply_direct(Mat<out_eT>& out, const T1& expr)
+op_vectorise_col::apply_direct(Mat<out_eT>& out, const T1& expr, const bool output_is_row)
   {
   coot_extra_debug_sigprint();
 
@@ -41,18 +41,39 @@ op_vectorise_col::apply_direct(Mat<out_eT>& out, const T1& expr)
 
   if (U.M.n_elem == 0)
     {
-    out.set_size(0, 1);
+    if (!output_is_row)
+      {
+      out.set_size(0, 1);
+      }
+    else
+      {
+      out.set_size(1, 0);
+      }
     return;
     }
 
   if(U.is_alias(out))
     {
     // output matrix is the same as the input matrix
-    out.set_size(out.n_elem, 1);  // set_size() doesn't destroy data as long as the number of elements in the matrix remains the same
+    if (!output_is_row)
+      {
+      out.set_size(out.n_elem, 1);  // set_size() doesn't destroy data as long as the number of elements in the matrix remains the same
+      }
+    else
+      {
+      out.set_size(1, out.n_elem);
+      }
     }
   else
     {
-    out.set_size(U.M.n_elem, 1);
+    if (!output_is_row)
+      {
+      out.set_size(U.M.n_elem, 1);
+      }
+    else
+      {
+      out.set_size(1, U.M.n_elem);
+      }
     arrayops::copy(out.get_dev_mem(false), U.M.get_dev_mem(false), U.M.n_elem);
     }
   }
@@ -62,19 +83,22 @@ op_vectorise_col::apply_direct(Mat<out_eT>& out, const T1& expr)
 template<typename out_eT, typename eT>
 inline
 void
-op_vectorise_col::apply_direct(Mat<out_eT>& out, const subview<eT>& sv)
+op_vectorise_col::apply_direct(Mat<out_eT>& out, const subview<eT>& sv, const bool output_is_row)
   {
   coot_extra_debug_sigprint();
 
+  const uword new_n_rows = (output_is_row ? 1 : sv.n_elem);
+  const uword new_n_cols = (output_is_row ? sv.n_elem : 1);
+
   if(&out == &(sv.m))
     {
-    Mat<out_eT> tmp(sv.n_elem, 1);
+    Mat<out_eT> tmp(new_n_rows, new_n_cols);
     arrayops::copy_subview(tmp.get_dev_mem(false), sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
     out.steal_mem(tmp);
     }
   else
     {
-    out.set_size(sv.n_elem, 1);
+    out.set_size(new_n_rows, new_n_cols);
     arrayops::copy_subview(out.get_dev_mem(false), sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
     }
   }
@@ -122,7 +146,7 @@ op_vectorise_all::apply(Mat<out_eT>& out, const Op<T1,op_vectorise_all>& in)
     SizeProxy<T1> S(in.m);
     if (S.get_n_rows() == 1 || S.get_n_cols() == 1)
       {
-      op_vectorise_col::apply_direct(out, in.m);
+      op_vectorise_col::apply_direct(out, in.m, true /* use in row vector mode */);
       }
     else
       {
