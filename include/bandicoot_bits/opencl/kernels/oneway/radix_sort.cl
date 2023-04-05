@@ -39,7 +39,7 @@ COOT_FN(PREFIX,radix_sort)(__global eT1* A,
   for (UWORD b = 0; b < max_bit; ++b)
     {
     // Step 1: count the number of elements with each bit value that belong to this thread.
-    __global uint_eT1* memptr = (uint_eT1*) unsorted_memptr;
+    __global uint_eT1* memptr = (__global uint_eT1*) unsorted_memptr;
 
     local_counts[0] = 0; // holds the count of elements with bit value 0
     local_counts[1] = 0; // holds the count of elements with bit value 1
@@ -146,7 +146,7 @@ COOT_FN(PREFIX,radix_sort)(__global eT1* A,
   // In both cases, we have to put the 1-bit values before the 0-bit values.
   // But, for floating point signed types, we need to reverse the order of the 1-bit points.
   // So, we need a slightly different implementation for both cases.
-  __global uint_eT1* memptr = (uint_eT1*) unsorted_memptr;
+  __global uint_eT1* memptr = (__global uint_eT1*) unsorted_memptr;
   local_counts[0] = 0;
   local_counts[1] = 0;
 

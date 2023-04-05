@@ -35,7 +35,7 @@ COOT_FN(PREFIX,radix_sort_rowwise)(__global eT1* A,
     for (UWORD b = 0; b < max_bit; ++b)
       {
       // Since we are sorting bitwise, we should treat the data as unsigned integers to make bitwise operations easy.
-      __global uint_eT1* rowptr = (uint_eT1*) unsorted_rowptr;
+      __global uint_eT1* rowptr = (__global uint_eT1*) unsorted_rowptr;
 
       counts[0] = 0; // holds the count of points with bit value 0
       counts[1] = 0; // holds the count of points with bit value 1
@@ -74,7 +74,7 @@ COOT_FN(PREFIX,radix_sort_rowwise)(__global eT1* A,
     // In both cases, we have to put the 1-bit values before the 0-bit values.
     // But, for floating point signed types, we need to reverse the order of the 1-bit points.
     // So, we need a slightly different implementation for both cases.
-    __global uint_eT1* rowptr = (uint_eT1*) unsorted_rowptr;
+    __global uint_eT1* rowptr = (__global uint_eT1*) unsorted_rowptr;
     counts[0] = 0;
     counts[1] = 0;
 
