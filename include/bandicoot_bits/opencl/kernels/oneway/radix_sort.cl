@@ -30,8 +30,8 @@ COOT_FN(PREFIX,radix_sort)(__global eT1* A,
 
   UWORD local_counts[2];
 
-  eT1* unsorted_memptr = A;
-  eT1* sorted_memptr = tmp_mem;
+  __global eT1* unsorted_memptr = A;
+  __global eT1* sorted_memptr = tmp_mem;
 
   // If the type is unsigned, all the work will be done the same way.
   const UWORD max_bit = COOT_FN(coot_is_signed_,eT1)() ? 8 * sizeof(eT1) - 1 : 8 * sizeof(eT1);
@@ -39,7 +39,7 @@ COOT_FN(PREFIX,radix_sort)(__global eT1* A,
   for (UWORD b = 0; b < max_bit; ++b)
     {
     // Step 1: count the number of elements with each bit value that belong to this thread.
-    uint_eT1* memptr = (uint_eT1*) unsorted_memptr;
+    __global uint_eT1* memptr = (uint_eT1*) unsorted_memptr;
 
     local_counts[0] = 0; // holds the count of elements with bit value 0
     local_counts[1] = 0; // holds the count of elements with bit value 1
@@ -129,7 +129,7 @@ COOT_FN(PREFIX,radix_sort)(__global eT1* A,
       }
 
     // Now swap pointers.
-    eT1* tmp = unsorted_memptr;
+    __global eT1* tmp = unsorted_memptr;
     unsorted_memptr = sorted_memptr;
     sorted_memptr = tmp;
 
@@ -146,7 +146,7 @@ COOT_FN(PREFIX,radix_sort)(__global eT1* A,
   // In both cases, we have to put the 1-bit values before the 0-bit values.
   // But, for floating point signed types, we need to reverse the order of the 1-bit points.
   // So, we need a slightly different implementation for both cases.
-  uint_eT1* memptr = (uint_eT1*) unsorted_memptr;
+  __global uint_eT1* memptr = (uint_eT1*) unsorted_memptr;
   local_counts[0] = 0;
   local_counts[1] = 0;
 
