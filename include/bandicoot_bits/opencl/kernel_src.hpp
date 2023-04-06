@@ -107,6 +107,13 @@ kernel_src::get_src_preamble()
   "inline bool coot_is_fp_float() { return true; } \n"
   "inline bool coot_is_fp_double() { return true; } \n"
   "\n"
+  "inline bool coot_is_signed_uint() { return false; } \n"
+  "inline bool coot_is_signed_int() { return true; } \n"
+  "inline bool coot_is_signed_ulong() { return false; } \n"
+  "inline bool coot_is_signed_long() { return true; } \n"
+  "inline bool coot_is_signed_float() { return true; } \n"
+  "inline bool coot_is_signed_double() { return true; } \n"
+  "\n"
   // MAGMA-specific macros.
   "#define MAGMA_BLK_X 64 \n"
   "#define MAGMA_BLK_Y 32 \n"

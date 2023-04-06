@@ -17,6 +17,21 @@
 
 using namespace coot;
 
+template<typename eT>
+struct tolerance { };
+
+template<>
+struct tolerance<float>
+  {
+  constexpr static float value = 1e-3;
+  };
+
+template<>
+struct tolerance<double>
+  {
+  constexpr static double value = 1e-7;
+  };
+
 // simple normalisation
 
 TEMPLATE_TEST_CASE("simple_normalise_vec", "[normalise]", float, double)
@@ -165,9 +180,9 @@ TEMPLATE_TEST_CASE("large_normalise_vec", "[normalise]", float, double)
   arma::Col<eT> y2_cpu(y2);
   arma::Col<eT> y3_cpu(y3);
 
-  REQUIRE( arma::approx_equal( y1_cpu, y1_cpu_ref, "reldiff", 1e-5 ) );
-  REQUIRE( arma::approx_equal( y2_cpu, y2_cpu_ref, "reldiff", 1e-5 ) );
-  REQUIRE( arma::approx_equal( y3_cpu, y3_cpu_ref, "reldiff", 1e-5 ) );
+  REQUIRE( arma::approx_equal( y1_cpu, y1_cpu_ref, "reldiff", tolerance<eT>::value ) );
+  REQUIRE( arma::approx_equal( y2_cpu, y2_cpu_ref, "reldiff", tolerance<eT>::value ) );
+  REQUIRE( arma::approx_equal( y3_cpu, y3_cpu_ref, "reldiff", tolerance<eT>::value ) );
   }
 
 
@@ -210,12 +225,12 @@ TEMPLATE_TEST_CASE("large_normalise_colwise", "[normalise]", float, double)
   arma::Mat<eT> y3a_cpu(y3a);
   arma::Mat<eT> y3b_cpu(y3b);
 
-  REQUIRE( arma::approx_equal( y1a_cpu, y1_cpu_ref, "reldiff", 1e-5 ) );
-  REQUIRE( arma::approx_equal( y1b_cpu, y1_cpu_ref, "reldiff", 1e-5 ) );
-  REQUIRE( arma::approx_equal( y2a_cpu, y2_cpu_ref, "reldiff", 1e-5 ) );
-  REQUIRE( arma::approx_equal( y2b_cpu, y2_cpu_ref, "reldiff", 1e-5 ) );
-  REQUIRE( arma::approx_equal( y3a_cpu, y3_cpu_ref, "reldiff", 1e-5 ) );
-  REQUIRE( arma::approx_equal( y3b_cpu, y3_cpu_ref, "reldiff", 1e-5 ) );
+  REQUIRE( arma::approx_equal( y1a_cpu, y1_cpu_ref, "reldiff", tolerance<eT>::value ) );
+  REQUIRE( arma::approx_equal( y1b_cpu, y1_cpu_ref, "reldiff", tolerance<eT>::value ) );
+  REQUIRE( arma::approx_equal( y2a_cpu, y2_cpu_ref, "reldiff", tolerance<eT>::value ) );
+  REQUIRE( arma::approx_equal( y2b_cpu, y2_cpu_ref, "reldiff", tolerance<eT>::value ) );
+  REQUIRE( arma::approx_equal( y3a_cpu, y3_cpu_ref, "reldiff", tolerance<eT>::value ) );
+  REQUIRE( arma::approx_equal( y3b_cpu, y3_cpu_ref, "reldiff", tolerance<eT>::value ) );
   }
 
 
@@ -246,9 +261,9 @@ TEMPLATE_TEST_CASE("large_normalise_rowwise", "[normalise]", float, double)
   arma::Mat<eT> y2_cpu(y2);
   arma::Mat<eT> y3_cpu(y3);
 
-  REQUIRE( arma::approx_equal( y1_cpu, y1_cpu_ref, "reldiff", 1e-5 ) );
-  REQUIRE( arma::approx_equal( y2_cpu, y2_cpu_ref, "reldiff", 1e-5 ) );
-  REQUIRE( arma::approx_equal( y3_cpu, y3_cpu_ref, "reldiff", 1e-5 ) );
+  REQUIRE( arma::approx_equal( y1_cpu, y1_cpu_ref, "reldiff", tolerance<eT>::value ) );
+  REQUIRE( arma::approx_equal( y2_cpu, y2_cpu_ref, "reldiff", tolerance<eT>::value ) );
+  REQUIRE( arma::approx_equal( y3_cpu, y3_cpu_ref, "reldiff", tolerance<eT>::value ) );
   }
 
 
@@ -296,8 +311,8 @@ TEMPLATE_TEST_CASE("already_normalised_colwise", "[normalise]", float, double)
   arma::Mat<eT> z1_cpu(z1);
   arma::Mat<eT> z2_cpu(z2);
 
-  REQUIRE( arma::approx_equal( z1_cpu, y_cpu, "reldiff", 1e-5 ) );
-  REQUIRE( arma::approx_equal( z2_cpu, y_cpu, "reldiff", 1e-5 ) );
+  REQUIRE( arma::approx_equal( z1_cpu, y_cpu, "reldiff", tolerance<eT>::value ) );
+  REQUIRE( arma::approx_equal( z2_cpu, y_cpu, "reldiff", tolerance<eT>::value ) );
   }
 
 
@@ -317,7 +332,7 @@ TEMPLATE_TEST_CASE("already_normalised_rowwise", "[normalise]", float, double)
   arma::Mat<eT> y_cpu(y);
   arma::Mat<eT> z_cpu(z);
 
-  REQUIRE( arma::approx_equal( z_cpu, y_cpu, "reldiff", 1e-5 ) );
+  REQUIRE( arma::approx_equal( z_cpu, y_cpu, "reldiff", tolerance<eT>::value ) );
   }
 
 
@@ -691,9 +706,7 @@ TEMPLATE_TEST_CASE
   arma::Col<eT2> y2_ref_cpu(y2_ref);
   arma::Col<eT2> y3_ref_cpu(y3_ref);
 
-  const double tol = (is_same_type<eT2, float>::yes) ? 1e-3 : 1e-6;
-
-  REQUIRE( arma::approx_equal( y1_cpu, y1_ref_cpu, "reldiff", tol) );
-  REQUIRE( arma::approx_equal( y2_cpu, y2_ref_cpu, "reldiff", tol) );
-  REQUIRE( arma::approx_equal( y3_cpu, y3_ref_cpu, "reldiff", tol) );
+  REQUIRE( arma::approx_equal( y1_cpu, y1_ref_cpu, "reldiff", tolerance<eT2>::value ) );
+  REQUIRE( arma::approx_equal( y2_cpu, y2_ref_cpu, "reldiff", tolerance<eT2>::value ) );
+  REQUIRE( arma::approx_equal( y3_cpu, y3_ref_cpu, "reldiff", tolerance<eT2>::value ) );
   }
