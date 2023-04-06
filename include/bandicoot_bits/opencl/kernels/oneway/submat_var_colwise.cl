@@ -27,7 +27,7 @@ COOT_FN(PREFIX,submat_var_colwise)(__global eT1* out,
   const UWORD col = get_global_id(0);
   if(col < sub_n_cols)
     {
-    const eT1* colptr = &(A[ (col + start_col)*A_n_rows + start_row ]);
+    __global const eT1* colptr = &(A[ (col + start_col)*A_n_rows + start_row ]);
     const eT1 mean_val = means[col];
     eT1 acc = (eT1)(0);
     for(UWORD i = 0; i < sub_n_rows; ++i)
