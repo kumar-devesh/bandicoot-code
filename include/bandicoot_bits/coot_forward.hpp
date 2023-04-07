@@ -92,6 +92,11 @@ class op_diagmat2;
 class op_diagvec;
 class op_normalise_vec;
 class op_normalise_mat;
+class op_mean;
+class op_median;
+class op_stddev;
+class op_var;
+class op_range;
 
 class mtop_conv_to;
 class mtop_all;
