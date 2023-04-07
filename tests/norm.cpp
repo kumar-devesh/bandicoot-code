@@ -253,7 +253,11 @@ TEMPLATE_TEST_CASE("invalid_matrix_norm", "[norm]", double, float)
   {
   Mat<TestType> x = randu<Mat<TestType>>(10, 10);
 
-  REQUIRE_THROWS( norm(x, "-inf") );
+  std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
+  std::cerr.rdbuf(NULL);
+  TestType out;
+  REQUIRE_THROWS( out = norm(x, "-inf") );
+  std::cerr.rdbuf(orig_cerr_buf);
   }
 
 
