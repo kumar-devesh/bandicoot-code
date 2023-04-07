@@ -105,7 +105,7 @@ op_var::apply_direct(Mat<eT>& out, const subview<eT>& in, const uword dim, const
   // If `in` is a subview of `out`, we need to extract it.
   if (((void*) &in.m) == ((void*) &out))
     {
-    Mat<in_eT> tmp(in);
+    Mat<eT> tmp(in);
     apply_direct(out, tmp, dim, norm_type);
     return;
     }
