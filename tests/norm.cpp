@@ -79,17 +79,17 @@ TEMPLATE_TEST_CASE("single_element_norm", "[norm]", double, float)
 
 TEMPLATE_TEST_CASE("expr_norm", "[norm]", double, float)
   {
-  Row<TestType> x = randi<Col<TestType>>(1000, distr_param(0, 50));
-  Row<TestType> z = vectorise(repmat(trans(x + 3), 2, 2));
+  Row<TestType> x = randi<Row<TestType>>(1000, distr_param(0, 50));
+  Row<TestType> z = vectorise(repmat(trans(x + 3), 2, 2)).t();
 
   for (uword p = 1; p < 11; ++p)
     {
-    REQUIRE( norm(vectorise(repmat(trans(x + 3), 2, 2)), p) == Approx(norm(z, p)) );
+    REQUIRE( norm(vectorise(repmat(trans(x + 3), 2, 2).t()), p) == Approx(norm(z, p)) );
     }
 
-  REQUIRE( norm(vectorise(repmat(trans(x + 3), 2, 2)), "-inf") == Approx(norm(z, "-inf")) );
-  REQUIRE( norm(vectorise(repmat(trans(x + 3), 2, 2)), "inf") == Approx(norm(z, "inf")) );
-  REQUIRE( norm(vectorise(repmat(trans(x + 3), 2, 2)), "fro") == Approx(norm(z, "fro")) );
+  REQUIRE( norm(vectorise(repmat(trans(x + 3), 2, 2).t()), "-inf") == Approx(norm(z, "-inf")) );
+  REQUIRE( norm(vectorise(repmat(trans(x + 3), 2, 2).t()), "inf") == Approx(norm(z, "inf")) );
+  REQUIRE( norm(vectorise(repmat(trans(x + 3), 2, 2).t()), "fro") == Approx(norm(z, "fro")) );
   }
 
 
