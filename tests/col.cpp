@@ -17,9 +17,10 @@
 
 using namespace coot;
 
-template<typename eT>
-void test_create_col_1()
+TEMPLATE_TEST_CASE("create_col_1", "[col]", double, float, u32, s32, u64, s64)
   {
+  typedef TestType eT;
+
   Mat<eT> x(10, 10);
   for (uword i = 0; i < x.n_elem; ++i)
     {
@@ -42,21 +43,10 @@ void test_create_col_1()
 
 
 
-TEST_CASE("create_col_1")
+TEMPLATE_TEST_CASE("create_col_2", "[col]", double, float, u32, s32, u64, s64)
   {
-  test_create_col_1<double>();
-  test_create_col_1<float>();
-  test_create_col_1<u32>();
-  test_create_col_1<s32>();
-  test_create_col_1<u64>();
-  test_create_col_1<s64>();
-  }
+  typedef TestType eT;
 
-
-
-template<typename eT>
-void test_create_col_2()
-  {
   Mat<eT> x(10, 10);
   for (uword i = 0; i < x.n_elem; ++i)
     {
@@ -79,21 +69,9 @@ void test_create_col_2()
 
 
 
-TEST_CASE("create_col_2")
+TEMPLATE_TEST_CASE("empty_col_constructors", "[col]", double, float, u32, s32, u64, s64)
   {
-  test_create_col_2<double>();
-  test_create_col_2<float>();
-  test_create_col_2<u32>();
-  test_create_col_2<s32>();
-  test_create_col_2<u64>();
-  test_create_col_2<s64>();
-  }
-
-
-
-template<typename eT>
-void test_empty_col_constructors()
-  {
+  typedef TestType eT;
   Col<eT> c1;
   Col<eT> c2(100);
   Col<eT> c3(100, 1);
@@ -108,21 +86,10 @@ void test_empty_col_constructors()
 
 
 
-TEST_CASE("empty_col_constructors")
+TEMPLATE_TEST_CASE("col_move_constructor_and_operator", "[col]", double, float, u32, s32, u64, s64)
   {
-  test_empty_col_constructors<double>();
-  test_empty_col_constructors<float>();
-  test_empty_col_constructors<u32>();
-  test_empty_col_constructors<s32>();
-  test_empty_col_constructors<u64>();
-  test_empty_col_constructors<s64>();
-  }
+  typedef TestType eT;
 
-
-
-template<typename eT>
-void test_move_constructor_and_operator()
-  {
   Col<eT> c1(100);
   c1.fill(eT(2));
   Col<eT> c2(std::move(c1));
@@ -152,21 +119,10 @@ void test_move_constructor_and_operator()
 
 
 
-TEST_CASE("col_move_constructor_and_operator")
+TEMPLATE_TEST_CASE("col_arma_conversion", "[col]", double, float, u32, s32, u64, s64)
   {
-  test_move_constructor_and_operator<double>();
-  test_move_constructor_and_operator<float>();
-  test_move_constructor_and_operator<u32>();
-  test_move_constructor_and_operator<s32>();
-  test_move_constructor_and_operator<u64>();
-  test_move_constructor_and_operator<s64>();
-  }
+  typedef TestType eT;
 
-
-
-template<typename eT>
-void test_col_arma_conversion()
-  {
   Col<eT> c1(100);
   for (uword i = 0; i < c1.n_elem; ++i)
     {
@@ -185,21 +141,10 @@ void test_col_arma_conversion()
 
 
 
-TEST_CASE("col_arma_conversion")
+TEMPLATE_TEST_CASE("col_rows_1", "[col]", double, float, u32, s32, u64, s64)
   {
-  test_col_arma_conversion<double>();
-  test_col_arma_conversion<float>();
-  test_col_arma_conversion<u32>();
-  test_col_arma_conversion<s32>();
-  test_col_arma_conversion<u64>();
-  test_col_arma_conversion<s64>();
-  }
+  typedef TestType eT;
 
-
-
-template<typename eT>
-void test_col_rows_1()
-  {
   Col<eT> c(100);
   for (uword i = 0; i < c.n_elem; ++i)
     {
@@ -218,21 +163,10 @@ void test_col_rows_1()
 
 
 
-TEST_CASE("col_rows_1")
+TEMPLATE_TEST_CASE("col_rows_2", "[col]", double, float, u32, s32, u64, s64)
   {
-  test_col_rows_1<double>();
-  test_col_rows_1<float>();
-  test_col_rows_1<u32>();
-  test_col_rows_1<s32>();
-  test_col_rows_1<u64>();
-  test_col_rows_1<s64>();
-  }
+  typedef TestType eT;
 
-
-
-template<typename eT>
-void test_col_rows_2()
-  {
   Col<eT> c(100);
   for (uword i = 0; i < c.n_elem; ++i)
     {
@@ -260,21 +194,10 @@ void test_col_rows_2()
 
 
 
-TEST_CASE("col_rows_2")
+TEMPLATE_TEST_CASE("col_subvec_1", "[col]", double, float, u32, s32, u64, s64)
   {
-  test_col_rows_2<double>();
-  test_col_rows_2<float>();
-  test_col_rows_2<u32>();
-  test_col_rows_2<s32>();
-  test_col_rows_2<u64>();
-  test_col_rows_2<s64>();
-  }
+  typedef TestType eT;
 
-
-
-template<typename eT>
-void test_col_subvec_1()
-  {
   Col<eT> c(100);
   for (uword i = 0; i < c.n_elem; ++i)
     {
@@ -293,21 +216,10 @@ void test_col_subvec_1()
 
 
 
-TEST_CASE("col_subvec_1")
+TEMPLATE_TEST_CASE("col_subvec_2", "[col]", double, float, u32, s32, u64, s64)
   {
-  test_col_subvec_1<double>();
-  test_col_subvec_1<float>();
-  test_col_subvec_1<u32>();
-  test_col_subvec_1<s32>();
-  test_col_subvec_1<u64>();
-  test_col_subvec_1<s64>();
-  }
+  typedef TestType eT;
 
-
-
-template<typename eT>
-void test_col_subvec_2()
-  {
   Col<eT> c(100);
   for (uword i = 0; i < c.n_elem; ++i)
     {
@@ -335,12 +247,21 @@ void test_col_subvec_2()
 
 
 
-TEST_CASE("col_subvec_2")
+TEST_CASE("col_invalid_size", "[col]")
   {
-  test_col_subvec_2<double>();
-  test_col_subvec_2<float>();
-  test_col_subvec_2<u32>();
-  test_col_subvec_2<s32>();
-  test_col_subvec_2<u64>();
-  test_col_subvec_2<s64>();
+  // Disable cerr output for this test.
+  std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
+  std::cerr.rdbuf(NULL);
+
+  vec x;
+  REQUIRE_THROWS( x = randi<rowvec>(100, distr_param(0, 10)) );
+  REQUIRE_THROWS( x.set_size(1, 2) );
+  REQUIRE_THROWS( x = rowvec(5) );
+  REQUIRE_THROWS( x = mat(10, 5) );
+
+  // Restore cerr output.
+  std::cerr.rdbuf(orig_cerr_buf);
+
+  // This one needs to not throw.
+  x = mat(10, 1);
   }

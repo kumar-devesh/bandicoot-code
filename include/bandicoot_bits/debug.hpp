@@ -412,6 +412,20 @@ coot_check_bounds(const bool state, const T1& x)
 
 
 
+coot_hot
+coot_inline
+void
+coot_set_error(bool& err_state, char*& err_msg, const bool expression, const char* message)
+  {
+  if(expression)
+    {
+    err_state = true;
+    err_msg   = const_cast<char*>(message);
+    }
+  }
+
+
+
 //
 // functions for generating strings indicating size errors
 
@@ -609,6 +623,7 @@ coot_assert_blas_size(const T1& A, const T2& B)
   #define coot_debug_warn                    true ? (void)0 : coot_warn
   #define coot_debug_check                   true ? (void)0 : coot_check
   #define coot_debug_check_bounds            true ? (void)0 : coot_check_bounds
+  #define coot_debug_set_error               true ? (void)0 : coot_set_error
   #define coot_debug_assert_same_size        true ? (void)0 : coot_assert_same_size
   #define coot_debug_assert_mul_size         true ? (void)0 : coot_assert_mul_size
   #define coot_debug_assert_trans_mul_size   true ? (void)0 : coot_assert_trans_mul_size
@@ -620,6 +635,7 @@ coot_assert_blas_size(const T1& A, const T2& B)
   #define coot_debug_warn                  coot_warn
   #define coot_debug_check                 coot_check
   #define coot_debug_check_bounds          coot_check_bounds
+  #define coot_debug_set_error             coot_set_error
   #define coot_debug_assert_same_size      coot_assert_same_size
   #define coot_debug_assert_mul_size       coot_assert_mul_size
   #define coot_debug_assert_trans_mul_size coot_assert_trans_mul_size

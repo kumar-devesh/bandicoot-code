@@ -198,7 +198,7 @@ TEMPLATE_TEST_CASE("row_strans", "[trans]", double, float, u32, s32, u64, s64)
 
 TEMPLATE_TEST_CASE("col_htrans", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Col<TestType> x = randi<Row<TestType>>(10, distr_param(0, 50));
+  Col<TestType> x = randi<Col<TestType>>(10, distr_param(0, 50));
   Row<TestType> y = x.t();
   check_transpose(y, x);
   }
@@ -207,7 +207,7 @@ TEMPLATE_TEST_CASE("col_htrans", "[trans]", double, float, u32, s32, u64, s64)
 
 TEMPLATE_TEST_CASE("col_strans", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Col<TestType> x = randi<Row<TestType>>(10, distr_param(0, 50));
+  Col<TestType> x = randi<Col<TestType>>(10, distr_param(0, 50));
   Row<TestType> y = x.st();
   check_transpose(y, x);
   }
