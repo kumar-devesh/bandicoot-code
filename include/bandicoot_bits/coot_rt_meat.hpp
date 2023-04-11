@@ -2412,7 +2412,7 @@ coot_rt_t::median_vec(dev_mem_t<eT> mem, const uword n_elem)
     }
   else
     {
-    coot_stop_runtime_error("coot_rt::median(): unknown backend");
+    coot_stop_runtime_error("coot_rt::median_vec(): unknown backend");
     }
 
   return eT(0); // fix warning

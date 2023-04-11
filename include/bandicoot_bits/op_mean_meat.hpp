@@ -51,6 +51,9 @@ op_mean::apply_direct(Mat<out_eT>& out, const Mat<in_eT>& in, const uword dim, c
   {
   coot_extra_debug_sigprint();
 
+  // We can't apply the kernel into an alias.
+  copy_alias<in_eT> C(in, out);
+
   if (dim == 0)
     {
     out.set_size(in.n_rows > 0 ? 1 : 0, in.n_cols);
@@ -66,8 +69,6 @@ op_mean::apply_direct(Mat<out_eT>& out, const Mat<in_eT>& in, const uword dim, c
     return;
     }
 
-  // We can't apply the kernel into an alias.
-  copy_alias<in_eT> C(in, out);
   coot_rt_t::mean(out.get_dev_mem(false), C.M.get_dev_mem(false), in.n_rows, in.n_cols, dim, post_conv_apply);
   }
 
@@ -79,6 +80,14 @@ void
 op_mean::apply_direct(Mat<out_eT>& out, const subview<in_eT>& in, const uword dim, const bool post_conv_apply)
   {
   coot_extra_debug_sigprint();
+
+  // If `in` is a subview of `out`, we need to make a copy.
+  if (((void*) &in.m) == ((void*) &out))
+    {
+    Mat<in_eT> tmp(in);
+    apply_direct(out, tmp, dim, post_conv_apply);
+    return;
+    }
 
   if (dim == 0)
     {

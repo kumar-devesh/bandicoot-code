@@ -73,7 +73,7 @@ TEST_CASE("direct_vectorise_row", "[vectorise]")
   mat x = randu<mat>(10, 10);
   mat xt = x.t();
 
-  vec y = vectorise(x, 1);
+  rowvec y = vectorise(x, 1);
 
   REQUIRE( y.n_elem == x.n_elem );
 
@@ -409,9 +409,9 @@ TEST_CASE("row_vectorises_inside_glue", "[vectorise]")
 
   mat z = trans(vectorise(x, 1)) * vectorise(y, 1);
 
-  vec xv = vectorise(x, 1);
-  vec yv = vectorise(y, 1);
-  mat zz = trans(xv) * yv;
+  vec xv = vectorise(x, 1).t();
+  rowvec yv = vectorise(y, 1);
+  mat zz = xv * yv;
 
   REQUIRE( z.n_elem == x.n_elem * y.n_elem );
 
@@ -542,16 +542,16 @@ TEST_CASE("vectorise_row_bonanza", "[vectorise]")
   mat y = randu<mat>(2, 50);
   mat z = randu<mat>(100, 100);
 
-  rowvec out = vectorise(z % (trans(vectorise(x, 1) * 3) * (vectorise(y, 1) - 2)), 1);
+  rowvec out = vectorise(z % (trans(vectorise(x, 1) * 3) * (vectorise(y, 1) - 2)), 1).t().t();
 
   // Now assemble by hand for comparison...
-  vec tmp1 = vectorise(x, 1) * 3;
-  vec tmp2 = vectorise(y, 1) - 2;
+  rowvec tmp1 = vectorise(x, 1) * 3;
+  rowvec tmp2 = vectorise(y, 1) - 2;
   mat tmp3 = trans(tmp1) * tmp2;
   mat tmp4 = z % tmp3;
-  mat tmp4t = trans(tmp4);
+  mat tmp4t = trans(tmp4); // has size 100x100 but is in the same order as out
 
-  REQUIRE( out.n_elem == tmp4.n_elem );
+  REQUIRE( out.n_elem == tmp4t.n_elem );
 
   for (size_t i = 0; i < out.n_elem; ++i)
     {

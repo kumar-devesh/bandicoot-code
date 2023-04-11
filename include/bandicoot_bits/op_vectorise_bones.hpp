@@ -25,9 +25,9 @@ class op_vectorise_col
 
   template<typename out_eT, typename T1> inline static void apply(Mat<out_eT>& out, const Op<T1,op_vectorise_col>& in);
 
-  template<typename out_eT, typename T1> inline static void apply_direct(Mat<out_eT>& out, const T1& in);
-
-  template<typename out_eT, typename eT> inline static void apply_direct(Mat<out_eT>& out, const subview<eT>& sv);
+  // output_is_row is only used by op_vectorise_all in special situations
+  template<typename out_eT, typename T1> inline static void apply_direct(Mat<out_eT>& out, const T1& in, const bool output_is_row = false);
+  template<typename out_eT, typename eT> inline static void apply_direct(Mat<out_eT>& out, const subview<eT>& sv, const bool output_is_row = false);
 
   template<typename T1> inline static uword compute_n_rows(const Op<T1, op_vectorise_col>& op, const uword in_n_rows, const uword in_n_cols);
   template<typename T1> inline static uword compute_n_cols(const Op<T1, op_vectorise_col>& op, const uword in_n_rows, const uword in_n_cols);

@@ -54,6 +54,9 @@ op_var::apply_direct(Mat<eT>& out, const Mat<eT>& in, const uword dim, const uwo
   {
   coot_extra_debug_sigprint();
 
+  // Our kernel can't handle aliases.
+  copy_alias<eT> C(in, out);
+
   if (dim == 0)
     {
     out.set_size(in.n_rows > 0 ? 1 : 0, in.n_cols);
@@ -71,10 +74,7 @@ op_var::apply_direct(Mat<eT>& out, const Mat<eT>& in, const uword dim, const uwo
 
   // First we need to compute the mean.
   Mat<eT> mean;
-  op_mean::apply_direct(mean, in, dim, false);
-
-  // Our kernel can't handle aliases.
-  copy_alias<eT> C(in, out);
+  op_mean::apply_direct(mean, C.M, dim, false);
 
   coot_rt_t::var(out.get_dev_mem(false), C.M.get_dev_mem(false), mean.get_dev_mem(false), in.n_rows, in.n_cols, dim, norm_type);
   }
@@ -101,6 +101,14 @@ void
 op_var::apply_direct(Mat<eT>& out, const subview<eT>& in, const uword dim, const uword norm_type)
   {
   coot_extra_debug_sigprint();
+
+  // If `in` is a subview of `out`, we need to extract it.
+  if (((void*) &in.m) == ((void*) &out))
+    {
+    Mat<eT> tmp(in);
+    apply_direct(out, tmp, dim, norm_type);
+    return;
+    }
 
   if (dim == 0)
     {
