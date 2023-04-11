@@ -68,13 +68,13 @@ op_cor::apply(Mat<out_eT>& out, const Op<T1, op_cor>& in)
 template<typename out_eT, typename T1>
 inline
 void
-op_cor::apply(Mat<out_eT>& out, const Op<mtOp<out_eT, T1, mtop_conv_to> op_cor>& in)
+op_cor::apply(Mat<out_eT>& out, const Op<mtOp<out_eT, T1, mtop_conv_to>, op_cor>& in)
   {
   coot_extra_debug_sigprint();
 
   typedef typename T1::elem_type eT;
 
-  const unwrap<T1> U(in.m.m);
+  const unwrap<T1> U(in.m.q);
   const extract_subview<typename unwrap<T1>::stored_type> E(U.M);
 
   if (E.M.n_elem == 0)

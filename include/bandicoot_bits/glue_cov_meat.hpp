@@ -17,7 +17,7 @@
 template<typename out_eT, typename T1, typename T2>
 inline
 void
-glue_cov::apply(Mat<out_eT>& out, const Op<T1, T2, glue_cov>& in)
+glue_cov::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_cov>& in)
   {
   coot_extra_debug_sigprint();
 
@@ -49,18 +49,18 @@ glue_cov::apply(Mat<out_eT>& out, const Op<T1, T2, glue_cov>& in)
   const eT norm_val     = (norm_type == 0) ? ( (N > 1) ? eT(N - 1) : eT(1) ) : eT(N);
 
   // TODO: a dedicated kernel for this particular operation would be widely useful
-  Col<eT> mean_vals_AA, mean_vals_BB;
+  Row<eT> mean_vals_AA, mean_vals_BB;
   op_mean::apply_direct(mean_vals_AA, AA, 0, false); // no conversion
   op_mean::apply_direct(mean_vals_BB, BB, 0, false); // no conversion
 
   Mat<eT> tmp_AA(AA), tmp_BB(BB);
-  for (uword i = 0; i < tmp_AA.n_cols; ++i)
+  for (uword i = 0; i < tmp_AA.n_rows; ++i)
     {
-    tmp_AA.col(i) -= mean_vals_AA;
+    tmp_AA.row(i) -= mean_vals_AA;
     }
-  for (uword i = 0; i < tmp_BB.n_cols; ++i)
+  for (uword i = 0; i < tmp_BB.n_rows; ++i)
     {
-    tmp_BB.col(i) -= mean_vals_BB;
+    tmp_BB.row(i) -= mean_vals_BB;
     }
 
   out = conv_to<Mat<out_eT>>::from((tmp_AA.t() * tmp_BB) / norm_val);

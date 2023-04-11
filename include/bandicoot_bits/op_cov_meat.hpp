@@ -42,12 +42,12 @@ op_cov::apply(Mat<out_eT>& out, const Op<T1, op_cov>& in)
   const eT norm_val     = (norm_type == 0) ? ( (N > 1) ? eT(N - 1) : eT(1) ) : eT(N);
 
   // TODO: a dedicated kernel for this particular operation would be widely useful
-  Col<eT> mean_vals;
+  Row<eT> mean_vals;
   op_mean::apply_direct(mean_vals, AA, 0, false); // no conversion
   Mat<eT> tmp(AA);
-  for (uword i = 0; i < tmp.n_cols; ++i)
+  for (uword i = 0; i < tmp.n_rows; ++i)
     {
-    tmp.col(i) -= mean_vals;
+    tmp.row(i) -= mean_vals;
     }
 
   out = conv_to<Mat<out_eT>>::from((tmp.t() * tmp) / norm_val);
@@ -64,7 +64,7 @@ op_cov::apply(Mat<out_eT>& out, const Op<mtOp<out_eT, T1, mtop_conv_to>, op_cov>
 
   typedef typename T1::elem_type eT;
 
-  const unwrap<T1> U(in.m.m);
+  const unwrap<T1> U(in.m.q);
   const extract_subview<typename unwrap<T1>::stored_type> E(U.M);
 
   if (E.M.n_elem == 0)
@@ -83,15 +83,15 @@ op_cov::apply(Mat<out_eT>& out, const Op<mtOp<out_eT, T1, mtop_conv_to>, op_cov>
   const eT norm_val     = (norm_type == 0) ? ( (N > 1) ? eT(N - 1) : eT(1) ) : eT(N);
 
   // TODO: a dedicated kernel for this particular operation would be widely useful
-  Col<out_eT> mean_vals;
+  Row<out_eT> mean_vals;
   op_mean::apply_direct(mean_vals, AA, 0, true); // convert then compute mean
 
   Mat<out_eT> tmp(AA.n_rows, AA.n_cols);
   coot_rt_t::copy_array(tmp.get_dev_mem(false), AA.get_dev_mem(false), tmp.n_elem);
-  for (uword i = 0; i < tmp.n_cols; ++i)
+  for (uword i = 0; i < tmp.n_rows; ++i)
     {
-    // tmp.col(i) = AA.col(i) - mean_vals, plus conversion to out_eT
-    tmp.col(i) -= mean_vals;
+    // tmp.row(i) = AA.row(i) - mean_vals, plus conversion to out_eT
+    tmp.row(i) -= mean_vals;
     }
 
   out = ((tmp.t() * tmp) / norm_val);
