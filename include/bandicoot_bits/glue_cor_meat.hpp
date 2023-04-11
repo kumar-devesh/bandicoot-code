@@ -45,11 +45,11 @@ glue_cor::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_cor>& in)
     }
 
   const uword N         = AA.n_rows;
-  const uword norm_type = in.aux_uword_a;
+  const uword norm_type = in.aux_uword;
   const eT norm_val     = (norm_type == 0) ? ( (N > 1) ? eT(N - 1) : eT(1) ) : eT(N);
 
   // TODO: a dedicated kernel for this particular operation would be widely useful
-  const Col<eT> mean_vals_AA, mean_vals_BB;
+  Row<eT> mean_vals_AA, mean_vals_BB;
   op_mean::apply_direct(mean_vals_AA, AA, 0, true); // no conversion
   op_mean::apply_direct(mean_vals_BB, BB, 0, true); // no conversion
 
@@ -57,19 +57,18 @@ glue_cor::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_cor>& in)
   Mat<eT> tmp_BB(BB.n_rows, BB.n_cols);
   coot_rt_t::copy_array(tmp_AA.get_dev_mem(false), AA.get_dev_mem(false), tmp_AA.n_elem);
   coot_rt_t::copy_array(tmp_BB.get_dev_mem(false), BB.get_dev_mem(false), tmp_BB.n_elem);
-  for (uword i = 0; i < tmp_AA.n_cols; ++i)
+  for (uword i = 0; i < tmp_AA.n_rows; ++i)
     {
-    tmp_AA.col(i) -= mean_vals_AA;
+    tmp_AA.row(i) -= mean_vals_AA;
     }
-  for (uword i = 0; i < tmp_BB.n_cols; ++i)
+  for (uword i = 0; i < tmp_BB.n_rows; ++i)
     {
-    tmp_BB.col(i) -= mean_vals_BB;
+    tmp_BB.row(i) -= mean_vals_BB;
     }
 
   Mat<eT> tmp = (tmp_AA.t() * tmp_BB / norm_val);
-  const Col<out_eT> s = sqrt(tmp.diag());
 
-  out = conv_to<Mat<out_eT>>::from(tmp / (s * s.t()));
+  out = conv_to<Mat<out_eT>>::from(tmp / ( stddev(AA).t() * stddev(BB) ));
   }
 
 

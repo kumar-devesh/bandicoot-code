@@ -48,19 +48,20 @@ op_cor::apply(Mat<out_eT>& out, const Op<T1, op_cor>& in)
   const eT norm_val     = (norm_type == 0) ? ( (N > 1) ? eT(N - 1) : eT(1) ) : eT(N);
 
   // TODO: a dedicated kernel for this particular operation would be widely useful
-  const Col<out_eT> mean_vals;
-  op_mean::apply_direct(mean_vals, AA, 0, true); // convert before computing mean
+  Row<eT> mean_vals;
+  op_mean::apply_direct(mean_vals, AA, 0, true); // no conversion
 
-  Mat<out_eT> tmp(AA.n_rows, AA.n_cols);
+  Mat<eT> tmp(AA);
   coot_rt_t::copy_array(tmp.get_dev_mem(false), AA.get_dev_mem(false), tmp.n_elem);
-  for (uword i = 0; i < tmp.n_cols; ++i)
+  for (uword i = 0; i < tmp.n_rows; ++i)
     {
-    tmp.col(i) -= mean_vals;
+    tmp.row(i) -= mean_vals;
     }
-  tmp = (tmp.t() * tmp / norm_val);
-  const Col<out_eT> s = sqrt(tmp.diag());
+  // Since `tmp` is a manually created alias, glue_times's alias detection doesn't work, so we use a separate object.
+  Mat<eT> tmp2 = (tmp.t() * tmp / norm_val);
+  const Col<eT> s = sqrt(tmp2.diag());
 
-  out = (tmp / (s * s.t()));
+  out = conv_to<Mat<out_eT>>::from(tmp2 / (s * s.t()));
   }
 
 
@@ -99,16 +100,18 @@ op_cor::apply(Mat<out_eT>& out, const Op<mtOp<out_eT, T1, mtop_conv_to>, op_cor>
   const eT norm_val     = (norm_type == 0) ? ( (N > 1) ? eT(N - 1) : eT(1) ) : eT(N);
 
   // TODO: a dedicated kernel for this particular operation would be widely useful
-  const Col<eT> mean_vals = mean(AA, 0);
-  Mat<eT> tmp(AA);
-  for (uword i = 0; i < tmp.n_cols; ++i)
+  Row<out_eT> mean_vals;
+  op_mean::apply_direct(mean_vals, AA, 0, true); // convert before computing mean
+  Mat<out_eT> tmp = conv_to<Mat<out_eT>>::from(AA);
+  coot_rt_t::copy_array(tmp.get_dev_mem(false), AA.get_dev_mem(false), tmp.n_elem);
+  for (uword i = 0; i < tmp.n_rows; ++i)
     {
-    tmp.col(i) -= mean_vals;
+    tmp.row(i) -= mean_vals;
     }
-  tmp = (tmp.t() * tmp / norm_val);
-  const Col<eT> s = sqrt(tmp.diag());
+  Mat<out_eT> tmp2 = (tmp.t() * tmp / norm_val);
+  const Col<out_eT> s = sqrt(tmp2.diag());
 
-  out = conv_to<Mat<out_eT>>::from(tmp / (s * s.t()));
+  out = (tmp2 / (s * s.t()));
   }
 
 
