@@ -31,6 +31,8 @@ struct unwrap
 
   template<typename eT2>
   coot_inline bool is_alias(const Mat<eT2>&) const { return false; }
+  template<typename eT2>
+  coot_inline bool is_alias(const subview<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X.m)); }
   };
 
 
@@ -51,6 +53,8 @@ struct unwrap< Mat<eT> >
 
   template<typename eT2>
   coot_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
+  template<typename eT2>
+  coot_inline bool is_alias(const subview<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X.m)); }
   };
 
 
@@ -71,6 +75,8 @@ struct unwrap< Row<eT> >
 
   template<typename eT2>
   coot_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
+  template<typename eT2>
+  coot_inline bool is_alias(const subview<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X.m)); }
   };
 
 
@@ -91,6 +97,8 @@ struct unwrap< Col<eT> >
 
   template<typename eT2>
   coot_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
+  template<typename eT2>
+  coot_inline bool is_alias(const subview<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X.m)); }
   };
 
 
@@ -109,6 +117,8 @@ struct unwrap< subview<eT> >
 
   const subview<eT>& M;
 
+  template<typename eT2>
+  coot_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M.m) == void_ptr(&X)); }
   template<typename eT2>
   coot_inline bool is_alias(const subview<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
   };
@@ -132,6 +142,8 @@ struct unwrap< mtOp<out_eT, T1, mtop_conv_to> >
 
   template<typename eT2>
   coot_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
+  template<typename eT2>
+  coot_inline bool is_alias(const subview<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X.m)); }
   };
 
 
@@ -152,6 +164,8 @@ struct unwrap< mtGlue<out_eT, T1, T2, mtglue_type> >
 
   template<typename eT2>
   coot_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
+  template<typename eT2>
+  coot_inline bool is_alias(const subview<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X.m)); }
   };
 
 
