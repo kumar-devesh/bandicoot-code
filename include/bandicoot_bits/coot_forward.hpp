@@ -125,6 +125,8 @@ class eglue_div;
 
 class glue_times;
 class glue_times_diag;
+class glue_join_cols;
+class glue_join_rows;
 
 class glue_mixed_plus;
 class glue_mixed_minus;
