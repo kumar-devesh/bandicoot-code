@@ -18,12 +18,14 @@
 template<typename out_eT, typename T1, typename T2>
 inline
 void
-glue_join_cols::apply(Mat<out_eT>& out, const T1& A, const T2& B, const std::string& func_name)
+glue_join_cols::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_join_cols>& glue)
   {
   coot_extra_debug_sigprint();
 
-  const no_conv_unwrap<T1> U1(A.get_ref());
-  const no_conv_unwrap<T2> U2(B.get_ref());
+  const std::string func_name = (glue.aux_uword == 0) ? "join_cols()" : "join_vert()";
+
+  const no_conv_unwrap<T1> U1(glue.A);
+  const no_conv_unwrap<T2> U2(glue.B);
 
   const extract_subview<typename unwrap<T1>::stored_type> E1(U1.M);
   const extract_subview<typename unwrap<T2>::stored_type> E2(U2.M);
@@ -41,10 +43,11 @@ glue_join_cols::apply(Mat<out_eT>& out, const T1& A, const T2& B, const std::str
     func_name + ": number of columns must be the same in both objects"
     );
 
-  out.set_size(A_n_rows + B_n_rows, (std::max)(A_n_cols, B_n_cols));
+  const uword new_n_rows = A_n_rows + B_n_rows;
+  const uword new_n_cols = (std::max)(A_n_cols, B_n_cols);
 
   // Shortcut: if there is nothing to do, leave early.
-  if (out.n_elem == 0)
+  if (new_n_rows == 0 || new_n_cols == 0)
     {
     return;
     }
@@ -52,12 +55,13 @@ glue_join_cols::apply(Mat<out_eT>& out, const T1& A, const T2& B, const std::str
   // Ensure that A or B aren't aliases.
   if ((void_ptr(&out) == void_ptr(&E1.M)) || (void_ptr(&out) == void_ptr(&E2.M)))
     {
-    Mat<out_eT> tmp;
+    Mat<out_eT> tmp(new_n_rows, new_n_cols);
     coot_rt_t::join_cols(tmp.get_dev_mem(false), E1.M.get_dev_mem(false), E2.get_dev_mem(false), A_n_rows, A_n_cols, B_n_rows, B_n_cols, func_name);
     out.steal_mem(tmp);
     }
   else
     {
+    out.set_size(new_n_rows, new_n_cols);
     coot_rt_t::join_cols(out.get_dev_mem(false), E1.M.get_dev_mem(false), E2.get_dev_mem(false), A_n_rows, A_n_cols, B_n_rows, B_n_cols, func_name);
     }
   }

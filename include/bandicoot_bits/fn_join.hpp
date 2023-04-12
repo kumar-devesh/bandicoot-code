@@ -15,48 +15,46 @@
 
 
 
-// We don't use any delayed evaluation infrastructure for join_cols() or join_rows().
-// This is because we can't benefit from any speedups; in Armadillo, we can have Proxy-based
-// access to either underlying matrix and thus avoid forming the full matrix, but here
-// in Bandicoot we can't do that, as our kernels all work directly on memory.
-// So, we always just form the result matrix directly.
-
-
-
-template<typename eT, typename T1, typename T2>
+template<typename T1, typename T2>
 coot_warn_unused
 inline
-Mat<eT>
+typename
+enable_if2
+  <
+  (is_coot_type<T1>::value && is_coot_type<T2>::value && is_same_type<typename T1::elem_type, typename T2::elem_type>::value),
+  const Glue<T1, T2, glue_join_cols>
+  >::result
 join_cols
   (
-  const Base<eT, T1>& A,
-  const Base<eT, T2>& B
+  const T1& A,
+  const T2& B
   )
   {
   coot_extra_debug_sigprint();
 
-  Mat<eT> out;
-  glue_join_cols::apply(out, A, B, "join_cols");
-  return out;
+  return Glue<T1, T2, glue_join_cols>(A, B, 0);
   }
 
 
 
-template<typename eT, typename T1, typename T2>
+template<typename T1, typename T2>
 coot_warn_unused
 inline
-Mat<eT>
+typename
+enable_if2
+  <
+  (is_coot_type<T1>::value && is_coot_type<T2>::value && is_same_type<typename T1::elem_type, typename T2::elem_type>::value),
+  const Glue<T1, T2, glue_join_cols>
+  >::result
 join_vert
   (
-  const Base<eT, T1>& A,
-  const Base<eT, T2>& B
+  const T1& A,
+  const T1& B
   )
   {
   coot_extra_debug_sigprint();
 
-  Mat<eT> out;
-  glue_join_cols::apply(out, A, B, "join_vert");
-  return out;
+  return Glue<T1, T2, glue_join_cols>(A, B, 1);
   }
 
 
@@ -64,7 +62,12 @@ join_vert
 template<typename eT, typename T1, typename T2>
 coot_warn_unused
 inline
-Mat<eT>
+typename
+enable_if2
+  <
+  (is_coot_type<T1>::value && is_coot_type<T2>::value && is_same_type<typename T1::elem_type, typename T2::elem_type>::value),
+  const Glue<T1, T2, glue_join_rows>
+  >::result
 join_rows
   (
   const Base<eT, T1>& A,
@@ -73,26 +76,27 @@ join_rows
   {
   coot_extra_debug_sigprint();
 
-  Mat<eT> out;
-  glue_join_rows::apply(out, A, B, "join_rows");
-  return out;
+  return Glue<T1, T2, glue_join_rows>(A, B, 0);
   }
 
 
 
-template<typename eT, typename T1, typename T2>
+template<typename T1, typename T2>
 coot_warn_unused
 inline
-Mat<eT>
+typename
+enable_if2
+  <
+  (is_coot_type<T1>::value && is_coot_type<T2>::value && is_same_type<typename T1::elem_type, typename T2::elem_type>::value),
+  const Glue<T1, T2, glue_join_rows>
+  >::result
 join_horiz
   {
-  const Base<eT, T1>& A,
-  const Base<eT, T2>& B
+  const T1& A,
+  const T2& B
   )
   {
   coot_extra_debug_sigprint();
 
-  Mat<eT> out;
-  glue_join_rows::apply(out, A, B, "join_horiz");
-  return out;
+  return Glue<T1, T2, glue_join_rows>(A, B, 1);
   }
