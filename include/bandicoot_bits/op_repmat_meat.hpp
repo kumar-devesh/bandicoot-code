@@ -46,6 +46,7 @@ op_repmat::apply(Mat<out_eT>& out, const Op<T1, op_repmat>& in)
   const uword copies_per_col = in.aux_uword_b;
 
   const unwrap<T1> U(in.m);
+  const extract_subview<typename unwrap<T1>::stored_type> E(U.M);
 
   if (U.is_alias(out))
     {
@@ -55,12 +56,12 @@ op_repmat::apply(Mat<out_eT>& out, const Op<T1, op_repmat>& in)
       return;
       }
 
-    Mat<typename T1::elem_type> tmp(U.M);
+    Mat<typename T1::elem_type> tmp(E.M);
     apply_noalias(out, tmp, copies_per_row, copies_per_col);
     }
   else
     {
-    apply_noalias(out, U.M, copies_per_row, copies_per_col);
+    apply_noalias(out, E.M, copies_per_row, copies_per_col);
     }
   }
 
@@ -77,6 +78,7 @@ op_repmat::apply(Mat<out_eT>& out, const Op<mtOp<out_eT, T1, mtop_conv_to>, op_r
   const uword copies_per_col = in.aux_uword_b;
 
   const unwrap<T1> U(in.m.q);
+  const extract_subview<typename unwrap<T1>::stored_type> E(U.M);
 
   if (U.is_alias(out))
     {
@@ -86,12 +88,12 @@ op_repmat::apply(Mat<out_eT>& out, const Op<mtOp<out_eT, T1, mtop_conv_to>, op_r
       return;
       }
 
-    Mat<typename T1::elem_type> tmp(U.M);
+    Mat<typename T1::elem_type> tmp(E.M);
     apply_noalias(out, tmp, copies_per_row, copies_per_col);
     }
   else
     {
-    apply_noalias(out, U.M, copies_per_row, copies_per_col);
+    apply_noalias(out, E.M, copies_per_row, copies_per_col);
     }
   }
 

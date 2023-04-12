@@ -68,34 +68,6 @@ op_min::apply(Mat<eT2>& out, const Op<T1, op_min>& in)
 
 
 
-template<typename eT>
-inline
-void
-op_min::apply(Mat<eT>& out, const Op<subview<eT>, op_min>& in)
-  {
-  coot_extra_debug_sigprint();
-
-  const uword dim = in.aux_uword_a;
-
-  coot_debug_check( (dim > 1), "min(): parameter 'dim' must be 0 or 1" );
-
-  if(&out != &(in.m.m))
-    {
-    // There are no type conversions here, so set post_conv_apply to false.
-    op_min::apply_noalias(out, in.m, dim, false);
-    }
-  else
-    {
-    Mat<eT> tmp;
-
-    op_min::apply_noalias(tmp, in.m, dim, false);
-
-    out.steal_mem(tmp);
-    }
-  }
-
-
-
 template<typename out_eT, typename in_eT>
 inline
 void

@@ -29,8 +29,11 @@ dot
   const unwrap<T1>    U(A.get_ref());
   const unwrap<T2>    V(B.get_ref());
 
-  const Mat<eT1>& X = U.M;
-  const Mat<eT2>& Y = V.M;
+  const extract_subview<typename unwrap<T1>::stored_type> E(U.M);
+  const extract_subview<typename unwrap<T2>::stored_type> F(V.M);
+
+  const Mat<eT1>& X = E.M;
+  const Mat<eT2>& Y = F.M;
 
   // check same size
 
