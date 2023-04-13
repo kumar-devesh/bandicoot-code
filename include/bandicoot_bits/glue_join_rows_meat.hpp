@@ -27,24 +27,24 @@ glue_join_rows::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_join_rows>& glue
   const no_conv_unwrap<T1> U1(glue.A);
   const no_conv_unwrap<T2> U2(glue.B);
 
-  const extract_subview<typename unwrap<T1>::stored_type> E1(U1.M);
-  const extract_subview<typename unwrap<T2>::stored_type> E2(U2.M);
+  const extract_subview<typename no_conv_unwrap<T1>::stored_type> E1(U1.M);
+  const extract_subview<typename no_conv_unwrap<T2>::stored_type> E2(U2.M);
 
   // check for same number of columns
-  const uword A_n_rows = X.n_rows;
-  const uword A_n_cols = X.n_cols;
+  const uword A_n_rows = E1.M.n_rows;
+  const uword A_n_cols = E1.M.n_cols;
 
-  const uword B_n_rows = Y.n_rows;
-  const uword B_n_cols = Y.n_cols;
+  const uword B_n_rows = E2.M.n_rows;
+  const uword B_n_cols = E2.M.n_cols;
 
   coot_debug_check
     (
-    ( (A_n_cols != B_n_cols) && ( (A_n_rows > 0) || (A_n_cols > 0) ) && ( (B_n_rows > 0) || (B_n_cols > 0) ) ),
-    func_name + ": number of columns must be the same in both objects"
+    ( (A_n_rows != B_n_rows) && ( (A_n_rows > 0) || (A_n_cols > 0) ) && ( (B_n_rows > 0) || (B_n_cols > 0) ) ),
+    func_name + ": number of rows must be the same"
     );
 
-  const uword new_n_rows = A_n_rows + B_n_rows;
-  const uword new_n_cols = (std::max)(A_n_cols, B_n_cols);
+  const uword new_n_rows = (std::max)(A_n_rows, B_n_rows);
+  const uword new_n_cols = A_n_cols + B_n_cols;
 
   // Shortcut: if there is nothing to do, leave early.
   if (new_n_rows == 0 || new_n_cols == 0)
@@ -56,13 +56,13 @@ glue_join_rows::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_join_rows>& glue
   if ((void_ptr(&out) == void_ptr(&E1.M)) || (void_ptr(&out) == void_ptr(&E2.M)))
     {
     Mat<out_eT> tmp(new_n_rows, new_n_cols);
-    coot_rt_t::join_rows(tmp.get_dev_mem(false), E1.M.get_dev_mem(false), E2.get_dev_mem(false), A_n_rows, A_n_cols, B_n_rows, B_n_cols, func_name);
+    coot_rt_t::join_rows(tmp.get_dev_mem(false), E1.M.get_dev_mem(false), E2.M.get_dev_mem(false), A_n_rows, A_n_cols, B_n_rows, B_n_cols);
     out.steal_mem(tmp);
     }
   else
     {
     out.set_size(new_n_rows, new_n_cols);
-    coot_rt_t::join_rows(out.get_dev_mem(false), E1.M.get_dev_mem(false), E2.get_dev_mem(false), A_n_rows, A_n_cols, B_n_rows, B_n_cols, func_name);
+    coot_rt_t::join_rows(out.get_dev_mem(false), E1.M.get_dev_mem(false), E2.M.get_dev_mem(false), A_n_rows, A_n_cols, B_n_rows, B_n_cols);
     }
   }
 
@@ -71,13 +71,13 @@ glue_join_rows::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_join_rows>& glue
 template<typename T1, typename T2>
 inline
 uword
-glue_join_rows::compute_n_rows(const Glue<T1, T2, glue_join_cols>& glue, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols)
+glue_join_rows::compute_n_rows(const Glue<T1, T2, glue_join_rows>& glue, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols)
   {
   coot_ignore(glue);
   coot_ignore(A_n_cols);
   coot_ignore(B_n_cols);
 
-  return A_n_rows + B_n_rows;
+  return (std::max)(A_n_rows, B_n_rows);
   }
 
 
@@ -85,11 +85,11 @@ glue_join_rows::compute_n_rows(const Glue<T1, T2, glue_join_cols>& glue, const u
 template<typename T1, typename T2>
 inline
 uword
-glue_join_rows::compute_n_cols(const Glue<T1, T2, glue_join_cols>& glue, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols)
+glue_join_rows::compute_n_cols(const Glue<T1, T2, glue_join_rows>& glue, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols)
   {
   coot_ignore(glue);
   coot_ignore(A_n_rows);
   coot_ignore(B_n_rows);
 
-  return (std::max)(A_n_cols, B_n_cols);
+  return A_n_cols + B_n_cols;
   }

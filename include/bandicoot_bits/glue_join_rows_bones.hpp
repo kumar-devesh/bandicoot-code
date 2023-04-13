@@ -20,6 +20,6 @@ struct glue_join_rows
   // Note that it's okay if T1 and T2 contain conversions.
   template<typename out_eT, typename T1, typename T2> static inline void apply(Mat<out_eT>& out, const Glue<T1, T2, glue_join_rows>& glue);
 
-  template<typename T1, typename T2> static inline uword compute_n_rows(const Glue<T1, T2, glue_join_cols>& glue, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols);
-  template<typename T1, typename T2> static inline uword compute_n_cols(const Glue<T1, T2, glue_join_cols>& glue, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols);
+  template<typename T1, typename T2> static inline uword compute_n_rows(const Glue<T1, T2, glue_join_rows>& glue, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols);
+  template<typename T1, typename T2> static inline uword compute_n_cols(const Glue<T1, T2, glue_join_rows>& glue, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols);
   };

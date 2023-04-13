@@ -49,7 +49,7 @@ enable_if2
 join_vert
   (
   const T1& A,
-  const T1& B
+  const T2& B
   )
   {
   coot_extra_debug_sigprint();
@@ -59,7 +59,7 @@ join_vert
 
 
 
-template<typename eT, typename T1, typename T2>
+template<typename T1, typename T2>
 coot_warn_unused
 inline
 typename
@@ -70,8 +70,8 @@ enable_if2
   >::result
 join_rows
   (
-  const Base<eT, T1>& A,
-  const Base<eT, T2>& B
+  const T1& A,
+  const T2& B
   )
   {
   coot_extra_debug_sigprint();
@@ -91,7 +91,7 @@ enable_if2
   const Glue<T1, T2, glue_join_rows>
   >::result
 join_horiz
-  {
+  (
   const T1& A,
   const T2& B
   )

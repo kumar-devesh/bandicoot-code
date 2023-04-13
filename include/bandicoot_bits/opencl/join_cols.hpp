@@ -23,39 +23,52 @@ join_cols(dev_mem_t<eT> out, const dev_mem_t<eT> A, const dev_mem_t<eT> B, const
 
   const uword out_n_rows = A_n_rows + B_n_rows;
 
-  const size_t zeros[3]    = { 0,                     0,                     0 };
-  const size_t B_dst[3]    = { A_n_rows * sizeof(eT), 0,                     0 };
-  const size_t A_region[3] = { A_n_rows * sizeof(eT), A_n_cols * sizeof(eT), 1 };
-  const size_t B_region[3] = { B_n_rows * sizeof(eT), B_n_cols * sizeof(eT), 1 };
+  const size_t zeros[3]    = { 0,                     0,        0 };
+  const size_t B_dst[3]    = { A_n_rows * sizeof(eT), 0,        0 };
+  const size_t A_region[3] = { A_n_rows * sizeof(eT), A_n_cols, 1 };
+  const size_t B_region[3] = { B_n_rows * sizeof(eT), B_n_cols, 1 };
+
+  const uword A_n_elem = A_n_rows * A_n_cols;
+  const uword B_n_elem = B_n_rows * B_n_cols;
 
   cl_int status;
   runtime_t::cq_guard guard;
 
-  status = clEnqueueCopyBufferRect(get_rt().cl_rt.get_cq(),
-                                   A.cl_mem_ptr,
-                                   out.cl_mem_ptr,
-                                   zeros, // origin is 0 for the first copy, for both input and output
-                                   zeros,
-                                   A_region,
-                                   A_n_rows,
-                                   0,
-                                   out_n_rows,
-                                   0,
-                                   NULL);
-  coot_check_cl_error(status, "coot::opencl::join_cols(): clEnqueueCopyBufferRect() failed for first argument");
+  if (A_n_elem > 0)
+    {
+    status = clEnqueueCopyBufferRect(get_rt().cl_rt.get_cq(),
+                                     A.cl_mem_ptr,
+                                     out.cl_mem_ptr,
+                                     zeros, // origin is 0 for the first copy, for both input and output
+                                     zeros,
+                                     A_region,
+                                     A_n_rows * sizeof(eT),
+                                     0,
+                                     out_n_rows * sizeof(eT),
+                                     0,
+                                     0,
+                                     NULL,
+                                     NULL);
+    coot_check_cl_error(status, "coot::opencl::join_cols(): clEnqueueCopyBufferRect() failed for first argument");
+    }
 
-  status = clEnqueueCopyBufferRect(get_rt().cl_rt.get_cq(),
-                                   B.cl_mem_ptr,
-                                   out.cl_mem_ptr,
-                                   zeros,
-                                   B_dst, // the B matrix is offset in memory
-                                   B_region,
-                                   B_n_rows,
-                                   0,
-                                   out_n_rows,
-                                   0,
-                                   NULL);
-  coot_check_cl_error(status, "coot::opencl::join_cols(): clEnqueueCopyBufferRect() failed for second argument");
+  if (B_n_elem > 0)
+    {
+    status = clEnqueueCopyBufferRect(get_rt().cl_rt.get_cq(),
+                                     B.cl_mem_ptr,
+                                     out.cl_mem_ptr,
+                                     zeros,
+                                     B_dst, // the B matrix is offset in memory
+                                     B_region,
+                                     B_n_rows * sizeof(eT),
+                                     0,
+                                     out_n_rows * sizeof(eT),
+                                     0,
+                                     0,
+                                     NULL,
+                                     NULL);
+    coot_check_cl_error(status, "coot::opencl::join_cols(): clEnqueueCopyBufferRect() failed for second argument");
+    }
   }
 
 

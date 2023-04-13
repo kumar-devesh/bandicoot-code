@@ -28,6 +28,7 @@ join_cols(dev_mem_t<eT> out, const dev_mem_t<eT> A, const dev_mem_t<eT> B, const
                         (A_n_rows + B_n_rows) * sizeof(eT),
                         (void*) A.cuda_mem_ptr,
                         A_n_rows * sizeof(eT),
+                        A_n_rows * sizeof(eT),
                         A_n_cols,
                         cudaMemcpyDeviceToDevice);
   coot_check_cuda_error(result, "coot::cuda::join_cols(): could not copy first argument");
@@ -35,6 +36,7 @@ join_cols(dev_mem_t<eT> out, const dev_mem_t<eT> A, const dev_mem_t<eT> B, const
   result = cudaMemcpy2D((void*) (out.cuda_mem_ptr + A_n_rows),
                         (A_n_rows + B_n_rows) * sizeof(eT),
                         (void*) B.cuda_mem_ptr,
+                        B_n_rows * sizeof(eT),
                         B_n_rows * sizeof(eT),
                         B_n_cols,
                         cudaMemcpyDeviceToDevice);

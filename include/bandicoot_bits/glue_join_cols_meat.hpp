@@ -27,15 +27,15 @@ glue_join_cols::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_join_cols>& glue
   const no_conv_unwrap<T1> U1(glue.A);
   const no_conv_unwrap<T2> U2(glue.B);
 
-  const extract_subview<typename unwrap<T1>::stored_type> E1(U1.M);
-  const extract_subview<typename unwrap<T2>::stored_type> E2(U2.M);
+  const extract_subview<typename no_conv_unwrap<T1>::stored_type> E1(U1.M);
+  const extract_subview<typename no_conv_unwrap<T2>::stored_type> E2(U2.M);
 
   // check for same number of columns
-  const uword A_n_rows = X.n_rows;
-  const uword A_n_cols = X.n_cols;
+  const uword A_n_rows = E1.M.n_rows;
+  const uword A_n_cols = E1.M.n_cols;
 
-  const uword B_n_rows = Y.n_rows;
-  const uword B_n_cols = Y.n_cols;
+  const uword B_n_rows = E2.M.n_rows;
+  const uword B_n_cols = E2.M.n_cols;
 
   coot_debug_check
     (
@@ -56,13 +56,13 @@ glue_join_cols::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_join_cols>& glue
   if ((void_ptr(&out) == void_ptr(&E1.M)) || (void_ptr(&out) == void_ptr(&E2.M)))
     {
     Mat<out_eT> tmp(new_n_rows, new_n_cols);
-    coot_rt_t::join_cols(tmp.get_dev_mem(false), E1.M.get_dev_mem(false), E2.get_dev_mem(false), A_n_rows, A_n_cols, B_n_rows, B_n_cols, func_name);
+    coot_rt_t::join_cols(tmp.get_dev_mem(false), E1.M.get_dev_mem(false), E2.M.get_dev_mem(false), A_n_rows, A_n_cols, B_n_rows, B_n_cols);
     out.steal_mem(tmp);
     }
   else
     {
     out.set_size(new_n_rows, new_n_cols);
-    coot_rt_t::join_cols(out.get_dev_mem(false), E1.M.get_dev_mem(false), E2.get_dev_mem(false), A_n_rows, A_n_cols, B_n_rows, B_n_cols, func_name);
+    coot_rt_t::join_cols(out.get_dev_mem(false), E1.M.get_dev_mem(false), E2.M.get_dev_mem(false), A_n_rows, A_n_cols, B_n_rows, B_n_cols);
     }
   }
 

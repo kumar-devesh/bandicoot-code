@@ -35,7 +35,7 @@ join_rows(dev_mem_t<eT> out, const dev_mem_t<eT> A, const dev_mem_t<eT> B, const
 
   result = cudaMemcpy((void*) (out.cuda_mem_ptr + A_n_elem),
                       (void*) B.cuda_mem_ptr,
-                      B_n_elem,
+                      B_n_elem * sizeof(eT),
                       cudaMemcpyDeviceToDevice);
   coot_check_cuda_error(result, "coot::cuda::join_rows(): could not copy second argument");
   }
@@ -45,7 +45,7 @@ join_rows(dev_mem_t<eT> out, const dev_mem_t<eT> A, const dev_mem_t<eT> B, const
 template<typename eT1, typename eT2, typename eT3>
 inline
 void
-join_cols(dev_mem_t<eT3> out, const dev_mem_t<eT1> A, const dev_mem_t<eT2> B, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols)
+join_rows(dev_mem_t<eT3> out, const dev_mem_t<eT1> A, const dev_mem_t<eT2> B, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols)
   {
   coot_extra_debug_sigprint();
 
