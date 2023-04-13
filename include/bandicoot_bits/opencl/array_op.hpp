@@ -25,7 +25,7 @@ array_op(dev_mem_t<eT3> out, const uword n_elem, dev_mem_t<eT1> in_a, dev_mem_t<
   coot_extra_debug_sigprint();
 
   // Get kernel.
-  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT1, eT2, eT3>(num);
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT3, eT2, eT1>(num);
 
   runtime_t::cq_guard guard;
 

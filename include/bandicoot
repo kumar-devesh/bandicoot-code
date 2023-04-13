@@ -231,6 +231,8 @@ namespace coot
   #include "bandicoot_bits/op_var_bones.hpp"
   #include "bandicoot_bits/op_stddev_bones.hpp"
   #include "bandicoot_bits/op_range_bones.hpp"
+  #include "bandicoot_bits/op_cov_bones.hpp"
+  #include "bandicoot_bits/op_cor_bones.hpp"
 
   #include "bandicoot_bits/mtop_conv_to_bones.hpp"
   #include "bandicoot_bits/mtop_all_bones.hpp"
@@ -238,6 +240,8 @@ namespace coot
   #include "bandicoot_bits/mtop_relational_bones.hpp"
 
   #include "bandicoot_bits/glue_times_bones.hpp"
+  #include "bandicoot_bits/glue_cov_bones.hpp"
+  #include "bandicoot_bits/glue_cor_bones.hpp"
 
   #include "bandicoot_bits/mtglue_relational_bones.hpp"
 
@@ -460,6 +464,8 @@ namespace coot
   #include "bandicoot_bits/fn_stddev.hpp"
   #include "bandicoot_bits/fn_var.hpp"
   #include "bandicoot_bits/fn_range.hpp"
+  #include "bandicoot_bits/fn_cov.hpp"
+  #include "bandicoot_bits/fn_cor.hpp"
 
 
   //
@@ -510,6 +516,8 @@ namespace coot
   #include "bandicoot_bits/op_var_meat.hpp"
   #include "bandicoot_bits/op_stddev_meat.hpp"
   #include "bandicoot_bits/op_range_meat.hpp"
+  #include "bandicoot_bits/op_cov_meat.hpp"
+  #include "bandicoot_bits/op_cor_meat.hpp"
 
   #include "bandicoot_bits/mtop_conv_to_meat.hpp"
   #include "bandicoot_bits/mtop_all_meat.hpp"
@@ -517,6 +525,8 @@ namespace coot
   #include "bandicoot_bits/mtop_relational_meat.hpp"
 
   #include "bandicoot_bits/glue_times_meat.hpp"
+  #include "bandicoot_bits/glue_cov_meat.hpp"
+  #include "bandicoot_bits/glue_cor_meat.hpp"
 
   #include "bandicoot_bits/mtglue_relational_meat.hpp"
 

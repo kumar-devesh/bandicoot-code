@@ -76,3 +76,43 @@ op_stddev::apply(Mat<out_eT>& out, const Op<T1, op_stddev>& in, const typename e
   // Now take the square root.
   coot_rt_t::eop_scalar(out.get_dev_mem(false), tmp.get_dev_mem(false), out.n_elem, eT(0), out_eT(0), twoway_kernel_id::equ_array_sqrt_post);
   }
+
+
+
+template<typename T1>
+inline
+uword
+op_stddev::compute_n_rows(const Op<T1, op_stddev>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(in_n_cols);
+
+  const uword dim = op.aux_uword_b;
+  if (dim == 0)
+    {
+    return std::min(in_n_rows, uword(1)); // either 0 or 1
+    }
+  else
+    {
+    return in_n_rows;
+    }
+  }
+
+
+
+template<typename T1>
+inline
+uword
+op_stddev::compute_n_cols(const Op<T1, op_stddev>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(in_n_rows);
+
+  const uword dim = op.aux_uword_b;
+  if (dim == 0)
+    {
+    return in_n_cols;
+    }
+  else
+    {
+    return std::min(in_n_cols, uword(1)); // either 0 or 1
+    }
+  }

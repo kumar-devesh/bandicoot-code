@@ -97,6 +97,8 @@ class op_median;
 class op_stddev;
 class op_var;
 class op_range;
+class op_cov;
+class op_cor;
 
 class mtop_conv_to;
 class mtop_all;
@@ -125,6 +127,8 @@ class eglue_div;
 
 class glue_times;
 class glue_times_diag;
+class glue_cov;
+class glue_cor;
 
 class glue_mixed_plus;
 class glue_mixed_minus;
