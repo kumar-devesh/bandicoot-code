@@ -90,7 +90,8 @@ eop_core<eop_type>::apply(Mat<eT>& out, const eOp<T1, eop_type>& x)
   if (!force_conv_unwrap)
     {
     const no_conv_unwrap<typename SizeProxy<T1>::stored_type> U(x.m.Q);
-    const Mat<in_eT>& A = U.M;
+    const extract_subview<typename no_conv_unwrap<typename SizeProxy<T1>::stored_type>::stored_type> E(U.M);
+    const Mat<in_eT>& A = E.M;
 
     dev_mem_t<in_eT> A_dev_mem = A.get_dev_mem(false);
 
@@ -100,7 +101,8 @@ eop_core<eop_type>::apply(Mat<eT>& out, const eOp<T1, eop_type>& x)
     {
     // We have to perform any conversion before this level.
     const unwrap<typename SizeProxy<T1>::stored_type> U(x.m.Q);
-    const Mat<typename T1::elem_type>& A = U.M;
+    const extract_subview<typename unwrap<typename SizeProxy<T1>::stored_type>::stored_type> E(U.M);
+    const Mat<typename T1::elem_type>& A = E.M;
 
     dev_mem_t<typename T1::elem_type> A_dev_mem = A.get_dev_mem(false);
 
@@ -128,7 +130,8 @@ eop_core<eop_type>::apply(Mat<eT>& out, const eOp<mtOp<eT, eOp<T2, eop_type>, mt
   const twoway_kernel_id::enum_id kernel_num = eop_type::kernel_conv_post;
 
   const unwrap<T2> U(X.m.Q.q.m.Q);
-  const Mat<in_eT>& A = U.M;
+  const extract_subview<typename unwrap<T2>::stored_type> E(U.M);
+  const Mat<in_eT>& A = E.M;
 
   dev_mem_t<eT>    out_dev_mem = out.get_dev_mem(false);
   dev_mem_t<in_eT>   A_dev_mem =   A.get_dev_mem(false);

@@ -23,14 +23,13 @@ op_stddev::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_stddev>& in)
 
   typedef typename T1::elem_type eT;
 
-  unwrap<T1> U(in.m);
-
   const uword norm_type = in.aux_uword_a;
   const uword dim = in.aux_uword_b;
 
   // The kernels we have don't operate on subviews, or aliases.
-  extract_subview<typename unwrap<T1>::stored_type> E(U.M);
-  copy_alias<eT> C(E.M, out);
+  const unwrap<T1> U(in.m);
+  const extract_subview<typename unwrap<T1>::stored_type> E(U.M);
+  const copy_alias<eT> C(E.M, out);
 
   // First compute the variance.
   op_var::apply_direct(out, C.M, dim, norm_type);
@@ -60,7 +59,7 @@ op_stddev::apply(Mat<out_eT>& out, const Op<T1, op_stddev>& in, const typename e
   const uword norm_type = in.aux_uword_a;
   const uword dim = in.aux_uword_b;
 
-  unwrap<T1> U(in.m);
+  const unwrap<T1> U(in.m);
 
   // If there is a type conversion, we must first compute using the original element type, and then convert in the last step.
   Mat<eT> tmp;

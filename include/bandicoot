@@ -402,8 +402,8 @@ namespace coot
   //
   // classes that underlay metaprogramming
 
-  #include "bandicoot_bits/no_conv_unwrap.hpp"
   #include "bandicoot_bits/unwrap.hpp"
+  #include "bandicoot_bits/no_conv_unwrap.hpp"
   #include "bandicoot_bits/SizeProxy.hpp"
   #include "bandicoot_bits/strip.hpp"
   #include "bandicoot_bits/extract_subview.hpp"

@@ -24,6 +24,7 @@ op_resize::apply(Mat<out_eT>& out, const Op<T1, op_resize>& in)
   const uword new_n_cols = in.aux_uword_b;
 
   const unwrap<T1> U(in.m);
+  const extract_subview<typename unwrap<T1>::stored_type> E(U.M);
 
   if (U.is_alias(out) && std::is_same<out_eT, typename T1::elem_type>::value)
     {
@@ -31,7 +32,7 @@ op_resize::apply(Mat<out_eT>& out, const Op<T1, op_resize>& in)
     }
   else
     {
-    op_resize::apply_mat_noalias(out, U.M, new_n_rows, new_n_cols);
+    op_resize::apply_mat_noalias(out, E.M, new_n_rows, new_n_cols);
     }
   }
 
@@ -48,9 +49,10 @@ op_resize::apply(Mat<out_eT>& out, const Op<mtOp<out_eT, T1, mtop_conv_to>, op_r
   const uword new_n_cols = in.aux_uword_b;
 
   const unwrap<T1> U(in.m.q);
+  const extract_subview<typename unwrap<T1>::stored_type> E(U.M);
 
   // Aliases aren't possible if the types are different (which is the only way an mtOp will get made).
-  op_resize::apply_mat_noalias(out, U.M, new_n_rows, new_n_cols);
+  op_resize::apply_mat_noalias(out, E.M, new_n_rows, new_n_cols);
   }
 
 

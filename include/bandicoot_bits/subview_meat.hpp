@@ -186,14 +186,14 @@ subview<eT>::inplace_op(const Base<eT, T1>& in, twoway_kernel_id::enum_id num, c
   {
   coot_extra_debug_sigprint();
 
-  const no_conv_unwrap<T1> U(in.get_ref());
-  const typename no_conv_unwrap<T1>::stored_type X = U.M;
+  const no_conv_unwrap<T1>                                        U(in.get_ref());
+  const extract_subview<typename no_conv_unwrap<T1>::stored_type> E(U.M);
 
-  coot_assert_same_size(n_rows, n_cols, X.n_rows, X.n_cols, identifier);
+  coot_assert_same_size(n_rows, n_cols, E.M.n_rows, E.M.n_cols, identifier);
 
   if(n_elem == 0)  { return; }
 
-  coot_rt_t::inplace_op_subview(m.get_dev_mem(false), X.get_dev_mem(false), m.n_rows, aux_row1, aux_col1, X.n_rows, X.n_cols, num, identifier);
+  coot_rt_t::inplace_op_subview(m.get_dev_mem(false), E.M.get_dev_mem(false), m.n_rows, aux_row1, aux_col1, E.M.n_rows, E.M.n_cols, num, identifier);
   }
 
 
@@ -305,14 +305,14 @@ subview<eT>::inplace_op(const mtOp<eT, T1, mtop_conv_to>& x, twoway_kernel_id::e
   coot_extra_debug_sigprint();
 
   // Avoid explicitly performing the conv_to so we can incorporate it into our operation here.
-  const no_conv_unwrap<T1>   U(x.q);
-  const Mat<typename T1::elem_type>& X = U.M;
+  const no_conv_unwrap<T1>                                        U(x.q);
+  const extract_subview<typename no_conv_unwrap<T1>::stored_type> E(U.M);
 
-  coot_assert_same_size(n_rows, n_cols, X.n_rows, X.n_cols, identifier);
+  coot_assert_same_size(n_rows, n_cols, E.M.n_rows, E.M.n_cols, identifier);
 
   if(n_elem == 0)  { return; }
 
-  coot_rt_t::inplace_op_subview(m.get_dev_mem(false), X.get_dev_mem(false), m.n_rows, aux_row1, aux_col1, X.n_rows, X.n_cols, num, identifier);
+  coot_rt_t::inplace_op_subview(m.get_dev_mem(false), E.M.get_dev_mem(false), m.n_rows, aux_row1, aux_col1, E.M.n_rows, E.M.n_cols, num, identifier);
   }
 
 

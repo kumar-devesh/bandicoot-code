@@ -25,7 +25,8 @@ trace(const Base<typename T1::elem_type, T1>& X)
   typedef typename T1::elem_type eT;
 
   const unwrap<T1>   U(X.get_ref());
-  const Mat<eT>& A = U.M;
+  const extract_subview<typename unwrap<T1>::stored_type> E(U.M);
+  const Mat<eT>& A = E.M;
 
   if(A.n_elem == 0)  { return eT(0); }
 

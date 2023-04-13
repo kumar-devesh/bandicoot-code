@@ -25,7 +25,9 @@ op_vectorise_col::apply(Mat<out_eT>& out, const Op<T1,op_vectorise_col>& in)
   {
   coot_extra_debug_sigprint();
 
-  op_vectorise_col::apply_direct(out, in.m);
+  const unwrap<T1> U(in.m);
+
+  op_vectorise_col::apply_direct(out, U.M);
   }
 
 
@@ -190,7 +192,9 @@ op_vectorise_row::apply(Mat<out_eT>& out, const Op<T1,op_vectorise_row>& in)
   {
   coot_extra_debug_sigprint();
 
-  op_vectorise_row::apply_direct(out, in.m);
+  const unwrap<T1> U(in.m);
+
+  op_vectorise_row::apply_direct(out, U.M);
   }
 
 
