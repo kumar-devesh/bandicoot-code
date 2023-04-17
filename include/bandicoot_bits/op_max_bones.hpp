@@ -26,9 +26,6 @@ class op_max
   template<typename eT2, typename T1>
   inline static void apply(Mat<eT2>& out, const Op<T1, op_max>& in);
 
-  template<typename eT>
-  inline static void apply(Mat<eT>& out, const Op<subview<eT>, op_max>& in);
-
   template<typename out_eT, typename in_eT>
   inline static void apply_noalias(Mat<out_eT>& out, const Mat<in_eT>& A, const uword dim, const bool post_conv_apply);
 

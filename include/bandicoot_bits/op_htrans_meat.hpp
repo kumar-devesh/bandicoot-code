@@ -22,6 +22,7 @@ op_htrans::apply(Mat<out_eT>& out, const Op<T1, op_htrans>& in)
   coot_extra_debug_sigprint();
 
   const no_conv_unwrap<T1> U(in.m);
+  const extract_subview<typename no_conv_unwrap<T1>::stored_type> E(U.M);
 
   if(U.is_alias(out))
     {
@@ -29,12 +30,12 @@ op_htrans::apply(Mat<out_eT>& out, const Op<T1, op_htrans>& in)
 
     // TODO: inplace implementation?
     Mat<out_eT> tmp;
-    op_htrans::apply_noalias(tmp, U.M);
+    op_htrans::apply_noalias(tmp, E.M);
     out.steal_mem(tmp);
     }
   else
     {
-    op_htrans::apply_noalias(out, U.M);
+    op_htrans::apply_noalias(out, E.M);
     }
   }
 
@@ -103,17 +104,18 @@ op_htrans2::apply(Mat<out_eT>& out, const Op<T1, op_htrans2>& in)
   coot_extra_debug_sigprint();
 
   const no_conv_unwrap<T1> U(in.m);
+  const extract_subview<typename no_conv_unwrap<T1>::stored_type> E(U.M);
 
   if(U.is_alias(out))
     {
     // TODO: implement inplace version?
     Mat<out_eT> tmp;
-    op_htrans2::apply_noalias(tmp, U.M, in.aux);
+    op_htrans2::apply_noalias(tmp, E.M, in.aux);
     out.steal_mem(tmp);
     }
   else
     {
-    op_htrans2::apply_noalias(out, U.M, in.aux);
+    op_htrans2::apply_noalias(out, E.M, in.aux);
     }
   }
 

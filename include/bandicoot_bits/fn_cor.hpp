@@ -1,4 +1,4 @@
-// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2023 Ryan Curtin (http://www.ratml.org)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,22 +17,27 @@
 template<typename T1>
 coot_warn_unused
 inline
-typename T1::elem_type
-as_scalar(const Base<typename T1::elem_type, T1>& X)
+const Op<T1, op_cor>
+cor(const Base<typename T1::elem_type, T1>& X, const uword norm_type = 0)
   {
   coot_extra_debug_sigprint();
 
-  typedef typename T1::elem_type eT;
+  coot_debug_check( (norm_type > 1), "cor(): parameter 'norm_type' must be 0 or 1" );
 
-  const no_conv_unwrap<T1> U(X.get_ref());
-  const typename no_conv_unwrap<T1>::stored_type& A = U.M;
+  return Op<T1, op_cor>(X.get_ref(), norm_type, 0);
+  }
 
-  if(A.n_elem != 1)
-    {
-    coot_debug_check(true, "as_scalar(): expression doesn't evaluate to exactly one element");
 
-    return Datum<eT>::nan;
-    }
 
-  return eT(A(0,0));
+template<typename T1, typename T2>
+coot_warn_unused
+inline
+const Glue<T1, T2, glue_cor>
+cor(const Base<typename T1::elem_type, T1>& A, const Base<typename T1::elem_type, T2>& B, const uword norm_type = 0)
+  {
+  coot_extra_debug_sigprint();
+
+  coot_debug_check( (norm_type > 1), "cor(): parameter 'norm_type' must be 0 or 1" );
+
+  return Glue<T1, T2, glue_cor>(A.get_ref(), B.get_ref(), norm_type);
   }

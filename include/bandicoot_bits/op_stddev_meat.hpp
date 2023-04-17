@@ -23,14 +23,13 @@ op_stddev::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_stddev>& in)
 
   typedef typename T1::elem_type eT;
 
-  unwrap<T1> U(in.m);
-
   const uword norm_type = in.aux_uword_a;
   const uword dim = in.aux_uword_b;
 
   // The kernels we have don't operate on subviews, or aliases.
-  extract_subview<typename unwrap<T1>::stored_type> E(U.M);
-  copy_alias<eT> C(E.M, out);
+  const unwrap<T1> U(in.m);
+  const extract_subview<typename unwrap<T1>::stored_type> E(U.M);
+  const copy_alias<eT> C(E.M, out);
 
   // First compute the variance.
   op_var::apply_direct(out, C.M, dim, norm_type);
@@ -60,7 +59,7 @@ op_stddev::apply(Mat<out_eT>& out, const Op<T1, op_stddev>& in, const typename e
   const uword norm_type = in.aux_uword_a;
   const uword dim = in.aux_uword_b;
 
-  unwrap<T1> U(in.m);
+  const unwrap<T1> U(in.m);
 
   // If there is a type conversion, we must first compute using the original element type, and then convert in the last step.
   Mat<eT> tmp;
@@ -75,4 +74,44 @@ op_stddev::apply(Mat<out_eT>& out, const Op<T1, op_stddev>& in, const typename e
 
   // Now take the square root.
   coot_rt_t::eop_scalar(out.get_dev_mem(false), tmp.get_dev_mem(false), out.n_elem, eT(0), out_eT(0), twoway_kernel_id::equ_array_sqrt_post);
+  }
+
+
+
+template<typename T1>
+inline
+uword
+op_stddev::compute_n_rows(const Op<T1, op_stddev>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(in_n_cols);
+
+  const uword dim = op.aux_uword_b;
+  if (dim == 0)
+    {
+    return std::min(in_n_rows, uword(1)); // either 0 or 1
+    }
+  else
+    {
+    return in_n_rows;
+    }
+  }
+
+
+
+template<typename T1>
+inline
+uword
+op_stddev::compute_n_cols(const Op<T1, op_stddev>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(in_n_rows);
+
+  const uword dim = op.aux_uword_b;
+  if (dim == 0)
+    {
+    return in_n_cols;
+    }
+  else
+    {
+    return std::min(in_n_cols, uword(1)); // either 0 or 1
+    }
   }

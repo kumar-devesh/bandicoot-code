@@ -69,3 +69,64 @@ struct strip_diagmat< eOp<Op<T1, op_diagmat>, eop_type> >
 
   const eOp<T1, eop_type> M;
   };
+
+
+
+// transposes are still diagonal
+// NOTE: this could have problems with complex elements
+template<typename T1>
+struct strip_diagmat< Op<Op<T1, op_diagmat>, op_htrans> >
+  {
+  typedef T1 stored_type;
+
+  inline
+  strip_diagmat(const Op<Op<T1, op_diagmat>, op_htrans>& X)
+    : M(X.m.m)
+    {
+    coot_extra_debug_sigprint();
+    }
+
+  static constexpr bool do_diagmat = true;
+
+  const T1& M;
+  };
+
+
+
+// transposes are still diagonal
+template<typename T1>
+struct strip_diagmat< Op<Op<T1, op_diagmat>, op_strans> >
+  {
+  typedef T1 stored_type;
+
+  inline
+  strip_diagmat(const Op<Op<T1, op_diagmat>, op_strans>& X)
+    : M(X.m.m)
+    {
+    coot_extra_debug_sigprint();
+    }
+
+  static constexpr bool do_diagmat = true;
+
+  const T1& M;
+  };
+
+
+
+// rewrite scalar * X.t() as scalar * X
+template<typename T1>
+struct strip_diagmat< Op<Op<T1, op_diagmat>, op_htrans2> >
+  {
+  typedef eOp<T1, eop_scalar_times> stored_type;
+
+  inline
+  strip_diagmat(const Op<Op<T1, op_diagmat>, op_htrans2>& X)
+    : M(X.m.m, X.aux)
+    {
+    coot_extra_debug_sigprint();
+    }
+
+  static constexpr bool do_diagmat = true;
+
+  const eOp<T1, eop_scalar_times> M;
+  };

@@ -201,6 +201,33 @@ class SizeProxy< subview_row<eT> >
 
 
 
+template<typename eT>
+class SizeProxy< diagview<eT> >
+  {
+  public:
+
+  typedef eT                                       elem_type;
+  typedef typename get_pod_type<elem_type>::result pod_type;
+  typedef diagview<eT>                             stored_type;
+
+  static const bool is_row = false;
+  static const bool is_col = true;
+
+  coot_aligned const diagview<eT>& Q;
+
+  inline explicit SizeProxy(const diagview<eT>& A)
+    : Q(A)
+    {
+    coot_extra_debug_sigprint();
+    }
+
+  coot_aligned uword get_n_rows() const { return Q.n_rows; }
+  coot_aligned uword get_n_cols() const { return 1; }
+  coot_aligned uword get_n_elem() const { return Q.n_elem; }
+  };
+
+
+
 // eOp
 template<typename T1, typename eop_type>
 class SizeProxy< eOp<T1, eop_type> >

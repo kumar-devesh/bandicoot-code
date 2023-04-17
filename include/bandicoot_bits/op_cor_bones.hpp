@@ -1,4 +1,4 @@
-// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2023 Ryan Curtin (https://www.ratml.org)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,25 +14,14 @@
 
 
 
-template<typename T1>
-coot_warn_unused
-inline
-typename T1::elem_type
-as_scalar(const Base<typename T1::elem_type, T1>& X)
+class op_cor
+  : public traits_op_default
   {
-  coot_extra_debug_sigprint();
+  public:
 
-  typedef typename T1::elem_type eT;
+  template<typename out_eT, typename T1> inline static void apply(Mat<out_eT>& out, const Op<T1, op_cor>& in);
+  template<typename out_eT, typename T1> inline static void apply(Mat<out_eT>& out, const Op<mtOp<out_eT, T1, mtop_conv_to>, op_cor>& in);
 
-  const no_conv_unwrap<T1> U(X.get_ref());
-  const typename no_conv_unwrap<T1>::stored_type& A = U.M;
-
-  if(A.n_elem != 1)
-    {
-    coot_debug_check(true, "as_scalar(): expression doesn't evaluate to exactly one element");
-
-    return Datum<eT>::nan;
-    }
-
-  return eT(A(0,0));
-  }
+  template<typename T1> inline static uword compute_n_rows(const Op<T1, op_cor>& op, const uword in_n_rows, const uword in_n_cols);
+  template<typename T1> inline static uword compute_n_cols(const Op<T1, op_cor>& op, const uword in_n_rows, const uword in_n_cols);
+  };

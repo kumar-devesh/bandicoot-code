@@ -140,6 +140,19 @@ struct is_subview_col< const subview_col<eT> >
   { static const bool value = true; };
 
 
+template<typename T>
+struct is_diagview
+  { static const bool value = false; };
+
+template<typename eT>
+struct is_diagview< diagview<eT> >
+  { static const bool value = true; };
+
+template<typename eT>
+struct is_diagview< const diagview<eT> >
+  { static const bool value = true; };
+
+
 
 //
 //
@@ -325,6 +338,7 @@ struct is_coot_type
   || is_subview<T1>::value
   || is_subview_col<T1>::value
   || is_subview_row<T1>::value
+  || is_diagview<T1>::value
   ;
   };
 

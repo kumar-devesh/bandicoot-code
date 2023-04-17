@@ -14,20 +14,15 @@
 
 
 
-template<typename T1>
+template<typename eT>
 coot_warn_unused
 inline
-typename T1::elem_type
-accu(const Base<typename T1::elem_type, T1>& X)
+eT
+accu(const Mat<eT>& A)
   {
   coot_extra_debug_sigprint();
 
-  typedef typename T1::elem_type eT;
-
-  const unwrap<T1>   U(X.get_ref());
-  const Mat<eT>& A = U.M;
-
-  if(A.n_elem == 0)  { return eT(0); }
+  if (A.n_elem == 0) { return eT(0); }
 
   return coot_rt_t::accu(A.get_dev_mem(false), A.n_elem);
   }
@@ -45,4 +40,18 @@ accu(const subview<eT>& S)
   if(S.n_elem == 0)  { return eT(0); }
 
   return coot_rt_t::accu_subview(S.m.get_dev_mem(false), S.m.n_rows, S.aux_row1, S.aux_col1, S.n_rows, S.n_cols);
+  }
+
+
+
+template<typename T1>
+coot_warn_unused
+inline
+typename T1::elem_type
+accu(const Base<typename T1::elem_type, T1>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  const unwrap<T1> U(X.get_ref());
+  return accu(U.M);
   }

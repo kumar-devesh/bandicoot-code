@@ -68,34 +68,6 @@ op_sum::apply(Mat<out_eT>& out, const Op<T1, op_sum>& in)
 
 
 
-template<typename eT>
-inline
-void
-op_sum::apply(Mat<eT>& out, const Op<subview<eT>, op_sum>& in)
-  {
-  coot_extra_debug_sigprint();
-
-  const uword dim = in.aux_uword_a;
-
-  coot_debug_check( (dim > 1), "sum(): parameter 'dim' must be 0 or 1" );
-
-  if(&out != &(in.m.m))
-    {
-    // There are no type conversions here, so set post_conv_apply to false.
-    op_sum::apply_noalias(out, in.m, dim, false);
-    }
-  else
-    {
-    Mat<eT> tmp;
-
-    op_sum::apply_noalias(tmp, in.m, dim, false);
-
-    out.steal_mem(tmp);
-    }
-  }
-
-
-
 template<typename out_eT, typename in_eT>
 inline
 void
