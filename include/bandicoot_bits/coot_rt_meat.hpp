@@ -2548,17 +2548,17 @@ coot_rt_t::var_vec_subview(const dev_mem_t<eT> mem, const eT mean, const uword M
 
 
 
-template<typename eT1, typename eT2, typename eT3>
+template<typename eT1, typename eT2, typename eT3, typename eT4, typename eT5>
 inline
 void
-coot_rt_t::join_cols(dev_mem_t<eT3> out, const dev_mem_t<eT1> A, const dev_mem_t<eT2> B, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols)
+coot_rt_t::join_cols(dev_mem_t<eT5> out, const dev_mem_t<eT1> A, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<eT2> B, const uword B_n_rows, const uword B_n_cols, const dev_mem_t<eT3> C, const uword C_n_rows, const uword C_n_cols, const dev_mem_t<eT4> D, const uword D_n_rows, const uword D_n_cols)
   {
   coot_extra_debug_sigprint();
 
   if (get_rt().backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
-    opencl::join_cols(out, A, B, A_n_rows, A_n_cols, B_n_rows, B_n_cols);
+    opencl::join_cols(out, A, A_n_rows, A_n_cols, B, B_n_rows, B_n_cols, C, C_n_rows, C_n_cols, D, D_n_rows, D_n_cols);
     #else
     coot_stop_runtime_error("coot_rt::join_cols(): OpenCL backend not enabled");
     #endif
@@ -2566,7 +2566,7 @@ coot_rt_t::join_cols(dev_mem_t<eT3> out, const dev_mem_t<eT1> A, const dev_mem_t
   else if (get_rt().backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    cuda::join_cols(out, A, B, A_n_rows, A_n_cols, B_n_rows, B_n_cols);
+    cuda::join_cols(out, A, A_n_rows, A_n_cols, B, B_n_rows, B_n_cols, C, C_n_rows, C_n_cols, D, D_n_rows, D_n_cols);
     #else
     coot_stop_runtime_error("coot_rt::join_cols(): CUDA backend not enabled");
     #endif
@@ -2579,17 +2579,17 @@ coot_rt_t::join_cols(dev_mem_t<eT3> out, const dev_mem_t<eT1> A, const dev_mem_t
 
 
 
-template<typename eT1, typename eT2, typename eT3>
+template<typename eT1, typename eT2, typename eT3, typename eT4, typename eT5>
 inline
 void
-coot_rt_t::join_rows(dev_mem_t<eT3> out, const dev_mem_t<eT1> A, const dev_mem_t<eT2> B, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols)
+coot_rt_t::join_rows(dev_mem_t<eT5> out, const dev_mem_t<eT1> A, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<eT2> B, const uword B_n_rows, const uword B_n_cols, const dev_mem_t<eT3> C, const uword C_n_rows, const uword C_n_cols, const dev_mem_t<eT4> D, const uword D_n_rows, const uword D_n_cols)
   {
   coot_extra_debug_sigprint();
 
   if (get_rt().backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
-    opencl::join_rows(out, A, B, A_n_rows, A_n_cols, B_n_rows, B_n_cols);
+    opencl::join_rows(out, A, A_n_rows, A_n_cols, B, B_n_rows, B_n_cols, C, C_n_rows, C_n_cols, D, D_n_rows, D_n_cols);
     #else
     coot_stop_runtime_error("coot_rt::join_rows(): OpenCL backend not enabled");
     #endif
@@ -2597,7 +2597,7 @@ coot_rt_t::join_rows(dev_mem_t<eT3> out, const dev_mem_t<eT1> A, const dev_mem_t
   else if (get_rt().backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    cuda::join_rows(out, A, B, A_n_rows, A_n_cols, B_n_rows, B_n_cols);
+    cuda::join_rows(out, A, A_n_rows, A_n_cols, B, B_n_rows, B_n_cols, C, C_n_rows, C_n_cols, D, D_n_rows, D_n_cols);
     #else
     coot_stop_runtime_error("coot_rt::join_rows(): CUDA backend not enabled");
     #endif

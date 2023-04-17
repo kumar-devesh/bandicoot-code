@@ -56,13 +56,21 @@ glue_join_rows::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_join_rows>& glue
   if ((void_ptr(&out) == void_ptr(&E1.M)) || (void_ptr(&out) == void_ptr(&E2.M)))
     {
     Mat<out_eT> tmp(new_n_rows, new_n_cols);
-    coot_rt_t::join_rows(tmp.get_dev_mem(false), E1.M.get_dev_mem(false), E2.M.get_dev_mem(false), A_n_rows, A_n_cols, B_n_rows, B_n_cols);
+    coot_rt_t::join_rows(tmp.get_dev_mem(false),
+                         E1.M.get_dev_mem(false), A_n_rows, A_n_cols,
+                         E2.M.get_dev_mem(false), B_n_rows, B_n_cols,
+                         E1.M.get_dev_mem(false), 0, 0, /* ignored */
+                         E1.M.get_dev_mem(false), 0, 0 /* ignored */);
     out.steal_mem(tmp);
     }
   else
     {
     out.set_size(new_n_rows, new_n_cols);
-    coot_rt_t::join_rows(out.get_dev_mem(false), E1.M.get_dev_mem(false), E2.M.get_dev_mem(false), A_n_rows, A_n_cols, B_n_rows, B_n_cols);
+    coot_rt_t::join_rows(out.get_dev_mem(false),
+                         E1.M.get_dev_mem(false), A_n_rows, A_n_cols,
+                         E2.M.get_dev_mem(false), B_n_rows, B_n_cols,
+                         E1.M.get_dev_mem(false), 0, 0, /* ignored */
+                         E1.M.get_dev_mem(false), 0, 0 /* ignored */);
     }
   }
 

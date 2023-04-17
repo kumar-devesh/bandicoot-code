@@ -100,3 +100,171 @@ join_horiz
 
   return Glue<T1, T2, glue_join_rows>(A, B, 1);
   }
+
+
+
+// higher-arity calls (no delayed evaluation here)
+
+
+
+template<typename eT, typename T1, typename T2, typename T3>
+coot_warn_unused
+inline
+Mat<eT>
+join_cols
+  (
+  const Base<eT, T1>& A,
+  const Base<eT, T2>& B,
+  const Base<eT, T3>& C
+  )
+  {
+  coot_extra_debug_sigprint();
+
+  Mat<eT> result;
+  glue_join_cols::apply(result, A.get_ref(), B.get_ref(), C.get_ref(), "join_cols()");
+  return result;
+  }
+
+
+
+template<typename eT, typename T1, typename T2, typename T3, typename T4>
+coot_warn_unused
+inline
+Mat<eT>
+join_cols
+  (
+  const Base<eT, T1>& A,
+  const Base<eT, T2>& B,
+  const Base<eT, T3>& C,
+  const Base<eT, T4>& D
+  )
+  {
+  coot_extra_debug_sigprint();
+
+  Mat<eT> result;
+  glue_join_cols::apply(result, A.get_ref(), B.get_ref(), C.get_ref(), D.get_ref(), "join_cols()");
+  return result;
+  }
+
+
+
+template<typename eT, typename T1, typename T2, typename T3>
+coot_warn_unused
+inline
+Mat<eT>
+join_vert
+  (
+  const Base<eT, T1>& A,
+  const Base<eT, T2>& B,
+  const Base<eT, T3>& C
+  )
+  {
+  coot_extra_debug_sigprint();
+
+  Mat<eT> result;
+  glue_join_cols::apply(result, A.get_ref(), B.get_ref(), C.get_ref(), "join_vert()");
+  return result;
+  }
+
+
+
+template<typename eT, typename T1, typename T2, typename T3, typename T4>
+coot_warn_unused
+inline
+Mat<eT>
+join_vert
+  (
+  const Base<eT, T1>& A,
+  const Base<eT, T2>& B,
+  const Base<eT, T3>& C,
+  const Base<eT, T4>& D
+  )
+  {
+  coot_extra_debug_sigprint();
+
+  Mat<eT> result;
+  glue_join_cols::apply(result, A.get_ref(), B.get_ref(), C.get_ref(), D.get_ref(), "join_vert()");
+  return result;
+  }
+
+
+
+template<typename eT, typename T1, typename T2, typename T3>
+coot_warn_unused
+inline
+Mat<eT>
+join_rows
+  (
+  const Base<eT, T1>& A,
+  const Base<eT, T2>& B,
+  const Base<eT, T3>& C
+  )
+  {
+  coot_extra_debug_sigprint();
+
+  Mat<eT> result;
+  glue_join_rows::apply(result, A.get_ref(), B.get_ref(), C.get_ref(), "join_rows()");
+  return result;
+  }
+
+
+
+template<typename eT, typename T1, typename T2, typename T3, typename T4>
+coot_warn_unused
+inline
+Mat<eT>
+join_rows
+  (
+  const Base<eT, T1>& A,
+  const Base<eT, T2>& B,
+  const Base<eT, T3>& C,
+  const Base<eT, T4>& D
+  )
+  {
+  coot_extra_debug_sigprint();
+
+  Mat<eT> result;
+  glue_join_rows::apply(result, A.get_ref(), B.get_ref(), C.get_ref(), D.get_ref(), "join_rows()");
+  return result;
+  }
+
+
+
+template<typename eT, typename T1, typename T2, typename T3>
+coot_warn_unused
+inline
+Mat<eT>
+join_horiz
+  (
+  const Base<eT, T1>& A,
+  const Base<eT, T2>& B,
+  const Base<eT, T3>& C
+  )
+  {
+  coot_extra_debug_sigprint();
+
+  Mat<eT> result;
+  glue_join_rows::apply(result, A.get_ref(), B.get_ref(), C.get_ref(), "join_horiz()");
+  return result;
+  }
+
+
+
+template<typename eT, typename T1, typename T2, typename T3, typename T4>
+coot_warn_unused
+inline
+Mat<eT>
+join_horiz
+  (
+  const Base<eT, T1>& A,
+  const Base<eT, T2>& B,
+  const Base<eT, T3>& C,
+  const Base<eT, T4>& D
+  )
+  {
+  coot_extra_debug_sigprint();
+
+  Mat<eT> result;
+  glue_join_rows::apply(result, A.get_ref(), B.get_ref(), C.get_ref(), D.get_ref(), "join_horiz()");
+  return result;
+  }
