@@ -62,7 +62,7 @@ TEMPLATE_TEST_CASE("simple_hardcoded_join_rows", "[join_rows]", float, double, u
 
 
 
-TEMPLATE_TEST_CASE("simple_harcoded_three_join_rows", "[join_rows]", float, double, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("simple_hardcoded_three_join_rows", "[join_rows]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
@@ -119,7 +119,7 @@ TEMPLATE_TEST_CASE("simple_harcoded_three_join_rows", "[join_rows]", float, doub
 
 
 
-TEMPLATE_TEST_CASE("simple_harcoded_four_join_rows", "[join_rows]", float, double, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("simple_hardcoded_four_join_rows", "[join_rows]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
