@@ -62,6 +62,133 @@ TEMPLATE_TEST_CASE("simple_hardcoded_join_cols", "[join_cols]", float, double, u
 
 
 
+TEMPLATE_TEST_CASE("simple_hardcoded_three_join_cols", "[join_cols]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+  
+  Mat<eT> x(2, 2); // [[1, 2; 3 4]]
+  x(0, 0) = eT(1);
+  x(1, 0) = eT(2);
+  x(0, 1) = eT(3);
+  x(1, 1) = eT(4);
+  Mat<eT> y(2, 2); // [[5, 6; 7, 8]]
+  y(0, 0) = eT(5);
+  y(1, 0) = eT(6);
+  y(0, 1) = eT(7);
+  y(1, 1) = eT(8);
+  Mat<eT> z(2, 2); // [[9, 10; 11, 12]]
+  z(0, 0) = eT(9);
+  z(1, 0) = eT(10);
+  z(0, 1) = eT(11);
+  z(1, 1) = eT(12);
+
+  Mat<eT> z1 = join_cols(x, y, z);
+  Mat<eT> z2 = join_vert(x, y, z);
+
+  REQUIRE( z1.n_rows == 6 );
+  REQUIRE( z1.n_cols == 2 );
+  REQUIRE( z2.n_rows == 6 );
+  REQUIRE( z2.n_cols == 2 );
+
+  REQUIRE( eT(z1(0, 0)) == Approx(eT(1)).margin(1e-5) );
+  REQUIRE( eT(z1(1, 0)) == Approx(eT(2)).margin(1e-5) );
+  REQUIRE( eT(z1(2, 0)) == Approx(eT(5)).margin(1e-5) );
+  REQUIRE( eT(z1(3, 0)) == Approx(eT(6)).margin(1e-5) );
+  REQUIRE( eT(z1(4, 0)) == Approx(eT(9)).margin(1e-5) );
+  REQUIRE( eT(z1(5, 0)) == Approx(eT(10)).margin(1e-5) );
+  REQUIRE( eT(z1(0, 1)) == Approx(eT(3)).margin(1e-5) );
+  REQUIRE( eT(z1(1, 1)) == Approx(eT(4)).margin(1e-5) );
+  REQUIRE( eT(z1(2, 1)) == Approx(eT(7)).margin(1e-5) );
+  REQUIRE( eT(z1(3, 1)) == Approx(eT(8)).margin(1e-5) );
+  REQUIRE( eT(z1(4, 1)) == Approx(eT(11)).margin(1e-5) );
+  REQUIRE( eT(z1(5, 1)) == Approx(eT(12)).margin(1e-5) );
+
+  REQUIRE( eT(z2(0, 0)) == Approx(eT(1)).margin(1e-5) );
+  REQUIRE( eT(z2(1, 0)) == Approx(eT(2)).margin(1e-5) );
+  REQUIRE( eT(z2(2, 0)) == Approx(eT(5)).margin(1e-5) );
+  REQUIRE( eT(z2(3, 0)) == Approx(eT(6)).margin(1e-5) );
+  REQUIRE( eT(z2(4, 0)) == Approx(eT(9)).margin(1e-5) );
+  REQUIRE( eT(z2(5, 0)) == Approx(eT(10)).margin(1e-5) );
+  REQUIRE( eT(z2(0, 1)) == Approx(eT(3)).margin(1e-5) );
+  REQUIRE( eT(z2(1, 1)) == Approx(eT(4)).margin(1e-5) );
+  REQUIRE( eT(z2(2, 1)) == Approx(eT(7)).margin(1e-5) );
+  REQUIRE( eT(z2(3, 1)) == Approx(eT(8)).margin(1e-5) );
+  REQUIRE( eT(z2(4, 1)) == Approx(eT(11)).margin(1e-5) );
+  REQUIRE( eT(z2(5, 1)) == Approx(eT(12)).margin(1e-5) );
+  }
+
+
+
+TEMPLATE_TEST_CASE("simple_hardcoded_four_join_cols", "[join_cols]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  Mat<eT> x(2, 2); // [[1, 2; 3 4]]
+  x(0, 0) = eT(1);
+  x(1, 0) = eT(2);
+  x(0, 1) = eT(3);
+  x(1, 1) = eT(4);
+  Mat<eT> y(2, 2); // [[5, 6; 7, 8]]
+  y(0, 0) = eT(5);
+  y(1, 0) = eT(6);
+  y(0, 1) = eT(7);
+  y(1, 1) = eT(8);
+  Mat<eT> z(2, 2); // [[9, 10; 11, 12]]
+  z(0, 0) = eT(9);
+  z(1, 0) = eT(10);
+  z(0, 1) = eT(11);
+  z(1, 1) = eT(12);
+  Mat<eT> w(2, 2); // [[13, 14; 15, 16]]
+  w(0, 0) = eT(13);
+  w(1, 0) = eT(14);
+  w(0, 1) = eT(15);
+  w(1, 1) = eT(16);
+
+  Mat<eT> z1 = join_cols(x, y, z, w);
+  Mat<eT> z2 = join_vert(x, y, z, w);
+
+  REQUIRE( z1.n_rows == 8 );
+  REQUIRE( z1.n_cols == 2 );
+  REQUIRE( z2.n_rows == 8 );
+  REQUIRE( z2.n_cols == 2 );
+
+  REQUIRE( eT(z1(0, 0)) == Approx(eT(1)).margin(1e-5) );
+  REQUIRE( eT(z1(1, 0)) == Approx(eT(2)).margin(1e-5) );
+  REQUIRE( eT(z1(2, 0)) == Approx(eT(5)).margin(1e-5) );
+  REQUIRE( eT(z1(3, 0)) == Approx(eT(6)).margin(1e-5) );
+  REQUIRE( eT(z1(4, 0)) == Approx(eT(9)).margin(1e-5) );
+  REQUIRE( eT(z1(5, 0)) == Approx(eT(10)).margin(1e-5) );
+  REQUIRE( eT(z1(6, 0)) == Approx(eT(13)).margin(1e-5) );
+  REQUIRE( eT(z1(7, 0)) == Approx(eT(14)).margin(1e-5) );
+  REQUIRE( eT(z1(0, 1)) == Approx(eT(3)).margin(1e-5) );
+  REQUIRE( eT(z1(1, 1)) == Approx(eT(4)).margin(1e-5) );
+  REQUIRE( eT(z1(2, 1)) == Approx(eT(7)).margin(1e-5) );
+  REQUIRE( eT(z1(3, 1)) == Approx(eT(8)).margin(1e-5) );
+  REQUIRE( eT(z1(4, 1)) == Approx(eT(11)).margin(1e-5) );
+  REQUIRE( eT(z1(5, 1)) == Approx(eT(12)).margin(1e-5) );
+  REQUIRE( eT(z1(6, 1)) == Approx(eT(15)).margin(1e-5) );
+  REQUIRE( eT(z1(7, 1)) == Approx(eT(16)).margin(1e-5) );
+
+  REQUIRE( eT(z2(0, 0)) == Approx(eT(1)).margin(1e-5) );
+  REQUIRE( eT(z2(1, 0)) == Approx(eT(2)).margin(1e-5) );
+  REQUIRE( eT(z2(2, 0)) == Approx(eT(5)).margin(1e-5) );
+  REQUIRE( eT(z2(3, 0)) == Approx(eT(6)).margin(1e-5) );
+  REQUIRE( eT(z2(4, 0)) == Approx(eT(9)).margin(1e-5) );
+  REQUIRE( eT(z2(5, 0)) == Approx(eT(10)).margin(1e-5) );
+  REQUIRE( eT(z2(6, 0)) == Approx(eT(13)).margin(1e-5) );
+  REQUIRE( eT(z2(7, 0)) == Approx(eT(14)).margin(1e-5) );
+  REQUIRE( eT(z2(0, 1)) == Approx(eT(3)).margin(1e-5) );
+  REQUIRE( eT(z2(1, 1)) == Approx(eT(4)).margin(1e-5) );
+  REQUIRE( eT(z2(2, 1)) == Approx(eT(7)).margin(1e-5) );
+  REQUIRE( eT(z2(3, 1)) == Approx(eT(8)).margin(1e-5) );
+  REQUIRE( eT(z2(4, 1)) == Approx(eT(11)).margin(1e-5) );
+  REQUIRE( eT(z2(5, 1)) == Approx(eT(12)).margin(1e-5) );
+  REQUIRE( eT(z2(6, 1)) == Approx(eT(15)).margin(1e-5) );
+  REQUIRE( eT(z2(7, 1)) == Approx(eT(16)).margin(1e-5) );
+  }
+
+
+
 // Large random matrices test
 TEMPLATE_TEST_CASE("random_join_cols", "[join_cols]", float, double, u32, s32, u64, s64)
   {
@@ -119,6 +246,107 @@ TEMPLATE_TEST_CASE("random_join_cols", "[join_cols]", float, double, u32, s32, u
     REQUIRE( arma::approx_equal( z21_cpu_b, x_cpu, "absdiff", 1e-5 ) );
     REQUIRE( arma::approx_equal( z22_cpu_a, y_cpu, "absdiff", 1e-5 ) );
     REQUIRE( arma::approx_equal( z22_cpu_b, x_cpu, "absdiff", 1e-5 ) );
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("random_three_join_cols", "[join_cols]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  for (size_t t = 6; t < 12; ++t)
+    {
+    const uword n_rows_1 = (uword) std::pow(2.0, (double) (t - 1)) - 1;
+    const uword n_rows_2 = (uword) std::pow(2.0, (double) (t - 1)) + 2;
+    const uword n_rows_3 = (uword) std::pow(2.0, (double) (t - 1)) - 2;
+    const uword n_cols = (uword) std::pow(2.0, (double) t) + 3;
+
+    Mat<eT> x = randi<Mat<eT>>(n_rows_1, n_cols, distr_param(0, 100));
+    Mat<eT> y = randi<Mat<eT>>(n_rows_2, n_cols, distr_param(100, 200));
+    Mat<eT> z = randi<Mat<eT>>(n_rows_3, n_cols, distr_param(200, 300));
+
+    Mat<eT> z11 = join_cols(x, y, z);
+    Mat<eT> z12 = join_vert(x, y, z);
+
+    REQUIRE( z11.n_rows == n_rows_1 + n_rows_2 + n_rows_3 );
+    REQUIRE( z11.n_cols == n_cols );
+    REQUIRE( z12.n_rows == n_rows_1 + n_rows_2 + n_rows_3 );
+    REQUIRE( z12.n_cols == n_cols );
+
+    arma::Mat<eT> x_cpu(x);
+    arma::Mat<eT> y_cpu(y);
+    arma::Mat<eT> z_cpu(z);
+    arma::Mat<eT> z11_cpu(z11);
+    arma::Mat<eT> z12_cpu(z12);
+
+    arma::Mat<eT> z11_cpu_a = z11_cpu.rows(0, n_rows_1 - 1);
+    arma::Mat<eT> z11_cpu_b = z11_cpu.rows(n_rows_1, n_rows_1 + n_rows_2 - 1);
+    arma::Mat<eT> z11_cpu_c = z11_cpu.rows(n_rows_1 + n_rows_2, n_rows_1 + n_rows_2 + n_rows_3 - 1);
+    arma::Mat<eT> z12_cpu_a = z12_cpu.rows(0, n_rows_1 - 1);
+    arma::Mat<eT> z12_cpu_b = z12_cpu.rows(n_rows_1, n_rows_1 + n_rows_2 - 1);
+    arma::Mat<eT> z12_cpu_c = z12_cpu.rows(n_rows_1 + n_rows_2, n_rows_1 + n_rows_2 + n_rows_3 - 1);
+
+    REQUIRE( arma::approx_equal( z11_cpu_a, x_cpu, "absdiff", 1e-5 ) );
+    REQUIRE( arma::approx_equal( z11_cpu_b, y_cpu, "absdiff", 1e-5 ) );
+    REQUIRE( arma::approx_equal( z11_cpu_c, z_cpu, "absdiff", 1e-5 ) );
+    REQUIRE( arma::approx_equal( z12_cpu_a, x_cpu, "absdiff", 1e-5 ) );
+    REQUIRE( arma::approx_equal( z12_cpu_b, y_cpu, "absdiff", 1e-5 ) );
+    REQUIRE( arma::approx_equal( z12_cpu_c, z_cpu, "absdiff", 1e-5 ) );
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("random_four_join_cols", "[join_cols]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  for (size_t t = 6; t < 12; ++t)
+    {
+    const uword n_rows_1 = (uword) std::pow(2.0, (double) (t - 1)) - 1;
+    const uword n_rows_2 = (uword) std::pow(2.0, (double) (t - 1)) + 2;
+    const uword n_rows_3 = (uword) std::pow(2.0, (double) (t - 1)) - 2;
+    const uword n_rows_4 = (uword) std::pow(2.0, (double) (t - 1)) + 3;
+    const uword n_cols = (uword) std::pow(2.0, (double) t) + 3;
+
+    Mat<eT> x = randi<Mat<eT>>(n_rows_1, n_cols, distr_param(0, 100));
+    Mat<eT> y = randi<Mat<eT>>(n_rows_2, n_cols, distr_param(100, 200));
+    Mat<eT> z = randi<Mat<eT>>(n_rows_3, n_cols, distr_param(200, 300));
+    Mat<eT> w = randi<Mat<eT>>(n_rows_4, n_cols, distr_param(300, 400));
+
+    Mat<eT> z11 = join_cols(x, y, z, w);
+    Mat<eT> z12 = join_vert(x, y, z, w);
+
+    REQUIRE( z11.n_rows == n_rows_1 + n_rows_2 + n_rows_3 + n_rows_4 );
+    REQUIRE( z11.n_cols == n_cols );
+    REQUIRE( z12.n_rows == n_rows_1 + n_rows_2 + n_rows_3 + n_rows_4 );
+    REQUIRE( z12.n_cols == n_cols );
+
+    arma::Mat<eT> x_cpu(x);
+    arma::Mat<eT> y_cpu(y);
+    arma::Mat<eT> z_cpu(z);
+    arma::Mat<eT> w_cpu(w);
+    arma::Mat<eT> z11_cpu(z11);
+    arma::Mat<eT> z12_cpu(z12);
+
+    arma::Mat<eT> z11_cpu_a = z11_cpu.rows(0, n_rows_1 - 1);
+    arma::Mat<eT> z11_cpu_b = z11_cpu.rows(n_rows_1, n_rows_1 + n_rows_2 - 1);
+    arma::Mat<eT> z11_cpu_c = z11_cpu.rows(n_rows_1 + n_rows_2, n_rows_1 + n_rows_2 + n_rows_3 - 1);
+    arma::Mat<eT> z11_cpu_d = z11_cpu.rows(n_rows_1 + n_rows_2 + n_rows_3, n_rows_1 + n_rows_2 + n_rows_3 + n_rows_4 - 1);
+    arma::Mat<eT> z12_cpu_a = z12_cpu.rows(0, n_rows_1 - 1);
+    arma::Mat<eT> z12_cpu_b = z12_cpu.rows(n_rows_1, n_rows_1 + n_rows_2 - 1);
+    arma::Mat<eT> z12_cpu_c = z12_cpu.rows(n_rows_1 + n_rows_2, n_rows_1 + n_rows_2 + n_rows_3 - 1);
+    arma::Mat<eT> z12_cpu_d = z12_cpu.rows(n_rows_1 + n_rows_2 + n_rows_3, n_rows_1 + n_rows_2 + n_rows_3 + n_rows_4 - 1);
+
+    REQUIRE( arma::approx_equal( z11_cpu_a, x_cpu, "absdiff", 1e-5 ) );
+    REQUIRE( arma::approx_equal( z11_cpu_b, y_cpu, "absdiff", 1e-5 ) );
+    REQUIRE( arma::approx_equal( z11_cpu_c, z_cpu, "absdiff", 1e-5 ) );
+    REQUIRE( arma::approx_equal( z11_cpu_d, w_cpu, "absdiff", 1e-5 ) );
+    REQUIRE( arma::approx_equal( z12_cpu_a, x_cpu, "absdiff", 1e-5 ) );
+    REQUIRE( arma::approx_equal( z12_cpu_b, y_cpu, "absdiff", 1e-5 ) );
+    REQUIRE( arma::approx_equal( z12_cpu_c, z_cpu, "absdiff", 1e-5 ) );
+    REQUIRE( arma::approx_equal( z12_cpu_d, w_cpu, "absdiff", 1e-5 ) );
     }
   }
 
@@ -195,6 +423,59 @@ TEST_CASE("mismatched_n_cols_join_cols", "[join_cols]")
   REQUIRE_THROWS( z = join_cols(y, x) );
   REQUIRE_THROWS( z = join_vert(x, y) );
   REQUIRE_THROWS( z = join_vert(y, x) );
+
+  // Restore cerr output.
+  std::cerr.rdbuf(orig_cerr_buf);
+  }
+
+
+
+TEST_CASE("mismatched_n_cols_three_join_cols", "[join_cols]")
+  {
+  mat x = randu<mat>(5, 2);
+  mat y(3, 7);
+  mat z(6, 1);
+
+  // Disable cerr output for this test.
+  std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
+  std::cerr.rdbuf(NULL);
+
+  mat out;
+  REQUIRE_THROWS( out = join_cols(x, y, z) );
+  REQUIRE_THROWS( out = join_vert(x, y, z) );
+
+  y = randu<mat>(5, 2);
+  REQUIRE_THROWS( out = join_cols(x, y, z) );
+  REQUIRE_THROWS( out = join_vert(x, y, z) );
+
+  // Restore cerr output.
+  std::cerr.rdbuf(orig_cerr_buf);
+  }
+
+
+
+TEST_CASE("mismatched_n_cols_four_join_cols", "[join_cols]")
+  {
+  mat x = randu<mat>(5, 2);
+  mat y(3, 7);
+  mat z(6, 1);
+  mat w(12, 3);
+
+  // Disable cerr output for this test.
+  std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
+  std::cerr.rdbuf(NULL);
+
+  mat out;
+  REQUIRE_THROWS( out = join_cols(x, y, z, w) );
+  REQUIRE_THROWS( out = join_vert(x, y, z, w) );
+
+  y = randu<mat>(5, 2);
+  REQUIRE_THROWS( out = join_cols(x, y, z, w) );
+  REQUIRE_THROWS( out = join_vert(x, y, z, w) );
+
+  z = randu<mat>(5, 2);
+  REQUIRE_THROWS( out = join_cols(x, y, z, w) );
+  REQUIRE_THROWS( out = join_vert(x, y, z, w) );
 
   // Restore cerr output.
   std::cerr.rdbuf(orig_cerr_buf);
@@ -522,4 +803,64 @@ TEST_CASE("alias_join_cols", "[join_cols]")
 
   REQUIRE( arma::approx_equal( x_cpu_1, x_ref_cpu, "absdiff", 1e-5 ) );
   REQUIRE( arma::approx_equal( x_cpu_2, y_cpu,     "absdiff", 1e-5 ) );
+  }
+
+
+
+TEST_CASE("alias_three_join_cols", "[join_cols]")
+  {
+  mat x = randu<mat>(10, 20);
+  mat y = randu<mat>(15, 20);
+  mat z = randu<mat>(20, 20);
+  mat x_ref(x);
+
+  x = join_cols(x, y, z);
+
+  REQUIRE( x.n_rows == 45 );
+  REQUIRE( x.n_cols == 20 );
+
+  arma::mat x_ref_cpu(x_ref);
+  arma::mat y_cpu(y);
+  arma::mat x_cpu(x);
+  arma::mat z_cpu(z);
+
+  arma::mat x_cpu_1 = x_cpu.rows(0, 9);
+  arma::mat x_cpu_2 = x_cpu.rows(10, 24);
+  arma::mat x_cpu_3 = x_cpu.rows(25, 44);
+
+  REQUIRE( arma::approx_equal( x_cpu_1, x_ref_cpu, "absdiff", 1e-5 ) );
+  REQUIRE( arma::approx_equal( x_cpu_2, y_cpu,     "absdiff", 1e-5 ) );
+  REQUIRE( arma::approx_equal( x_cpu_3, z_cpu,     "absdiff", 1e-5 ) );
+  }
+
+
+
+TEST_CASE("alias_four_join_cols", "[join_cols]")
+  {
+  mat x = randu<mat>(10, 20);
+  mat y = randu<mat>(15, 20);
+  mat z = randu<mat>(20, 20);
+  mat w = randu<mat>(25, 20);
+  mat x_ref(x);
+
+  x = join_cols(x, y, z, w);
+
+  REQUIRE( x.n_rows == 70 );
+  REQUIRE( x.n_cols == 20 );
+
+  arma::mat x_ref_cpu(x_ref);
+  arma::mat y_cpu(y);
+  arma::mat x_cpu(x);
+  arma::mat z_cpu(z);
+  arma::mat w_cpu(w);
+
+  arma::mat x_cpu_1 = x_cpu.rows(0, 9);
+  arma::mat x_cpu_2 = x_cpu.rows(10, 24);
+  arma::mat x_cpu_3 = x_cpu.rows(25, 44);
+  arma::mat x_cpu_4 = x_cpu.rows(45, 69);
+
+  REQUIRE( arma::approx_equal( x_cpu_1, x_ref_cpu, "absdiff", 1e-5 ) );
+  REQUIRE( arma::approx_equal( x_cpu_2, y_cpu,     "absdiff", 1e-5 ) );
+  REQUIRE( arma::approx_equal( x_cpu_3, z_cpu,     "absdiff", 1e-5 ) );
+  REQUIRE( arma::approx_equal( x_cpu_4, w_cpu,     "absdiff", 1e-5 ) );
   }
