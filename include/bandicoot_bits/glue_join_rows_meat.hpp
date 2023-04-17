@@ -76,6 +76,133 @@ glue_join_rows::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_join_rows>& glue
 
 
 
+template<typename eT, typename T1, typename T2, typename T3>
+inline
+void
+glue_join_rows::apply(Mat<eT>& out, const T1& A, const T2& B, const T3& C, const std::string& func_name)
+  {
+  coot_extra_debug_sigprint();
+
+  const no_conv_unwrap<T1> U1(A);
+  const no_conv_unwrap<T2> U2(B);
+  const no_conv_unwrap<T3> U3(C);
+
+  const extract_subview<typename no_conv_unwrap<T1>::stored_type> E1(U1.M);
+  const extract_subview<typename no_conv_unwrap<T2>::stored_type> E2(U2.M);
+  const extract_subview<typename no_conv_unwrap<T3>::stored_type> E3(U3.M);
+
+  // check for same number of columns
+  const uword A_n_rows = E1.M.n_rows;
+  const uword A_n_cols = E1.M.n_cols;
+  const uword B_n_rows = E2.M.n_rows;
+  const uword B_n_cols = E2.M.n_cols;
+  const uword C_n_rows = E3.M.n_rows;
+  const uword C_n_cols = E3.M.n_cols;
+
+  const uword out_n_cols = A_n_cols + B_n_cols + C_n_cols;
+  const uword out_n_rows = ((std::max)((std::max)(A_n_rows, B_n_rows), C_n_rows));
+
+  coot_debug_check( ((A_n_rows != out_n_rows) && ((A_n_rows > 0) || (A_n_cols > 0))), func_name + ": number of rows must be the same" );
+  coot_debug_check( ((B_n_rows != out_n_rows) && ((B_n_rows > 0) || (B_n_cols > 0))), func_name + ": number of rows must be the same" );
+  coot_debug_check( ((C_n_rows != out_n_rows) && ((C_n_rows > 0) || (C_n_cols > 0))), func_name + ": number of rows must be the same" );
+
+  // Shortcut: if there is nothing to do, leave early.
+  if (out_n_rows == 0 || out_n_cols == 0)
+    {
+    out.set_size(out_n_rows, out_n_cols);
+    return;
+    }
+
+  // Ensure that the output is not an alias.
+  if ((void_ptr(&out) == void_ptr(&E1.M)) || (void_ptr(&out) == void_ptr(&E2.M)) || (void_ptr(&out) == void_ptr(&E3.M)))
+    {
+    Mat<eT> tmp(out_n_rows, out_n_cols);
+    coot_rt_t::join_rows(tmp.get_dev_mem(false),
+                         E1.M.get_dev_mem(false), A_n_rows, A_n_cols,
+                         E2.M.get_dev_mem(false), B_n_rows, B_n_cols,
+                         E3.M.get_dev_mem(false), C_n_rows, C_n_cols,
+                         E1.M.get_dev_mem(false), 0, 0 /* ignored */);
+    out.steal_mem(tmp);
+    }
+  else
+    {
+    out.set_size(out_n_rows, out_n_cols);
+    coot_rt_t::join_rows(out.get_dev_mem(false),
+                         E1.M.get_dev_mem(false), A_n_rows, A_n_cols,
+                         E2.M.get_dev_mem(false), B_n_rows, B_n_cols,
+                         E3.M.get_dev_mem(false), C_n_rows, C_n_cols,
+                         E1.M.get_dev_mem(false), 0, 0 /* ignored */);
+    }
+  }
+
+
+
+template<typename eT, typename T1, typename T2, typename T3, typename T4>
+inline
+void
+glue_join_rows::apply(Mat<eT>& out, const T1& A, const T2& B, const T3& C, const T4& D, const std::string& func_name)
+  {
+  coot_extra_debug_sigprint();
+
+  const no_conv_unwrap<T1> U1(A);
+  const no_conv_unwrap<T2> U2(B);
+  const no_conv_unwrap<T3> U3(C);
+  const no_conv_unwrap<T4> U4(D);
+
+  const extract_subview<typename no_conv_unwrap<T1>::stored_type> E1(U1.M);
+  const extract_subview<typename no_conv_unwrap<T2>::stored_type> E2(U2.M);
+  const extract_subview<typename no_conv_unwrap<T3>::stored_type> E3(U3.M);
+  const extract_subview<typename no_conv_unwrap<T3>::stored_type> E4(U4.M);
+
+  // check for same number of columns
+  const uword A_n_rows = E1.M.n_rows;
+  const uword A_n_cols = E1.M.n_cols;
+  const uword B_n_rows = E2.M.n_rows;
+  const uword B_n_cols = E2.M.n_cols;
+  const uword C_n_rows = E3.M.n_rows;
+  const uword C_n_cols = E3.M.n_cols;
+  const uword D_n_rows = E4.M.n_rows;
+  const uword D_n_cols = E4.M.n_cols;
+
+  const uword out_n_cols = A_n_cols + B_n_cols + C_n_cols + D_n_cols;
+  const uword out_n_rows = (std::max)((std::max)((std::max)(A_n_rows, B_n_rows), C_n_rows), D_n_rows);
+
+  coot_debug_check( ((A_n_rows != out_n_rows) && ((A_n_rows > 0) || (A_n_cols > 0))), func_name + ": number of rows must be the same" );
+  coot_debug_check( ((B_n_rows != out_n_rows) && ((B_n_rows > 0) || (B_n_cols > 0))), func_name + ": number of rows must be the same" );
+  coot_debug_check( ((C_n_rows != out_n_rows) && ((C_n_rows > 0) || (C_n_cols > 0))), func_name + ": number of rows must be the same" );
+  coot_debug_check( ((D_n_rows != out_n_rows) && ((D_n_rows > 0) || (D_n_cols > 0))), func_name + ": number of rows must be the same" );
+
+  // Shortcut: if there is nothing to do, leave early.
+  if (out_n_rows == 0 || out_n_cols == 0)
+    {
+    out.set_size(out_n_rows, out_n_cols);
+    return;
+    }
+
+  // Ensure that the output is not an alias.
+  if ((void_ptr(&out) == void_ptr(&E1.M)) || (void_ptr(&out) == void_ptr(&E2.M)) || (void_ptr(&out) == void_ptr(&E3.M)))
+    {
+    Mat<eT> tmp(out_n_rows, out_n_cols);
+    coot_rt_t::join_rows(tmp.get_dev_mem(false),
+                         E1.M.get_dev_mem(false), A_n_rows, A_n_cols,
+                         E2.M.get_dev_mem(false), B_n_rows, B_n_cols,
+                         E3.M.get_dev_mem(false), C_n_rows, C_n_cols,
+                         E4.M.get_dev_mem(false), D_n_rows, D_n_cols);
+    out.steal_mem(tmp);
+    }
+  else
+    {
+    out.set_size(out_n_rows, out_n_cols);
+    coot_rt_t::join_rows(out.get_dev_mem(false),
+                         E1.M.get_dev_mem(false), A_n_rows, A_n_cols,
+                         E2.M.get_dev_mem(false), B_n_rows, B_n_cols,
+                         E3.M.get_dev_mem(false), C_n_rows, C_n_cols,
+                         E4.M.get_dev_mem(false), D_n_rows, D_n_cols);
+    }
+  }
+
+
+
 template<typename T1, typename T2>
 inline
 uword
