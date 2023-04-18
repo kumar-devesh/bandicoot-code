@@ -21,7 +21,7 @@ join_cols(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword A_n_rows, const 
   {
   coot_extra_debug_sigprint();
 
-  const uword out_n_rows = A_n_rows + B_n_rows;
+  const uword out_n_rows = A_n_rows + B_n_rows + C_n_rows + D_n_rows;
 
   const size_t zeros[3]    = { 0,                                             0,        0 };
   const size_t B_dst[3]    = { A_n_rows * sizeof(eT),                         0,        0 };
@@ -82,7 +82,7 @@ join_cols(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword A_n_rows, const 
                                      C.cl_mem_ptr,
                                      out.cl_mem_ptr,
                                      zeros,
-                                     C_dst, // the B matrix is offset in memory
+                                     C_dst, // the C matrix is offset in memory
                                      C_region,
                                      C_n_rows * sizeof(eT),
                                      0,
@@ -91,7 +91,7 @@ join_cols(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword A_n_rows, const 
                                      0,
                                      NULL,
                                      NULL);
-    coot_check_cl_error(status, "coot::opencl::join_cols(): clEnqueueCopyBufferRect() failed for second argument");
+    coot_check_cl_error(status, "coot::opencl::join_cols(): clEnqueueCopyBufferRect() failed for third argument");
     }
 
   if (D_n_elem > 0)
@@ -100,7 +100,7 @@ join_cols(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword A_n_rows, const 
                                      D.cl_mem_ptr,
                                      out.cl_mem_ptr,
                                      zeros,
-                                     D_dst, // the B matrix is offset in memory
+                                     D_dst, // the D matrix is offset in memory
                                      D_region,
                                      D_n_rows * sizeof(eT),
                                      0,
@@ -109,7 +109,7 @@ join_cols(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword A_n_rows, const 
                                      0,
                                      NULL,
                                      NULL);
-    coot_check_cl_error(status, "coot::opencl::join_cols(): clEnqueueCopyBufferRect() failed for second argument");
+    coot_check_cl_error(status, "coot::opencl::join_cols(): clEnqueueCopyBufferRect() failed for fourth argument");
     }
   }
 
@@ -127,7 +127,7 @@ join_cols(dev_mem_t<eT5> out, const dev_mem_t<eT1> A, const uword A_n_rows, cons
   const uword C_n_elem = C_n_rows * C_n_cols;
   const uword D_n_elem = D_n_rows * D_n_cols;
 
-  const uword out_n_rows = A_n_rows + B_n_rows;
+  const uword out_n_rows = A_n_rows + B_n_rows + C_n_rows + D_n_rows;
 
   // If the types are different, we need to perform a cast during the copy.  We can use the submat_inplace_set_mat kernel for this.
   if (A_n_elem > 0)

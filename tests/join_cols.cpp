@@ -65,7 +65,7 @@ TEMPLATE_TEST_CASE("simple_hardcoded_join_cols", "[join_cols]", float, double, u
 TEMPLATE_TEST_CASE("simple_hardcoded_three_join_cols", "[join_cols]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
-  
+
   Mat<eT> x(2, 2); // [[1, 2; 3 4]]
   x(0, 0) = eT(1);
   x(1, 0) = eT(2);
