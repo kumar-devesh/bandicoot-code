@@ -470,12 +470,9 @@ namespace coot
   #include "bandicoot_bits/fn_stddev.hpp"
   #include "bandicoot_bits/fn_var.hpp"
   #include "bandicoot_bits/fn_range.hpp"
-<<<<<<< HEAD
-  #include "bandicoot_bits/fn_join.hpp"
-=======
   #include "bandicoot_bits/fn_cov.hpp"
   #include "bandicoot_bits/fn_cor.hpp"
->>>>>>> origin/unstable
+  #include "bandicoot_bits/fn_join.hpp"
 
 
   //
@@ -535,13 +532,10 @@ namespace coot
   #include "bandicoot_bits/mtop_relational_meat.hpp"
 
   #include "bandicoot_bits/glue_times_meat.hpp"
-<<<<<<< HEAD
-  #include "bandicoot_bits/glue_join_cols_meat.hpp"
-  #include "bandicoot_bits/glue_join_rows_meat.hpp"
-=======
   #include "bandicoot_bits/glue_cov_meat.hpp"
   #include "bandicoot_bits/glue_cor_meat.hpp"
->>>>>>> origin/unstable
+  #include "bandicoot_bits/glue_join_cols_meat.hpp"
+  #include "bandicoot_bits/glue_join_rows_meat.hpp"
 
   #include "bandicoot_bits/mtglue_relational_meat.hpp"
 
