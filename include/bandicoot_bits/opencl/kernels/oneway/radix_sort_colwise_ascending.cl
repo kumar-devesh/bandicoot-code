@@ -14,28 +14,28 @@
 
 
 
-__global__
+__kernel
 void
-COOT_FN(PREFIX,radix_sort_colwise)(eT1* A,
-                                   eT1* tmp_mem,
-                                   const UWORD A_n_rows,
-                                   const UWORD A_n_cols)
+COOT_FN(PREFIX,radix_sort_colwise_ascending)(__global eT1* A,
+                                             __global eT1* tmp_mem,
+                                             const UWORD A_n_rows,
+                                             const UWORD A_n_cols)
   {
-  const UWORD col = blockIdx.x * blockDim.x + threadIdx.x;
+  const UWORD col = get_global_id(0);
   if(col < A_n_cols)
     {
-    eT1* unsorted_colptr =       &A[col * A_n_rows];
-    eT1* sorted_colptr =   &tmp_mem[col * A_n_rows];
+    __global eT1* unsorted_colptr =       &A[col * A_n_rows];
+    __global eT1* sorted_colptr =   &tmp_mem[col * A_n_rows];
 
     UWORD counts[2];
 
     // If the type is unsigned, all the work will be done the same way.
-    const UWORD max_bit = coot_is_signed((eT1) 0) ? (8 * sizeof(eT1) - 1) : (8 * sizeof(eT1));
+    const UWORD max_bit = COOT_FN(coot_is_signed_,eT1)() ? (8 * sizeof(eT1) - 1) : (8 * sizeof(eT1));
 
     for (UWORD b = 0; b < max_bit; ++b)
       {
       // Since we are sorting bitwise, we should treat the data as unsigned integers to make bitwise operations easy.
-      uint_eT1* colptr = reinterpret_cast<uint_eT1*>(unsorted_colptr);
+      __global uint_eT1* colptr = (__global uint_eT1*) unsorted_colptr;
 
       counts[0] = 0; // holds the count of points with bit value 0
       counts[1] = 0; // holds the count of points with bit value 1
@@ -58,13 +58,13 @@ COOT_FN(PREFIX,radix_sort_colwise)(eT1* A,
         }
 
       // swap pointers (unsorted is now sorted)
-      eT1* tmp = unsorted_colptr;
+      __global eT1* tmp = unsorted_colptr;
       unsorted_colptr = sorted_colptr;
       sorted_colptr = tmp;
       }
 
     // If the type is unsigned, we're now done---we don't have to handle a sign bit differently.
-    if (!coot_is_signed((eT1) 0))
+    if (!COOT_FN(coot_is_signed_,eT1)())
       {
       return;
       }
@@ -73,7 +73,7 @@ COOT_FN(PREFIX,radix_sort_colwise)(eT1* A,
     // In both cases, we have to put the 1-bit values before the 0-bit values.
     // But, for floating point signed types, we need to reverse the order of the 1-bit points.
     // So, we need a slightly different implementation for both cases.
-    uint_eT1* colptr = reinterpret_cast<uint_eT1*>(unsorted_colptr);
+    __global uint_eT1* colptr = (__global uint_eT1*) unsorted_colptr;
     counts[0] = 0;
     counts[1] = 0;
 
@@ -87,7 +87,7 @@ COOT_FN(PREFIX,radix_sort_colwise)(eT1* A,
     // counts[0] now holds the number of positive points; counts[1] holds the number of negative points
 
     // This is different for integral and floating point types.
-    if (coot_is_fp((eT1) 0))
+    if (COOT_FN(coot_is_fp_,eT1)())
       {
       // Floating point implementation:
       // For negative values, we have things sorted in reverse order, so we need to reverse that in our final swap pass.

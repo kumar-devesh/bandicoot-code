@@ -16,10 +16,10 @@
 
 __kernel
 void
-COOT_FN(PREFIX,radix_sort)(__global eT1* A,
-                           __global eT1* tmp_mem,
-                           const UWORD n_elem,
-                           __local volatile uint_eT1* aux_mem)
+COOT_FN(PREFIX,radix_sort_ascending)(__global eT1* A,
+                                     __global eT1* tmp_mem,
+                                     const UWORD n_elem,
+                                     __local volatile uint_eT1* aux_mem)
   {
   const UWORD tid = get_global_id(0);
 

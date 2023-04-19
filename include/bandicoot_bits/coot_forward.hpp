@@ -99,6 +99,8 @@ class op_var;
 class op_range;
 class op_cov;
 class op_cor;
+class op_sort;
+class op_sort_vec;
 
 class mtop_conv_to;
 class mtop_all;

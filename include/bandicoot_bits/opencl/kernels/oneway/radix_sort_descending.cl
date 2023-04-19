@@ -14,33 +14,32 @@
 
 
 
-__global__
+__kernel
 void
-COOT_FN(PREFIX,radix_sort)(eT1* A,
-                           eT1* tmp_mem,
-                           const UWORD n_elem)
+COOT_FN(PREFIX,radix_sort_descending)(__global eT1* A,
+                                      __global eT1* tmp_mem,
+                                      const UWORD n_elem,
+                                      __local volatile uint_eT1* aux_mem)
   {
-  uint_eT1* aux_mem = (uint_eT1*) aux_shared_mem;
+  const UWORD tid = get_global_id(0);
 
-  const UWORD tid = threadIdx.x;
-
-  const UWORD num_threads = blockDim.x;
+  const UWORD num_threads = get_global_size(0);
   const UWORD elems_per_thread = (n_elem + num_threads - 1) / num_threads; // this is ceil(n_elem / num_threads)
   const UWORD start_elem = tid * elems_per_thread;
   UWORD end_elem = min((tid + 1) * elems_per_thread, n_elem);
 
   UWORD local_counts[2];
 
-  eT1* unsorted_memptr = A;
-  eT1* sorted_memptr = tmp_mem;
+  __global eT1* unsorted_memptr = A;
+  __global eT1* sorted_memptr = tmp_mem;
 
   // If the type is unsigned, all the work will be done the same way.
-  const UWORD max_bit = coot_is_signed((eT1) 0) ? 8 * sizeof(eT1) - 1 : 8 * sizeof(eT1);
+  const UWORD max_bit = COOT_FN(coot_is_signed_,eT1)() ? 8 * sizeof(eT1) - 1 : 8 * sizeof(eT1);
 
   for (UWORD b = 0; b < max_bit; ++b)
     {
     // Step 1: count the number of elements with each bit value that belong to this thread.
-    uint_eT1* memptr = reinterpret_cast<uint_eT1*>(unsorted_memptr);
+    __global uint_eT1* memptr = (__global uint_eT1*) unsorted_memptr;
 
     local_counts[0] = 0; // holds the count of elements with bit value 0
     local_counts[1] = 0; // holds the count of elements with bit value 1
@@ -58,11 +57,10 @@ COOT_FN(PREFIX,radix_sort)(eT1* A,
       {
       ++local_counts[(memptr[i] & mask) >> b];
       }
-
     // Step 2: aggregate the counts for all threads.
-    aux_mem[tid              ] = local_counts[0];
-    aux_mem[tid + num_threads] = local_counts[1];
-    __syncthreads();
+    aux_mem[tid              ] = local_counts[1];
+    aux_mem[tid + num_threads] = local_counts[0];
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     // At the end of this, `tid` should be assigned two sections of memory to put its 0 and 1 points in.
     //    aux_mem[tid] should hold the first place to put a 0 point
@@ -83,14 +81,14 @@ COOT_FN(PREFIX,radix_sort)(eT1* A,
         aux_mem[bi] += aux_mem[ai];
         }
       offset *= 2;
-      __syncthreads();
+      barrier(CLK_LOCAL_MEM_FENCE);
       }
 
     if (tid == 0)
       {
       aux_mem[2 * num_threads - 1] = 0;
       }
-    __syncthreads();
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     // Step 2b: down-sweep to build prefix sum.
     for (UWORD s = 1; s <= num_threads; s *= 2)
@@ -104,12 +102,12 @@ COOT_FN(PREFIX,radix_sort)(eT1* A,
         aux_mem[ai] = aux_mem[bi];
         aux_mem[bi] += tmp;
         }
-      __syncthreads();
+      barrier(CLK_LOCAL_MEM_FENCE);
       }
 
     // Step 3: move points into the correct place.
-    local_counts[0] = aux_mem[tid              ]; // contains the first place we should put a 0 point
-    local_counts[1] = aux_mem[tid + num_threads]; // contains the first place we should put a 1 point
+    local_counts[0] = aux_mem[tid + num_threads]; // contains the first place we should put a 0 point
+    local_counts[1] = aux_mem[tid              ]; // contains the first place we should put a 1 point
     i = start_elem;
     while (i + 1 < end_elem)
       {
@@ -131,15 +129,15 @@ COOT_FN(PREFIX,radix_sort)(eT1* A,
       }
 
     // Now swap pointers.
-    eT1* tmp = unsorted_memptr;
+    __global eT1* tmp = unsorted_memptr;
     unsorted_memptr = sorted_memptr;
     sorted_memptr = tmp;
 
-    __syncthreads();
+    barrier(CLK_GLOBAL_MEM_FENCE);
     }
 
   // If the type is integral, we're now done---we don't have to handle a sign bit differently.
-  if (!coot_is_signed((eT1) 0))
+  if (!COOT_FN(coot_is_signed_,eT1)())
     {
     return;
     }
@@ -148,7 +146,7 @@ COOT_FN(PREFIX,radix_sort)(eT1* A,
   // In both cases, we have to put the 1-bit values before the 0-bit values.
   // But, for floating point signed types, we need to reverse the order of the 1-bit points.
   // So, we need a slightly different implementation for both cases.
-  uint_eT1* memptr = reinterpret_cast<uint_eT1*>(unsorted_memptr);
+  __global uint_eT1* memptr = (__global uint_eT1*) unsorted_memptr;
   local_counts[0] = 0;
   local_counts[1] = 0;
 
@@ -168,10 +166,10 @@ COOT_FN(PREFIX,radix_sort)(eT1* A,
     }
 
   // local_counts[0] now holds the number of positive points; local_counts[1] holds the number of negative points
-  // swap these and perform a prefix sum, as with the rest of the bits
-  aux_mem[tid              ] = local_counts[1];
-  aux_mem[tid + num_threads] = local_counts[0];
-  __syncthreads();
+  // perform a prefix sum, as with the rest of the bits
+  aux_mem[tid              ] = local_counts[0];
+  aux_mem[tid + num_threads] = local_counts[1];
+  barrier(CLK_LOCAL_MEM_FENCE);
 
   // Up-sweep total sum into final element.
   UWORD offset = 1;
@@ -184,14 +182,14 @@ COOT_FN(PREFIX,radix_sort)(eT1* A,
       aux_mem[bi] += aux_mem[ai];
       }
     offset *= 2;
-    __syncthreads();
+    barrier(CLK_LOCAL_MEM_FENCE);
     }
 
   if (tid == 0)
     {
     aux_mem[2 * num_threads - 1] = 0;
     }
-  __syncthreads();
+  barrier(CLK_LOCAL_MEM_FENCE);
 
   // Down-sweep to build prefix sum.
   for (UWORD s = 1; s <= num_threads; s *= 2)
@@ -205,18 +203,18 @@ COOT_FN(PREFIX,radix_sort)(eT1* A,
       aux_mem[ai] = aux_mem[bi];
       aux_mem[bi] += tmp;
       }
-    __syncthreads();
+    barrier(CLK_LOCAL_MEM_FENCE);
     }
 
   // Step 3: move points into the correct place.
   // This is different for integral and floating point types.
-  if (coot_is_fp((eT1) 0))
+  if (COOT_FN(coot_is_fp_,eT1)())
     {
     // Floating point implementation:
     // For negative values, we have things sorted in reverse order, so we need to reverse that in our final swap pass.
     // That means that thread 0's negative points go into the last slots, and the last thread's negative points go into the first slots.
-    local_counts[0] = aux_mem[tid + num_threads]; // contains the first place we should put a 0 point (we will move upwards)
-    local_counts[1] = aux_mem[num_threads] - aux_mem[tid]; // contains the first place we should put a 1 point (we will move downwards)
+    local_counts[0] = aux_mem[tid]; // contains the first place we should put a 0 point (we will move upwards)
+    local_counts[1] = aux_mem[2 * num_threads] - aux_mem[num_threads + tid]; // contains the first place we should put a 1 point (we will move downwards)
     local_counts[1] = (local_counts[1] == 0) ? 0 : local_counts[1] - 1; // avoid underflow
     i = start_elem;
     while (i + 1 < end_elem)
@@ -251,8 +249,8 @@ COOT_FN(PREFIX,radix_sort)(eT1* A,
     {
     // Signed integral implementation:
     // Here, we have values in the right order, we just need to put the negative values ahead of the positive values.
-    local_counts[0] = aux_mem[tid + num_threads];
-    local_counts[1] = aux_mem[tid];
+    local_counts[0] = aux_mem[tid];
+    local_counts[1] = aux_mem[tid + num_threads];
     i = start_elem;
     while (i + 1 < end_elem)
       {
