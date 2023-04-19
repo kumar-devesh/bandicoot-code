@@ -110,7 +110,7 @@ COOT_FN(PREFIX,radix_sort_colwise_ascending)(eT1* A,
       // Signed integral implementation:
       // Here, we have values in the right order, we just need to put the negative values ahead of the positive values.
       counts[0] = counts[1]; // now holds the offset to put the next positive value at
-      counts[1] = counts[0]; // now holds the offset to put the next negative value at
+      counts[1] = 0;         // now holds the offset to put the next negative value at
 
       for (UWORD i = 0; i < A_n_rows; ++i)
         {

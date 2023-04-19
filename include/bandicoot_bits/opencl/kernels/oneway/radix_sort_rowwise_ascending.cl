@@ -106,7 +106,7 @@ COOT_FN(PREFIX,radix_sort_rowwise_ascending)(__global eT1* A,
     else
       {
       counts[0] = counts[1]; // now holds the offset to put the next positive value at
-      counts[1] = counts[0]; // now holds the offset to put the next negative value at
+      counts[1] = 0;         // now holds the offset to put the next negative value at
 
       for (UWORD i = 0; i < A_n_cols; ++i)
         {
