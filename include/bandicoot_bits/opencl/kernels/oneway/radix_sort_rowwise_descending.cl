@@ -82,7 +82,7 @@ COOT_FN(PREFIX,radix_sort_rowwise_descending)(__global eT1* A,
     if (COOT_FN(coot_is_fp_,eT1)())
       {
       counts[0] = 0;            // now holds the offset to put the next positive value at
-      counts[1] = A_n_rows - 1; // now holds the offset to put the next negative value at (we move backwards)
+      counts[1] = A_n_cols - 1; // now holds the offset to put the next negative value at (we move backwards)
 
       for (UWORD i = 0; i < A_n_cols; ++i)
         {
@@ -107,7 +107,7 @@ COOT_FN(PREFIX,radix_sort_rowwise_descending)(__global eT1* A,
       // counts[0] now holds the number of positive points; counts[1] holds the number of negative points
 
       counts[1] = counts[0]; // now holds the offset to put the next positive value at
-      counts[1] = 0;         // now holds the offset to put the next negative value at
+      counts[0] = 0;         // now holds the offset to put the next negative value at
 
       for (UWORD i = 0; i < A_n_cols; ++i)
         {
