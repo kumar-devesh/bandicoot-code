@@ -83,7 +83,7 @@ COOT_FN(PREFIX,radix_sort_rowwise_descending)(eT1* A,
     if (coot_is_fp((eT1) 0))
       {
       counts[0] = 0;            // now holds the offset to put the next positive value at
-      counts[1] = A_n_rows - 1; // now holds the offset to put the next negative value at (we move backwards)
+      counts[1] = A_n_cols - 1; // now holds the offset to put the next negative value at (we move backwards)
 
       for (UWORD i = 0; i < A_n_cols; ++i)
         {
