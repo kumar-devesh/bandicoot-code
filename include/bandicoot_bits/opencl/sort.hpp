@@ -74,7 +74,7 @@ sort_rowwise(dev_mem_t<eT> A, const uword n_rows, const uword n_cols, const uwor
 
   runtime_t::cq_guard guard;
 
-  cl_kernel k = get_rt().cl_rt.get_kernel<eT>(sort_type == 0 ? oneway_kernel_id::radix_sort_rowwise_ascending : oneway_kernel_id::radix_sort_colwise_descending);
+  cl_kernel k = get_rt().cl_rt.get_kernel<eT>(sort_type == 0 ? oneway_kernel_id::radix_sort_rowwise_ascending : oneway_kernel_id::radix_sort_rowwise_descending);
 
   cl_int status = 0;
 
