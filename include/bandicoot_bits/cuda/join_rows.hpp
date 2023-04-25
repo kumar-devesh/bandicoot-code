@@ -62,7 +62,7 @@ join_rows(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword A_n_rows, const 
                         (void*) D.cuda_mem_ptr,
                         D_n_elem * sizeof(eT),
                         cudaMemcpyDeviceToDevice);
-    coot_check_cuda_error(result, "coot::cuda::join_rows(): could not copy third argument");
+    coot_check_cuda_error(result, "coot::cuda::join_rows(): could not copy fourth argument");
     }
   }
 
