@@ -242,6 +242,8 @@ namespace coot
   #include "bandicoot_bits/glue_times_bones.hpp"
   #include "bandicoot_bits/glue_cov_bones.hpp"
   #include "bandicoot_bits/glue_cor_bones.hpp"
+  #include "bandicoot_bits/glue_join_cols_bones.hpp"
+  #include "bandicoot_bits/glue_join_rows_bones.hpp"
 
   #include "bandicoot_bits/mtglue_relational_bones.hpp"
 
@@ -351,6 +353,8 @@ namespace coot
       #include "bandicoot_bits/opencl/mean.hpp"
       #include "bandicoot_bits/opencl/median.hpp"
       #include "bandicoot_bits/opencl/var.hpp"
+      #include "bandicoot_bits/opencl/join_cols.hpp"
+      #include "bandicoot_bits/opencl/join_rows.hpp"
 //      #include "bandicoot_bits/opencl/eig.hpp"
       }
   #endif
@@ -393,6 +397,8 @@ namespace coot
     #include "bandicoot_bits/cuda/mean.hpp"
     #include "bandicoot_bits/cuda/median.hpp"
     #include "bandicoot_bits/cuda/var.hpp"
+    #include "bandicoot_bits/cuda/join_cols.hpp"
+    #include "bandicoot_bits/cuda/join_rows.hpp"
 //    #include "bandicoot_bits/cuda/eig.hpp"
     }
   #endif
@@ -466,6 +472,7 @@ namespace coot
   #include "bandicoot_bits/fn_range.hpp"
   #include "bandicoot_bits/fn_cov.hpp"
   #include "bandicoot_bits/fn_cor.hpp"
+  #include "bandicoot_bits/fn_join.hpp"
 
 
   //
@@ -527,6 +534,8 @@ namespace coot
   #include "bandicoot_bits/glue_times_meat.hpp"
   #include "bandicoot_bits/glue_cov_meat.hpp"
   #include "bandicoot_bits/glue_cor_meat.hpp"
+  #include "bandicoot_bits/glue_join_cols_meat.hpp"
+  #include "bandicoot_bits/glue_join_rows_meat.hpp"
 
   #include "bandicoot_bits/mtglue_relational_meat.hpp"
 
