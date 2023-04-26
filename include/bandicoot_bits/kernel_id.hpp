@@ -119,6 +119,10 @@ struct oneway_kernel_id
     radix_sort_colwise_descending,
     radix_sort_rowwise_descending,
     radix_sort_descending,
+    radix_sort_index_ascending,
+    radix_sort_index_descending,
+    stable_radix_sort_index_ascending,
+    stable_radix_sort_index_descending,
     //
     invalid_kernel
     };
@@ -199,6 +203,10 @@ struct oneway_kernel_id
     names.push_back("radix_sort_colwise_descending");
     names.push_back("radix_sort_rowwise_descending");
     names.push_back("radix_sort_descending");
+    names.push_back("radix_sort_index_ascending");
+    names.push_back("radix_sort_index_descending");
+    names.push_back("stable_radix_sort_index_ascending");
+    names.push_back("stable_radix_sort_index_descending");
 
     return names;
     }
