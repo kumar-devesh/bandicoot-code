@@ -2607,3 +2607,34 @@ coot_rt_t::join_rows(dev_mem_t<eT5> out, const dev_mem_t<eT1> A, const uword A_n
     coot_stop_runtime_error("coot_rt::join_rows(): unknown backend");
     }
   }
+
+
+
+template<typename eT>
+inline
+void
+coot_rt_t::find(dev_mem_t<uword>& out, uword& out_len, const dev_mem_t<eT> A, const uword n_elem, const uword k, const uword find_type)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    opencl::find(out, out_len, A, n_elem, k, find_type);
+    #else
+    coot_stop_runtime_error("coot_rt::find(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    cuda::find(out, out_len, A, n_elem, k, find_type);
+    #else
+    coot_stop_runtime_error("coot_rt::find(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::find(): unknown backend");
+    }
+  }

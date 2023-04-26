@@ -275,6 +275,9 @@ class coot_rt_t
   template<typename eT1, typename eT2, typename eT3, typename eT4, typename eT5>
   static inline void join_rows(dev_mem_t<eT5> out, const dev_mem_t<eT1> A, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<eT2> B, const uword B_n_rows, const uword B_n_cols, const dev_mem_t<eT3> C, const uword C_n_rows, const uword C_n_cols, const dev_mem_t<eT4> D, const uword D_n_rows, const uword D_n_cols);
 
+  template<typename eT>
+  static inline void find(dev_mem_t<uword>& out, uword& out_len, const dev_mem_t<eT> A, const uword n_elem, const uword k, const uword find_type);
+
   static inline void synchronise();
 
   // RC-TODO: unified interface for some other operations?
