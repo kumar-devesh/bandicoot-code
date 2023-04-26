@@ -117,6 +117,11 @@ struct oneway_kernel_id
     radix_sort_rowwise,
     radix_sort,
     //
+    count_nonzeros,
+    find,
+    find_first,
+    find_last,
+    //
     invalid_kernel
     };
 
@@ -193,6 +198,11 @@ struct oneway_kernel_id
     names.push_back("radix_sort_colwise");
     names.push_back("radix_sort_rowwise");
     names.push_back("radix_sort");
+
+    names.push_back("count_nonzeros");
+    names.push_back("find");
+    names.push_back("find_first");
+    names.push_back("find_last");
 
     return names;
     }
