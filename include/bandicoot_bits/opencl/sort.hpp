@@ -24,6 +24,12 @@ sort_colwise(dev_mem_t<eT> A, const uword n_rows, const uword n_cols, const uwor
   {
   coot_extra_debug_sigprint();
 
+  // If the matrix is empty, don't do anything.
+  if (n_rows == 0 || n_cols == 0)
+    {
+    return;
+    }
+
   // First, allocate a temporary matrix we will use during computation.
   dev_mem_t<eT> tmp_mem;
   tmp_mem.cl_mem_ptr = get_rt().cl_rt.acquire_memory<eT>(n_rows * n_cols);
@@ -68,6 +74,12 @@ sort_rowwise(dev_mem_t<eT> A, const uword n_rows, const uword n_cols, const uwor
   {
   coot_extra_debug_sigprint();
 
+  // If the matrix is empty, don't do anything.
+  if (n_rows == 0 || n_cols == 0)
+    {
+    return;
+    }
+
   // First, allocate a temporary matrix we will use during computation.
   dev_mem_t<eT> tmp_mem;
   tmp_mem.cl_mem_ptr = get_rt().cl_rt.acquire_memory<eT>(n_rows * n_cols);
@@ -108,6 +120,12 @@ void
 sort_vec(dev_mem_t<eT> A, const uword n_elem, const uword sort_type)
   {
   coot_extra_debug_sigprint();
+
+  // If the vector is empty, don't do anything.
+  if (n_elem == 0)
+    {
+    return;
+    }
 
   runtime_t::cq_guard guard;
 
