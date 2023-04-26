@@ -898,3 +898,82 @@ TEST_CASE("invalid_mat_sort_dim", "[sort]")
   // Restore cerr output.
   std::cerr.rdbuf(orig_cerr_buf);
   }
+
+
+
+// test that sorting does not change the original matrix
+TEST_CASE("sort_does_not_affect_original", "[sort]")
+  {
+  vec x = randu<vec>(1000);
+  vec x_old = x;
+
+  vec y = sort(x);
+
+  arma::vec x_cpu(x);
+  arma::vec x_old_cpu(x_old);
+
+  REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
+
+  x = x_old;
+  y = sort(x, "ascend");
+
+  x_cpu = arma::vec(x);
+  REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
+
+  x = x_old;
+  y = sort(x, "descend");
+
+  x_cpu = arma::vec(x);
+  REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
+  }
+
+
+
+TEST_CASE("sort_mat_does_not_affect_original", "[sort]")
+  {
+  mat x = randu<mat>(1000);
+  mat x_old = x;
+
+  mat y = sort(x);
+
+  arma::mat x_cpu(x);
+  arma::mat x_old_cpu(x_old);
+
+  REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
+
+  x = x_old;
+  y = sort(x, "ascend");
+
+  x_cpu = arma::mat(x);
+  REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
+
+  x = x_old;
+  y = sort(x, "ascend", 0);
+
+  x_cpu = arma::mat(x);
+  REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
+
+  x = x_old;
+  y = sort(x, "ascend", 1);
+
+  x_cpu = arma::mat(x);
+  REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
+
+  x = x_old;
+  y = sort(x, "descend");
+
+  x_cpu = arma::mat(x);
+  REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
+
+  x = x_old;
+  y = sort(x, "descend", 0);
+
+  x_cpu = arma::mat(x);
+  REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
+
+  x = x_old;
+  y = sort(x, "descend", 1);
+
+  x_cpu = arma::mat(x);
+  REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
+  }
