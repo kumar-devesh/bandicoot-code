@@ -52,7 +52,7 @@ sort_colwise(dev_mem_t<eT> A, const uword n_rows, const uword n_cols, const uwor
       (void**) args,
       0);
 
-  coot_check_cuda_error(result, "coot::cuda::radix_sort_colwise(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "coot::cuda::sort_colwise(): cuLaunchKernel() failed");
 
   get_rt().cuda_rt.synchronise();
   get_rt().cuda_rt.release_memory(tmp_mem.cuda_mem_ptr);
@@ -98,7 +98,7 @@ sort_rowwise(dev_mem_t<eT> A, const uword n_rows, const uword n_cols, const uwor
       (void**) args,
       0);
 
-  coot_check_cuda_error(result, "coot::cuda::radix_sort_rowwise(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "coot::cuda::sort_rowwise(): cuLaunchKernel() failed");
 
   get_rt().cuda_rt.synchronise();
   get_rt().cuda_rt.release_memory(tmp_mem.cuda_mem_ptr);
@@ -147,7 +147,7 @@ sort_vec(dev_mem_t<eT> A, const uword n_elem, const uword sort_type)
       (void**) args,
       0);
 
-  coot_check_cuda_error(result, "coot::cuda::radix_sort(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "coot::cuda::sort(): cuLaunchKernel() failed");
 
   get_rt().cuda_rt.synchronise();
   get_rt().cuda_rt.release_memory(tmp_mem.cuda_mem_ptr);
