@@ -481,6 +481,7 @@ namespace coot
   #include "bandicoot_bits/fn_join.hpp"
   #include "bandicoot_bits/fn_sort.hpp"
   #include "bandicoot_bits/fn_sort_index.hpp"
+  #include "bandicoot_bits/fn_symmat.hpp"
 
 
   //
