@@ -2700,3 +2700,34 @@ coot_rt_t::sort_vec(dev_mem_t<eT> mem, const uword n_elem, const uword sort_type
     coot_stop_runtime_error("coot_rt::sort_vec(): unknown backend");
     }
   }
+
+
+
+template<typename eT>
+inline
+void
+coot_rt_t::sort_index_vec(dev_mem_t<uword> out, dev_mem_t<eT> A, const uword n_elem, const uword sort_type, const uword stable_sort)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    opencl::sort_index_vec(out, A, n_elem, sort_type, stable_sort);
+    #else
+    coot_stop_runtime_error("coot_rt::sort_index_vec(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    cuda::sort_index_vec(out, A, n_elem, sort_type, stable_sort);
+    #else
+    coot_stop_runtime_error("coot_rt::sort_index_vec(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::sort_index_vec(): unknown backend");
+    }
+  }

@@ -284,6 +284,9 @@ class coot_rt_t
   template<typename eT>
   static inline void sort_vec(dev_mem_t<eT> mem, const uword n_elem, const uword sort_type);
 
+  template<typename eT>
+  static inline void sort_index_vec(dev_mem_t<uword> out, dev_mem_t<eT> mem, const uword n_elem, const uword sort_type, const uword stable_sort);
+
   static inline void synchronise();
 
   // RC-TODO: unified interface for some other operations?
