@@ -45,7 +45,6 @@ mtop_sort_index::apply(Mat<uword>& out, const mtOp<uword, T1, mtop_sort_index>& 
     }
 
   coot_rt_t::sort_index_vec(out.get_dev_mem(false), const_cast<Mat<eT>&>(E.M).get_dev_mem(false), out.n_elem, sort_type, is_stable_sort);
-  //E.M.print("E.M after");
   }
 
 
@@ -76,7 +75,6 @@ mtop_sort_index::apply(Mat<uword>& out, const mtOp<uword, Mat<eT>, mtop_sort_ind
     }
 
   coot_rt_t::sort_index_vec(out.get_dev_mem(false), tmp.get_dev_mem(false), out.n_elem, sort_type, is_stable_sort);
-  //tmp.print("tmp after");
   }
 
 

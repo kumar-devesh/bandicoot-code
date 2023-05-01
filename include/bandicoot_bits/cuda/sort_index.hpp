@@ -77,7 +77,7 @@ sort_index_vec(dev_mem_t<uword> out, dev_mem_t<eT> A, const uword n_elem, const 
       (void**) args,
       0);
 
-  coot_check_cuda_error(result, "coot::cuda::radix_sort_index(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "coot::cuda::sort_index_vec(): cuLaunchKernel() failed");
 
   get_rt().cuda_rt.synchronise();
   get_rt().cuda_rt.release_memory(tmp_mem.cuda_mem_ptr);
