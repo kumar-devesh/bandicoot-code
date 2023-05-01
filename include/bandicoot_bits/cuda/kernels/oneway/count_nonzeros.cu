@@ -78,6 +78,8 @@ COOT_FN(PREFIX,count_nonzeros)(const eT1* A,
 
   if (tid == 0)
     {
+    // Set the last element correctly.
+    thread_counts[num_threads] = aux_mem[num_threads - 1];
     aux_mem[num_threads - 1] = 0;
     }
   __syncthreads();

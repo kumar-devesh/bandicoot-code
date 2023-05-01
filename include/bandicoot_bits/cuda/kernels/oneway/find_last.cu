@@ -39,8 +39,8 @@ COOT_FN(PREFIX,find_last)(const eT1* A,
   const UWORD start_elem = tid * elems_per_thread;
   UWORD end_elem = min((tid + 1) * elems_per_thread, n_elem);
 
-  UWORD out_index = (tid == 0) ? 0 : thread_counts[tid - 1];
-  UWORD last_out_index = thread_counts[tid];
+  UWORD out_index = thread_counts[tid];
+  UWORD last_out_index = thread_counts[tid + 1];
 
   UWORD i = start_elem;
 
@@ -53,7 +53,7 @@ COOT_FN(PREFIX,find_last)(const eT1* A,
         {
         if (out_index >= m)
           {
-          out[out_index] = i;
+          out[out_index - m] = i;
           }
 
         ++out_index;
@@ -62,7 +62,7 @@ COOT_FN(PREFIX,find_last)(const eT1* A,
         {
         if (out_index >= m)
           {
-          out[out_index] = (i + 1);
+          out[out_index - m] = (i + 1);
           }
 
         ++out_index;
@@ -70,13 +70,14 @@ COOT_FN(PREFIX,find_last)(const eT1* A,
 
       i += 2;
       }
+
     if (i < end_elem)
       {
       if (A[i] != (eT1) 0)
         {
         if (out_index >= m)
           {
-          out[out_index] = i;
+          out[out_index - m] = i;
           }
 
         ++out_index;

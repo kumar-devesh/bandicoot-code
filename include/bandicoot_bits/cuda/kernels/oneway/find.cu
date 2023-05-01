@@ -33,7 +33,7 @@ COOT_FN(PREFIX,find)(const eT1* A,
   const UWORD start_elem = tid * elems_per_thread;
   UWORD end_elem = min((tid + 1) * elems_per_thread, n_elem);
 
-  UWORD out_index = (tid == 0) ? 0 : thread_counts[tid - 1];
+  UWORD out_index = thread_counts[tid];
 
   UWORD i = start_elem;
 

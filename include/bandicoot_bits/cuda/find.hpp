@@ -39,7 +39,7 @@ find(dev_mem_t<uword>& out, uword& out_len, const dev_mem_t<eT> A, const uword n
 
   // First, allocate temporary memory for the prefix sum.
   dev_mem_t<uword> counts_mem;
-  counts_mem.cuda_mem_ptr = get_rt().cuda_rt.acquire_memory<uword>(pow2_num_threads);
+  counts_mem.cuda_mem_ptr = get_rt().cuda_rt.acquire_memory<uword>(pow2_num_threads + 1);
 
   CUfunction nnz_k = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::count_nonzeros);
 
@@ -60,7 +60,7 @@ find(dev_mem_t<uword>& out, uword& out_len, const dev_mem_t<eT> A, const uword n
 
   get_rt().cuda_rt.synchronise();
 
-  const uword total_nonzeros = get_val(counts_mem, pow2_num_threads - 1);
+  const uword total_nonzeros = get_val(counts_mem, pow2_num_threads);
   out_len = (k == 0) ? total_nonzeros : (std::min)(k, total_nonzeros);
   out.cuda_mem_ptr = get_rt().cuda_rt.acquire_memory<uword>(out_len);
 
