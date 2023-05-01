@@ -113,9 +113,16 @@ struct oneway_kernel_id
     submat_var,
     submat_var_small,
     //
-    radix_sort_colwise,
-    radix_sort_rowwise,
-    radix_sort,
+    radix_sort_colwise_ascending,
+    radix_sort_rowwise_ascending,
+    radix_sort_ascending,
+    radix_sort_colwise_descending,
+    radix_sort_rowwise_descending,
+    radix_sort_descending,
+    radix_sort_index_ascending,
+    radix_sort_index_descending,
+    stable_radix_sort_index_ascending,
+    stable_radix_sort_index_descending,
     //
     count_nonzeros,
     find,
@@ -195,9 +202,16 @@ struct oneway_kernel_id
     names.push_back("submat_var");
     names.push_back("submat_var_small");
 
-    names.push_back("radix_sort_colwise");
-    names.push_back("radix_sort_rowwise");
-    names.push_back("radix_sort");
+    names.push_back("radix_sort_colwise_ascending");
+    names.push_back("radix_sort_rowwise_ascending");
+    names.push_back("radix_sort_ascending");
+    names.push_back("radix_sort_colwise_descending");
+    names.push_back("radix_sort_rowwise_descending");
+    names.push_back("radix_sort_descending");
+    names.push_back("radix_sort_index_ascending");
+    names.push_back("radix_sort_index_descending");
+    names.push_back("stable_radix_sort_index_ascending");
+    names.push_back("stable_radix_sort_index_descending");
 
     names.push_back("count_nonzeros");
     names.push_back("find");

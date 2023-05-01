@@ -99,6 +99,8 @@ class op_var;
 class op_range;
 class op_cov;
 class op_cor;
+class op_sort;
+class op_sort_vec;
 
 class mtop_conv_to;
 class mtop_all;
@@ -112,6 +114,7 @@ class mtop_rel_gteq_pre;
 class mtop_rel_gteq_post;
 class mtop_rel_eq;
 class mtop_rel_noteq;
+class mtop_sort_index;
 class mtop_find;
 
 class eop_scalar_plus;
