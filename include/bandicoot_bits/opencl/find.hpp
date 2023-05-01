@@ -31,41 +31,46 @@ find(dev_mem_t<uword>& out, uword& out_len, const dev_mem_t<eT> A, const uword n
     return;
     }
 
-/*
+  runtime_t::cq_guard guard;
+
+  cl_kernel nnz_k = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::count_nonzeros);
+
+  size_t kernel_wg_size;
+  cl_int status = clGetKernelWorkGroupInfo(nnz_k, get_rt().cl_rt.get_device(), CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &kernel_wg_size, NULL);
+  coot_check_cl_error(status, "coot::opencl::find(): clGetKernelWorkGroupInfo() failed");
+
   // The kernel requires that all threads are in one block.
-  const size_t mtpb = (size_t) get_rt().cuda_rt.dev_prop.maxThreadsPerBlock;
-  const size_t num_threads = std::min(mtpb, size_t(std::ceil(n_elem / std::max(1.0, (2 * std::ceil(std::log2(n_elem)))))));
-  // The number of threads needs to be a power of two.
-  const size_t pow2_num_threads = std::min(mtpb, (size_t) std::pow(2.0f, std::ceil(std::log2((float) num_threads))));
+  const size_t total_num_threads = std::ceil(n_elem / std::max(1.0, (2 * std::ceil(std::log2(n_elem)))));
+  const size_t pow2_num_threads = std::min(kernel_wg_size, (size_t) std::pow(2.0f, std::ceil(std::log2((float) total_num_threads))));
 
   // First, allocate temporary memory for the prefix sum.
   dev_mem_t<uword> counts_mem;
-  tmp_mem.cuda_mem_ptr = get_rt().cuda_rt.acquire_memory<uword>(pow2_num_threads);
+  counts_mem.cl_mem_ptr = get_rt().cl_rt.acquire_memory<uword>(pow2_num_threads + 1);
 
-  CUfunction nnz_k = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::count_nonzero);
+  runtime_t::adapt_uword cl_n_elem(n_elem);
 
-  const void* nnz_args[] = {
-      &(A.cuda_mem_ptr),
-      &(counts_mem.cuda_mem_ptr),
-      (uword*) &n_elem };
+  status  = clSetKernelArg(nnz_k, 0, sizeof(cl_mem),                      &(A.cl_mem_ptr));
+  status |= clSetKernelArg(nnz_k, 1, sizeof(cl_mem),                      &(counts_mem.cl_mem_ptr));
+  status |= clSetKernelArg(nnz_k, 2, cl_n_elem.size,                      cl_n_elem.addr);
+  status |= clSetKernelArg(nnz_k, 3, sizeof(eT) * (pow2_num_threads + 1), NULL);
 
-  CUresult result = cuLaunchKernel(
-      nnz_k,
-      1, 1, 1, pow2_num_threads, 1, 1,
-      sizeof(uword) * pow2_num_threads,
-      NULL,
-      (void**) args,
-      0);
+  coot_check_cl_error(status, "coot::opencl::find(): could not set kernel arguments for count_nonzeros kernel");
 
-  coot_check_cuda_error(result, "coot::cuda::find(): cuLaunchKernel() failed for count_nonzeros kernel");
+  const size_t k1_work_dim       = 1;
+  const size_t k1_work_offset[1] = { 0 };
+  const size_t k1_work_size[1]   = { pow2_num_threads };
 
-  get_rt().cuda_rt.synchronise();
+  status = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), nnz_k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+
+  coot_check_cl_error(status, "coot::opencl::find(): could not run find_nonzeros kernel");
+
+  get_rt().cl_rt.synchronise();
 
   const uword total_nonzeros = get_val(counts_mem, pow2_num_threads);
   out_len = (k == 0) ? total_nonzeros : (std::min)(k, total_nonzeros);
-  out.cuda_mem_ptr = get_rt().cuda_rt.acquire_memory<uword>((std::min)(out_len);
+  out.cl_mem_ptr = get_rt().cl_rt.acquire_memory<uword>(out_len);
 
-  if (output_size == 0)
+  if (out_len == 0)
     {
     // There are no nonzero values---we're done.
     return;
@@ -74,62 +79,59 @@ find(dev_mem_t<uword>& out, uword& out_len, const dev_mem_t<eT> A, const uword n
   if (k == 0 || total_nonzeros < k)
     {
     // Get all nonzero elements.
-    CUfunction k = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::find);
+    cl_kernel find_k = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::find);
 
-    const void* find_args[] = {
-        &(A.cuda_mem_ptr),
-        &(counts_mem.cuda_mem_ptr),
-        &(out.cuda_mem_ptr),
-        (uword*) &n_elem };
+    status  = clSetKernelArg(find_k, 0, sizeof(cl_mem), &(A.cl_mem_ptr));
+    status |= clSetKernelArg(find_k, 1, sizeof(cl_mem), &(counts_mem.cl_mem_ptr));
+    status |= clSetKernelArg(find_k, 2, sizeof(cl_mem), &(out.cl_mem_ptr));
+    status |= clSetKernelArg(find_k, 3, cl_n_elem.size, cl_n_elem.addr);
 
-    result = cuLaunchKernel(
-        k,
-        1, 1, 1, pow2_num_threads, 1, 1,
-        0, NULL, (void**) find_args, 0);
+    coot_check_cl_error(status, "coot::opencl::find(): could not set kernel arguments for find kernel");
 
-    coot_check_cuda_error(result, "coot::cuda::find(): cuLaunchKernel() failed for find kernel");
+    status = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), find_k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+
+    coot_check_cl_error(status, "coot::opencl::find(): could not run find kernel");
     }
   else if (find_type == 0)
     {
     // Get first `k` nonzero elements.
-    CUfunction k = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::find_first);
+    cl_kernel find_k = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::find_first);
 
-    const void* find_args[] = {
-        &(A.cuda_mem_ptr),
-        &(counts_mem.cuda_mem_ptr),
-        &(out.cuda_mem_ptr),
-        (uword*) &k,
-        (uword*) &n_elem };
+    runtime_t::adapt_uword cl_k(k);
 
-    result = cuLaunchKernel(
-        k,
-        1, 1, 1, pow2_num_threads, 1, 1,
-        0, NULL, (void**) find_args, 0);
+    status  = clSetKernelArg(find_k, 0, sizeof(cl_mem), &(A.cl_mem_ptr));
+    status |= clSetKernelArg(find_k, 1, sizeof(cl_mem), &(counts_mem.cl_mem_ptr));
+    status |= clSetKernelArg(find_k, 2, sizeof(cl_mem), &(out.cl_mem_ptr));
+    status |= clSetKernelArg(find_k, 3, cl_k.size,      cl_k.addr);
+    status |= clSetKernelArg(find_k, 4, cl_n_elem.size, cl_n_elem.addr);
 
-    coot_check_cuda_error(result, "coot::cuda::find(): cuLaunchKernel() failed for find_first kernel");
+    coot_check_cl_error(status, "coot::opencl::find(): could not set kernel arguments for find_first kernel");
+
+    status = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), find_k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+
+    coot_check_cl_error(status, "coot::opencl::find(): could not run find_first kernel");
     }
   else
     {
     // Get last `k` nonzero elements.
-    CUfunction k = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::find_last);
+    cl_kernel find_k = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::find_last);
 
-    const uword m = total_nonzero - k;
+    const uword m = total_nonzeros - k;
 
-    const void* find_args[] = {
-        &(A.cuda_mem_ptr),
-        &(counts_mem.cuda_mem_ptr),
-        &(out.cuda_mem_ptr),
-        (uword*) &m,
-        (uword*) &n_elem };
+    runtime_t::adapt_uword cl_m(m);
 
-    result = cuLaunchKernel(
-        k,
-        1, 1, 1, pow2_num_threads, 1, 1,
-        0, NULL, (void**) find_args, 0);
+    status  = clSetKernelArg(find_k, 0, sizeof(cl_mem), &(A.cl_mem_ptr));
+    status |= clSetKernelArg(find_k, 1, sizeof(cl_mem), &(counts_mem.cl_mem_ptr));
+    status |= clSetKernelArg(find_k, 2, sizeof(cl_mem), &(out.cl_mem_ptr));
+    status |= clSetKernelArg(find_k, 3, cl_m.size,      cl_m.addr);
+    status |= clSetKernelArg(find_k, 4, cl_n_elem.size, cl_n_elem.addr);
 
-    coot_check_cuda_error(result, "coot::cuda::find(): cuLaunchKernel() failed for find_last kernel");
+    coot_check_cl_error(status, "coot::opencl::find(): could not set kernel arguments for find_last kernel");
+
+    status = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), find_k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+
+    coot_check_cl_error(status, "coot::opencl::find(): could not run find_last kernel");
     }
 
-  get_rt().cuda_rt.release_memory(counts_mem.cuda_mem_ptr);
-*/
+  get_rt().cl_rt.release_memory(counts_mem.cl_mem_ptr);
   }
