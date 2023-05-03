@@ -16,15 +16,15 @@
 
 __kernel
 void
-COOT_FN(PREFIX,symmatu)(__global eT1* out,
-                        const UWORD size)
+COOT_FN(PREFIX,symmatu_inplace)(__global eT1* out,
+                                const UWORD size)
   {
   const UWORD row = get_global_id(0);
   const UWORD col = get_global_id(1);
 
   if (row < size && col < size && col > row)
     {
-    const eT1 val = A[row + size * col];
+    const eT1 val = out[row + size * col];
 
     // only need to copy to the lower triangle for the in-place version
     out[col + size * row] = val;

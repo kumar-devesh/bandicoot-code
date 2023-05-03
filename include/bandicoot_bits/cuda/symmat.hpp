@@ -29,15 +29,15 @@ symmat(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword size, const uwor
 
   coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "coot::cuda::symmat(): CUDA runtime not valid");
 
-  kernel_dims dims = two_dimensional_grid_dims(n_rows, n_cols);
+  kernel_dims dims = two_dimensional_grid_dims(size, size);
 
   // If out == in, then we can avoid the copy of the input triangle.
   CUfunction k;
-  void** args;
+  const void** args;
   const void* args_inplace[]  = { &(out.cuda_mem_ptr), (uword*) &size };
-  const void* args_separate[] = { &(out.cuda_mem_ptr), &(A.cuda_mem_ptr), (uword*) &size };
+  const void* args_separate[] = { &(out.cuda_mem_ptr), &(in.cuda_mem_ptr), (uword*) &size };
 
-  if (out.cuda_mem_ptr == in.cuda_mem_ptr)
+  if ((void*) out.cuda_mem_ptr == (void*) in.cuda_mem_ptr)
     {
     k = (lower == 1) ? get_rt().cuda_rt.get_kernel<eT2>(oneway_kernel_id::symmatl_inplace) : get_rt().cuda_rt.get_kernel<eT2>(oneway_kernel_id::symmatu_inplace);
     args = args_inplace;

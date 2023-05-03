@@ -24,7 +24,7 @@ COOT_FN(PREFIX,symmatu_inplace)(eT1* out,
 
   if (row < size && col < size && col > row)
     {
-    const eT1 val = A[row + size * col];
+    const eT1 val = out[row + size * col];
 
     // only need to copy to the lower triangle for the in-place version
     out[col + size * row] = val;

@@ -23,8 +23,6 @@ op_symmat::apply(Mat<out_eT>& out, const Op<T1, op_symmat>& in)
 
   const uword lower = in.aux_uword_a;
 
-  typedef typename T1::elem_type eT;
-
   const unwrap<T1> U(in.m);
   const extract_subview<typename unwrap<T1>::stored_type> E(U.M);
 
@@ -39,7 +37,14 @@ op_symmat::apply(Mat<out_eT>& out, const Op<T1, op_symmat>& in)
 
   // It's okay if `out` is an alias of `E.M`; the kernel can be run in-place with no problems.
   out.set_size(E.M.n_rows, E.M.n_cols);
-  coot_rt_t::symmat(out.get_dev_mem(false), E.M.get_dev_mem(false), E.M.n_rows, E.M.n_cols, lower);
+
+  if (E.M.n_elem == 0)
+    {
+    // Nothing to do---quit early.
+    return;
+    }
+
+  coot_rt_t::symmat(out.get_dev_mem(false), E.M.get_dev_mem(false), E.M.n_rows, lower);
   }
 
 
@@ -53,9 +58,7 @@ op_symmat::apply(Mat<out_eT>& out, const Op<mtOp<out_eT, T1, mtop_conv_to>, op_s
 
   const uword lower = in.aux_uword_a;
 
-  typedef typename T1::elem_type eT;
-
-  const unwrap<T1> U(in.Q.m);
+  const unwrap<T1> U(in.m.q);
   const extract_subview<typename unwrap<T1>::stored_type> E(U.M);
 
   if (lower)
@@ -69,7 +72,14 @@ op_symmat::apply(Mat<out_eT>& out, const Op<mtOp<out_eT, T1, mtop_conv_to>, op_s
 
   // Aliases are not possible if a conversion is involved.
   out.set_size(E.M.n_rows, E.M.n_cols);
-  coot_rt_t::symmat(out.get_dev_mem(false), E.M.get_dev_mem(false), E.M.n_rows, E.M.n_cols, lower);
+
+  if (E.M.n_elem == 0)
+    {
+    // Nothing to do---quit early.
+    return;
+    }
+
+  coot_rt_t::symmat(out.get_dev_mem(false), E.M.get_dev_mem(false), E.M.n_rows, lower);
   }
 
 
