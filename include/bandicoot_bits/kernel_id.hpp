@@ -124,6 +124,9 @@ struct oneway_kernel_id
     stable_radix_sort_index_ascending,
     stable_radix_sort_index_descending,
     //
+    symmatu_inplace,
+    symmatl_inplace,
+    //
     invalid_kernel
     };
 
@@ -207,6 +210,9 @@ struct oneway_kernel_id
     names.push_back("radix_sort_index_descending");
     names.push_back("stable_radix_sort_index_ascending");
     names.push_back("stable_radix_sort_index_descending");
+
+    names.push_back("symmatu_inplace");
+    names.push_back("symmatl_inplace");
 
     return names;
     }
@@ -492,6 +498,9 @@ struct twoway_kernel_id
     rel_any_neq_colwise,
     rel_any_neq_rowwise,
     //
+    symmatu,
+    symmatl,
+    //
     invalid_kernel
     };
 
@@ -659,6 +668,9 @@ struct twoway_kernel_id
     names.push_back("rel_any_neq_small");
     names.push_back("rel_any_neq_colwise");
     names.push_back("rel_any_neq_rowwise");
+
+    names.push_back("symmatu");
+    names.push_back("symmatl");
 
     return names;
     }
