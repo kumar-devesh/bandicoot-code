@@ -124,6 +124,11 @@ struct oneway_kernel_id
     stable_radix_sort_index_ascending,
     stable_radix_sort_index_descending,
     //
+    count_nonzeros,
+    find,
+    find_first,
+    find_last,
+    //
     invalid_kernel
     };
 
@@ -207,6 +212,11 @@ struct oneway_kernel_id
     names.push_back("radix_sort_index_descending");
     names.push_back("stable_radix_sort_index_ascending");
     names.push_back("stable_radix_sort_index_descending");
+
+    names.push_back("count_nonzeros");
+    names.push_back("find");
+    names.push_back("find_first");
+    names.push_back("find_last");
 
     return names;
     }

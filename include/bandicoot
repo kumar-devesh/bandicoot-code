@@ -240,6 +240,7 @@ namespace coot
   #include "bandicoot_bits/mtop_any_bones.hpp"
   #include "bandicoot_bits/mtop_relational_bones.hpp"
   #include "bandicoot_bits/mtop_sort_index_bones.hpp"
+  #include "bandicoot_bits/mtop_find_bones.hpp"
 
   #include "bandicoot_bits/glue_times_bones.hpp"
   #include "bandicoot_bits/glue_cov_bones.hpp"
@@ -359,6 +360,7 @@ namespace coot
       #include "bandicoot_bits/opencl/var.hpp"
       #include "bandicoot_bits/opencl/join_cols.hpp"
       #include "bandicoot_bits/opencl/join_rows.hpp"
+      #include "bandicoot_bits/opencl/find.hpp"
 //      #include "bandicoot_bits/opencl/eig.hpp"
       }
   #endif
@@ -405,6 +407,7 @@ namespace coot
     #include "bandicoot_bits/cuda/var.hpp"
     #include "bandicoot_bits/cuda/join_cols.hpp"
     #include "bandicoot_bits/cuda/join_rows.hpp"
+    #include "bandicoot_bits/cuda/find.hpp"
 //    #include "bandicoot_bits/cuda/eig.hpp"
     }
   #endif
@@ -481,6 +484,7 @@ namespace coot
   #include "bandicoot_bits/fn_join.hpp"
   #include "bandicoot_bits/fn_sort.hpp"
   #include "bandicoot_bits/fn_sort_index.hpp"
+  #include "bandicoot_bits/fn_find.hpp"
 
 
   //
@@ -540,6 +544,7 @@ namespace coot
   #include "bandicoot_bits/mtop_any_meat.hpp"
   #include "bandicoot_bits/mtop_relational_meat.hpp"
   #include "bandicoot_bits/mtop_sort_index_meat.hpp"
+  #include "bandicoot_bits/mtop_find_meat.hpp"
 
   #include "bandicoot_bits/glue_times_meat.hpp"
   #include "bandicoot_bits/glue_cov_meat.hpp"

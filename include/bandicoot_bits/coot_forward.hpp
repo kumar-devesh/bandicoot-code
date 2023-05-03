@@ -115,6 +115,7 @@ class mtop_rel_gteq_post;
 class mtop_rel_eq;
 class mtop_rel_noteq;
 class mtop_sort_index;
+class mtop_find;
 
 class eop_scalar_plus;
 class eop_neg;
