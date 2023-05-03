@@ -24,7 +24,7 @@ COOT_FN(PREFIX,count_nonzeros)(const eT1* A,
   // This will give us a count for each individual thread; we then want to prefix-sum this.
   // This kernel is meant to be used as the first part of find().
 
-  uint_eT1* aux_mem = (uint_eT1*) aux_shared_mem; // should have size equal to num_threads
+  uint_eT1* aux_mem = (uint_eT1*) aux_shared_mem; // should have size equal to num_threads + 1
 
   const UWORD tid = threadIdx.x;
 
