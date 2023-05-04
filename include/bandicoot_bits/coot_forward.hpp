@@ -116,6 +116,9 @@ class mtop_rel_eq;
 class mtop_rel_noteq;
 class mtop_sort_index;
 class mtop_find;
+class mtop_find_finite;
+class mtop_find_nonfinite;
+class mtop_find_nan;
 
 class eop_scalar_plus;
 class eop_neg;

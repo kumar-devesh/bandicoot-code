@@ -226,6 +226,10 @@ mtop_all::all_vec(T1& X)
 
   typedef typename T1::elem_type eT;
   unwrap<T1> U(X);
+  if (U.M.n_elem == 0)
+    {
+    return true; // This matches compatibility with Armadillo and Octave.
+    }
 
   return coot_rt_t::all_vec(U.M.get_dev_mem(false), U.M.n_elem, eT(0), twoway_kernel_id::rel_all_neq, twoway_kernel_id::rel_all_neq_small);
   }
@@ -253,6 +257,10 @@ mtop_all::all_vec(const mtOp<eT2, T1, mtop_conv_to>& op)
   coot_extra_debug_sigprint();
 
   unwrap<T1> U(op.q);
+  if (U.M.n_elem == 0)
+    {
+    return true; // This matches compatibility with Armadillo and Octave.
+    }
 
   return coot_rt_t::all_vec(U.M.get_dev_mem(false), U.M.n_elem, eT2(0), twoway_kernel_id::rel_all_neq, twoway_kernel_id::rel_all_neq_small);
   }
@@ -306,6 +314,10 @@ mtop_all::all_vec(const mtOp<uword, T1, mtop_type>& in,
 
   // No optimization possible.
   unwrap<mtOp<uword, T1, mtop_type>> U(in);
+  if (U.M.n_elem == 0)
+    {
+    return true; // This matches compatibility with Armadillo and Octave.
+    }
 
   return coot_rt_t::all_vec(U.M.get_dev_mem(false), U.M.n_elem, eT(0), twoway_kernel_id::rel_all_neq, twoway_kernel_id::rel_all_neq_small);
   }

@@ -258,6 +258,10 @@ struct oneway_real_kernel_id
     vec_norm_min,
     vec_norm_min_small,
     //
+    rel_isfinite,
+    rel_isnonfinite,
+    rel_isnan,
+    //
     invalid_kernel
     };
 
@@ -281,6 +285,10 @@ struct oneway_real_kernel_id
     names.push_back("vec_norm_k_small");
     names.push_back("vec_norm_min");
     names.push_back("vec_norm_min_small");
+
+    names.push_back("rel_isfinite");
+    names.push_back("rel_isnonfinite");
+    names.push_back("rel_isnan");
 
     return names;
     }

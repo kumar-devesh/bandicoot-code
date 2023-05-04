@@ -47,6 +47,39 @@ relational_scalar_op(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> in_mem, cons
 
 
 
+template<typename eT1>
+inline
+void
+relational_unary_array_op(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> in_mem, const uword n_elem, const oneway_real_kernel_id::enum_id num, const std::string& name)
+  {
+  coot_extra_debug_sigprint();
+
+  // Shortcut: if there is nothing to do, return.
+  if (n_elem == 0)
+    return;
+
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT1>(num);
+
+  runtime_t::cq_guard guard;
+  runtime_t::adapt_uword N(n_elem);
+
+  cl_int status = 0;
+
+  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &out_mem.cl_mem_ptr);
+  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &in_mem.cl_mem_ptr );
+  status |= clSetKernelArg(kernel, 2, N.size,         N.addr             );
+
+  coot_check_cl_error(status, "coot::opencl::relational_unary_array_op() (" + name + "): couldn't set kernel arguments");
+
+  size_t work_size = size_t(n_elem);
+
+  status = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &work_size, NULL, 0, NULL, NULL);
+
+  coot_check_cl_error(status, "coot::opencl::relational_unary_array_op() (" + name + "): couldn't execute kernel");
+  }
+
+
+
 template<typename eT1, typename eT2>
 inline
 void
