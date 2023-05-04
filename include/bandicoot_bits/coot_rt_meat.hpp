@@ -2734,6 +2734,37 @@ coot_rt_t::sort_index_vec(dev_mem_t<uword> out, dev_mem_t<eT> A, const uword n_e
 
 
 
+template<typename eT>
+inline
+void
+coot_rt_t::find(dev_mem_t<uword>& out, uword& out_len, const dev_mem_t<eT> A, const uword n_elem, const uword k, const uword find_type)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    opencl::find(out, out_len, A, n_elem, k, find_type);
+    #else
+    coot_stop_runtime_error("coot_rt::find(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    cuda::find(out, out_len, A, n_elem, k, find_type);
+    #else
+    coot_stop_runtime_error("coot_rt::find(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::find(): unknown backend");
+    }
+  }
+
+
+
 template<typename eT1, typename eT2>
 inline
 void
