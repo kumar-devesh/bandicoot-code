@@ -217,8 +217,8 @@ TEMPLATE_TEST_CASE("symmatu_in_expr", "[symmat]", float, double, u32, s32, u64, 
 
   Mat<eT> y = repmat(symmatu(x), 3, 2);
 
-  REQUIRE( y.n_rows == x.n_rows * 2 );
-  REQUIRE( y.n_cols == x.n_cols * 3 );
+  REQUIRE( y.n_rows == x.n_rows * 3 );
+  REQUIRE( y.n_cols == x.n_cols * 2 );
 
   Mat<eT> z = symmatu(x);
   Mat<eT> y_ref = repmat(z, 3, 2);
@@ -237,12 +237,12 @@ TEMPLATE_TEST_CASE("expr_in_symmatu", "[symmat]", float, double, u32, s32, u64, 
 
   Mat<eT> x = randi<Mat<eT>>(20, 40, distr_param(1, 100));
 
-  Mat<eT> y = symmatu(repmat(x, 1, 2).t() + 4);
+  Mat<eT> y = symmatu(repmat(x, 2, 1).t() + 4);
 
   REQUIRE( y.n_rows == x.n_cols );
   REQUIRE( y.n_cols == x.n_cols );
 
-  Mat<eT> z = repmat(x, 1, 2).t() + 4;
+  Mat<eT> z = repmat(x, 2, 1).t() + 4;
   Mat<eT> y_ref = symmatu(z);
 
   arma::Mat<eT> y_cpu(y);
@@ -577,10 +577,10 @@ TEMPLATE_TEST_CASE("symmatl_in_expr", "[symmat]", float, double, u32, s32, u64, 
 
   Mat<eT> y = repmat(symmatl(x), 3, 2);
 
-  REQUIRE( y.n_rows == x.n_rows * 2 );
-  REQUIRE( y.n_cols == x.n_cols * 3 );
+  REQUIRE( y.n_rows == x.n_rows * 3 );
+  REQUIRE( y.n_cols == x.n_cols * 2 );
 
-  Mat<eT> z = symmatu(x);
+  Mat<eT> z = symmatl(x);
   Mat<eT> y_ref = repmat(z, 3, 2);
 
   arma::Mat<eT> y_cpu(y);
@@ -597,12 +597,12 @@ TEMPLATE_TEST_CASE("expr_in_symmatl", "[symmat]", float, double, u32, s32, u64, 
 
   Mat<eT> x = randi<Mat<eT>>(20, 40, distr_param(1, 100));
 
-  Mat<eT> y = symmatl(repmat(x, 1, 2).t() + 4);
+  Mat<eT> y = symmatl(repmat(x, 2, 1).t() + 4);
 
   REQUIRE( y.n_rows == x.n_cols );
   REQUIRE( y.n_cols == x.n_cols );
 
-  Mat<eT> z = repmat(x, 1, 2).t() + 4;
+  Mat<eT> z = repmat(x, 2, 1).t() + 4;
   Mat<eT> y_ref = symmatl(z);
 
   arma::Mat<eT> y_cpu(y);
