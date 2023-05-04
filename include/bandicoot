@@ -241,6 +241,9 @@ namespace coot
   #include "bandicoot_bits/mtop_relational_bones.hpp"
   #include "bandicoot_bits/mtop_sort_index_bones.hpp"
   #include "bandicoot_bits/mtop_find_bones.hpp"
+  #include "bandicoot_bits/mtop_find_finite_bones.hpp"
+  #include "bandicoot_bits/mtop_find_nonfinite_bones.hpp"
+  #include "bandicoot_bits/mtop_find_nan_bones.hpp"
 
   #include "bandicoot_bits/glue_times_bones.hpp"
   #include "bandicoot_bits/glue_cov_bones.hpp"
@@ -545,6 +548,9 @@ namespace coot
   #include "bandicoot_bits/mtop_relational_meat.hpp"
   #include "bandicoot_bits/mtop_sort_index_meat.hpp"
   #include "bandicoot_bits/mtop_find_meat.hpp"
+  #include "bandicoot_bits/mtop_find_finite_meat.hpp"
+  #include "bandicoot_bits/mtop_find_nonfinite_meat.hpp"
+  #include "bandicoot_bits/mtop_find_nan_meat.hpp"
 
   #include "bandicoot_bits/glue_times_meat.hpp"
   #include "bandicoot_bits/glue_cov_meat.hpp"
