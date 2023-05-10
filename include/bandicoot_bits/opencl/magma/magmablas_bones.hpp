@@ -60,6 +60,16 @@
 #define MAGMABLAS_TRANS_NB 32
 #define MAGMABLAS_TRANS_INPLACE_NB 16
 
+#define MAGMABLAS_LASWP_MAX_PIVOTS 32
+#define MAGMABLAS_LASWP_NTHREADS 64
+
+// Utility struct for laswp
+typedef struct
+  {
+  int npivots;
+  int ipiv[MAGMABLAS_LASWP_MAX_PIVOTS];
+  } magmablas_laswp_params_t;
+
 
 
 inline
@@ -78,6 +88,25 @@ template<typename eT>
 inline
 void
 magmablas_run_laset_kernel(const opencl::magma_real_kernel_id::enum_id num, magma_uplo_t uplo, magma_int_t m, magma_int_t n, eT offdiag, eT diag, cl_mem dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue);
+
+
+
+inline
+void
+magmablas_slaswp(magma_int_t n, magmaFloat_ptr dAT, size_t dAT_offset, magma_int_t ldda, magma_int_t k1, magma_int_t k2, const magma_int_t* ipiv, magma_int_t inci, magma_queue_t queue);
+
+
+
+inline
+void
+magmablas_dlaswp(magma_int_t n, magmaDouble_ptr dAT, size_t dAT_offset, magma_int_t ldda, magma_int_t k1, magma_int_t k2, const magma_int_t* ipiv, magma_int_t inci, magma_queue_t queue);
+
+
+
+template<typename eT>
+inline
+void
+magmablas_laswp(magma_int_t n, cl_mem dAT, size_t dAT_offset, magma_int_t ldda, magma_int_t k1, magma_int_t k2, const magma_int_t* ipiv, magma_int_t inci, magma_queue_t queue);
 
 
 

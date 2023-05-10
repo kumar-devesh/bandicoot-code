@@ -121,6 +121,14 @@ kernel_src::get_src_preamble()
   "#define MAGMA_TRANS_NY 8 \n"
   "#define MAGMA_TRANS_NB 32 \n"
   "#define MAGMA_TRANS_INPLACE_NB 16 \n"
+  "#define MAGMABLAS_LASWP_MAX_PIVOTS 32 \n"
+  "#define MAGMABLAS_LASWP_NTHREADS 64 \n"
+  "\n"
+  "typedef struct \n"
+  "  { \n"
+  "  int npivots; \n"
+  "  int ipiv[MAGMABLAS_LASWP_MAX_PIVOTS]; \n"
+  "  } magmablas_laswp_params_t; \n"
   ;
 
   return source;
