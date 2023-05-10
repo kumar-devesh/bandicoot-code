@@ -129,6 +129,9 @@ magma_dgetrf_gpu
   minmn = std::min( m, n );
 
   magma_queue_t queues[2];
+
+  queues[0] = magma_queue_create();
+
   magma_int_t nb = magma_get_dgetrf_nb( m );
 
   if (nb <= 1 || nb >= std::min(m, n) )
@@ -137,19 +140,20 @@ magma_dgetrf_gpu
     if ( MAGMA_SUCCESS != magma_dmalloc_cpu( &work, m*n ))
       {
       *info = MAGMA_ERR_HOST_ALLOC;
+      magma_queue_destroy( queues[0] );
       return *info;
       }
-    magma_dgetmatrix( m, n, dA, dA_offset, ldda, work, m, NULL);
+    magma_dgetmatrix( m, n, dA, dA_offset, ldda, work, m, queues[0]);
     coot_fortran(coot_dgetrf)( &m, &n, work, &m, ipiv, info );
-    magma_dsetmatrix( m, n, work, m, dA, dA_offset, ldda, NULL);
+    magma_dsetmatrix( m, n, work, m, dA, dA_offset, ldda, queues[0]);
     magma_free_cpu( work );
     work=NULL;
 
+    magma_queue_destroy( queues[0] );
     return *info;
     }
   else
     {
-    queues[0] = magma_queue_create();
     queues[1] = magma_queue_create();
 
     /* Use hybrid blocked code. */

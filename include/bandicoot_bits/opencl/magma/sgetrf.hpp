@@ -126,24 +126,26 @@ magma_sgetrf_gpu
   magma_int_t nb = magma_get_sgetrf_nb( m );
 
   magma_queue_t queues[2];
+  queues[0] = magma_queue_create();
 
   if (nb <= 1 || nb >= std::min(m,n) )
     {
     if ( MAGMA_SUCCESS != magma_smalloc_cpu( &work, m*n ))
       {
       *info = MAGMA_ERR_HOST_ALLOC;
+      magma_queue_destroy( queues[0] );
       return *info;
       }
-    magma_sgetmatrix( m, n, dA, dA_offset, ldda, work, m, NULL);
+    magma_sgetmatrix( m, n, dA, dA_offset, ldda, work, m, queues[0] );
     coot_fortran(coot_sgetrf)( &m, &n, work, &m, ipiv, info );
-    magma_ssetmatrix( m, n, work, m, dA, dA_offset, ldda, NULL);
+    magma_ssetmatrix( m, n, work, m, dA, dA_offset, ldda, queues[0] );
     magma_free_cpu( work );  work=NULL;
 
+    magma_queue_destroy( queues[0] );
     return *info;
     }
   else
     {
-    queues[0] = magma_queue_create();
     queues[1] = magma_queue_create();
 
     /* Use blocked code. */
