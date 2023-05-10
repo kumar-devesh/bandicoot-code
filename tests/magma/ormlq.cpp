@@ -188,6 +188,8 @@ TEST_CASE("magma_dormlq_1", "[ormlq]")
         }
       }
     }
+
+  magma_queue_destroy( queue );
   }
 
 
@@ -323,6 +325,8 @@ TEST_CASE("magma_sormlq_1", "[ormlq]")
         }
       }
     }
+
+  magma_queue_destroy( queue );
   }
 
 #endif

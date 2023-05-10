@@ -158,6 +158,8 @@ TEST_CASE("magma_dorgqr2_1", "[orgqr2]")
     magma_free( dA );
     magma_free( dT );
     }
+
+  magma_queue_destroy( queue );
   }
 
 
@@ -263,6 +265,8 @@ TEST_CASE("magma_sorgqr2_1", "[orgqr2]")
     magma_free( dA );
     magma_free( dT );
     }
+
+  magma_queue_destroy( queue );
   }
 
 #endif

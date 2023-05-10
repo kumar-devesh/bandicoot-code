@@ -277,6 +277,8 @@ TEST_CASE("magma_dgeqrf2_1", "[geqrf]")
     magma_free_pinned( h_R );
     magma_free( d_A );
     }
+
+  magma_queue_destroy( queue );
   }
 
 
@@ -501,6 +503,8 @@ TEST_CASE("magma_sgeqrf2_1", "[geqrf]")
     magma_free_pinned( h_R );
     magma_free( d_A );
     }
+
+  magma_queue_destroy( queue );
   }
 
 #endif
