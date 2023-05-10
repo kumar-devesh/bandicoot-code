@@ -1257,6 +1257,39 @@ coot_rt_t::chol(dev_mem_t<eT> out, const uword n_rows)
 
 template<typename eT>
 inline
+bool
+coot_rt_t::lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const uword n_rows, const uword n_cols)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::lu(L, U, pivoting, P, n_rows, n_cols);
+    #else
+    coot_stop_runtime_error("coot_rt::lu(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::lu(L, U, pivoting, P, n_rows, n_cols);
+    #else
+    coot_stop_runtime_error("coot_rt::lu(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::lu(): unknown backend");
+    }
+
+  return false; // fix warnings
+  }
+
+
+
+template<typename eT>
+inline
 std::tuple<bool, std::string>
 coot_rt_t::svd(dev_mem_t<eT> U, dev_mem_t<eT> S, dev_mem_t<eT> V, dev_mem_t<eT> A, const uword n_rows, const uword n_cols, const bool compute_u_vt)
   {
