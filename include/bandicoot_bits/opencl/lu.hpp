@@ -39,11 +39,11 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
     if (pivoting)
       {
       ipiv = new int[ipiv_size];
-      status = magma_dgetrf_gpu(n_rows, n_cols, U.cl_mem_ptr, 0, n_rows, ipiv, &info);
+      status = magma_sgetrf_gpu(n_rows, n_cols, U.cl_mem_ptr, 0, n_rows, ipiv, &info);
       }
     else
       {
-      status = magma_dgetrf_nopiv_gpu(n_rows, n_cols, U.cl_mem_ptr, 0, n_rows, &info);
+      status = magma_sgetrf_nopiv_gpu(n_rows, n_cols, U.cl_mem_ptr, 0, n_rows, &info);
       }
     }
   else if (is_double<eT>::value)
@@ -51,11 +51,11 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
     if (pivoting)
       {
       ipiv = new int[ipiv_size];
-      status = magma_sgetrf_gpu(n_rows, n_cols, U.cl_mem_ptr, 0, n_rows, ipiv, &info);
+      status = magma_dgetrf_gpu(n_rows, n_cols, U.cl_mem_ptr, 0, n_rows, ipiv, &info);
       }
     else
       {
-      status = magma_sgetrf_gpu(n_rows, n_cols, U.cl_mem_ptr, 0, n_rows, &info);
+      status = magma_dgetrf_nopiv_gpu(n_rows, n_cols, U.cl_mem_ptr, 0, n_rows, &info);
       }
     }
   else
@@ -109,7 +109,8 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
         }
       }
 
-    dev_mem_t<uword> ipiv_gpu = get_rt().cl_rt.acquire_memory<uword>(n_rows);
+    dev_mem_t<uword> ipiv_gpu;
+    ipiv_gpu.cl_mem_ptr = get_rt().cl_rt.acquire_memory<uword>(n_rows);
     copy_into_dev_mem(ipiv_gpu, ipiv2, n_rows);
     delete[] ipiv;
     delete[] ipiv2;
