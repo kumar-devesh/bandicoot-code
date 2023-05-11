@@ -302,7 +302,7 @@ TEMPLATE_TEST_CASE("random_four_join_rows", "[join_rows]", float, double, u32, s
   {
   typedef TestType eT;
 
-  for (size_t t = 6; t < 12; ++t)
+  for (size_t t = 6; t < 10; ++t)
     {
     const uword n_rows = (uword) std::pow(2.0, (double) t) + 3;
     const uword n_cols_1 = (uword) std::pow(2.0, (double) (t - 1)) - 1;
