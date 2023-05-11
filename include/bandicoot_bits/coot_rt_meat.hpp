@@ -1224,7 +1224,7 @@ coot_rt_t::relational_array_op(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> X_
 
 template<typename eT>
 inline
-bool
+std::tuple<bool, std::string>
 coot_rt_t::chol(dev_mem_t<eT> out, const uword n_rows)
   {
   coot_extra_debug_sigprint();
@@ -1250,7 +1250,7 @@ coot_rt_t::chol(dev_mem_t<eT> out, const uword n_rows)
     coot_stop_runtime_error("coot_rt::chol(): unknown backend");
     }
 
-  return false; // fix warnings
+  return std::make_tuple(false, ""); // fix warnings
   }
 
 

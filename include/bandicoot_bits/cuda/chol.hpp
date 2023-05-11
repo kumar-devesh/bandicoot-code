@@ -14,102 +14,127 @@
 
 
 
+// Utility cleanup function to clean up any allocated memory.
+inline
+void
+chol_cleanup(void* gpu_workspace, char* host_workspace, int* dev_info)
+  {
+  cudaFree(gpu_workspace);
+  cpu_memory::release(host_workspace);
+  cudaFree(dev_info);
+  }
+
+
+
 /**
  * Compute the Cholesky decomposition using CUDA.
  */
 template<typename eT>
 inline
-bool
+std::tuple<bool, std::string>
 chol(dev_mem_t<eT> mem, const uword n_rows)
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "coot::cuda::chol(): cuda runtime not valid");
+  if (get_rt().cuda_rt.is_valid() == false)
+    {
+    return std::make_tuple(false, "CUDA runtime not valid");
+    }
 
   // The cuSolverDN library provides a potrf() implementation.  ...and its own entirely separate error code type.
-
   cusolverStatus_t status;
   cudaError_t status2;
 
-  // This is an additional error code for cusolverDn; but it is an error code on the device...
-  // TODO: check it for additional better error output
-  int* dev_info = NULL;
-  cudaMalloc(&dev_info, sizeof(int));
-
-  if (std::is_same<eT, float>::value)
+  cudaDataType data_type;
+  if (is_float<eT>::value)
     {
-    int workspace_size = 0;
-    status = cusolverDnSpotrf_bufferSize(get_rt().cuda_rt.cusolver_handle,
-                                         CUBLAS_FILL_MODE_UPPER,
-                                         (int) n_rows,
-                                         (float*) mem.cuda_mem_ptr,
-                                         (int) n_rows,
-                                         &workspace_size);
-    coot_check_cusolver_error(status, "coot::cuda::chol(): couldn't calculate workspace size with cusolverDnSpotrf_bufferSize()");
-
-    // Now allocate workspace for cuSolverDn.
-    float* workspace_mem = NULL;
-    status2 = cudaMalloc((void**) &workspace_mem, sizeof(float) * workspace_size);
-    coot_check_cuda_error(status2, "coot::cuda::chol(): couldn't cudaMalloc() workspace memory");
-
-    status = cusolverDnSpotrf(get_rt().cuda_rt.cusolver_handle,
-                              CUBLAS_FILL_MODE_UPPER,
-                              (int) n_rows,
-                              (float*) mem.cuda_mem_ptr,
-                              (int) n_rows,
-                              workspace_mem,
-                              workspace_size,
-                              dev_info);
-    coot_check_cusolver_error(status, "coot::cuda::chol(): couldn't run cusolverDnSpotrf()");
-
-    if (workspace_mem)
-      {
-      status2 = cudaFree(workspace_mem);
-      coot_check_cuda_error(status2, "coot::cuda::chol(): couldn't cudaFree() workspace memory");
-      }
+    data_type = CUDA_R_32F;
     }
-  else if (std::is_same<eT, double>::value)
+  else if (is_double<eT>::value)
     {
-    int workspace_size = 0;
-    status = cusolverDnDpotrf_bufferSize(get_rt().cuda_rt.cusolver_handle,
-                                         CUBLAS_FILL_MODE_UPPER,
-                                         (int) n_rows,
-                                         (double*) mem.cuda_mem_ptr,
-                                         (int) n_rows,
-                                         &workspace_size);
-    coot_check_cusolver_error(status, "coot::cuda::chol(): couldn't calculate workspace size with cusolverDnDpotrf_bufferSize()");
-
-    // Now allocate workspace for cuSolverDN.
-    double* workspace_mem = NULL;
-    status2 = cudaMalloc((void**) &workspace_mem, sizeof(double) * workspace_size);
-    coot_check_cuda_error(status2, "coot::cuda::chol(): couldn't cudaMalloc() workspace memory");
-
-    status = cusolverDnDpotrf(get_rt().cuda_rt.cusolver_handle,
-                              CUBLAS_FILL_MODE_UPPER,
-                              (int) n_rows,
-                              (double*) mem.cuda_mem_ptr,
-                              (int) n_rows,
-                              workspace_mem,
-                              workspace_size,
-                              dev_info);
-    coot_check_cusolver_error(status, "coot::cuda::chol(): couldn't run cusolverDnSpotrf()");
-
-    if (workspace_mem)
-      {
-      status2 = cudaFree(workspace_mem);
-      coot_check_cuda_error(status2, "coot::cuda::chol(): couldn't cudaFree() workspace memory");
-      }
+    data_type = CUDA_R_64F;
     }
   else
     {
-    // RC-TODO: better error
-    throw std::runtime_error("coot::cuda::chol(): type not supported");
+    return std::make_tuple(false, "unknown data type, must be float or double");
     }
 
-  if (dev_info)
+  size_t host_workspace_size = 0;
+  size_t gpu_workspace_size = 0;
+  status = cusolverDnXpotrf_bufferSize(get_rt().cuda_rt.cusolver_handle,
+                                       NULL, // no special parameters
+                                       CUBLAS_FILL_MODE_UPPER,
+                                       (s64) n_rows,
+                                       data_type,
+                                       (void*) mem.cuda_mem_ptr,
+                                       (s64) n_rows,
+                                       data_type,
+                                       &gpu_workspace_size,
+                                       &host_workspace_size);
+  if (status != CUSOLVER_STATUS_SUCCESS)
     {
-    status2 = cudaFree(dev_info);
-    coot_check_cuda_error(status2, "coot::cuda::chol(): couldn't cudaFree() auxiliary dev_info variable");
+    return std::make_tuple(false, "cusolverDnXpotrf_bufferSize() failed with error " + error_as_string(status));
+    }
+
+  void* gpu_workspace = NULL;
+  status2 = cudaMalloc((void**) &gpu_workspace, gpu_workspace_size);
+  if (status2 != cudaSuccess)
+    {
+    return std::make_tuple(false, "couldn't cudaMalloc() device workspace: " + error_as_string(status2));
+    }
+
+  char* host_workspace = cpu_memory::acquire<char>(host_workspace_size);
+
+  // This is an additional error code for cusolverDn; but it is an error code on the device.
+  int* dev_info = NULL;
+  status2 = cudaMalloc(&dev_info, sizeof(int));
+  if (status2 != cudaSuccess)
+    {
+    chol_cleanup(gpu_workspace, host_workspace, NULL);
+    return std::make_tuple(false, "couldn't cudaMalloc() device info holder: " + error_as_string(status2));
+    }
+
+  status = cusolverDnXpotrf(get_rt().cuda_rt.cusolver_handle,
+                            NULL,
+                            CUBLAS_FILL_MODE_UPPER,
+                            (s64) n_rows,
+                            data_type,
+                            (void*) mem.cuda_mem_ptr,
+                            (s64) n_rows,
+                            data_type,
+                            gpu_workspace,
+                            gpu_workspace_size,
+                            (void*) host_workspace,
+                            host_workspace_size,
+                            dev_info);
+  if (status != CUSOLVER_STATUS_SUCCESS)
+    {
+    chol_cleanup(gpu_workspace, host_workspace, NULL);
+    return std::make_tuple(false, "couldn't run cusolverDnXpotrf(): " + error_as_string(status));
+    }
+
+  // It seems that CUSOLVER_STATUS_SUCCESS gets returned even when the Cholesky
+  // decomposition fails!  So we have to process dev_info more carefully.
+  int info;
+  status2 = cudaMemcpy(&info, dev_info, sizeof(int), cudaMemcpyDeviceToHost);
+  chol_cleanup(gpu_workspace, host_workspace, dev_info);
+
+  if (status2 != cudaSuccess)
+    {
+    return std::make_tuple(false, "couldn't copy status code from GPU after factorisation: " + error_as_string(status2));
+    }
+
+  if (info < 0)
+    {
+    std::ostringstream oss;
+    oss << "cusolverDnXpotrf() failed: parameter " << (-info) << " was incorrect on entry";
+    return std::make_tuple(false, oss.str());
+    }
+  else if (info > 0)
+    {
+    std::ostringstream oss;
+    oss << "decomposition failed: the leading minor of order " << info << " is not positive definite";
+    return std::make_tuple(false, oss.str());
     }
 
   // Now we need to set the lower triangular part of the matrix to zeros.
@@ -130,7 +155,10 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
       (void**) args,
       0);
 
-  coot_check_cuda_error(result, "coot::cuda::chol(): cuLaunchKernel() failed for kernel ltri_set_zero");
+  if (result != CUDA_SUCCESS)
+    {
+    return std::make_tuple(false, "cuLaunchKernel() failed for kernel ltri_set_zero: " + error_as_string(result));
+    }
 
-  return true;
+  return std::make_tuple(true, "");
   }
