@@ -148,7 +148,7 @@ svd(dev_mem_t<eT> U,
 
   if (status2 != cudaSuccess)
     {
-    return std::make_tuple(false, "couldn't copy status code from GPU after factorisation");
+    return std::make_tuple(false, "couldn't copy status code from GPU after factorisation: " + error_as_string(status2));
     }
 
   if (info < 0)
