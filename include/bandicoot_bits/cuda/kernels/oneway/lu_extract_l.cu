@@ -26,7 +26,10 @@ COOT_FN(PREFIX,lu_extract_l)(eT1* L,
 
   if( (row < n_rows) && (col < n_cols))
     {
-    L[index] = (row > col) ? U[index] : ((row == col) ? 1 : 0);
+    if (col < n_rows) // L has size n_rows x n_rows
+      {
+      L[index] = (row > col) ? U[index] : ((row == col) ? 1 : 0);
+      }
     U[index] = (row > col) ? 0 : U[index];
     }
   }

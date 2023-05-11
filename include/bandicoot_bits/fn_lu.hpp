@@ -32,11 +32,13 @@ lu
 
   // The LU factorisation will be done in-place, into U.
   U = X.get_ref();
-  L.set_size(U.n_rows, U.n_cols);
+  L.set_size(U.n_rows, U.n_rows);
 
   if (U.n_elem == 0)
     {
     // Nothing to do---leave early.
+    L.set_size(U.n_rows, 0);
+    U.set_size(0, U.n_cols);
     return true;
     }
 
@@ -66,12 +68,15 @@ lu
 
   // The LU factorisation will be done in-place, into U.
   U = X.get_ref();
-  L.set_size(U.n_rows, U.n_cols);
+  L.set_size(U.n_rows, U.n_rows);
   P.zeros(U.n_rows, U.n_rows);
 
   if (U.n_elem == 0)
     {
     // Nothing to do---leave early.
+    L.set_size(U.n_rows, 0);
+    U.set_size(0, U.n_cols);
+    P.eye(L.n_rows, L.n_rows);
     return true;
     }
 

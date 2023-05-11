@@ -12,10 +12,11 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
+// This extracts L from U, and sets the lower diagonal of U to 0.
 __kernel
 void
 COOT_FN(PREFIX,lu_extract_l)(__global eT1* L,
-                             __global const eT1* U,
+                             __global eT1* U,
                              const UWORD n_rows,
                              const UWORD n_cols)
   {
@@ -25,6 +26,10 @@ COOT_FN(PREFIX,lu_extract_l)(__global eT1* L,
 
   if( (row < n_rows) && (col < n_cols))
     {
-    L[index] = (row > col) ? U[index] : ((row == col) ? 1 : 0);
+    if (col < n_rows)
+      {
+      L[index] = (row > col) ? U[index] : ((row == col) ? 1 : 0);
+      }
+    U[index] = (row > col) ? 0 : U[index];
     }
   }
