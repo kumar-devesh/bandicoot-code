@@ -641,6 +641,7 @@ struct is_supported_elem_type
     is_s32<T1>::value ||
     is_u64<T1>::value ||
     is_s64<T1>::value ||
+    is_uword<T1>::value ||
     is_float<T1>::value ||
     is_double<T1>::value ||
     is_supported_complex_float<T1>::value ||

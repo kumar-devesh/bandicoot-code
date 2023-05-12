@@ -34,5 +34,7 @@ template<> struct uint_type<double> { typedef u64 result; };
 template<> struct uint_type<u64>    { typedef u64 result; };
 template<> struct uint_type<s64>    { typedef u64 result; };
 
+template<> struct uint_type<uword>  { typedef uword result; };
+
 // Used sometimes by the kernel generation utilities to avoid specifying an unnecessary type.
 template<> struct uint_type<void>   { typedef void result; };

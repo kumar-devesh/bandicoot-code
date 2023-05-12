@@ -2345,7 +2345,7 @@ coot_rt_t::mean_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword
     #if defined(COOT_USE_CUDA)
     cuda::mean_subview(out, in, M_n_rows, start_row, start_col, n_rows, n_cols, dim, post_conv_apply);
     #else
-    coot_stop_runtime_error("coot_rt::mean_subview(): CUDA backend not enabled"):
+    coot_stop_runtime_error("coot_rt::mean_subview(): CUDA backend not enabled");
     #endif
     }
   else

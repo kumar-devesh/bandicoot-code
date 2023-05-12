@@ -996,7 +996,7 @@ void test_eop_exp10()
     {
     for (uword c = 0; c < 5; ++c)
       {
-      REQUIRE( eT(y(r, c)) == Approx(eT(exp10(eT(x(r, c))))).epsilon(0.01) );
+      REQUIRE( eT(y(r, c)) == Approx(eT(std::pow(10.0, eT(x(r, c))))).epsilon(0.01) );
       }
     }
   }
