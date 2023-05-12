@@ -123,8 +123,13 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
 
   xorwow32_state = acquire_memory<u32>(6 * num_rng_threads);
   init_xorwow_state<u32>(xorwow32_state, num_rng_threads);
-  xorwow64_state = acquire_memory<u64>(6 * num_rng_threads);
-  init_xorwow_state<u64>(xorwow64_state, num_rng_threads);
+
+  if (has_sizet64())
+    {
+    xorwow64_state = acquire_memory<u64>(6 * num_rng_threads);
+    init_xorwow_state<u64>(xorwow64_state, num_rng_threads);
+    }
+
   philox_state = acquire_memory<u32>(6 * num_rng_threads);
   init_philox_state(philox_state, num_rng_threads);
 
@@ -648,12 +653,12 @@ runtime_t::load_cached_kernels(const std::string& unique_host_device_id, const s
 
   std::vector<std::pair<std::string, cl_kernel*>> name_map;
   rt_common::init_zero_elem_kernel_map(zeroway_kernels, name_map, zeroway_kernel_id::get_names());
-  rt_common::init_one_elem_real_kernel_map(oneway_real_kernels, name_map, oneway_real_kernel_id::get_names(), "");
+  rt_common::init_one_elem_real_kernel_map(oneway_real_kernels, name_map, oneway_real_kernel_id::get_names(), "", has_float64());
   rt_common::init_one_elem_integral_kernel_map(oneway_integral_kernels, name_map, oneway_integral_kernel_id::get_names(), "");
-  rt_common::init_one_elem_kernel_map(oneway_kernels, name_map, oneway_kernel_id::get_names(), "");
-  rt_common::init_two_elem_kernel_map(twoway_kernels, name_map, twoway_kernel_id::get_names(), "");
-  rt_common::init_three_elem_kernel_map(threeway_kernels, name_map, threeway_kernel_id::get_names(), "");
-  rt_common::init_one_elem_real_kernel_map(magma_real_kernels, name_map, magma_real_kernel_id::get_names(), "");
+  rt_common::init_one_elem_kernel_map(oneway_kernels, name_map, oneway_kernel_id::get_names(), "", has_float64());
+  rt_common::init_two_elem_kernel_map(twoway_kernels, name_map, twoway_kernel_id::get_names(), "", has_float64());
+  rt_common::init_three_elem_kernel_map(threeway_kernels, name_map, threeway_kernel_id::get_names(), "", has_float64());
+  rt_common::init_one_elem_real_kernel_map(magma_real_kernels, name_map, magma_real_kernel_id::get_names(), "", has_float64());
 
   return create_kernels(name_map, prog_holder, "");
   }
@@ -670,14 +675,14 @@ runtime_t::compile_kernels(const std::string& unique_host_id)
   std::vector<std::pair<std::string, cl_kernel*>> name_map;
   type_to_dev_string type_map;
   std::string source =
-      kernel_src::get_src_preamble() +
+      kernel_src::get_src_preamble(has_float64()) +
       rt_common::get_zero_elem_kernel_src(zeroway_kernels, kernel_src::get_zeroway_source(), zeroway_kernel_id::get_names(), name_map, type_map) +
-      rt_common::get_one_elem_real_kernel_src(oneway_real_kernels, kernel_src::get_oneway_real_source(), oneway_real_kernel_id::get_names(), "", name_map, type_map) +
+      rt_common::get_one_elem_real_kernel_src(oneway_real_kernels, kernel_src::get_oneway_real_source(), oneway_real_kernel_id::get_names(), "", name_map, type_map, has_float64()) +
       rt_common::get_one_elem_integral_kernel_src(oneway_integral_kernels, kernel_src::get_oneway_integral_source(), oneway_integral_kernel_id::get_names(), "", name_map, type_map) +
-      rt_common::get_one_elem_kernel_src(oneway_kernels, kernel_src::get_oneway_source(), oneway_kernel_id::get_names(), "", name_map, type_map) +
-      rt_common::get_two_elem_kernel_src(twoway_kernels, kernel_src::get_twoway_source(), twoway_kernel_id::get_names(), "", name_map, type_map) +
-      rt_common::get_three_elem_kernel_src(threeway_kernels, kernel_src::get_threeway_source(), threeway_kernel_id::get_names(), name_map, type_map) +
-      rt_common::get_one_elem_real_kernel_src(magma_real_kernels, kernel_src::get_magma_real_source(), magma_real_kernel_id::get_names(), "", name_map, type_map) +
+      rt_common::get_one_elem_kernel_src(oneway_kernels, kernel_src::get_oneway_source(), oneway_kernel_id::get_names(), "", name_map, type_map, has_float64()) +
+      rt_common::get_two_elem_kernel_src(twoway_kernels, kernel_src::get_twoway_source(), twoway_kernel_id::get_names(), "", name_map, type_map, has_float64()) +
+      rt_common::get_three_elem_kernel_src(threeway_kernels, kernel_src::get_threeway_source(), threeway_kernel_id::get_names(), name_map, type_map, has_float64()) +
+      rt_common::get_one_elem_real_kernel_src(magma_real_kernels, kernel_src::get_magma_real_source(), magma_real_kernel_id::get_names(), "", name_map, type_map, has_float64()) +
       kernel_src::get_src_epilogue();
 
   cl_int status;
@@ -766,8 +771,11 @@ runtime_t::create_kernels(const std::vector<std::pair<std::string, cl_kernel*>>&
     return false;
     }
 
+  std::cout << "compiled program!\n";
+
   for (uword i = 0; i < name_map.size(); ++i)
     {
+    std::cout << "create kernel " << name_map.at(i).first.c_str() << "\n";
     (*name_map.at(i).second) = clCreateKernel(prog_holder.prog, name_map.at(i).first.c_str(), &status);
 
     if((status != CL_SUCCESS) || (name_map.at(i).second == NULL))
@@ -1074,13 +1082,34 @@ runtime_t::get_kernel(const rt_common::kernels_t<HeldType>& k, const EnumType nu
   {
   coot_extra_debug_sigprint();
 
-       if(is_same_type<eT1, u32   >::yes) { return get_kernel<eTs...>(k.u32_kernels, num); }
-  else if(is_same_type<eT1, s32   >::yes) { return get_kernel<eTs...>(k.s32_kernels, num); }
-  else if(is_same_type<eT1, u64   >::yes) { return get_kernel<eTs...>(k.u64_kernels, num); }
-  else if(is_same_type<eT1, s64   >::yes) { return get_kernel<eTs...>(k.s64_kernels, num); }
-  else if(is_same_type<eT1, float >::yes) { return get_kernel<eTs...>(  k.f_kernels, num); }
-  else if(is_same_type<eT1, double>::yes) { return get_kernel<eTs...>(  k.d_kernels, num); }
-  else { coot_debug_check(true, "unsupported element type"); }
+  if(is_same_type<eT1, u32>::yes)
+    {
+    return get_kernel<eTs...>(k.u32_kernels, num);
+    }
+  else if(is_same_type<eT1, s32>::yes)
+    {
+    return get_kernel<eTs...>(k.s32_kernels, num);
+    }
+  else if(is_same_type<eT1, u64>::yes)
+    {
+    return get_kernel<eTs...>(k.u64_kernels, num);
+    }
+  else if(is_same_type<eT1, s64>::yes)
+    {
+    return get_kernel<eTs...>(k.s64_kernels, num);
+    }
+  else if(is_same_type<eT1, float>::yes)
+    {
+    return get_kernel<eTs...>(k.f_kernels, num);
+    }
+  else if(is_same_type<eT1, double>::yes)
+    {
+    coot_debug_check( has_float64(), "coot::cl_rt.get_kernel(): device does not support float64 (double) kernels; use a different element type (such as float)" );
+
+    return get_kernel<eTs...>(k.d_kernels, num);
+    }
+
+  throw std::invalid_argument("coot::cl_rt.get_kernel(): unsupported element type");
   }
 
 
@@ -1092,13 +1121,34 @@ runtime_t::get_kernel(const rt_common::kernels_t<std::vector<cl_kernel>>& k, con
   {
   coot_extra_debug_sigprint();
 
-       if(is_same_type<eT, u32   >::yes) { return k.u32_kernels.at(num); }
-  else if(is_same_type<eT, s32   >::yes) { return k.s32_kernels.at(num); }
-  else if(is_same_type<eT, u64   >::yes) { return k.u64_kernels.at(num); }
-  else if(is_same_type<eT, s64   >::yes) { return k.s64_kernels.at(num); }
-  else if(is_same_type<eT, float >::yes) { return   k.f_kernels.at(num); }
-  else if(is_same_type<eT, double>::yes) { return   k.d_kernels.at(num); }
-  else { coot_debug_check(true, "unsupported element type"); }
+  if(is_same_type<eT, u32>::yes)
+    {
+    return k.u32_kernels.at(num);
+    }
+  else if(is_same_type<eT, s32>::yes)
+    {
+    return k.s32_kernels.at(num);
+    }
+  else if(is_same_type<eT, u64>::yes)
+    {
+    return k.u64_kernels.at(num);
+    }
+  else if(is_same_type<eT, s64>::yes)
+    {
+    return k.s64_kernels.at(num);
+    }
+  else if(is_same_type<eT, float>::yes)
+    {
+    return k.f_kernels.at(num);
+    }
+  else if(is_same_type<eT, double>::yes)
+    {
+    coot_debug_check( has_float64(), "coot::cl_rt.get_kernel(): device does not support float64 (double) kernels, use a different element type (such as float)" );
+
+    return k.d_kernels.at(num);
+    }
+
+  throw std::invalid_argument("coot::cl_rt.get_kernel(): unsupported element type");
   }
 
 

@@ -69,7 +69,8 @@ template<typename KernelType>
 inline void init_one_elem_kernel_map(kernels_t<std::vector<KernelType>>& kernels,
                                      std::vector<std::pair<std::string, KernelType*>>& name_map,
                                      const std::string& prefix,
-                                     const std::vector<std::string>& kernel_names);
+                                     const std::vector<std::string>& kernel_names,
+                                     const bool has_float64);
 
 
 
@@ -96,7 +97,8 @@ inline std::string get_one_elem_kernel_src(kernels_t<std::vector<KernelType>>& k
                                            const std::vector<std::string>& kernel_names,
                                            const std::string& prefix,
                                            std::vector<std::pair<std::string, KernelType*>>& name_map,
-                                           const TypeMapper& type_map);
+                                           const TypeMapper& type_map,
+                                           const bool has_float64);
 
 
 
@@ -109,7 +111,8 @@ template<typename KernelType>
 inline void init_one_elem_real_kernel_map(kernels_t<std::vector<KernelType>>& kernels,
                                           std::vector<std::pair<std::string, KernelType*>>& name_map,
                                           const std::string& prefix,
-                                          const std::vector<std::string>& kernel_names);
+                                          const std::vector<std::string>& kernel_names,
+                                          const bool has_float64);
 
 
 
@@ -136,7 +139,8 @@ inline std::string get_one_elem_real_kernel_src(kernels_t<std::vector<KernelType
                                                 const std::vector<std::string>& kernel_names,
                                                 const std::string& prefix,
                                                 std::vector<std::pair<std::string, KernelType*>>& name_map,
-                                                const TypeMapper& type_map);
+                                                const TypeMapper& type_map,
+                                                const bool has_float64);
 
 
 
@@ -189,7 +193,8 @@ template<typename KernelType>
 inline void init_two_elem_kernel_map(kernels_t<kernels_t<std::vector<KernelType>>>& kernels,
                                      std::vector<std::pair<std::string, KernelType*>>& name_map,
                                      const std::string& prefix,
-                                     const std::vector<std::string>& kernel_names);
+                                     const std::vector<std::string>& kernel_names,
+                                     const bool has_float64);;
 
 
 
@@ -217,7 +222,8 @@ inline std::string get_two_elem_kernel_src(kernels_t<kernels_t<std::vector<Kerne
                                            const std::vector<std::string>& kernel_names,
                                            const std::string& prefix,
                                            std::vector<std::pair<std::string, KernelType*>>& name_map,
-                                           const TypeMapper& type_map);
+                                           const TypeMapper& type_map,
+                                           const bool has_float64);
 
 
 
@@ -230,7 +236,8 @@ template<typename KernelType>
 inline void init_three_elem_kernel_map(kernels_t<kernels_t<kernels_t<std::vector<KernelType>>>>& kernels,
                                        std::vector<std::pair<std::string, KernelType*>>& name_map,
                                        const std::string& prefix,
-                                       const std::vector<std::string>& kernel_names);
+                                       const std::vector<std::string>& kernel_names,
+                                       const bool has_float64);
 
 
 
@@ -251,4 +258,5 @@ inline std::string get_three_elem_kernel_src(kernels_t<kernels_t<kernels_t<std::
                                              const std::string& source,
                                              const std::vector<std::string>& kernel_names,
                                              std::vector<std::pair<std::string, KernelType*>>& name_map,
-                                             const TypeMapper& type_map);
+                                             const TypeMapper& type_map,
+                                             const bool has_float64);

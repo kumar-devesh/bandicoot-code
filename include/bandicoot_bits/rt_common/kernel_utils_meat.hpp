@@ -172,14 +172,18 @@ void
 init_one_elem_kernel_map(kernels_t<std::vector<KernelType>>& kernels,
                          std::vector<std::pair<std::string, KernelType*>>& name_map,
                          const std::vector<std::string>& kernel_names,
-                         const std::string& prefix)
+                         const std::string& prefix,
+                         const bool has_float64)
   {
   kernels.u32_kernels.resize(kernel_names.size());
   kernels.s32_kernels.resize(kernel_names.size());
   kernels.u64_kernels.resize(kernel_names.size());
   kernels.s64_kernels.resize(kernel_names.size());
   kernels.f_kernels.resize(kernel_names.size());
-  kernels.d_kernels.resize(kernel_names.size());
+  if (has_float64)
+    {
+    kernels.d_kernels.resize(kernel_names.size());
+    }
 
   for (size_t j = 0; j < kernel_names.size(); ++j)
     {
@@ -201,9 +205,12 @@ init_one_elem_kernel_map(kernels_t<std::vector<KernelType>>& kernels,
     {
     name_map.push_back(std::make_pair(prefix + "f_" + kernel_names[j], &kernels.f_kernels.at(j)));
     }
-  for (size_t j = 0; j < kernel_names.size(); ++j)
+  if (has_float64)
     {
-    name_map.push_back(std::make_pair(prefix + "d_" + kernel_names[j], &kernels.d_kernels.at(j)));
+    for (size_t j = 0; j < kernel_names.size(); ++j)
+      {
+      name_map.push_back(std::make_pair(prefix + "d_" + kernel_names[j], &kernels.d_kernels.at(j)));
+      }
     }
   }
 
@@ -217,16 +224,17 @@ get_one_elem_kernel_src(kernels_t<std::vector<KernelType>>& kernels,
                         const std::vector<std::string>& kernel_names,
                         const std::string& prefix,
                         std::vector<std::pair<std::string, KernelType*>>& name_map,
-                        const TypeMapper& type_map)
+                        const TypeMapper& type_map,
+                        const bool has_float64)
   {
   const std::string u32_src = substitute_types<TypeMapper, u32, higher_eT1, higher_eT2>(source, prefix + "u32_", type_map);
   const std::string s32_src = substitute_types<TypeMapper, s32, higher_eT1, higher_eT2>(source, prefix + "s32_", type_map);
   const std::string u64_src = substitute_types<TypeMapper, u64, higher_eT1, higher_eT2>(source, prefix + "u64_", type_map);
   const std::string s64_src = substitute_types<TypeMapper, s64, higher_eT1, higher_eT2>(source, prefix + "s64_", type_map);
   const std::string   f_src = substitute_types<TypeMapper, float, higher_eT1, higher_eT2>(source, prefix + "f_", type_map);
-  const std::string   d_src = substitute_types<TypeMapper, double, higher_eT1, higher_eT2>(source, prefix + "d_", type_map);
+  const std::string   d_src = has_float64 ? substitute_types<TypeMapper, double, higher_eT1, higher_eT2>(source, prefix + "d_", type_map) : "";
 
-  init_one_elem_kernel_map(kernels, name_map, kernel_names, prefix);
+  init_one_elem_kernel_map(kernels, name_map, kernel_names, prefix, has_float64);
 
   return u32_src + s32_src + u64_src + s64_src + f_src + d_src;
   }
@@ -239,18 +247,25 @@ void
 init_one_elem_real_kernel_map(kernels_t<std::vector<KernelType>>& kernels,
                               std::vector<std::pair<std::string, KernelType*>>& name_map,
                               const std::vector<std::string>& kernel_names,
-                              const std::string& prefix)
+                              const std::string& prefix,
+                              const bool has_float64)
   {
   kernels.f_kernels.resize(kernel_names.size());
-  kernels.d_kernels.resize(kernel_names.size());
+  if (has_float64)
+    {
+    kernels.d_kernels.resize(kernel_names.size());
+    }
 
   for (size_t j = 0; j < kernel_names.size(); ++j)
     {
     name_map.push_back(std::make_pair(prefix + "f_" + kernel_names[j], &kernels.f_kernels.at(j)));
     }
-  for (size_t j = 0; j < kernel_names.size(); ++j)
+  if (has_float64)
     {
-    name_map.push_back(std::make_pair(prefix + "d_" + kernel_names[j], &kernels.d_kernels.at(j)));
+    for (size_t j = 0; j < kernel_names.size(); ++j)
+      {
+      name_map.push_back(std::make_pair(prefix + "d_" + kernel_names[j], &kernels.d_kernels.at(j)));
+      }
     }
   }
 
@@ -264,12 +279,13 @@ get_one_elem_real_kernel_src(kernels_t<std::vector<KernelType>>& kernels,
                              const std::vector<std::string>& kernel_names,
                              const std::string& prefix,
                              std::vector<std::pair<std::string, KernelType*>>& name_map,
-                             const TypeMapper& type_map)
+                             const TypeMapper& type_map,
+                             const bool has_float64)
   {
   const std::string   f_src = substitute_types<TypeMapper, float, higher_eT1, higher_eT2>(source, prefix + "f_", type_map);
-  const std::string   d_src = substitute_types<TypeMapper, double, higher_eT1, higher_eT2>(source, prefix + "d_", type_map);
+  const std::string   d_src = has_float64 ? substitute_types<TypeMapper, double, higher_eT1, higher_eT2>(source, prefix + "d_", type_map) : "";
 
-  init_one_elem_real_kernel_map(kernels, name_map, kernel_names, prefix);
+  init_one_elem_real_kernel_map(kernels, name_map, kernel_names, prefix, has_float64);
 
   return f_src + d_src;
   }
@@ -337,14 +353,18 @@ void
 init_two_elem_kernel_map(kernels_t<kernels_t<std::vector<KernelType>>>& kernels,
                          std::vector<std::pair<std::string, KernelType*>>& name_map,
                          const std::vector<std::string>& kernel_names,
-                         const std::string& prefix)
+                         const std::string& prefix,
+                         const bool has_float64)
   {
-  init_one_elem_kernel_map<KernelType>(kernels.u32_kernels, name_map, kernel_names, prefix + "u32_");
-  init_one_elem_kernel_map<KernelType>(kernels.s32_kernels, name_map, kernel_names, prefix + "s32_");
-  init_one_elem_kernel_map<KernelType>(kernels.u64_kernels, name_map, kernel_names, prefix + "u64_");
-  init_one_elem_kernel_map<KernelType>(kernels.s64_kernels, name_map, kernel_names, prefix + "s64_");
-  init_one_elem_kernel_map<KernelType>(kernels.f_kernels, name_map, kernel_names, prefix + "f_");
-  init_one_elem_kernel_map<KernelType>(kernels.d_kernels, name_map, kernel_names, prefix + "d_");
+  init_one_elem_kernel_map<KernelType>(kernels.u32_kernels, name_map, kernel_names, prefix + "u32_", has_float64);
+  init_one_elem_kernel_map<KernelType>(kernels.s32_kernels, name_map, kernel_names, prefix + "s32_", has_float64);
+  init_one_elem_kernel_map<KernelType>(kernels.u64_kernels, name_map, kernel_names, prefix + "u64_", has_float64);
+  init_one_elem_kernel_map<KernelType>(kernels.s64_kernels, name_map, kernel_names, prefix + "s64_", has_float64);
+  init_one_elem_kernel_map<KernelType>(kernels.f_kernels, name_map, kernel_names, prefix + "f_", has_float64);
+  if (has_float64)
+    {
+    init_one_elem_kernel_map<KernelType>(kernels.d_kernels, name_map, kernel_names, prefix + "d_", has_float64);
+    }
   }
 
 
@@ -357,14 +377,15 @@ get_two_elem_kernel_src(kernels_t<kernels_t<std::vector<KernelType>>>& kernels,
                         const std::vector<std::string>& kernel_names,
                         const std::string& prefix,
                         std::vector<std::pair<std::string, KernelType*>>& name_map,
-                        const TypeMapper& type_map)
+                        const TypeMapper& type_map,
+                        const bool has_float64)
   {
-  const std::string u32_src = get_one_elem_kernel_src<KernelType, TypeMapper, u32, higher_eT>(kernels.u32_kernels, source, kernel_names, prefix + "u32_", name_map, type_map);
-  const std::string s32_src = get_one_elem_kernel_src<KernelType, TypeMapper, s32, higher_eT>(kernels.s32_kernels, source, kernel_names, prefix + "s32_", name_map, type_map);
-  const std::string u64_src = get_one_elem_kernel_src<KernelType, TypeMapper, u64, higher_eT>(kernels.u64_kernels, source, kernel_names, prefix + "u64_", name_map, type_map);
-  const std::string s64_src = get_one_elem_kernel_src<KernelType, TypeMapper, s64, higher_eT>(kernels.s64_kernels, source, kernel_names, prefix + "s64_", name_map, type_map);
-  const std::string f_src = get_one_elem_kernel_src<KernelType, TypeMapper, float, higher_eT>(kernels.f_kernels, source, kernel_names, prefix + "f_", name_map, type_map);
-  const std::string d_src = get_one_elem_kernel_src<KernelType, TypeMapper, double, higher_eT>(kernels.d_kernels, source, kernel_names, prefix + "d_", name_map, type_map);
+  const std::string u32_src = get_one_elem_kernel_src<KernelType, TypeMapper, u32, higher_eT>(kernels.u32_kernels, source, kernel_names, prefix + "u32_", name_map, type_map, has_float64);
+  const std::string s32_src = get_one_elem_kernel_src<KernelType, TypeMapper, s32, higher_eT>(kernels.s32_kernels, source, kernel_names, prefix + "s32_", name_map, type_map, has_float64);
+  const std::string u64_src = get_one_elem_kernel_src<KernelType, TypeMapper, u64, higher_eT>(kernels.u64_kernels, source, kernel_names, prefix + "u64_", name_map, type_map, has_float64);
+  const std::string s64_src = get_one_elem_kernel_src<KernelType, TypeMapper, s64, higher_eT>(kernels.s64_kernels, source, kernel_names, prefix + "s64_", name_map, type_map, has_float64);
+  const std::string f_src = get_one_elem_kernel_src<KernelType, TypeMapper, float, higher_eT>(kernels.f_kernels, source, kernel_names, prefix + "f_", name_map, type_map, has_float64);
+  const std::string d_src = has_float64 ? get_one_elem_kernel_src<KernelType, TypeMapper, double, higher_eT>(kernels.d_kernels, source, kernel_names, prefix + "d_", name_map, type_map, has_float64) : "";
 
   return u32_src + s32_src + u64_src + s64_src + f_src + d_src;
   }
@@ -377,14 +398,18 @@ void
 init_three_elem_kernel_map(kernels_t<kernels_t<kernels_t<std::vector<KernelType>>>>& kernels,
                            std::vector<std::pair<std::string, KernelType*>>& name_map,
                            const std::vector<std::string>& kernel_names,
-                           const std::string& prefix)
+                           const std::string& prefix,
+                           const bool has_float64)
   {
-  init_two_elem_kernel_map(kernels.u32_kernels, name_map, kernel_names, prefix + "u32_");
-  init_two_elem_kernel_map(kernels.s32_kernels, name_map, kernel_names, prefix + "s32_");
-  init_two_elem_kernel_map(kernels.u64_kernels, name_map, kernel_names, prefix + "u64_");
-  init_two_elem_kernel_map(kernels.s64_kernels, name_map, kernel_names, prefix + "s64_");
-  init_two_elem_kernel_map(kernels.f_kernels, name_map, kernel_names, prefix + "f_");
-  init_two_elem_kernel_map(kernels.d_kernels, name_map, kernel_names, prefix + "d_");
+  init_two_elem_kernel_map(kernels.u32_kernels, name_map, kernel_names, prefix + "u32_", has_float64);
+  init_two_elem_kernel_map(kernels.s32_kernels, name_map, kernel_names, prefix + "s32_", has_float64);
+  init_two_elem_kernel_map(kernels.u64_kernels, name_map, kernel_names, prefix + "u64_", has_float64);
+  init_two_elem_kernel_map(kernels.s64_kernels, name_map, kernel_names, prefix + "s64_", has_float64);
+  init_two_elem_kernel_map(kernels.f_kernels, name_map, kernel_names, prefix + "f_", has_float64);
+  if (has_float64)
+    {
+    init_two_elem_kernel_map(kernels.d_kernels, name_map, kernel_names, prefix + "d_", has_float64);
+    }
   }
 
 
@@ -394,14 +419,15 @@ inline std::string get_three_elem_kernel_src(kernels_t<kernels_t<kernels_t<std::
                                              const std::string& source,
                                              const std::vector<std::string>& kernel_names,
                                              std::vector<std::pair<std::string, KernelType*>>& name_map,
-                                             const TypeMapper& type_map)
+                                             const TypeMapper& type_map,
+                                             const bool has_float64)
   {
-  const std::string u32_src = get_two_elem_kernel_src<KernelType, TypeMapper, u32>(kernels.u32_kernels, source, kernel_names, "u32_", name_map, type_map);
-  const std::string s32_src = get_two_elem_kernel_src<KernelType, TypeMapper, s32>(kernels.s32_kernels, source, kernel_names, "s32_", name_map, type_map);
-  const std::string u64_src = get_two_elem_kernel_src<KernelType, TypeMapper, u64>(kernels.u64_kernels, source, kernel_names, "u64_", name_map, type_map);
-  const std::string s64_src = get_two_elem_kernel_src<KernelType, TypeMapper, s64>(kernels.s64_kernels, source, kernel_names, "s64_", name_map, type_map);
-  const std::string f_src = get_two_elem_kernel_src<KernelType, TypeMapper, float>(kernels.f_kernels, source, kernel_names, "f_", name_map, type_map);
-  const std::string d_src = get_two_elem_kernel_src<KernelType, TypeMapper, double>(kernels.d_kernels, source, kernel_names, "d_", name_map, type_map);
+  const std::string u32_src = get_two_elem_kernel_src<KernelType, TypeMapper, u32>(kernels.u32_kernels, source, kernel_names, "u32_", name_map, type_map, has_float64);
+  const std::string s32_src = get_two_elem_kernel_src<KernelType, TypeMapper, s32>(kernels.s32_kernels, source, kernel_names, "s32_", name_map, type_map, has_float64);
+  const std::string u64_src = get_two_elem_kernel_src<KernelType, TypeMapper, u64>(kernels.u64_kernels, source, kernel_names, "u64_", name_map, type_map, has_float64);
+  const std::string s64_src = get_two_elem_kernel_src<KernelType, TypeMapper, s64>(kernels.s64_kernels, source, kernel_names, "s64_", name_map, type_map, has_float64);
+  const std::string f_src = get_two_elem_kernel_src<KernelType, TypeMapper, float>(kernels.f_kernels, source, kernel_names, "f_", name_map, type_map, has_float64);
+  const std::string d_src = has_float64 ? get_two_elem_kernel_src<KernelType, TypeMapper, double>(kernels.d_kernels, source, kernel_names, "d_", name_map, type_map, has_float64) : "";
 
   return u32_src + s32_src + u64_src + s64_src + f_src + d_src;
   }
