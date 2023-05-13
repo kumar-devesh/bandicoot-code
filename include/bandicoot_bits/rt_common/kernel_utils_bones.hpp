@@ -194,7 +194,7 @@ inline void init_two_elem_kernel_map(kernels_t<kernels_t<std::vector<KernelType>
                                      std::vector<std::pair<std::string, KernelType*>>& name_map,
                                      const std::string& prefix,
                                      const std::vector<std::string>& kernel_names,
-                                     const bool has_float64);;
+                                     const bool has_float64);
 
 
 
