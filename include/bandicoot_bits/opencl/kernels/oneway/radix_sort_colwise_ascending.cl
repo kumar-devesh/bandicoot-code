@@ -16,16 +16,16 @@
 
 __kernel
 void
-COOT_FN(PREFIX,radix_sort_rowwise)(__global eT1* A,
-                                   __global eT1* tmp_mem,
-                                   const UWORD A_n_rows,
-                                   const UWORD A_n_cols)
+COOT_FN(PREFIX,radix_sort_colwise_ascending)(__global eT1* A,
+                                             __global eT1* tmp_mem,
+                                             const UWORD A_n_rows,
+                                             const UWORD A_n_cols)
   {
-  const UWORD row = get_global_id(0);
-  if(row < A_n_rows)
+  const UWORD col = get_global_id(0);
+  if(col < A_n_cols)
     {
-    __global eT1* unsorted_rowptr =       &A[row];
-    __global eT1* sorted_rowptr =   &tmp_mem[row];
+    __global eT1* unsorted_colptr =       &A[col * A_n_rows];
+    __global eT1* sorted_colptr =   &tmp_mem[col * A_n_rows];
 
     UWORD counts[2];
 
@@ -35,33 +35,32 @@ COOT_FN(PREFIX,radix_sort_rowwise)(__global eT1* A,
     for (UWORD b = 0; b < max_bit; ++b)
       {
       // Since we are sorting bitwise, we should treat the data as unsigned integers to make bitwise operations easy.
-      __global uint_eT1* rowptr = (__global uint_eT1*) unsorted_rowptr;
+      __global uint_eT1* colptr = (__global uint_eT1*) unsorted_colptr;
 
       counts[0] = 0; // holds the count of points with bit value 0
       counts[1] = 0; // holds the count of points with bit value 1
 
       uint_eT1 mask = (((uint_eT1) 1) << b);
 
-      for (UWORD i = 0; i < A_n_cols; ++i)
+      for (UWORD i = 0; i < A_n_rows; ++i)
         {
-        ++counts[(rowptr[i * A_n_rows] & mask) >> b];
+        ++counts[((colptr[i] & mask) >> b)];
         }
 
       counts[1] = counts[0]; // now holds the offset to put the next value at
       counts[0] = 0;
 
-      for (UWORD i = 0; i < A_n_cols; ++i)
+      for (UWORD i = 0; i < A_n_rows; ++i)
         {
-        const UWORD in_index = i * A_n_rows;
-        const eT1 val = unsorted_rowptr[in_index];
-        const UWORD out_index = (counts[((rowptr[in_index] & mask) >> b)]++) * A_n_rows;
-        sorted_rowptr[out_index] = val;
+        const eT1 val = unsorted_colptr[i];
+        const UWORD out_index = counts[((colptr[i] & mask) >> b)]++;
+        sorted_colptr[out_index] = val;
         }
 
       // swap pointers (unsorted is now sorted)
-      __global eT1* tmp = unsorted_rowptr;
-      unsorted_rowptr = sorted_rowptr;
-      sorted_rowptr = tmp;
+      __global eT1* tmp = unsorted_colptr;
+      unsorted_colptr = sorted_colptr;
+      sorted_colptr = tmp;
       }
 
     // If the type is unsigned, we're now done---we don't have to handle a sign bit differently.
@@ -74,47 +73,51 @@ COOT_FN(PREFIX,radix_sort_rowwise)(__global eT1* A,
     // In both cases, we have to put the 1-bit values before the 0-bit values.
     // But, for floating point signed types, we need to reverse the order of the 1-bit points.
     // So, we need a slightly different implementation for both cases.
-    __global uint_eT1* rowptr = (__global uint_eT1*) unsorted_rowptr;
+    __global uint_eT1* colptr = (__global uint_eT1*) unsorted_colptr;
     counts[0] = 0;
     counts[1] = 0;
 
     const UWORD last_bit = 8 * sizeof(eT1) - 1;
     uint_eT1 mask = (((uint_eT1) 1) << last_bit);
 
-    for (UWORD i = 0; i < A_n_cols; ++i)
+    for (UWORD i = 0; i < A_n_rows; ++i)
       {
-      ++counts[(rowptr[i * A_n_rows] & mask) >> last_bit];
+      ++counts[((colptr[i] & mask) >> last_bit)];
       }
     // counts[0] now holds the number of positive points; counts[1] holds the number of negative points
 
+    // This is different for integral and floating point types.
     if (COOT_FN(coot_is_fp_,eT1)())
       {
+      // Floating point implementation:
+      // For negative values, we have things sorted in reverse order, so we need to reverse that in our final swap pass.
+      // That means that thread 0's negative points go into the last slots, and the last thread's negative points go into the first slots.
       counts[0] = counts[1];     // now holds the offset to put the next positive value at
       counts[1] = counts[0] - 1; // now holds the offset to put the next negative value at (we move backwards)
 
-      for (UWORD i = 0; i < A_n_cols; ++i)
+      for (UWORD i = 0; i < A_n_rows; ++i)
         {
-        const UWORD in_index = i * A_n_rows;
-        const eT1 val = unsorted_rowptr[in_index];
-        const UWORD bit_val = ((rowptr[in_index] & mask) >> last_bit);
-        const UWORD out_index = counts[bit_val] * A_n_rows;
+        const eT1 val = unsorted_colptr[i];
+        const UWORD bit_val = ((colptr[i] & mask) >> last_bit);
+        const UWORD out_index = counts[bit_val];
         const int offset = (bit_val == 1) ? -1 : 1;
         counts[bit_val] += offset; // decrements for negative values, increments for positive values
-        sorted_rowptr[out_index] = val;
+        sorted_colptr[out_index] = val;
         }
       }
     else
       {
+      // Signed integral implementation:
+      // Here, we have values in the right order, we just need to put the negative values ahead of the positive values.
       counts[0] = counts[1]; // now holds the offset to put the next positive value at
-      counts[1] = counts[0]; // now holds the offset to put the next negative value at
+      counts[1] = 0;         // now holds the offset to put the next negative value at
 
-      for (UWORD i = 0; i < A_n_cols; ++i)
+      for (UWORD i = 0; i < A_n_rows; ++i)
         {
-        const UWORD in_index = i * A_n_rows;
-        const eT1 val = unsorted_rowptr[in_index];
-        const UWORD bit_val = ((rowptr[in_index] & mask) >> last_bit);
-        const UWORD out_index = (counts[bit_val]++) * A_n_rows;
-        sorted_rowptr[out_index] = val;
+        const eT1 val = unsorted_colptr[i];
+        const UWORD bit_val = ((colptr[i] & mask) >> last_bit);
+        const UWORD out_index = counts[bit_val]++;
+        sorted_colptr[out_index] = val;
         }
       }
     }

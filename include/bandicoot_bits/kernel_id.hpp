@@ -113,9 +113,24 @@ struct oneway_kernel_id
     submat_var,
     submat_var_small,
     //
-    radix_sort_colwise,
-    radix_sort_rowwise,
-    radix_sort,
+    radix_sort_colwise_ascending,
+    radix_sort_rowwise_ascending,
+    radix_sort_ascending,
+    radix_sort_colwise_descending,
+    radix_sort_rowwise_descending,
+    radix_sort_descending,
+    radix_sort_index_ascending,
+    radix_sort_index_descending,
+    stable_radix_sort_index_ascending,
+    stable_radix_sort_index_descending,
+    //
+    count_nonzeros,
+    find,
+    find_first,
+    find_last,
+    //
+    symmatu_inplace,
+    symmatl_inplace,
     //
     invalid_kernel
     };
@@ -190,9 +205,24 @@ struct oneway_kernel_id
     names.push_back("submat_var");
     names.push_back("submat_var_small");
 
-    names.push_back("radix_sort_colwise");
-    names.push_back("radix_sort_rowwise");
-    names.push_back("radix_sort");
+    names.push_back("radix_sort_colwise_ascending");
+    names.push_back("radix_sort_rowwise_ascending");
+    names.push_back("radix_sort_ascending");
+    names.push_back("radix_sort_colwise_descending");
+    names.push_back("radix_sort_rowwise_descending");
+    names.push_back("radix_sort_descending");
+    names.push_back("radix_sort_index_ascending");
+    names.push_back("radix_sort_index_descending");
+    names.push_back("stable_radix_sort_index_ascending");
+    names.push_back("stable_radix_sort_index_descending");
+
+    names.push_back("count_nonzeros");
+    names.push_back("find");
+    names.push_back("find_first");
+    names.push_back("find_last");
+
+    names.push_back("symmatu_inplace");
+    names.push_back("symmatl_inplace");
 
     return names;
     }
@@ -228,6 +258,10 @@ struct oneway_real_kernel_id
     vec_norm_min,
     vec_norm_min_small,
     //
+    rel_isfinite,
+    rel_isnonfinite,
+    rel_isnan,
+    //
     invalid_kernel
     };
 
@@ -251,6 +285,10 @@ struct oneway_real_kernel_id
     names.push_back("vec_norm_k_small");
     names.push_back("vec_norm_min");
     names.push_back("vec_norm_min_small");
+
+    names.push_back("rel_isfinite");
+    names.push_back("rel_isnonfinite");
+    names.push_back("rel_isnan");
 
     return names;
     }
@@ -478,6 +516,9 @@ struct twoway_kernel_id
     rel_any_neq_colwise,
     rel_any_neq_rowwise,
     //
+    symmatu,
+    symmatl,
+    //
     invalid_kernel
     };
 
@@ -645,6 +686,9 @@ struct twoway_kernel_id
     names.push_back("rel_any_neq_small");
     names.push_back("rel_any_neq_colwise");
     names.push_back("rel_any_neq_rowwise");
+
+    names.push_back("symmatu");
+    names.push_back("symmatl");
 
     return names;
     }
