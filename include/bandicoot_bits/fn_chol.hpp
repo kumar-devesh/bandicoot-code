@@ -14,7 +14,7 @@
 
 
 
-// TODO: add optional 'layout' argument
+// TODO: add other versions
 template<typename T1>
 inline
 bool
@@ -24,5 +24,11 @@ chol(Mat<typename T1::elem_type>& out, const Base<typename T1::elem_type, T1>& X
 
   out = X.get_ref();
 
-  return coot_rt_t::chol(out.get_dev_mem(true), out.n_rows);
+  std::tuple<bool, std::string> result = coot_rt_t::chol(out.get_dev_mem(true), out.n_rows);
+  if (std::get<0>(result) == false)
+    {
+    coot_stop_runtime_error("coot::chol(): " + std::get<1>(result));
+    }
+
+  return true;
   }
