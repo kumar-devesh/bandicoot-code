@@ -38,6 +38,11 @@ TEMPLATE_TEST_CASE("simple_normalise_vec", "[normalise]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> c(10);
   for (uword i = 0; i < 10; ++i)
     c[i] = eT(i);
@@ -63,6 +68,11 @@ TEMPLATE_TEST_CASE("simple_normalise_vec", "[normalise]", float, double)
 TEMPLATE_TEST_CASE("simple_normalise_colwise", "[normalise]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
@@ -117,6 +127,11 @@ TEMPLATE_TEST_CASE("simple_normalise_rowwise", "[normalise]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
     {
@@ -161,6 +176,11 @@ TEMPLATE_TEST_CASE("large_normalise_vec", "[normalise]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x = randu<Col<eT>>(100000);
   arma::Col<eT> x_cpu(x);
 
@@ -190,6 +210,11 @@ TEMPLATE_TEST_CASE("large_normalise_vec", "[normalise]", float, double)
 TEMPLATE_TEST_CASE("large_normalise_colwise", "[normalise]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randu<Mat<eT>>(10000, 500);
   arma::Mat<eT> x_cpu(x);
@@ -239,6 +264,11 @@ TEMPLATE_TEST_CASE("large_normalise_rowwise", "[normalise]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randu<Mat<eT>>(1250, 1500);
   arma::Mat<eT> x_cpu(x);
 
@@ -274,6 +304,11 @@ TEMPLATE_TEST_CASE("already_normalised_vec", "[normalise]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x = randi<Col<eT>>(10000, distr_param(1, 10));
 
   Col<eT> y = normalise(x);
@@ -295,6 +330,11 @@ TEMPLATE_TEST_CASE("already_normalised_vec", "[normalise]", float, double)
 TEMPLATE_TEST_CASE("already_normalised_colwise", "[normalise]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(500, 1000, distr_param(1, 10));
 
@@ -321,6 +361,11 @@ TEMPLATE_TEST_CASE("already_normalised_rowwise", "[normalise]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(500, 1000, distr_param(1, 10));
 
   Mat<eT> y = normalise(x, 2, 1);
@@ -342,6 +387,11 @@ TEMPLATE_TEST_CASE("already_normalised_rowwise", "[normalise]", float, double)
 TEMPLATE_TEST_CASE("zeros_normalise_vec", "[normalise]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x(100);
   x.zeros();
@@ -367,6 +417,11 @@ TEMPLATE_TEST_CASE("zeros_normalise_vec", "[normalise]", float, double)
 TEMPLATE_TEST_CASE("zeros_normalise_colwise", "[normalise]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(10, 25);
   x.zeros();
@@ -426,6 +481,11 @@ TEMPLATE_TEST_CASE("zeros_normalise_rowwise", "[normalise]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(25, 10);
   x.zeros();
   x.row(3) = randu<Row<eT>>(10);
@@ -468,8 +528,8 @@ TEMPLATE_TEST_CASE("zeros_normalise_rowwise", "[normalise]", float, double)
 
 TEST_CASE("empty_normalise_vec", "[normalise]")
   {
-  vec x;
-  vec y = normalise(x);
+  fvec x;
+  fvec y = normalise(x);
   REQUIRE( y.n_elem == 0 );
   }
 
@@ -477,10 +537,10 @@ TEST_CASE("empty_normalise_vec", "[normalise]")
 
 TEST_CASE("empty_normalise_vec_mat", "[normalise]")
   {
-  mat x;
-  mat y1 = normalise(x, 2);
-  mat y2 = normalise(x, 2, 0);
-  mat y3 = normalise(x, 2, 1);
+  fmat x;
+  fmat y1 = normalise(x, 2);
+  fmat y2 = normalise(x, 2, 0);
+  fmat y3 = normalise(x, 2, 1);
 
   REQUIRE( y1.n_rows == 0 );
   REQUIRE( y1.n_cols == 0 );
@@ -497,6 +557,11 @@ TEMPLATE_TEST_CASE("alias_normalise_vec", "[normalise]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x = randu<Col<eT>>(1000);
   x = normalise(x);
 
@@ -510,6 +575,11 @@ TEMPLATE_TEST_CASE("alias_normalise_vec", "[normalise]", float, double)
 TEMPLATE_TEST_CASE("alias_normalise_colwise", "[normalise]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randu<Mat<eT>>(150, 10);
   x = normalise(x, 2, 0);
@@ -529,6 +599,11 @@ TEMPLATE_TEST_CASE("alias_normalise_colwise", "[normalise]", float, double)
 TEMPLATE_TEST_CASE("alias_normalise_rowwise", "[normalise]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randu<Mat<eT>>(10, 150);
   x = normalise(x, 2, 1);
@@ -550,6 +625,11 @@ TEMPLATE_TEST_CASE("alias_normalise_rowwise", "[normalise]", float, double)
 TEMPLATE_TEST_CASE("subview_normalise_vec", "[normalise]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x(10);
   for (uword i = 0; i < 10; ++i)
@@ -578,6 +658,11 @@ TEMPLATE_TEST_CASE("subview_normalise_vec", "[normalise]", float, double)
 TEMPLATE_TEST_CASE("subview_normalise_colwise", "[normalise}", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
@@ -632,6 +717,11 @@ TEMPLATE_TEST_CASE("subview_normalise_rowwise", "[normalise]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
     {
@@ -682,6 +772,11 @@ TEMPLATE_TEST_CASE
   {
   typedef typename TestType::first_type eT2;
   typedef typename TestType::second_type eT1;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Col<eT1> x = randi<Col<eT1>>(100, distr_param(10, 15));
 

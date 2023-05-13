@@ -17,9 +17,15 @@
 
 using namespace coot;
 
-template<typename eT>
-void test_randu()
+TEMPLATE_TEST_CASE("randu_1", "[randu]", float, double, u32, s32, u64, s64)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> f = randu<Mat<eT>>(1000, 1000);
   arma::Mat<eT> f_cpu(f);
   for (uword c = 0; c < 1000; ++c)
@@ -34,22 +40,16 @@ void test_randu()
 
 
 
-TEST_CASE("randu_1", "[randu]")
-{
-  test_randu<float>();
-  test_randu<double>();
-  test_randu<u32>();
-  test_randu<s32>();
-  test_randu<u64>();
-  test_randu<s64>();
-}
-
-
-
 // Use member .randu() function.
-template<typename eT>
-void test_randu_2()
+TEMPLATE_TEST_CASE("randu_2", "[randu]", float, double, u32, s32, u64, s64)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> f(1000, 1000);
   f.randu();
   arma::Mat<eT> f_cpu(f);
@@ -65,22 +65,16 @@ void test_randu_2()
 
 
 
-TEST_CASE("randu_2", "[randu]")
-{
-  test_randu_2<float>();
-  test_randu_2<double>();
-  test_randu_2<u32>();
-  test_randu_2<s32>();
-  test_randu_2<u64>();
-  test_randu_2<s64>();
-}
-
-
-
 // Use member .randu() function and set size.
-template<typename eT>
-void test_randu_3()
+TEMPLATE_TEST_CASE("randu_3", "[randu]", float, double, u32, s32, u64, s64)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> f(5, 5);
   f.randu(1000, 1000);
   REQUIRE( f.n_rows == 1000 );
@@ -99,23 +93,16 @@ void test_randu_3()
 
 
 
-TEST_CASE("randu_3", "[randu]")
-{
-  test_randu_3<float>();
-  test_randu_3<double>();
-  test_randu_3<u32>();
-  test_randu_3<s32>();
-  test_randu_3<u64>();
-  test_randu_3<s64>();
-}
-
-
-
-
 // Test Row/Col randu().
-template<typename eT>
-void test_row_col_randu()
+TEMPLATE_TEST_CASE("randu_row_col", "[randu]", float, double, u32, s32, u64, s64)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Row<eT> r1(1000);
   r1.randu();
   Row<eT> r2(10);
@@ -171,22 +158,16 @@ void test_row_col_randu()
 
 
 
-TEST_CASE("randu_row_col", "[randu]")
-  {
-  test_row_col_randu<float>();
-  test_row_col_randu<double>();
-  test_row_col_randu<u32>();
-  test_row_col_randu<s32>();
-  test_row_col_randu<u64>();
-  test_row_col_randu<s64>();
-  }
-
-
-
 // For floating-point types only.
-template<typename eT>
-void test_randu_distr()
+TEMPLATE_TEST_CASE("randu_distr", "[randu]", float, double)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   // Sample a large number of random values, then bin them into 5 bins.
   // The empirically observed probability of each bin should match 0.2, plus or minus some variance (calculation detailed below).
 
@@ -224,12 +205,4 @@ void test_randu_distr()
   REQUIRE( bin_counts[3] <= 2210 );
   REQUIRE( bin_counts[4] >= 1795 );
   REQUIRE( bin_counts[4] <= 2210 );
-  }
-
-
-
-TEST_CASE("randu_distr", "[randu]")
-  {
-  test_randu_distr<float>();
-  test_randu_distr<double>();
   }

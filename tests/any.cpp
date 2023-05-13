@@ -21,6 +21,11 @@ TEMPLATE_TEST_CASE("any_vec_simple", "[any]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x(50);
   x.zeros();
 
@@ -40,6 +45,11 @@ TEMPLATE_TEST_CASE("any_vec_simple", "[any]", float, double, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("any_vec_large", "[any]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x(100000);
   x.zeros();
@@ -63,6 +73,11 @@ TEMPLATE_TEST_CASE("any_vec_mat", "[any]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(50, 50);
   x.zeros();
 
@@ -83,6 +98,11 @@ TEMPLATE_TEST_CASE("any_vec_mat", "[any]", float, double, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("any_mat", "[any]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(10000, 500);
   x.zeros();
@@ -125,6 +145,11 @@ TEMPLATE_TEST_CASE("any_mat_large", "[any]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(100, 50000);
   x.zeros();
   x(11, 10) = eT(1);
@@ -166,7 +191,7 @@ TEMPLATE_TEST_CASE("any_mat_large", "[any]", float, double, u32, s32, u64, s64)
 
 TEST_CASE("any_empty", "[any]")
   {
-  mat x;
+  fmat x;
 
   urowvec y = any(x);
   urowvec y2 = any(x, 0);
@@ -226,6 +251,11 @@ TEMPLATE_TEST_CASE("any_mat_rowwise", "[any]", float, double, u32, s32, u64, s64
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(500, 10000);
   x.zeros();
   x.row(10).ones();
@@ -258,6 +288,11 @@ TEMPLATE_TEST_CASE("any_mat_rowwise", "[any]", float, double, u32, s32, u64, s64
 TEMPLATE_TEST_CASE("any_mat_rowwise_large", "[any]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(50000, 100);
   x.zeros();
@@ -292,7 +327,7 @@ TEMPLATE_TEST_CASE("any_mat_rowwise_large", "[any]", float, double, u32, s32, u6
 
 TEST_CASE("any_rowwise_empty", "[any]")
   {
-  mat x;
+  fmat x;
   uvec y = any(x, 1);
 
   REQUIRE( y.n_rows == 0 );
@@ -338,6 +373,11 @@ TEMPLATE_TEST_CASE("any_mat_subview", "[any]", float, double, u32, s32, u64, s64
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(100, 100);
   x.zeros();
   x(0, 0) = eT(1);
@@ -380,6 +420,11 @@ TEMPLATE_TEST_CASE("any_mat_rowwise_subview", "[any]", float, double, u32, s32, 
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(100, 100);
   x.zeros();
   x(0, 0) = eT(1);
@@ -413,6 +458,11 @@ TEMPLATE_TEST_CASE("any_mat_rowwise_subview", "[any]", float, double, u32, s32, 
 TEMPLATE_TEST_CASE("any_mat_expr", "[any]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(100, 100);
   x.zeros();
@@ -455,6 +505,11 @@ TEMPLATE_TEST_CASE("any_mat_expr", "[any]", float, double, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("any_mat_expr_rowwise", "[any]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(100, 100);
   x.zeros();
@@ -500,6 +555,11 @@ TEMPLATE_TEST_CASE(
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Col<eT1> x = randi<Col<eT1>>(1000, distr_param(10, 20));
 
   REQUIRE ( any(conv_to<Col<eT2>>::from(x)) == true );
@@ -525,6 +585,11 @@ TEMPLATE_TEST_CASE(
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x = randi<Mat<eT1>>(500, 500, distr_param(10, 20));
 
   REQUIRE( any(any(conv_to<Mat<eT2>>::from(x))) == true );
@@ -549,6 +614,11 @@ TEMPLATE_TEST_CASE(
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Mat<eT1> x(500, 500);
   x.zeros();
@@ -601,6 +671,11 @@ TEMPLATE_TEST_CASE(
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x(500, 10000);
   x.zeros();
   x.row(10).ones();
@@ -643,6 +718,11 @@ TEMPLATE_TEST_CASE(
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Mat<eT1> x(10000, 500);
   x.zeros();
@@ -687,6 +767,11 @@ TEMPLATE_TEST_CASE(
 TEMPLATE_TEST_CASE("any_relational_expressions", "[any]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> X = randi<Mat<eT>>(10, 10, distr_param(0, 2));
 
@@ -825,6 +910,11 @@ TEMPLATE_TEST_CASE("any_relational_expressions", "[any]", float, double, u32, s3
 TEMPLATE_TEST_CASE("any_vec_relational_op", "[any]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x = randi<Col<eT>>(500, distr_param(0, 2));
 

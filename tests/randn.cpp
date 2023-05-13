@@ -17,9 +17,15 @@
 
 using namespace coot;
 
-template<typename eT>
-void test_randn()
+TEMPLATE_TEST_CASE("randn_1", "[randn]", float, double, s32, s64)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> f = randn<Mat<eT>>(1000, 1000);
   arma::Mat<eT> f_cpu(f);
   for (uword r = 0; r < 1000; ++r)
@@ -33,20 +39,16 @@ void test_randn()
 
 
 
-TEST_CASE("randn_1", "[randn]")
-{
-  test_randn<float>();
-  test_randn<double>();
-  test_randn<s32>();
-  test_randn<s64>();
-}
-
-
-
 // Use member .randn() function.
-template<typename eT>
-void test_randn_2()
+TEMPLATE_TEST_CASE("randn_2", "[randn]", float, double, s32, s64)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> f(1000, 1000);
   f.randn();
   arma::Mat<eT> f_cpu(f);
@@ -61,20 +63,16 @@ void test_randn_2()
 
 
 
-TEST_CASE("randn_2", "[randn]")
-{
-  test_randn_2<float>();
-  test_randn_2<double>();
-  test_randn_2<s32>();
-  test_randn_2<s64>();
-}
-
-
-
 // Use member .randu() function and set size.
-template<typename eT>
-void test_randn_3()
+TEMPLATE_TEST_CASE("randn_3", "[randn]", float, double, s32, s64)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> f(5, 5);
   f.randn(1000, 1000);
   REQUIRE( f.n_rows == 1000 );
@@ -92,20 +90,16 @@ void test_randn_3()
 
 
 
-TEST_CASE("randn_3", "[randn]")
-{
-  test_randn_3<float>();
-  test_randn_3<double>();
-  test_randn_3<s32>();
-  test_randn_3<s64>();
-}
-
-
-
 // Test Row/Col randn().
-template<typename eT>
-void test_row_col_randn()
+TEMPLATE_TEST_CASE("row_col_randn", "[randn]", float, double, s32, s64)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Row<eT> r1(1000);
   r1.randn();
   Row<eT> r2(10);
@@ -149,16 +143,6 @@ void test_row_col_randn()
     REQUIRE( abs(eT(c3_cpu[i])) <= eT(500) );
     REQUIRE( abs(eT(c4_cpu[i])) <= eT(500) );
     }
-  }
-
-
-
-TEST_CASE("randn_row_col", "[randn]")
-  {
-  test_row_col_randn<float>();
-  test_row_col_randn<double>();
-  test_row_col_randn<s32>();
-  test_row_col_randn<s64>();
   }
 
 
@@ -325,9 +309,15 @@ void test_randn_distr(const double mu = 0.0, const double sd = 1.0, const size_t
 
 
 
-template<typename eT>
-void run_randn_distr_tests()
+TEMPLATE_TEST_CASE("randn_distr", "[randn]", float, double)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   test_randn_distr<eT>(0.0, 1.0, 0);
   test_randn_distr<eT>(0.0, 1.0, 1);
 
@@ -350,12 +340,4 @@ void run_randn_distr_tests()
       test_randn_distr<eT>(mu, sd, 3);
       }
     }
-  }
-
-
-
-TEST_CASE("randn_distr", "[randn]")
-  {
-  run_randn_distr_tests<float>();
-  run_randn_distr_tests<double>();
   }

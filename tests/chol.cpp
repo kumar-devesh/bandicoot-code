@@ -17,9 +17,15 @@
 
 using namespace coot;
 
-template<typename eT>
-void test_chol_1()
+TEMPLATE_TEST_CASE("chol_1", "[chol]", float, double)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(5, 5);
   x.zeros();
   for (uword i = 0; i < 5; ++i)
@@ -44,17 +50,15 @@ void test_chol_1()
 
 
 
-TEST_CASE("chol_1")
+TEMPLATE_TEST_CASE("chol_2", "[chol]", float, double)
   {
-  test_chol_1<double>();
-  test_chol_1<float>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_chol_2()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(1));
   for (uword i = 0; i < 5; ++i)
@@ -95,17 +99,15 @@ void test_chol_2()
 
 
 
-TEST_CASE("chol_2")
+TEMPLATE_TEST_CASE("chol_3", "[chol]", float, double)
   {
-  test_chol_2<double>();
-  test_chol_2<float>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_chol_3()
-  {
   Mat<eT> x(50, 50);
   x.randu();
   // force symmetry
@@ -138,12 +140,4 @@ void test_chol_3()
       REQUIRE( eT(z(r, c)) == Approx(eT(x(r, c))) );
       }
     }
-  }
-
-
-
-TEST_CASE("chol_3")
-  {
-  test_chol_3<double>();
-  test_chol_3<float>();
   }

@@ -19,21 +19,28 @@ using namespace coot;
 
 TEMPLATE_TEST_CASE("trivial_svd", "[svd]", float, double)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   // The SVD of the identity matrix should produce singular values that are all 1.
   // (We can't say as much about the singular vectors.)
-  Mat<TestType> x(50, 50);
+  Mat<eT> x(50, 50);
   x.zeros();
   for (uword i = 0; i < 50; ++i)
     {
-    x(i, i) = TestType(1);
+    x(i, i) = eT(1);
     }
 
-  Col<TestType> s = svd(x);
+  Col<eT> s = svd(x);
 
   REQUIRE( s.n_elem == 50 );
   for (uword i = 0; i < 50; ++i)
     {
-    REQUIRE ( TestType(s[i]) == Approx(1.0) );
+    REQUIRE ( eT(s[i]) == Approx(1.0) );
     }
   }
 
@@ -41,11 +48,18 @@ TEMPLATE_TEST_CASE("trivial_svd", "[svd]", float, double)
 
 TEMPLATE_TEST_CASE("empty_svd", "[svd]", float, double)
   {
-  Mat<TestType> x;
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x;
 
   // All three SVD variants should return empty matrices.
-  Col<TestType> s;
-  Mat<TestType> u, v;
+  Col<eT> s;
+  Mat<eT> u, v;
 
   bool result = svd(s, x);
   REQUIRE( result == true );
@@ -65,29 +79,36 @@ TEMPLATE_TEST_CASE("empty_svd", "[svd]", float, double)
 
 TEMPLATE_TEST_CASE("single_element_svd", "[svd]", float, double)
   {
-  Mat<TestType> x(1, 1);
-  x(0, 0) = TestType(5);
+  typedef TestType eT;
 
-  Col<TestType> s;
-  Mat<TestType> u, v;
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x(1, 1);
+  x(0, 0) = eT(5);
+
+  Col<eT> s;
+  Mat<eT> u, v;
 
   bool result = svd(s, x);
   REQUIRE( result == true );
   REQUIRE( s.n_elem == 1 );
-  REQUIRE( TestType(s[0]) == Approx(TestType(5)) );
+  REQUIRE( eT(s[0]) == Approx(eT(5)) );
 
   s = svd(x);
   REQUIRE( s.n_elem == 1 );
-  REQUIRE( TestType(s[0]) == Approx(TestType(5)) );
+  REQUIRE( eT(s[0]) == Approx(eT(5)) );
 
   result = svd(u, s, v, x);
   REQUIRE( result == true );
   REQUIRE( u.n_elem == 1 );
-  REQUIRE( TestType(u[0]) == Approx(TestType(1)) );
+  REQUIRE( eT(u[0]) == Approx(eT(1)) );
   REQUIRE( s.n_elem == 1 );
-  REQUIRE( TestType(s[0]) == Approx(TestType(5)) );
+  REQUIRE( eT(s[0]) == Approx(eT(5)) );
   REQUIRE( v.n_elem == 1 );
-  REQUIRE( TestType(v[0]) == Approx(TestType(1)) );
+  REQUIRE( eT(v[0]) == Approx(eT(1)) );
   }
 
 
@@ -95,6 +116,11 @@ TEMPLATE_TEST_CASE("single_element_svd", "[svd]", float, double)
 template<typename eT>
 void test_svd_reconstruction(const uword n_rows, const uword n_cols)
   {
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(n_rows, n_cols);
   x.randu();
   // Add a bit down the diagonal.
@@ -167,33 +193,40 @@ TEMPLATE_TEST_CASE("wide_svd", "[svd]", float, double)
 
 TEMPLATE_TEST_CASE("arma_svd_comparison", "[svd]", float, double)
   {
-  Mat<TestType> x(50, 50);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x(50, 50);
   x.randu();
   for (uword i = 0; i < 50; ++i)
     {
-    x(i, i) += TestType(0.5);
+    x(i, i) += eT(0.5);
     }
-  arma::Mat<TestType> x_cpu(x);
+  arma::Mat<eT> x_cpu(x);
 
-  Col<TestType> s = svd(x);
-  arma::Col<TestType> s_cpu = svd(x_cpu);
+  Col<eT> s = svd(x);
+  arma::Col<eT> s_cpu = svd(x_cpu);
 
   REQUIRE( s.n_elem == s_cpu.n_elem );
-  arma::Col<TestType> s2_cpu(s);
+  arma::Col<eT> s2_cpu(s);
   for (uword i = 0; i < s.n_elem; ++i)
     {
-    if (std::is_same<TestType, float>::value)
-      REQUIRE( TestType(s2_cpu[i]) == Approx(TestType(s_cpu[i])).epsilon(0.001).margin(0.0001) );
+    if (std::is_same<eT, float>::value)
+      REQUIRE( eT(s2_cpu[i]) == Approx(eT(s_cpu[i])).epsilon(0.001).margin(0.0001) );
     else
-      REQUIRE( TestType(s2_cpu[i]) == Approx(TestType(s_cpu[i])).margin(0.00001) );
+      REQUIRE( eT(s2_cpu[i]) == Approx(eT(s_cpu[i])).margin(0.00001) );
     }
 
   // Make sure that U and V come out similarly too.
-  Mat<TestType> u, v;
+  Mat<eT> u, v;
   bool result = svd(u, s, v, x);
   REQUIRE( result == true );
 
-  arma::Mat<TestType> u_cpu, v_cpu;
+  arma::Mat<eT> u_cpu, v_cpu;
   result = svd(u_cpu, s_cpu, v_cpu, x_cpu);
   REQUIRE( result == true );
 
@@ -204,32 +237,32 @@ TEMPLATE_TEST_CASE("arma_svd_comparison", "[svd]", float, double)
   REQUIRE( v.n_rows == v_cpu.n_rows );
   REQUIRE( v.n_cols == v_cpu.n_cols );
 
-  arma::Mat<TestType> v2_cpu(v);
-  arma::Mat<TestType> u2_cpu(u);
-  s2_cpu = arma::Col<TestType>(s);
+  arma::Mat<eT> v2_cpu(v);
+  arma::Mat<eT> u2_cpu(u);
+  s2_cpu = arma::Col<eT>(s);
 
   // The singular vectors that are returned may point opposite directions, so we check with abs().
   for (uword i = 0; i < u.n_elem; ++i)
     {
-    if (std::is_same<TestType, float>::value)
-      REQUIRE( std::abs(TestType(u2_cpu[i])) == Approx(std::abs(TestType(u_cpu[i]))).epsilon(0.05).margin(0.0001) );
+    if (std::is_same<eT, float>::value)
+      REQUIRE( std::abs(eT(u2_cpu[i])) == Approx(std::abs(eT(u_cpu[i]))).epsilon(0.05).margin(0.0001) );
     else
-      REQUIRE( std::abs(TestType(u2_cpu[i])) == Approx(std::abs(TestType(u_cpu[i]))).epsilon(0.001).margin(0.00001) );
+      REQUIRE( std::abs(eT(u2_cpu[i])) == Approx(std::abs(eT(u_cpu[i]))).epsilon(0.001).margin(0.00001) );
     }
 
   for (uword i = 0; i < s.n_elem; ++i)
     {
-    if (std::is_same<TestType, float>::value)
-      REQUIRE( TestType(s2_cpu[i]) == Approx(TestType(s_cpu[i])).epsilon(0.05).margin(0.0001) );
+    if (std::is_same<eT, float>::value)
+      REQUIRE( eT(s2_cpu[i]) == Approx(eT(s_cpu[i])).epsilon(0.05).margin(0.0001) );
     else
-      REQUIRE( TestType(s2_cpu[i]) == Approx(TestType(s_cpu[i])).epsilon(0.001).margin(0.00001) );
+      REQUIRE( eT(s2_cpu[i]) == Approx(eT(s_cpu[i])).epsilon(0.001).margin(0.00001) );
     }
 
   for (uword i = 0; i < v.n_elem; ++i)
     {
-    if (std::is_same<TestType, float>::value)
-      REQUIRE( std::abs(TestType(v2_cpu[i])) == Approx(std::abs(TestType(v_cpu[i]))).epsilon(0.05).margin(0.0001) );
+    if (std::is_same<eT, float>::value)
+      REQUIRE( std::abs(eT(v2_cpu[i])) == Approx(std::abs(eT(v_cpu[i]))).epsilon(0.05).margin(0.0001) );
     else
-      REQUIRE( std::abs(TestType(v2_cpu[i])) == Approx(std::abs(TestType(v_cpu[i]))).epsilon(0.001).margin(0.00001) );
+      REQUIRE( std::abs(eT(v2_cpu[i])) == Approx(std::abs(eT(v_cpu[i]))).epsilon(0.001).margin(0.00001) );
     }
   }

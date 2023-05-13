@@ -21,6 +21,11 @@ TEMPLATE_TEST_CASE("simple_var_test", "[var]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(15, 11);
   x.ones();
   for (uword c = 1; c < 11; ++c)
@@ -70,6 +75,11 @@ TEMPLATE_TEST_CASE("random_var_test", "[var]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(500, 700);
   x.randu();
 
@@ -113,6 +123,11 @@ TEMPLATE_TEST_CASE("random_var_test", "[var]", float, double)
 TEMPLATE_TEST_CASE("randi_var_test", "[var]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(500, 700, distr_param(1, 100));
 
@@ -158,6 +173,11 @@ TEMPLATE_TEST_CASE("randi_var_test", "[var]", float, double, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("simple_subview_var_test", "[var]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(15, 11);
   x.ones();
@@ -214,6 +234,11 @@ TEMPLATE_TEST_CASE("random_subview_var_test", "[var]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(500, 700);
   x.randu();
 
@@ -255,10 +280,10 @@ TEMPLATE_TEST_CASE("random_subview_var_test", "[var]", float, double)
 
 TEST_CASE("empty_var_test", "[var]")
   {
-  mat x;
-  rowvec m1 = var(x);
-  rowvec m2 = var(x, 0, 0);
-  vec m3 = var(x, 0, 1);
+  fmat x;
+  frowvec m1 = var(x);
+  frowvec m2 = var(x, 0, 0);
+  fvec m3 = var(x, 0, 1);
 
   REQUIRE( m1.n_elem == 0 );
   REQUIRE( m2.n_elem == 0 );
@@ -277,6 +302,11 @@ TEMPLATE_TEST_CASE("simple_var_vec_test", "[var]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x(1000);
   x.ones();
 
@@ -290,6 +320,11 @@ TEMPLATE_TEST_CASE("simple_var_vec_test_2", "[var]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x = linspace<Col<eT>>(1, 11, 11);
 
   REQUIRE( var(x) == Approx(eT(11)) );
@@ -301,6 +336,11 @@ TEMPLATE_TEST_CASE("simple_var_vec_test_2", "[var]", float, double)
 TEMPLATE_TEST_CASE("random_var_vec_test", "[var]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x(100000);
   x.randu();
@@ -324,6 +364,11 @@ TEMPLATE_TEST_CASE("randi_var_vec_test", "[var]", float, double, u32, s32, u64, 
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x = randi<Col<eT>>(100000, distr_param(1, 100));
 
   arma::Col<eT> x_cpu(x);
@@ -343,9 +388,9 @@ TEMPLATE_TEST_CASE("randi_var_vec_test", "[var]", float, double, u32, s32, u64, 
 
 TEST_CASE("empty_var_vec_test", "[var]")
   {
-  vec x;
-  const double var_val = var(x);
-  const double var_val2 = var(x, 1);
+  fvec x;
+  const float var_val = var(x);
+  const float var_val2 = var(x, 1);
 
   REQUIRE( var_val == 0.0 );
   REQUIRE( var_val2 == 0.0 );
@@ -355,17 +400,17 @@ TEST_CASE("empty_var_vec_test", "[var]")
 
 TEST_CASE("var_op_test", "[var]")
   {
-  mat x(50, 50);
+  fmat x(50, 50);
   x.randu();
 
-  rowvec m1 = var(2 * x + 3);
-  mat y = 2 * x + 3;
-  rowvec m2 = var(y);
+  frowvec m1 = var(2 * x + 3);
+  fmat y = 2 * x + 3;
+  frowvec m2 = var(y);
 
   REQUIRE( m1.n_elem == m2.n_elem );
   for (size_t i = 0; i < m1.n_elem; ++i)
     {
-    REQUIRE( double(m1[i]) == Approx(double(m2[i])) );
+    REQUIRE( float(m1[i]) == Approx(float(m2[i])) );
     }
 
   m1 = var(2 * x + 3, 1);
@@ -374,7 +419,7 @@ TEST_CASE("var_op_test", "[var]")
   REQUIRE( m1.n_elem == m2.n_elem );
   for (size_t i = 0; i < m1.n_elem; ++i)
     {
-    REQUIRE( double(m1[i]) == Approx(double(m2[i])) );
+    REQUIRE( float(m1[i]) == Approx(float(m2[i])) );
     }
   }
 
@@ -383,10 +428,10 @@ TEST_CASE("var_op_test", "[var]")
 // single element var
 TEST_CASE("single_element_var", "[var]")
   {
-  vec x(1);
+  fvec x(1);
   x(0) = 3.0;
 
-  REQUIRE( (isinf(var(x)) || isnan(var(x))) ); // adjusted will divide by 0
+  REQUIRE( (std::isinf(var(x)) || std::isnan(var(x))) ); // adjusted will divide by 0
   REQUIRE( var(x, 1) == 0.0 );
   }
 
@@ -396,15 +441,17 @@ TEMPLATE_TEST_CASE("var_subvec", "[var]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(15, 11);
   x.ones();
   for (uword c = 1; c < 11; ++c)
     {
     x.col(c) *= (c + 1);
     }
-
-  static_assert( is_coot_type<subview_col<double>>::value == true, "subview row is a coot type");
-  static_assert( resolves_to_vector<subview_col<double>>::value == true, "subview row resolves to vector");
 
   for (uword i = 0; i < 11; ++i)
     {
@@ -437,6 +484,11 @@ TEMPLATE_TEST_CASE
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Mat<eT1> x = randi<Mat<eT1>>(100, 50, distr_param(1, 1000));
   Mat<eT2> x_conv = conv_to<Mat<eT2>>::from(x);
@@ -546,6 +598,11 @@ TEMPLATE_TEST_CASE
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Col<eT1> x = randi<Col<eT1>>(10000, distr_param(1, 50));
   Col<eT2> x_conv = conv_to<Col<eT2>>::from(x);

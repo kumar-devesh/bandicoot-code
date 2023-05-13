@@ -21,6 +21,11 @@ TEMPLATE_TEST_CASE("reshape_same_size", "[reshape]", float, double, u32, s32, u6
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(30, 30, distr_param(10, 20));
   Mat<eT> y = reshape(x, 15, 60);
 
@@ -39,6 +44,11 @@ TEMPLATE_TEST_CASE("reshape_same_size", "[reshape]", float, double, u32, s32, u6
 TEMPLATE_TEST_CASE("reshape_smaller", "[reshape]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(30, 30, distr_param(10, 20));
   Mat<eT> y = reshape(x, 15, 30);
@@ -61,6 +71,11 @@ TEMPLATE_TEST_CASE("reshape_larger", "[reshape]", float, double, u32, s32, u64, 
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(30, 30, distr_param(10, 20));
   Mat<eT> y = reshape(x, 15, 70);
 
@@ -82,6 +97,11 @@ TEMPLATE_TEST_CASE("reshape_larger", "[reshape]", float, double, u32, s32, u64, 
 TEMPLATE_TEST_CASE("reshape_alias_same_size", "[reshape]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x1 = randi<Mat<eT>>(30, 30, distr_param(10, 20));
   Mat<eT> x2 = x1;
@@ -114,6 +134,11 @@ TEMPLATE_TEST_CASE("reshape_alias_smaller", "[reshape]", float, double, u32, s32
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x1 = randi<Mat<eT>>(30, 30, distr_param(10, 20));
   Mat<eT> x2 = x1;
   Mat<eT> x_orig = x1;
@@ -144,6 +169,11 @@ TEMPLATE_TEST_CASE("reshape_alias_smaller", "[reshape]", float, double, u32, s32
 TEMPLATE_TEST_CASE("reshape_alias_larger", "[reshape]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x1 = randi<Mat<eT>>(30, 30, distr_param(10, 20));
   Mat<eT> x2 = x1;
@@ -178,6 +208,11 @@ TEMPLATE_TEST_CASE("reshape_subview_same_size", "[reshape]", float, double, u32,
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(30, 30, distr_param(10, 20));
   Mat<eT> y = reshape(x.submat(5, 5, 24, 24), 10, 40);
 
@@ -200,6 +235,11 @@ TEMPLATE_TEST_CASE("reshape_subview_smaller", "[reshape]", float, double, u32, s
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(30, 30, distr_param(10, 20));
   Mat<eT> y = reshape(x.submat(5, 5, 24, 24), 10, 20);
 
@@ -221,6 +261,11 @@ TEMPLATE_TEST_CASE("reshape_subview_smaller", "[reshape]", float, double, u32, s
 TEMPLATE_TEST_CASE("reshape_subview_larger", "[reshape]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(30, 30, distr_param(10, 20));
   Mat<eT> y = reshape(x.submat(5, 5, 24, 24), 10, 50);
@@ -245,6 +290,11 @@ TEMPLATE_TEST_CASE("reshape_alias_subview_same_size", "[reshape]", float, double
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(30, 30, distr_param(10, 20));
   Mat<eT> x_orig = x;
   x = reshape(x.submat(5, 5, 24, 24), 10, 40);
@@ -268,6 +318,11 @@ TEMPLATE_TEST_CASE("reshape_alias_subview_smaller", "[reshape]", float, double, 
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(30, 30, distr_param(10, 20));
   Mat<eT> x_orig = x;
   x = reshape(x.submat(5, 5, 24, 24), 10, 20);
@@ -290,6 +345,11 @@ TEMPLATE_TEST_CASE("reshape_alias_subview_smaller", "[reshape]", float, double, 
 TEMPLATE_TEST_CASE("reshape_alias_subview_larger", "[reshape]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(30, 30, distr_param(10, 20));
   Mat<eT> x_orig = x;
@@ -315,6 +375,11 @@ TEMPLATE_TEST_CASE("reshape_from_empty", "[reshape]", float, double, u32, s32, u
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x;
   Mat<eT> y = reshape(x, 10, 10);
 
@@ -330,6 +395,11 @@ TEMPLATE_TEST_CASE("reshape_from_empty", "[reshape]", float, double, u32, s32, u
 TEMPLATE_TEST_CASE("reshape_to_empty", "[reshape]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(10, 20));
   Mat<eT> y = reshape(x, 0, 0);
@@ -348,6 +418,11 @@ TEMPLATE_TEST_CASE("reshape_to_empty", "[reshape]", float, double, u32, s32, u64
 TEMPLATE_TEST_CASE("reshape_op", "[reshape]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(20, 10, distr_param(10, 20));
   Mat<eT> op_res = (trans(x) * 3 + 4);
@@ -383,6 +458,11 @@ TEMPLATE_TEST_CASE
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Mat<eT1> x = randi<Mat<eT1>>(5, 5, distr_param(10, 20));
 

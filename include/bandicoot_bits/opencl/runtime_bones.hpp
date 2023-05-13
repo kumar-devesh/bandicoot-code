@@ -74,6 +74,15 @@ class runtime_t
 
   inline void release_memory(cl_mem dev_mem);
 
+  template<typename eT>
+  inline constexpr bool is_supported_type(const typename enable_if<is_supported_kernel_elem_type<eT>::value && !is_double<eT>::value>::result* junk = 0) { return true; }
+
+  template<typename eT>
+  inline bool is_supported_type(const typename enable_if<is_double<eT>::value>::result* junk = 0) { return has_float64(); }
+
+  template<typename eT>
+  inline constexpr bool is_supported_type(const typename enable_if<!is_supported_kernel_elem_type<eT>::value>::result* junk = 0) { return false; }
+
   inline void synchronise();
 
   inline cl_device_id     get_device();

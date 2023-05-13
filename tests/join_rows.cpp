@@ -22,6 +22,11 @@ TEMPLATE_TEST_CASE("simple_hardcoded_join_rows", "[join_rows]", float, double, u
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(2, 2); // [[1, 2; 3 4]]
   x(0, 0) = eT(1);
   x(1, 0) = eT(2);
@@ -65,6 +70,11 @@ TEMPLATE_TEST_CASE("simple_hardcoded_join_rows", "[join_rows]", float, double, u
 TEMPLATE_TEST_CASE("simple_hardcoded_three_join_rows", "[join_rows]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(2, 2); // [[1, 2; 3 4]]
   x(0, 0) = eT(1);
@@ -122,6 +132,11 @@ TEMPLATE_TEST_CASE("simple_hardcoded_three_join_rows", "[join_rows]", float, dou
 TEMPLATE_TEST_CASE("simple_hardcoded_four_join_rows", "[join_rows]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(2, 2); // [[1, 2; 3 4]]
   x(0, 0) = eT(1);
@@ -194,6 +209,11 @@ TEMPLATE_TEST_CASE("random_join_rows", "[join_rows]", float, double, u32, s32, u
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   for (size_t t = 6; t < 12; ++t)
     {
     const uword n_rows = (uword) std::pow(2.0, (double) t) + 3;
@@ -255,6 +275,11 @@ TEMPLATE_TEST_CASE("random_three_join_rows", "[join_rows]", float, double, u32, 
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   for (size_t t = 6; t < 12; ++t)
     {
     const uword n_rows = (uword) std::pow(2.0, (double) t) + 3;
@@ -301,6 +326,11 @@ TEMPLATE_TEST_CASE("random_three_join_rows", "[join_rows]", float, double, u32, 
 TEMPLATE_TEST_CASE("random_four_join_rows", "[join_rows]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   for (size_t t = 6; t < 12; ++t)
     {
@@ -355,13 +385,13 @@ TEMPLATE_TEST_CASE("random_four_join_rows", "[join_rows]", float, double, u32, s
 // One matrix is empty test
 TEST_CASE("one_empty_matrix_join_rows", "[join_rows]")
   {
-  mat x = randu<mat>(5, 2);
-  mat y(5, 0);
+  fmat x = randu<fmat>(5, 2);
+  fmat y(5, 0);
 
-  mat z1 = join_rows(x, y);
-  mat z2 = join_rows(y, x);
-  mat z3 = join_horiz(x, y);
-  mat z4 = join_horiz(y, x);
+  fmat z1 = join_rows(x, y);
+  fmat z2 = join_rows(y, x);
+  fmat z3 = join_horiz(x, y);
+  fmat z4 = join_horiz(y, x);
 
   REQUIRE( z1.n_rows == 5 );
   REQUIRE( z1.n_cols == 2 );
@@ -372,11 +402,11 @@ TEST_CASE("one_empty_matrix_join_rows", "[join_rows]")
   REQUIRE( z4.n_rows == 5 );
   REQUIRE( z4.n_cols == 2 );
 
-  arma::mat x_cpu(x);
-  arma::mat z1_cpu(z1);
-  arma::mat z2_cpu(z2);
-  arma::mat z3_cpu(z3);
-  arma::mat z4_cpu(z4);
+  arma::fmat x_cpu(x);
+  arma::fmat z1_cpu(z1);
+  arma::fmat z2_cpu(z2);
+  arma::fmat z3_cpu(z3);
+  arma::fmat z4_cpu(z4);
 
   REQUIRE( arma::approx_equal( z1_cpu, x_cpu, "absdiff", 1e-5 ) );
   REQUIRE( arma::approx_equal( z2_cpu, x_cpu, "absdiff", 1e-5 ) );
@@ -389,14 +419,14 @@ TEST_CASE("one_empty_matrix_join_rows", "[join_rows]")
 // One matrix is empty and has the wrong number of cols
 TEST_CASE("one_wrong_empty_matrix_join_rows", "[join_rows]")
   {
-  mat x = randu<mat>(5, 2);
-  mat y(3, 0);
+  fmat x = randu<fmat>(5, 2);
+  fmat y(3, 0);
 
   // Disable cerr output for this test.
   std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
   std::cerr.rdbuf(NULL);
 
-  mat z;
+  fmat z;
   REQUIRE_THROWS( z = join_rows(x, y) );
   REQUIRE_THROWS( z = join_rows(y, x) );
   REQUIRE_THROWS( z = join_horiz(x, y) );
@@ -411,14 +441,14 @@ TEST_CASE("one_wrong_empty_matrix_join_rows", "[join_rows]")
 // Matrices do not match in number of rows
 TEST_CASE("mismatched_n_rows_join_rows", "[join_rows]")
   {
-  mat x = randu<mat>(5, 2);
-  mat y = randu<mat>(6, 2);
+  fmat x = randu<fmat>(5, 2);
+  fmat y = randu<fmat>(6, 2);
 
   // Disable cerr output for this test.
   std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
   std::cerr.rdbuf(NULL);
 
-  mat z;
+  fmat z;
   REQUIRE_THROWS( z = join_rows(x, y) );
   REQUIRE_THROWS( z = join_rows(y, x) );
   REQUIRE_THROWS( z = join_horiz(x, y) );
@@ -432,19 +462,19 @@ TEST_CASE("mismatched_n_rows_join_rows", "[join_rows]")
 
 TEST_CASE("mismatched_n_rows_three_join_rows", "[join_rows]")
   {
-  mat x = randu<mat>(5, 2);
-  mat y(3, 7);
-  mat z(6, 1);
+  fmat x = randu<fmat>(5, 2);
+  fmat y(3, 7);
+  fmat z(6, 1);
 
   // Disable cerr output for this test.
   std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
   std::cerr.rdbuf(NULL);
 
-  mat out;
+  fmat out;
   REQUIRE_THROWS( out = join_rows(x, y, z) );
   REQUIRE_THROWS( out = join_horiz(x, y, z) );
 
-  y = randu<mat>(5, 2);
+  y = randu<fmat>(5, 2);
   REQUIRE_THROWS( out = join_rows(x, y, z) );
   REQUIRE_THROWS( out = join_horiz(x, y, z) );
 
@@ -456,24 +486,24 @@ TEST_CASE("mismatched_n_rows_three_join_rows", "[join_rows]")
 
 TEST_CASE("mismatched_n_rows_four_join_rows", "[join_rows]")
   {
-  mat x = randu<mat>(5, 2);
-  mat y(3, 7);
-  mat z(6, 1);
-  mat w(12, 3);
+  fmat x = randu<fmat>(5, 2);
+  fmat y(3, 7);
+  fmat z(6, 1);
+  fmat w(12, 3);
 
   // Disable cerr output for this test.
   std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
   std::cerr.rdbuf(NULL);
 
-  mat out;
+  fmat out;
   REQUIRE_THROWS( out = join_rows(x, y, z, w) );
   REQUIRE_THROWS( out = join_horiz(x, y, z, w) );
 
-  y = randu<mat>(5, 2);
+  y = randu<fmat>(5, 2);
   REQUIRE_THROWS( out = join_rows(x, y, z, w) );
   REQUIRE_THROWS( out = join_horiz(x, y, z, w) );
 
-  z = randu<mat>(5, 2);
+  z = randu<fmat>(5, 2);
   REQUIRE_THROWS( out = join_rows(x, y, z, w) );
   REQUIRE_THROWS( out = join_horiz(x, y, z, w) );
 
@@ -486,13 +516,13 @@ TEST_CASE("mismatched_n_rows_four_join_rows", "[join_rows]")
 // Both matrices are empty but have a nonzero number of rows
 TEST_CASE("empty_matrices_nonzero_rows_join_rows", "[join_rows]")
   {
-  mat x(1, 0);
-  mat y(123, 0);
+  fmat x(1, 0);
+  fmat y(123, 0);
 
   std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
   std::cerr.rdbuf(NULL);
 
-  mat z;
+  fmat z;
   REQUIRE_THROWS( z = join_rows(x, y) );
   REQUIRE_THROWS( z = join_rows(y, x) );
   REQUIRE_THROWS( z = join_horiz(x, y) );
@@ -507,12 +537,12 @@ TEST_CASE("empty_matrices_nonzero_rows_join_rows", "[join_rows]")
 // Both matrices are totally empty
 TEST_CASE("totally_empty_matrices_join_rows", "[join_rows]")
   {
-  mat x, y;
+  fmat x, y;
 
-  mat z1 = join_rows(x, y);
-  mat z2 = join_rows(y, x);
-  mat z3 = join_horiz(x, y);
-  mat z4 = join_horiz(y, x);
+  fmat z1 = join_rows(x, y);
+  fmat z2 = join_rows(y, x);
+  fmat z3 = join_horiz(x, y);
+  fmat z4 = join_horiz(y, x);
 
   REQUIRE( z1.n_rows == 0 );
   REQUIRE( z1.n_cols == 0 );
@@ -530,6 +560,11 @@ TEST_CASE("totally_empty_matrices_join_rows", "[join_rows]")
 TEMPLATE_TEST_CASE("one_input_expr_join_rows", "[join_rows]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(250, 150, distr_param(0, 100));
   Mat<eT> y = randi<Mat<eT>>(250, 213, distr_param(100, 200));
@@ -585,6 +620,11 @@ TEMPLATE_TEST_CASE("two_input_exprs_join_rows", "[join_rows]", float, double, u3
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(100, 50, distr_param(0, 100));
   Mat<eT> y = randi<Mat<eT>>(50, 75, distr_param(100, 200));
   Mat<eT> x_mod = repmat(x, 3, 1);
@@ -621,6 +661,11 @@ TEMPLATE_TEST_CASE("join_rows_in_expr", "[join_rows]", float, double, u32, s32, 
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(15, 10, distr_param(0, 10));
   Mat<eT> y = randi<Mat<eT>>(15, 7, distr_param(10, 20));
 
@@ -655,6 +700,11 @@ TEMPLATE_TEST_CASE
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Mat<eT1> x = randi<Mat<eT1>>(10, 143, distr_param(30, 40));
   Mat<eT2> y = randi<Mat<eT2>>(10, 110, distr_param(10, 30));
@@ -752,6 +802,11 @@ TEMPLATE_TEST_CASE
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x = randi<Mat<eT1>>(10, 143, distr_param(30, 40));
   Mat<eT1> y = randi<Mat<eT1>>(10, 110, distr_param(10, 30));
 
@@ -785,21 +840,21 @@ TEMPLATE_TEST_CASE
 
 TEST_CASE("alias_join_rows", "[join_rows]")
   {
-  mat x = randu<mat>(20, 10);
-  mat y = randu<mat>(20, 15);
-  mat x_ref(x);
+  fmat x = randu<fmat>(20, 10);
+  fmat y = randu<fmat>(20, 15);
+  fmat x_ref(x);
 
   x = join_rows(x, y);
 
   REQUIRE( x.n_rows == 20 );
   REQUIRE( x.n_cols == 25 );
 
-  arma::mat x_ref_cpu(x_ref);
-  arma::mat y_cpu(y);
-  arma::mat x_cpu(x);
+  arma::fmat x_ref_cpu(x_ref);
+  arma::fmat y_cpu(y);
+  arma::fmat x_cpu(x);
 
-  arma::mat x_cpu_1 = x_cpu.cols(0, 9);
-  arma::mat x_cpu_2 = x_cpu.cols(10, 24);
+  arma::fmat x_cpu_1 = x_cpu.cols(0, 9);
+  arma::fmat x_cpu_2 = x_cpu.cols(10, 24);
 
   REQUIRE( arma::approx_equal( x_cpu_1, x_ref_cpu, "absdiff", 1e-5 ) );
   REQUIRE( arma::approx_equal( x_cpu_2, y_cpu,     "absdiff", 1e-5 ) );
@@ -809,24 +864,24 @@ TEST_CASE("alias_join_rows", "[join_rows]")
 
 TEST_CASE("alias_three_join_rows", "[join_rows]")
   {
-  mat x = randu<mat>(20, 10);
-  mat y = randu<mat>(20, 15);
-  mat z = randu<mat>(20, 20);
-  mat x_ref(x);
+  fmat x = randu<fmat>(20, 10);
+  fmat y = randu<fmat>(20, 15);
+  fmat z = randu<fmat>(20, 20);
+  fmat x_ref(x);
 
   x = join_rows(x, y, z);
 
   REQUIRE( x.n_rows == 20 );
   REQUIRE( x.n_cols == 45 );
 
-  arma::mat x_ref_cpu(x_ref);
-  arma::mat y_cpu(y);
-  arma::mat x_cpu(x);
-  arma::mat z_cpu(z);
+  arma::fmat x_ref_cpu(x_ref);
+  arma::fmat y_cpu(y);
+  arma::fmat x_cpu(x);
+  arma::fmat z_cpu(z);
 
-  arma::mat x_cpu_1 = x_cpu.cols(0, 9);
-  arma::mat x_cpu_2 = x_cpu.cols(10, 24);
-  arma::mat x_cpu_3 = x_cpu.cols(25, 44);
+  arma::fmat x_cpu_1 = x_cpu.cols(0, 9);
+  arma::fmat x_cpu_2 = x_cpu.cols(10, 24);
+  arma::fmat x_cpu_3 = x_cpu.cols(25, 44);
 
   REQUIRE( arma::approx_equal( x_cpu_1, x_ref_cpu, "absdiff", 1e-5 ) );
   REQUIRE( arma::approx_equal( x_cpu_2, y_cpu,     "absdiff", 1e-5 ) );
@@ -837,27 +892,27 @@ TEST_CASE("alias_three_join_rows", "[join_rows]")
 
 TEST_CASE("alias_four_join_rows", "[join_rows]")
   {
-  mat x = randu<mat>(20, 10);
-  mat y = randu<mat>(20, 15);
-  mat z = randu<mat>(20, 20);
-  mat w = randu<mat>(20, 25);
-  mat x_ref(x);
+  fmat x = randu<fmat>(20, 10);
+  fmat y = randu<fmat>(20, 15);
+  fmat z = randu<fmat>(20, 20);
+  fmat w = randu<fmat>(20, 25);
+  fmat x_ref(x);
 
   x = join_rows(x, y, z, w);
 
   REQUIRE( x.n_rows == 20 );
   REQUIRE( x.n_cols == 70 );
 
-  arma::mat x_ref_cpu(x_ref);
-  arma::mat y_cpu(y);
-  arma::mat x_cpu(x);
-  arma::mat z_cpu(z);
-  arma::mat w_cpu(w);
+  arma::fmat x_ref_cpu(x_ref);
+  arma::fmat y_cpu(y);
+  arma::fmat x_cpu(x);
+  arma::fmat z_cpu(z);
+  arma::fmat w_cpu(w);
 
-  arma::mat x_cpu_1 = x_cpu.cols(0, 9);
-  arma::mat x_cpu_2 = x_cpu.cols(10, 24);
-  arma::mat x_cpu_3 = x_cpu.cols(25, 44);
-  arma::mat x_cpu_4 = x_cpu.cols(45, 69);
+  arma::fmat x_cpu_1 = x_cpu.cols(0, 9);
+  arma::fmat x_cpu_2 = x_cpu.cols(10, 24);
+  arma::fmat x_cpu_3 = x_cpu.cols(25, 44);
+  arma::fmat x_cpu_4 = x_cpu.cols(45, 69);
 
   REQUIRE( arma::approx_equal( x_cpu_1, x_ref_cpu, "absdiff", 1e-5 ) );
   REQUIRE( arma::approx_equal( x_cpu_2, y_cpu,     "absdiff", 1e-5 ) );

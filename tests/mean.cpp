@@ -21,6 +21,11 @@ TEMPLATE_TEST_CASE("simple_mean_test", "[mean]", float, double, u32, s32, u64, s
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(15, 10);
   x.ones();
   for (uword c = 1; c < 10; ++c)
@@ -55,6 +60,11 @@ TEMPLATE_TEST_CASE("random_mean_test", "[mean]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(500, 700);
   x.randu();
 
@@ -86,6 +96,11 @@ TEMPLATE_TEST_CASE("random_mean_randi_test", "[mean]", float, double, u32, s32, 
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(500, 700, distr_param(0, 50));
 
   Row<eT> col_means = mean(x);
@@ -115,6 +130,11 @@ TEMPLATE_TEST_CASE("random_mean_randi_test", "[mean]", float, double, u32, s32, 
 TEMPLATE_TEST_CASE("simple_subview_mean_test", "[mean]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(15, 10);
   x.ones();
@@ -154,6 +174,11 @@ TEMPLATE_TEST_CASE("random_subview_mean_test", "[mean]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(500, 700);
   x.randu();
 
@@ -185,6 +210,11 @@ TEMPLATE_TEST_CASE("random_subview_mean_randi_test", "[mean]", float, double, u3
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(500, 700, distr_param(0, 10));
 
   Row<eT> col_means = mean(x.submat(10, 10, 490, 690));
@@ -213,10 +243,10 @@ TEMPLATE_TEST_CASE("random_subview_mean_randi_test", "[mean]", float, double, u3
 
 TEST_CASE("empty_mean_test", "[mean]")
   {
-  mat x;
-  rowvec m1 = mean(x);
-  rowvec m2 = mean(x, 0);
-  vec m3 = mean(x, 1);
+  fmat x;
+  frowvec m1 = mean(x);
+  frowvec m2 = mean(x, 0);
+  fvec m3 = mean(x, 1);
 
   REQUIRE( m1.n_elem == 0 );
   REQUIRE( m2.n_elem == 0 );
@@ -229,6 +259,11 @@ TEMPLATE_TEST_CASE("simple_mean_vec_test", "[mean]", float, double, u32, s32, u6
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x(1000);
   x.ones();
 
@@ -240,6 +275,11 @@ TEMPLATE_TEST_CASE("simple_mean_vec_test", "[mean]", float, double, u32, s32, u6
 TEMPLATE_TEST_CASE("random_mean_vec_test", "[mean]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x(100000);
   x.randu();
@@ -258,6 +298,11 @@ TEMPLATE_TEST_CASE("random_mean_vec_randi_test", "[mean]", float, double, u32, s
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x = randi<Col<eT>>(100000, distr_param(0, 100));
 
   arma::Col<eT> x_cpu(x);
@@ -272,8 +317,8 @@ TEMPLATE_TEST_CASE("random_mean_vec_randi_test", "[mean]", float, double, u32, s
 
 TEST_CASE("empty_mean_vec_test", "[mean]")
   {
-  vec x;
-  const double mean_val = mean(x);
+  fvec x;
+  const float mean_val = mean(x);
 
   REQUIRE( mean_val == 0.0 );
   }
@@ -282,16 +327,16 @@ TEST_CASE("empty_mean_vec_test", "[mean]")
 
 TEST_CASE("mean_op_test", "[mean]")
   {
-  mat x(50, 50);
+  fmat x(50, 50);
   x.randu();
 
-  rowvec m1 = mean(2 * x + 3);
-  mat y = 2 * x + 3;
-  rowvec m2 = mean(y);
+  frowvec m1 = mean(2 * x + 3);
+  fmat y = 2 * x + 3;
+  frowvec m2 = mean(y);
 
   REQUIRE( m1.n_elem == m2.n_elem );
   for (size_t i = 0; i < m1.n_elem; ++i)
     {
-    REQUIRE( double(m1[i]) == Approx(double(m2[i])) );
+    REQUIRE( float(m1[i]) == Approx(float(m2[i])) );
     }
   }

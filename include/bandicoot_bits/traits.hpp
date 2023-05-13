@@ -662,6 +662,20 @@ struct is_supported_blas_type
 
 
 
+template<typename T1>
+struct is_supported_kernel_elem_type
+  {
+  static const bool value = \
+    is_u32<T1>::value ||
+    is_s32<T1>::value ||
+    is_u64<T1>::value ||
+    is_s64<T1>::value ||
+    is_float<T1>::value ||
+    is_double<T1>::value;
+  };
+
+
+
 template<typename T>
 struct is_signed
   {

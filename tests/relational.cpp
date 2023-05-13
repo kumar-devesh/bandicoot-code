@@ -25,6 +25,11 @@ TEMPLATE_TEST_CASE("simple_relational_scalar_ops", "[relational]", float, double
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(3, 3);
   x(0, 0) = eT(1);
   x(0, 1) = eT(2);
@@ -199,6 +204,11 @@ TEMPLATE_TEST_CASE("large_relational_scalar_test", "[relational]", float, double
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x = randi<Col<eT>>(100000, distr_param(1, 50));
 
   Col<uword> y1 = x > 25;
@@ -316,7 +326,7 @@ TEST_CASE("alias_scalar_relational_test", "[relational]")
 // empty tests
 TEST_CASE("empty_relational_test", "[relational]")
   {
-  mat x;
+  fmat x;
 
   umat y1 = (x > 3);
   umat y2 = (3 < x);
@@ -383,6 +393,11 @@ TEMPLATE_TEST_CASE(
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Mat<eT1> x = randi<Mat<eT1>>(10, 10, distr_param(1, 50));
   Mat<eT2> x_conv = conv_to<Mat<eT2>>::from(x);
@@ -496,6 +511,11 @@ TEMPLATE_TEST_CASE("simple_array_relational_op", "[relational]", float, double, 
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> X(3, 3);
   Mat<eT> Y(3, 3);
 
@@ -599,6 +619,11 @@ TEMPLATE_TEST_CASE("simple_array_relational_op", "[relational]", float, double, 
 TEMPLATE_TEST_CASE("large_relational_array_test", "[relational]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> X = randi<Mat<eT>>(100, 100, distr_param(1, 100));
   Mat<eT> Y = randi<Mat<eT>>(100, 100, distr_param(1, 100));
@@ -707,8 +732,8 @@ TEMPLATE_TEST_CASE("large_relational_array_test", "[relational]", float, double,
 
 TEST_CASE("empty_relational_array_op", "[relational]")
   {
-  mat x;
-  mat y;
+  fmat x;
+  fmat y;
 
   umat z1 = x < y;
   umat z2 = y < x;

@@ -21,6 +21,11 @@ TEMPLATE_TEST_CASE("all_vec_simple", "[all]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x = randi<Col<eT>>(50, distr_param(3, 5));
 
   REQUIRE( all(x) == true );
@@ -39,6 +44,11 @@ TEMPLATE_TEST_CASE("all_vec_simple", "[all]", float, double, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("all_vec_large", "[all]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x = randi<Col<eT>>(100000, distr_param(3, 5));
 
@@ -61,6 +71,11 @@ TEMPLATE_TEST_CASE("all_vec_mat", "[all]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(50, 50, distr_param(3, 5));
 
   REQUIRE( all(all(x)) == true );
@@ -80,6 +95,11 @@ TEMPLATE_TEST_CASE("all_vec_mat", "[all]", float, double, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("all_mat", "[all]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(10000, 500, distr_param(10, 30));
   x.col(10).zeros();
@@ -121,6 +141,11 @@ TEMPLATE_TEST_CASE("all_mat_large", "[all]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(100, 50000, distr_param(10, 30));
   x.col(10).zeros();
   x.col(50).zeros();
@@ -161,7 +186,7 @@ TEMPLATE_TEST_CASE("all_mat_large", "[all]", float, double, u32, s32, u64, s64)
 
 TEST_CASE("all_empty", "[all]")
   {
-  mat x;
+  fmat x;
 
   urowvec y = all(x);
   urowvec y2 = all(x, 0);
@@ -220,6 +245,11 @@ TEMPLATE_TEST_CASE("all_mat_rowwise", "[all]", float, double, u32, s32, u64, s64
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(500, 10000, distr_param(10, 30));
   x.row(10).zeros();
   x.row(50).zeros();
@@ -251,6 +281,11 @@ TEMPLATE_TEST_CASE("all_mat_rowwise", "[all]", float, double, u32, s32, u64, s64
 TEMPLATE_TEST_CASE("all_mat_rowwise_large", "[all]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(50000, 100, distr_param(10, 30));
   x.row(10).zeros();
@@ -284,7 +319,7 @@ TEMPLATE_TEST_CASE("all_mat_rowwise_large", "[all]", float, double, u32, s32, u6
 
 TEST_CASE("all_rowwise_empty", "[all]")
   {
-  mat x;
+  fmat x;
   uvec y = all(x, 1);
 
   REQUIRE( y.n_rows == 0 );
@@ -329,6 +364,11 @@ TEMPLATE_TEST_CASE("all_mat_subview", "[all]", float, double, u32, s32, u64, s64
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(100, 100, distr_param(10, 20));
   x.col(5).zeros();
   x.col(15).zeros();
@@ -368,6 +408,11 @@ TEMPLATE_TEST_CASE("all_mat_rowwise_subview", "[all]", float, double, u32, s32, 
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(100, 100, distr_param(10, 20));
   x.row(5).zeros();
   x.row(15).zeros();
@@ -398,6 +443,11 @@ TEMPLATE_TEST_CASE("all_mat_rowwise_subview", "[all]", float, double, u32, s32, 
 TEMPLATE_TEST_CASE("all_mat_expr", "[all]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(100, 100, distr_param(10, 20));
   Mat<eT> y = x;
@@ -439,6 +489,11 @@ TEMPLATE_TEST_CASE("all_mat_expr", "[all]", float, double, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("all_mat_expr_rowwise", "[all]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(100, 100, distr_param(10, 20));
   Mat<eT> y = x;
@@ -483,6 +538,11 @@ TEMPLATE_TEST_CASE(
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Col<eT1> x = randi<Col<eT1>>(1000, distr_param(10, 20));
 
   REQUIRE ( all(conv_to<Col<eT2>>::from(x)) == true );
@@ -508,6 +568,11 @@ TEMPLATE_TEST_CASE(
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x = randi<Mat<eT1>>(500, 500, distr_param(10, 20));
 
   REQUIRE( all(all(conv_to<Mat<eT2>>::from(x))) == true );
@@ -532,6 +597,11 @@ TEMPLATE_TEST_CASE(
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Mat<eT1> x = randi<Mat<eT1>>(10000, 500, distr_param(10, 30));
   x.col(10).zeros();
@@ -583,6 +653,11 @@ TEMPLATE_TEST_CASE(
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x = randi<Mat<eT1>>(500, 10000, distr_param(10, 30));
   x.row(10).zeros();
   x.row(50).zeros();
@@ -624,6 +699,11 @@ TEMPLATE_TEST_CASE(
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Mat<eT1> x = randi<Mat<eT1>>(10000, 500, distr_param(10, 30));
   x.col(10).ones();
@@ -667,6 +747,11 @@ TEMPLATE_TEST_CASE(
 TEMPLATE_TEST_CASE("all_relational_expressions", "[all]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> X = randi<Mat<eT>>(10, 10, distr_param(0, 5));
 
@@ -805,6 +890,11 @@ TEMPLATE_TEST_CASE("all_relational_expressions", "[all]", float, double, u32, s3
 TEMPLATE_TEST_CASE("all_vec_relational_op", "[all]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x = randi<Col<eT>>(500, distr_param(0, 3));
 

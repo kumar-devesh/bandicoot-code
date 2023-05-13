@@ -771,11 +771,8 @@ runtime_t::create_kernels(const std::vector<std::pair<std::string, cl_kernel*>>&
     return false;
     }
 
-  std::cout << "compiled program!\n";
-
   for (uword i = 0; i < name_map.size(); ++i)
     {
-    std::cout << "create kernel " << name_map.at(i).first.c_str() << "\n";
     (*name_map.at(i).second) = clCreateKernel(prog_holder.prog, name_map.at(i).first.c_str(), &status);
 
     if((status != CL_SUCCESS) || (name_map.at(i).second == NULL))
