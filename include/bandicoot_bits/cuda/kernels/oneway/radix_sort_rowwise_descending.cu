@@ -16,10 +16,10 @@
 
 __global__
 void
-COOT_FN(PREFIX,radix_sort_rowwise)(eT1* A,
-                                   eT1* tmp_mem,
-                                   const UWORD A_n_rows,
-                                   const UWORD A_n_cols)
+COOT_FN(PREFIX,radix_sort_rowwise_descending)(eT1* A,
+                                              eT1* tmp_mem,
+                                              const UWORD A_n_rows,
+                                              const UWORD A_n_cols)
   {
   const UWORD row = blockIdx.x * blockDim.x + threadIdx.x;
   if(row < A_n_rows)
@@ -47,8 +47,9 @@ COOT_FN(PREFIX,radix_sort_rowwise)(eT1* A,
         ++counts[(rowptr[i * A_n_rows] & mask) >> b];
         }
 
-      counts[1] = counts[0]; // now holds the offset to put the next value at
-      counts[0] = 0;
+      // Since we are sorting in descending order, 1-valued points come first.
+      counts[0] = counts[1]; // now holds the offset to put the next value at
+      counts[1] = 0;
 
       for (UWORD i = 0; i < A_n_cols; ++i)
         {
@@ -75,22 +76,14 @@ COOT_FN(PREFIX,radix_sort_rowwise)(eT1* A,
     // But, for floating point signed types, we need to reverse the order of the 1-bit points.
     // So, we need a slightly different implementation for both cases.
     uint_eT1* rowptr = reinterpret_cast<uint_eT1*>(unsorted_rowptr);
-    counts[0] = 0;
-    counts[1] = 0;
 
     const UWORD last_bit = 8 * sizeof(eT1) - 1;
     uint_eT1 mask = (((uint_eT1) 1) << last_bit);
 
-    for (UWORD i = 0; i < A_n_cols; ++i)
-      {
-      ++counts[(rowptr[i * A_n_rows] & mask) >> last_bit];
-      }
-    // counts[0] now holds the number of positive points; counts[1] holds the number of negative points
-
     if (coot_is_fp((eT1) 0))
       {
-      counts[0] = counts[1];     // now holds the offset to put the next positive value at
-      counts[1] = counts[0] - 1; // now holds the offset to put the next negative value at (we move backwards)
+      counts[0] = 0;            // now holds the offset to put the next positive value at
+      counts[1] = A_n_cols - 1; // now holds the offset to put the next negative value at (we move backwards)
 
       for (UWORD i = 0; i < A_n_cols; ++i)
         {
@@ -105,8 +98,17 @@ COOT_FN(PREFIX,radix_sort_rowwise)(eT1* A,
       }
     else
       {
-      counts[0] = counts[1]; // now holds the offset to put the next positive value at
+      counts[0] = 0;
+      counts[1] = 0;
+
+      for (UWORD i = 0; i < A_n_cols; ++i)
+        {
+        ++counts[(rowptr[i * A_n_rows] & mask) >> last_bit];
+        }
+      // counts[0] now holds the number of positive points; counts[1] holds the number of negative points
+
       counts[1] = counts[0]; // now holds the offset to put the next negative value at
+      counts[0] = 0;         // now holds the offset to put the next positive value at
 
       for (UWORD i = 0; i < A_n_cols; ++i)
         {

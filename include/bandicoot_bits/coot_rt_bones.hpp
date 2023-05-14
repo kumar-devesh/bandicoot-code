@@ -144,11 +144,14 @@ class coot_rt_t
   template<typename eT1, typename eT2>
   static inline void relational_scalar_op(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> in_mem, const uword n_elem, const eT2 val, const twoway_kernel_id::enum_id num, const std::string& name);
 
+  template<typename eT1>
+  static inline void relational_unary_array_op(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> in_mem, const uword n_elem, const oneway_real_kernel_id::enum_id num, const std::string& name);
+
   template<typename eT1, typename eT2>
   static inline void relational_array_op(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> X_mem, const dev_mem_t<eT2> Y_mem, const uword n_elem, const twoway_kernel_id::enum_id num, const std::string& name);
 
   template<typename eT>
-  static inline bool chol(dev_mem_t<eT> out, const uword n_rows);
+  static inline std::tuple<bool, std::string> chol(dev_mem_t<eT> out, const uword n_rows);
 
   template<typename eT>
   static inline std::tuple<bool, std::string> svd(dev_mem_t<eT> U, dev_mem_t<eT> S, dev_mem_t<eT> V, dev_mem_t<eT> A, const uword n_rows, const uword n_cols, const bool compute_u_vt);
@@ -277,6 +280,24 @@ class coot_rt_t
 
   template<typename eT1, typename eT2, typename eT3, typename eT4, typename eT5>
   static inline void join_rows(dev_mem_t<eT5> out, const dev_mem_t<eT1> A, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<eT2> B, const uword B_n_rows, const uword B_n_cols, const dev_mem_t<eT3> C, const uword C_n_rows, const uword C_n_cols, const dev_mem_t<eT4> D, const uword D_n_rows, const uword D_n_cols);
+
+  template<typename eT>
+  static inline void sort_colwise(dev_mem_t<eT> mem, const uword n_rows, const uword n_cols, const uword sort_type);
+
+  template<typename eT>
+  static inline void sort_rowwise(dev_mem_t<eT> mem, const uword n_rows, const uword n_cols, const uword sort_type);
+
+  template<typename eT>
+  static inline void sort_vec(dev_mem_t<eT> mem, const uword n_elem, const uword sort_type);
+
+  template<typename eT>
+  static inline void sort_index_vec(dev_mem_t<uword> out, dev_mem_t<eT> mem, const uword n_elem, const uword sort_type, const uword stable_sort);
+
+  template<typename eT>
+  static inline void find(dev_mem_t<uword>& out, uword& out_len, const dev_mem_t<eT> A, const uword n_elem, const uword k, const uword find_type);
+
+  template<typename eT1, typename eT2>
+  static inline void symmat(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword size, const uword lower);
 
   static inline void synchronise();
 

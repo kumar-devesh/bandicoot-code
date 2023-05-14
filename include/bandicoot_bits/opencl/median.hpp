@@ -15,94 +15,6 @@
 
 
 /**
- * Sort the data in each column.
- */
-template<typename eT>
-inline
-void
-radix_sort_colwise(dev_mem_t<eT> A, const uword n_rows, const uword n_cols)
-  {
-  coot_extra_debug_sigprint();
-
-  // First, allocate a temporary matrix we will use during computation.
-  dev_mem_t<eT> tmp_mem;
-  tmp_mem.cl_mem_ptr = get_rt().cl_rt.acquire_memory<eT>(n_rows * n_cols);
-
-  runtime_t::cq_guard guard;
-
-  cl_kernel k = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::radix_sort_colwise);
-
-  cl_int status = 0;
-
-  runtime_t::adapt_uword cl_n_rows(n_rows);
-  runtime_t::adapt_uword cl_n_cols(n_cols);
-
-  status |= clSetKernelArg(k, 0, sizeof(cl_mem), &(A.cl_mem_ptr));
-  status |= clSetKernelArg(k, 1, sizeof(cl_mem), &(tmp_mem.cl_mem_ptr));
-  status |= clSetKernelArg(k, 2, cl_n_rows.size, cl_n_rows.addr);
-  status |= clSetKernelArg(k, 3, cl_n_cols.size, cl_n_cols.addr);
-
-  coot_check_cl_error(status, "coot::opencl::radix_sort_colwise(): failed to set kernel arguments");
-
-  const size_t k1_work_dim       = 1;
-  const size_t k1_work_offset[1] = { 0 };
-  const size_t k1_work_size[1]   = { n_cols };
-
-  status = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
-
-  coot_check_cl_error(status, "coot::opencl::radix_sort_colwise(): failed to run kernel");
-
-  get_rt().cl_rt.synchronise();
-  get_rt().cl_rt.release_memory(tmp_mem.cl_mem_ptr);
-  }
-
-
-
-/**
- * Sort the data in each row.
- */
-template<typename eT>
-inline
-void
-radix_sort_rowwise(dev_mem_t<eT> A, const uword n_rows, const uword n_cols)
-  {
-  coot_extra_debug_sigprint();
-
-  // First, allocate a temporary matrix we will use during computation.
-  dev_mem_t<eT> tmp_mem;
-  tmp_mem.cl_mem_ptr = get_rt().cl_rt.acquire_memory<eT>(n_rows * n_cols);
-
-  runtime_t::cq_guard guard;
-
-  cl_kernel k = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::radix_sort_rowwise);
-
-  cl_int status = 0;
-
-  runtime_t::adapt_uword cl_n_rows(n_rows);
-  runtime_t::adapt_uword cl_n_cols(n_cols);
-
-  status |= clSetKernelArg(k, 0, sizeof(cl_mem), &(A.cl_mem_ptr));
-  status |= clSetKernelArg(k, 1, sizeof(cl_mem), &(tmp_mem.cl_mem_ptr));
-  status |= clSetKernelArg(k, 2, cl_n_rows.size, cl_n_rows.addr);
-  status |= clSetKernelArg(k, 3, cl_n_cols.size, cl_n_cols.addr);
-
-  coot_check_cl_error(status, "coot::opencl::radix_sort_rowwise(): failed to set kernel arguments");
-
-  const size_t k1_work_dim       = 1;
-  const size_t k1_work_offset[1] = { 0 };
-  const size_t k1_work_size[1]   = { n_rows };
-
-  status = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
-
-  coot_check_cl_error(status, "coot::opencl::radix_sort_rowwise(): failed to run kernel");
-
-  get_rt().cl_rt.synchronise();
-  get_rt().cl_rt.release_memory(tmp_mem.cl_mem_ptr);
-  }
-
-
-
-/**
  * Compute the row-wise or column-wise mean of the input matrix, storing the result in the output matrix.
  */
 template<typename eT2, typename eT1>
@@ -117,7 +29,7 @@ median(dev_mem_t<eT2> out, dev_mem_t<eT1> in, const uword n_rows, const uword n_
   if (dim == 0)
     {
     // Sort the data in each column.
-    radix_sort_colwise(in, n_rows, n_cols);
+    sort_colwise(in, n_rows, n_cols, 0);
     const uword middle_element = (n_rows / 2);
 
     if (n_rows % 2 == 0)
@@ -136,7 +48,7 @@ median(dev_mem_t<eT2> out, dev_mem_t<eT1> in, const uword n_rows, const uword n_
   else
     {
     // Sort the data in each row.
-    radix_sort_rowwise(in, n_rows, n_cols);
+    sort_rowwise(in, n_rows, n_cols, 0);
     const uword middle_element = (n_cols / 2);
 
     if (n_cols % 2 == 0)
@@ -158,53 +70,6 @@ median(dev_mem_t<eT2> out, dev_mem_t<eT1> in, const uword n_rows, const uword n_
 
 template<typename eT>
 inline
-void
-radix_sort(dev_mem_t<eT> A, const uword n_elem)
-  {
-  coot_extra_debug_sigprint();
-
-  runtime_t::cq_guard guard;
-
-  cl_kernel k = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::radix_sort);
-
-  size_t kernel_wg_size;
-  cl_int status = clGetKernelWorkGroupInfo(k, get_rt().cl_rt.get_device(), CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &kernel_wg_size, NULL);
-  coot_check_cl_error(status, "coot::opencl::radix_sort(): clGetKernelWorkGroupInfo() failed");
-
-  const size_t total_num_threads = std::ceil(n_elem / std::max(1.0, (2 * std::ceil(std::log2(n_elem)))));
-  const size_t pow2_num_threads = std::min(kernel_wg_size, (size_t) std::pow(2.0f, std::ceil(std::log2((float) total_num_threads))));
-
-  // First, allocate a temporary matrix we will use during computation.
-  dev_mem_t<eT> tmp_mem;
-  tmp_mem.cl_mem_ptr = get_rt().cl_rt.acquire_memory<eT>(n_elem);
-
-  status = 0;
-
-  runtime_t::adapt_uword cl_n_elem(n_elem);
-
-  status |= clSetKernelArg(k, 0, sizeof(cl_mem),                    &(A.cl_mem_ptr));
-  status |= clSetKernelArg(k, 1, sizeof(cl_mem),                    &(tmp_mem.cl_mem_ptr));
-  status |= clSetKernelArg(k, 2, cl_n_elem.size,                    cl_n_elem.addr);
-  status |= clSetKernelArg(k, 3, 2 * sizeof(eT) * pow2_num_threads, NULL);
-
-  coot_check_cl_error(status, "coot::opencl::radix_sort(): failed to set kernel arguments");
-
-  const size_t k1_work_dim       = 1;
-  const size_t k1_work_offset[1] = { 0 };
-  const size_t k1_work_size[1]   = { pow2_num_threads };
-
-  status = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
-
-  coot_check_cl_error(status, "coot::opencl::radix_sort(): failed to run kernel");
-
-  get_rt().cl_rt.synchronise();
-  get_rt().cl_rt.release_memory(tmp_mem.cl_mem_ptr);
-  }
-
-
-
-template<typename eT>
-inline
 eT
 median_vec(dev_mem_t<eT> mem, const uword n_elem)
   {
@@ -213,7 +78,7 @@ median_vec(dev_mem_t<eT> mem, const uword n_elem)
   coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::median_vec(): OpenCL runtime not valid" );
 
   // Sort the data.
-  radix_sort(mem, n_elem);
+  sort_vec(mem, n_elem, 0);
   // Now get the median element.
   const uword middle_element = n_elem / 2;
   if (n_elem % 2 == 0)

@@ -19,12 +19,15 @@
  */
 template<typename eT>
 inline
-bool
+std::tuple<bool, std::string>
 chol(dev_mem_t<eT> mem, const uword n_rows)
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::chol(): OpenCL runtime not valid");
+  if (get_rt().cl_rt.is_valid() == false)
+    {
+    return std::make_tuple(false, "OpenCL runtime not valid");
+    }
 
   magma_int_t info   = 0;
   magma_int_t status = 0;
@@ -44,10 +47,27 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
     }
   else
     {
-    coot_debug_check( true, "coot::opencl::chol(): not implemented for given type" );
+    return std::make_tuple(false, "not implemented for given type; must be float or double");
     }
 
-  coot_check_magma_error(status, "coot::opencl::chol(): MAGMA failure in potrf_gpu()");
+  if (status != MAGMA_SUCCESS)
+    {
+    return std::make_tuple(false, "MAGMA failure in potrf_gpu(): " + magma::error_as_string(status));
+    }
+
+  // Process the returned info.
+  if (info < 0)
+    {
+    std::ostringstream oss;
+    oss << "parameter " << (-info) << " was incorrect on entry to MAGMA potrf_gpu()";
+    return std::make_tuple(false, oss.str());
+    }
+  else if (info > 0)
+    {
+    std::ostringstream oss;
+    oss << "factorisation failed: the leading minor of order " << info << " is not positive definite";
+    return std::make_tuple(false, oss.str());
+    }
 
   // now set the lower triangular part (excluding diagonal) to zero
   cl_int status2 = 0;
@@ -62,17 +82,19 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
   status2 |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &(mem.cl_mem_ptr));
   status2 |= clSetKernelArg(kernel, 1, dev_n_rows.size, dev_n_rows.addr);
   status2 |= clSetKernelArg(kernel, 2, dev_n_rows.size, dev_n_rows.addr);
+  if (status2 != CL_SUCCESS)
+    {
+    return std::make_tuple(false, "failed to set arguments for kernel ltri_set_zero: " + coot_cl_error::as_string(status2));
+    }
 
   size_t global_work_offset[2] = { 0, 0 };
   size_t global_work_size[2] = { size_t(n_rows), size_t(n_rows) };
 
   status2 |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 2, global_work_offset, global_work_size, NULL, 0, NULL, NULL);
+  if (status2 != CL_SUCCESS)
+    {
+    return std::make_tuple(false, "failed to run kernel ltri_set_zero: " + coot_cl_error::as_string(status2));
+    }
 
-  coot_check_cl_error(status2, "coot::opencl::chol(): failed to run kernel ltri_set_zero");
-
-  //// using MAGMA 1.3
-  //status = magma_dpotrf_gpu(MagmaUpper, out.n_rows, out.get_dev_mem(), 0, out.n_rows, get_rt().cl_rt.get_cq(), &info);
-
-  return true;
-
+  return std::make_tuple(true, "");
   }
