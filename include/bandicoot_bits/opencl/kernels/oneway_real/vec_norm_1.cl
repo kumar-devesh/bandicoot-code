@@ -15,12 +15,12 @@
 
 
 // Forward declarations we may need.
-void COOT_FN(PREFIX,accu_wavefront_reduce_other)(__local volatile eT1* data, UWORD tid);
-void COOT_FN(PREFIX,accu_wavefront_reduce_8)(__local volatile eT1* data, UWORD tid);
-void COOT_FN(PREFIX,accu_wavefront_reduce_16)(__local volatile eT1* data, UWORD tid);
-void COOT_FN(PREFIX,accu_wavefront_reduce_32)(__local volatile eT1* data, UWORD tid);
-void COOT_FN(PREFIX,accu_wavefront_reduce_64)(__local volatile eT1* data, UWORD tid);
-void COOT_FN(PREFIX,accu_wavefront_reduce_128)(__local volatile eT1* data, UWORD tid);
+void COOT_FN(PREFIX,accu_subgroup_reduce_other)(__local volatile eT1* data, UWORD tid);
+void COOT_FN(PREFIX,accu_subgroup_reduce_8)(__local volatile eT1* data, UWORD tid);
+void COOT_FN(PREFIX,accu_subgroup_reduce_16)(__local volatile eT1* data, UWORD tid);
+void COOT_FN(PREFIX,accu_subgroup_reduce_32)(__local volatile eT1* data, UWORD tid);
+void COOT_FN(PREFIX,accu_subgroup_reduce_64)(__local volatile eT1* data, UWORD tid);
+void COOT_FN(PREFIX,accu_subgroup_reduce_128)(__local volatile eT1* data, UWORD tid);
 
 
 
@@ -48,7 +48,7 @@ COOT_FN(PREFIX,vec_norm_1)(__global const eT1* in_mem,
     }
   barrier(CLK_LOCAL_MEM_FENCE);
 
-  for (UWORD s = get_local_size(0) / 2; s > WAVEFRONT_SIZE; s >>= 1)
+  for (UWORD s = get_local_size(0) / 2; s > SUBGROUP_SIZE; s >>= 1)
     {
     if (tid < s)
       {
@@ -57,9 +57,9 @@ COOT_FN(PREFIX,vec_norm_1)(__global const eT1* in_mem,
     barrier(CLK_LOCAL_MEM_FENCE);
     }
 
-  if (tid < WAVEFRONT_SIZE)
+  if (tid < SUBGROUP_SIZE)
     {
-    COOT_FN_3(PREFIX,accu_wavefront_reduce_,WAVEFRONT_SIZE_NAME)(aux_mem, tid);
+    COOT_FN_3(PREFIX,accu_subgroup_reduce_,SUBGROUP_SIZE_NAME)(aux_mem, tid);
     }
 
   if (tid == 0)
