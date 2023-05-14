@@ -1140,7 +1140,7 @@ runtime_t::get_kernel(const rt_common::kernels_t<std::vector<cl_kernel>>& k, con
     }
   else if(is_same_type<eT, double>::yes)
     {
-    coot_debug_check( has_float64(), "coot::cl_rt.get_kernel(): device does not support float64 (double) kernels, use a different element type (such as float)" );
+    coot_debug_check( has_float64() == false, "coot::cl_rt.get_kernel(): device does not support float64 (double) kernels, use a different element type (such as float)" );
 
     return k.d_kernels.at(num);
     }
