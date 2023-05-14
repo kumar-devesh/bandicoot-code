@@ -155,6 +155,7 @@ namespace coot
     #include "bandicoot_bits/opencl/random_bones.hpp"
     #include "bandicoot_bits/opencl/copy_bones.hpp"
     #include "bandicoot_bits/opencl/generic_reduce_bones.hpp"
+    #include "bandicoot_bits/opencl/opencl_misc.hpp"
     }
 
   #include "bandicoot_bits/opencl/magma/magma_types.hpp"
