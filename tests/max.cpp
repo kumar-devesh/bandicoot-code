@@ -21,6 +21,11 @@ TEMPLATE_TEST_CASE("max_small", "[max]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x(16);
   for (uword i = 0; i < 16; ++i)
     x[i] = i + 1;
@@ -36,6 +41,11 @@ TEMPLATE_TEST_CASE("max_1", "[max]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x(6400);
   for (uword i = 0; i < 6400; ++i)
     x[i] = i + 1;
@@ -50,6 +60,11 @@ TEMPLATE_TEST_CASE("max_1", "[max]", float, double, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("max_strange_size", "[max]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x(608);
 
@@ -67,6 +82,11 @@ TEMPLATE_TEST_CASE("max_large", "[max]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   arma::Col<eT> cpu_x = arma::conv_to<arma::Col<eT>>::from(arma::randu<arma::Col<double>>(100000) * 10.0);
   cpu_x.randu();
   Col<eT> x(cpu_x);
@@ -81,6 +101,11 @@ TEMPLATE_TEST_CASE("max_large", "[max]", float, double, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("max_2", "[max]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x(50);
   x.randu();
@@ -97,6 +122,11 @@ TEMPLATE_TEST_CASE("max_2", "[max]", float, double)
 TEMPLATE_TEST_CASE("max_3", "[max]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(10, 1);
   x[0] = 4.7394;
@@ -124,6 +154,11 @@ TEMPLATE_TEST_CASE("max_colwise_1", "[max]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
     {
@@ -148,6 +183,11 @@ TEMPLATE_TEST_CASE("max_colwise_1", "[max]", float, double, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("max_colwise_2", "[max]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
@@ -174,6 +214,11 @@ TEMPLATE_TEST_CASE("max_rowwise_1", "[max]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
     {
@@ -198,6 +243,11 @@ TEMPLATE_TEST_CASE("max_rowwise_1", "[max]", float, double, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("max_rowwise_2", "[max]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
@@ -224,6 +274,11 @@ TEMPLATE_TEST_CASE("subview_max_colwise_1", "[max]", float, double, u32, s32, u6
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
     {
@@ -248,6 +303,11 @@ TEMPLATE_TEST_CASE("subview_max_colwise_1", "[max]", float, double, u32, s32, u6
 TEMPLATE_TEST_CASE("subview_max_colwise_2", "[max]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
@@ -274,6 +334,11 @@ TEMPLATE_TEST_CASE("subview_max_colwise_full", "[max]", float, double, u32, s32,
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
     {
@@ -298,6 +363,11 @@ TEMPLATE_TEST_CASE("subview_max_colwise_full", "[max]", float, double, u32, s32,
 TEMPLATE_TEST_CASE("subview_max_rowwise_1", "[max]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
@@ -324,6 +394,11 @@ TEMPLATE_TEST_CASE("subview_max_rowwise_2", "[max]", float, double, u32, s32, u6
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
     {
@@ -348,6 +423,11 @@ TEMPLATE_TEST_CASE("subview_max_rowwise_2", "[max]", float, double, u32, s32, u6
 TEMPLATE_TEST_CASE("subview_max_rowwise_full", "[max]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)

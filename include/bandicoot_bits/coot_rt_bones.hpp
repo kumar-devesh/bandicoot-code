@@ -58,6 +58,9 @@ class coot_rt_t
   template<typename eT>
   static inline void release_memory(dev_mem_t<eT> dev_mem);
 
+  template<typename eT>
+  static inline bool is_supported_type();
+
   static inline void set_rng_seed(const u64 seed);
 
   template<typename out_eT, typename in_eT>

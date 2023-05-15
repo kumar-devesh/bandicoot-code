@@ -15,14 +15,16 @@
 
 
 template<typename T1, typename op_type, bool condition>
-struct Op_traits {};
+class Op_traits {};
 
 
 
 
 template<typename T1, typename op_type>
-struct Op_traits<T1, op_type, true>
+class Op_traits<T1, op_type, true>
   {
+  public:
+
   static constexpr bool is_row  = op_type::template traits<T1>::is_row;
   static constexpr bool is_col  = op_type::template traits<T1>::is_col;
   static constexpr bool is_xvec = op_type::template traits<T1>::is_xvec;
@@ -31,8 +33,10 @@ struct Op_traits<T1, op_type, true>
 
 
 template<typename T1, typename op_type>
-struct Op_traits<T1, op_type, false>
+class Op_traits<T1, op_type, false>
   {
+  public:
+
   static constexpr bool is_row  = false;
   static constexpr bool is_col  = false;
   static constexpr bool is_xvec = false;

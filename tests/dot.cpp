@@ -17,9 +17,15 @@
 
 using namespace coot;
 
-template<typename eT>
-void test_dot_1()
+TEMPLATE_TEST_CASE("dot_1", "[dot]", float, double, u32, s32, u64, s64)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Row<eT> x(10);
   Row<eT> y(10);
   for (uword i = 0; i < 10; ++i)
@@ -35,21 +41,15 @@ void test_dot_1()
 
 
 
-TEST_CASE("dot_1")
+TEMPLATE_TEST_CASE("dot_2", "[dot]", float, double)
   {
-  test_dot_1<double>();
-  test_dot_1<float>();
-  test_dot_1<u32>();
-  test_dot_1<s32>();
-  test_dot_1<u64>();
-  test_dot_1<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_dot_2()
-  {
   Col<eT> x(1000);
   Row<eT> y(1000);
   x.randu();
@@ -68,17 +68,15 @@ void test_dot_2()
 
 
 
-TEST_CASE("dot_2")
+TEMPLATE_TEST_CASE("mat_dot", "[dot]", double, float)
   {
-  test_dot_2<double>();
-  test_dot_2<float>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_mat_dot()
-  {
   Mat<eT> x(10, 10);
   Mat<eT> y(10, 10);
 
@@ -98,17 +96,15 @@ void test_mat_dot()
 
 
 
-TEST_CASE("mat_dot")
+TEMPLATE_TEST_CASE("expr_dot", "[dot]", float, double, u32, s32, u64, s64)
   {
-  test_mat_dot<double>();
-  test_mat_dot<float>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_expr_dot()
-  {
   Col<eT> x(10);
   Col<eT> y(10);
 
@@ -131,21 +127,26 @@ void test_expr_dot()
 
 
 
-TEST_CASE("expr_dot")
+TEMPLATE_TEST_CASE
+  (
+  "different_eT_dot",
+  "[dot]",
+  (std::pair<double, double>), (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, float>), (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, u32>), (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, s32>), (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, u64>), (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, s64>), (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
   {
-  test_expr_dot<double>();
-  test_expr_dot<float>();
-  test_expr_dot<u32>();
-  test_expr_dot<s32>();
-  test_expr_dot<u64>();
-  test_expr_dot<s64>();
-  }
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
-
-template<typename eT1, typename eT2>
-void test_different_eT_dot()
-  {
   Col<eT1> x(10);
   Col<eT2> y(10);
 
@@ -163,59 +164,24 @@ void test_different_eT_dot()
 
 
 
-TEST_CASE("different_eT_dot")
-  {
-  test_different_eT_dot<u32, u32>();
-  test_different_eT_dot<u32, s32>();
-  test_different_eT_dot<u32, u64>();
-  test_different_eT_dot<u32, s64>();
-  test_different_eT_dot<u32, float>();
-  test_different_eT_dot<u32, double>();
-  test_different_eT_dot<s32, u32>();
-  test_different_eT_dot<s32, s32>();
-  test_different_eT_dot<s32, u64>();
-  test_different_eT_dot<s32, s64>();
-  test_different_eT_dot<s32, float>();
-  test_different_eT_dot<s32, double>();
-  test_different_eT_dot<u64, u32>();
-  test_different_eT_dot<u64, s32>();
-  test_different_eT_dot<u64, u64>();
-  test_different_eT_dot<u64, s64>();
-  test_different_eT_dot<u64, float>();
-  test_different_eT_dot<u64, double>();
-  test_different_eT_dot<s64, u32>();
-  test_different_eT_dot<s64, s32>();
-  test_different_eT_dot<s64, u64>();
-  test_different_eT_dot<s64, s64>();
-  test_different_eT_dot<s64, float>();
-  test_different_eT_dot<s64, double>();
-  test_different_eT_dot<float, u32>();
-  test_different_eT_dot<float, s32>();
-  test_different_eT_dot<float, u64>();
-  test_different_eT_dot<float, s64>();
-  test_different_eT_dot<float, float>();
-  test_different_eT_dot<float, double>();
-  test_different_eT_dot<double, u32>();
-  test_different_eT_dot<double, s32>();
-  test_different_eT_dot<double, u64>();
-  test_different_eT_dot<double, s64>();
-  test_different_eT_dot<double, float>();
-  test_different_eT_dot<double, double>();
-  test_different_eT_dot<u32, u32>();
-  test_different_eT_dot<u32, s32>();
-  test_different_eT_dot<u32, u64>();
-  test_different_eT_dot<u32, s64>();
-  test_different_eT_dot<u32, float>();
-  test_different_eT_dot<u32, double>();
-  }
-
-
-
 // Make sure that dot() returns the expected results when one type is signed
 // and the other is unsigned.
-template<typename ueT1, typename seT2>
-void test_signed_unsigned_dot()
+TEMPLATE_TEST_CASE
+  (
+  "signed_unsigned_dot",
+  "[dot]",
+  (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, s64>),
+  (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, s32>), (std::pair<u64, s64>)
+  )
   {
+  typedef typename TestType::first_type ueT1;
+  typedef typename TestType::second_type seT2;
+
+  if (!coot_rt_t::is_supported_type<ueT1>() || !coot_rt_t::is_supported_type<seT2>())
+    {
+    return;
+    }
+
   Col<ueT1> x(10);
   Col<seT2> y(10);
 
@@ -230,17 +196,4 @@ void test_signed_unsigned_dot()
   out_eT result = dot(x, y);
 
   REQUIRE(result == Approx(out_eT(-385)));
-  }
-
-
-TEST_CASE("signed_unsigned_dot")
-  {
-  test_signed_unsigned_dot<u32, s32>();
-  test_signed_unsigned_dot<u32, s64>();
-  test_signed_unsigned_dot<u32, float>();
-  test_signed_unsigned_dot<u32, double>();
-  test_signed_unsigned_dot<u64, s32>();
-  test_signed_unsigned_dot<u64, s64>();
-  test_signed_unsigned_dot<u64, float>();
-  test_signed_unsigned_dot<u64, double>();
   }

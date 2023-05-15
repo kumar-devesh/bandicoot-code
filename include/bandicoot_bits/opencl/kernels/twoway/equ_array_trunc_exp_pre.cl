@@ -41,10 +41,10 @@ COOT_FN(PREFIX,equ_array_trunc_exp_pre)(__global eT2* out,
       }
     else
       {
-      const double fp_val = (double) val;
-      if (fp_val >= log(coot_type_max_double()))
+      const ARMA_FP_TYPE fp_val = (ARMA_FP_TYPE) val;
+      if (fp_val >= log(COOT_FN(coot_type_max_,ARMA_FP_TYPE)()))
         {
-        out[i] = (eT2) coot_type_max_double();
+        out[i] = (eT2) COOT_FN(coot_type_max_,ARMA_FP_TYPE)();
         }
       else
         {

@@ -249,6 +249,39 @@ coot_rt_t::release_memory(dev_mem_t<eT> dev_mem)
 
 
 
+template<typename eT>
+inline
+bool
+coot_rt_t::is_supported_type()
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #ifdef COOT_USE_OPENCL
+    return get_rt().cl_rt.is_supported_type<eT>();
+    #else
+    coot_stop_runtime_error("coot_rt::is_supported_type(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #ifdef COOT_USE_CUDA
+    return get_rt().cuda_rt.is_supported_type<eT>();
+    #else
+    coot_stop_runtime_error("coot_rt::is_supported_type(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::is_supported_type(): unknown backend");
+    }
+
+  return false;
+  }
+
+
+
 inline
 void
 coot_rt_t::set_rng_seed(const u64 seed)
@@ -2376,7 +2409,7 @@ coot_rt_t::mean_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword
     #if defined(COOT_USE_CUDA)
     cuda::mean_subview(out, in, M_n_rows, start_row, start_col, n_rows, n_cols, dim, post_conv_apply);
     #else
-    coot_stop_runtime_error("coot_rt::mean_subview(): CUDA backend not enabled"):
+    coot_stop_runtime_error("coot_rt::mean_subview(): CUDA backend not enabled");
     #endif
     }
   else

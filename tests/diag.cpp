@@ -25,6 +25,11 @@ TEMPLATE_TEST_CASE("main_diag_set", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   arma::Mat<eT> x_cpu_orig(x);
 
@@ -46,6 +51,11 @@ TEMPLATE_TEST_CASE("main_diag_plus", "[diag]", float, double, u32, s32, u64, s64
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   arma::Mat<eT> x_cpu_orig(x);
 
@@ -66,6 +76,11 @@ TEMPLATE_TEST_CASE("main_diag_plus", "[diag]", float, double, u32, s32, u64, s64
 TEMPLATE_TEST_CASE("main_diag_minus", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   x += eT(5);
@@ -89,6 +104,11 @@ TEMPLATE_TEST_CASE("main_diag_mul", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   arma::Mat<eT> x_cpu_orig(x);
 
@@ -109,6 +129,11 @@ TEMPLATE_TEST_CASE("main_diag_mul", "[diag]", float, double, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("main_diag_div", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   arma::Mat<eT> x_cpu_orig(x);
@@ -132,6 +157,11 @@ TEMPLATE_TEST_CASE("main_diag_div", "[diag]", float, double, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("off_diag_set", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   Mat<eT> x_orig(x);
@@ -158,6 +188,11 @@ TEMPLATE_TEST_CASE("off_diag_plus", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   Mat<eT> x_orig(x);
   arma::Mat<eT> x_cpu_orig(x_orig);
@@ -182,6 +217,11 @@ TEMPLATE_TEST_CASE("off_diag_plus", "[diag]", float, double, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("off_diag_minus", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   x += eT(5);
@@ -209,6 +249,11 @@ TEMPLATE_TEST_CASE("off_diag_mul", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   Mat<eT> x_orig(x);
   arma::Mat<eT> x_cpu_orig(x_orig);
@@ -233,6 +278,11 @@ TEMPLATE_TEST_CASE("off_diag_mul", "[diag]", float, double, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("off_diag_div", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   Mat<eT> x_orig(x);
@@ -261,6 +311,11 @@ TEMPLATE_TEST_CASE("subview_main_diag_set", "[diag]", float, double, u32, s32, u
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   arma::Mat<eT> x_cpu_orig(x);
 
@@ -277,6 +332,11 @@ TEMPLATE_TEST_CASE("subview_main_diag_plus", "[diag]", float, double, u32, s32, 
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   arma::Mat<eT> x_cpu_orig(x);
 
@@ -292,6 +352,11 @@ TEMPLATE_TEST_CASE("subview_main_diag_plus", "[diag]", float, double, u32, s32, 
 TEMPLATE_TEST_CASE("subview_main_diag_minus", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   x += eT(5);
@@ -310,6 +375,11 @@ TEMPLATE_TEST_CASE("subview_main_diag_mul", "[diag]", float, double, u32, s32, u
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   arma::Mat<eT> x_cpu_orig(x);
 
@@ -325,6 +395,11 @@ TEMPLATE_TEST_CASE("subview_main_diag_mul", "[diag]", float, double, u32, s32, u
 TEMPLATE_TEST_CASE("subview_main_diag_div", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   arma::Mat<eT> x_cpu_orig(x);
@@ -343,6 +418,11 @@ TEMPLATE_TEST_CASE("subview_main_diag_div", "[diag]", float, double, u32, s32, u
 TEMPLATE_TEST_CASE("subview_off_diag_set", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   Mat<eT> x_orig(x);
@@ -367,6 +447,11 @@ TEMPLATE_TEST_CASE("subview_off_diag_plus", "[diag]", float, double, u32, s32, u
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   Mat<eT> x_orig(x);
   arma::Mat<eT> x_cpu_orig(x);
@@ -389,6 +474,11 @@ TEMPLATE_TEST_CASE("subview_off_diag_plus", "[diag]", float, double, u32, s32, u
 TEMPLATE_TEST_CASE("subview_off_diag_minus", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   x += eT(5);
@@ -414,6 +504,11 @@ TEMPLATE_TEST_CASE("subview_off_diag_mul", "[diag]", float, double, u32, s32, u6
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   Mat<eT> x_orig(x);
   arma::Mat<eT> x_cpu_orig(x);
@@ -436,6 +531,11 @@ TEMPLATE_TEST_CASE("subview_off_diag_mul", "[diag]", float, double, u32, s32, u6
 TEMPLATE_TEST_CASE("subview_off_diag_div", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   Mat<eT> x_orig(x);
@@ -462,6 +562,11 @@ TEMPLATE_TEST_CASE("main_diag_extract", "[diag]", float, double, u32, s32, u64, 
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   arma::Mat<eT> x_cpu(x);
 
@@ -480,6 +585,11 @@ TEMPLATE_TEST_CASE("main_diag_extract", "[diag]", float, double, u32, s32, u64, 
 TEMPLATE_TEST_CASE("off_diag_extract", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   arma::Mat<eT> x_cpu(x);
@@ -503,6 +613,11 @@ TEMPLATE_TEST_CASE("subview_main_diag_extract", "[diag]", float, double, u32, s3
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   arma::Mat<eT> x_cpu(x);
 
@@ -521,6 +636,11 @@ TEMPLATE_TEST_CASE("subview_main_diag_extract", "[diag]", float, double, u32, s3
 TEMPLATE_TEST_CASE("subview_off_diag_extract", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   arma::Mat<eT> x_cpu(x);
@@ -544,6 +664,11 @@ TEMPLATE_TEST_CASE("non_square_diag", "[diag]", float, double, u32, s32, u64, s6
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(20, 10, distr_param(0, 100));
 
   REQUIRE( x.diag().n_elem == 10 );
@@ -559,6 +684,11 @@ TEMPLATE_TEST_CASE("non_square_subview_diag", "[diag]", float, double, u32, s32,
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
 
   REQUIRE( x.submat(2, 2, 7, 11).diag().n_elem == 6 );
@@ -573,6 +703,11 @@ TEMPLATE_TEST_CASE("non_square_subview_diag", "[diag]", float, double, u32, s32,
 TEMPLATE_TEST_CASE("extract_diag_into_subview", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(10, 10, distr_param(0, 100));
   Mat<eT> y = randi<Mat<eT>>(20, 20, distr_param(0, 100));
@@ -599,6 +734,11 @@ TEMPLATE_TEST_CASE("element_access_diag", "[diag]", float, double, u32, s32, u64
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   arma::Mat<eT> x_cpu(x);
 
@@ -623,6 +763,11 @@ TEMPLATE_TEST_CASE("element_access_diag", "[diag]", float, double, u32, s32, u64
 TEMPLATE_TEST_CASE("element_access_subview_diag", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 100));
   arma::Mat<eT> x_cpu(x);
@@ -649,6 +794,11 @@ TEMPLATE_TEST_CASE("diagview_clamp", "[diag]", float, double, u32, s32, u64, s64
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(500, 500, distr_param(0, 10));
   x.diag().clamp(3, 5);
 
@@ -666,6 +816,11 @@ TEMPLATE_TEST_CASE("diagview_clamp", "[diag]", float, double, u32, s32, u64, s64
 TEMPLATE_TEST_CASE("diagview_set", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(500, 500, distr_param(0, 100));
   arma::Mat<eT> x_cpu(x);
@@ -693,6 +848,11 @@ TEMPLATE_TEST_CASE("diagview_set_alias", "[diag]", float, double, u32, s32, u64,
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(500, 500, distr_param(0, 100));
   arma::Mat<eT> x_cpu(x);
 
@@ -715,6 +875,11 @@ TEMPLATE_TEST_CASE("diagview_set_alias", "[diag]", float, double, u32, s32, u64,
 TEMPLATE_TEST_CASE("diagview_copy", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(50, 50, distr_param(0, 100));
   Mat<eT> y = randi<Mat<eT>>(50, 50, distr_param(100, 200));
@@ -741,6 +906,11 @@ TEMPLATE_TEST_CASE("diag_inplace_plus_vector", "[diag]", float, double, u32, s32
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 50));
   arma::Mat<eT> x_cpu(x);
 
@@ -761,6 +931,11 @@ TEMPLATE_TEST_CASE("diag_inplace_plus_vector", "[diag]", float, double, u32, s32
 TEMPLATE_TEST_CASE("diag_inplace_minus_vector", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(200, 300));
   arma::Mat<eT> x_cpu(x);
@@ -783,6 +958,11 @@ TEMPLATE_TEST_CASE("diag_inplace_schur_vector", "[diag]", float, double, u32, s3
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(0, 50));
   arma::Mat<eT> x_cpu(x);
 
@@ -803,6 +983,11 @@ TEMPLATE_TEST_CASE("diag_inplace_schur_vector", "[diag]", float, double, u32, s3
 TEMPLATE_TEST_CASE("diag_inplace_div_vector", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(20, 20, distr_param(500, 600));
   arma::Mat<eT> x_cpu(x);
@@ -825,6 +1010,11 @@ TEMPLATE_TEST_CASE("diag_inplace_div_vector", "[diag]", float, double, u32, s32,
 TEMPLATE_TEST_CASE("diag_randu", "[diag]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(200, 200, distr_param(500, 600));
   x.diag().randu();
@@ -854,6 +1044,11 @@ TEMPLATE_TEST_CASE("diag_randu", "[diag]", float, double)
 TEMPLATE_TEST_CASE("diag_randn", "[diag]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(200, 200, distr_param(500, 600));
   x.diag().randn();
@@ -888,6 +1083,11 @@ TEMPLATE_TEST_CASE("mat_inplace_diag_plus", "[diag]", float, double, u32, s32, u
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(30, 30, distr_param(0, 100));
   Col<eT> y = randi<Col<eT>>(30, distr_param(200, 300));
 
@@ -907,6 +1107,11 @@ TEMPLATE_TEST_CASE("mat_inplace_diag_plus", "[diag]", float, double, u32, s32, u
 TEMPLATE_TEST_CASE("mat_inplace_diag_minus", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(30, 30, distr_param(0, 100));
   Col<eT> y = randi<Col<eT>>(30, distr_param(200, 300));
@@ -928,6 +1133,11 @@ TEMPLATE_TEST_CASE("mat_inplace_diag_schur", "[diag]", float, double, u32, s32, 
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(30, 30, distr_param(0, 100));
   Col<eT> y = randi<Col<eT>>(30, distr_param(200, 300));
 
@@ -948,6 +1158,11 @@ TEMPLATE_TEST_CASE("mat_inplace_diag_div", "[diag]", float, double, u32, s32, u6
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(30, 30, distr_param(5, 10));
   Col<eT> y = randi<Col<eT>>(30, distr_param(100, 200));
 
@@ -967,6 +1182,11 @@ TEMPLATE_TEST_CASE("mat_inplace_diag_div", "[diag]", float, double, u32, s32, u6
 TEMPLATE_TEST_CASE("mat_inplace_diag_mul", "[diag]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(30, 30, distr_param(0, 10));
   Mat<eT> y = randi<Mat<eT>>(30, 30, distr_param(0, 10));
@@ -989,6 +1209,11 @@ TEMPLATE_TEST_CASE("mat_inplace_diag_mul", "[diag]", float, double)
 TEMPLATE_TEST_CASE("diagmat", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> y = randi<Col<eT>>(50, distr_param(10, 20));
   Mat<eT> x = diagmat(y);
@@ -1020,6 +1245,11 @@ TEMPLATE_TEST_CASE("diagmat", "[diag]", float, double, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("diagmat2", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> y = randi<Col<eT>>(50, distr_param(10, 20));
 
@@ -1072,6 +1302,11 @@ TEMPLATE_TEST_CASE("diagmat_submatrix", "[diag]", float, double, u32, s32, u64, 
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(10, 10, distr_param(10, 20));
   Col<eT> y = randi<Col<eT>>(8, distr_param(50, 60));
 
@@ -1112,6 +1347,11 @@ TEMPLATE_TEST_CASE("diagmat_trace", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> y = randi<Col<eT>>(10, distr_param(10, 20));
 
   REQUIRE( trace(diagmat(y)) == Approx(accu(y)) );
@@ -1124,6 +1364,11 @@ TEMPLATE_TEST_CASE("diagmat_trace", "[diag]", float, double, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("diagmat_times_1", "[diag]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> a_diag = randi<Col<eT>>(10, distr_param(10, 20));
   Mat<eT> b = randi<Mat<eT>>(10, 20, distr_param(10, 20));
@@ -1163,6 +1408,11 @@ TEMPLATE_TEST_CASE("diagmat_times_2", "[diag]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> a_diag = randi<Col<eT>>(10, distr_param(10, 20));
   Mat<eT> b = randi<Mat<eT>>(20, 10, distr_param(10, 20));
 
@@ -1200,6 +1450,11 @@ TEMPLATE_TEST_CASE("diagmat_times_2", "[diag]", float, double)
 TEMPLATE_TEST_CASE("diagmat_times_3", "[diag]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> a_diag = randi<Col<eT>>(10, distr_param(10, 20));
   Mat<eT> b = randi<Mat<eT>>(20, 10, distr_param(10, 20));
@@ -1239,6 +1494,11 @@ TEMPLATE_TEST_CASE("diagmat_times_4", "[diag]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> a = randi<Mat<eT>>(20, 10, distr_param(10, 20));
   Col<eT> b_diag = randi<Col<eT>>(10, distr_param(10, 20));
 
@@ -1276,6 +1536,11 @@ TEMPLATE_TEST_CASE("diagmat_times_4", "[diag]", float, double)
 TEMPLATE_TEST_CASE("diagmat_times_5", "[diag]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> a = randi<Mat<eT>>(10, 20, distr_param(10, 20));
   Col<eT> b_diag = randi<Col<eT>>(10, distr_param(10, 20));
@@ -1315,6 +1580,11 @@ TEMPLATE_TEST_CASE("diagmat_times_6", "[diag]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> a = randi<Mat<eT>>(10, 20, distr_param(10, 20));
   Col<eT> b_diag = randi<Col<eT>>(10, distr_param(10, 20));
 
@@ -1352,6 +1622,11 @@ TEMPLATE_TEST_CASE("diagmat_times_6", "[diag]", float, double)
 TEMPLATE_TEST_CASE("diagmat_times_7", "[diag]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> a_diag = randi<Col<eT>>(10, distr_param(10, 20));
   Col<eT> b_diag = randi<Col<eT>>(10, distr_param(20, 30));
@@ -1393,6 +1668,11 @@ TEMPLATE_TEST_CASE("diagmat2_trans", "[diag]", float, double, u32, s32, u64, s64
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x = randi<Col<eT>>(50, distr_param(10, 20));
 
   Mat<eT> y1 = diagmat(trans(x), 3);
@@ -1427,6 +1707,11 @@ TEMPLATE_TEST_CASE("diagvec_mat", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(50, 50, distr_param(10, 20));
   Col<eT> y1 = diagvec(x);
   Col<eT> y2 = x.diag();
@@ -1447,6 +1732,11 @@ TEMPLATE_TEST_CASE("diagvec_subview", "[diag]", float, double, u32, s32, u64, s6
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(50, 50, distr_param(10, 20));
   Col<eT> y1 = diagvec(x.submat(11, 11, 30, 30));
   Col<eT> y2 = x.submat(11, 11, 30, 30).diag();
@@ -1466,6 +1756,11 @@ TEMPLATE_TEST_CASE("diagvec_subview", "[diag]", float, double, u32, s32, u64, s6
 TEMPLATE_TEST_CASE("diagvec_op", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(50, 50, distr_param(10, 20));
 
@@ -1489,6 +1784,11 @@ TEMPLATE_TEST_CASE("diagvec_mat_alias", "[diag]", float, double, u32, s32, u64, 
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(50, 50, distr_param(10, 20));
   Mat<eT> x2 = x.diag();
   x = diagvec(x);
@@ -1508,6 +1808,11 @@ TEMPLATE_TEST_CASE("diagvec_mat_alias", "[diag]", float, double, u32, s32, u64, 
 TEMPLATE_TEST_CASE("diagvec_k_mat", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(50, 50, distr_param(10, 20));
   for (sword k = -49; k < 50; ++k)
@@ -1532,6 +1837,11 @@ TEMPLATE_TEST_CASE("diagvec_k_subview", "[diag]", float, double, u32, s32, u64, 
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(50, 50, distr_param(10, 20));
   for (sword k = -19; k < 20; ++k)
     {
@@ -1554,6 +1864,11 @@ TEMPLATE_TEST_CASE("diagvec_k_subview", "[diag]", float, double, u32, s32, u64, 
 TEMPLATE_TEST_CASE("diagvec_k_op", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(50, 50, distr_param(10, 20));
   for (sword k = -49; k < 50; ++k)
@@ -1579,6 +1894,11 @@ TEMPLATE_TEST_CASE("diagvec_k_op", "[diag]", float, double, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("diagvec_k_mat_alias", "[diag]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   for (sword k = -49; k < 50; ++k)
     {

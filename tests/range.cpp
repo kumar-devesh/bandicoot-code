@@ -21,6 +21,11 @@ TEMPLATE_TEST_CASE("simple_range_test", "[range]", u32, s32, u64, s64, float, do
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(15, 11);
   x.ones();
   for (uword c = 1; c < 11; ++c)
@@ -56,6 +61,11 @@ TEMPLATE_TEST_CASE("random_range_test", "[range]", u32, s32, u64, s64, float, do
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(500, 700);
   x.randu();
 
@@ -86,6 +96,11 @@ TEMPLATE_TEST_CASE("random_range_test", "[range]", u32, s32, u64, s64, float, do
 TEMPLATE_TEST_CASE("simple_subview_range_test", "[range]", u32, s32, u64, s64, float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(15, 10);
   x.ones();
@@ -126,6 +141,11 @@ TEMPLATE_TEST_CASE("random_subview_range_test", "[range]", u32, s32, u64, s64, f
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(500, 700);
   x.randu();
 
@@ -155,10 +175,10 @@ TEMPLATE_TEST_CASE("random_subview_range_test", "[range]", u32, s32, u64, s64, f
 
 TEST_CASE("empty_range_test", "[range]")
   {
-  mat x;
-  rowvec m1 = range(x);
-  rowvec m2 = range(x, 0);
-  vec m3 = range(x, 1);
+  fmat x;
+  frowvec m1 = range(x);
+  frowvec m2 = range(x, 0);
+  fvec m3 = range(x, 1);
 
   REQUIRE( m1.n_elem == 0 );
   REQUIRE( m2.n_elem == 0 );
@@ -171,6 +191,11 @@ TEMPLATE_TEST_CASE("simple_range_vec_test", "[range]", u32, s32, u64, s64, float
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x(1000);
   x.ones();
 
@@ -182,6 +207,11 @@ TEMPLATE_TEST_CASE("simple_range_vec_test", "[range]", u32, s32, u64, s64, float
 TEMPLATE_TEST_CASE("random_range_vec_test", "[range]", u32, s32, u64, s64, float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x(100000);
   x.randu();
@@ -198,8 +228,8 @@ TEMPLATE_TEST_CASE("random_range_vec_test", "[range]", u32, s32, u64, s64, float
 
 TEST_CASE("empty_range_vec_test", "[range]")
   {
-  vec x;
-  const double range_val = range(x);
+  fvec x;
+  const float range_val = range(x);
 
   REQUIRE( range_val == 0.0 );
   }
@@ -208,17 +238,17 @@ TEST_CASE("empty_range_vec_test", "[range]")
 
 TEST_CASE("range_op_test", "[range]")
   {
-  mat x(50, 50);
+  fmat x(50, 50);
   x.randu();
 
-  rowvec m1 = range(2 * x + 3);
-  mat y = 2 * x + 3;
-  rowvec m2 = range(y);
+  frowvec m1 = range(2 * x + 3);
+  fmat y = 2 * x + 3;
+  frowvec m2 = range(y);
 
   REQUIRE( m1.n_elem == m2.n_elem );
   for (size_t i = 0; i < m1.n_elem; ++i)
     {
-    REQUIRE( double(m1[i]) == Approx(double(m2[i])) );
+    REQUIRE( float(m1[i]) == Approx(float(m2[i])) );
     }
   }
 
@@ -238,6 +268,11 @@ TEMPLATE_TEST_CASE
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Mat<eT1> x = randi<Mat<eT1>>(100, 50, distr_param(1, 1000));
   Mat<eT2> x_conv = conv_to<Mat<eT2>>::from(x);
@@ -302,6 +337,11 @@ TEMPLATE_TEST_CASE
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Col<eT1> x = randi<Col<eT1>>(10000, distr_param(1, 500000));
   Col<eT2> x_conv = conv_to<Col<eT2>>::from(x);

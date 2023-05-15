@@ -21,6 +21,11 @@ TEMPLATE_TEST_CASE("chol_1", "[chol]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(5, 5);
   x.zeros();
   for (uword i = 0; i < 5; ++i)
@@ -48,6 +53,11 @@ TEMPLATE_TEST_CASE("chol_1", "[chol]", float, double)
 TEMPLATE_TEST_CASE("chol_2", "[chol]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(5, 5);
   x.fill(eT(1));
@@ -92,6 +102,11 @@ TEMPLATE_TEST_CASE("chol_2", "[chol]", float, double)
 TEMPLATE_TEST_CASE("chol_3", "[chol]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(50, 50);
   x.randu();

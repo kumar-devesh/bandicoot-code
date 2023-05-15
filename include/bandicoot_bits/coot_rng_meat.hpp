@@ -64,12 +64,11 @@ inline void coot_rng::fill_randi(dev_mem_t<eT> dest, const uword n, const distr_
   {
   coot_extra_debug_sigprint();
 
-  int a;
-  int b;
+  int a = 0;
+  int b = 0;
 
   if (param.state == 0)
     {
-    a = 0;
     b = std::numeric_limits<int>::max();
     }
   else if (param.state == 1)

@@ -22,8 +22,15 @@ using namespace coot;
 // Compare with Armadillo's implementation and ensure that the result is at least close.
 TEMPLATE_TEST_CASE("norm_basic", "[norm]", double, float)
   {
-  Col<TestType> x = randi<Col<TestType>>(1000, distr_param(0, 50));
-  arma::Col<TestType> x_cpu(x);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Col<eT> x = randi<Col<eT>>(1000, distr_param(0, 50));
+  arma::Col<eT> x_cpu(x);
 
   REQUIRE( norm(x, 1) == Approx(norm(x_cpu, 1)) );
   REQUIRE( norm(x, 2) == Approx(norm(x_cpu, 2)) );
@@ -46,41 +53,62 @@ TEMPLATE_TEST_CASE("norm_basic", "[norm]", double, float)
 
 TEMPLATE_TEST_CASE("empty_norm", "[norm]", double, float)
   {
-  Col<TestType> x;
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Col<eT> x;
 
   for (uword p = 1; p < 11; ++p)
     {
-    REQUIRE( norm(x, p) == TestType(0) );
+    REQUIRE( norm(x, p) == eT(0) );
     }
 
-  REQUIRE( norm(x, "-inf") == TestType(0) );
-  REQUIRE( norm(x, "inf") == TestType(0) );
-  REQUIRE( norm(x, "fro") == TestType(0) );
+  REQUIRE( norm(x, "-inf") == eT(0) );
+  REQUIRE( norm(x, "inf") == eT(0) );
+  REQUIRE( norm(x, "fro") == eT(0) );
   }
 
 
 
 TEMPLATE_TEST_CASE("single_element_norm", "[norm]", double, float)
   {
-  Row<TestType> x(1);
-  x[0] = TestType(10);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Row<eT> x(1);
+  x[0] = eT(10);
 
   for (uword p = 1; p < 11; ++p)
     {
-    REQUIRE( norm(x, p) == Approx(TestType(10)) );
+    REQUIRE( norm(x, p) == Approx(eT(10)) );
     }
 
-  REQUIRE( norm(x, "-inf") == Approx(TestType(10)) );
-  REQUIRE( norm(x, "inf") == Approx(TestType(10)) );
-  REQUIRE( norm(x, "fro") == Approx(TestType(10)) );
+  REQUIRE( norm(x, "-inf") == Approx(eT(10)) );
+  REQUIRE( norm(x, "inf") == Approx(eT(10)) );
+  REQUIRE( norm(x, "fro") == Approx(eT(10)) );
   }
 
 
 
 TEMPLATE_TEST_CASE("expr_norm", "[norm]", double, float)
   {
-  Row<TestType> x = randi<Row<TestType>>(1000, distr_param(0, 50));
-  Row<TestType> z = vectorise(repmat(trans(x + 3), 2, 2)).t();
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Row<eT> x = randi<Row<eT>>(1000, distr_param(0, 50));
+  Row<eT> z = vectorise(repmat(trans(x + 3), 2, 2)).t();
 
   for (uword p = 1; p < 11; ++p)
     {
@@ -97,12 +125,19 @@ TEMPLATE_TEST_CASE("expr_norm", "[norm]", double, float)
 // Attempt to get norm2 to overflow by using very large elements.
 TEMPLATE_TEST_CASE("norm2_overflow", "[norm]", double, float)
   {
-  Col<TestType> x(10000);
-  Col<TestType> f = randu<Col<TestType>>(10000) * 0.9;
-  x = f * std::numeric_limits<TestType>::max();
+  typedef TestType eT;
 
-  const TestType x_max = max(x);
-  Col<TestType> x_normalized = x / x_max;
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Col<eT> x(10000);
+  Col<eT> f = randu<Col<eT>>(10000) * 0.9;
+  x = f * std::numeric_limits<eT>::max();
+
+  const eT x_max = max(x);
+  Col<eT> x_normalized = x / x_max;
 
   REQUIRE( norm(x, 2) == Approx(norm(x_normalized, 2) * x_max) );
   }
@@ -112,12 +147,19 @@ TEMPLATE_TEST_CASE("norm2_overflow", "[norm]", double, float)
 // Attempt to get norm2 to underflow by using very small elements.
 TEMPLATE_TEST_CASE("norm2_underflow", "[norm]", double, float)
   {
-  Col<TestType> x(10000);
-  Col<TestType> f = randi<Col<TestType>>(10000, distr_param(1, 25));
-  x = f * std::numeric_limits<TestType>::min();
+  typedef TestType eT;
 
-  const TestType x_max = max(x);
-  Col<TestType> x_normalized = x / x_max;
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Col<eT> x(10000);
+  Col<eT> f = randi<Col<eT>>(10000, distr_param(1, 25));
+  x = f * std::numeric_limits<eT>::min();
+
+  const eT x_max = max(x);
+  Col<eT> x_normalized = x / x_max;
 
   REQUIRE( norm(x, 2) == Approx(norm(x_normalized, 2) * x_max) );
   }
@@ -127,10 +169,17 @@ TEMPLATE_TEST_CASE("norm2_underflow", "[norm]", double, float)
 // Try a complicated expression with norm() inside of it too.
 TEMPLATE_TEST_CASE("double_norm_expr", "[norm]", double, float)
   {
-  Col<TestType> x = randi<Col<TestType>>(10000, distr_param(0, 100));
-  Col<TestType> y = randi<Col<TestType>>(10000, distr_param(50, 150));
+  typedef TestType eT;
 
-  Col<TestType> z = x * norm(x, 1) / norm(x, 2) % (y + 3);
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Col<eT> x = randi<Col<eT>>(10000, distr_param(0, 100));
+  Col<eT> y = randi<Col<eT>>(10000, distr_param(50, 150));
+
+  Col<eT> z = x * norm(x, 1) / norm(x, 2) % (y + 3);
 
   REQUIRE( norm(x * norm(x, 1) / norm(x, 2) % (y + 3), 2) == Approx(norm(z, 2)) );
   }
@@ -145,6 +194,12 @@ TEMPLATE_TEST_CASE(
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
 
   Col<eT1> x = randi<Col<eT1>>(10000, distr_param(0, 100));
   Col<eT2> y = conv_to<Col<eT2>>::from(x);
@@ -164,8 +219,15 @@ TEMPLATE_TEST_CASE(
 // Compute norms of a very large vector (hopefully enough to trigger a second reduce).
 TEMPLATE_TEST_CASE("large_norm", "[norm]", double, float)
   {
-  Col<TestType> x = randi<Col<TestType>>(1000000, distr_param(0, 100));
-  arma::Col<TestType> x_cpu(x);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Col<eT> x = randi<Col<eT>>(1000000, distr_param(0, 100));
+  arma::Col<eT> x_cpu(x);
 
   REQUIRE( norm(x, 1) == Approx(norm(x_cpu, 1)).epsilon(0.01) );
   REQUIRE( norm(x, 2) == Approx(norm(x_cpu, 2)).epsilon(0.01) );
@@ -182,8 +244,15 @@ TEMPLATE_TEST_CASE("large_norm", "[norm]", double, float)
 // Compute matrix norms of small random matrix.
 TEMPLATE_TEST_CASE("small_matrix_norm", "[norm]", double, float)
   {
-  Mat<TestType> x = randu<Mat<TestType>>(10, 10);
-  arma::Mat<TestType> x_cpu(x);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randu<Mat<eT>>(10, 10);
+  arma::Mat<eT> x_cpu(x);
 
   REQUIRE( norm(x, 1) == Approx(norm(x_cpu, 1)).epsilon(0.01) );
   REQUIRE( norm(x, 2) == Approx(norm(x_cpu, 2)).epsilon(0.01) );
@@ -196,8 +265,15 @@ TEMPLATE_TEST_CASE("small_matrix_norm", "[norm]", double, float)
 // Compute matrix norms of large random matrix.
 TEMPLATE_TEST_CASE("large_matrix_norm", "[norm]", double, float)
   {
-  Mat<TestType> x = randu<Mat<TestType>>(1000, 1000);
-  arma::Mat<TestType> x_cpu(x);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randu<Mat<eT>>(1000, 1000);
+  arma::Mat<eT> x_cpu(x);
 
   REQUIRE( norm(x, 1) == Approx(norm(x_cpu, 1)).epsilon(0.01) );
   REQUIRE( norm(x, 2) == Approx(norm(x_cpu, 2)).epsilon(0.01) );
@@ -210,8 +286,15 @@ TEMPLATE_TEST_CASE("large_matrix_norm", "[norm]", double, float)
 // Compute matrix norms of tall, skinny matrix.
 TEMPLATE_TEST_CASE("tall_matrix_norm", "[norm]", double, float)
   {
-  Mat<TestType> x = randn<Mat<TestType>>(1000, 10);
-  arma::Mat<TestType> x_cpu(x);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randn<Mat<eT>>(1000, 10);
+  arma::Mat<eT> x_cpu(x);
 
   REQUIRE( norm(x, 1) == Approx(norm(x_cpu, 1)).epsilon(0.01) );
   REQUIRE( norm(x, 2) == Approx(norm(x_cpu, 2)).epsilon(0.01) );
@@ -224,8 +307,15 @@ TEMPLATE_TEST_CASE("tall_matrix_norm", "[norm]", double, float)
 // Compute matrix norms of short, wide matrix.
 TEMPLATE_TEST_CASE("wide_matrix_norm", "[norm]", double, float)
   {
-  Mat<TestType> x = randn<Mat<TestType>>(10, 1000);
-  arma::Mat<TestType> x_cpu(x);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randn<Mat<eT>>(10, 1000);
+  arma::Mat<eT> x_cpu(x);
 
   REQUIRE( norm(x, 1) == Approx(norm(x_cpu, 1)).epsilon(0.01) );
   REQUIRE( norm(x, 2) == Approx(norm(x_cpu, 2)).epsilon(0.01) );
@@ -238,12 +328,19 @@ TEMPLATE_TEST_CASE("wide_matrix_norm", "[norm]", double, float)
 // Compute matrix norms of empty matrix.
 TEMPLATE_TEST_CASE("empty_matrix_norm", "[norm]", double, float)
   {
-  Mat<TestType> x;
+  typedef TestType eT;
 
-  REQUIRE( norm(x, 1) == Approx(TestType(0)).margin(1e-6) );
-  REQUIRE( norm(x, 2) == Approx(TestType(0)).margin(1e-6) );
-  REQUIRE( norm(x, "inf") == Approx(TestType(0)).margin(1e-6) );
-  REQUIRE( norm(x, "fro") == Approx(TestType(0)).margin(1e-6) );
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x;
+
+  REQUIRE( norm(x, 1) == Approx(eT(0)).margin(1e-6) );
+  REQUIRE( norm(x, 2) == Approx(eT(0)).margin(1e-6) );
+  REQUIRE( norm(x, "inf") == Approx(eT(0)).margin(1e-6) );
+  REQUIRE( norm(x, "fro") == Approx(eT(0)).margin(1e-6) );
   }
 
 
@@ -251,11 +348,18 @@ TEMPLATE_TEST_CASE("empty_matrix_norm", "[norm]", double, float)
 // Ensure invalid norm type throws an exception.
 TEMPLATE_TEST_CASE("invalid_matrix_norm", "[norm]", double, float)
   {
-  Mat<TestType> x = randu<Mat<TestType>>(10, 10);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randu<Mat<eT>>(10, 10);
 
   std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
   std::cerr.rdbuf(NULL);
-  TestType out;
+  eT out;
   REQUIRE_THROWS( out = norm(x, "-inf") );
   std::cerr.rdbuf(orig_cerr_buf);
   }
@@ -265,8 +369,15 @@ TEMPLATE_TEST_CASE("invalid_matrix_norm", "[norm]", double, float)
 // Test subview norms over a single column.
 TEMPLATE_TEST_CASE("subview_col_norm", "[norm]", double, float)
   {
-  Mat<TestType> x = randu<Mat<TestType>>(250, 250);
-  arma::Mat<TestType> x_cpu(x);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randu<Mat<eT>>(250, 250);
+  arma::Mat<eT> x_cpu(x);
 
   REQUIRE( norm(x.submat(10, 10, 10, 150), 1)      == Approx(norm(x_cpu.submat(10, 10, 10, 150), 1))      );
   REQUIRE( norm(x.submat(10, 10, 10, 150), 2)      == Approx(norm(x_cpu.submat(10, 10, 10, 150), 2))      );
@@ -283,8 +394,15 @@ TEMPLATE_TEST_CASE("subview_col_norm", "[norm]", double, float)
 // Test subview norms over a single row.
 TEMPLATE_TEST_CASE("subview_row_norm", "[norm]", double, float)
   {
-  Mat<TestType> x = randu<Mat<TestType>>(250, 250);
-  arma::Mat<TestType> x_cpu(x);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randu<Mat<eT>>(250, 250);
+  arma::Mat<eT> x_cpu(x);
 
   REQUIRE( norm(x.submat(10, 10, 150, 10), 1)      == Approx(norm(x_cpu.submat(10, 10, 150, 10), 1))      );
   REQUIRE( norm(x.submat(10, 10, 150, 10), 2)      == Approx(norm(x_cpu.submat(10, 10, 150, 10), 2))      );
@@ -301,8 +419,15 @@ TEMPLATE_TEST_CASE("subview_row_norm", "[norm]", double, float)
 // Test subview norms over a vectorised subview.
 TEMPLATE_TEST_CASE("subview_vectorised_norm", "[norm]", double, float)
   {
-  Mat<TestType> x = randu<Mat<TestType>>(250, 250);
-  arma::Mat<TestType> x_cpu(x);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randu<Mat<eT>>(250, 250);
+  arma::Mat<eT> x_cpu(x);
 
   REQUIRE( norm(vectorise(x.submat(10, 10, 150, 150)), 1)      == Approx(norm(vectorise(x_cpu.submat(10, 10, 150, 150)), 1))      );
   REQUIRE( norm(vectorise(x.submat(10, 10, 150, 150)), 2)      == Approx(norm(vectorise(x_cpu.submat(10, 10, 150, 150)), 2))      );
@@ -319,8 +444,15 @@ TEMPLATE_TEST_CASE("subview_vectorised_norm", "[norm]", double, float)
 // Test subview matrix norms.
 TEMPLATE_TEST_CASE("subview_matrix_norm", "[norm]", double, float)
   {
-  Mat<TestType> x = randu<Mat<TestType>>(250, 250);
-  arma::Mat<TestType> x_cpu(x);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randu<Mat<eT>>(250, 250);
+  arma::Mat<eT> x_cpu(x);
 
   REQUIRE( norm(x.submat(10, 10, 150, 150), 1)     == Approx(norm(x_cpu.submat(10, 10, 150, 150), 1)) );
   REQUIRE( norm(x.submat(10, 10, 150, 150), 2)     == Approx(norm(x_cpu.submat(10, 10, 150, 150), 2)) );
@@ -333,8 +465,15 @@ TEMPLATE_TEST_CASE("subview_matrix_norm", "[norm]", double, float)
 // Test subview norms when the subview is the size of the full matrix.
 TEMPLATE_TEST_CASE("full_subview_matrix_norm", "[norm]", double, float)
   {
-  Mat<TestType> x = randu<Mat<TestType>>(250, 250);
-  arma::Mat<TestType> x_cpu(x);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randu<Mat<eT>>(250, 250);
+  arma::Mat<eT> x_cpu(x);
 
   REQUIRE( norm(x.submat(0, 0, 249, 249), 1)     == Approx(norm(x_cpu.submat(0, 0, 249, 249), 1)) );
   REQUIRE( norm(x.submat(0, 0, 249, 249), 2)     == Approx(norm(x_cpu.submat(0, 0, 249, 249), 2)) );
@@ -346,7 +485,7 @@ TEMPLATE_TEST_CASE("full_subview_matrix_norm", "[norm]", double, float)
 
 TEST_CASE("subview_norm_1", "[norm]")
   {
-  mat x = randu<mat>(10, 10);
-  arma::mat x_cpu(x);
+  fmat x = randu<fmat>(10, 10);
+  arma::fmat x_cpu(x);
   REQUIRE( norm(x.submat(1, 1, 5, 1), "-inf") == Approx(norm(x_cpu.submat(1, 1, 5, 1), "-inf")) );
   }

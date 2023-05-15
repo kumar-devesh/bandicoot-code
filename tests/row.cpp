@@ -21,6 +21,11 @@ TEMPLATE_TEST_CASE("create_row_1", "[row]", double, float, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(10, 10);
   for (uword i = 0; i < x.n_elem; ++i)
     {
@@ -46,6 +51,11 @@ TEMPLATE_TEST_CASE("create_row_1", "[row]", double, float, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("create_row_2", "[row]", double, float, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(10, 10);
   for (uword i = 0; i < x.n_elem; ++i)
@@ -73,6 +83,11 @@ TEMPLATE_TEST_CASE("empty_row_constructors", "[row]", double, float, u32, s32, u
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Row<eT> r1;
   Row<eT> r2(100);
   Row<eT> r3(1, 100);
@@ -90,6 +105,11 @@ TEMPLATE_TEST_CASE("empty_row_constructors", "[row]", double, float, u32, s32, u
 TEMPLATE_TEST_CASE("row_move_constructor_and_operator", "[row]", double, float, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Row<eT> r1(100);
   r1.fill(eT(2));
@@ -124,6 +144,11 @@ TEMPLATE_TEST_CASE("row_arma_conversion", "[row]", double, float, u32, s32, u64,
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Row<eT> r1(100);
   for (uword i = 0; i < r1.n_elem; ++i)
     {
@@ -146,6 +171,11 @@ TEMPLATE_TEST_CASE("row_cols_1", "[row]", double, float, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Row<eT> r(100);
   for (uword i = 0; i < r.n_elem; ++i)
     {
@@ -167,6 +197,11 @@ TEMPLATE_TEST_CASE("row_cols_1", "[row]", double, float, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("row_cols_2", "[row]", double, float, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Row<eT> r(100);
   for (uword i = 0; i < r.n_elem; ++i)
@@ -199,6 +234,11 @@ TEMPLATE_TEST_CASE("row_subvec_1", "[row]", double, float, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Row<eT> r(100);
   for (uword i = 0; i < r.n_elem; ++i)
     {
@@ -220,6 +260,11 @@ TEMPLATE_TEST_CASE("row_subvec_1", "[row]", double, float, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("row_subvec_2", "[row]", double, float, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Row<eT> r(100);
   for (uword i = 0; i < r.n_elem; ++i)
@@ -254,15 +299,15 @@ TEST_CASE("row_invalid_size", "[row]")
   std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
   std::cerr.rdbuf(NULL);
 
-  rowvec x;
-  REQUIRE_THROWS( x = randi<vec>(100, distr_param(0, 10)) );
+  frowvec x;
+  REQUIRE_THROWS( x = randi<fvec>(100, distr_param(0, 10)) );
   REQUIRE_THROWS( x.set_size(2, 1) );
-  REQUIRE_THROWS( x = vec(5) );
-  REQUIRE_THROWS( x = mat(10, 5) );
+  REQUIRE_THROWS( x = fvec(5) );
+  REQUIRE_THROWS( x = fmat(10, 5) );
 
   // Restore cerr output.
   std::cerr.rdbuf(orig_cerr_buf);
 
   // This one needs to not throw.
-  x = mat(1, 10);
+  x = fmat(1, 10);
   }

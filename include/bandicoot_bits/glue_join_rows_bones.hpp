@@ -15,8 +15,11 @@
 
 
 
-struct glue_join_rows
+class glue_join_rows
+  : public traits_glue_default
   {
+  public:
+
   // Note that it's okay if T1 and T2 contain conversions.
   template<typename out_eT, typename T1, typename T2> static inline void apply(Mat<out_eT>& out, const Glue<T1, T2, glue_join_rows>& glue);
 

@@ -17,9 +17,15 @@
 
 using namespace coot;
 
-template<typename eT>
-void test_fill()
+TEMPLATE_TEST_CASE("fill_1", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(5, 5);
 
   x.fill(eT(0));
@@ -35,21 +41,15 @@ void test_fill()
 
 
 
-TEST_CASE("fill_1")
+TEMPLATE_TEST_CASE("fill_2", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_fill<double>();
-  test_fill<float>();
-  test_fill<u32>();
-  test_fill<s32>();
-  test_fill<u64>();
-  test_fill<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_fill_2()
-  {
   Mat<eT> x(5, 5);
 
   x.fill(eT(50));
@@ -65,21 +65,15 @@ void test_fill_2()
 
 
 
-TEST_CASE("fill_2")
+TEMPLATE_TEST_CASE("scalar_plus", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_fill_2<float>();
-  test_fill_2<double>();
-  test_fill_2<u32>();
-  test_fill_2<s32>();
-  test_fill_2<u64>();
-  test_fill_2<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_scalar_plus()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(0));
 
@@ -96,21 +90,15 @@ void test_scalar_plus()
 
 
 
-TEST_CASE("scalar_plus")
+TEMPLATE_TEST_CASE("scalar_minus", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_scalar_plus<float>();
-  test_scalar_plus<double>();
-  test_scalar_plus<u32>();
-  test_scalar_plus<s32>();
-  test_scalar_plus<u64>();
-  test_scalar_plus<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_scalar_minus()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(10));
 
@@ -127,21 +115,15 @@ void test_scalar_minus()
 
 
 
-TEST_CASE("scalar_minus")
+TEMPLATE_TEST_CASE("scalar_mul", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_scalar_minus<float>();
-  test_scalar_minus<double>();
-  test_scalar_minus<u32>();
-  test_scalar_minus<s32>();
-  test_scalar_minus<u64>();
-  test_scalar_minus<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_scalar_mul()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(1));
 
@@ -158,21 +140,15 @@ void test_scalar_mul()
 
 
 
-TEST_CASE("scalar_mul")
+TEMPLATE_TEST_CASE("scalar_div", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_scalar_mul<float>();
-  test_scalar_mul<double>();
-  test_scalar_mul<u32>();
-  test_scalar_mul<s32>();
-  test_scalar_mul<u64>();
-  test_scalar_mul<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_scalar_div()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(10));
 
@@ -189,21 +165,15 @@ void test_scalar_div()
 
 
 
-TEST_CASE("scalar_div")
+TEMPLATE_TEST_CASE("submat_scalar_fill", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_scalar_div<float>();
-  test_scalar_div<double>();
-  test_scalar_div<u32>();
-  test_scalar_div<s32>();
-  test_scalar_div<u64>();
-  test_scalar_div<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_submat_scalar_fill()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(10));
 
@@ -227,21 +197,15 @@ void test_submat_scalar_fill()
 
 
 
-TEST_CASE("submat_scalar_fill")
+TEMPLATE_TEST_CASE("submat_scalar_add", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_submat_scalar_fill<float>();
-  test_submat_scalar_fill<double>();
-  test_submat_scalar_fill<u32>();
-  test_submat_scalar_fill<s32>();
-  test_submat_scalar_fill<u64>();
-  test_submat_scalar_fill<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_submat_scalar_add()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(10));
 
@@ -265,22 +229,15 @@ void test_submat_scalar_add()
 
 
 
-TEST_CASE("submat_scalar_add")
+TEMPLATE_TEST_CASE("submat_scalar_minus", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_submat_scalar_add<float>();
-  test_submat_scalar_add<double>();
-  test_submat_scalar_add<u32>();
-  test_submat_scalar_add<s32>();
-  test_submat_scalar_add<u64>();
-  test_submat_scalar_add<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-
-template<typename eT>
-void test_submat_scalar_minus()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(10));
 
@@ -304,22 +261,15 @@ void test_submat_scalar_minus()
 
 
 
-TEST_CASE("submat_scalar_minus")
+TEMPLATE_TEST_CASE("submat_scalar_mul", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_submat_scalar_minus<float>();
-  test_submat_scalar_minus<double>();
-  test_submat_scalar_minus<u32>();
-  test_submat_scalar_minus<s32>();
-  test_submat_scalar_minus<u64>();
-  test_submat_scalar_minus<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-
-template<typename eT>
-void test_submat_scalar_mul()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(10));
 
@@ -343,22 +293,15 @@ void test_submat_scalar_mul()
 
 
 
-TEST_CASE("submat_scalar_mul")
+TEMPLATE_TEST_CASE("submat_scalar_div", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_submat_scalar_mul<float>();
-  test_submat_scalar_mul<double>();
-  test_submat_scalar_mul<u32>();
-  test_submat_scalar_mul<s32>();
-  test_submat_scalar_mul<u64>();
-  test_submat_scalar_mul<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-
-template<typename eT>
-void test_submat_scalar_div()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(10));
 
@@ -378,18 +321,6 @@ void test_submat_scalar_div()
         }
       }
     }
-  }
-
-
-
-TEST_CASE("submat_scalar_div")
-  {
-  test_submat_scalar_div<float>();
-  test_submat_scalar_div<double>();
-  test_submat_scalar_div<u32>();
-  test_submat_scalar_div<s32>();
-  test_submat_scalar_div<u64>();
-  test_submat_scalar_div<s64>();
   }
 
 
@@ -434,9 +365,26 @@ TEST_CASE("submat_huge_scalar_fill")
 
 
 
-template<typename eT1, typename eT2>
-void test_eop_scalar_plus()
+TEMPLATE_TEST_CASE
+  (
+  "eop_scalar_plus",
+  "[eop_scalar]",
+  (std::pair<double, double>), (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, float>), (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, u32>), (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, s32>), (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, u64>), (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, s64>), (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
   {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x(5, 5);
   x.fill(eT1(3));
 
@@ -453,51 +401,15 @@ void test_eop_scalar_plus()
 
 
 
-TEST_CASE("eop_scalar_plus_1")
+TEMPLATE_TEST_CASE("eop_neg", "[eop_scalar]", double, float, s32, s64)
   {
-  test_eop_scalar_plus<u32, u32>();
-  test_eop_scalar_plus<u32, s32>();
-  test_eop_scalar_plus<u32, u64>();
-  test_eop_scalar_plus<u32, s64>();
-  test_eop_scalar_plus<u32, float>();
-  test_eop_scalar_plus<u32, double>();
-  test_eop_scalar_plus<s32, u32>();
-  test_eop_scalar_plus<s32, s32>();
-  test_eop_scalar_plus<s32, u64>();
-  test_eop_scalar_plus<s32, s64>();
-  test_eop_scalar_plus<s32, float>();
-  test_eop_scalar_plus<s32, double>();
-  test_eop_scalar_plus<u64, u32>();
-  test_eop_scalar_plus<u64, s32>();
-  test_eop_scalar_plus<u64, u64>();
-  test_eop_scalar_plus<u64, s64>();
-  test_eop_scalar_plus<u64, float>();
-  test_eop_scalar_plus<u64, double>();
-  test_eop_scalar_plus<s64, u32>();
-  test_eop_scalar_plus<s64, s32>();
-  test_eop_scalar_plus<s64, u64>();
-  test_eop_scalar_plus<s64, s64>();
-  test_eop_scalar_plus<s64, float>();
-  test_eop_scalar_plus<s64, double>();
-  test_eop_scalar_plus<float, u32>();
-  test_eop_scalar_plus<float, s32>();
-  test_eop_scalar_plus<float, u64>();
-  test_eop_scalar_plus<float, s64>();
-  test_eop_scalar_plus<float, float>();
-  test_eop_scalar_plus<float, double>();
-  test_eop_scalar_plus<double, u32>();
-  test_eop_scalar_plus<double, s32>();
-  test_eop_scalar_plus<double, u64>();
-  test_eop_scalar_plus<double, s64>();
-  test_eop_scalar_plus<double, float>();
-  test_eop_scalar_plus<double, double>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_neg()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(3));
 
@@ -514,19 +426,15 @@ void test_eop_neg()
 
 
 
-TEST_CASE("eop_neg_1")
+TEMPLATE_TEST_CASE("eop_scalar_minus_pre", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_neg<float>();
-  test_eop_neg<double>();
-  test_eop_neg<s32>();
-  test_eop_neg<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_scalar_minus_pre()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(3));
 
@@ -543,21 +451,15 @@ void test_eop_scalar_minus_pre()
 
 
 
-TEST_CASE("eop_scalar_minus_pre")
+TEMPLATE_TEST_CASE("eop_scalar_minus_post", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_scalar_minus_pre<float>();
-  test_eop_scalar_minus_pre<double>();
-  test_eop_scalar_minus_pre<u32>();
-  test_eop_scalar_minus_pre<s32>();
-  test_eop_scalar_minus_pre<u64>();
-  test_eop_scalar_minus_pre<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_scalar_minus_post()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(3));
 
@@ -574,21 +476,15 @@ void test_eop_scalar_minus_post()
 
 
 
-TEST_CASE("eop_scalar_minus_post")
+TEMPLATE_TEST_CASE("eop_scalar_times", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_scalar_minus_post<float>();
-  test_eop_scalar_minus_post<double>();
-  test_eop_scalar_minus_post<u32>();
-  test_eop_scalar_minus_post<s32>();
-  test_eop_scalar_minus_post<u64>();
-  test_eop_scalar_minus_post<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_scalar_times()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(3));
 
@@ -605,21 +501,15 @@ void test_eop_scalar_times()
 
 
 
-TEST_CASE("eop_scalar_times")
+TEMPLATE_TEST_CASE("eop_scalar_div_pre", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_scalar_times<float>();
-  test_eop_scalar_times<double>();
-  test_eop_scalar_times<u32>();
-  test_eop_scalar_times<s32>();
-  test_eop_scalar_times<u64>();
-  test_eop_scalar_times<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_scalar_div_pre()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(3));
 
@@ -636,21 +526,15 @@ void test_eop_scalar_div_pre()
 
 
 
-TEST_CASE("eop_scalar_div_pre")
+TEMPLATE_TEST_CASE("eop_scalar_div_post", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_scalar_div_pre<float>();
-  test_eop_scalar_div_pre<double>();
-  test_eop_scalar_div_pre<u32>();
-  test_eop_scalar_div_pre<s32>();
-  test_eop_scalar_div_pre<u64>();
-  test_eop_scalar_div_pre<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_scalar_div_post()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(4));
 
@@ -667,21 +551,15 @@ void test_eop_scalar_div_post()
 
 
 
-TEST_CASE("eop_scalar_div_post")
+TEMPLATE_TEST_CASE("eop_square", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_scalar_div_post<float>();
-  test_eop_scalar_div_post<double>();
-  test_eop_scalar_div_post<u32>();
-  test_eop_scalar_div_post<s32>();
-  test_eop_scalar_div_post<u64>();
-  test_eop_scalar_div_post<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_square()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(3));
 
@@ -698,21 +576,15 @@ void test_eop_square()
 
 
 
-TEST_CASE("eop_square")
+TEMPLATE_TEST_CASE("eop_sqrt", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_square<float>();
-  test_eop_square<double>();
-  test_eop_square<u32>();
-  test_eop_square<s32>();
-  test_eop_square<u64>();
-  test_eop_square<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_sqrt()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(9));
 
@@ -729,21 +601,15 @@ void test_eop_sqrt()
 
 
 
-TEST_CASE("eop_sqrt")
+TEMPLATE_TEST_CASE("eop_log", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_sqrt<float>();
-  test_eop_sqrt<double>();
-  test_eop_sqrt<u32>();
-  test_eop_sqrt<s32>();
-  test_eop_sqrt<u64>();
-  test_eop_sqrt<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_log()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(10));
 
@@ -760,21 +626,15 @@ void test_eop_log()
 
 
 
-TEST_CASE("eop_log")
+TEMPLATE_TEST_CASE("eop_exp", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_log<float>();
-  test_eop_log<double>();
-  test_eop_log<u32>();
-  test_eop_log<s32>();
-  test_eop_log<u64>();
-  test_eop_log<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_exp()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(3));
 
@@ -791,21 +651,15 @@ void test_eop_exp()
 
 
 
-TEST_CASE("eop_exp")
+TEMPLATE_TEST_CASE("eop_abs", "[eop_scalar]", double, float, s32, s64)
   {
-  test_eop_exp<float>();
-  test_eop_exp<double>();
-  test_eop_exp<u32>();
-  test_eop_exp<s32>();
-  test_eop_exp<u64>();
-  test_eop_exp<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_abs()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(-3));
 
@@ -822,21 +676,40 @@ void test_eop_abs()
 
 
 
-TEST_CASE("eop_abs")
+TEMPLATE_TEST_CASE("eop_abs_2", "[eop_scalar]", u32, u64)
   {
-  test_eop_exp<float>();
-  test_eop_exp<double>();
-  test_eop_exp<u32>();
-  test_eop_exp<s32>();
-  test_eop_exp<u64>();
-  test_eop_exp<s64>();
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x(5, 5);
+  x.fill(eT(5));
+
+  Mat<eT> y = abs(x);
+
+  for (uword r = 0; r < 5; ++r)
+    {
+    for (uword c = 0; c < 5; ++c)
+      {
+      REQUIRE( eT(y(r, c)) == Approx(eT(x(r, c))) );
+      }
+    }
   }
 
 
 
-template<typename eT>
-void test_eop_log2()
+TEMPLATE_TEST_CASE("eop_log2", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(5, 5);
   x.fill(eT(3));
 
@@ -853,21 +726,15 @@ void test_eop_log2()
 
 
 
-TEST_CASE("eop_log2")
+TEMPLATE_TEST_CASE("eop_log10", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_log2<float>();
-  test_eop_log2<double>();
-  test_eop_log2<u32>();
-  test_eop_log2<s32>();
-  test_eop_log2<u64>();
-  test_eop_log2<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_log10()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(3));
 
@@ -884,21 +751,15 @@ void test_eop_log10()
 
 
 
-TEST_CASE("eop_log10")
+TEMPLATE_TEST_CASE("eop_trunc_log", "[eop_scalar]", double, float, s32, s64)
   {
-  test_eop_log10<float>();
-  test_eop_log10<double>();
-  test_eop_log10<u32>();
-  test_eop_log10<s32>();
-  test_eop_log10<u64>();
-  test_eop_log10<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_trunc_log()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(3));
   x[0] = std::numeric_limits<eT>::infinity();
@@ -918,9 +779,16 @@ void test_eop_trunc_log()
 
 
 
-template<typename eT>
-void test_eop_trunc_log_pos()
+// We can't test anything that will return a negative value for unsigned types.
+TEMPLATE_TEST_CASE("eop_trunc_log_pos", "[eop_scalar]", u32, u64)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(5, 5);
   x.fill(eT(3));
   x[0] = std::numeric_limits<eT>::infinity() + 1;
@@ -940,22 +808,15 @@ void test_eop_trunc_log_pos()
 
 
 
-// We can't test anything that will return a negative value for unsigned types.
-TEST_CASE("eop_trunc_log")
+TEMPLATE_TEST_CASE("eop_exp2", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_trunc_log<float>();
-  test_eop_trunc_log<double>();
-  test_eop_trunc_log_pos<u32>();
-  test_eop_trunc_log<s32>();
-  test_eop_trunc_log_pos<u64>();
-  test_eop_trunc_log<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_exp2()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(3));
 
@@ -972,21 +833,15 @@ void test_eop_exp2()
 
 
 
-TEST_CASE("eop_exp2")
+TEMPLATE_TEST_CASE("eop_exp10", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_exp2<float>();
-  test_eop_exp2<double>();
-  test_eop_exp2<u32>();
-  test_eop_exp2<s32>();
-  test_eop_exp2<u64>();
-  test_eop_exp2<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_exp10()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(3));
 
@@ -996,29 +851,22 @@ void test_eop_exp10()
     {
     for (uword c = 0; c < 5; ++c)
       {
-      REQUIRE( eT(y(r, c)) == Approx(eT(exp10(eT(x(r, c))))).epsilon(0.01) );
+      REQUIRE( eT(y(r, c)) == Approx(eT(std::pow(10.0, eT(x(r, c))))).epsilon(0.01) );
       }
     }
   }
 
 
 
-TEST_CASE("eop_exp10")
+TEMPLATE_TEST_CASE("eop_trunc_exp", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_exp10<float>();
-  test_eop_exp10<double>();
-  test_eop_exp10<u32>();
-  test_eop_exp10<s32>();
-  test_eop_exp10<u64>();
-  test_eop_exp10<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-
-template<typename eT>
-void test_eop_trunc_exp()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(3));
   x[0] = eT(10);
@@ -1047,21 +895,15 @@ void test_eop_trunc_exp()
 
 
 
-TEST_CASE("eop_trunc_exp")
+TEMPLATE_TEST_CASE("eop_cos", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_trunc_exp<float>();
-  test_eop_trunc_exp<double>();
-  test_eop_trunc_exp<u32>();
-  test_eop_trunc_exp<s32>();
-  test_eop_trunc_exp<u64>();
-  test_eop_trunc_exp<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_cos()
-  {
   arma::Mat<double> x_cpu(5, 5, arma::fill::randu);
   x_cpu *= 50;
   Mat<eT> x(arma::conv_to<arma::Mat<eT>>::from(x_cpu));
@@ -1079,21 +921,15 @@ void test_eop_cos()
 
 
 
-TEST_CASE("eop_cos")
+TEMPLATE_TEST_CASE("eop_sin", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_cos<float>();
-  test_eop_cos<double>();
-  test_eop_cos<u32>();
-  test_eop_cos<s32>();
-  test_eop_cos<u64>();
-  test_eop_cos<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_sin()
-  {
   arma::Mat<double> x_cpu(5, 5, arma::fill::randu);
   x_cpu *= 50;
   Mat<eT> x(arma::conv_to<arma::Mat<eT>>::from(x_cpu));
@@ -1111,21 +947,15 @@ void test_eop_sin()
 
 
 
-TEST_CASE("eop_sin")
+TEMPLATE_TEST_CASE("eop_tan", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_sin<float>();
-  test_eop_sin<double>();
-  test_eop_sin<u32>();
-  test_eop_sin<s32>();
-  test_eop_sin<u64>();
-  test_eop_sin<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_tan()
-  {
   arma::Mat<double> x_cpu(5, 5, arma::fill::randu);
   x_cpu *= 50;
   Mat<eT> x(arma::conv_to<arma::Mat<eT>>::from(x_cpu));
@@ -1143,21 +973,15 @@ void test_eop_tan()
 
 
 
-TEST_CASE("eop_tan")
+TEMPLATE_TEST_CASE("eop_acos", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_tan<float>();
-  test_eop_tan<double>();
-  test_eop_tan<u32>();
-  test_eop_tan<s32>();
-  test_eop_tan<u64>();
-  test_eop_tan<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_acos()
-  {
   arma::Mat<double> x_cpu(5, 5, arma::fill::randu);
   x_cpu[3] = 1.0;
   Mat<eT> x(arma::conv_to<arma::Mat<eT>>::from(x_cpu));
@@ -1175,21 +999,15 @@ void test_eop_acos()
 
 
 
-TEST_CASE("eop_acos")
+TEMPLATE_TEST_CASE("eop_asin", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_acos<float>();
-  test_eop_acos<double>();
-  test_eop_acos<u32>();
-  test_eop_acos<s32>();
-  test_eop_acos<u64>();
-  test_eop_acos<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_asin()
-  {
   arma::Mat<double> x_cpu(5, 5, arma::fill::randu);
   x_cpu[3] = 1.0;
   Mat<eT> x(arma::conv_to<arma::Mat<eT>>::from(x_cpu));
@@ -1207,21 +1025,15 @@ void test_eop_asin()
 
 
 
-TEST_CASE("eop_asin")
+TEMPLATE_TEST_CASE("eop_atan", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_asin<float>();
-  test_eop_asin<double>();
-  test_eop_asin<u32>();
-  test_eop_asin<s32>();
-  test_eop_asin<u64>();
-  test_eop_asin<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_atan()
-  {
   arma::Mat<double> x_cpu(5, 5, arma::fill::randu);
   x_cpu *= 50;
   Mat<eT> x(arma::conv_to<arma::Mat<eT>>::from(x_cpu));
@@ -1239,21 +1051,15 @@ void test_eop_atan()
 
 
 
-TEST_CASE("eop_atan")
+TEMPLATE_TEST_CASE("eop_cosh", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_atan<float>();
-  test_eop_atan<double>();
-  test_eop_atan<u32>();
-  test_eop_atan<s32>();
-  test_eop_atan<u64>();
-  test_eop_atan<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_cosh()
-  {
   arma::Mat<double> x_cpu(5, 5, arma::fill::randu);
   x_cpu *= 50;
   Mat<eT> x(arma::conv_to<arma::Mat<eT>>::from(x_cpu));
@@ -1271,21 +1077,15 @@ void test_eop_cosh()
 
 
 
-TEST_CASE("eop_cosh")
+TEMPLATE_TEST_CASE("eop_sinh", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_cosh<float>();
-  test_eop_cosh<double>();
-  test_eop_cosh<u32>();
-  test_eop_cosh<s32>();
-  test_eop_cosh<u64>();
-  test_eop_cosh<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_sinh()
-  {
   arma::Mat<double> x_cpu(5, 5, arma::fill::randu);
   x_cpu *= 50;
   Mat<eT> x(arma::conv_to<arma::Mat<eT>>::from(x_cpu));
@@ -1303,21 +1103,15 @@ void test_eop_sinh()
 
 
 
-TEST_CASE("eop_sinh")
+TEMPLATE_TEST_CASE("eop_tanh", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_sinh<float>();
-  test_eop_sinh<double>();
-  test_eop_sinh<u32>();
-  test_eop_sinh<s32>();
-  test_eop_sinh<u64>();
-  test_eop_sinh<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_tanh()
-  {
   arma::Mat<double> x_cpu(5, 5, arma::fill::randu);
   x_cpu *= 50;
   Mat<eT> x(arma::conv_to<arma::Mat<eT>>::from(x_cpu));
@@ -1335,21 +1129,15 @@ void test_eop_tanh()
 
 
 
-TEST_CASE("eop_tanh")
+TEMPLATE_TEST_CASE("eop_acosh", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_tanh<float>();
-  test_eop_tanh<double>();
-  test_eop_tanh<u32>();
-  test_eop_tanh<s32>();
-  test_eop_tanh<u64>();
-  test_eop_tanh<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_acosh()
-  {
   arma::Mat<double> x_cpu(5, 5, arma::fill::randu);
   x_cpu *= 50;
   x_cpu += 1;
@@ -1369,21 +1157,15 @@ void test_eop_acosh()
 
 
 
-TEST_CASE("eop_acosh")
+TEMPLATE_TEST_CASE("eop_asinh", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_acosh<float>();
-  test_eop_acosh<double>();
-  test_eop_acosh<u32>();
-  test_eop_acosh<s32>();
-  test_eop_acosh<u64>();
-  test_eop_acosh<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_asinh()
-  {
   arma::Mat<double> x_cpu(5, 5, arma::fill::randu);
   x_cpu *= 50;
   Mat<eT> x(arma::conv_to<arma::Mat<eT>>::from(x_cpu));
@@ -1401,21 +1183,15 @@ void test_eop_asinh()
 
 
 
-TEST_CASE("eop_asinh")
+TEMPLATE_TEST_CASE("eop_atanh", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eop_asinh<float>();
-  test_eop_asinh<double>();
-  test_eop_asinh<u32>();
-  test_eop_asinh<s32>();
-  test_eop_asinh<u64>();
-  test_eop_asinh<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_atanh()
-  {
   arma::Mat<double> x_cpu(5, 5, arma::fill::randu);
   x_cpu *= 50;
   Mat<eT> x(arma::conv_to<arma::Mat<eT>>::from(x_cpu));
@@ -1433,21 +1209,15 @@ void test_eop_atanh()
 
 
 
-TEST_CASE("eop_atanh")
+TEMPLATE_TEST_CASE("eglue_atan2", "[eop_scalar]", double, float)
   {
-  test_eop_atanh<float>();
-  test_eop_atanh<double>();
-  test_eop_atanh<u32>();
-  test_eop_atanh<s32>();
-  test_eop_atanh<u64>();
-  test_eop_atanh<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eglue_atan2()
-  {
   arma::Mat<eT> x_cpu(5, 5, arma::fill::randn);
   x_cpu *= 50;
   arma::Mat<eT> y_cpu(5, 5, arma::fill::randn);
@@ -1471,17 +1241,15 @@ void test_eglue_atan2()
 
 
 
-TEST_CASE("eglue_atan2")
+TEMPLATE_TEST_CASE("eglue_hypot", "[eop_scalar]", double, float)
   {
-  test_eglue_atan2<float>();
-  test_eglue_atan2<double>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eglue_hypot()
-  {
   arma::Mat<eT> x_cpu(5, 5, arma::fill::randu);
   x_cpu *= 50;
   arma::Mat<eT> y_cpu(5, 5, arma::fill::randu);
@@ -1504,17 +1272,15 @@ void test_eglue_hypot()
 
 
 
-TEST_CASE("eglue_hypot")
+TEMPLATE_TEST_CASE("eop_sinc", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_eglue_hypot<float>();
-  test_eglue_hypot<double>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_eop_sinc()
-  {
   arma::mat xd_cpu(5, 5, arma::fill::randn);
   xd_cpu *= 50;
   arma::Mat<eT> x_cpu = arma::conv_to<arma::Mat<eT>>::from(xd_cpu);
@@ -1535,21 +1301,14 @@ void test_eop_sinc()
 
 
 
-TEST_CASE("eop_sinc")
-  {
-  test_eop_sinc<float>();
-  test_eop_sinc<double>();
-  test_eop_sinc<u32>();
-  test_eop_sinc<s32>();
-  test_eop_sinc<u64>();
-  test_eop_sinc<s64>();
-  }
-
-
-
 template<typename eT>
 void test_pow(eT exponent)
   {
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   arma::mat xd_cpu(5, 5, arma::fill::randn);
   xd_cpu *= 20;
   xd_cpu[0] = 5;
@@ -1572,41 +1331,40 @@ void test_pow(eT exponent)
 
 
 
-TEST_CASE("eop_pow")
+TEMPLATE_TEST_CASE("eop_pow_1", "[eop_scalar]", double, float)
   {
-  test_pow<float>(0);
-  test_pow<float>(1);
-  test_pow<float>(2);
-  test_pow<float>(3);
-  test_pow<float>(-1);
-  test_pow<double>(0);
-  test_pow<double>(1);
-  test_pow<double>(2);
-  test_pow<double>(3);
-  test_pow<double>(-1);
-  test_pow<u32>(0);
-  test_pow<u32>(1);
-  test_pow<u32>(2);
-  test_pow<u32>(3);
-  test_pow<s32>(0);
-  test_pow<s32>(1);
-  test_pow<s32>(2);
-  test_pow<s32>(3);
-  test_pow<u64>(0);
-  test_pow<u64>(1);
-  test_pow<u64>(2);
-  test_pow<u64>(3);
-  test_pow<s64>(0);
-  test_pow<s64>(1);
-  test_pow<s64>(2);
-  test_pow<s64>(3);
+  typedef TestType eT;
+
+  test_pow<eT>(0);
+  test_pow<eT>(1);
+  test_pow<eT>(2);
+  test_pow<eT>(3);
+  test_pow<eT>(-1);
   }
 
 
 
-template<typename eT>
-void test_floor()
+TEMPLATE_TEST_CASE("eop_pow_2", "[eop_scalar]", u32, s32, u64, s64)
   {
+  typedef TestType eT;
+
+  test_pow<eT>(0);
+  test_pow<eT>(1);
+  test_pow<eT>(2);
+  test_pow<eT>(3);
+  }
+
+
+
+TEMPLATE_TEST_CASE("eop_floor", "[eop_scalar]", double, float, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   arma::mat xd_cpu(5, 5, arma::fill::randu);
   xd_cpu *= 50;
   arma::Mat<eT> x_cpu = arma::conv_to<arma::Mat<eT>>::from(xd_cpu);
@@ -1627,21 +1385,15 @@ void test_floor()
 
 
 
-TEST_CASE("eop_floor")
+TEMPLATE_TEST_CASE("eop_ceil", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_floor<float>();
-  test_floor<double>();
-  test_floor<u32>();
-  test_floor<s32>();
-  test_floor<u64>();
-  test_floor<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_ceil()
-  {
   arma::mat xd_cpu(5, 5, arma::fill::randu);
   xd_cpu *= 50;
   arma::Mat<eT> x_cpu = arma::conv_to<arma::Mat<eT>>::from(xd_cpu);
@@ -1662,21 +1414,15 @@ void test_ceil()
 
 
 
-TEST_CASE("eop_ceil")
+TEMPLATE_TEST_CASE("eop_round", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_ceil<float>();
-  test_ceil<double>();
-  test_ceil<u32>();
-  test_ceil<s32>();
-  test_ceil<u64>();
-  test_ceil<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_round()
-  {
   arma::mat xd_cpu(5, 5, arma::fill::randu);
   xd_cpu *= 50;
   arma::Mat<eT> x_cpu = arma::conv_to<arma::Mat<eT>>::from(xd_cpu);
@@ -1697,21 +1443,15 @@ void test_round()
 
 
 
-TEST_CASE("eop_round")
+TEMPLATE_TEST_CASE("eop_trunc", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_round<float>();
-  test_round<double>();
-  test_round<u32>();
-  test_round<s32>();
-  test_round<u64>();
-  test_round<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_trunc()
-  {
   arma::mat xd_cpu(5, 5, arma::fill::randu);
   xd_cpu *= 50;
   arma::Mat<eT> x_cpu = arma::conv_to<arma::Mat<eT>>::from(xd_cpu);
@@ -1732,21 +1472,15 @@ void test_trunc()
 
 
 
-TEST_CASE("eop_trunc")
+TEMPLATE_TEST_CASE("eop_sign", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_trunc<float>();
-  test_trunc<double>();
-  test_trunc<u32>();
-  test_trunc<s32>();
-  test_trunc<u64>();
-  test_trunc<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_sign()
-  {
   arma::mat xd_cpu(5, 5, arma::fill::randu);
   xd_cpu *= 50;
   arma::Mat<eT> x_cpu = arma::conv_to<arma::Mat<eT>>::from(xd_cpu);
@@ -1767,21 +1501,15 @@ void test_sign()
 
 
 
-TEST_CASE("eop_sign")
+TEMPLATE_TEST_CASE("eop_erf", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_sign<float>();
-  test_sign<double>();
-  test_sign<u32>();
-  test_sign<s32>();
-  test_sign<u64>();
-  test_sign<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_erf()
-  {
   arma::mat xd_cpu(5, 5, arma::fill::randu);
   xd_cpu *= 50;
   arma::Mat<eT> x_cpu = arma::conv_to<arma::Mat<eT>>::from(xd_cpu);
@@ -1806,21 +1534,15 @@ void test_erf()
 
 
 
-TEST_CASE("eop_erf")
+TEMPLATE_TEST_CASE("eop_erfc", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_erf<float>();
-  test_erf<double>();
-  test_erf<u32>();
-  test_erf<s32>();
-  test_erf<u64>();
-  test_erf<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_erfc()
-  {
   arma::mat xd_cpu(5, 5, arma::fill::randu);
   xd_cpu *= 50;
   arma::Mat<eT> x_cpu = arma::conv_to<arma::Mat<eT>>::from(xd_cpu);
@@ -1845,21 +1567,15 @@ void test_erfc()
 
 
 
-TEST_CASE("eop_erfc")
+TEMPLATE_TEST_CASE("eop_lgamma", "[eop_scalar]", double, float, u32, s32, u64, s64)
   {
-  test_erfc<float>();
-  test_erfc<double>();
-  test_erfc<u32>();
-  test_erfc<s32>();
-  test_erfc<u64>();
-  test_erfc<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_lgamma()
-  {
   arma::mat xd_cpu(5, 5, arma::fill::randu);
   xd_cpu *= 5;
   xd_cpu += 1; // lgamma(x) is undefined for x <= 0
@@ -1877,16 +1593,4 @@ void test_lgamma()
       REQUIRE( eT(y(r, c)) == Approx(eT(y_cpu(r, c))) );
       }
     }
-  }
-
-
-
-TEST_CASE("eop_lgamma")
-  {
-  test_lgamma<float>();
-  test_lgamma<double>();
-  test_lgamma<u32>();
-  test_lgamma<s32>();
-  test_lgamma<u64>();
-  test_lgamma<s64>();
   }
