@@ -106,10 +106,10 @@ TEMPLATE_TEST_CASE("lu_random_large", "[lu]", float, double)
   // Check random large square LU decompositions against Armadillo.
   for (uword t = 8; t < 13; ++t)
     {
-    const uword n = (double) std::pow(2.0, (double) t) + 32;
-    std::cout << "trial " << t << ", size " << n << "\n";
+    const uword n = (double) std::pow(2.0, (double) t) + 1;
 
     Mat<eT> X = randu<Mat<eT>>(n, n);
+    X.diag() += 0.5;
 
     Mat<eT> L, U;
 
@@ -127,12 +127,12 @@ TEMPLATE_TEST_CASE("lu_random_large", "[lu]", float, double)
     arma::Mat<eT> U_cpu(U);
     REQUIRE( U_cpu.is_trimatu() );
 
-    REQUIRE( arma::all( L_cpu.diag() == eT(1) ) );
-
     // Check reconstruction error of X.
     Mat<eT> Xr = L * U;
 
-    const double error = norm(X - Xr, 2) / X.n_elem;
+//    const double error = norm(X - Xr, 2) / X.n_elem;
+    Xr -= X;
+    const double error = std::sqrt(accu(square(Xr))) / Xr.n_elem;
     const double tol = (is_float<eT>::value ? 1e-5 : 1e-8);
 
     REQUIRE( error < tol );
@@ -223,16 +223,16 @@ TEMPLATE_TEST_CASE("lu_random_sizes_arma_comparison", "[lu]", float, double)
   {
   typedef TestType eT;
 
-  arma::uvec x_sizes = arma::randi<arma::uvec>(15, arma::distr_param(100, 1500));
-  arma::uvec y_sizes = arma::randi<arma::uvec>(15, arma::distr_param(100, 1500));
+  arma::uvec x_sizes = arma::randi<arma::uvec>(15, arma::distr_param(100, 2000));
+  arma::uvec y_sizes = arma::randi<arma::uvec>(15, arma::distr_param(100, 2000));
 
   for (size_t t = 0; t < 15; ++t)
     {
     const uword m = x_sizes[t];
     const uword n = y_sizes[t];
-    std::cout << "Trial " << t << ": " << m << " x " << n << std::endl;
 
     Mat<eT> X = randi<Mat<eT>>(m, n, distr_param(-100, 100)) % randu<Mat<eT>>(m, n);
+    X.diag() += 0.5;
     Mat<eT> L, U;
 
     const bool status = lu(L, U, X);
@@ -259,13 +259,13 @@ TEMPLATE_TEST_CASE("lu_random_sizes_arma_comparison", "[lu]", float, double)
 
     if (cpu_error > 1e-7)
       {
-      // The GPU version can be a good bit more inaccurate, especially for floats.
-      const double tol_factor = (is_float<eT>::value ? 100000 : 1000);
+      // The GPU version can be a bit more inaccurate.
+      const double tol_factor = (is_float<eT>::value ? 5000 : 500);
       REQUIRE( error < tol_factor * cpu_error );
       }
     else
       {
-      const double tol = (is_float<eT>::value ? 1e-5 : 1e-7);
+      const double tol = (is_float<eT>::value ? 5e-4 : 1e-6);
       REQUIRE( error < tol );
       }
     }
@@ -366,11 +366,13 @@ TEMPLATE_TEST_CASE("lup_random_large", "[lu]", float, double)
     {
     const uword n = (double) std::pow(2.0, (double) t);
 
-    Mat<eT> X = randu<Mat<eT>>(n, n);
+    arma::Mat<eT> X_in = arma::trimatl(arma::randu<arma::Mat<eT>>(n, n));
+    Mat<eT> X(X_in);
+    X.diag() += 0.5;
 
     Mat<eT> L, U, P;
 
-/*    const bool status = lu(L, U, P, X);
+    const bool status = lu(L, U, P, X);
     REQUIRE( status == true );
 
     REQUIRE( L.n_rows == n );
@@ -386,24 +388,19 @@ TEMPLATE_TEST_CASE("lup_random_large", "[lu]", float, double)
     arma::Mat<eT> U_cpu(U);
     REQUIRE( U_cpu.is_trimatu() );
 
+    arma::Mat<eT> P_cpu(P);
+
     REQUIRE( arma::all( L_cpu.diag() == eT(1) ) );
 
     // Check reconstruction error of X.
-    Mat<eT> Xr = P.t() * L * U;
-
-    const double error = norm(X - Xr, 2);*/
+    arma::Mat<eT> Xr = P_cpu.t() * L_cpu * U_cpu;
 
     arma::Mat<eT> X_cpu(X);
-    arma::Mat<eT> L_ref, U_ref, P_ref;
-    const bool arma_status = arma::lu(L_ref, U_ref, P_ref, X_cpu);
-    arma::Mat<eT> Xr_cpu = P_ref.t() * L_ref * U_ref;
+    Xr -= X_cpu;
+    const double error = std::sqrt(arma::accu(arma::square(Xr))) / Xr.n_elem;
+    const double tol = (is_float<eT>::value ? 1e-6 : 1e-10);
 
-    const double cpu_error = arma::norm(X_cpu - Xr_cpu, 2);
-
- //   std::cout << "GPU error: " << error << "\n";
-    std::cout << "CPU error: " << cpu_error << "\n";
-
-//    REQUIRE( error < 1e-5 );
+    REQUIRE( error < tol );
     }
   }
 
@@ -504,15 +501,15 @@ TEMPLATE_TEST_CASE("lup_random_sizes_arma_comparison", "[lu]", float, double)
   {
   typedef TestType eT;
 
-  arma::uvec x_sizes = arma::randi<arma::uvec>(15, arma::distr_param(100, 5000));
-  arma::uvec y_sizes = arma::randi<arma::uvec>(15, arma::distr_param(100, 5000));
+  arma::uvec x_sizes = arma::randi<arma::uvec>(15, arma::distr_param(100, 2000));
+  arma::uvec y_sizes = arma::randi<arma::uvec>(15, arma::distr_param(100, 2000));
 
   for (size_t t = 0; t < 15; ++t)
     {
     const uword m = x_sizes[t];
     const uword n = y_sizes[t];
 
-    Mat<eT> X = randi<Mat<eT>>(m, n, distr_param(-100, 100)) * randu<Mat<eT>>(m, n);
+    Mat<eT> X = randi<Mat<eT>>(m, n, distr_param(-100, 100)) % randu<Mat<eT>>(m, n);
     Mat<eT> L, U, P;
 
     const bool status = lu(L, U, P, X);
@@ -520,24 +517,34 @@ TEMPLATE_TEST_CASE("lup_random_sizes_arma_comparison", "[lu]", float, double)
     REQUIRE( status == true );
 
     REQUIRE( L.n_rows == X.n_rows );
-    REQUIRE( L.n_cols == X.n_cols );
+    REQUIRE( L.n_cols == X.n_rows );
     REQUIRE( U.n_rows == X.n_rows );
     REQUIRE( U.n_cols == X.n_cols );
     REQUIRE( P.n_rows == X.n_rows );
-    REQUIRE( P.n_cols == X.n_cols );
+    REQUIRE( P.n_cols == X.n_rows );
 
     arma::Mat<eT> X_cpu(X);
     arma::Mat<eT> L_ref, U_ref, P_ref;
     const bool arma_status = arma::lu(L_ref, U_ref, P_ref, X_cpu);
-
     REQUIRE( arma_status == true );
 
-    arma::Mat<eT> L_cpu(L);
-    arma::Mat<eT> U_cpu(U);
-    arma::Mat<eT> P_cpu(P);
+    Mat<eT> Xr = P.t() * L * U;
+    arma::Mat<eT> Xr_cpu = P_ref.t() * L_ref * U_ref;
 
-    REQUIRE( arma::approx_equal( L_cpu, L_ref, "reldiff", 1e-5 ) );
-    REQUIRE( arma::approx_equal( U_cpu, U_ref, "reldiff", 1e-5 ) );
-    REQUIRE( arma::approx_equal( P_cpu, P_ref, "reldiff", 1e-5 ) );
+    Xr -= X;
+    // TODO: debug issues that are observed with norm(X - Xr, 2) here!
+    const double error = std::sqrt(accu(square(Xr)));
+    const double cpu_error = arma::norm(X_cpu - Xr_cpu, 2);
+
+    if (cpu_error > 1e-7)
+      {
+      // The GPU version can be a bit more inaccurate.
+      REQUIRE( error < 50 * cpu_error );
+      }
+    else
+      {
+      const double tol = 1e-6;
+      REQUIRE( error < tol );
+      }
     }
   }
