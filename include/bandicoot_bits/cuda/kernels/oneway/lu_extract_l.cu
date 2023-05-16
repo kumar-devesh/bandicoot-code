@@ -22,6 +22,12 @@ COOT_FN(PREFIX,lu_extract_l)(eT1* L,
   {
   const UWORD row = blockIdx.x * blockDim.x + threadIdx.x;
   const UWORD col = blockIdx.y * blockDim.y + threadIdx.y;
+
+  // Note that U might not be square, but L must be.
+  // If n_cols > n_rows, then U is upper trapezoidal.
+  // If n_rows > n_cols, then L is lower trapezoidal.
+  // However, L is always square (size n_rows x n_rows).
+
   const UWORD index = row + n_rows * col;
 
   if( (row < n_rows) && (col < n_cols))
@@ -31,5 +37,9 @@ COOT_FN(PREFIX,lu_extract_l)(eT1* L,
       L[index] = (row > col) ? U[index] : ((row == col) ? 1 : 0);
       }
     U[index] = (row > col) ? 0 : U[index];
+    }
+  else if ( (row < n_rows) && (col < n_rows) ) // L has size n_rows x n_rows
+    {
+    L[index] = (row == col) ? 1 : 0; // there is no corresponding entry in U
     }
   }

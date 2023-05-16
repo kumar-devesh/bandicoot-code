@@ -31,7 +31,8 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
 
   // This is an additional error code for cusolverDn; but it is an error code on the device...
   int* dev_info = NULL;
-  cudaMalloc(&dev_info, sizeof(int));
+  status2 = cudaMalloc((void**) &dev_info, sizeof(int));
+  coot_check_cuda_error(status2, "coot::cuda::lu(): couldn't cudaMalloc() device info holder");
 
   cudaDataType data_type;
   if (is_float<eT>::value)
@@ -57,8 +58,8 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
                                        U.cuda_mem_ptr,
                                        n_rows,
                                        data_type,
-                                       &host_workspace_size,
-                                       &gpu_workspace_size);
+                                       &gpu_workspace_size,
+                                       &host_workspace_size);
   coot_check_cusolver_error(status, "coot::cuda::lu(): couldn't compute workspace size with cusolverDnXgetrf_bufferSize()");
 
   s64* ipiv = NULL;
@@ -90,16 +91,18 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
                             (void*) host_workspace,
                             host_workspace_size,
                             dev_info);
+  coot_check_cusolver_error(status, "coot::cuda::lu(): cusolverDnXgetrf() failed");
 
   status2 = cudaFree(gpu_workspace);
   coot_check_cuda_error(status2, "coot::cuda::lu(): couldn't cudaFree() GPU workspace memory");
-  status2 = cudaFree(dev_info);
-  coot_check_cuda_error(status2, "coot::cuda::lu(): couldn't cudaFree() device info holder");
   cpu_memory::release(host_workspace);
 
   // Check whether the factorisation was successful.
   int info_result;
   status2 = cudaMemcpy(&info_result, dev_info, sizeof(int), cudaMemcpyDeviceToHost);
+  coot_check_cuda_error(status2, "coot::cuda::lu(): couldn't copy device info holder to host");
+  status2 = cudaFree(dev_info);
+  coot_check_cuda_error(status2, "coot::cuda::lu(): couldn't cudaFree() device info holder");
   if (info_result < 0)
     {
     std::ostringstream oss;
@@ -124,7 +127,8 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
       (uword*) &n_rows,
       (uword*) &n_cols };
 
-  const kernel_dims dims = two_dimensional_grid_dims(n_rows, n_cols);
+  const size_t max_rc = std::max(n_rows, n_cols);
+  const kernel_dims dims = two_dimensional_grid_dims(n_rows, max_rc);
 
   CUresult status3 = cuLaunchKernel(
       kernel,
@@ -149,7 +153,7 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
 
     for (uword i = 0; i < ipiv_size; ++i)
       {
-      const int k = ipiv_cpu[i];
+      const int k = ipiv_cpu[i] - 1; // cusolverDnXgetrf() returns one-indexed results
 
       if (ipiv2[i] != ipiv2[k])
         {
@@ -172,7 +176,7 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
         &(ipiv_gpu.cuda_mem_ptr),
         (uword*) &n_rows };
 
-    const kernel_dims dims2 = one_dimensional_grid_dims(ipiv_size);
+    const kernel_dims dims2 = one_dimensional_grid_dims(n_rows);
 
     status3 = cuLaunchKernel(
         kernel,
