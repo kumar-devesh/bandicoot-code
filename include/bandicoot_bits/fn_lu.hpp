@@ -1,4 +1,4 @@
-// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2023 Ryan Curtin (http://www.ratml.org)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ lu
     return true;
     }
 
-  const bool status = coot_rt_t::lu(L.get_dev_mem(false), U.get_dev_mem(false), false /* no pivoting */, U.get_dev_mem(false) /* ignored */, U.n_rows, U.n_cols);
+  const bool status = coot_rt_t::lu(L.get_dev_mem(true), U.get_dev_mem(true), false /* no pivoting */, U.get_dev_mem(false) /* ignored */, U.n_rows, U.n_cols);
 
   return status;
   }
@@ -80,7 +80,7 @@ lu
     return true;
     }
 
-  const bool status = coot_rt_t::lu(L.get_dev_mem(false), U.get_dev_mem(false), true, P.get_dev_mem(false), U.n_rows, U.n_cols);
+  const bool status = coot_rt_t::lu(L.get_dev_mem(true), U.get_dev_mem(true), true, P.get_dev_mem(true), U.n_rows, U.n_cols);
 
   return status;
   }
