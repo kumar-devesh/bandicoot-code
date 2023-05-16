@@ -1,4 +1,4 @@
-// Copyright 2019 Ryan Curtin (http://www.ratml.org)
+// Copyright 2023 Ryan Curtin (http://www.ratml.org)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
   coot_check_cl_error(status2, "coot::opencl::lu(): failed to set arguments for kernel lu_extract_l");
 
   size_t global_work_offset[2] = { 0, 0 };
-  size_t global_work_size[2] = { size_t(n_rows), size_t(n_cols) };
+  size_t global_work_size[2] = { size_t(n_rows), size_t(std::max(n_rows, n_cols)) };
 
   status2 = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 2, global_work_offset, global_work_size, NULL, 0, NULL, NULL);
 
@@ -101,7 +101,7 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
 
     for (uword i = 0; i < ipiv_size; ++i)
       {
-      const uword k = (uword) ipiv[i];
+      const uword k = (uword) ipiv[i] - 1; // the original data is returned in a 1-indexed way
 
       if (ipiv2[i] != ipiv2[k])
         {
@@ -117,8 +117,6 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
 
     kernel = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::lu_extract_p);
 
-    runtime_t::adapt_uword cl_ipiv_size(ipiv_size);
-
     status2  = clSetKernelArg(kernel, 0, sizeof(cl_mem),    &(P.cl_mem_ptr));
     status2 |= clSetKernelArg(kernel, 1, sizeof(cl_mem),    &(ipiv_gpu.cl_mem_ptr));
     status2 |= clSetKernelArg(kernel, 2, dev_n_rows.size,   dev_n_rows.addr);
@@ -126,13 +124,15 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
     coot_check_cl_error(status2, "coot::opencl::lu(): failed to set arguments for kernel lu_extract_p");
 
     size_t global_work_offset_2 = 0;
-    size_t global_work_size_2   = ipiv_size;
+    size_t global_work_size_2   = n_rows;
 
     status2 = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, &global_work_offset_2, &global_work_size_2, NULL, 0, NULL, NULL);
 
     coot_check_cl_error(status2, "coot::opencl::lu(): failed to run kernel lu_extract_p");
+
+    get_rt().cl_rt.synchronise();
+    get_rt().cl_rt.release_memory(ipiv_gpu.cl_mem_ptr);
     }
 
   return true;
-
   }
