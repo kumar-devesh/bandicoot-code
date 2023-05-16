@@ -23,6 +23,6 @@ COOT_FN(PREFIX,lu_extract_p)(__global eT1* P,
   if (row < n_rows)
     {
     const UWORD index = row + ipiv2[row] * n_rows;
-    P[index] = (UWORD) 1;
+    P[index] = (eT1) 1;
     }
   }
