@@ -29,6 +29,11 @@ inline std::string error_as_string(const magma_int_t error_code)
     case MAGMA_ERR_UNKNOWN:           return "MAGMA_ERR_UNKNOWN (unspecified error)";
     case MAGMA_ERR_NOT_IMPLEMENTED:   return "MAGMA_ERR_NOT_IMPLEMENTED";
     case MAGMA_ERR_NAN:               return "MAGMA_ERR_NAN (NaN detected)";
-    default:                          return "unspecified MAGMA error code";
+    default:
+      {
+      std::ostringstream oss;
+      oss << "unspecified MAGMA error code (" << error_code << ")";
+      return oss.str();
+      }
     }
   }
