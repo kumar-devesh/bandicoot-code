@@ -53,7 +53,7 @@ magma_int_t
 magma_get_dgetrf_nb(magma_int_t m)
   {
   if      (m <= 2048) return 64;
-  else if (m <  7200) return 192;
+  else if (m <  7200) return 128; // clMAGMA uses 192 here, but for unknown reasons this seems to cause very bad results
   else                return 256;
   }
 
