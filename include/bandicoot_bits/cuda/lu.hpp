@@ -64,12 +64,10 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
 
   s64* ipiv = NULL;
   const uword ipiv_size = std::min(n_rows, n_cols);
-  if (pivoting)
-    {
-    // Allocate space for pivots.
-    status2 = cudaMalloc((void**) &ipiv, sizeof(s64) * ipiv_size);
-    coot_check_cuda_error(status2, "coot::cuda::lu(): couldn't cudaMalloc() pivot array");
-    }
+
+  // Allocate space for pivots.
+  status2 = cudaMalloc((void**) &ipiv, sizeof(s64) * ipiv_size);
+  coot_check_cuda_error(status2, "coot::cuda::lu(): couldn't cudaMalloc() pivot array");
 
   void* gpu_workspace = NULL;
   status2 = cudaMalloc((void**) &gpu_workspace, gpu_workspace_size);
@@ -118,14 +116,48 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
     coot_stop_runtime_error(oss.str());
     }
 
-  // Now extract the lower triangular part (excluding diagonal).  This is done with a custom kernel.
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::lu_extract_l);
+  // First the pivoting needs to be "unwound" into a way where we can make P.
+  uword* ipiv2 = cpu_memory::acquire<uword>(n_rows);
+  for (uword i = 0; i < n_rows; ++i)
+    {
+    ipiv2[i] = i;
+    }
 
-  const void* args[] = {
-      &(L.cuda_mem_ptr),
-      &(U.cuda_mem_ptr),
-      (uword*) &n_rows,
-      (uword*) &n_cols };
+  s64* ipiv_cpu = cpu_memory::acquire<s64>(ipiv_size);
+  status2 = cudaMemcpy(ipiv_cpu, ipiv, ipiv_size * sizeof(s64), cudaMemcpyDeviceToHost);
+  coot_check_cuda_error(status2, "coot::cuda::lu(): couldn't copy pivot array from GPU");
+
+  for (uword i = 0; i < ipiv_size; ++i)
+    {
+    const int k = ipiv_cpu[i] - 1; // cusolverDnXgetrf() returns one-indexed results
+
+    if (ipiv2[i] != ipiv2[k])
+      {
+      std::swap( ipiv2[i], ipiv2[k] );
+      }
+    }
+
+  dev_mem_t<uword> ipiv_gpu;
+  ipiv_gpu.cuda_mem_ptr = get_rt().cuda_rt.acquire_memory<uword>(n_rows);
+  copy_into_dev_mem(ipiv_gpu, ipiv2, n_rows);
+  cpu_memory::release(ipiv_cpu);
+  cpu_memory::release(ipiv2);
+  status2 = cudaFree(ipiv);
+  coot_check_cuda_error(status2, "coot::cuda::lu(): couldn't cudaFree() pivot array");
+
+  // Now extract the lower triangular part (excluding diagonal).  This is done with a custom kernel.
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(pivoting ? oneway_kernel_id::lu_extract_l : oneway_kernel_id::lu_extract_pivoted_l);
+
+  const void* pivot_args[] = { &(L.cuda_mem_ptr),
+                               &(U.cuda_mem_ptr),
+                               (uword*) &n_rows,
+                               (uword*) &n_cols };
+
+  const void* nopivot_args[] = { &(L.cuda_mem_ptr),
+                                 &(U.cuda_mem_ptr),
+                                 (uword*) &n_rows,
+                                 (uword*) &n_cols,
+                                 &(ipiv_gpu.cuda_mem_ptr) };
 
   const size_t max_rc = std::max(n_rows, n_cols);
   const kernel_dims dims = two_dimensional_grid_dims(n_rows, max_rc);
@@ -133,42 +165,13 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
   CUresult status3 = cuLaunchKernel(
       kernel,
       dims.d[0], dims.d[1], dims.d[2], dims.d[3], dims.d[4], dims.d[5],
-      0, NULL, (void**) args, 0);
+      0, NULL, (pivoting ? (void**) pivot_args : (void**) nopivot_args), 0);
 
-  coot_check_cuda_error(status3, "coot::cuda::lu(): cuLaunchKernel() failed for lu_extract_l kernel");
+  coot_check_cuda_error(status3, "coot::cuda::lu(): cuLaunchKernel() failed for " + (pivoting ? std::string("lu_extract_l") : std::string("lu_extract_pivoted_l")) + " kernel");
 
   // If pivoting was allowed, extract the permutation matrix.
   if (pivoting)
     {
-    // First the pivoting needs to be "unwound" into a way where we can make P.
-    uword* ipiv2 = cpu_memory::acquire<uword>(n_rows);
-    for (uword i = 0; i < n_rows; ++i)
-      {
-      ipiv2[i] = i;
-      }
-
-    s64* ipiv_cpu = cpu_memory::acquire<s64>(ipiv_size);
-    status2 = cudaMemcpy(ipiv_cpu, ipiv, ipiv_size * sizeof(s64), cudaMemcpyDeviceToHost);
-    coot_check_cuda_error(status2, "coot::cuda::lu(): couldn't copy pivot array from GPU");
-
-    for (uword i = 0; i < ipiv_size; ++i)
-      {
-      const int k = ipiv_cpu[i] - 1; // cusolverDnXgetrf() returns one-indexed results
-
-      if (ipiv2[i] != ipiv2[k])
-        {
-        std::swap( ipiv2[i], ipiv2[k] );
-        }
-      }
-
-    dev_mem_t<uword> ipiv_gpu;
-    ipiv_gpu.cuda_mem_ptr = get_rt().cuda_rt.acquire_memory<uword>(n_rows);
-    copy_into_dev_mem(ipiv_gpu, ipiv2, n_rows);
-    cpu_memory::release(ipiv_cpu);
-    cpu_memory::release(ipiv2);
-    status2 = cudaFree(ipiv);
-    coot_check_cuda_error(status2, "coot::cuda::lu(): couldn't cudaFree() pivot array");
-
     kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::lu_extract_p);
 
     const void* args2[] = {
@@ -184,6 +187,9 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
         0, NULL, (void**) args2, 0);
     coot_check_cuda_error(status3, "coot::cuda::lu(): cuLaunchKernel() failed for lu_extract_p kernel");
     }
+
+  get_rt().cuda_rt.synchronise();
+  get_rt().cuda_rt.release_memory(ipiv_gpu.cuda_mem_ptr);
 
   return true;
   }
