@@ -19,20 +19,18 @@
  */
 template<typename eT>
 inline
-bool
+std::tuple<bool, std::string>
 lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const uword n_rows, const uword n_cols)
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "coot::cuda::lu(): CUDA runtime not valid");
+  if (get_rt().cuda_rt.is_valid() == false)
+    {
+    return std::make_tuple(false, "CUDA runtime not valid");
+    }
 
   cusolverStatus_t status;
   cudaError_t status2;
-
-  // This is an additional error code for cusolverDn; but it is an error code on the device...
-  int* dev_info = NULL;
-  status2 = cudaMalloc((void**) &dev_info, sizeof(int));
-  coot_check_cuda_error(status2, "coot::cuda::lu(): couldn't cudaMalloc() device info holder");
 
   cudaDataType data_type;
   if (is_float<eT>::value)
@@ -45,7 +43,15 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
     }
   else
     {
-    coot_stop_runtime_error("coot::cuda::lu(): unknown data type, must be float or double");
+    return std::make_tuple(false, "unknown data type, must be float or double");
+    }
+
+  // This is an additional error code for cusolverDn; but it is an error code on the device...
+  int* dev_info = NULL;
+  status2 = cudaMalloc((void**) &dev_info, sizeof(int));
+  if (status2 != cudaSuccess)
+    {
+    return std::make_tuple(false, "couldn't cudaMalloc() device info holder");
     }
 
   size_t host_workspace_size = 0;
@@ -60,18 +66,31 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
                                        data_type,
                                        &gpu_workspace_size,
                                        &host_workspace_size);
-  coot_check_cusolver_error(status, "coot::cuda::lu(): couldn't compute workspace size with cusolverDnXgetrf_bufferSize()");
+  if (status != CUSOLVER_STATUS_SUCCESS)
+    {
+    cudaFree(dev_info);
+    return std::make_tuple(false, "couldn't compute workspace size with cusolverDnXgetrf_bufferSize()");
+    }
 
   s64* ipiv = NULL;
   const uword ipiv_size = std::min(n_rows, n_cols);
 
   // Allocate space for pivots.
   status2 = cudaMalloc((void**) &ipiv, sizeof(s64) * ipiv_size);
-  coot_check_cuda_error(status2, "coot::cuda::lu(): couldn't cudaMalloc() pivot array");
+  if (status2 != cudaSuccess)
+    {
+    cudaFree(dev_info);
+    return std::make_tuple(false, "couldn't cudaMalloc() pivot array");
+    }
 
   void* gpu_workspace = NULL;
   status2 = cudaMalloc((void**) &gpu_workspace, gpu_workspace_size);
-  coot_check_cuda_error(status2, "coot::cuda::lu(): couldn't cudaMalloc() GPU workspace memory");
+  if (status2 != cudaSuccess)
+    {
+    cudaFree(dev_info);
+    cudaFree(ipiv);
+    return std::make_tuple(false, "couldn't cudaMalloc() GPU workspace memory");
+    }
 
   char* host_workspace = cpu_memory::acquire<char>(host_workspace_size);
 
@@ -89,31 +108,40 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
                             (void*) host_workspace,
                             host_workspace_size,
                             dev_info);
-  coot_check_cusolver_error(status, "coot::cuda::lu(): cusolverDnXgetrf() failed");
 
-  status2 = cudaFree(gpu_workspace);
-  coot_check_cuda_error(status2, "coot::cuda::lu(): couldn't cudaFree() GPU workspace memory");
+  cudaFree(gpu_workspace);
   cpu_memory::release(host_workspace);
+
+  if (status != CUSOLVER_STATUS_SUCCESS)
+    {
+    cudaFree(dev_info);
+    cudaFree(ipiv);
+    return std::make_tuple(false, "factorisation via cusolverDnXgetrf() failed");
+    }
 
   // Check whether the factorisation was successful.
   int info_result;
   status2 = cudaMemcpy(&info_result, dev_info, sizeof(int), cudaMemcpyDeviceToHost);
-  coot_check_cuda_error(status2, "coot::cuda::lu(): couldn't copy device info holder to host");
-  status2 = cudaFree(dev_info);
-  coot_check_cuda_error(status2, "coot::cuda::lu(): couldn't cudaFree() device info holder");
+  cudaFree(dev_info);
+  if (status2 != cudaSuccess)
+    {
+    cudaFree(ipiv);
+    return std::make_tuple(false, "couldn't copy device info holder to host");
+    }
+
   if (info_result < 0)
     {
     std::ostringstream oss;
-    oss << "coot::cuda::lu(): parameter " << -info_result << " was incorrect in call to cusolverDnXgetrf()";
-    coot_stop_runtime_error(oss.str());
+    oss << "parameter " << -info_result << " was incorrect in call to cusolverDnXgetrf()";
+    return std::make_tuple(false, oss.str());
     }
   else if (info_result > 0 && info_result < (int) std::max(n_rows, n_cols))
     {
     // Technically any positive info_result indicates a failed decomposition, but it looks like it randomly sometimes returns very large (invalid) numbers.
     // So... we ignore those.
     std::ostringstream oss;
-    oss << "coot::cuda::lu(): decomposition failed, U(" << (info_result - 1) << ", " << (info_result - 1) << ") was found to be 0";
-    coot_stop_runtime_error(oss.str());
+    oss << "decomposition failed, U(" << (info_result - 1) << ", " << (info_result - 1) << ") was found to be 0";
+    return std::make_tuple(false, oss.str());
     }
 
   // First the pivoting needs to be "unwound" into a way where we can make P.
@@ -125,7 +153,14 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
 
   s64* ipiv_cpu = cpu_memory::acquire<s64>(ipiv_size);
   status2 = cudaMemcpy(ipiv_cpu, ipiv, ipiv_size * sizeof(s64), cudaMemcpyDeviceToHost);
-  coot_check_cuda_error(status2, "coot::cuda::lu(): couldn't copy pivot array from GPU");
+  cudaFree(ipiv);
+
+  if (status2 != cudaSuccess)
+    {
+    cpu_memory::release(ipiv2);
+    cpu_memory::release(ipiv_cpu);
+    return std::make_tuple(false, "couldn't copy pivot array from GPU");
+    }
 
   for (uword i = 0; i < ipiv_size; ++i)
     {
@@ -142,8 +177,6 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
   copy_into_dev_mem(ipiv_gpu, ipiv2, n_rows);
   cpu_memory::release(ipiv_cpu);
   cpu_memory::release(ipiv2);
-  status2 = cudaFree(ipiv);
-  coot_check_cuda_error(status2, "coot::cuda::lu(): couldn't cudaFree() pivot array");
 
   // Now extract the lower triangular part (excluding diagonal).  This is done with a custom kernel.
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(pivoting ? oneway_real_kernel_id::lu_extract_l : oneway_real_kernel_id::lu_extract_pivoted_l);
@@ -167,7 +200,11 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
       dims.d[0], dims.d[1], dims.d[2], dims.d[3], dims.d[4], dims.d[5],
       0, NULL, (pivoting ? (void**) pivot_args : (void**) nopivot_args), 0);
 
-  coot_check_cuda_error(status3, "coot::cuda::lu(): cuLaunchKernel() failed for " + (pivoting ? std::string("lu_extract_l") : std::string("lu_extract_pivoted_l")) + " kernel");
+  if (status3 != CUDA_SUCCESS)
+    {
+    get_rt().cuda_rt.release_memory(ipiv_gpu.cuda_mem_ptr);
+    return std::make_tuple(false, "coot::cuda::lu(): cuLaunchKernel() failed for " + (pivoting ? std::string("lu_extract_l") : std::string("lu_extract_pivoted_l")) + " kernel");
+    }
 
   // If pivoting was allowed, extract the permutation matrix.
   if (pivoting)
@@ -185,11 +222,16 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
         kernel,
         dims2.d[0], dims2.d[1], dims2.d[2], dims2.d[3], dims2.d[4], dims2.d[5],
         0, NULL, (void**) args2, 0);
-    coot_check_cuda_error(status3, "coot::cuda::lu(): cuLaunchKernel() failed for lu_extract_p kernel");
+
+    if (status3 != CUDA_SUCCESS)
+      {
+      get_rt().cuda_rt.release_memory(ipiv_gpu.cuda_mem_ptr);
+      return std::make_tuple(false, "cuLaunchKernel() failed for lu_extract_p kernel");
+      }
     }
 
   get_rt().cuda_rt.synchronise();
   get_rt().cuda_rt.release_memory(ipiv_gpu.cuda_mem_ptr);
 
-  return true;
+  return std::make_tuple(true, "");
   }

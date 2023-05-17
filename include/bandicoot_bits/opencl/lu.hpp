@@ -19,20 +19,23 @@
  */
 template<typename eT>
 inline
-bool
+std::tuple<bool, std::string>
 lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const uword n_rows, const uword n_cols)
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::lu(): OpenCL runtime not valid");
+  if (get_rt().cl_rt.is_valid() == false)
+    {
+    return std::make_tuple(false, "OpenCL runtime not valid");
+    }
 
   // We'll perform the operation in-place in U.
 
   magma_int_t info   = 0;
-  magma_int_t status = 0;
+  magma_int_t status = 0; // NOTE: all paths through dgetrf and sgetrf just return status == info...
 
   const uword ipiv_size = (std::min)(n_rows, n_cols);
-  int* ipiv = new int[ipiv_size];
+  int* ipiv = cpu_memory::acquire<int>(ipiv_size);
 
   if(is_float<eT>::value)
     {
@@ -44,13 +47,28 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
     }
   else
     {
-    coot_debug_check( true, "coot::opencl::lu(): not implemented for given type" );
+    return std::make_tuple(false, "unknown data type, must be float or double");
     }
 
-  coot_check_magma_error(status, "coot::opencl::lu(): MAGMA failure in getrf_gpu()");
+  if (status != MAGMA_SUCCESS)
+    {
+    cpu_memory::release(ipiv);
+    if (info < 0)
+      {
+      std::ostringstream oss;
+      oss << "parameter " << -info << " was incorrect in call to MAGMA getrf_gpu()";
+      return std::make_tuple(false, oss.str());
+      }
+    else
+      {
+      std::ostringstream oss;
+      oss << "decomposition failed, U(" << (info - 1) << ", " << (info - 1) << ") was found to be 0";
+      return std::make_tuple(false, oss.str());
+      }
+    }
 
   // First the pivoting needs to be "unwound" into a way where we can make P.
-  uword* ipiv2 = new uword[n_rows];
+  uword* ipiv2 = cpu_memory::acquire<uword>(n_rows);
   for (uword i = 0; i < n_rows; ++i)
     {
     ipiv2[i] = i;
@@ -69,8 +87,8 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
   dev_mem_t<uword> ipiv_gpu;
   ipiv_gpu.cl_mem_ptr = get_rt().cl_rt.acquire_memory<uword>(n_rows);
   copy_into_dev_mem(ipiv_gpu, ipiv2, n_rows);
-  delete[] ipiv;
-  delete[] ipiv2;
+  cpu_memory::release(ipiv);
+  cpu_memory::release(ipiv2);
 
   // Now extract the lower triangular part (excluding diagonal).  This is done with a custom kernel.
   cl_int status2 = 0;
@@ -92,14 +110,22 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
     status2 |= clSetKernelArg(kernel, 4, sizeof(cl_mem), &(ipiv_gpu.cl_mem_ptr));
     }
 
-  coot_check_cl_error(status2, "coot::opencl::lu(): failed to set arguments for kernel " + (pivoting ? std::string("lu_extract_l") : std::string("lu_extract_pivoted_l")));
+  if (status2 != CL_SUCCESS)
+    {
+    get_rt().cl_rt.release_memory(ipiv_gpu.cl_mem_ptr);
+    return std::make_tuple(false, "failed to set arguments for kernel " + (pivoting ? std::string("lu_extract_l") : std::string("lu_extract_pivoted_l")));
+    }
 
   size_t global_work_offset[2] = { 0, 0 };
   size_t global_work_size[2] = { size_t(n_rows), size_t(std::max(n_rows, n_cols)) };
 
   status2 = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 2, global_work_offset, global_work_size, NULL, 0, NULL, NULL);
 
-  coot_check_cl_error(status2, "coot::opencl::lu(): failed to run kernel " + (pivoting ? std::string("lu_extract_l") : std::string("lu_extract_pivoted_l")));
+  if (status2 != CL_SUCCESS)
+    {
+    get_rt().cl_rt.release_memory(ipiv_gpu.cl_mem_ptr);
+    return std::make_tuple(false, "failed to run kernel " + (pivoting ? std::string("lu_extract_l") : std::string("lu_extract_pivoted_l")));
+    }
 
   // If pivoting was allowed, extract the permutation matrix.
   if (pivoting)
@@ -110,19 +136,26 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
     status2 |= clSetKernelArg(kernel, 1, sizeof(cl_mem),    &(ipiv_gpu.cl_mem_ptr));
     status2 |= clSetKernelArg(kernel, 2, dev_n_rows.size,   dev_n_rows.addr);
 
-    coot_check_cl_error(status2, "coot::opencl::lu(): failed to set arguments for kernel lu_extract_p");
+    if (status2 != CL_SUCCESS)
+      {
+      get_rt().cl_rt.release_memory(ipiv_gpu.cl_mem_ptr);
+      return std::make_tuple(false, "failed to set arguments for kernel lu_extract_p");
+      }
 
     size_t global_work_offset_2 = 0;
     size_t global_work_size_2   = n_rows;
 
     status2 = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, &global_work_offset_2, &global_work_size_2, NULL, 0, NULL, NULL);
 
-    coot_check_cl_error(status2, "coot::opencl::lu(): failed to run kernel lu_extract_p");
-
+    if (status2 != CL_SUCCESS)
+      {
+      get_rt().cl_rt.release_memory(ipiv_gpu.cl_mem_ptr);
+      return std::make_tuple(false, "failed to run kernel lu_extract_p");
+      }
     }
 
   get_rt().cl_rt.synchronise();
   get_rt().cl_rt.release_memory(ipiv_gpu.cl_mem_ptr);
 
-  return true;
+  return std::make_tuple(true, "");
   }

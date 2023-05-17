@@ -42,9 +42,13 @@ lu
     return true;
     }
 
-  const bool status = coot_rt_t::lu(L.get_dev_mem(true), U.get_dev_mem(true), false /* no pivoting */, U.get_dev_mem(false) /* ignored */, U.n_rows, U.n_cols);
+  const std::tuple<bool, std::string> result = coot_rt_t::lu(L.get_dev_mem(true), U.get_dev_mem(true), false /* no pivoting */, U.get_dev_mem(false) /* ignored */, U.n_rows, U.n_cols);
+  if (!std::get<0>(result))
+    {
+    coot_debug_warn("lu(): " + std::get<1>(result));
+    }
 
-  return status;
+  return std::get<0>(result);
   }
 
 
@@ -80,7 +84,11 @@ lu
     return true;
     }
 
-  const bool status = coot_rt_t::lu(L.get_dev_mem(true), U.get_dev_mem(true), true, P.get_dev_mem(true), U.n_rows, U.n_cols);
+  const std::tuple<bool, std::string> result = coot_rt_t::lu(L.get_dev_mem(true), U.get_dev_mem(true), true, P.get_dev_mem(true), U.n_rows, U.n_cols);
+  if (!std::get<0>(result))
+    {
+    coot_debug_warn("lu(): " + std::get<1>(result));
+    }
 
-  return status;
+  return std::get<0>(result);
   }

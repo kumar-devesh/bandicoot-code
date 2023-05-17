@@ -1257,7 +1257,7 @@ coot_rt_t::chol(dev_mem_t<eT> out, const uword n_rows)
 
 template<typename eT>
 inline
-bool
+std::tuple<bool, std::string>
 coot_rt_t::lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const uword n_rows, const uword n_cols)
   {
   coot_extra_debug_sigprint();
@@ -1283,7 +1283,7 @@ coot_rt_t::lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<e
     coot_stop_runtime_error("coot_rt::lu(): unknown backend");
     }
 
-  return false; // fix warnings
+  return std::make_tuple(false, ""); // fix warnings
   }
 
 
