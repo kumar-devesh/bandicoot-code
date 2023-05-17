@@ -16,7 +16,7 @@
 
 struct kernel_src
   {
-  static inline const std::string&  get_src_preamble();
+  static inline const std::string&  get_src_preamble(const bool has_float64);
 
   static inline const std::string&  get_zeroway_source();
   static inline       std::string  init_zeroway_source();
@@ -46,7 +46,7 @@ struct kernel_src
 
 inline
 const std::string&
-kernel_src::get_src_preamble()
+kernel_src::get_src_preamble(const bool has_float64)
   {
   char u32_max[32];
   char u64_max[32];
@@ -96,23 +96,29 @@ kernel_src::get_src_preamble()
   "inline long coot_type_max_long() { return " + std::string(s64_max) + "; } \n"
   "\n"
   "inline float coot_type_min_float() { return FLT_MIN; } \n"
-  "inline double coot_type_min_double() { return DBL_MIN; } \n"
-  "inline float coot_type_max_float() { return FLT_MAX; } \n"
-  "inline double coot_type_max_double() { return DBL_MAX; } \n"
+  "inline float coot_type_max_float() { return FLT_MAX; } \n" +
+  ((has_float64) ?
+      std::string("inline double coot_type_min_double() { return DBL_MIN; } \n"
+                  "inline double coot_type_max_double() { return DBL_MAX; } \n") :
+      std::string("")) +
   "\n"
   "inline bool coot_is_fp_uint() { return false; } \n"
   "inline bool coot_is_fp_int() { return false; } \n"
   "inline bool coot_is_fp_ulong() { return false; } \n"
   "inline bool coot_is_fp_long() { return false; } \n"
-  "inline bool coot_is_fp_float() { return true; } \n"
-  "inline bool coot_is_fp_double() { return true; } \n"
+  "inline bool coot_is_fp_float() { return true; } \n" +
+  ((has_float64) ?
+      std::string("inline bool coot_is_fp_double() { return true; } \n") :
+      std::string("")) +
   "\n"
   "inline bool coot_is_signed_uint() { return false; } \n"
   "inline bool coot_is_signed_int() { return true; } \n"
   "inline bool coot_is_signed_ulong() { return false; } \n"
   "inline bool coot_is_signed_long() { return true; } \n"
-  "inline bool coot_is_signed_float() { return true; } \n"
-  "inline bool coot_is_signed_double() { return true; } \n"
+  "inline bool coot_is_signed_float() { return true; } \n" +
+  ((has_float64) ?
+      std::string("inline bool coot_is_signed_double() { return true; } \n") :
+      std::string("")) +
   "\n"
   // MAGMA-specific macros.
   "#define MAGMA_BLK_X 64 \n"
@@ -129,6 +135,10 @@ kernel_src::get_src_preamble()
   "  int npivots; \n"
   "  int ipiv[MAGMABLAS_LASWP_MAX_PIVOTS]; \n"
   "  } magmablas_laswp_params_t; \n"
+  "\n"
+  // Sometimes we need to approximate Armadillo functionality that uses
+  // double---but double may not be available.  So we do our best...
+  "#define ARMA_FP_TYPE " + ((has_float64) ? std::string("double") : std::string("float")) + " \n"
   ;
 
   return source;

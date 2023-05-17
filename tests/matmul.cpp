@@ -18,9 +18,15 @@
 
 using namespace coot;
 
-template<typename eT>
-void test_mat_mul_square()
+TEMPLATE_TEST_CASE("mat_mul_square", "[matmul]", float, double)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   arma::Mat<eT> cpu_x(20, 20, arma::fill::randu);
   arma::Mat<eT> cpu_y(20, 20, arma::fill::randu);
   arma::Mat<eT> cpu_z = cpu_x * cpu_y;
@@ -41,17 +47,15 @@ void test_mat_mul_square()
 
 
 
-TEST_CASE("mat_mul_square")
+TEMPLATE_TEST_CASE("mat_mul_square_trans_a", "[matmul]", float, double)
   {
-  test_mat_mul_square<float>();
-  test_mat_mul_square<double>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_mat_mul_square_trans_a()
-  {
   arma::Mat<eT> cpu_x(20, 20, arma::fill::randu);
   arma::Mat<eT> cpu_y(20, 20, arma::fill::randu);
   arma::Mat<eT> cpu_z = cpu_x.t() * cpu_y;
@@ -72,17 +76,15 @@ void test_mat_mul_square_trans_a()
 
 
 
-TEST_CASE("mat_mul_square_trans_a")
+TEMPLATE_TEST_CASE("mat_mul_square_trans_b", "[matmul]", float, double)
   {
-  test_mat_mul_square_trans_a<float>();
-  test_mat_mul_square_trans_a<double>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_mat_mul_square_trans_b()
-  {
   arma::Mat<eT> cpu_x(20, 20, arma::fill::randu);
   arma::Mat<eT> cpu_y(20, 20, arma::fill::randu);
   arma::Mat<eT> cpu_z = cpu_x * cpu_y.t();
@@ -103,17 +105,15 @@ void test_mat_mul_square_trans_b()
 
 
 
-TEST_CASE("mat_mul_square_trans_b")
+TEMPLATE_TEST_CASE("mat_mul_square_trans_both", "[matmul]", float, double)
   {
-  test_mat_mul_square_trans_b<float>();
-  test_mat_mul_square_trans_b<double>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_mat_mul_square_trans_both()
-  {
   arma::Mat<eT> cpu_x(20, 20, arma::fill::randu);
   arma::Mat<eT> cpu_y(20, 20, arma::fill::randu);
   arma::Mat<eT> cpu_z = cpu_x.t()  * cpu_y.t();
@@ -134,17 +134,15 @@ void test_mat_mul_square_trans_both()
 
 
 
-TEST_CASE("mat_mul_square_trans_both")
+TEMPLATE_TEST_CASE("mat_mul_nonsquare", "[matmul]", float, double)
   {
-  test_mat_mul_square_trans_both<float>();
-  test_mat_mul_square_trans_both<double>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_mat_mul_nonsquare()
-  {
   arma::Mat<eT> cpu_x(20, 50, arma::fill::randu);
   arma::Mat<eT> cpu_y(50, 20, arma::fill::randu);
   arma::Mat<eT> cpu_z = cpu_x * cpu_y;
@@ -165,17 +163,15 @@ void test_mat_mul_nonsquare()
 
 
 
-TEST_CASE("mat_mul_nonsquare")
+TEMPLATE_TEST_CASE("mat_mul_nonsquare_trans", "[matmul]", float, double)
   {
-  test_mat_mul_nonsquare<float>();
-  test_mat_mul_nonsquare<double>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_mat_mul_nonsquare_trans()
-  {
   arma::Mat<eT> cpu_x(50, 20, arma::fill::randu);
   arma::Mat<eT> cpu_y(20, 50, arma::fill::randu);
   arma::Mat<eT> cpu_z = cpu_x * cpu_y;
@@ -196,17 +192,15 @@ void test_mat_mul_nonsquare_trans()
 
 
 
-TEST_CASE("mat_mul_nonsquare_trans")
+TEMPLATE_TEST_CASE("mat_vec_mul_square", "[matmul]", float, double)
   {
-  test_mat_mul_nonsquare_trans<float>();
-  test_mat_mul_nonsquare_trans<double>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_mat_vec_mul_square()
-  {
   arma::Mat<eT> cpu_A(50, 50, arma::fill::randu);
   arma::Col<eT> cpu_x(50, arma::fill::randu);
   arma::Col<eT> cpu_y = cpu_A * cpu_x;
@@ -224,17 +218,15 @@ void test_mat_vec_mul_square()
 
 
 
-TEST_CASE("mat_vec_mul_square")
+TEMPLATE_TEST_CASE("mat_vec_mul_square_trans", "[matmul]", float, double)
   {
-  test_mat_vec_mul_square<float>();
-  test_mat_vec_mul_square<double>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_mat_vec_mul_square_trans()
-  {
   arma::Mat<eT> cpu_A(50, 50, arma::fill::randu);
   arma::Col<eT> cpu_x(50, arma::fill::randu);
   arma::Col<eT> cpu_y = cpu_A.t() * cpu_x;
@@ -252,17 +244,15 @@ void test_mat_vec_mul_square_trans()
 
 
 
-TEST_CASE("mat_vec_mul_square_trans")
+TEMPLATE_TEST_CASE("mat_vec_mul_nonsquare", "[matmul]", float, double)
   {
-  test_mat_vec_mul_square_trans<float>();
-  test_mat_vec_mul_square_trans<double>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_mat_vec_mul_nonsquare()
-  {
   arma::Mat<eT> cpu_A(10, 50, arma::fill::randu);
   arma::Col<eT> cpu_x(50, arma::fill::randu);
   arma::Col<eT> cpu_y = cpu_A * cpu_x;
@@ -280,17 +270,15 @@ void test_mat_vec_mul_nonsquare()
 
 
 
-TEST_CASE("mat_vec_mul_nonsquare")
+TEMPLATE_TEST_CASE("mat_vec_mul_nonsquare_trans", "[matmul]", float, double)
   {
-  test_mat_vec_mul_nonsquare<float>();
-  test_mat_vec_mul_nonsquare<double>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_mat_vec_mul_nonsquare_trans()
-  {
   arma::Mat<eT> cpu_A(50, 10, arma::fill::randu);
   arma::Col<eT> cpu_x(50, arma::fill::randu);
   arma::Col<eT> cpu_y = cpu_A.t() * cpu_x;
@@ -304,12 +292,4 @@ void test_mat_vec_mul_nonsquare_trans()
     {
     REQUIRE( eT(y(i)) == Approx(eT(cpu_y(i))) );
     }
-  }
-
-
-
-TEST_CASE("mat_vec_mul_nonsquare_trans")
-  {
-  test_mat_vec_mul_nonsquare_trans<float>();
-  test_mat_vec_mul_nonsquare_trans<double>();
   }

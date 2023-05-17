@@ -23,6 +23,11 @@ TEMPLATE_TEST_CASE("stddev_mat_test", "[stddev]", float, double, u32, s32, u64, 
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(100, 50, distr_param(1, 10));
 
   Row<eT> col_vars = var(x);
@@ -73,6 +78,11 @@ TEMPLATE_TEST_CASE("stddev_vec_test", "[stddev]", float, double, u32, s32, u64, 
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x1 = randi<Col<eT>>(10000, distr_param(1, 20));
   Row<eT> x2 = randi<Row<eT>>(50000, distr_param(1, 5));
 
@@ -96,11 +106,11 @@ TEMPLATE_TEST_CASE("stddev_vec_test", "[stddev]", float, double, u32, s32, u64, 
 
 TEST_CASE("stddev_empty_test", "[stddev]")
   {
-  mat x;
+  fmat x;
 
-  vec y1 = stddev(x);
-  vec y2 = stddev(x, 0, 0);
-  rowvec y3 = stddev(x, 0, 0);
+  fvec y1 = stddev(x);
+  fvec y2 = stddev(x, 0, 0);
+  frowvec y3 = stddev(x, 0, 0);
 
   REQUIRE( y1.n_elem == 0 );
   REQUIRE( y2.n_elem == 0 );
@@ -119,21 +129,21 @@ TEST_CASE("stddev_empty_test", "[stddev]")
 
 TEST_CASE("stddev_empty_vec_test", "[stddev]")
   {
-  vec x;
+  fvec x;
 
-  REQUIRE( stddev(x) == double(0) );
-  REQUIRE( stddev(x, 1) == double(0) );
+  REQUIRE( stddev(x) == float(0) );
+  REQUIRE( stddev(x, 1) == float(0) );
   }
 
 
 
 TEST_CASE("stddev_one_elem_test", "[stddev]")
   {
-  vec x(1);
+  fvec x(1);
   x(0) = 0.0;
 
-  REQUIRE( (isnan(stddev(x)) || isinf(stddev(x))) );
-  REQUIRE( stddev(x, 1) == double(0) );
+  REQUIRE( (std::isnan(stddev(x)) || std::isinf(stddev(x))) );
+  REQUIRE( stddev(x, 1) == float(0) );
   }
 
 
@@ -141,6 +151,11 @@ TEST_CASE("stddev_one_elem_test", "[stddev]")
 TEMPLATE_TEST_CASE("stddev_submat_test", "[stddev]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(100, 50, distr_param(1, 10));
 
@@ -192,6 +207,11 @@ TEMPLATE_TEST_CASE("stddev_subvec_test", "[stddev]", float, double, u32, s32, u6
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x1 = randi<Col<eT>>(10000, distr_param(1, 20));
   Row<eT> x2 = randi<Row<eT>>(50000, distr_param(1, 5));
 
@@ -227,6 +247,11 @@ TEMPLATE_TEST_CASE
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Mat<eT1> x = randi<Mat<eT1>>(100, 50, distr_param(1, 1000));
   Mat<eT2> x_conv = conv_to<Mat<eT2>>::from(x);
@@ -336,6 +361,11 @@ TEMPLATE_TEST_CASE
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Col<eT1> x = randi<Col<eT1>>(10000, distr_param(1, 50));
   Col<eT2> x_conv = conv_to<Col<eT2>>::from(x);

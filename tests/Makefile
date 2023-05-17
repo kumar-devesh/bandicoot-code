@@ -1,6 +1,7 @@
 
-#LIB_FLAGS = -lbandicoot
-#LIB_FLAGS = -lbandicoot -lOpenCL -lclBLAS -lnvrtc -lcudart -lcublas -lcuda
+# Use this when compiling without CUDA.
+# (If you want to do that, also comment out COOT_USE_CUDA in bandicoot_bits/config.hpp.)
+#LIB_FLAGS = -lOpenCL -lclBLAS -larmadillo -llapack -lblas
 LIB_FLAGS = -lOpenCL -lclBLAS -lnvrtc -lcudart -lcublas -lcuda -lcurand -lcusolver -llapack -lblas -larmadillo
 
 CXX_FLAGS = -std=c++11 -Wshadow -Wall -pedantic -O0 -I../include/ -g -DCOOT_USE_U64S64

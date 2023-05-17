@@ -34,8 +34,8 @@ COOT_FN(PREFIX,equ_array_sinc_pre)(__global eT2* out,
       }
     else
       {
-      const double fp_val = (double) val;
-      const double tmp = fp_val * M_PI;
+      const ARMA_FP_TYPE fp_val = (ARMA_FP_TYPE) val;
+      const ARMA_FP_TYPE tmp = fp_val * M_PI;
       out[i] = (tmp == 0.0) ? (eT2) 1.0 : (eT2) (sin(tmp) / tmp);
       }
     }

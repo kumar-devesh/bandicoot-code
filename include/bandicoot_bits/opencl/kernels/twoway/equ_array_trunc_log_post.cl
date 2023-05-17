@@ -44,14 +44,14 @@ COOT_FN(PREFIX,equ_array_trunc_log_post)(__global eT2* out,
       }
     else
       {
-      const double fp_val = (double) val;
-      if (fp_val <= (double) 0)
+      const ARMA_FP_TYPE fp_val = (ARMA_FP_TYPE) val;
+      if (fp_val <= (ARMA_FP_TYPE) 0)
         {
-        out[i] = (eT2) log(coot_type_min_double());
+        out[i] = (eT2) log(COOT_FN(coot_type_min_,ARMA_FP_TYPE)());
         }
       else if (isinf(fp_val))
         {
-        out[i] = (eT2) log(coot_type_max_double());
+        out[i] = (eT2) log(COOT_FN(coot_type_max_,ARMA_FP_TYPE)());
         }
       else
         {

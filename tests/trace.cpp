@@ -17,9 +17,15 @@
 
 using namespace coot;
 
-template<typename eT>
-void test_trace_1()
+TEMPLATE_TEST_CASE("trace_1", "[trace]", float, double, u32, s32, u64, s64)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(5, 5);
   x.zeros();
   for (uword i = 0; i < 5; ++i)
@@ -32,21 +38,15 @@ void test_trace_1()
 
 
 
-TEST_CASE("trace_1")
+TEMPLATE_TEST_CASE("trace_2", "[trace]", float, double)
   {
-  test_trace_1<double>();
-  test_trace_1<float>();
-  test_trace_1<u32>();
-  test_trace_1<s32>();
-  test_trace_1<u64>();
-  test_trace_1<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_trace_2()
-  {
   Mat<eT> x(10, 5);
   x.randu();
   x += eT(1);
@@ -64,17 +64,15 @@ void test_trace_2()
 
 
 
-TEST_CASE("trace_2")
+TEMPLATE_TEST_CASE("trace_3", "[trace]", float, double)
   {
-  test_trace_2<double>();
-  test_trace_2<float>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_trace_3()
-  {
   Mat<eT> x(5, 10);
   x.randu();
   x += eT(1);
@@ -88,12 +86,4 @@ void test_trace_3()
     }
 
   REQUIRE( sum == Approx(manual_sum) );
-  }
-
-
-
-TEST_CASE("trace_3")
-  {
-  test_trace_3<double>();
-  test_trace_3<float>();
   }

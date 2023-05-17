@@ -641,6 +641,7 @@ struct is_supported_elem_type
     is_s32<T1>::value ||
     is_u64<T1>::value ||
     is_s64<T1>::value ||
+    is_uword<T1>::value ||
     is_float<T1>::value ||
     is_double<T1>::value ||
     is_supported_complex_float<T1>::value ||
@@ -657,6 +658,20 @@ struct is_supported_blas_type
     is_double<T1>::value ||
     is_supported_complex_float<T1>::value ||
     is_supported_complex_double<T1>::value;
+  };
+
+
+
+template<typename T1>
+struct is_supported_kernel_elem_type
+  {
+  static const bool value = \
+    is_u32<T1>::value ||
+    is_s32<T1>::value ||
+    is_u64<T1>::value ||
+    is_s64<T1>::value ||
+    is_float<T1>::value ||
+    is_double<T1>::value;
   };
 
 

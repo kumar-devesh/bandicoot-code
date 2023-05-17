@@ -17,9 +17,15 @@
 
 using namespace coot;
 
-template<typename eT>
-void test_linspace_1()
+TEMPLATE_TEST_CASE("linspace_1", "[linspace]", float, double)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> a = linspace<Col<eT>>(1,5,5);
 
   REQUIRE(eT(a(0)) == Approx(eT(1.0)));
@@ -54,9 +60,15 @@ void test_linspace_1()
 
 
 
-template<typename eT>
-void test_linspace_2()
+TEMPLATE_TEST_CASE("linspace_2", "[linspace]", float, double, u32, s32, u64, s64)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> a = linspace<Col<eT>>(1,5,5);
 
   REQUIRE(eT(a(0)) == Approx(eT(1.0)));
@@ -69,18 +81,4 @@ void test_linspace_2()
 
   REQUIRE(X.n_rows == 6);
   REQUIRE(X.n_cols == 1);
-  }
-
-
-
-TEMPLATE_TEST_CASE("linspace_1", "[linspace]", double, float)
-  {
-  test_linspace_1<TestType>();
-  }
-
-
-
-TEMPLATE_TEST_CASE("linspace_2", "[linspace]", double, float, u32, s32, u64, s64)
-  {
-  test_linspace_2<TestType>();
   }

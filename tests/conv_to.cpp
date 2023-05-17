@@ -34,6 +34,11 @@ TEMPLATE_TEST_CASE
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x(5, 5);
   for (uword i = 0; i < 25; ++i)
     x[i] = i + 1;
@@ -61,6 +66,11 @@ TEMPLATE_TEST_CASE
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Mat<eT1> x(5, 5);
   for (uword i = 0; i < 25; ++i)
@@ -125,6 +135,11 @@ TEMPLATE_TEST_CASE
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Col<eT1> x(25);
   for (uword i = 0; i < 25; ++i)
     x[i] = i + 1;
@@ -157,6 +172,11 @@ TEMPLATE_TEST_CASE
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x(5, 5);
   x.fill(eT1(3));
 
@@ -183,6 +203,11 @@ TEMPLATE_TEST_CASE
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   arma::Mat<eT1> cpu_x(20, 20, arma::fill::randu);
   arma::Mat<eT2> cpu_y(20, 20, arma::fill::randu);
@@ -216,6 +241,11 @@ TEMPLATE_TEST_CASE
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   arma::Mat<eT1> cpu_x(20, 20, arma::fill::randu);
   arma::Mat<eT2> cpu_y(20, 20, arma::fill::randu);
@@ -257,6 +287,11 @@ TEMPLATE_TEST_CASE
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x(2, 2);
   x.fill(eT1(3));
 
@@ -289,6 +324,11 @@ TEMPLATE_TEST_CASE
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Mat<eT1> x(2, 2);
   x.fill(eT1(-3));
@@ -323,6 +363,11 @@ TEMPLATE_TEST_CASE
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x(2, 2);
   x.fill(eT1(3));
 
@@ -354,6 +399,11 @@ TEMPLATE_TEST_CASE
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x(2, 2);
   x.fill(eT1(-1.5));
 
@@ -378,6 +428,11 @@ TEMPLATE_TEST_CASE
 template<typename out_eT, typename in_eT, typename eop_type>
 void test_eop_conv_to(const out_eT aux = out_eT(0))
   {
+  if (!coot_rt_t::is_supported_type<out_eT>() || !coot_rt_t::is_supported_type<in_eT>())
+    {
+    return;
+    }
+
   Mat<in_eT> x(3, 3);
   for (uword i = 0; i < 9; ++i)
     {
@@ -510,6 +565,11 @@ TEMPLATE_TEST_CASE
   typedef typename TestType::first_type in_eT;
   typedef typename TestType::second_type out_eT;
 
+  if (!coot_rt_t::is_supported_type<in_eT>() || !coot_rt_t::is_supported_type<out_eT>())
+    {
+    return;
+    }
+
   Mat<in_eT> x(3, 3);
   for (uword i = 0; i < 9; ++i)
     {
@@ -533,6 +593,11 @@ TEMPLATE_TEST_CASE
 template<typename out_eT, typename in_eT, typename eop_type>
 void test_double_merged_eop_conv_to(out_eT aux_val)
   {
+  if (!coot_rt_t::is_supported_type<in_eT>() || !coot_rt_t::is_supported_type<out_eT>())
+    {
+    return;
+    }
+
   out_eT aux_out = aux_val;
   in_eT  aux_in  = in_eT(aux_val);
 
@@ -698,6 +763,11 @@ TEMPLATE_TEST_CASE
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x(5, 3);
   x.fill(eT1(3));
 
@@ -732,6 +802,11 @@ TEMPLATE_TEST_CASE
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x(5, 3);
   x.fill(eT1(3));
 
@@ -764,6 +839,11 @@ TEMPLATE_TEST_CASE
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Mat<eT1> x(5, 3);
   x.fill(eT1(1));
@@ -798,6 +878,11 @@ TEMPLATE_TEST_CASE
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x(5, 3);
   x.fill(eT1(3));
 
@@ -830,6 +915,11 @@ TEMPLATE_TEST_CASE
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Mat<eT1> x(5, 3);
   x.fill(eT1(2));
@@ -864,6 +954,11 @@ TEMPLATE_TEST_CASE
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Mat<eT1> x(5, 3);
   x.fill(eT1(1));
@@ -905,6 +1000,11 @@ TEMPLATE_TEST_CASE
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x(5, 3);
   x.fill(eT1(1));
   Mat<eT2> y(6, 4);
@@ -944,6 +1044,11 @@ TEMPLATE_TEST_CASE
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Mat<eT1> x(5, 3);
   x.fill(eT1(3));
@@ -985,6 +1090,11 @@ TEMPLATE_TEST_CASE
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x(5, 3);
   x.fill(eT1(2));
   Mat<eT2> y(6, 4);
@@ -1025,6 +1135,11 @@ TEMPLATE_TEST_CASE
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   arma::Mat<eT1> x = arma::randi<arma::Mat<eT1>>(10, 15, arma::distr_param(1, 10));
   Mat<eT2> y = randi<Mat<eT2>>(6, 7, distr_param(20, 30));
 
@@ -1052,6 +1167,11 @@ TEMPLATE_TEST_CASE
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   arma::Mat<eT1> x = arma::randi<arma::Mat<eT1>>(10, 15, arma::distr_param(1, 10));
   Mat<eT2> y = randi<Mat<eT2>>(6, 7, distr_param(20, 30));
@@ -1081,6 +1201,11 @@ TEMPLATE_TEST_CASE
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   arma::Mat<eT1> x = arma::randi<arma::Mat<eT1>>(10, 15, arma::distr_param(1, 10));
   Mat<eT2> y = randi<Mat<eT2>>(6, 7, distr_param(20, 30));
 
@@ -1109,6 +1234,11 @@ TEMPLATE_TEST_CASE
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x = randi<Mat<eT1>>(10, 15, distr_param(1, 10));
   arma::Mat<eT2> y = arma::randi<arma::Mat<eT2>>(6, 7, arma::distr_param(20, 30));
 
@@ -1136,6 +1266,11 @@ TEMPLATE_TEST_CASE
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Mat<eT1> x = randi<Mat<eT1>>(10, 15, distr_param(1, 10));
   arma::Mat<eT2> y = arma::randi<arma::Mat<eT2>>(6, 7, arma::distr_param(20, 30));
@@ -1166,6 +1301,11 @@ TEMPLATE_TEST_CASE
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x = randi<Mat<eT1>>(10, 15, distr_param(1, 10));
   arma::Mat<eT2> y = arma::randi<arma::Mat<eT2>>(6, 7, arma::distr_param(20, 30));
 
@@ -1194,6 +1334,11 @@ TEMPLATE_TEST_CASE
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   arma::Mat<eT1> x = arma::randi<arma::Mat<eT1>>(10, 15, arma::distr_param(1, 10));
   arma::Mat<eT2> y = arma::randi<arma::Mat<eT2>>(6, 7, arma::distr_param(20, 30));

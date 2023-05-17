@@ -58,6 +58,9 @@ class coot_rt_t
   template<typename eT>
   static inline void release_memory(dev_mem_t<eT> dev_mem);
 
+  template<typename eT>
+  static inline bool is_supported_type();
+
   static inline void set_rng_seed(const u64 seed);
 
   template<typename out_eT, typename in_eT>
@@ -148,7 +151,7 @@ class coot_rt_t
   static inline void relational_array_op(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> X_mem, const dev_mem_t<eT2> Y_mem, const uword n_elem, const twoway_kernel_id::enum_id num, const std::string& name);
 
   template<typename eT>
-  static inline bool chol(dev_mem_t<eT> out, const uword n_rows);
+  static inline std::tuple<bool, std::string> chol(dev_mem_t<eT> out, const uword n_rows);
 
   template<typename eT>
   static inline std::tuple<bool, std::string> lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_mem_t<eT> P, const uword n_rows, const uword n_cols);
@@ -295,6 +298,9 @@ class coot_rt_t
 
   template<typename eT>
   static inline void find(dev_mem_t<uword>& out, uword& out_len, const dev_mem_t<eT> A, const uword n_elem, const uword k, const uword find_type);
+
+  template<typename eT1, typename eT2>
+  static inline void symmat(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword size, const uword lower);
 
   static inline void synchronise();
 

@@ -14,6 +14,18 @@
 
 
 
+// Utility to free memory before returning.
+inline
+void
+svd_cleanup(char* device_buffer, char* host_buffer, int* dev_info)
+  {
+  cudaFree(device_buffer);
+  cpu_memory::release(host_buffer);
+  cudaFree(dev_info);
+  }
+
+
+
 /**
  * Compute the singular value decomposition using CUDA (cuSolverDn).
  *
@@ -86,13 +98,14 @@ svd(dev_mem_t<eT> U,
     {
     return std::make_tuple(false, "couldn't cudaMalloc() device workspace: " + error_as_string(status2));
     }
-  char* host_buffer = new char[host_buffer_size];
+  char* host_buffer = cpu_memory::acquire<char>(host_buffer_size);
 
   // This is an additional error code for cusolverDn; but it is an error code on the device...
   int* dev_info = NULL;
   status2 = cudaMalloc(&dev_info, sizeof(int));
   if (status2 != cudaSuccess)
     {
+    svd_cleanup(device_buffer, host_buffer, NULL);
     return std::make_tuple(false, "couldn't cudaMalloc() status value: " + error_as_string(status2));
     }
 
@@ -121,9 +134,34 @@ svd(dev_mem_t<eT> U,
                             dev_info);
   if (status != CUSOLVER_STATUS_SUCCESS)
     {
+    svd_cleanup(device_buffer, host_buffer, dev_info);
     return std::make_tuple(false, "cusolverDnXgesvd() failed: " + error_as_string(status));
-    // TODO: check dev_info for additional better error output
-    //
+    }
+
+  // It seems that CUSOLVER_STATUS_SUCCESS gets returned even when the SVD
+  // failed!  So we have to process dev_info more carefully.
+  int info;
+  status2 = cudaMemcpy(&info, dev_info, sizeof(int), cudaMemcpyDeviceToHost);
+
+  // We don't need any of the allocated memory now.
+  svd_cleanup(device_buffer, host_buffer, dev_info);
+
+  if (status2 != cudaSuccess)
+    {
+    return std::make_tuple(false, "couldn't copy status code from GPU after factorisation: " + error_as_string(status2));
+    }
+
+  if (info < 0)
+    {
+    std::ostringstream oss;
+    oss << "cusolverDnXgesvd() failed: parameter " << (-info) << " was incorrect on entry";
+    return std::make_tuple(false, oss.str());
+    }
+  else if (info > 0)
+    {
+    std::ostringstream oss;
+    oss << "cusolverDnXgesvd() failed: " << status2 << " superdiagonals of an intermediate bidiagonal form did not converge to 0";
+    return std::make_tuple(false, oss.str());
     }
 
   return std::make_tuple(true, "");

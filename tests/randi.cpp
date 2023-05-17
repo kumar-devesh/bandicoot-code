@@ -17,9 +17,15 @@
 
 using namespace coot;
 
-template<typename eT>
-void test_randi()
+TEMPLATE_TEST_CASE("randi_1", "[randi]", float, double, u32, s32, u64, s64)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> f = randi<Mat<eT>>(1000, 1000);
   arma::Mat<eT> f_cpu(f);
 
@@ -35,21 +41,14 @@ void test_randi()
 
 
 
-TEST_CASE("randi_1", "[randi]")
-  {
-  test_randi<float>();
-  test_randi<double>();
-  test_randi<u32>();
-  test_randi<s32>();
-  test_randi<u64>();
-  test_randi<s64>();
-  }
-
-
-
 template<typename eT>
 void test_randi_range(int lo, int hi)
   {
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> f = randi<Mat<eT>>(1000, 1000, distr_param(lo, hi));
   arma::Mat<eT> f_cpu(f);
 
@@ -65,19 +64,16 @@ void test_randi_range(int lo, int hi)
 
 
 
-TEST_CASE("randi_range", "[randi]")
+TEMPLATE_TEST_CASE("randi_range_1", "[randi]", float, double, u32, s32, u64, s64)
   {
-  test_randi_range<float>(0, 50);
-  test_randi_range<double>(0, 50);
-  test_randi_range<u32>(0, 50);
-  test_randi_range<s32>(0, 50);
-  test_randi_range<u64>(0, 50);
-  test_randi_range<s64>(0, 50);
+  test_randi_range<TestType>(0, 50);
+  }
 
-  test_randi_range<float>(-75, 12);
-  test_randi_range<double>(-75, 12);
-  test_randi_range<s32>(-75, 12);
-  test_randi_range<s64>(-75, 12);
+
+
+TEMPLATE_TEST_CASE("randi_range_2", "[randi]", float, double, s32, s64)
+  {
+  test_randi_range<TestType>(-75, 12);
   }
 
 
@@ -86,6 +82,11 @@ TEST_CASE("randi_range", "[randi]")
 template<typename eT>
 void test_row_col_randi(int lo, int hi)
   {
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Row<eT> r1 = randi<Row<eT>>(1000, distr_param(lo, hi));
   Row<eT> r2 = randi<Row<eT>>(1, 1000, distr_param(lo, hi));
 
@@ -117,19 +118,16 @@ void test_row_col_randi(int lo, int hi)
 
 
 
-TEST_CASE("randi_row_col", "[randi]")
+TEMPLATE_TEST_CASE("randi_row_col_1", "[randi]", float, double, u32, s32, u64, s64)
   {
-  test_row_col_randi<float>(0, 500);
-  test_row_col_randi<double>(0, 500);
-  test_row_col_randi<u32>(0, 500);
-  test_row_col_randi<s32>(0, 500);
-  test_row_col_randi<u64>(0, 500);
-  test_row_col_randi<s64>(0, 500);
+  test_row_col_randi<TestType>(0, 500);
+  }
 
-  test_row_col_randi<float>(-125, 500);
-  test_row_col_randi<double>(-125, 500);
-  test_row_col_randi<s32>(-125, 500);
-  test_row_col_randi<s64>(-125, 500);
+
+
+TEMPLATE_TEST_CASE("randi_row_col_2", "[randi]", float, double, s32, s64)
+  {
+  test_row_col_randi<TestType>(-125, 500);
   }
 
 
@@ -137,6 +135,11 @@ TEST_CASE("randi_row_col", "[randi]")
 template<typename eT>
 void test_randi_distr(int lo, int hi)
   {
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   // Sample a large number of random values.
   // They are already binned, so the empirically observed probability of each value is (1 / (hi - lo)).
 
@@ -200,17 +203,14 @@ void test_randi_distr(int lo, int hi)
 
 
 
-TEST_CASE("randi_distr", "[randi]")
+TEMPLATE_TEST_CASE("randi_distr_1", "[randi]", float, double, u32, s32, u64, s64)
   {
-  test_randi_distr<float>(0, 67);
-  test_randi_distr<double>(0, 67);
-  test_randi_distr<u32>(0, 67);
-  test_randi_distr<s32>(0, 67);
-  test_randi_distr<u64>(0, 67);
-  test_randi_distr<s64>(0, 67);
+  test_randi_distr<TestType>(0, 67);
+  }
 
-  test_randi_distr<float>(-11, 17);
-  test_randi_distr<double>(-11, 17);
-  test_randi_distr<s32>(-11, 17);
-  test_randi_distr<s64>(-11, 17);
+
+
+TEMPLATE_TEST_CASE("randi_distr_2", "[randi]", float, double, s32, s64)
+  {
+  test_randi_distr<TestType>(-11, 17);
   }

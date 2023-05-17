@@ -21,6 +21,11 @@ TEMPLATE_TEST_CASE("min_small", "[min]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x(16);
   for (uword i = 0; i < 16; ++i)
     x[i] = i + 1;
@@ -36,6 +41,11 @@ TEMPLATE_TEST_CASE("min_1", "[min]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x(6400);
   for (uword i = 0; i < 6400; ++i)
     x[i] = (6400 - i);
@@ -50,6 +60,11 @@ TEMPLATE_TEST_CASE("min_1", "[min]", float, double, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("min_strange_size", "[min]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x(608);
 
@@ -67,6 +82,11 @@ TEMPLATE_TEST_CASE("min_large", "[min]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   arma::Col<eT> cpu_x = arma::conv_to<arma::Col<eT>>::from(arma::randu<arma::Col<double>>(100000) * 10.0);
   cpu_x.randu();
   Col<eT> x(cpu_x);
@@ -83,6 +103,11 @@ TEMPLATE_TEST_CASE("min_2", "[min]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x(50);
   x.randu();
   x += eT(1);
@@ -98,6 +123,11 @@ TEMPLATE_TEST_CASE("min_2", "[min]", float, double)
 TEMPLATE_TEST_CASE("min_colwise_1", "[min]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
@@ -124,6 +154,11 @@ TEMPLATE_TEST_CASE("min_colwise_2", "[min]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
     {
@@ -148,6 +183,11 @@ TEMPLATE_TEST_CASE("min_colwise_2", "[min]", float, double, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("min_rowwise_1", "[min]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
@@ -174,6 +214,11 @@ TEMPLATE_TEST_CASE("min_rowwise_2", "[min]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
     {
@@ -198,6 +243,11 @@ TEMPLATE_TEST_CASE("min_rowwise_2", "[min]", float, double, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("subview_min_colwise_1", "[min]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
@@ -224,6 +274,11 @@ TEMPLATE_TEST_CASE("subview_min_colwise_2", "[min]", float, double, u32, s32, u6
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
     {
@@ -248,6 +303,11 @@ TEMPLATE_TEST_CASE("subview_min_colwise_2", "[min]", float, double, u32, s32, u6
 TEMPLATE_TEST_CASE("subview_min_colwise_full", "[min]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
@@ -274,6 +334,11 @@ TEMPLATE_TEST_CASE("subview_min_rowwise_1", "[min]", float, double, u32, s32, u6
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
     {
@@ -299,6 +364,11 @@ TEMPLATE_TEST_CASE("subview_min_rowwise_2", "[min]", float, double, u32, s32, u6
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
     {
@@ -323,6 +393,11 @@ TEMPLATE_TEST_CASE("subview_min_rowwise_2", "[min]", float, double, u32, s32, u6
 TEMPLATE_TEST_CASE("subview_min_rowwise_full", "[min]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)

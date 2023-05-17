@@ -20,6 +20,11 @@ using namespace coot;
 template<typename eT>
 void test_eye(const uword n_rows, const uword n_cols)
   {
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(n_rows, n_cols);
   x.eye();
 
@@ -41,49 +46,29 @@ void test_eye(const uword n_rows, const uword n_cols)
 
 
 
-TEST_CASE("eye_1")
+TEMPLATE_TEST_CASE("eye_1", "[eye]", float, double, u32, s32, u64, s64)
   {
-  test_eye<double>(5, 5);
-  test_eye<float>(5, 5);
-  test_eye<u32>(5, 5);
-  test_eye<s32>(5, 5);
-  test_eye<u64>(5, 5);
-  test_eye<s64>(5, 5);
+  test_eye<TestType>(5, 5);
   }
 
 
 
-TEST_CASE("eye_2")
+TEMPLATE_TEST_CASE("eye_2", "[eye]", float, double, u32, s32, u64, s64)
   {
-  test_eye<double>(10, 50);
-  test_eye<float>(10, 50);
-  test_eye<u32>(10, 50);
-  test_eye<s32>(10, 50);
-  test_eye<u64>(10, 50);
-  test_eye<s64>(10, 50);
+  test_eye<TestType>(10, 50);
   }
 
 
 
-TEST_CASE("eye_3")
+TEMPLATE_TEST_CASE("eye_3", "[eye]", float, double, u32, s32, u64, s64)
   {
-  test_eye<double>(50, 10);
-  test_eye<float>(50, 10);
-  test_eye<u32>(50, 10);
-  test_eye<s32>(50, 10);
-  test_eye<u64>(50, 10);
-  test_eye<s64>(50, 10);
+  test_eye<TestType>(50, 10);
   }
 
 
 
-TEST_CASE("eye_empty")
+TEMPLATE_TEST_CASE("eye_empty", "[eye]", float, double, u32, s32, u64, s64)
   {
   // This just checks that there is no crash.
-  test_eye<double>(0, 0);
-  test_eye<float>(0, 0);
-  test_eye<u32>(0, 0);
-  test_eye<s32>(0, 0);
-  test_eye<u64>(0, 0);
-  test_eye<s64>(0, 0);
+  test_eye<TestType>(0, 0);
   }

@@ -62,6 +62,10 @@ struct runtime_t
 
   inline void set_rng_seed(const u64 seed);
 
+  // all types are currently supported by CUDA
+  template<typename eT>
+  inline constexpr bool is_supported_type() { return true; }
+
   // use CURAND_ORDERING_PSEUDO_SEEDED with XORWOW / CURAND_ORDERING_PSEUDO_BEST
   // We use XORWOW for uniform distributions, and Philox for normal distributions.
   coot_aligned curandGenerator_t  xorwow_rand;

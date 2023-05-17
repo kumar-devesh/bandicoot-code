@@ -38,12 +38,12 @@ struct tolerance<double>
 // The correlation of an empty matrix should be empty.
 TEST_CASE("empty_cor", "[cor]")
   {
-  mat x;
-  mat y = cor(x);
+  fmat x;
+  fmat y = cor(x);
 
   REQUIRE( y.n_elem == 0 );
 
-  mat z = cor(x, y);
+  fmat z = cor(x, y);
 
   REQUIRE( z.n_elem == 0 );
 
@@ -61,28 +61,28 @@ TEST_CASE("empty_cor", "[cor]")
 // The correlation of a 1x1 matrix should be [[1]].
 TEST_CASE("single_elem_cor", "[cor]")
   {
-  mat x(1, 1);
+  fmat x(1, 1);
   x(0, 0) = 5.0;
 
-  mat y = cor(x);
+  fmat y = cor(x);
 
   REQUIRE( y.n_elem == 1 );
-  REQUIRE( double(y[0]) == Approx(1.0).margin(1e-15) );
+  REQUIRE( float(y[0]) == Approx(1.0).margin(1e-10) );
 
-  mat z = cor(x, y);
+  fmat z = cor(x, y);
 
   REQUIRE( z.n_elem == 1 );
-  REQUIRE( isnan(double(z[0])) );
+  REQUIRE( std::isnan(float(z[0])) );
 
   y = cor(x, 1);
 
   REQUIRE( y.n_elem == 1 );
-  REQUIRE( double(y[0]) == Approx(1.0).margin(1e-15) );
+  REQUIRE( float(y[0]) == Approx(1.0).margin(1e-10) );
 
   z = cor(x, y, 1);
 
   REQUIRE( z.n_elem == 1 );
-  REQUIRE( isnan(double(z[0])) );
+  REQUIRE( std::isnan(float(z[0])) );
   }
 
 
@@ -91,6 +91,12 @@ TEST_CASE("single_elem_cor", "[cor]")
 TEMPLATE_TEST_CASE("random_basic_cor", "[cor]", double, float)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(3, 3, distr_param(1, 10));
   x(0, 0) += 15;
   x(1, 1) += 30;
@@ -144,6 +150,11 @@ TEMPLATE_TEST_CASE("random_vec_cor", "[cor]", double, float)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> c = randi<Col<eT>>(100, distr_param(1, 10));
   Row<eT> r = randi<Row<eT>>(100, distr_param(1, 10));
 
@@ -175,6 +186,11 @@ TEMPLATE_TEST_CASE("random_neg_vec_cor", "[cor]", double, float)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> c = 10 * randu<Col<eT>>(100) - 5;
   Row<eT> r = 10 * randu<Row<eT>>(100) - 5;
 
@@ -205,6 +221,11 @@ TEMPLATE_TEST_CASE("random_neg_vec_cor", "[cor]", double, float)
 TEMPLATE_TEST_CASE("random_mat_cor_size_sweep", "[cor]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   for (size_t i = 5; i < 11; ++i)
     {
@@ -241,6 +262,11 @@ TEMPLATE_TEST_CASE("randu_neg_mat_cor_size_sweep", "[cor]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   for (size_t i = 3; i < 10; ++i)
     {
     const size_t dim = std::pow(2.0, (double) i);
@@ -274,6 +300,11 @@ TEMPLATE_TEST_CASE("randu_neg_mat_cor_size_sweep", "[cor]", float, double)
 TEMPLATE_TEST_CASE("vector_x_vector_cor", "[cor]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x1 = randi<Col<eT>>(1000, distr_param(1, 100));
   Col<eT> x2 = randi<Col<eT>>(1000, distr_param(1, 100));
@@ -347,6 +378,11 @@ TEMPLATE_TEST_CASE("vec_x_matrix_cor", "[cor]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x1 = randi<Col<eT>>(200, distr_param(1, 100));
   Row<eT> x2 = randi<Row<eT>>(200, distr_param(1, 100));
   Mat<eT> x3 = randi<Mat<eT>>(200, 200, distr_param(1, 100));
@@ -417,6 +453,11 @@ TEMPLATE_TEST_CASE("random_mat_x_mat_cor_size_sweep", "[cor]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   for (size_t i = 3; i < 10; ++i)
     {
     const size_t dim = std::pow(2.0, (double) i);
@@ -453,6 +494,11 @@ TEMPLATE_TEST_CASE("random_neg_mat_x_mat_cor_size_sweep", "[cor]", float, double
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   for (size_t i = 3; i < 10; ++i)
     {
     const size_t dim = std::pow(2.0, (double) i);
@@ -488,6 +534,11 @@ TEMPLATE_TEST_CASE("random_neg_mat_x_mat_cor_size_sweep", "[cor]", float, double
 TEMPLATE_TEST_CASE("random_neg_non_square_mat_x_mat_cor_size_sweep", "[cor]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   for (size_t i = 3; i < 10; ++i)
     {
@@ -526,6 +577,11 @@ TEMPLATE_TEST_CASE("expr_cor", "[cor]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(100, 100, distr_param(0, 100));
   Col<eT> d = randi<Col<eT>>(100, distr_param(10, 20));
 
@@ -549,6 +605,11 @@ TEMPLATE_TEST_CASE("expr_cor", "[cor]", float, double)
 TEMPLATE_TEST_CASE("expr_x_expr_cor", "[cor]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(100, 100, distr_param(0, 100));
   Col<eT> d = randi<Col<eT>>(100, distr_param(10, 20));
@@ -575,6 +636,11 @@ TEMPLATE_TEST_CASE("cor_in_expr", "[cor]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(127, 566, distr_param(1, 10));
   Col<eT> c = randi<Col<eT>>(566, distr_param(10, 20));
 
@@ -598,6 +664,11 @@ TEMPLATE_TEST_CASE("cor_in_expr", "[cor]", float, double)
 TEMPLATE_TEST_CASE("chained_cor", "[cor]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x1 = randi<Mat<eT>>(173, 174, distr_param(50, 60));
   Mat<eT> x2 = randi<Mat<eT>>(173, 174, distr_param(50, 60));
@@ -628,6 +699,11 @@ TEMPLATE_TEST_CASE
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Mat<eT1> x = randi<Mat<eT1>>(512, 162, distr_param(1, 1000));
 

@@ -39,8 +39,15 @@ void check_transpose(const Mat<eT1>& A, const Mat<eT2>& B)
 
 TEMPLATE_TEST_CASE("htrans_basic", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x = randi<Mat<TestType>>(10, 5, distr_param(0, 50));
-  Mat<TestType> y = trans(x);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(10, 5, distr_param(0, 50));
+  Mat<eT> y = trans(x);
   check_transpose(y, x);
   }
 
@@ -48,8 +55,15 @@ TEMPLATE_TEST_CASE("htrans_basic", "[trans]", double, float, u32, s32, u64, s64)
 
 TEMPLATE_TEST_CASE("strans_basic", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x = randi<Mat<TestType>>(10, 5, distr_param(0, 50));
-  Mat<TestType> y = trans(x);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(10, 5, distr_param(0, 50));
+  Mat<eT> y = trans(x);
   check_transpose(y, x);
   }
 
@@ -57,8 +71,15 @@ TEMPLATE_TEST_CASE("strans_basic", "[trans]", double, float, u32, s32, u64, s64)
 
 TEMPLATE_TEST_CASE("member_t", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x = randi<Mat<TestType>>(10, 5, distr_param(0, 50));
-  Mat<TestType> y = x.t();
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(10, 5, distr_param(0, 50));
+  Mat<eT> y = x.t();
   check_transpose(y, x);
   }
 
@@ -66,8 +87,15 @@ TEMPLATE_TEST_CASE("member_t", "[trans]", double, float, u32, s32, u64, s64)
 
 TEMPLATE_TEST_CASE("member_ht", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x = randi<Mat<TestType>>(10, 5, distr_param(0, 50));
-  Mat<TestType> y = x.ht();
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(10, 5, distr_param(0, 50));
+  Mat<eT> y = x.ht();
   check_transpose(y, x);
   }
 
@@ -75,8 +103,15 @@ TEMPLATE_TEST_CASE("member_ht", "[trans]", double, float, u32, s32, u64, s64)
 
 TEMPLATE_TEST_CASE("member_st", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x = randi<Mat<TestType>>(10, 5, distr_param(0, 50));
-  Mat<TestType> y = x.st();
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(10, 5, distr_param(0, 50));
+  Mat<eT> y = x.st();
   check_transpose(y, x);
   }
 
@@ -84,8 +119,15 @@ TEMPLATE_TEST_CASE("member_st", "[trans]", double, float, u32, s32, u64, s64)
 
 TEMPLATE_TEST_CASE("large_htrans", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x = randi<Mat<TestType>>(1000, 200, distr_param(0, 1000));
-  Mat<TestType> y = x.t();
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(1000, 200, distr_param(0, 1000));
+  Mat<eT> y = x.t();
   check_transpose(y, x);
   }
 
@@ -93,8 +135,15 @@ TEMPLATE_TEST_CASE("large_htrans", "[trans]", double, float, u32, s32, u64, s64)
 
 TEMPLATE_TEST_CASE("large_strans", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x = randi<Mat<TestType>>(1000, 200, distr_param(0, 1000));
-  Mat<TestType> y = strans(x);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(1000, 200, distr_param(0, 1000));
+  Mat<eT> y = strans(x);
   check_transpose(y, x);
   }
 
@@ -102,8 +151,15 @@ TEMPLATE_TEST_CASE("large_strans", "[trans]", double, float, u32, s32, u64, s64)
 
 TEMPLATE_TEST_CASE("alias_htrans", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x = randi<Mat<TestType>>(10, 5, distr_param(0, 50));
-  Mat<TestType> x_old(x);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(10, 5, distr_param(0, 50));
+  Mat<eT> x_old(x);
   x = x.t();
   check_transpose(x, x_old);
   }
@@ -112,8 +168,15 @@ TEMPLATE_TEST_CASE("alias_htrans", "[trans]", double, float, u32, s32, u64, s64)
 
 TEMPLATE_TEST_CASE("alias_strans", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x = randi<Mat<TestType>>(10, 5, distr_param(0, 50));
-  Mat<TestType> x_old(x);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(10, 5, distr_param(0, 50));
+  Mat<eT> x_old(x);
   x = x.st();
   check_transpose(x, x_old);
   }
@@ -122,8 +185,15 @@ TEMPLATE_TEST_CASE("alias_strans", "[trans]", double, float, u32, s32, u64, s64)
 
 TEMPLATE_TEST_CASE("alias_htrans_subview", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x = randi<Mat<TestType>>(10, 5, distr_param(0, 50));
-  Mat<TestType> x_old = x.submat(1, 1, 5, 3);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(10, 5, distr_param(0, 50));
+  Mat<eT> x_old = x.submat(1, 1, 5, 3);
   x = trans(x.submat(1, 1, 5, 3));
   check_transpose(x, x_old);
   }
@@ -132,8 +202,15 @@ TEMPLATE_TEST_CASE("alias_htrans_subview", "[trans]", double, float, u32, s32, u
 
 TEMPLATE_TEST_CASE("alias_strans_subview", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x = randi<Mat<TestType>>(10, 5, distr_param(0, 50));
-  Mat<TestType> x_old = x.submat(1, 1, 5, 3);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(10, 5, distr_param(0, 50));
+  Mat<eT> x_old = x.submat(1, 1, 5, 3);
   x = strans(x.submat(1, 1, 5, 3));
   check_transpose(x, x_old);
   }
@@ -142,8 +219,15 @@ TEMPLATE_TEST_CASE("alias_strans_subview", "[trans]", double, float, u32, s32, u
 
 TEMPLATE_TEST_CASE("zero_size_htrans", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x;
-  Mat<TestType> y = x.t();
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x;
+  Mat<eT> y = x.t();
   REQUIRE(y.n_elem == 0);
   }
 
@@ -151,8 +235,15 @@ TEMPLATE_TEST_CASE("zero_size_htrans", "[trans]", double, float, u32, s32, u64, 
 
 TEMPLATE_TEST_CASE("zero_size_strans", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x;
-  Mat<TestType> y = x.st();
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x;
+  Mat<eT> y = x.st();
   REQUIRE(y.n_elem == 0);
   }
 
@@ -160,9 +251,16 @@ TEMPLATE_TEST_CASE("zero_size_strans", "[trans]", double, float, u32, s32, u64, 
 
 TEMPLATE_TEST_CASE("1x1_htrans", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x(1, 1);
-  x[0] = TestType(3);
-  Mat<TestType> y = x.t();
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x(1, 1);
+  x[0] = eT(3);
+  Mat<eT> y = x.t();
   check_transpose(y, x);
   }
 
@@ -170,9 +268,16 @@ TEMPLATE_TEST_CASE("1x1_htrans", "[trans]", double, float, u32, s32, u64, s64)
 
 TEMPLATE_TEST_CASE("1x1_strans", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x(1, 1);
-  x[0] = TestType(3);
-  Mat<TestType> y = x.st();
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x(1, 1);
+  x[0] = eT(3);
+  Mat<eT> y = x.st();
   check_transpose(y, x);
   }
 
@@ -180,8 +285,15 @@ TEMPLATE_TEST_CASE("1x1_strans", "[trans]", double, float, u32, s32, u64, s64)
 
 TEMPLATE_TEST_CASE("row_htrans", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Row<TestType> x = randi<Row<TestType>>(10, distr_param(0, 50));
-  Col<TestType> y = x.t();
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Row<eT> x = randi<Row<eT>>(10, distr_param(0, 50));
+  Col<eT> y = x.t();
   check_transpose(y, x);
   }
 
@@ -189,8 +301,15 @@ TEMPLATE_TEST_CASE("row_htrans", "[trans]", double, float, u32, s32, u64, s64)
 
 TEMPLATE_TEST_CASE("row_strans", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Row<TestType> x = randi<Row<TestType>>(10, distr_param(0, 50));
-  Col<TestType> y = x.st();
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Row<eT> x = randi<Row<eT>>(10, distr_param(0, 50));
+  Col<eT> y = x.st();
   check_transpose(y, x);
   }
 
@@ -198,8 +317,15 @@ TEMPLATE_TEST_CASE("row_strans", "[trans]", double, float, u32, s32, u64, s64)
 
 TEMPLATE_TEST_CASE("col_htrans", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Col<TestType> x = randi<Col<TestType>>(10, distr_param(0, 50));
-  Row<TestType> y = x.t();
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Col<eT> x = randi<Col<eT>>(10, distr_param(0, 50));
+  Row<eT> y = x.t();
   check_transpose(y, x);
   }
 
@@ -207,8 +333,15 @@ TEMPLATE_TEST_CASE("col_htrans", "[trans]", double, float, u32, s32, u64, s64)
 
 TEMPLATE_TEST_CASE("col_strans", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Col<TestType> x = randi<Col<TestType>>(10, distr_param(0, 50));
-  Row<TestType> y = x.st();
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Col<eT> x = randi<Col<eT>>(10, distr_param(0, 50));
+  Row<eT> y = x.st();
   check_transpose(y, x);
   }
 
@@ -216,10 +349,17 @@ TEMPLATE_TEST_CASE("col_strans", "[trans]", double, float, u32, s32, u64, s64)
 
 TEMPLATE_TEST_CASE("simple_htrans2", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x = randi<Mat<TestType>>(30, 20, distr_param(0, 50));
-  Mat<TestType> y = TestType(3) * x.t();
-  Mat<TestType> y2 = x.t();
-  y2 *= TestType(3);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(30, 20, distr_param(0, 50));
+  Mat<eT> y = eT(3) * x.t();
+  Mat<eT> y2 = x.t();
+  y2 *= eT(3);
 
   REQUIRE( y.n_rows == y2.n_rows );
   REQUIRE( y.n_cols == y2.n_cols );
@@ -227,7 +367,7 @@ TEMPLATE_TEST_CASE("simple_htrans2", "[trans]", double, float, u32, s32, u64, s6
     {
     for (uword r = 0; r < y.n_rows; ++r)
       {
-      REQUIRE( TestType(y(r, c)) == Approx(TestType(y2(r, c))) );
+      REQUIRE( eT(y(r, c)) == Approx(eT(y2(r, c))) );
       }
     }
   }
@@ -236,10 +376,17 @@ TEMPLATE_TEST_CASE("simple_htrans2", "[trans]", double, float, u32, s32, u64, s6
 
 TEMPLATE_TEST_CASE("htrans_after_op", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x = randi<Mat<TestType>>(30, 20, distr_param(0, 50));
-  Mat<TestType> z = randi<Mat<TestType>>(30, 20, distr_param(10, 100));
-  Mat<TestType> y = trans((4 * (x + 3)) % z);
-  Mat<TestType> op_result = (4 * (x + 3)) % z;
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(30, 20, distr_param(0, 50));
+  Mat<eT> z = randi<Mat<eT>>(30, 20, distr_param(10, 100));
+  Mat<eT> y = trans((4 * (x + 3)) % z);
+  Mat<eT> op_result = (4 * (x + 3)) % z;
   check_transpose(y, op_result);
   }
 
@@ -247,10 +394,17 @@ TEMPLATE_TEST_CASE("htrans_after_op", "[trans]", double, float, u32, s32, u64, s
 
 TEMPLATE_TEST_CASE("strans_after_op", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x = randi<Mat<TestType>>(30, 20, distr_param(0, 50));
-  Mat<TestType> z = randi<Mat<TestType>>(30, 20, distr_param(10, 100));
-  Mat<TestType> y = strans((4 * (x + 3)) % z);
-  Mat<TestType> op_result = (4 * (x + 3)) % z;
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(30, 20, distr_param(0, 50));
+  Mat<eT> z = randi<Mat<eT>>(30, 20, distr_param(10, 100));
+  Mat<eT> y = strans((4 * (x + 3)) % z);
+  Mat<eT> op_result = (4 * (x + 3)) % z;
   check_transpose(y, op_result);
   }
 
@@ -258,11 +412,18 @@ TEMPLATE_TEST_CASE("strans_after_op", "[trans]", double, float, u32, s32, u64, s
 
 TEMPLATE_TEST_CASE("htrans_in_op", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x = randi<Mat<TestType>>(30, 20, distr_param(0, 50));
-  Mat<TestType> z = randi<Mat<TestType>>(20, 30, distr_param(10, 100));
-  Mat<TestType> y = (4 * abs(x) + z.t());
-  Mat<TestType> zt = trans(z);
-  Mat<TestType> y2 = (4 * abs(x) + zt);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(30, 20, distr_param(0, 50));
+  Mat<eT> z = randi<Mat<eT>>(20, 30, distr_param(10, 100));
+  Mat<eT> y = (4 * abs(x) + z.t());
+  Mat<eT> zt = trans(z);
+  Mat<eT> y2 = (4 * abs(x) + zt);
 
   REQUIRE( y.n_rows == y2.n_rows );
   REQUIRE( y.n_cols == y2.n_cols );
@@ -270,7 +431,7 @@ TEMPLATE_TEST_CASE("htrans_in_op", "[trans]", double, float, u32, s32, u64, s64)
     {
     for (uword r = 0; r < y.n_rows; ++r)
       {
-      REQUIRE( TestType(y(r, c)) == Approx(TestType(y2(r, c))) );
+      REQUIRE( eT(y(r, c)) == Approx(eT(y2(r, c))) );
       }
     }
   }
@@ -279,11 +440,18 @@ TEMPLATE_TEST_CASE("htrans_in_op", "[trans]", double, float, u32, s32, u64, s64)
 
 TEMPLATE_TEST_CASE("strans_in_op", "[trans]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x = randi<Mat<TestType>>(30, 20, distr_param(0, 50));
-  Mat<TestType> z = randi<Mat<TestType>>(20, 30, distr_param(10, 100));
-  Mat<TestType> y = (4 * abs(x) + z.st());
-  Mat<TestType> zt = strans(z);
-  Mat<TestType> y2 = (4 * abs(x) + zt);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(30, 20, distr_param(0, 50));
+  Mat<eT> z = randi<Mat<eT>>(20, 30, distr_param(10, 100));
+  Mat<eT> y = (4 * abs(x) + z.st());
+  Mat<eT> zt = strans(z);
+  Mat<eT> y2 = (4 * abs(x) + zt);
 
   REQUIRE( y.n_rows == y2.n_rows );
   REQUIRE( y.n_cols == y2.n_cols );
@@ -291,7 +459,7 @@ TEMPLATE_TEST_CASE("strans_in_op", "[trans]", double, float, u32, s32, u64, s64)
     {
     for (uword r = 0; r < y.n_rows; ++r)
       {
-      REQUIRE( TestType(y(r, c)) == Approx(TestType(y2(r, c))) );
+      REQUIRE( eT(y(r, c)) == Approx(eT(y2(r, c))) );
       }
     }
   }
@@ -310,6 +478,11 @@ TEMPLATE_TEST_CASE(
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Mat<eT1> x = randi<Mat<eT1>>(20, 40, distr_param(0, 50));
   Mat<eT2> y = trans(conv_to<Mat<eT2>>::from(x));
@@ -331,6 +504,11 @@ TEMPLATE_TEST_CASE(
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x = randi<Mat<eT1>>(20, 40, distr_param(0, 50));
   Mat<eT2> y = strans(conv_to<Mat<eT2>>::from(x));
   check_transpose(y, x);
@@ -351,6 +529,11 @@ TEMPLATE_TEST_CASE(
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x = randi<Mat<eT1>>(20, 40, distr_param(0, 50));
   Mat<eT2> y = conv_to<Mat<eT2>>::from(x.t());
   check_transpose(y, x);
@@ -370,6 +553,11 @@ TEMPLATE_TEST_CASE(
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Mat<eT1> x = randi<Mat<eT1>>(20, 40, distr_param(0, 50));
   Mat<eT2> y = conv_to<Mat<eT2>>::from(x.st());

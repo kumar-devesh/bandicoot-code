@@ -1,4 +1,4 @@
-// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2023 Ryan Curtin (https://www.ratml.org/)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,21 +14,19 @@
 
 
 
-// TODO: add other versions
-template<typename T1>
-inline
-bool
-chol(Mat<typename T1::elem_type>& out, const Base<typename T1::elem_type, T1>& X)
+__kernel
+void
+COOT_FN(PREFIX,symmatl_inplace)(__global eT1* out,
+                                const UWORD size)
   {
-  coot_extra_debug_sigprint();
+  const UWORD row = get_global_id(0);
+  const UWORD col = get_global_id(1);
 
-  out = X.get_ref();
-
-  std::tuple<bool, std::string> result = coot_rt_t::chol(out.get_dev_mem(true), out.n_rows);
-  if (std::get<0>(result) == false)
+  if (row < size && col < size && row > col)
     {
-    coot_stop_runtime_error("coot::chol(): " + std::get<1>(result));
-    }
+    const eT1 val = out[row + size * col];
 
-  return true;
+    // only need to copy to the upper triangle for the in-place version
+    out[col + size * row] = val;
+    }
   }

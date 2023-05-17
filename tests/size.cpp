@@ -20,9 +20,9 @@ using namespace coot;
 // create Mat, Row, Col using SizeMat
 TEST_CASE("sizemat_constructors", "[size]")
   {
-  mat X(SizeMat(5, 10));
-  vec C(SizeMat(10, 1));
-  rowvec R(SizeMat(1, 10));
+  fmat X(SizeMat(5, 10));
+  fvec C(SizeMat(10, 1));
+  frowvec R(SizeMat(1, 10));
 
   REQUIRE( X.n_rows == 5 );
   REQUIRE( X.n_cols == 10 );
@@ -42,7 +42,7 @@ TEST_CASE("sizemat_constructors", "[size]")
 // .set_size with SizeMat
 TEST_CASE("mat_set_size_sizemat", "[size]")
   {
-  mat X;
+  fmat X;
   X.zeros(20, 20);
 
   X.set_size(SizeMat(8, 9));
@@ -57,7 +57,7 @@ TEST_CASE("mat_set_size_sizemat", "[size]")
 // .resize with SizeMat
 TEST_CASE("mat_resize_sizemat", "[size]")
   {
-  mat X;
+  fmat X;
   X.ones(20, 20);
 
   X.set_size(SizeMat(30, 40));
@@ -72,17 +72,17 @@ TEST_CASE("mat_resize_sizemat", "[size]")
 // get subview using SizeMat
 TEST_CASE("subview_using_sizemat", "[size]")
   {
-  mat X = randi<mat>(30, 40, distr_param(20, 30));
+  fmat X = randi<fmat>(30, 40, distr_param(20, 30));
 
-  mat Y = X.submat(3, 3, SizeMat(10, 11));
-  mat Y2 = X.submat(3, 3, 12, 13);
+  fmat Y = X.submat(3, 3, SizeMat(10, 11));
+  fmat Y2 = X.submat(3, 3, 12, 13);
 
   REQUIRE( Y.n_rows == 10 );
   REQUIRE( Y.n_cols == 11 );
   REQUIRE( Y.n_elem == 110 );
 
-  arma::mat Y_cpu(Y);
-  arma::mat Y2_cpu(Y2);
+  arma::fmat Y_cpu(Y);
+  arma::fmat Y2_cpu(Y2);
 
   REQUIRE( arma::approx_equal( Y_cpu, Y2_cpu, "reldiff", 1e-5 ) );
   }
@@ -92,14 +92,14 @@ TEST_CASE("subview_using_sizemat", "[size]")
 // get subvec using SizeMat
 TEST_CASE("subvec_using_sizemat", "[size]")
   {
-  vec C = randi<vec>(100, distr_param(10, 20));
-  rowvec R = randi<rowvec>(100, distr_param(10, 20));
+  fvec C = randi<fvec>(100, distr_param(10, 20));
+  frowvec R = randi<frowvec>(100, distr_param(10, 20));
 
-  vec C_sub = C.subvec(3, SizeMat(10, 1));
-  vec C2_sub = C.subvec(3, 12);
+  fvec C_sub = C.subvec(3, SizeMat(10, 1));
+  fvec C2_sub = C.subvec(3, 12);
 
-  rowvec R_sub = R.subvec(3, SizeMat(1, 10));
-  rowvec R2_sub = R.subvec(3, 12);
+  frowvec R_sub = R.subvec(3, SizeMat(1, 10));
+  frowvec R2_sub = R.subvec(3, 12);
 
   REQUIRE( C_sub.n_rows == 10 );
   REQUIRE( C_sub.n_cols == 1 );
@@ -109,10 +109,10 @@ TEST_CASE("subvec_using_sizemat", "[size]")
   REQUIRE( R_sub.n_cols == 10 );
   REQUIRE( R_sub.n_elem == 10 );
 
-  arma::vec C_sub_cpu(C_sub);
-  arma::vec C2_sub_cpu(C2_sub);
-  arma::rowvec R_sub_cpu(R_sub);
-  arma::rowvec R2_sub_cpu(R2_sub);
+  arma::fvec C_sub_cpu(C_sub);
+  arma::fvec C2_sub_cpu(C2_sub);
+  arma::frowvec R_sub_cpu(R_sub);
+  arma::frowvec R2_sub_cpu(R2_sub);
 
   REQUIRE( arma::approx_equal( C_sub_cpu, C2_sub_cpu, "reldiff", 1e-5 ) );
   REQUIRE( arma::approx_equal( R_sub_cpu, R2_sub_cpu, "reldiff", 1e-5 ) );
@@ -209,10 +209,10 @@ TEST_CASE("sizemat_div_scalar", "[size]")
 // use SizeMat with resize
 TEST_CASE("sizemat_resize", "[size]")
   {
-  mat X(30, 30);
+  fmat X(30, 30);
   X.ones();
 
-  mat Y = resize(X, SizeMat(20, 15));
+  fmat Y = resize(X, SizeMat(20, 15));
 
   REQUIRE( Y.n_rows == 20 );
   REQUIRE( Y.n_cols == 15 );
@@ -224,10 +224,10 @@ TEST_CASE("sizemat_resize", "[size]")
 // use SizeMat with reshape
 TEST_CASE("sizemat_reshape", "[size]")
   {
-  mat X(30, 40);
+  fmat X(30, 40);
   X.ones();
 
-  mat Y = reshape(X, SizeMat(20, 15));
+  fmat Y = reshape(X, SizeMat(20, 15));
 
   REQUIRE( Y.n_rows == 20 );
   REQUIRE( Y.n_cols == 15 );
@@ -239,10 +239,10 @@ TEST_CASE("sizemat_reshape", "[size]")
 // create Mat using size of arbitrary object
 TEST_CASE("mat_sizemat_object", "[size]")
   {
-  mat X(30, 30);
+  fmat X(30, 30);
   X.ones();
 
-  mat Y(size(trans(repmat(X, 2, 3))));
+  fmat Y(size(trans(repmat(X, 2, 3))));
 
   REQUIRE( Y.n_rows == 90 );
   REQUIRE( Y.n_cols == 60 );
@@ -253,9 +253,9 @@ TEST_CASE("mat_sizemat_object", "[size]")
 // randi/randn/randu with SizeMat
 TEST_CASE("rand_sizemat", "[size]")
   {
-  mat X = randu<mat>(SizeMat(10, 20));
-  mat Y = randn<mat>(SizeMat(5, 8));
-  mat Z = randi<mat>(SizeMat(20, 10), distr_param(10, 20));
+  fmat X = randu<fmat>(SizeMat(10, 20));
+  fmat Y = randn<fmat>(SizeMat(5, 8));
+  fmat Z = randi<fmat>(SizeMat(20, 10), distr_param(10, 20));
 
   REQUIRE( X.n_rows == 10 );
   REQUIRE( X.n_cols == 20 );

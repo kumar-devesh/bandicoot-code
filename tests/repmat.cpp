@@ -19,9 +19,16 @@ using namespace coot;
 
 TEMPLATE_TEST_CASE("repmat_basic", "[repmat]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x = randi<Mat<TestType>>(5, 5, distr_param(0, 50));
+  typedef TestType eT;
 
-  Mat<TestType> y = repmat(x, 5, 5);
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(5, 5, distr_param(0, 50));
+
+  Mat<eT> y = repmat(x, 5, 5);
 
   REQUIRE(y.n_rows == 25);
   REQUIRE(y.n_cols == 25);
@@ -30,7 +37,7 @@ TEMPLATE_TEST_CASE("repmat_basic", "[repmat]", double, float, u32, s32, u64, s64
     for (size_t r = 0; r < 25; ++r)
       {
       // Approx() is for floating-point imprecision (though that shouldn't be an issue really).
-      REQUIRE( TestType(y(r, c)) == Approx(TestType(x(r % 5, c % 5))) );
+      REQUIRE( eT(y(r, c)) == Approx(eT(x(r % 5, c % 5))) );
       }
     }
   }
@@ -38,8 +45,15 @@ TEMPLATE_TEST_CASE("repmat_basic", "[repmat]", double, float, u32, s32, u64, s64
 
 TEMPLATE_TEST_CASE("repmat_zero_size", "[repmat]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x = randi<Mat<TestType>>(5, 5, distr_param(0, 50));
-  Mat<TestType> y = repmat(x, 0, 0);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(5, 5, distr_param(0, 50));
+  Mat<eT> y = repmat(x, 0, 0);
 
   REQUIRE(y.n_rows == 0);
   REQUIRE(y.n_cols == 0);
@@ -59,8 +73,15 @@ TEMPLATE_TEST_CASE("repmat_zero_size", "[repmat]", double, float, u32, s32, u64,
 
 TEMPLATE_TEST_CASE("repmat_same_size", "[repmat]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x = randi<Mat<TestType>>(5, 5, distr_param(0, 50));
-  Mat<TestType> y = repmat(x, 1, 1);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(5, 5, distr_param(0, 50));
+  Mat<eT> y = repmat(x, 1, 1);
 
   REQUIRE(x.n_rows == y.n_rows);
   REQUIRE(x.n_cols == y.n_cols);
@@ -69,7 +90,7 @@ TEMPLATE_TEST_CASE("repmat_same_size", "[repmat]", double, float, u32, s32, u64,
     {
     for (size_t r = 0; r < y.n_rows; ++r)
       {
-      REQUIRE( TestType(y(r, c)) == Approx(TestType(x(r, c))) );
+      REQUIRE( eT(y(r, c)) == Approx(eT(x(r, c))) );
       }
     }
   }
@@ -78,8 +99,15 @@ TEMPLATE_TEST_CASE("repmat_same_size", "[repmat]", double, float, u32, s32, u64,
 
 TEMPLATE_TEST_CASE("repmat_alias", "[repmat]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x = randi<Mat<TestType>>(5, 5, distr_param(0, 50));
-  Mat<TestType> x_old(x);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(5, 5, distr_param(0, 50));
+  Mat<eT> x_old(x);
   x = repmat(x, 2, 2);
 
   REQUIRE(x.n_rows == 10);
@@ -89,7 +117,7 @@ TEMPLATE_TEST_CASE("repmat_alias", "[repmat]", double, float, u32, s32, u64, s64
     {
     for (size_t r = 0; r < x.n_rows; ++r)
       {
-      REQUIRE( TestType(x(r, c)) == Approx(TestType(x_old(r % x_old.n_rows, c % x_old.n_cols))) );
+      REQUIRE( eT(x(r, c)) == Approx(eT(x_old(r % x_old.n_rows, c % x_old.n_cols))) );
       }
     }
   }
@@ -98,8 +126,15 @@ TEMPLATE_TEST_CASE("repmat_alias", "[repmat]", double, float, u32, s32, u64, s64
 
 TEMPLATE_TEST_CASE("repmat_alias_same_size", "[repmat]", double, float, u32, s32, u64, s64)
   {
-  Mat<TestType> x = randi<Mat<TestType>>(5, 5, distr_param(0, 50));
-  Mat<TestType> x_old(x);
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(5, 5, distr_param(0, 50));
+  Mat<eT> x_old(x);
   x = repmat(x, 1, 1);
 
   REQUIRE(x.n_rows == 5);
@@ -109,7 +144,7 @@ TEMPLATE_TEST_CASE("repmat_alias_same_size", "[repmat]", double, float, u32, s32
     {
     for (size_t r = 0; r < x.n_rows; ++r)
       {
-      REQUIRE( TestType(x(r, c)) == Approx(TestType(x_old(r, c))) );
+      REQUIRE( eT(x(r, c)) == Approx(eT(x_old(r, c))) );
       }
     }
   }
@@ -128,6 +163,11 @@ TEMPLATE_TEST_CASE(
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Mat<eT1> x = randi<Mat<eT1>>(5, 5, distr_param(0, 50));
   Mat<eT2> y = conv_to<Mat<eT2>>::from(repmat(x, 5, 5));
@@ -158,6 +198,11 @@ TEMPLATE_TEST_CASE(
   {
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
   Mat<eT1> x = randi<Mat<eT1>>(5, 5, distr_param(0, 50));
   Mat<eT2> y = repmat(conv_to<Mat<eT2>>::from(x), 5, 5);

@@ -249,6 +249,39 @@ coot_rt_t::release_memory(dev_mem_t<eT> dev_mem)
 
 
 
+template<typename eT>
+inline
+bool
+coot_rt_t::is_supported_type()
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #ifdef COOT_USE_OPENCL
+    return get_rt().cl_rt.is_supported_type<eT>();
+    #else
+    coot_stop_runtime_error("coot_rt::is_supported_type(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #ifdef COOT_USE_CUDA
+    return get_rt().cuda_rt.is_supported_type<eT>();
+    #else
+    coot_stop_runtime_error("coot_rt::is_supported_type(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::is_supported_type(): unknown backend");
+    }
+
+  return false;
+  }
+
+
+
 inline
 void
 coot_rt_t::set_rng_seed(const u64 seed)
@@ -1224,7 +1257,7 @@ coot_rt_t::relational_array_op(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> X_
 
 template<typename eT>
 inline
-bool
+std::tuple<bool, std::string>
 coot_rt_t::chol(dev_mem_t<eT> out, const uword n_rows)
   {
   coot_extra_debug_sigprint();
@@ -1250,7 +1283,7 @@ coot_rt_t::chol(dev_mem_t<eT> out, const uword n_rows)
     coot_stop_runtime_error("coot_rt::chol(): unknown backend");
     }
 
-  return false; // fix warnings
+  return std::make_tuple(false, ""); // fix warnings
   }
 
 
@@ -2409,7 +2442,7 @@ coot_rt_t::mean_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword
     #if defined(COOT_USE_CUDA)
     cuda::mean_subview(out, in, M_n_rows, start_row, start_col, n_rows, n_cols, dim, post_conv_apply);
     #else
-    coot_stop_runtime_error("coot_rt::mean_subview(): CUDA backend not enabled"):
+    coot_stop_runtime_error("coot_rt::mean_subview(): CUDA backend not enabled");
     #endif
     }
   else
@@ -2824,5 +2857,34 @@ coot_rt_t::find(dev_mem_t<uword>& out, uword& out_len, const dev_mem_t<eT> A, co
   else
     {
     coot_stop_runtime_error("coot_rt::find(): unknown backend");
+    }
+  }
+
+
+
+template<typename eT1, typename eT2>
+inline
+void
+coot_rt_t::symmat(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword size, const uword lower)
+  {
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    opencl::symmat(out, in, size, lower);
+    #else
+    coot_stop_runtime_error("coot_rt::symmat(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    cuda::symmat(out, in, size, lower);
+    #else
+    coot_stop_runtime_error("coot_rt::symmat(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::symmat(): unknown backend");
     }
   }
