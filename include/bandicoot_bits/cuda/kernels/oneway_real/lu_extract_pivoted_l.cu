@@ -17,6 +17,7 @@ __global__
 void
 COOT_FN(PREFIX,lu_extract_pivoted_l)(eT1* L,
                                      eT1* U,
+                                     const eT1* in,
                                      const UWORD n_rows,
                                      const UWORD n_cols,
                                      const UWORD* ipiv)
@@ -24,28 +25,26 @@ COOT_FN(PREFIX,lu_extract_pivoted_l)(eT1* L,
   const UWORD row = blockIdx.x * blockDim.x + threadIdx.x;
   const UWORD col = blockIdx.y * blockDim.y + threadIdx.y;
 
-  // Note that U might not be square, but L must be.
-  // If n_cols > n_rows, then U is upper trapezoidal.
-  // If n_rows > n_cols, then L is lower trapezoidal.
-  // However, L is always square (size n_rows x n_rows).
+  // Note that neither U nor L must be square.
+  //   L has size n_rows x min(n_rows, n_cols).
+  //   U has size min(n_rows, n_cols) x n_cols.
+  const UWORD min_rows_cols = min(n_rows, n_cols);
 
-  const UWORD index = row + n_rows * col;
+  const UWORD in_index = row + n_rows * col; // this is also L_out_index
+  const UWORD U_out_index = row + min_rows_cols * col;
 
   // We are extracted a permuted version of L.
   // Instead of extracting row i of U as row i of L,
   // we extract row i of U as row ipiv[i] of L.
-  const UWORD L_index = ipiv[row] + n_rows * col;
+  const UWORD L_out_index = ipiv[row] + n_rows * col;
 
-  if( (row < n_rows) && (col < n_cols))
+  if ((row < n_rows) && (col < min_rows_cols))
     {
-    if (col < n_rows) // L has size n_rows x n_rows
-      {
-      L[L_index] = (row > col) ? U[index] : ((row == col) ? 1 : 0);
-      }
-    U[index] = (row > col) ? 0 : U[index];
+    L[L_out_index] = (row > col) ? in[in_index] : ((row == col) ? 1 : 0);
     }
-  else if ( (row < n_rows) && (col < n_rows) ) // L has size n_rows x n_rows
+
+  if ((row < min_rows_cols) && (col < n_cols))
     {
-    L[L_index] = (row == col) ? 1 : 0; // there is no corresponding entry in U
+    U[U_out_index] = (row > col) ? 0 : in[in_index];
     }
   }

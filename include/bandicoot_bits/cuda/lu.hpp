@@ -20,7 +20,7 @@
 template<typename eT>
 inline
 std::tuple<bool, std::string>
-lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const uword n_rows, const uword n_cols)
+lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_mem_t<eT> P, const uword n_rows, const uword n_cols)
   {
   coot_extra_debug_sigprint();
 
@@ -61,7 +61,7 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
                                        n_rows,
                                        n_cols,
                                        data_type,
-                                       U.cuda_mem_ptr,
+                                       in.cuda_mem_ptr,
                                        n_rows,
                                        data_type,
                                        &gpu_workspace_size,
@@ -99,7 +99,7 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
                             n_rows,
                             n_cols,
                             data_type,
-                            U.cuda_mem_ptr,
+                            in.cuda_mem_ptr,
                             n_rows,
                             ipiv,
                             data_type,
@@ -183,11 +183,13 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
 
   const void* pivot_args[] = { &(L.cuda_mem_ptr),
                                &(U.cuda_mem_ptr),
+                               &(in.cuda_mem_ptr),
                                (uword*) &n_rows,
                                (uword*) &n_cols };
 
   const void* nopivot_args[] = { &(L.cuda_mem_ptr),
                                  &(U.cuda_mem_ptr),
+                                 &(in.cuda_mem_ptr),
                                  (uword*) &n_rows,
                                  (uword*) &n_cols,
                                  &(ipiv_gpu.cuda_mem_ptr) };

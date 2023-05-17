@@ -30,19 +30,46 @@ lu
 
   coot_debug_check( (&L) == (&U), "lu(): L and U are the same object" );
 
-  // The LU factorisation will be done in-place, into U.
-  U = X.get_ref();
-  L.set_size(U.n_rows, U.n_rows);
+  SizeProxy<T1> S(X.get_ref());
+
+  const uword in_n_rows = S.get_n_rows();
+  const uword in_n_cols = S.get_n_cols();
+  const uword min_rows_cols = std::min(in_n_rows, in_n_cols);
+
+  // If n_rows <= n_cols, then we can do the operation in-place in U.
+  // Otherwise, U will be smaller than the matrix we need to do the LU decomposition into.
+  bool U_inplace = false;
+  Mat<typename T1::elem_type> in; // may or may not be used
+  if (in_n_rows > in_n_cols)
+    {
+    // We need to use `in` separately.
+    in = X.get_ref();
+    U.set_size(min_rows_cols, in_n_cols);
+    }
+  else
+    {
+    // We can use the memory of `U` directly.
+    U_inplace = true;
+    U = X.get_ref();
+    }
+
+  L.set_size(in_n_rows, min_rows_cols);
 
   if (U.n_elem == 0)
     {
     // Nothing to do---leave early.
-    L.set_size(U.n_rows, 0);
-    U.set_size(0, U.n_cols);
+    L.set_size(in_n_rows, 0);
+    U.set_size(0, in_n_cols);
     return true;
     }
 
-  const std::tuple<bool, std::string> result = coot_rt_t::lu(L.get_dev_mem(true), U.get_dev_mem(true), false /* no pivoting */, U.get_dev_mem(false) /* ignored */, U.n_rows, U.n_cols);
+  const std::tuple<bool, std::string> result = coot_rt_t::lu(L.get_dev_mem(true),
+                                                             U.get_dev_mem(true),
+                                                             (U_inplace ? U.get_dev_mem(true) : in.get_dev_mem(true)),
+                                                             false /* no pivoting */,
+                                                             U.get_dev_mem(false) /* ignored */,
+                                                             in_n_rows,
+                                                             in_n_cols);
   if (!std::get<0>(result))
     {
     coot_debug_warn("lu(): " + std::get<1>(result));
@@ -70,21 +97,48 @@ lu
 
   coot_debug_check( (&L) == (&U), "lu(): L and U are the same object" );
 
-  // The LU factorisation will be done in-place, into U.
-  U = X.get_ref();
-  L.set_size(U.n_rows, U.n_rows);
-  P.zeros(U.n_rows, U.n_rows);
+  SizeProxy<T1> S(X.get_ref());
+
+  const uword in_n_rows = S.get_n_rows();
+  const uword in_n_cols = S.get_n_cols();
+  const uword min_rows_cols = std::min(in_n_rows, in_n_cols);
+
+  // If n_rows <= n_cols, then we can do the operation in-place in U.
+  // Otherwise, U will be smaller than the matrix we need to do the LU decomposition into.
+  bool U_inplace = false;
+  Mat<typename T1::elem_type> in; // may or may not be used
+  if (in_n_rows > in_n_cols)
+    {
+    // We need to use `in` separately.
+    in = X.get_ref();
+    U.set_size(min_rows_cols, in_n_cols);
+    }
+  else
+    {
+    // We can use the memory of `U` directly.
+    U_inplace = true;
+    U = X.get_ref();
+    }
+
+  L.set_size(in_n_rows, min_rows_cols);
+  P.zeros(in_n_rows, in_n_rows);
 
   if (U.n_elem == 0)
     {
     // Nothing to do---leave early.
-    L.set_size(U.n_rows, 0);
-    U.set_size(0, U.n_cols);
-    P.eye(L.n_rows, L.n_rows);
+    L.set_size(in_n_rows, 0);
+    U.set_size(0, in_n_cols);
+    P.eye(in_n_rows, in_n_rows);
     return true;
     }
 
-  const std::tuple<bool, std::string> result = coot_rt_t::lu(L.get_dev_mem(true), U.get_dev_mem(true), true, P.get_dev_mem(true), U.n_rows, U.n_cols);
+  const std::tuple<bool, std::string> result = coot_rt_t::lu(L.get_dev_mem(true),
+                                                             U.get_dev_mem(true),
+                                                             (U_inplace ? U.get_dev_mem(true) : in.get_dev_mem(true)),
+                                                             true,
+                                                             P.get_dev_mem(true),
+                                                             in_n_rows,
+                                                             in_n_cols);
   if (!std::get<0>(result))
     {
     coot_debug_warn("lu(): " + std::get<1>(result));

@@ -20,7 +20,7 @@
 template<typename eT>
 inline
 std::tuple<bool, std::string>
-lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const uword n_rows, const uword n_cols)
+lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_mem_t<eT> P, const uword n_rows, const uword n_cols)
   {
   coot_extra_debug_sigprint();
 
@@ -29,7 +29,8 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
     return std::make_tuple(false, "OpenCL runtime not valid");
     }
 
-  // We'll perform the operation in-place in U.
+  // We'll perform the operation in-place in `in`.
+  // If n_rows <= n_cols, then `in` can safely be the same memory as `U`.
 
   magma_int_t info   = 0;
   magma_int_t status = 0; // NOTE: all paths through dgetrf and sgetrf just return status == info...
@@ -39,11 +40,11 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
 
   if(is_float<eT>::value)
     {
-    status = magma_sgetrf_gpu(n_rows, n_cols, U.cl_mem_ptr, 0, n_rows, ipiv, &info);
+    status = magma_sgetrf_gpu(n_rows, n_cols, in.cl_mem_ptr, 0, n_rows, ipiv, &info);
     }
   else if (is_double<eT>::value)
     {
-    status = magma_dgetrf_gpu(n_rows, n_cols, U.cl_mem_ptr, 0, n_rows, ipiv, &info);
+    status = magma_dgetrf_gpu(n_rows, n_cols, in.cl_mem_ptr, 0, n_rows, ipiv, &info);
     }
   else
     {
@@ -103,11 +104,12 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
 
   status2  = clSetKernelArg(kernel, 0, sizeof(cl_mem), &(L.cl_mem_ptr));
   status2 |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &(U.cl_mem_ptr));
-  status2 |= clSetKernelArg(kernel, 2, dev_n_rows.size, dev_n_rows.addr);
-  status2 |= clSetKernelArg(kernel, 3, dev_n_cols.size, dev_n_cols.addr);
+  status2 |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &(in.cl_mem_ptr));
+  status2 |= clSetKernelArg(kernel, 3, dev_n_rows.size, dev_n_rows.addr);
+  status2 |= clSetKernelArg(kernel, 4, dev_n_cols.size, dev_n_cols.addr);
   if (!pivoting)
     {
-    status2 |= clSetKernelArg(kernel, 4, sizeof(cl_mem), &(ipiv_gpu.cl_mem_ptr));
+    status2 |= clSetKernelArg(kernel, 5, sizeof(cl_mem), &(ipiv_gpu.cl_mem_ptr));
     }
 
   if (status2 != CL_SUCCESS)
