@@ -78,7 +78,7 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
   runtime_t::cq_guard guard;
 
   // If pivoting is allowed, we extract L as-is.  Otherwise, we apply the pivoting to L while we extract it.
-  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(pivoting ? oneway_kernel_id::lu_extract_l : oneway_kernel_id::lu_extract_pivoted_l);
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(pivoting ? oneway_real_kernel_id::lu_extract_l : oneway_real_kernel_id::lu_extract_pivoted_l);
 
   runtime_t::adapt_uword dev_n_rows(n_rows);
   runtime_t::adapt_uword dev_n_cols(n_cols);
@@ -104,7 +104,7 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
   // If pivoting was allowed, extract the permutation matrix.
   if (pivoting)
     {
-    kernel = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::lu_extract_p);
+    kernel = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::lu_extract_p);
 
     status2  = clSetKernelArg(kernel, 0, sizeof(cl_mem),    &(P.cl_mem_ptr));
     status2 |= clSetKernelArg(kernel, 1, sizeof(cl_mem),    &(ipiv_gpu.cl_mem_ptr));

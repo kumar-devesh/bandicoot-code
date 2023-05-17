@@ -146,7 +146,7 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
   coot_check_cuda_error(status2, "coot::cuda::lu(): couldn't cudaFree() pivot array");
 
   // Now extract the lower triangular part (excluding diagonal).  This is done with a custom kernel.
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(pivoting ? oneway_kernel_id::lu_extract_l : oneway_kernel_id::lu_extract_pivoted_l);
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(pivoting ? oneway_real_kernel_id::lu_extract_l : oneway_real_kernel_id::lu_extract_pivoted_l);
 
   const void* pivot_args[] = { &(L.cuda_mem_ptr),
                                &(U.cuda_mem_ptr),
@@ -172,7 +172,7 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, const bool pivoting, dev_mem_t<eT> P, const
   // If pivoting was allowed, extract the permutation matrix.
   if (pivoting)
     {
-    kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::lu_extract_p);
+    kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::lu_extract_p);
 
     const void* args2[] = {
         &(P.cuda_mem_ptr),
