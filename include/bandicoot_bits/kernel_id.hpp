@@ -130,6 +130,7 @@ struct oneway_kernel_id
     find_last,
     //
     lu_extract_l,
+    lu_extract_pivoted_l,
     lu_extract_p,
     //
     invalid_kernel
@@ -222,6 +223,7 @@ struct oneway_kernel_id
     names.push_back("find_last");
 
     names.push_back("lu_extract_l");
+    names.push_back("lu_extract_pivoted_l");
     names.push_back("lu_extract_p");
 
     return names;
