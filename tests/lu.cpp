@@ -244,9 +244,11 @@ TEMPLATE_TEST_CASE("lu_random_sizes_arma_comparison", "[lu]", float, double)
 
     REQUIRE( status == true );
 
+    const uword min_mn = std::min(m, n);
+
     REQUIRE( L.n_rows == X.n_rows );
-    REQUIRE( L.n_cols == X.n_rows );
-    REQUIRE( U.n_rows == X.n_rows );
+    REQUIRE( L.n_cols == min_mn   );
+    REQUIRE( U.n_rows == min_mn   );
     REQUIRE( U.n_cols == X.n_cols );
 
     arma::Mat<eT> X_cpu(X);
@@ -520,9 +522,11 @@ TEMPLATE_TEST_CASE("lup_random_sizes_arma_comparison", "[lu]", float, double)
 
     REQUIRE( status == true );
 
+    const uword min_mn = std::min(m, n);
+
     REQUIRE( L.n_rows == X.n_rows );
-    REQUIRE( L.n_cols == X.n_rows );
-    REQUIRE( U.n_rows == X.n_rows );
+    REQUIRE( L.n_cols == min_mn   );
+    REQUIRE( U.n_rows == min_mn   );
     REQUIRE( U.n_cols == X.n_cols );
     REQUIRE( P.n_rows == X.n_rows );
     REQUIRE( P.n_cols == X.n_rows );
