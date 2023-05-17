@@ -58,17 +58,7 @@ TEMPLATE_TEST_CASE("lu_small", "[lu]", float, double)
     {
     for (uword r = 0; r < 4; ++r)
       {
-      if (c > r)
-        {
-        // Check that L is lower triangular.
-        REQUIRE( eT(L(r, c)) == eT(0) );
-        }
-      else if (c == r)
-        {
-        // The diagonal of L should be 1.
-        REQUIRE( eT(L(r, c)) == eT(1) );
-        }
-      else
+      if (r > c)
         {
         // Check that U is upper triangular.
         REQUIRE( eT(U(r, c)) == eT(0) );
@@ -77,23 +67,33 @@ TEMPLATE_TEST_CASE("lu_small", "[lu]", float, double)
     }
 
   // Check that the solution is approximately accurate.
-  // These solutions were computed by Julia (with no pivoting).
-  REQUIRE( eT(L(1, 0)) == Approx(eT(9.0)        ).margin(1e-5) );
-  REQUIRE( eT(L(2, 0)) == Approx(eT(3.0)        ).margin(1e-5) );
-  REQUIRE( eT(L(3, 0)) == Approx(eT(0.0)        ).margin(1e-5) );
-  REQUIRE( eT(L(2, 1)) == Approx(eT(1.0 / 5.0)  ).margin(1e-5) );
-  REQUIRE( eT(L(3, 1)) == Approx(eT(0.0)        ).margin(1e-5) );
-  REQUIRE( eT(L(3, 2)) == Approx(eT(-5.0 / 11.0)).margin(1e-5) );
+  // These solutions were computed by Julia (with pivoting).
+  REQUIRE( eT(L(0, 0)) == Approx(eT(1.0 / 9.0) ).margin(1e-5) );
+  REQUIRE( eT(L(1, 0)) == Approx(eT(1.0)       ).margin(1e-5) );
+  REQUIRE( eT(L(2, 0)) == Approx(eT(1.0 / 3.0) ).margin(1e-5) );
+  REQUIRE( eT(L(3, 0)) == Approx(eT(0.0)       ).margin(1e-5) );
+  REQUIRE( eT(L(0, 1)) == Approx(eT(5.0 / 6.0) ).margin(1e-5) );
+  REQUIRE( eT(L(1, 1)) == Approx(eT(0.0)       ).margin(1e-5) );
+  REQUIRE( eT(L(2, 1)) == Approx(eT(1.0)       ).margin(1e-5) );
+  REQUIRE( eT(L(3, 1)) == Approx(eT(0.0)       ).margin(1e-5) );
+  REQUIRE( eT(L(0, 2)) == Approx(eT(1.0)       ).margin(1e-5) );
+  REQUIRE( eT(L(1, 2)) == Approx(eT(0.0)       ).margin(1e-5) );
+  REQUIRE( eT(L(2, 2)) == Approx(eT(0.0)       ).margin(1e-5) );
+  REQUIRE( eT(L(3, 2)) == Approx(eT(6.0 / 11.0)).margin(1e-5) );
+  REQUIRE( eT(L(0, 3)) == Approx(eT(0.0)       ).margin(1e-5) );
+  REQUIRE( eT(L(1, 3)) == Approx(eT(0.0)       ).margin(1e-5) );
+  REQUIRE( eT(L(2, 3)) == Approx(eT(0.0)       ).margin(1e-5) );
+  REQUIRE( eT(L(3, 3)) == Approx(eT(1.0)       ).margin(1e-5) );
 
-  REQUIRE( eT(U(0, 0)) == Approx(eT(1.0)       ).margin(1e-5) );
-  REQUIRE( eT(U(0, 1)) == Approx(eT(3.0)       ).margin(1e-5) );
-  REQUIRE( eT(U(1, 1)) == Approx(eT(-25.0)     ).margin(1e-5) );
-  REQUIRE( eT(U(0, 2)) == Approx(eT(5.0)       ).margin(1e-5) );
-  REQUIRE( eT(U(1, 2)) == Approx(eT(-39.0)     ).margin(1e-5) );
-  REQUIRE( eT(U(2, 2)) == Approx(eT(-2.2)      ).margin(1e-5) );
-  REQUIRE( eT(U(0, 3)) == Approx(eT(7.0)       ).margin(1e-5) );
-  REQUIRE( eT(U(1, 3)) == Approx(eT(-55.0)     ).margin(1e-5) );
-  REQUIRE( eT(U(2, 3)) == Approx(eT(-4.0)      ).margin(1e-5) );
+  REQUIRE( eT(U(0, 0)) == Approx(eT(9.0)       ).margin(1e-5) );
+  REQUIRE( eT(U(0, 1)) == Approx(eT(2.0)       ).margin(1e-5) );
+  REQUIRE( eT(U(1, 1)) == Approx(eT(10.0 / 3.0)).margin(1e-5) );
+  REQUIRE( eT(U(0, 2)) == Approx(eT(6.0)       ).margin(1e-5) );
+  REQUIRE( eT(U(1, 2)) == Approx(eT(3.0)       ).margin(1e-5) );
+  REQUIRE( eT(U(2, 2)) == Approx(eT(11.0 / 6.0)).margin(1e-5) );
+  REQUIRE( eT(U(0, 3)) == Approx(eT(8.0)       ).margin(1e-5) );
+  REQUIRE( eT(U(1, 3)) == Approx(eT(10.0 / 3.0)).margin(1e-5) );
+  REQUIRE( eT(U(2, 3)) == Approx(eT(10.0 / 3.0)).margin(1e-5) );
   REQUIRE( eT(U(3, 3)) == Approx(eT(2.0 / 11.0)).margin(1e-5) );
   }
 
@@ -121,9 +121,8 @@ TEMPLATE_TEST_CASE("lu_random_large", "[lu]", float, double)
     REQUIRE( U.n_rows == n );
     REQUIRE( U.n_cols == n );
 
-    // Check properties of L and U.
-    arma::Mat<eT> L_cpu(L);
-    REQUIRE( L_cpu.is_trimatl() );
+    // Check properties of U.
+    // Due to the pivoting, L is not necessarily lower triangular.
     arma::Mat<eT> U_cpu(U);
     REQUIRE( U_cpu.is_trimatu() );
 
@@ -223,8 +222,14 @@ TEMPLATE_TEST_CASE("lu_random_sizes_arma_comparison", "[lu]", float, double)
   {
   typedef TestType eT;
 
+  const size_t seed = std::time(NULL);
+  arma::arma_rng::set_seed(seed);
+
   arma::uvec x_sizes = arma::randi<arma::uvec>(15, arma::distr_param(100, 2000));
   arma::uvec y_sizes = arma::randi<arma::uvec>(15, arma::distr_param(100, 2000));
+
+  x_sizes[0] = 91;
+  y_sizes[0] = 109;
 
   for (size_t t = 0; t < 15; ++t)
     {
@@ -255,18 +260,17 @@ TEMPLATE_TEST_CASE("lu_random_sizes_arma_comparison", "[lu]", float, double)
     arma::Mat<eT> Xr_cpu = L_ref * U_ref;
 
     const double cpu_error = arma::norm(X_cpu - Xr_cpu, 2);
-    const double error = norm(X - Xr, 2);
+    Xr -= X;
+    const double error = std::sqrt(accu(square(Xr)));
 
     if (cpu_error > 1e-7)
       {
       // The GPU version can be a bit more inaccurate.
-      const double tol_factor = (is_float<eT>::value ? 5000 : 500);
-      REQUIRE( error < tol_factor * cpu_error );
+      REQUIRE( error < 50 * cpu_error );
       }
     else
       {
-      const double tol = (is_float<eT>::value ? 5e-4 : 1e-6);
-      REQUIRE( error < tol );
+      REQUIRE( error < 1e-6 );
       }
     }
   }
@@ -543,8 +547,7 @@ TEMPLATE_TEST_CASE("lup_random_sizes_arma_comparison", "[lu]", float, double)
       }
     else
       {
-      const double tol = 1e-6;
-      REQUIRE( error < tol );
+      REQUIRE( error < 1e-6 );
       }
     }
   }
