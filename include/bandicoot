@@ -308,8 +308,6 @@ namespace coot
     #include "bandicoot_bits/opencl/magma/sgesvd.hpp"
     #include "bandicoot_bits/opencl/magma/spotrf.hpp"
     #include "bandicoot_bits/opencl/magma/sgetrf.hpp"
-    #include "bandicoot_bits/opencl/magma/sgetf2.hpp"
-    #include "bandicoot_bits/opencl/magma/sgetrf_nopiv.hpp"
 
     #include "bandicoot_bits/opencl/magma/dlarfb.hpp"
     #include "bandicoot_bits/opencl/magma/dorgqr.hpp"
@@ -327,8 +325,6 @@ namespace coot
     #include "bandicoot_bits/opencl/magma/dgesvd.hpp"
     #include "bandicoot_bits/opencl/magma/dpotrf.hpp"
     #include "bandicoot_bits/opencl/magma/dgetrf.hpp"
-    #include "bandicoot_bits/opencl/magma/dgetf2.hpp"
-    #include "bandicoot_bits/opencl/magma/dgetrf_nopiv.hpp"
 
     namespace opencl
       {
