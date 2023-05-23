@@ -25,6 +25,12 @@ namespace coot
   #define coot_sort01 sort01
   #define coot_dort01 dort01
 
+  #define coot_sgeqlf sgeqlf
+  #define coot_dgeqlf dgeqlf
+
+  #define coot_sormql sormql
+  #define coot_dormql dormql
+
 #else
 
   #define coot_sbdt01 SBDT01
@@ -32,6 +38,12 @@ namespace coot
 
   #define coot_sort01 SORT01
   #define coot_dort01 DORT01
+
+  #define coot_sgeqlf SGEQLF
+  #define coot_dgeqlf DGEQLF
+
+  #define coot_sormql SORMQL
+  #define coot_dormql DORMQL
 
 #endif
 
@@ -44,6 +56,14 @@ extern "C"
   // check that matrix is orthogonal
   void coot_fortran(coot_sort01)(const char* rowcol, const blas_int* m, const blas_int* n, const float*  u, const blas_int* ldu, float*  work, const blas_int* lwork, float*  resid);
   void coot_fortran(coot_dort01)(const char* rowcol, const blas_int* m, const blas_int* n, const double* u, const blas_int* ldu, double* work, const blas_int* lwork, double* resid);
+
+  // QL factorisation of real matrix
+  void coot_fortran(coot_sgeqlf)(const blas_int* m, const blas_int* n, const float*  A, const blas_int* lda, const float*  tau, const float*  work, const blas_int* lwork, blas_int* info);
+  void coot_fortran(coot_dgeqlf)(const blas_int* m, const blas_int* n, const double* A, const blas_int* lda, const double* tau, const double* work, const blas_int* lwork, blas_int* info);
+
+  // multiply matrix C by orthogonal matrix Q, which came from gelqf
+  void coot_fortran(coot_sormql)(const char* side, const char* trans, const blas_int* m, const blas_int* n, const blas_int* k, const float*  A, const blas_int* lda, const float*  tau, float*  C, const blas_int* ldc, float*  work, const blas_int* lwork, blas_int* info);
+  void coot_fortran(coot_dormql)(const char* side, const char* trans, const blas_int* m, const blas_int* n, const blas_int* k, const double* A, const blas_int* lda, const double* tau, double* C, const blas_int* ldc, double* work, const blas_int* lwork, blas_int* info);
   }
 
   }; // namespace coot
