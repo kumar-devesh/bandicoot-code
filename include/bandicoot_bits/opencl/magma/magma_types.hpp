@@ -95,13 +95,13 @@ typedef enum {
     MagmaHessenberg    = 124   /* lascl */
 } magma_uplo_t;
 
+typedef magma_uplo_t magma_type_t;  /* lascl */
 
 typedef enum {
     MagmaLeft          = 141,
     MagmaRight         = 142,
     MagmaBothSides     = 143   /* trevc */
 } magma_side_t;
-
 
 typedef enum {
     MagmaNoTrans       = 111,

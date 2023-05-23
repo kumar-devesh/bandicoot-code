@@ -209,6 +209,68 @@ magmablas_run_laset_kernel
 
 inline
 void
+magmablas_slaset_band(magma_uplo_t uplo, magma_int_t m, magma_int_t n, magma_int_t k, float offdiag, float diag, magmaFloat_ptr dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue)
+  {
+  magmablas_laset_band<float>(uplo, m, n, k, offdiag, diag, (cl_mem) dA, dA_offset, ldda, queue);
+  }
+
+
+
+inline
+void
+magmablas_dlaset_band(magma_uplo_t uplo, magma_int_t m, magma_int_t n, magma_int_t k, double offdiag, double diag, magmaDouble_ptr dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue)
+  {
+  magmablas_laset_band<double>(uplo, m, n, k, offdiag, diag, (cl_mem) dA, dA_offset, ldda, queue);
+  }
+
+
+
+template<typename eT>
+inline
+void
+magmablas_laset_band(magma_uplo_t uplo, magma_int_t m, magma_int_t n, magma_int_t k, eT offdiag, eT diag, cl_mem dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue)
+  {
+  cl_int status;
+
+  opencl::runtime_t::adapt_uword local_m(m);
+  opencl::runtime_t::adapt_uword local_n(n);
+  opencl::runtime_t::adapt_uword local_k(k);
+  opencl::runtime_t::adapt_uword local_dA_offset(dA_offset);
+  opencl::runtime_t::adapt_uword local_ldda(ldda);
+
+  opencl::magma_real_kernel_id::enum_id num;
+  if (uplo == MagmaLower)
+    {
+    num = opencl::magma_real_kernel_id::laset_band_lower;
+    }
+  else
+    {
+    num = opencl::magma_real_kernel_id::laset_band_upper;
+    }
+
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(num);
+
+  status  = clSetKernelArg(kernel, 0, local_m.size,         local_m.addr);
+  status |= clSetKernelArg(kernel, 1, local_n.size,         local_n.addr);
+  status |= clSetKernelArg(kernel, 2, sizeof(eT),           &offdiag);
+  status |= clSetKernelArg(kernel, 3, sizeof(eT),           &diag);
+  status |= clSetKernelArg(kernel, 4, sizeof(cl_mem),       &dA);
+  status |= clSetKernelArg(kernel, 5, local_dA_offset.size, local_dA_offset.addr);
+  status |= clSetKernelArg(kernel, 6, local_ldda.size,      local_ldda.addr);
+  coot_check_runtime_error(status, "coot::opencl::magmablas_laset_band(): couldn't set kernel arguments");
+
+  size_t threads = size_t(std::min(k, m));
+  size_t grid    = size_t(magma_ceildiv( std::min(m, n), MAGMA_LASET_BAND_NB ));
+  grid *= threads;
+
+  status |= clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &grid, &threads, 0, NULL, NULL);
+  coot_check_runtime_error(status, "coot::opencl::magmablas_laset_band(): couldn't execute kernel");
+  }
+
+
+
+inline
+void
 magmablas_stranspose
   (
   magma_int_t m,

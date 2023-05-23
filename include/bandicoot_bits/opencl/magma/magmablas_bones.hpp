@@ -60,6 +60,7 @@
 #define MAGMABLAS_TRANS_NB 32
 #define MAGMABLAS_TRANS_INPLACE_NB 16
 
+#define MAGMA_LASET_BAND_NB 64
 
 
 inline
@@ -78,6 +79,25 @@ template<typename eT>
 inline
 void
 magmablas_run_laset_kernel(const opencl::magma_real_kernel_id::enum_id num, magma_uplo_t uplo, magma_int_t m, magma_int_t n, eT offdiag, eT diag, cl_mem dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue);
+
+
+
+inline
+void
+magmablas_slaset_band(magma_uplo_t uplo, magma_int_t m, magma_int_t n, magma_int_t k, float offdiag, float diag, magmaFloat_ptr dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue);
+
+
+
+inline
+void
+magmablas_dlaset_band(magma_uplo_t uplo, magma_int_t m, magma_int_t n, magma_int_t k, double offdiag, double diag, magmaDouble_ptr dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue);
+
+
+
+template<typename eT>
+inline
+void
+magmablas_laset_band(magma_uplo_t uplo, magma_int_t m, magma_int_t n, magma_int_t k, eT offdiag, eT diag, cl_mem dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue);
 
 
 
@@ -116,3 +136,23 @@ template<typename eT>
 inline
 void
 magmablas_transpose_inplace(magma_int_t n, cl_mem dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue);
+
+
+
+// TODO: implement these!
+inline
+void
+magmablas_slascl(magma_type_t type, magma_int_t kl, magma_int_t ku, float cfrom, float cto, magma_int_t m, magma_int_t n, magmaFloat_ptr dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue, magma_int_t *info);
+
+
+
+inline
+void
+magmablas_dlascl(magma_type_t type, magma_int_t kl, magma_int_t ku, double cfrom, double cto, magma_int_t m, magma_int_t n, magmaDouble_ptr dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue, magma_int_t *info);
+
+
+
+template<typename eT>
+inline
+void
+magmablas_lascl(magma_type_t type, magma_int_t kl, magma_int_t ku, eT cfrom, eT cto, magma_int_t m, magma_int_t n, cl_mem dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue, magma_int_t *info);

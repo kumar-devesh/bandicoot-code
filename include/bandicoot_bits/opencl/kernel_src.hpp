@@ -127,6 +127,7 @@ kernel_src::get_src_preamble(const bool has_float64)
   "#define MAGMA_TRANS_NY 8 \n"
   "#define MAGMA_TRANS_NB 32 \n"
   "#define MAGMA_TRANS_INPLACE_NB 16 \n"
+  "#define MAGMA_LASET_BAND_NB 64 \n"
   "\n"
   // Sometimes we need to approximate Armadillo functionality that uses
   // double---but double may not be available.  So we do our best...
