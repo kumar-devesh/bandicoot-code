@@ -324,6 +324,7 @@ namespace coot
     #include "bandicoot_bits/opencl/magma/dormbr.hpp"
     #include "bandicoot_bits/opencl/magma/dgesvd.hpp"
     #include "bandicoot_bits/opencl/magma/dpotrf.hpp"
+    #include "bandicoot_bits/opencl/magma/dormql2.hpp"
 
     namespace opencl
       {
