@@ -97,7 +97,7 @@ magma_dormql2_gpu
 
   // Parameter adjustments for Fortran indexing
   wA -= 1 + ldwa;
-  dC_offset -= 1 + lddc;
+  size_t dC_neg_offset = 1 + lddc;
   --tau;
 
   *info  = 0;
@@ -238,8 +238,8 @@ magma_dormql2_gpu
     magma_dsetmatrix( ib, ib, T, ib, dT, dT_offset, ib, queue );
     magma_dlarfb_gpu( side, trans, MagmaBackward, MagmaColumnwise,
                       mi, ni, ib,
-                      dA, dA_offset + (i-1) * ldda, ldda, dT, dT_offset, ib,  // dA using 0-based indices here
-                      dC, dC_offset + 1 + lddc, lddc,
+                      dA, dA_offset + (i-1) * ldda,             ldda, dT, dT_offset, ib,  // dA using 0-based indices here
+                      dC, dC_offset + 1 + lddc - dC_neg_offset, lddc,
                       dwork, 0, lddwork, queue );
     }
 
