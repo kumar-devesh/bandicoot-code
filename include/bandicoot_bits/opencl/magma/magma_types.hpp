@@ -131,6 +131,12 @@ typedef enum {
 } magma_direct_t;
 
 typedef enum {
+    MagmaRangeAll      = 311,  /* syevx, etc. */
+    MagmaRangeV        = 312,
+    MagmaRangeI        = 313
+} magma_range_t;
+
+typedef enum {
     MagmaQ             = 322,  /* unmbr, ungbr */
     MagmaP             = 323
 } magma_vect_t;

@@ -325,6 +325,9 @@ magma_ssetvector(magma_int_t m,
 
 //
 // double
+//
+
+
 
 inline
 void
@@ -346,6 +349,7 @@ magma_dgetmatrix_async(magma_int_t m, magma_int_t n, magmaDouble_const_ptr dA_sr
   clFlush(queue);
   check_error( err );
   }
+
 
 
 inline
@@ -370,6 +374,7 @@ magma_dgetmatrix_async(magma_int_t m, magma_int_t n, magmaDouble_const_ptr dA_sr
   }
 
 
+
 inline
 void
 magma_dsetmatrix_async(magma_int_t m, magma_int_t n, double const* hA_src, magma_int_t ldha, magmaDouble_ptr dB_dst, size_t dB_offset, magma_int_t lddb, magma_queue_t queue, magma_event_t *event)
@@ -390,6 +395,7 @@ magma_dsetmatrix_async(magma_int_t m, magma_int_t n, double const* hA_src, magma
   clFlush(queue);
   check_error( err );
   }
+
 
 
 inline
@@ -415,9 +421,42 @@ magma_dsetmatrix_async(magma_int_t m, magma_int_t n, double const* hA_src, magma
 
 
 
+inline
+void
+magma_dsetvector_async
+  (
+  magma_int_t n,
+  double const    *hx_src,                   magma_int_t incx,
+  magmaDouble_ptr  dy_dst, size_t dy_offset, magma_int_t incy,
+  magma_queue_t queue
+  )
+  {
+  magma_dsetmatrix(1, n, hx_src, incx, dy_dst, dy_offset, incy, queue);
+  }
+
+
+
+inline
+void
+magma_dgetvector_async
+  (
+  magma_int_t n,
+  magmaDouble_const_ptr  dx_src, size_t dx_offset, magma_int_t incx,
+  double                *hy_dst,                   magma_int_t incy,
+  magma_queue_t queue,
+  const char* func, const char* file, int line
+  )
+  {
+  magma_dgetmatrix_async(1, n, dx_src, dx_offset, incx, hy_dst, incy, queue);
+  }
+
+
 
 //
 // float
+//
+
+
 
 inline
 void
@@ -441,6 +480,7 @@ magma_sgetmatrix_async(magma_int_t m, magma_int_t n, magmaFloat_const_ptr dA_src
   }
 
 
+
 inline
 void
 magma_sgetmatrix_async(magma_int_t m, magma_int_t n, magmaFloat_const_ptr dA_src, size_t dA_offset, magma_int_t ldda, float* hB_dst, magma_int_t ldhb, magma_queue_t queue)
@@ -461,6 +501,7 @@ magma_sgetmatrix_async(magma_int_t m, magma_int_t n, magmaFloat_const_ptr dA_src
   clFlush(queue);
   check_error( err );
   }
+
 
 
 inline
@@ -504,6 +545,37 @@ magma_ssetmatrix_async(magma_int_t m, magma_int_t n, float const* hA_src, magma_
 
   clFlush(queue);
   check_error( err );
+  }
+
+
+
+inline
+void
+magma_ssetvector_async
+  (
+  magma_int_t n,
+  float const    *hx_src,                   magma_int_t incx,
+  magmaFloat_ptr  dy_dst, size_t dy_offset, magma_int_t incy,
+  magma_queue_t queue
+  )
+  {
+  magma_ssetmatrix(1, n, hx_src, incx, dy_dst, dy_offset, incy, queue);
+  }
+
+
+
+inline
+void
+magma_sgetvector_async
+  (
+  magma_int_t n,
+  magmaFloat_const_ptr  dx_src, size_t dx_offset, magma_int_t incx,
+  float                *hy_dst,                   magma_int_t incy,
+  magma_queue_t queue,
+  const char* func, const char* file, int line
+  )
+  {
+  magma_sgetmatrix_async(1, n, dx_src, dx_offset, incx, hy_dst, incy, queue);
   }
 
 
@@ -1077,6 +1149,324 @@ magma_strmm(
     clFlush(queue);
     check_error( err );
 }
+
+
+
+// symv
+
+
+
+inline
+void
+magmablas_ssymv_work
+  (
+  magma_uplo_t uplo, magma_int_t n,
+  float alpha,
+  magmaFloat_const_ptr dA, size_t dA_offset, magma_int_t ldda,
+  magmaFloat_const_ptr dx, size_t dx_offset, magma_int_t incx,
+  float beta,
+  magmaFloat_ptr dy, size_t dy_offset, magma_int_t incy,
+  magmaFloat_ptr dwork, size_t dwork_offset, magma_int_t lwork, // unused!
+  magma_queue_t queue
+  )
+  {
+  coot_ignore(dwork);
+  coot_ignore(dwork_offset);
+  coot_ignore(lwork);
+
+  if (n <= 0)
+    {
+    return;
+    }
+
+  cl_int err = clblasSsymv(
+      clblasColumnMajor,
+      clblas_uplo_const( uplo ),
+      n,
+      alpha, dA, dA_offset, ldda,
+             dx, dx_offset, incx,
+      beta,  dy, dy_offset, incy,
+      1, &queue, 0, NULL, get_g_event() );
+  clFlush(queue);
+  check_error( err );
+  }
+
+
+
+inline
+void
+magmablas_dsymv_work
+  (
+  magma_uplo_t uplo, magma_int_t n,
+  double alpha,
+  magmaDouble_const_ptr dA, size_t dA_offset, magma_int_t ldda,
+  magmaDouble_const_ptr dx, size_t dx_offset, magma_int_t incx,
+  double beta,
+  magmaDouble_ptr dy, size_t dy_offset, magma_int_t incy,
+  magmaDouble_ptr dwork, size_t dwork_offset, magma_int_t lwork,
+  magma_queue_t queue
+  )
+  {
+  coot_ignore(dwork);
+  coot_ignore(dwork_offset);
+  coot_ignore(lwork);
+
+  if (n <= 0)
+    {
+    return;
+    }
+
+  cl_int err = clblasDsymv(
+      clblasColumnMajor,
+      clblas_uplo_const( uplo ),
+      n,
+      alpha, dA, dA_offset, ldda,
+             dx, dx_offset, incx,
+      beta,  dy, dy_offset, incy,
+      1, &queue, 0, NULL, get_g_event() );
+  clFlush(queue);
+  check_error( err );
+  }
+
+
+
+// symmetric rank-2 update (syr2k)
+
+
+
+inline
+void
+magmablas_ssyr2k
+  (
+  magma_uplo_t uplo, magma_trans_t trans,
+  magma_int_t n, magma_int_t k,
+  float alpha,
+  magmaFloat_ptr dA, size_t dA_offset, magma_int_t ldda,
+  magmaFloat_ptr dB, size_t dB_offset, magma_int_t lddb,
+  float beta,
+  magmaFloat_ptr dC, size_t dC_offset, magma_int_t lddc,
+  magma_queue_t queue
+  )
+  {
+  if (n <= 0 || k <= 0)
+    {
+    return;
+    }
+
+  cl_int err = clblasSsyr2k(
+      clblasColumnMajor,
+      clblas_uplo_const( uplo ),
+      clblas_trans_const( trans ),
+      n, k,
+      alpha, dA, dA_offset, ldda,
+             dB, dB_offset, lddb,
+      beta,  dC, dC_offset, lddc,
+      1, &queue, 0, NULL, get_g_event() );
+  clFlush(queue);
+  check_error( err );
+  }
+
+
+
+inline
+void
+magmablas_dsyr2k
+  (
+  magma_uplo_t uplo, magma_trans_t trans,
+  magma_int_t n, magma_int_t k,
+  double alpha,
+  magmaDouble_ptr dA, size_t dA_offset, magma_int_t ldda,
+  magmaDouble_ptr dB, size_t dB_offset, magma_int_t lddb,
+  double beta,
+  magmaDouble_ptr dC, size_t dC_offset, magma_int_t lddc,
+  magma_queue_t queue
+  )
+  {
+  if (n <= 0 || k <= 0)
+    {
+    return;
+    }
+
+  cl_int err = clblasDsyr2k(
+      clblasColumnMajor,
+      clblas_uplo_const( uplo ),
+      clblas_trans_const( trans ),
+      n, k,
+      alpha, dA, dA_offset, ldda,
+             dB, dB_offset, lddb,
+      beta,  dC, dC_offset, lddc,
+      1, &queue, 0, NULL, get_g_event() );
+  clFlush(queue);
+  check_error( err );
+  }
+
+
+
+// dot products
+
+
+
+inline
+float
+magma_cblas_sdot
+  (
+  magma_int_t n,
+  const float *x, magma_int_t incx,
+  const float *y, magma_int_t incy
+  )
+  {
+  // after too many issues with MKL and other BLAS, just write our own dot product!
+  float value = 0.0;
+  magma_int_t i;
+  if ( incx == 1 && incy == 1 )
+    {
+    for( i=0; i < n; ++i )
+      {
+      value = value + x[i] * y[i];
+      }
+    }
+  else
+    {
+    magma_int_t ix=0, iy=0;
+    if ( incx < 0 ) { ix = (-n + 1)*incx; }
+    if ( incy < 0 ) { iy = (-n + 1)*incy; }
+    for( i=0; i < n; ++i )
+      {
+      value = value + x[ix] * y[iy];
+      ix += incx;
+      iy += incy;
+      }
+    }
+
+  return value;
+  }
+
+
+
+inline
+double
+magma_cblas_ddot
+  (
+  magma_int_t n,
+  const double *x, magma_int_t incx,
+  const double *y, magma_int_t incy
+  )
+  {
+  // after too many issues with MKL and other BLAS, just write our own dot product!
+  double value = 0.0;
+  magma_int_t i;
+  if ( incx == 1 && incy == 1 )
+    {
+    for( i=0; i < n; ++i )
+      {
+      value = value + x[i] * y[i];
+      }
+    }
+  else
+    {
+    magma_int_t ix=0, iy=0;
+    if ( incx < 0 ) { ix = (-n + 1)*incx; }
+    if ( incy < 0 ) { iy = (-n + 1)*incy; }
+    for( i=0; i < n; ++i )
+      {
+      value = value + x[ix] * y[iy];
+      ix += incx;
+      iy += incy;
+      }
+    }
+
+  return value;
+  }
+
+
+
+// nrm2
+
+
+
+inline
+float
+magma_cblas_snrm
+  (
+  magma_int_t n,
+  const float *x,
+  magma_int_t incx
+  )
+  {
+  if (n <= 0 || incx <= 0)
+    {
+    return 0;
+    }
+  else
+    {
+    float scale = 0;
+    float ssq   = 1;
+    // the following loop is equivalent to this call to the lapack
+    // auxiliary routine:
+    // call zlassq( n, x, incx, scale, ssq )
+    for( magma_int_t ix=0; ix < 1 + (n-1)*incx; ix += incx )
+      {
+      if ( x[ix] != 0 )
+        {
+        float temp = fabs( x[ix] );
+        if (scale < temp)
+          {
+          ssq = 1 + ssq * (scale/temp) * (scale/temp);
+          scale = temp;
+          }
+        else
+          {
+          ssq += (temp/scale) * (temp/scale);
+          }
+        }
+      }
+
+    return scale * std::sqrt(ssq);
+    }
+  }
+
+
+
+inline
+double
+magma_cblas_dnrm2
+  (
+  magma_int_t n,
+  const double *x,
+  magma_int_t incx
+  )
+  {
+  if (n <= 0 || incx <= 0)
+    {
+    return 0;
+    }
+  else
+    {
+    double scale = 0;
+    double ssq   = 1;
+    // the following loop is equivalent to this call to the lapack
+    // auxiliary routine:
+    // call zlassq( n, x, incx, scale, ssq )
+    for( magma_int_t ix=0; ix < 1 + (n-1)*incx; ix += incx )
+      {
+      if ( x[ix] != 0 )
+        {
+        double temp = fabs( x[ix] );
+        if (scale < temp)
+          {
+          ssq = 1 + ssq * (scale/temp) * (scale/temp);
+          scale = temp;
+          }
+        else
+          {
+          ssq += (temp/scale) * (temp/scale);
+          }
+        }
+      }
+
+    return scale * std::sqrt(ssq);
+    }
+  }
 
 
 

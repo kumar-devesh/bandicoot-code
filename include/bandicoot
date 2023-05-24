@@ -60,6 +60,21 @@
 #endif
 
 
+
+#if defined(COOT_USE_OPENMP)
+  #if defined(__has_include)
+    #if __has_include(<omp.h>)
+      #include <omp.h>
+    #else
+      #undef COOT_USE_OPENMP
+      #pragma message ("WARNING: use of OpenMP disabled; omp.h header not found")
+    #endif
+  #else
+    #include <omp.h>
+  #endif
+#endif
+
+
 #if defined(COOT_USE_CXX11)
   #include <mutex>
 #endif
@@ -326,6 +341,13 @@ namespace coot
     #include "bandicoot_bits/opencl/magma/dpotrf.hpp"
     #include "bandicoot_bits/opencl/magma/dormql2.hpp"
     #include "bandicoot_bits/opencl/magma/dormqr2.hpp"
+    #include "bandicoot_bits/opencl/magma/dormtr.hpp"
+    #include "bandicoot_bits/opencl/magma/dlaex3.hpp"
+    #include "bandicoot_bits/opencl/magma/dlaex1.hpp"
+    #include "bandicoot_bits/opencl/magma/dlaex0.hpp"
+    #include "bandicoot_bits/opencl/magma/dstedx.hpp"
+    #include "bandicoot_bits/opencl/magma/dlatrd2.hpp"
+    #include "bandicoot_bits/opencl/magma/dsytrd2.hpp"
 
     namespace opencl
       {
