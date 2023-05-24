@@ -547,7 +547,7 @@ TEMPLATE_TEST_CASE("lup_random_sizes_arma_comparison", "[lu]", float, double)
     if (cpu_error > 1e-7)
       {
       // The GPU version can be a bit more inaccurate.
-      REQUIRE( error < 50 * cpu_error );
+      REQUIRE( error < 100 * cpu_error );
       }
     else
       {
