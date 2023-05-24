@@ -259,8 +259,18 @@ magmablas_laset_band(magma_uplo_t uplo, magma_int_t m, magma_int_t n, magma_int_
   status |= clSetKernelArg(kernel, 6, local_ldda.size,      local_ldda.addr);
   coot_check_runtime_error(status, "coot::opencl::magmablas_laset_band(): couldn't set kernel arguments");
 
-  size_t threads = size_t(std::min(k, m));
-  size_t grid    = size_t(magma_ceildiv( std::min(m, n), MAGMA_LASET_BAND_NB ));
+  size_t threads;
+  size_t grid;
+  if (uplo == MagmaUpper)
+    {
+    threads = size_t( std::min(k, n) );
+    grid = size_t( magma_ceildiv( std::min(m + k - 1, n), MAGMA_LASET_BAND_NB ) );
+    }
+  else
+    {
+    threads = size_t( std::min(k, m) );
+    grid = size_t( magma_ceildiv( std::min(m, n), MAGMA_LASET_BAND_NB ) );
+    }
   grid *= threads;
 
   status |= clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &grid, &threads, 0, NULL, NULL);

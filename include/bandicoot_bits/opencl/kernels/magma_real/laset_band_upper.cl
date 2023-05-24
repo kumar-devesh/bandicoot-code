@@ -67,7 +67,7 @@ COOT_FN(PREFIX,laset_band_upper)(const UWORD m,
                                  const UWORD A_offset,
                                  const UWORD lda)
   {
-  int k   = get_num_groups(0);
+  int k   = get_local_size(0);
   int ibx = get_group_id(0) * MAGMA_LASET_BAND_NB;
   int ind = ibx + get_local_id(0) - k + 1;
 
