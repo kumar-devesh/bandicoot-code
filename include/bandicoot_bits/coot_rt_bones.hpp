@@ -154,6 +154,9 @@ class coot_rt_t
   static inline std::tuple<bool, std::string> chol(dev_mem_t<eT> out, const uword n_rows);
 
   template<typename eT>
+  static inline std::tuple<bool, std::string> lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_mem_t<eT> P, const uword n_rows, const uword n_cols);
+
+  template<typename eT>
   static inline std::tuple<bool, std::string> svd(dev_mem_t<eT> U, dev_mem_t<eT> S, dev_mem_t<eT> V, dev_mem_t<eT> A, const uword n_rows, const uword n_cols, const bool compute_u_vt);
 
   template<typename eT>

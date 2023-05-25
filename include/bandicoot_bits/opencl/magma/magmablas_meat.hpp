@@ -108,6 +108,126 @@ magmablas_slaset
 
 inline
 void
+magmablas_slaswp
+  (
+  magma_int_t n,
+  magmaFloat_ptr dAT,
+  size_t dAT_offset,
+  magma_int_t ldda,
+  magma_int_t k1,
+  magma_int_t k2,
+  const magma_int_t* ipiv,
+  magma_int_t inci,
+  magma_queue_t queue
+  )
+  {
+  return magmablas_laswp<float>(n, (cl_mem) dAT, dAT_offset, ldda, k1, k2, ipiv, inci, queue);
+  }
+
+
+
+inline
+void
+magmablas_dlaswp
+  (
+  magma_int_t n,
+  magmaDouble_ptr dAT,
+  size_t dAT_offset,
+  magma_int_t ldda,
+  magma_int_t k1,
+  magma_int_t k2,
+  const magma_int_t* ipiv,
+  magma_int_t inci,
+  magma_queue_t queue
+  )
+  {
+  return magmablas_laswp<double>(n, (cl_mem) dAT, dAT_offset, ldda, k1, k2, ipiv, inci, queue);
+  }
+
+
+
+template<typename eT>
+inline
+void
+magmablas_laswp
+  (
+  magma_int_t n,
+  cl_mem dAT,
+  size_t dAT_offset,
+  magma_int_t ldda,
+  magma_int_t k1,
+  magma_int_t k2,
+  const magma_int_t* ipiv,
+  magma_int_t inci,
+  magma_queue_t queue
+  )
+  {
+  cl_kernel kernel;
+  cl_int err;
+  int i;
+
+  magma_int_t info = 0;
+  if ( n < 0 )
+    {
+    info = -1;
+    }
+  else if ( k1 < 1 || k1 > n )
+    {
+    info = -4;
+    }
+  else if ( k2 < 1 || k2 > n )
+    {
+    info = -5;
+    }
+  else if ( inci <= 0 )
+    {
+    info = -7;
+    }
+
+  if (info != 0)
+    {
+    //magma_xerbla( __func__, -(info) );
+    return;  //info;
+    }
+
+  size_t grid[1] = { ((size_t) (n + MAGMABLAS_LASWP_NTHREADS - 1)) / 64 };
+  size_t threads[1] = { MAGMABLAS_LASWP_NTHREADS };
+  grid[0] *= threads[0];
+  magmablas_laswp_params_t params;
+
+  kernel = get_rt().cl_rt.get_kernel<eT>(opencl::magma_real_kernel_id::laswp);
+
+  for( int k = k1-1; k < k2; k += MAGMABLAS_LASWP_MAX_PIVOTS )
+    {
+    int npivots = std::min( MAGMABLAS_LASWP_MAX_PIVOTS, k2-k );
+    params.npivots = npivots;
+    for( int j = 0; j < npivots; ++j )
+      {
+      params.ipiv[j] = ipiv[(k+j)*inci] - k - 1;
+      }
+
+    if ( kernel != NULL )
+      {
+      err = 0;
+      i   = 0;
+      size_t k_offset = dAT_offset + k*ldda;
+      err |= clSetKernelArg( kernel, i++, sizeof(n       ), &n        );
+      err |= clSetKernelArg( kernel, i++, sizeof(dAT     ), &dAT      );
+      err |= clSetKernelArg( kernel, i++, sizeof(k_offset), &k_offset );
+      err |= clSetKernelArg( kernel, i++, sizeof(ldda    ), &ldda     );
+      err |= clSetKernelArg( kernel, i++, sizeof(params  ), &params   );
+      coot_check_runtime_error( err, "coot::opencl::magmablas_laswp(): couldn't set laswp kernel arguments" );
+
+      err = clEnqueueNDRangeKernel( queue, kernel, 1, NULL, grid, threads, 0, NULL, NULL );
+      coot_check_runtime_error( err, "coot::opencl::magmablas_laswp(): couldn't run laswp kernel" );
+      }
+    }
+  }
+
+
+
+inline
+void
 magmablas_dlaset
   (
   magma_uplo_t uplo,

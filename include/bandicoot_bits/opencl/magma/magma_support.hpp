@@ -89,6 +89,7 @@ magma_malloc_cpu( void** ptrPtr, size_t size )
 //inline magma_int_t magma_dmalloc_pinned( double **ptr_ptr, size_t n ) { return magma_malloc_pinned( (void**) ptr_ptr, n*sizeof(double)             ); }
 inline magma_int_t magma_dmalloc_pinned( double **ptr_ptr, size_t n ) { return magma_malloc_cpu( (void**) ptr_ptr, n*sizeof(double) ); }
 inline magma_int_t magma_smalloc_pinned( float  **ptr_ptr, size_t n ) { return magma_malloc_cpu( (void**) ptr_ptr, n*sizeof(float)  ); }
+inline magma_int_t magma_imalloc_pinned( int    **ptr_ptr, size_t n ) { return magma_malloc_cpu( (void**) ptr_ptr, n*sizeof(int)  ); }
 
 inline magma_int_t magma_free_pinned( void* ptr )  { free( ptr ); return MAGMA_SUCCESS; }
 

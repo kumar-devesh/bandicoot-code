@@ -240,6 +240,14 @@
   #define coot_cbdsqr cbdsqr
   #define coot_zbdsqr zbdsqr
 
+  #define coot_strsm  strsm
+  #define coot_dtrsm  dtrsm
+  #define coot_ctrsm  ctrsm
+  #define coot_ztrsm  ztrsm
+
+  #define coot_sger   sger
+  #define coot_dger   dger
+
   #define coot_slaed2 slaed2
   #define coot_dlaed2 dlaed2
 
@@ -492,6 +500,14 @@
   #define coot_dbdsqr DBDSQR
   #define coot_cbdsqr CBDSQR
   #define coot_zbdsqr ZBDSQR
+
+  #define coot_strsm STRSM
+  #define coot_dtrsm DTRSM
+  #define coot_ctrsm CTRSM
+  #define coot_ztrsm ZTRSM
+
+  #define coot_sger  SGER
+  #define coot_dger  DGER
 
   #define coot_slaed2 SLAED2
   #define coot_dlaed2 DLAED2
@@ -814,6 +830,16 @@ extern "C"
   void coot_fortran(coot_dbdsqr)(const char* uplo, const blas_int* n, const blas_int* ncvt, const blas_int* nru, const blas_int* ncc, double* d, double* e, double* vt, const blas_int* ldvt, double* u, const blas_int* ldu, double* c, const blas_int* ldc, double* work, blas_int* info);
   void coot_fortran(coot_cbdsqr)(const char* uplo, const blas_int* n, const blas_int* ncvt, const blas_int* nru, const blas_int* ncc, float*  d, float*  e, void*   vt, const blas_int* ldvt, void*   u, const blas_int* ldu, void*   c, const blas_int* ldc, float* work, blas_int* info);
   void coot_fortran(coot_zbdsqr)(const char* uplo, const blas_int* n, const blas_int* ncvt, const blas_int* nru, const blas_int* ncc, double* d, double* e, void*   vt, const blas_int* ldvt, void*   u, const blas_int* ldu, void*   c, const blas_int* ldc, double*  work, blas_int* info);
+
+  // solve matrix equations op(A)*X = aB or related equations
+  void coot_fortran(coot_strsm)(const char* side, const char* uplo, const char* transA, const char* diag, const blas_int* m, const blas_int* n, const float*  alpha, const float*  A, const blas_int* lda, float*  B, const blas_int* ldb);
+  void coot_fortran(coot_dtrsm)(const char* side, const char* uplo, const char* transA, const char* diag, const blas_int* m, const blas_int* n, const double* alpha, const double* A, const blas_int* lda, double* B, const blas_int* ldb);
+  void coot_fortran(coot_ctrsm)(const char* side, const char* uplo, const char* transA, const char* diag, const blas_int* m, const blas_int* n, const void*   alpha, const void*   A, const blas_int* lda, void*   B, const blas_int* ldb);
+  void coot_fortran(coot_ztrsm)(const char* side, const char* uplo, const char* transA, const char* diag, const blas_int* m, const blas_int* n, const void*   alpha, const void*   A, const blas_int* lda, void*   B, const blas_int* ldb);
+
+  // compute A <-- alpha * x * y^T + A
+  void coot_fortran(coot_sger)(const blas_int* m, const blas_int* n, const float*  alpha, const float*  x, const blas_int* incx, const float*  y, const blas_int* incy, float*  A, const blas_int* lda);
+  void coot_fortran(coot_dger)(const blas_int* m, const blas_int* n, const double* alpha, const double* x, const blas_int* incx, const double* y, const blas_int* incy, double* A, const blas_int* lda);
 
   // merges two sets of eigenvalues together into a single sorted set
   void coot_fortran(coot_slaed2)(blas_int* k, const blas_int* n, const blas_int* n1, float*  D, float*  Q, const blas_int* ldq, blas_int* indxq, float*  rho, const float*  Z, float*  dlamda, float*  W, float*  Q2, blas_int* indx, blas_int* indxc, blas_int* indxp, blas_int* coltyp, blas_int* info);

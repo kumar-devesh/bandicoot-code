@@ -28,6 +28,8 @@ struct magma_real_kernel_id
     transpose_inplace_odd_magma,
     transpose_inplace_even_magma,
 
+    laswp,
+
     lansy_inf_lower,
     lansy_inf_upper,
     lansy_max_lower,
@@ -59,6 +61,8 @@ struct magma_real_kernel_id
     names.push_back("transpose_magma");
     names.push_back("transpose_inplace_odd_magma");
     names.push_back("transpose_inplace_even_magma");
+
+    names.push_back("laswp");
 
     names.push_back("lansy_inf_lower");
     names.push_back("lansy_inf_upper");

@@ -324,6 +324,7 @@ namespace coot
     #include "bandicoot_bits/opencl/magma/sormbr.hpp"
     #include "bandicoot_bits/opencl/magma/sgesvd.hpp"
     #include "bandicoot_bits/opencl/magma/spotrf.hpp"
+    #include "bandicoot_bits/opencl/magma/sgetrf.hpp"
     #include "bandicoot_bits/opencl/magma/sormql2.hpp"
     #include "bandicoot_bits/opencl/magma/sormqr2.hpp"
     #include "bandicoot_bits/opencl/magma/sormtr.hpp"
@@ -350,6 +351,7 @@ namespace coot
     #include "bandicoot_bits/opencl/magma/dormbr.hpp"
     #include "bandicoot_bits/opencl/magma/dgesvd.hpp"
     #include "bandicoot_bits/opencl/magma/dpotrf.hpp"
+    #include "bandicoot_bits/opencl/magma/dgetrf.hpp"
     #include "bandicoot_bits/opencl/magma/dormql2.hpp"
     #include "bandicoot_bits/opencl/magma/dormqr2.hpp"
     #include "bandicoot_bits/opencl/magma/dormtr.hpp"
@@ -402,6 +404,7 @@ namespace coot
       #include "bandicoot_bits/opencl/join_rows.hpp"
       #include "bandicoot_bits/opencl/find.hpp"
       #include "bandicoot_bits/opencl/symmat.hpp"
+      #include "bandicoot_bits/opencl/lu.hpp"
       #include "bandicoot_bits/opencl/eig_sym.hpp"
       }
   #endif
@@ -450,6 +453,7 @@ namespace coot
     #include "bandicoot_bits/cuda/join_rows.hpp"
     #include "bandicoot_bits/cuda/find.hpp"
     #include "bandicoot_bits/cuda/symmat.hpp"
+    #include "bandicoot_bits/cuda/lu.hpp"
     #include "bandicoot_bits/cuda/eig_sym.hpp"
     }
   #endif
@@ -528,6 +532,7 @@ namespace coot
   #include "bandicoot_bits/fn_sort_index.hpp"
   #include "bandicoot_bits/fn_find.hpp"
   #include "bandicoot_bits/fn_symmat.hpp"
+  #include "bandicoot_bits/fn_lu.hpp"
   #include "bandicoot_bits/fn_eig_sym.hpp"
 
 
