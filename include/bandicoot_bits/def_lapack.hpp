@@ -266,6 +266,9 @@
   #define coot_sorgtr sorgtr
   #define coot_dorgtr dorgtr
 
+  #define coot_ssterf ssterf
+  #define coot_dsterf dsterf
+
 #else
 
   #define coot_sgetrf SGETRF
@@ -515,6 +518,9 @@
 
   #define coot_sorgtr SORGTR
   #define coot_dorgtr DORGTR
+
+  #define coot_ssterf SSTERF
+  #define coot_dsterf DSTERF
 
 #endif
 
@@ -842,4 +848,8 @@ extern "C"
   // generate real orthogonal matrix as the product of dsytrd-generated elementary reflectors
   void coot_fortran(coot_sorgtr)(const char* uplo, const blas_int* n, float*  A, const blas_int* lda, const float*  tau, float*  work, const blas_int* lwork, blas_int* info);
   void coot_fortran(coot_dorgtr)(const char* uplo, const blas_int* n, double* A, const blas_int* lda, const double* tau, double* work, const blas_int* lwork, blas_int* info);
+
+  // compute all eigenvalues of symmetric tridiagonal matrix
+  void coot_fortran(coot_ssterf)(const blas_int* n, float*  D, float*  E, blas_int* info);
+  void coot_fortran(coot_dsterf)(const blas_int* n, double* D, double* E, blas_int* info);
   }
