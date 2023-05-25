@@ -348,6 +348,7 @@ namespace coot
     #include "bandicoot_bits/opencl/magma/dstedx.hpp"
     #include "bandicoot_bits/opencl/magma/dlatrd2.hpp"
     #include "bandicoot_bits/opencl/magma/dsytrd2.hpp"
+    #include "bandicoot_bits/opencl/magma/dsyevd.hpp"
 
     namespace opencl
       {
