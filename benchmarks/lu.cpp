@@ -1,5 +1,5 @@
 /**
- * Benchmark comparison of Cholesky decomposition between CUDA and OpenCL backends.
+ * Benchmark comparison of LU decomposition between CUDA and OpenCL backends.
  */
 #include <bandicoot>
 #include <armadillo>
