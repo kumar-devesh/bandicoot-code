@@ -21,11 +21,12 @@ struct runtime_dev_info
   coot_aligned bool  is_gpu;
   coot_aligned bool  has_float64;
   coot_aligned bool  has_sizet64;
+  coot_aligned bool  has_subgroups;
   coot_aligned uword ptr_width;
   coot_aligned uword n_units;
   coot_aligned uword opencl_ver;
   coot_aligned uword max_wg;
-  coot_aligned uword wavefront_size;
+  coot_aligned uword subgroup_size; // 0 if subgroups not supported
 
   inline
   void
@@ -34,11 +35,12 @@ struct runtime_dev_info
     is_gpu         = false;
     has_float64    = false;
     has_sizet64    = false;
+    has_subgroups  = false;
     n_units        = 0;
     ptr_width      = 0;
     opencl_ver     = 0;
     max_wg         = 0;
-    wavefront_size = 0;
+    subgroup_size  = 0;
     }
 
   inline runtime_dev_info()  { reset(); }
@@ -61,13 +63,14 @@ class runtime_t
   runtime_t&       operator=(const runtime_t&) = delete;
   #endif
 
-  inline uword get_n_units() const;
-  inline uword get_max_wg() const;
-  inline uword get_wavefront_size() const;
+  inline uword get_n_units()        const;
+  inline uword get_max_wg()         const;
+  inline uword get_subgroup_size()  const;
 
-  inline bool is_valid()    const;
-  inline bool has_sizet64() const;
-  inline bool has_float64() const;
+  inline bool is_valid()      const;
+  inline bool has_sizet64()   const;
+  inline bool has_float64()   const;
+  inline bool has_subgroups() const;
 
   template<typename eT>
   inline cl_mem acquire_memory(const uword n_elem);

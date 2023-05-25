@@ -38,7 +38,7 @@ COOT_FN(PREFIX,dot)(__global twoway_promoted_eT* out_mem,
     }
   barrier(CLK_LOCAL_MEM_FENCE);
 
-  for (UWORD s = get_local_size(0) / 2; s > WAVEFRONT_SIZE; s >>= 1)
+  for (UWORD s = get_local_size(0) / 2; s > SUBGROUP_SIZE; s >>= 1)
     {
     if (tid < s)
       {
@@ -47,9 +47,9 @@ COOT_FN(PREFIX,dot)(__global twoway_promoted_eT* out_mem,
     barrier(CLK_LOCAL_MEM_FENCE);
     }
 
-  if (tid < WAVEFRONT_SIZE)
+  if (tid < SUBGROUP_SIZE)
     {
-    COOT_FN_3(PREFIX,dot_wavefront_reduce_,WAVEFRONT_SIZE_NAME)(aux_mem, tid);
+    COOT_FN_3(PREFIX,dot_subgroup_reduce_,SUBGROUP_SIZE_NAME)(aux_mem, tid);
     }
 
   if (tid == 0)
