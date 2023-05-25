@@ -510,6 +510,16 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
                 // It seems possible this could be different per kernel, but we'll hope not.
                 // We'll choose an input size that is larger than any reasonable subgroup size.
                 status = coot_sub_group_size(tmp_kernel, in_dev_id, 32768, dev_subgroup_size);
+
+                // It's not pointed out in the standards, but sometimes CL_INVALID_OPERATION will be returned if for some reason subgroups are not supported despite it being part of the standard.
+                // (I am looking at you, nvidia OpenCL driver.)
+                if (status == CL_INVALID_OPERATION)
+                  {
+                  dev_has_subgroups = false;
+                  dev_subgroup_size = 0;
+                  status = CL_SUCCESS;
+                  // TODO: on nvidia devices, the concept of subgroup does exist even though the driver sometimes does not support it.  We can surely exploit it.
+                  }
                 }
               }
             }
