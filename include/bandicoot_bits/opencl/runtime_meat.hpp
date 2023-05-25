@@ -83,10 +83,6 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
       coot_debug_warn("coot::cl_rt.init(): couldn't setup OpenCL kernels");
       return false;
       }
-    else
-      {
-
-      }
     }
 
 
@@ -385,8 +381,11 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
   cl_uint dev_align       = 0;
 
   size_t dev_max_wg         = 0;
-  size_t dev_wavefront_size = 0;
+  size_t dev_subgroup_size  = 0;
 
+  bool has_subgroup_extension = false;
+  bool has_intel_subgroup_extension = false;
+  bool dev_has_subgroups = false;
 
   clGetDeviceInfo(in_dev_id, CL_DEVICE_VENDOR,              sizeof(dev_name1),           &dev_name1,   NULL);
   clGetDeviceInfo(in_dev_id, CL_DEVICE_NAME,                sizeof(dev_name2),           &dev_name2,   NULL);
@@ -396,6 +395,35 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
   clGetDeviceInfo(in_dev_id, CL_DEVICE_MAX_COMPUTE_UNITS,   sizeof(cl_uint),             &dev_n_units, NULL);
   clGetDeviceInfo(in_dev_id, CL_DEVICE_MEM_BASE_ADDR_ALIGN, sizeof(cl_uint),             &dev_align,   NULL);
   clGetDeviceInfo(in_dev_id, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(size_t),              &dev_max_wg,  NULL);
+
+  // search for extensions we care about
+  size_t dev_extension_size;
+  clGetDeviceInfo(in_dev_id, CL_DEVICE_EXTENSIONS, 0, NULL, &dev_extension_size);
+  char* dev_extension_buffer = new char[dev_extension_size];
+  clGetDeviceInfo(in_dev_id, CL_DEVICE_EXTENSIONS, dev_extension_size, dev_extension_buffer, NULL);
+  std::string dev_extension_str(dev_extension_buffer);
+  delete[] dev_extension_buffer;
+  size_t last_space = 0;
+  size_t next_space = dev_extension_str.find(' ');
+  do
+    {
+    const size_t actual_last_space = (last_space == 0) ? 0 : (last_space + 1);
+    std::string ext = dev_extension_str.substr(actual_last_space, (next_space - actual_last_space));
+
+    // This extension, if present, allows us to get the subgroup size when on
+    // OpenCL < 2.0 devices.
+    if (ext == "cl_khr_subgroups")
+      {
+      has_subgroup_extension = true;
+      }
+    else if (ext == "cl_intel_subgroups")
+      {
+      has_intel_subgroup_extension = true;
+      }
+
+    last_space = next_space;
+    }
+  while ((next_space = dev_extension_str.find(' ', next_space + 1)) != std::string::npos);
 
   // contrary to the official OpenCL specification (OpenCL 1.2, sec 4.2 and sec 6.1.1).
   // certain OpenCL implementations use internal size_t which doesn't correspond to CL_DEVICE_ADDRESS_BITS
@@ -447,10 +475,6 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
 
         if(status == CL_SUCCESS)
           {
-          // Extract what might be the warp or wavefront size.
-          // It seems possible this could be different per kernel, but we'll hope not.
-          status = clGetKernelWorkGroupInfo(tmp_kernel, in_dev_id, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, sizeof(size_t), &dev_wavefront_size, NULL);
-
           tmp_dev_mem = clCreateBuffer(tmp_context, CL_MEM_READ_WRITE, sizeof(cl_uint)*4, NULL, &status);
 
           clSetKernelArg(tmp_kernel, 0, sizeof(cl_mem),  &tmp_dev_mem);
@@ -469,6 +493,24 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
               dev_sizet_width = tmp_cpu_mem[0];
               dev_ptr_width   = tmp_cpu_mem[1];
               dev_opencl_ver  = tmp_cpu_mem[2];
+
+              // Extract the subgroup size, if available.  Before OpenCL 2.0,
+              // subgroups were an extension.
+              if (tmp_cpu_mem[2] /* opencl_ver */ >= 210)
+                {
+                dev_has_subgroups = true;
+                }
+              else
+                {
+                dev_has_subgroups = has_subgroup_extension || has_intel_subgroup_extension;
+                }
+
+              if (dev_has_subgroups)
+                {
+                // It seems possible this could be different per kernel, but we'll hope not.
+                // We'll choose an input size that is larger than any reasonable subgroup size.
+                status = coot_sub_group_size(tmp_kernel, in_dev_id, 32768, dev_subgroup_size);
+                }
               }
             }
           }
@@ -501,17 +543,18 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
     get_cerr_stream() << "opencl_ver:     " << dev_opencl_ver << std::endl;
   //get_cerr_stream() << "align:          " << dev_align  << std::endl;
     get_cerr_stream() << "max_wg:         " << dev_max_wg << std::endl;
-    get_cerr_stream() << "wavefront_size: " << dev_wavefront_size << std::endl;
+    get_cerr_stream() << "subgroup_size:  " << dev_subgroup_size << std::endl;
     }
 
   out_info.is_gpu         = (dev_type == CL_DEVICE_TYPE_GPU);
   out_info.has_float64    = (dev_fp64 != 0);
   out_info.has_sizet64    = (dev_sizet_width >= 8);
+  out_info.has_subgroups  = dev_has_subgroups;
   out_info.ptr_width      = uword(dev_ptr_width);
   out_info.n_units        = uword(dev_n_units);
   out_info.opencl_ver     = uword(dev_opencl_ver);
   out_info.max_wg         = uword(dev_max_wg);
-  out_info.wavefront_size = uword(dev_wavefront_size);
+  out_info.subgroup_size  = uword(dev_subgroup_size);
 
   return (status == CL_SUCCESS);
   }
@@ -675,7 +718,7 @@ runtime_t::compile_kernels(const std::string& unique_host_id)
   std::vector<std::pair<std::string, cl_kernel*>> name_map;
   type_to_dev_string type_map;
   std::string source =
-      kernel_src::get_src_preamble(has_float64()) +
+      kernel_src::get_src_preamble(has_float64(), has_subgroups(), get_subgroup_size()) +
       rt_common::get_zero_elem_kernel_src(zeroway_kernels, kernel_src::get_zeroway_source(), zeroway_kernel_id::get_names(), name_map, type_map) +
       rt_common::get_one_elem_real_kernel_src(oneway_real_kernels, kernel_src::get_oneway_real_source(), oneway_real_kernel_id::get_names(), "", name_map, type_map, has_float64()) +
       rt_common::get_one_elem_integral_kernel_src(oneway_integral_kernels, kernel_src::get_oneway_integral_source(), oneway_integral_kernel_id::get_names(), "", name_map, type_map) +
@@ -714,20 +757,6 @@ runtime_t::compile_kernels(const std::string& unique_host_id)
     }
 
   std::string build_options = ((sizeof(uword) >= 8) && dev_info.has_sizet64) ? std::string("-D UWORD=ulong") : std::string("-D UWORD=uint");
-
-  // Add the wavefront size to the build options.
-  std::ostringstream wavefront_size_options;
-  wavefront_size_options << " -D WAVEFRONT_SIZE=" << dev_info.wavefront_size;
-  wavefront_size_options << " -D WAVEFRONT_SIZE_NAME=";
-  if (dev_info.wavefront_size == 8 || dev_info.wavefront_size == 16 || dev_info.wavefront_size == 32 || dev_info.wavefront_size == 64 || dev_info.wavefront_size == 128)
-    {
-    wavefront_size_options << dev_info.wavefront_size;
-    }
-  else
-    {
-    wavefront_size_options << "other";
-    }
-  build_options += wavefront_size_options.str();
 
   // Now load the compiled kernels.
   bool create_kernel_status = create_kernels(name_map, prog_holder, build_options);
@@ -845,9 +874,9 @@ runtime_t::get_max_wg() const
 
 inline
 uword
-runtime_t::get_wavefront_size() const
+runtime_t::get_subgroup_size() const
   {
-  return (valid) ? dev_info.wavefront_size : uword(0);
+  return dev_info.subgroup_size;
   }
 
 
@@ -875,6 +904,15 @@ bool
 runtime_t::has_float64() const
   {
   return dev_info.has_float64;
+  }
+
+
+
+inline
+bool
+runtime_t::has_subgroups() const
+  {
+  return dev_info.has_subgroups;
   }
 
 

@@ -316,7 +316,7 @@ generic_reduce_inner_small(const dev_mem_t<eT> mem,
   const size_t k1_work_dim       = 1;
   const size_t k1_work_offset    = 0;
   const uword total_num_threads = std::ceil(n_elem / std::max(1.0, (2 * std::ceil(std::log2(n_elem)))));
-  const uword wavefront_size = get_rt().cl_rt.get_wavefront_size();
+  const uword subgroup_size = get_rt().cl_rt.get_subgroup_size();
   const uword local_group_size = std::min(kernel_wg_size, total_num_threads);
 
   runtime_t::cq_guard guard;
@@ -327,7 +327,10 @@ generic_reduce_inner_small(const dev_mem_t<eT> mem,
   const uword pow2_group_size = (uword) std::pow(2.0f, std::ceil(std::log2((float) local_group_size)));
   const uword pow2_total_num_threads = (total_num_threads % pow2_group_size == 0) ? total_num_threads : ((total_num_threads / pow2_group_size) + 1) * pow2_group_size;
 
-  cl_kernel* k_use = (pow2_group_size <= wavefront_size) ? &kernel_small : &kernel;
+  // If the number of threads is less than the subgroup size (if subgroups are
+  // available), then we can use a more optimized kernel with subgroup barriers
+  // only.
+  cl_kernel* k_use = (pow2_group_size <= subgroup_size) ? &kernel_small : &kernel;
 
   cl_int status;
   status  = clSetKernelArg(*k_use, 0, sizeof(cl_mem),                   &mem.cl_mem_ptr);
