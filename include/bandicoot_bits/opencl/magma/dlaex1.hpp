@@ -83,15 +83,6 @@
 
 inline
 magma_int_t
-magma_get_smlsize_divideconquer()
-  {
-  return 128;
-  }
-
-
-
-inline
-magma_int_t
 magma_dlaex1
   (
   magma_int_t n,

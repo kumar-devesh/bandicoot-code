@@ -1456,7 +1456,7 @@ magma_cblas_ddot
 
 inline
 float
-magma_cblas_snrm
+magma_cblas_snrm2
   (
   magma_int_t n,
   const float *x,
@@ -1596,6 +1596,15 @@ magma_idamax(magma_int_t n, magmaDouble_const_ptr dx, size_t dx_offset, magma_in
   get_rt().cl_rt.release_memory(dwork);
 
   return result;
+  }
+
+
+
+inline
+magma_int_t
+magma_get_smlsize_divideconquer()
+  {
+  return 128;
   }
 
 
