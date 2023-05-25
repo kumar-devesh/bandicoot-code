@@ -1036,7 +1036,12 @@ runtime_t::delete_extra_cq(cl_command_queue& in_queue)
 
   coot_debug_check( (valid == false), "coot::cl_rt not valid" );
 
-  if(in_queue != NULL)  { clReleaseCommandQueue(in_queue); in_queue = NULL; }
+  if(in_queue != NULL)
+    {
+    clFinish(in_queue); // force all queued operations to finish
+    clReleaseCommandQueue(in_queue);
+    in_queue = NULL;
+    }
   }
 
 

@@ -23,7 +23,9 @@ struct magma_real_kernel_id
 
     transpose_magma, // _magma is to avoid potential naming conflicts
     transpose_inplace_odd_magma,
-    transpose_inplace_even_magma
+    transpose_inplace_even_magma,
+
+    laswp
     };
 
 
@@ -44,6 +46,8 @@ struct magma_real_kernel_id
     names.push_back("transpose_magma");
     names.push_back("transpose_inplace_odd_magma");
     names.push_back("transpose_inplace_even_magma");
+
+    names.push_back("laswp");
 
     return names;
     }

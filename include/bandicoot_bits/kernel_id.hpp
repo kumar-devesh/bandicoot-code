@@ -262,6 +262,10 @@ struct oneway_real_kernel_id
     rel_isnonfinite,
     rel_isnan,
     //
+    lu_extract_l,
+    lu_extract_pivoted_l,
+    lu_extract_p,
+    //
     invalid_kernel
     };
 
@@ -289,6 +293,10 @@ struct oneway_real_kernel_id
     names.push_back("rel_isfinite");
     names.push_back("rel_isnonfinite");
     names.push_back("rel_isnan");
+
+    names.push_back("lu_extract_l");
+    names.push_back("lu_extract_pivoted_l");
+    names.push_back("lu_extract_p");
 
     return names;
     }

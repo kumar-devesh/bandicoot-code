@@ -25,6 +25,9 @@ namespace coot
   #define coot_sort01 sort01
   #define coot_dort01 dort01
 
+  #define coot_slaswp slaswp
+  #define coot_dlaswp dlaswp
+
 #else
 
   #define coot_sbdt01 SBDT01
@@ -32,6 +35,9 @@ namespace coot
 
   #define coot_sort01 SORT01
   #define coot_dort01 DORT01
+
+  #define coot_slaswp SLASWP
+  #define coot_dlaswp DLASWP
 
 #endif
 
@@ -44,6 +50,10 @@ extern "C"
   // check that matrix is orthogonal
   void coot_fortran(coot_sort01)(const char* rowcol, const blas_int* m, const blas_int* n, const float*  u, const blas_int* ldu, float*  work, const blas_int* lwork, float*  resid);
   void coot_fortran(coot_dort01)(const char* rowcol, const blas_int* m, const blas_int* n, const double* u, const blas_int* ldu, double* work, const blas_int* lwork, double* resid);
+
+  // perform a series of row interchanges
+  void coot_fortran(coot_slaswp)(const blas_int* n, float*  A, const blas_int* lda, const blas_int* k1, const blas_int* k2, const blas_int* ipiv, const blas_int* incx);
+  void coot_fortran(coot_dlaswp)(const blas_int* n, double* A, const blas_int* lda, const blas_int* k1, const blas_int* k2, const blas_int* ipiv, const blas_int* incx);
   }
 
   }; // namespace coot
