@@ -1323,6 +1323,39 @@ coot_rt_t::svd(dev_mem_t<eT> U, dev_mem_t<eT> S, dev_mem_t<eT> V, dev_mem_t<eT> 
 
 template<typename eT>
 inline
+std::tuple<bool, std::string>
+coot_rt_t::eig_sym(dev_mem_t<eT> mem, const uword n_rows, const bool eigenvectors, dev_mem_t<eT> eigenvalues)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::eig_sym(mem, n_rows, eigenvectors, eigenvalues);
+    #else
+    coot_stop_runtime_error("coot_rt::eig_sym(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::eig_sym(mem, n_rows, eigenvectors, eigenvalues);
+    #else
+    coot_stop_runtime_error("coot_rt::eig_sym(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::eig_sym(): unknown backend");
+    }
+
+  return std::make_tuple(false, ""); // fix warnings
+  }
+
+
+
+template<typename eT>
+inline
 void
 coot_rt_t::copy_from_dev_mem(eT* dest, const dev_mem_t<eT> src, const uword N)
   {
