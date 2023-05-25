@@ -17,18 +17,16 @@
 // Compute eigenvalues only into pre-given object
 template<typename T1>
 inline
-typename
-enable_if2<
-    coot_real_only<typename T1::elem_type>::value,
-    bool
->::result
+bool
 eig_sym
   (
          Col<typename T1::elem_type>&     eigval,
-  const Base<typename T1::elem_type, T1>& X
+  const Base<typename T1::elem_type, T1>& X,
+  const typename coot_real_only<typename T1::elem_type>::result* junk = 0
   )
   {
   coot_extra_debug_sigprint();
+  coot_ignore(junk);
 
   // X will be destroyed during computation of the eigenvalues, and so we need a new object.
   typedef typename T1::elem_type eT;
@@ -37,7 +35,7 @@ eig_sym
   // check size
   if (tmp.n_rows != tmp.n_cols)
     {
-    coot_debug_warm("eig_sym(): matrix must be square");
+    coot_debug_warn("eig_sym(): matrix must be square");
     return false;
     }
 
@@ -69,17 +67,15 @@ eig_sym
 // Compute eigenvalues only into new object
 template<typename T1>
 inline
-typename
-enable_if2<
-    coot_real_only<typename T1::elem_type>::value,
-    Col<typename T1::elem_type>
->::result
+Col<typename T1::elem_type>
 eig_sym
   (
-  const Base<typename T1::elem_type, T1>& X
+  const Base<typename T1::elem_type, T1>& X,
+  const typename coot_real_only<typename T1::elem_type>::result* junk = 0
   )
   {
   coot_extra_debug_sigprint();
+  coot_ignore(junk);
 
   // X will be destroyed during computation of the eigenvalues, and so we need a new object.
   typedef typename T1::elem_type eT;
@@ -116,29 +112,29 @@ eig_sym
 // Compute eigenvectors and eigenvalues
 template<typename T1>
 inline
-typename
-enable_if2<
-    coot_real_only<typename T1::elem_type>::value,
-    bool
->::result
+bool
 eig_sym
   (
          Col<typename T1::elem_type>&     eigval,
          Mat<typename T1::elem_type>&     eigvec,
   const Base<typename T1::elem_type, T1>& expr,
-  const char* method = "std" // for compatibility
+  const char* method = "std", // for compatibility
+  const typename coot_real_only<typename T1::elem_type>::result* junk = 0
   )
   {
   coot_extra_debug_sigprint();
+  coot_ignore(junk);
 
   // The eigenvectors will end up in the matrix we work on.
   typedef typename T1::elem_type eT;
   eigvec = expr.get_ref();
 
+  coot_debug_check( (method[0] != 's'), "eig_sym(): invalid decomposition type; only \"std\" is supported");
+
   // check size
   if (eigvec.n_rows != eigvec.n_cols)
     {
-    coot_debug_warm("eig_sym(): matrix must be square");
+    coot_debug_warn("eig_sym(): matrix must be square");
     return false;
     }
 
