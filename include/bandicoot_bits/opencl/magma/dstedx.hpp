@@ -65,7 +65,7 @@
 
 inline
 magma_int_t
-magma_dsted
+magma_dstedx
   (
   magma_range_t range, magma_int_t n, double vl, double vu,
   magma_int_t il, magma_int_t iu, double *d, double *e,
