@@ -26,7 +26,16 @@ struct magma_real_kernel_id
 
     transpose_magma, // _magma is to avoid potential naming conflicts
     transpose_inplace_odd_magma,
-    transpose_inplace_even_magma
+    transpose_inplace_even_magma,
+
+    lansy_inf_lower,
+    lansy_inf_upper,
+    lansy_max_lower,
+    lansy_max_upper,
+
+    lascl_full,
+    lascl_lower,
+    lascl_upper
     };
 
 
@@ -50,6 +59,15 @@ struct magma_real_kernel_id
     names.push_back("transpose_magma");
     names.push_back("transpose_inplace_odd_magma");
     names.push_back("transpose_inplace_even_magma");
+
+    names.push_back("lansy_inf_lower");
+    names.push_back("lansy_inf_upper");
+    names.push_back("lansy_max_lower");
+    names.push_back("lansy_max_upper");
+
+    names.push_back("lascl_full");
+    names.push_back("lascl_lower");
+    names.push_back("lascl_upper");
 
     return names;
     }

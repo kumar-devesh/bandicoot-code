@@ -94,6 +94,7 @@ inline magma_int_t magma_free_pinned( void* ptr )  { free( ptr ); return MAGMA_S
 
 inline magma_int_t magma_dmalloc_cpu( double** ptr_ptr, size_t n ) { return magma_malloc_cpu( (void**) ptr_ptr, n*sizeof(double) ); }
 inline magma_int_t magma_smalloc_cpu( float**  ptr_ptr, size_t n ) { return magma_malloc_cpu( (void**) ptr_ptr, n*sizeof(float)  ); }
+inline magma_int_t magma_imalloc_cpu( int**    ptr_ptr, size_t n ) { return magma_malloc_cpu( (void**) ptr_ptr, n*sizeof(int)    ); }
 
 inline magma_int_t magma_free_cpu( void* ptr ) { free( ptr ); return MAGMA_SUCCESS; }
 
@@ -452,6 +453,35 @@ magma_dgetvector_async
 
 
 
+inline
+void
+magma_dcopymatrix
+  (
+  magma_int_t m, magma_int_t n,
+  magmaDouble_const_ptr dA_src, size_t dA_offset, magma_int_t ldda,
+  magmaDouble_ptr       dB_dst, size_t dB_offset, magma_int_t lddb,
+  magma_queue_t queue
+  )
+  {
+  if (m <= 0 || n <= 0)
+    {
+    return;
+    }
+
+  size_t src_origin[3] = { dA_offset*sizeof(double), 0, 0 };
+  size_t dst_orig[3]   = { dB_offset*sizeof(double), 0, 0 };
+  size_t region[3]     = { m*sizeof(double), size_t(n), 1 };
+  cl_int err = clEnqueueCopyBufferRect(
+      queue, dA_src, dB_dst,
+      src_origin, dst_orig, region,
+      ldda*sizeof(double), 0,
+      lddb*sizeof(double), 0,
+      0, NULL, NULL );
+  check_error( err );
+  }
+
+
+
 //
 // float
 //
@@ -580,6 +610,35 @@ magma_sgetvector_async
 
 
 
+inline
+void
+magma_scopymatrix
+  (
+  magma_int_t m, magma_int_t n,
+  magmaFloat_const_ptr dA_src, size_t dA_offset, magma_int_t ldda,
+  magmaFloat_ptr       dB_dst, size_t dB_offset, magma_int_t lddb,
+  magma_queue_t queue
+  )
+  {
+  if (m <= 0 || n <= 0)
+    {
+    return;
+    }
+
+  size_t src_origin[3] = { dA_offset*sizeof(float), 0, 0 };
+  size_t dst_orig[3]   = { dB_offset*sizeof(float), 0, 0 };
+  size_t region[3]     = { m*sizeof(float), size_t(n), 1 };
+  cl_int err = clEnqueueCopyBufferRect(
+      queue, dA_src, dB_dst,
+      src_origin, dst_orig, region,
+      ldda*sizeof(float), 0,
+      lddb*sizeof(float), 0,
+      0, NULL, NULL );
+  check_error( err );
+  }
+
+
+
 // This deals with a subtle bug with returning lwork as a float.
 // If lwork > 2**24, then it will get rounded as a float;
 // we need to ensure it is rounded up instead of down,
@@ -588,12 +647,7 @@ inline
 double
 magma_dmake_lwork( magma_int_t lwork )
   {
-    #if defined(PRECISION_s) || defined(PRECISION_c)
-    real_Double_t one_eps = 1. + lapackf77_dlamch("Epsilon");
-    return double(lwork*one_eps), 0 );
-    #else
-    return double(lwork);
-    #endif
+  return double(lwork);
   }
 
 
@@ -732,38 +786,54 @@ inline const char** get_magma2lapack_constants()
   }
 
 
+
 inline
 const char* lapack_trans_const( magma_trans_t magma_const )
-{
-    assert( magma_const >= MagmaNoTrans   );
-    assert( magma_const <= MagmaConjTrans );
-    return get_magma2lapack_constants()[ magma_const ];
-}
+  {
+  assert( magma_const >= MagmaNoTrans   );
+  assert( magma_const <= MagmaConjTrans );
+  return get_magma2lapack_constants()[ magma_const ];
+  }
+
+
 
 inline
 const char* lapack_uplo_const ( magma_uplo_t magma_const )
-{
-    assert( magma_const >= MagmaUpper );
-    assert( magma_const <= MagmaFull  );
-    return get_magma2lapack_constants()[ magma_const ];
-}
+  {
+  assert( magma_const >= MagmaUpper );
+  assert( magma_const <= MagmaFull  );
+  return get_magma2lapack_constants()[ magma_const ];
+  }
+
+
 
 inline
 const char* lapack_diag_const ( magma_diag_t magma_const )
-{
-    assert( magma_const >= MagmaNonUnit );
-    assert( magma_const <= MagmaUnit    );
-    return get_magma2lapack_constants()[ magma_const ];
-}
+  {
+  assert( magma_const >= MagmaNonUnit );
+  assert( magma_const <= MagmaUnit    );
+  return get_magma2lapack_constants()[ magma_const ];
+  }
+
 
 
 inline
 const char* lapack_side_const ( magma_side_t magma_const )
-{
-    assert( magma_const >= MagmaLeft  );
-    assert( magma_const <= MagmaBothSides );
-    return get_magma2lapack_constants()[ magma_const ];
-}
+  {
+  assert( magma_const >= MagmaLeft  );
+  assert( magma_const <= MagmaBothSides );
+  return get_magma2lapack_constants()[ magma_const ];
+  }
+
+
+
+inline
+const char* lapack_vec_const   ( magma_vec_t    magma_const )
+  {
+  assert( magma_const >= MagmaNoVec );
+  assert( magma_const <= MagmaOverwriteVec );
+  return get_magma2lapack_constants()[ magma_const ];
+  }
 
 
 /////////////////////
@@ -1466,6 +1536,66 @@ magma_cblas_dnrm2
 
     return scale * std::sqrt(ssq);
     }
+  }
+
+
+
+// amax
+
+
+
+inline
+magma_int_t
+magma_isamax(magma_int_t n, magmaFloat_const_ptr dx, size_t dx_offset, magma_int_t incx, magma_queue_t queue)
+  {
+  if (n <= 0)
+    {
+    return 0;
+    }
+
+  // need to initialize one GPU unsigned int to store the result...
+  cl_mem out = get_rt().cl_rt.acquire_memory<unsigned int>(1);
+  cl_mem dwork = get_rt().cl_rt.acquire_memory<float>(2 * n);
+
+  cl_int status = clblasiSamax(n, out, 0, dx, dx_offset, incx, dwork, 1, &queue, 0, NULL, get_g_event() );
+  opencl::coot_check_cl_error(status, "coot::opencl::magma_isamax(): call to clblasiSamax() failed");
+
+  int result = 0;
+  status = clEnqueueReadBuffer(queue, out, CL_TRUE, 0, sizeof(unsigned int), &result, 0, NULL, NULL);
+  opencl::coot_check_cl_error(status, "coot::opencl::magma_isamax(): getting result from device memory failed");
+
+  get_rt().cl_rt.release_memory(out);
+  get_rt().cl_rt.release_memory(dwork);
+
+  return result;
+  }
+
+
+
+inline
+magma_int_t
+magma_idamax(magma_int_t n, magmaDouble_const_ptr dx, size_t dx_offset, magma_int_t incx, magma_queue_t queue)
+  {
+  if (n <= 0)
+    {
+    return 0;
+    }
+
+  // need to initialize one GPU unsigned int to store the result...
+  cl_mem out = get_rt().cl_rt.acquire_memory<unsigned int>(1);
+  cl_mem dwork = get_rt().cl_rt.acquire_memory<double>(2 * n);
+
+  cl_int status = clblasiDamax(n, out, 0, dx, dx_offset, incx, dwork, 1, &queue, 0, NULL, get_g_event() );
+  opencl::coot_check_cl_error(status, "coot::opencl::magma_isamax(): call to clblasiSamax() failed");
+
+  int result = 0;
+  status = clEnqueueReadBuffer(queue, out, CL_TRUE, 0, sizeof(unsigned int), &result, 0, NULL, NULL);
+  opencl::coot_check_cl_error(status, "coot::opencl::magma_isamax(): getting result from device memory failed");
+
+  get_rt().cl_rt.release_memory(out);
+  get_rt().cl_rt.release_memory(dwork);
+
+  return result;
   }
 
 

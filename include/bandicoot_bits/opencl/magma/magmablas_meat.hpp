@@ -476,3 +476,357 @@ magmablas_transpose_inplace
   status = clEnqueueNDRangeKernel(queue, k, 2, NULL, grid, threads, 0, NULL, NULL);
   coot_check_runtime_error(status, "coot::opencl::magmablas_transpose_inplace(): couldn't execute kernel");
   }
+
+
+
+inline
+void
+magmablas_slascl
+  (
+  magma_type_t type,
+  magma_int_t kl,
+  magma_int_t ku,
+  float cfrom,
+  float cto,
+  magma_int_t m,
+  magma_int_t n,
+  magmaFloat_ptr dA,
+  size_t dA_offset,
+  magma_int_t ldda,
+  magma_queue_t queue,
+  magma_int_t *info
+  )
+  {
+  magmablas_lascl<float>(type, kl, ku, cfrom, cto, m, n, (cl_mem) dA, dA_offset, ldda, queue, info);
+  }
+
+
+
+inline
+void
+magmablas_dlascl
+  (
+  magma_type_t type,
+  magma_int_t kl,
+  magma_int_t ku,
+  double cfrom,
+  double cto,
+  magma_int_t m,
+  magma_int_t n,
+  magmaDouble_ptr dA,
+  size_t dA_offset,
+  magma_int_t ldda,
+  magma_queue_t queue,
+  magma_int_t *info
+  )
+  {
+  magmablas_lascl<double>(type, kl, ku, cfrom, cto, m, n, (cl_mem) dA, dA_offset, ldda, queue, info);
+  }
+
+
+
+template<typename eT>
+inline
+void
+magmablas_lascl
+  (
+  magma_type_t type,
+  magma_int_t kl,
+  magma_int_t ku,
+  eT cfrom,
+  eT cto,
+  magma_int_t m,
+  magma_int_t n,
+  cl_mem dA,
+  size_t dA_offset,
+  magma_int_t ldda,
+  magma_queue_t queue,
+  magma_int_t *info
+  )
+  {
+  *info = 0;
+  if ( type != MagmaLower && type != MagmaUpper && type != MagmaFull )
+    {
+    *info = -1;
+    }
+  else if ( cfrom == 0 || std::isnan(cfrom) )
+    {
+    *info = -4;
+    }
+  else if ( std::isnan(cto) )
+    {
+    *info = -5;
+    }
+  else if ( m < 0 )
+    {
+    *info = -6;
+    }
+  else if ( n < 0 )
+    {
+    *info = -3;
+    }
+  else if ( ldda < std::max(1,m) )
+    {
+    *info = -7;
+    }
+
+  if (*info != 0)
+    {
+    //magma_xerbla( __func__, -(*info) );
+    return;  //info;
+    }
+
+  size_t threads = size_t( MAGMABLAS_LASCL_NB );
+  size_t grid = size_t( magma_ceildiv( m, MAGMABLAS_LASCL_NB ) );
+  grid *= threads;
+
+  eT smlnum = 0, bignum = 0, cfromc = 0, ctoc = 0, cto1 = 0, cfrom1 = 0, mul = 0;
+  magma_int_t done = false;
+
+  cfromc = cfrom;
+  ctoc   = cto;
+  while( ! done )
+    {
+    cfrom1 = cfromc*smlnum;
+    if ( cfrom1 == cfromc )
+      {
+      // cfromc is an inf.  Multiply by a correctly signed zero for
+      // finite ctoc, or a nan if ctoc is infinite.
+      mul  = ctoc / cfromc;
+      done = true;
+      cto1 = ctoc;
+      }
+    else
+      {
+      cto1 = ctoc / bignum;
+      if ( cto1 == ctoc )
+        {
+        // ctoc is either 0 or an inf.  In both cases, ctoc itself
+        // serves as the correct multiplication factor.
+        mul  = ctoc;
+        done = true;
+        cfromc = 1;
+        }
+      else if ( std::abs(cfrom1) > std::abs(ctoc) && ctoc != 0 )
+        {
+        mul  = smlnum;
+        done = false;
+        cfromc = cfrom1;
+        }
+      else if ( std::abs(cto1) > std::abs(cfromc) )
+        {
+        mul  = bignum;
+        done = false;
+        ctoc = cto1;
+        }
+      else
+        {
+        mul  = ctoc / cfromc;
+        done = true;
+        }
+      }
+
+    cl_kernel k;
+    if (type == MagmaLower)
+      {
+      k = get_rt().cl_rt.get_kernel<eT>(opencl::magma_real_kernel_id::lascl_lower);
+      }
+    else if (type == MagmaUpper)
+      {
+      k = get_rt().cl_rt.get_kernel<eT>(opencl::magma_real_kernel_id::lascl_upper);
+      }
+    else
+      {
+      k = get_rt().cl_rt.get_kernel<eT>(opencl::magma_real_kernel_id::lascl_full);
+      }
+
+    opencl::runtime_t::adapt_uword local_m(m);
+    opencl::runtime_t::adapt_uword local_n(n);
+    opencl::runtime_t::adapt_uword local_dA_offset(dA_offset);
+    opencl::runtime_t::adapt_uword local_ldda(ldda);
+
+    cl_int status;
+    status  = clSetKernelArg(k, 0, local_m.size,          local_m.addr);
+    status |= clSetKernelArg(k, 1, local_n.size,          local_n.addr);
+    status |= clSetKernelArg(k, 2, sizeof(eT),            &mul);
+    status |= clSetKernelArg(k, 3, sizeof(cl_mem),        &dA);
+    status |= clSetKernelArg(k, 4, local_dA_offset.size,  local_dA_offset.addr);
+    status |= clSetKernelArg(k, 5, local_ldda.size,       local_ldda.addr);
+    coot_check_runtime_error(status, "coot::opencl::magmablas_lascl(): couldn't set kernel arguments");
+
+    status = clEnqueueNDRangeKernel( queue, k, 1, NULL, &grid, &threads, 0, NULL, NULL );
+    coot_check_runtime_error(status, "coot::opencl::magmablas_lascl(): couldn't run kernel");
+    }
+  }
+
+
+
+
+inline
+float
+magmablas_slansy(magma_norm_t norm, magma_uplo_t uplo, magma_int_t n, magmaFloat_const_ptr dA, size_t dA_offset, magma_int_t ldda, magmaFloat_ptr dwork, size_t dwork_offset, magma_int_t lddwork, magma_queue_t queue)
+  {
+  coot_ignore(lddwork);
+  const int i = magmablas_lansy<float>(norm, uplo, n, (cl_mem) dA, dA_offset, ldda, (cl_mem) dwork, dwork_offset, queue);
+  float res;
+  magma_sgetvector(1, dwork, dwork_offset + i, 1, &res, 1, queue);
+  return res;
+  }
+
+
+
+inline
+double
+magmablas_dlansy(magma_norm_t norm, magma_uplo_t uplo, magma_int_t n, magmaDouble_const_ptr dA, size_t dA_offset, magma_int_t ldda, magmaDouble_ptr dwork, size_t dwork_offset, magma_int_t lddwork, magma_queue_t queue)
+  {
+  coot_ignore(lddwork);
+  const int i = magmablas_lansy<double>(norm, uplo, n, (cl_mem) dA, dA_offset, ldda, (cl_mem) dwork, dwork_offset, queue);
+  double res;
+  magma_dgetvector(1, dwork, dwork_offset + i, 1, &res, 1, queue);
+  return res;
+  }
+
+
+
+template<typename eT>
+inline
+int
+magmablas_lansy(magma_norm_t norm, magma_uplo_t uplo, magma_int_t n, cl_mem dA, size_t dA_offset, magma_int_t ldda, cl_mem dwork, size_t dwork_offset, magma_queue_t queue)
+  {
+  magma_int_t info = 0;
+  // 1-norm == inf-norm since A is symmetric
+  bool inf_norm = (norm == MagmaInfNorm || norm == MagmaOneNorm);
+  bool max_norm = (norm == MagmaMaxNorm);
+
+  // inf_norm Double-Complex requires > 16 KB shared data (arch >= 200)
+  const bool inf_implemented = true;
+
+  if ( ! (max_norm || (inf_norm && inf_implemented)) )
+    {
+    info = -1;
+    }
+  else if ( uplo != MagmaUpper && uplo != MagmaLower )
+    {
+    info = -2;
+    }
+  else if ( n < 0 )
+    {
+    info = -3;
+    }
+  else if ( ldda < n )
+    {
+    info = -5;
+    }
+
+  if ( info != 0 )
+    {
+    //magma_xerbla( __func__, -(info) );
+    return info;
+    }
+
+  /* Quick return */
+  if ( n == 0 )
+    {
+    return 0;
+    }
+
+  if ( inf_norm )
+    {
+    magmablas_lansy_inf<eT>( uplo, n, dA, dA_offset, ldda, dwork, dwork_offset, queue );
+    }
+  else
+    {
+    magmablas_lansy_max<eT>( uplo, n, dA, dA_offset, ldda, dwork, dwork_offset, queue );
+    }
+
+  return magma_isamax( n, dwork, dwork_offset, 1, queue ) - 1;
+  }
+
+
+
+template<typename eT>
+inline
+void
+magmablas_lansy_inf
+  (
+  magma_uplo_t uplo, int n,
+  magmaFloat_const_ptr A, size_t A_offset, int lda,
+  magmaFloat_ptr dwork, size_t dwork_offset,
+  magma_queue_t queue
+  )
+  {
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>((uplo == MagmaLower) ? opencl::magma_real_kernel_id::lansy_inf_lower : opencl::magma_real_kernel_id::lansy_inf_upper);
+
+  cl_int err = 0;
+
+  int blocks = (n - 1) / MAGMABLAS_LANSY_INF_BS + 1;
+  size_t grid[3] = { size_t(blocks), 1, 1 };
+  size_t threads[3] = { MAGMABLAS_LANSY_INF_BS, 4, 1 };
+  grid[0] *= threads[0];
+  grid[1] *= threads[1];
+  grid[2] *= threads[2];
+
+  int n_full_block = (n - n % MAGMABLAS_LANSY_INF_BS) / MAGMABLAS_LANSY_INF_BS;
+  int n_mod_bs = n % MAGMABLAS_LANSY_INF_BS;
+
+  opencl::runtime_t::adapt_uword local_n(n);
+  opencl::runtime_t::adapt_uword local_A_offset(A_offset);
+  opencl::runtime_t::adapt_uword local_lda(lda);
+  opencl::runtime_t::adapt_uword local_dwork_offset(dwork_offset);
+  opencl::runtime_t::adapt_uword local_n_full_block(n_full_block);
+  opencl::runtime_t::adapt_uword local_n_mod_bs(n_mod_bs);
+
+  err  = clSetKernelArg(kernel, 0, local_n.size,            local_n.addr);
+  err |= clSetKernelArg(kernel, 1, sizeof(cl_mem),          &A);
+  err |= clSetKernelArg(kernel, 2, local_A_offset.size,     local_A_offset.addr);
+  err |= clSetKernelArg(kernel, 3, local_lda.size,          local_lda.addr);
+  err |= clSetKernelArg(kernel, 4, sizeof(cl_mem),          &dwork);
+  err |= clSetKernelArg(kernel, 5, local_dwork_offset.size, local_dwork_offset.addr);
+  err |= clSetKernelArg(kernel, 6, local_n_full_block.size, local_n_full_block.addr);
+  err |= clSetKernelArg(kernel, 7, local_n_mod_bs.size,     local_n_mod_bs.addr);
+  coot_check_runtime_error(err, "coot::opencl::magmablas_lansy_inf(): couldn't set kernel arguments");
+
+  err = clEnqueueNDRangeKernel( queue, kernel, 3, NULL, grid, threads, 0, NULL, NULL );
+  coot_check_runtime_error(err, "coot::opencl::magmablas_lansy_inf(): couldn't run kernel");
+  }
+
+
+
+template<typename eT>
+inline
+void
+magmablas_lansy_max
+  (
+  magma_uplo_t uplo, int n,
+  magmaFloat_const_ptr A, size_t A_offset, int lda,
+  magmaFloat_ptr dwork, size_t dwork_offset,
+  magma_queue_t queue
+  )
+  {
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>((uplo == MagmaLower) ? opencl::magma_real_kernel_id::lansy_max_lower : opencl::magma_real_kernel_id::lansy_max_upper);
+
+  cl_int err = 0;
+
+  int blocks = (n - 1) / MAGMABLAS_LANSY_MAX_BS + 1;
+  size_t grid[3] = { size_t(blocks), 1, 1 };
+  size_t threads[3] = { MAGMABLAS_LANSY_MAX_BS, 1, 1 };
+  grid[0] *= threads[0];
+  grid[1] *= threads[1];
+  grid[2] *= threads[2];
+
+  opencl::runtime_t::adapt_uword local_n(n);
+  opencl::runtime_t::adapt_uword local_A_offset(A_offset);
+  opencl::runtime_t::adapt_uword local_lda(lda);
+  opencl::runtime_t::adapt_uword local_dwork_offset(dwork_offset);
+
+  err  = clSetKernelArg(kernel, 0, local_n.size,            local_n.addr);
+  err |= clSetKernelArg(kernel, 1, sizeof(cl_mem),          &A);
+  err |= clSetKernelArg(kernel, 2, local_A_offset.size,     local_A_offset.addr);
+  err |= clSetKernelArg(kernel, 3, local_lda.size,          local_lda.addr);
+  err |= clSetKernelArg(kernel, 4, sizeof(cl_mem),          &dwork);
+  err |= clSetKernelArg(kernel, 5, local_dwork_offset.size, local_dwork_offset.addr);
+  coot_check_runtime_error(err, "coot::opencl::magmablas_lansy_max(): couldn't set kernel arguments");
+
+  err = clEnqueueNDRangeKernel( queue, kernel, 3, NULL, grid, threads, 0, NULL, NULL );
+  coot_check_runtime_error(err, "coot::opencl::magmablas_lansy_max(): couldn't run kernel");
+  }

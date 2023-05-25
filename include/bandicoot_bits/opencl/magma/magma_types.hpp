@@ -116,6 +116,17 @@ typedef enum {
 } magma_diag_t;
 
 typedef enum {
+    MagmaOneNorm       = 171,  /* lange, lanhe */
+    MagmaRealOneNorm   = 172,
+    MagmaTwoNorm       = 173,
+    MagmaFrobeniusNorm = 174,
+    MagmaInfNorm       = 175,
+    MagmaRealInfNorm   = 176,
+    MagmaMaxNorm       = 177,
+    MagmaRealMaxNorm   = 178
+} magma_norm_t;
+
+typedef enum {
     MagmaNoVec         = 301,  /* geev, syev, gesvd */
     MagmaVec           = 302,  /* geev, syev */
     MagmaIVec          = 303,  /* stedc */

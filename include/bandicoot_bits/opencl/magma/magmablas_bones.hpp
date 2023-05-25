@@ -60,7 +60,12 @@
 #define MAGMABLAS_TRANS_NB 32
 #define MAGMABLAS_TRANS_INPLACE_NB 16
 
+#define MAGMABLAS_LASCL_NB 64
+
 #define MAGMA_LASET_BAND_NB 64
+
+#define MAGMABLAS_LANSY_INF_BS 32
+#define MAGMABLAS_LANSY_MAX_BS 64
 
 
 inline
@@ -139,7 +144,6 @@ magmablas_transpose_inplace(magma_int_t n, cl_mem dA, size_t dA_offset, magma_in
 
 
 
-// TODO: implement these!
 inline
 void
 magmablas_slascl(magma_type_t type, magma_int_t kl, magma_int_t ku, float cfrom, float cto, magma_int_t m, magma_int_t n, magmaFloat_ptr dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue, magma_int_t *info);
@@ -156,3 +160,36 @@ template<typename eT>
 inline
 void
 magmablas_lascl(magma_type_t type, magma_int_t kl, magma_int_t ku, eT cfrom, eT cto, magma_int_t m, magma_int_t n, cl_mem dA, size_t dA_offset, magma_int_t ldda, magma_queue_t queue, magma_int_t *info);
+
+
+
+inline
+float
+magmablas_slansy(magma_norm_t norm, magma_uplo_t uplo, magma_int_t n, magmaFloat_const_ptr dA, size_t dA_offset, magma_int_t ldda, magmaFloat_ptr dwork, size_t dwork_offset, magma_int_t lddwork, magma_queue_t queue);
+
+
+
+inline
+double
+magmablas_dlansy(magma_norm_t norm, magma_uplo_t uplo, magma_int_t n, magmaDouble_const_ptr dA, size_t dA_offset, magma_int_t ldda, magmaDouble_ptr dwork, size_t dwork_offset, magma_int_t lddwork, magma_queue_t queue);
+
+
+
+template<typename eT>
+inline
+int
+magmablas_lansy(magma_norm_t norm, magma_uplo_t uplo, magma_int_t n, cl_mem dA, size_t dA_offset, magma_int_t ldda, cl_mem dwork, size_t dwork_offset, magma_queue_t queue);
+
+
+
+template<typename eT>
+inline
+void
+magmablas_lansy_inf(magma_uplo_t uplo, int n, magmaFloat_const_ptr A, size_t A_offset, int lda, magmaFloat_ptr dwork, size_t dwork_offset, magma_queue_t queue);
+
+
+
+template<typename eT>
+inline
+void
+magmablas_lansy_max(magma_uplo_t uplo, int n, magmaFloat_const_ptr A, size_t A_offset, int lda, magmaFloat_ptr dwork, size_t dwork_offset, magma_queue_t queue);
