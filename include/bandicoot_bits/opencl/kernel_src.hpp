@@ -16,7 +16,7 @@
 
 struct kernel_src
   {
-  static inline const std::string&  get_src_preamble(const bool has_float64);
+  static inline const std::string&  get_src_preamble(const bool has_float64, const bool has_subgroups, const size_t subgroup_size);
 
   static inline const std::string&  get_zeroway_source();
   static inline       std::string  init_zeroway_source();
@@ -46,7 +46,7 @@ struct kernel_src
 
 inline
 const std::string&
-kernel_src::get_src_preamble(const bool has_float64)
+kernel_src::get_src_preamble(const bool has_float64, const bool has_subgroups, const size_t subgroup_size)
   {
   char u32_max[32];
   char u64_max[32];
@@ -62,6 +62,9 @@ kernel_src::get_src_preamble(const bool has_float64)
   char s64_max[32];
   snprintf(s32_max, 32, "%llu", (unsigned long long) std::numeric_limits<s32>::max());
   snprintf(s64_max, 32, "%llu", (unsigned long long) std::numeric_limits<s64>::max());
+
+  char subgroup_size_str[32];
+  snprintf(subgroup_size_str, 32, "%zu", subgroup_size);
 
   static const std::string source = \
 
@@ -134,7 +137,14 @@ kernel_src::get_src_preamble(const bool has_float64)
   "\n"
   // Sometimes we need to approximate Armadillo functionality that uses
   // double---but double may not be available.  So we do our best...
-  "#define ARMA_FP_TYPE " + ((has_float64) ? std::string("double") : std::string("float")) + " \n"
+  "#define ARMA_FP_TYPE " + ((has_float64) ? std::string("double") : std::string("float")) + " \n" +
+  // Utility function for subgroup barriers; this is needed in case subgroups
+  // are not available.
+  ((has_subgroups) ?
+      std::string("#define SUBGROUP_BARRIER sub_group_barrier") :
+      std::string("#define SUBGROUP_BARRIER barrier")) + " \n"
+  "#define SUBGROUP_SIZE " + std::string(subgroup_size_str) + " \n"
+  "#define SUBGROUP_SIZE_NAME " + ((has_subgroups && subgroup_size < 128) ? std::string(subgroup_size_str) : "other") + " \n";
   ;
 
   return source;
@@ -242,9 +252,9 @@ kernel_src::init_oneway_source()
   // NOTE: kernel names must match the list in the kernel_id struct
 
   std::vector<std::string> aux_function_filenames = {
-      "accu_wavefront_reduce.cl",
-      "min_wavefront_reduce.cl",
-      "max_wavefront_reduce.cl"
+      "accu_subgroup_reduce.cl",
+      "min_subgroup_reduce.cl",
+      "max_subgroup_reduce.cl"
   };
 
   std::string source = "";
@@ -317,8 +327,8 @@ kernel_src::init_oneway_integral_source()
   // NOTE: kernel names must match the list in the kernel_id struct
 
   std::vector<std::string> aux_function_filenames = {
-      "and_wavefront_reduce.cl",
-      "or_wavefront_reduce.cl"
+      "and_subgroup_reduce.cl",
+      "or_subgroup_reduce.cl"
   };
 
   std::string source = "";
@@ -360,7 +370,7 @@ kernel_src::init_twoway_source()
   // NOTE: kernel names must match the list in the kernel_id struct
 
   std::vector<std::string> aux_function_filenames = {
-      "dot_wavefront_reduce.cl"
+      "dot_subgroup_reduce.cl"
   };
 
   std::string source = "";

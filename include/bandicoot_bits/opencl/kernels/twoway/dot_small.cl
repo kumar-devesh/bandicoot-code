@@ -39,6 +39,8 @@ COOT_FN(PREFIX,dot_small)(__global twoway_promoted_eT* out_mem,
 
   for (UWORD s = get_local_size(0) / 2; s > 0; s >>= 1)
     {
+    SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
+
     if (tid < s)
       {
       aux_mem[tid] += aux_mem[tid + s];

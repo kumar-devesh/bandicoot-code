@@ -50,6 +50,8 @@ COOT_FN(PREFIX,min_small)(__global const eT1* in_mem,
 
   for (UWORD s = get_local_size(0) / 2; s > 0; s >>= 1)
     {
+    SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
+
     if (tid < s)
       {
       aux_mem[tid] = min(aux_mem[tid], aux_mem[tid + s]);

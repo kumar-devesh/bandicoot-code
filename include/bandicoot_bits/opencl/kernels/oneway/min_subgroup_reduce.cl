@@ -13,75 +13,101 @@
 // ------------------------------------------------------------------------
 
 void
-COOT_FN(PREFIX,min_wavefront_reduce_other)(__local volatile eT1* data, UWORD tid)
+COOT_FN(PREFIX,min_subgroup_reduce_other)(__local volatile eT1* data, UWORD tid)
   {
-  for(UWORD i = WAVEFRONT_SIZE; i > 0; i >>= 1)
+  for(UWORD i = SUBGROUP_SIZE; i > 0; i >>= 1)
     {
     if (tid < i)
       data[tid] = min(data[tid], data[tid + i]);
+    SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
     }
   }
 
 
 
 void
-COOT_FN(PREFIX,min_wavefront_reduce_8)(__local volatile eT1* data, UWORD tid)
+COOT_FN(PREFIX,min_subgroup_reduce_8)(__local volatile eT1* data, UWORD tid)
   {
   data[tid] = min(data[tid], data[tid + 8]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 4]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 2]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 1]);
   }
 
 
 
 void
-COOT_FN(PREFIX,min_wavefront_reduce_16)(__local volatile eT1* data, UWORD tid)
+COOT_FN(PREFIX,min_subgroup_reduce_16)(__local volatile eT1* data, UWORD tid)
   {
   data[tid] = min(data[tid], data[tid + 16]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 8]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 4]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 2]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 1]);
   }
 
 
 
 void
-COOT_FN(PREFIX,min_wavefront_reduce_32)(__local volatile eT1* data, UWORD tid)
+COOT_FN(PREFIX,min_subgroup_reduce_32)(__local volatile eT1* data, UWORD tid)
   {
   data[tid] = min(data[tid], data[tid + 32]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 16]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 8]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 4]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 2]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 1]);
   }
 
 
 
 void
-COOT_FN(PREFIX,min_wavefront_reduce_64)(__local volatile eT1* data, UWORD tid)
+COOT_FN(PREFIX,min_subgroup_reduce_64)(__local volatile eT1* data, UWORD tid)
   {
   data[tid] = min(data[tid], data[tid + 64]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 32]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 16]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 8]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 4]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 2]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 1]);
   }
 
 
 
-void COOT_FN(PREFIX,min_wavefront_reduce_128)(__local volatile eT1* data, UWORD tid)
+void COOT_FN(PREFIX,min_subgroup_reduce_128)(__local volatile eT1* data, UWORD tid)
   {
   data[tid] = min(data[tid], data[tid + 128]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 64]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 32]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 16]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 8]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 4]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 2]);
+  SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
   data[tid] = min(data[tid], data[tid + 1]);
   }
