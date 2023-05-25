@@ -229,4 +229,178 @@ TEST_CASE("magma_dsyevd_1", "[syevd]")
   magma_queue_destroy(queue);
   }
 
+
+
+TEST_CASE("magma_ssyevd_1", "[syevd]")
+  {
+  if (get_rt().backend != CL_BACKEND)
+    {
+    return;
+    }
+
+  /* Constants */
+  const float s_zero = 0;
+  const magma_int_t izero = 0;
+  const magma_int_t ione  = 1;
+
+  /* Local variables */
+  float *h_A, *h_R, *h_work, aux_work[1], unused[1];
+  magmaFloat_ptr d_R;
+  float *w1, *w2, result[4]={0, 0, 0, 0}, eps, runused[1];
+  magma_int_t *iwork, aux_iwork[1];
+  magma_int_t N, Nfound, info, lwork, liwork, lda, ldda;
+  eps = coot_fortran(coot_slamch)("E");
+
+  float tol    = 30 * coot_fortran(coot_slamch)("E");
+  float tolulp = 30 * coot_fortran(coot_slamch)("P");
+
+  magma_queue_t queue = magma_queue_create();
+
+  magma_vec_t  jobzs[2] = { MagmaNoVec, MagmaVec };
+  magma_uplo_t uplos[2] = { MagmaLower, MagmaUpper };
+
+  for( int itest = 0; itest < 7; ++itest )
+    {
+    for ( int ijob = 0; ijob < 2; ++ijob)
+      {
+      for ( int iuplo = 0; iuplo < 2; ++iuplo )
+        {
+        N = 128 * (itest + 1) + 64;
+        Nfound = N;
+        lda  = N;
+        ldda = magma_roundup( N, 32 );  // multiple of 32 by default
+
+        magma_ssyevd_gpu( jobzs[ijob], uplos[iuplo],
+                          N, NULL, 0, ldda, NULL,  // A, w
+                          NULL, lda,            // host A
+                          aux_work,  -1,
+                          aux_iwork, -1,
+                          &info );
+
+        lwork  = (magma_int_t) aux_work[0];
+        liwork = aux_iwork[0];
+
+        /* Allocate host memory for the matrix */
+        REQUIRE( magma_smalloc_cpu( &h_A,    N*lda  ) == MAGMA_SUCCESS );
+        REQUIRE( magma_smalloc_cpu( &w1,     N      ) == MAGMA_SUCCESS );
+        REQUIRE( magma_smalloc_cpu( &w2,     N      ) == MAGMA_SUCCESS );
+        REQUIRE( magma_imalloc_cpu( &iwork,  liwork ) == MAGMA_SUCCESS );
+
+        REQUIRE( magma_smalloc_pinned( &h_R,    N*lda  ) == MAGMA_SUCCESS );
+        REQUIRE( magma_smalloc_pinned( &h_work, lwork  ) == MAGMA_SUCCESS );
+
+        REQUIRE( magma_smalloc( &d_R,    N*ldda ) == MAGMA_SUCCESS );
+
+        /* Clear eigenvalues, for |S-S_magma| check when fraction < 1. */
+        coot_fortran(coot_slaset)( "F", &N, &ione, &s_zero, &s_zero, w1, &N );
+        coot_fortran(coot_slaset)( "F", &N, &ione, &s_zero, &s_zero, w2, &N );
+
+        /* Initialize the matrix */
+        // We use a random symmetric matrix.
+        arma::fmat h_A_alias(h_A, N, lda, false, true);
+        h_A_alias.randu();
+        h_A_alias *= h_A_alias.t();
+        magma_ssetmatrix( N, N, h_A, lda, d_R, 0, ldda, queue );
+
+        /* ====================================================================
+           Performs operation using MAGMA
+           =================================================================== */
+        magma_ssyevd_gpu( jobzs[ijob], uplos[iuplo],
+                          N, d_R, 0, ldda, w1,
+                          h_R, lda,
+                          h_work, lwork,
+                          iwork, liwork,
+                          &info );
+        if (info != 0)
+          {
+          std::cerr << "magma_ssyevd_gpu returned error " << info << ": " << magma::error_as_string(info) << std::endl;
+          }
+        REQUIRE( info == 0 );
+
+        if ( jobzs[ijob] != MagmaNoVec )
+          {
+          /* =====================================================================
+             Check the results following the LAPACK's [zcds]drvst routine.
+             A is factored as A = U S U^H and the following 3 tests computed:
+             (1)    | A - U S U^H | / ( |A| N ) if all eigenvectors were computed
+                    | U^H A U - S | / ( |A| Nfound ) otherwise
+             (2)    | I - U^H U   | / ( N )
+             (3)    | S(with U) - S(w/o U) | / | S |    // currently disabled, but compares to LAPACK
+             =================================================================== */
+          magma_sgetmatrix( N, N, d_R, 0, ldda, h_R, lda, queue );
+
+          float *work;
+          REQUIRE( magma_smalloc_cpu( &work, 2*N*N ) == MAGMA_SUCCESS );
+
+          // e is unused since kband=0; tau is unused since itype=1
+          if( Nfound == N )
+            {
+            coot_fortran(coot_ssyt21)( &ione, lapack_uplo_const(uplos[iuplo]), &N, &izero,
+                                       h_A, &lda,
+                                       w1, runused,
+                                       h_R, &lda,
+                                       h_R, &lda,
+                                       unused, work,
+                                       &result[0] );
+            }
+          else
+            {
+            coot_fortran(coot_ssyt22)( &ione, lapack_uplo_const(uplos[iuplo]), &N, &Nfound, &izero,
+                                       h_A, &lda,
+                                       w1, runused,
+                                       h_R, &lda,
+                                       h_R, &lda,
+                                       unused, work,
+                                       &result[0] );
+            }
+          result[0] *= eps;
+          result[1] *= eps;
+
+          magma_free_cpu( work );
+          work=NULL;
+          }
+
+        /* =====================================================================
+           Performs operation using LAPACK
+           =================================================================== */
+        coot_fortran(coot_ssyevd)( lapack_vec_const(jobzs[ijob]), lapack_uplo_const(uplos[iuplo]),
+                                   &N, h_A, &lda, w2,
+                                   h_work, &lwork,
+                                   iwork, &liwork,
+                                   &info );
+        if (info != 0)
+          {
+          std::cerr << "LAPACK ssyevd returned error " << info << ": " << magma::error_as_string(info) << std::endl;
+          }
+
+        // compare eigenvalues
+        float maxw=0, diff=0;
+        for( int j=0; j < Nfound; j++ )
+          {
+          maxw = std::max(maxw, fabs(w1[j]));
+          maxw = std::max(maxw, fabs(w2[j]));
+          diff = std::max(diff, fabs(w1[j] - w2[j]));
+          }
+        result[3] = diff / (N*maxw);
+
+        REQUIRE( result[0] < tol );
+        REQUIRE( result[1] < tol );
+        REQUIRE( result[3] < tolulp );
+
+        magma_free_cpu( h_A    );
+        magma_free_cpu( w1     );
+        magma_free_cpu( w2     );
+        magma_free_cpu( iwork  );
+
+        magma_free_pinned( h_R    );
+        magma_free_pinned( h_work );
+
+        magma_free( d_R );
+        }
+      }
+    }
+
+  magma_queue_destroy(queue);
+  }
+
 #endif

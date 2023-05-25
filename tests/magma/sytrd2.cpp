@@ -168,4 +168,115 @@ TEST_CASE("magma_dsytrd2_1", "[sytrd2]")
 
 
 
+TEST_CASE("magma_ssytrd2_1", "[sytrd2]")
+  {
+  if (get_rt().backend != CL_BACKEND)
+    {
+    return;
+    }
+
+  float           eps;
+  float *h_A, *h_R, *h_Q, *h_work, *work;
+  magmaFloat_ptr d_R, dwork;
+  float *tau;
+  float          *diag, *offdiag;
+  float           result[2] = {0., 0.};
+  magma_int_t N, lda, ldda, lwork, info, nb, ldwork;
+  magma_int_t ione     = 1;
+  magma_int_t itwo     = 2;
+  magma_int_t ithree   = 3;
+  eps = std::numeric_limits<float>::epsilon();
+
+  float tol = 30 * eps;
+
+  magma_queue_t queue = magma_queue_create();
+
+  const magma_uplo_t uplos[2] = { MagmaUpper, MagmaLower };
+
+  for( int itest = 0; itest < 7; ++itest )
+    {
+    for (int iuplo = 0; iuplo < 2; ++iuplo )
+      {
+      N = 128 * (itest + 1) + 64;
+
+      lda    = N;
+      ldda   = magma_roundup( N, 32 );  // multiple of 32 by default
+      nb     = magma_get_ssytrd_nb(N);
+      lwork  = N*nb;  /* We suppose the magma nb is bigger than lapack nb */
+      ldwork = ldda*magma_ceildiv(N,64) + 2*ldda*nb;
+
+      REQUIRE( magma_smalloc_cpu( &h_A,     lda*N ) == MAGMA_SUCCESS );
+      REQUIRE( magma_smalloc_cpu( &tau,     N     ) == MAGMA_SUCCESS );
+      REQUIRE( magma_smalloc_cpu( &diag,    N   ) == MAGMA_SUCCESS );
+      REQUIRE( magma_smalloc_cpu( &offdiag, N-1 ) == MAGMA_SUCCESS );
+
+      REQUIRE( magma_smalloc_pinned( &h_R,     lda*N ) == MAGMA_SUCCESS );
+      REQUIRE( magma_smalloc_pinned( &h_work,  lwork ) == MAGMA_SUCCESS );
+
+      REQUIRE( magma_smalloc( &d_R,     ldda*N ) == MAGMA_SUCCESS );
+      REQUIRE( magma_smalloc( &dwork,   ldwork ) == MAGMA_SUCCESS );
+
+      /* ====================================================================
+         Initialize the matrix
+         =================================================================== */
+      arma::fmat h_A_alias((float*) h_A, N, N, false, true);
+      h_A_alias.randu();
+      magma_ssetmatrix( N, N, h_A, lda, d_R, 0, ldda, queue );
+
+      /* ====================================================================
+         Performs operation using MAGMA
+         =================================================================== */
+      magma_ssytrd2_gpu( uplos[iuplo], N, d_R, 0, ldda, diag, offdiag,
+                         tau, h_R, lda, h_work, lwork, dwork, 0, ldwork, &info );
+      if (info != 0)
+        {
+        std::cerr << "magma_ssytrd2_gpu returned error " << info << ": " << magma::error_as_string(info) << std::endl;
+        }
+      REQUIRE( info == 0 );
+
+      REQUIRE( magma_smalloc_cpu( &h_Q,  lda*N ) == MAGMA_SUCCESS );
+      REQUIRE( magma_smalloc_cpu( &work, 2*N*N ) == MAGMA_SUCCESS );
+
+      magma_sgetmatrix( N, N, d_R, 0, ldda, h_R, lda, queue );
+      magma_sgetmatrix( N, N, d_R, 0, ldda, h_Q, lda, queue );
+      coot_fortran(coot_sorgtr)( lapack_uplo_const(uplos[iuplo]), &N, h_Q, &lda, tau, h_work, &lwork, &info );
+
+      coot_fortran(coot_ssyt21)( &itwo, lapack_uplo_const(uplos[iuplo]), &N, &ione,
+                                 h_A, &lda, diag, offdiag,
+                                 h_Q, &lda, h_R, &lda,
+                                 tau, work,
+                                 &result[0] );
+
+      coot_fortran(coot_ssyt21)( &ithree, lapack_uplo_const(uplos[iuplo]), &N, &ione,
+                                 h_A, &lda, diag, offdiag,
+                                 h_Q, &lda, h_R, &lda,
+                                 tau, work,
+                                 &result[1] );
+      result[0] *= eps;
+      result[1] *= eps;
+
+      REQUIRE( result[0] < tol );
+      REQUIRE( result[1] < tol );
+
+      magma_free_cpu( h_Q  );
+      magma_free_cpu( work );
+
+      magma_free_cpu( h_A     );
+      magma_free_cpu( tau     );
+      magma_free_cpu( diag    );
+      magma_free_cpu( offdiag );
+
+      magma_free_pinned( h_R    );
+      magma_free_pinned( h_work );
+
+      magma_free( d_R   );
+      magma_free( dwork );
+      }
+    }
+
+  magma_queue_destroy(queue);
+  }
+
+
+
 #endif
