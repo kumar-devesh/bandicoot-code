@@ -149,7 +149,6 @@ namespace coot
     {
     #include "bandicoot_bits/opencl/magma_kernel_id.hpp"
     #include "bandicoot_bits/opencl/runtime_bones.hpp"
-    #include "bandicoot_bits/opencl/kernel_src.hpp"
     #include "bandicoot_bits/opencl/error.hpp"
     #include "bandicoot_bits/opencl/type_to_dev_string.hpp"
     #include "bandicoot_bits/opencl/random_bones.hpp"
@@ -169,6 +168,7 @@ namespace coot
   namespace opencl
     {
     #include "bandicoot_bits/opencl/debug.hpp"
+    #include "bandicoot_bits/opencl/kernel_src.hpp"
     }
 
   #endif
