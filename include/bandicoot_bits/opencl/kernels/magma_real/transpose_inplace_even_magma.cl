@@ -74,8 +74,8 @@ COOT_FN(PREFIX,transpose_inplace_even_magma)(const UWORD n,
   {
   matrix += matrix_offset;
 
-  __local eT1 sA[MAGMA_TRANS_INPLACE_NB][MAGMA_TRANS_INPLACE_NB + 1];
-  __local eT1 sB[MAGMA_TRANS_INPLACE_NB][MAGMA_TRANS_INPLACE_NB + 1];
+  __local eT1 sA[MAGMABLAS_TRANS_INPLACE_NB][MAGMABLAS_TRANS_INPLACE_NB + 1];
+  __local eT1 sB[MAGMABLAS_TRANS_INPLACE_NB][MAGMABLAS_TRANS_INPLACE_NB + 1];
 
   UWORD i = get_local_id(0);
   UWORD j = get_local_id(1);
@@ -84,8 +84,8 @@ COOT_FN(PREFIX,transpose_inplace_even_magma)(const UWORD n,
   UWORD ii = (lower ? (get_group_id(0) - 1) : (get_group_id(1) + get_num_groups(1)));
   UWORD jj = (lower ? (get_group_id(1)    ) : (get_group_id(0) + get_num_groups(1)));
 
-  ii *= MAGMA_TRANS_INPLACE_NB;
-  jj *= MAGMA_TRANS_INPLACE_NB;
+  ii *= MAGMABLAS_TRANS_INPLACE_NB;
+  jj *= MAGMABLAS_TRANS_INPLACE_NB;
 
   __global eT1* A = matrix + (ii + i) + (jj + j) * lda;
   if (ii == jj)

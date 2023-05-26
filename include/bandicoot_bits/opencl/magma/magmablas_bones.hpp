@@ -51,7 +51,6 @@
 
 // Adaptations of magmablas_* functions to use existing bandicoot backend functionality.
 
-// Make sure these match the definitions in kernel_src.hpp!
 #define MAGMABLAS_BLK_X 64
 #define MAGMABLAS_BLK_Y 32
 

@@ -65,19 +65,19 @@ COOT_FN(PREFIX,laset_lower)(const UWORD m,
   {
   A += A_offset;
 
-  UWORD ind = get_group_id(0) * MAGMA_BLK_X + get_local_id(0);
-  UWORD iby = get_group_id(1) * MAGMA_BLK_Y;
+  UWORD ind = get_group_id(0) * MAGMABLAS_BLK_X + get_local_id(0);
+  UWORD iby = get_group_id(1) * MAGMABLAS_BLK_Y;
   /* check if full block-column && (below diag) */
-  bool full = (iby + MAGMA_BLK_Y <= n && (ind >= iby + MAGMA_BLK_Y));
+  bool full = (iby + MAGMABLAS_BLK_Y <= n && (ind >= iby + MAGMABLAS_BLK_Y));
   /* do only rows inside matrix, and blocks not above diag */
-  if (ind < m && ind + MAGMA_BLK_X > iby)
+  if (ind < m && ind + MAGMABLAS_BLK_X > iby)
     {
     A += ind + iby*lda;
     if (full)
       {
       // full block-column, off-diagonal block
       #pragma unroll
-      for (int j=0; j < MAGMA_BLK_Y; ++j)
+      for (int j=0; j < MAGMABLAS_BLK_Y; ++j)
         {
         A[j * lda] = offdiag;
         }
@@ -85,7 +85,7 @@ COOT_FN(PREFIX,laset_lower)(const UWORD m,
     else
       {
       // either partial block-column or diagonal block
-      for (int j=0; j < MAGMA_BLK_Y && iby+j < n; ++j)
+      for (int j=0; j < MAGMABLAS_BLK_Y && iby+j < n; ++j)
         {
         if (iby + j == ind)
           A[j * lda] = diag;
