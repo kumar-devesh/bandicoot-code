@@ -22,6 +22,7 @@ struct runtime_dev_info
   coot_aligned bool  has_float64;
   coot_aligned bool  has_sizet64;
   coot_aligned bool  has_subgroups;
+  coot_aligned bool  must_synchronise_subgroups;
   coot_aligned uword ptr_width;
   coot_aligned uword n_units;
   coot_aligned uword opencl_ver;
@@ -67,10 +68,11 @@ class runtime_t
   inline uword get_max_wg()         const;
   inline uword get_subgroup_size()  const;
 
-  inline bool is_valid()      const;
-  inline bool has_sizet64()   const;
-  inline bool has_float64()   const;
-  inline bool has_subgroups() const;
+  inline bool is_valid()                   const;
+  inline bool has_sizet64()                const;
+  inline bool has_float64()                const;
+  inline bool has_subgroups()              const;
+  inline bool must_synchronise_subgroups() const;
 
   template<typename eT>
   inline cl_mem acquire_memory(const uword n_elem);
