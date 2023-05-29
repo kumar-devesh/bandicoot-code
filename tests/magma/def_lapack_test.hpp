@@ -28,6 +28,18 @@ namespace coot
   #define coot_slaswp slaswp
   #define coot_dlaswp dlaswp
 
+  #define coot_sgeqlf sgeqlf
+  #define coot_dgeqlf dgeqlf
+
+  #define coot_sormql sormql
+  #define coot_dormql dormql
+
+  #define coot_ssyt21 ssyt21
+  #define coot_dsyt21 dsyt21
+
+  #define coot_ssyt22 ssyt22
+  #define coot_dsyt22 dsyt22
+
 #else
 
   #define coot_sbdt01 SBDT01
@@ -38,6 +50,18 @@ namespace coot
 
   #define coot_slaswp SLASWP
   #define coot_dlaswp DLASWP
+
+  #define coot_sgeqlf SGEQLF
+  #define coot_dgeqlf DGEQLF
+
+  #define coot_sormql SORMQL
+  #define coot_dormql DORMQL
+
+  #define coot_ssyt21 SSYT21
+  #define coot_dsyt21 DSYT21
+
+  #define coot_ssyt22 SSYT22
+  #define coot_dsyt22 DSYT22
 
 #endif
 
@@ -54,6 +78,22 @@ extern "C"
   // perform a series of row interchanges
   void coot_fortran(coot_slaswp)(const blas_int* n, float*  A, const blas_int* lda, const blas_int* k1, const blas_int* k2, const blas_int* ipiv, const blas_int* incx);
   void coot_fortran(coot_dlaswp)(const blas_int* n, double* A, const blas_int* lda, const blas_int* k1, const blas_int* k2, const blas_int* ipiv, const blas_int* incx);
+
+  // QL factorisation of real matrix
+  void coot_fortran(coot_sgeqlf)(const blas_int* m, const blas_int* n, const float*  A, const blas_int* lda, const float*  tau, const float*  work, const blas_int* lwork, blas_int* info);
+  void coot_fortran(coot_dgeqlf)(const blas_int* m, const blas_int* n, const double* A, const blas_int* lda, const double* tau, const double* work, const blas_int* lwork, blas_int* info);
+
+  // multiply matrix C by orthogonal matrix Q, which came from gelqf
+  void coot_fortran(coot_sormql)(const char* side, const char* trans, const blas_int* m, const blas_int* n, const blas_int* k, const float*  A, const blas_int* lda, const float*  tau, float*  C, const blas_int* ldc, float*  work, const blas_int* lwork, blas_int* info);
+  void coot_fortran(coot_dormql)(const char* side, const char* trans, const blas_int* m, const blas_int* n, const blas_int* k, const double* A, const blas_int* lda, const double* tau, double* C, const blas_int* ldc, double* work, const blas_int* lwork, blas_int* info);
+
+  // check a decomposition of the form U S U^T
+  void coot_fortran(coot_ssyt21)(const blas_int* itype, const char* uplo, const blas_int* n, const blas_int* kband, const float*  A, const blas_int* lda, const float*  D, const float*  E, const float*  U, const blas_int* ldu, const float*  V, const blas_int* ldv, const float*  tau, float*  work, float*  result);
+  void coot_fortran(coot_dsyt21)(const blas_int* itype, const char* uplo, const blas_int* n, const blas_int* kband, const double* A, const blas_int* lda, const double* D, const double* E, const double* U, const blas_int* ldu, const double* V, const blas_int* ldv, const double* tau, double* work, double* result);
+
+  // check a decomposition of the form A U = U S
+  void coot_fortran(coot_ssyt22)(const blas_int* itype, const char* uplo, const blas_int* n, const blas_int* m, const blas_int* kband, const float*  A, const blas_int* lda, const float*  D, const float*  E, const float*  U, const blas_int* ldu, const float*  V, const blas_int* ldv, const float*  tau, float*  work, float*  result);
+  void coot_fortran(coot_dsyt22)(const blas_int* itype, const char* uplo, const blas_int* n, const blas_int* m, const blas_int* kband, const double* A, const blas_int* lda, const double* D, const double* E, const double* U, const blas_int* ldu, const double* V, const blas_int* ldv, const double* tau, double* work, double* result);
   }
 
   }; // namespace coot

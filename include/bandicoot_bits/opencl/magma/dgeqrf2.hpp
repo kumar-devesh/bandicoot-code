@@ -80,11 +80,17 @@ magma_dgeqrf2_gpu
   // check arguments
   *info = 0;
   if (m < 0)
+    {
     *info = -1;
+    }
   else if (n < 0)
+    {
     *info = -2;
+    }
   else if (ldda < std::max(1, m))
-      *info = -4;
+    {
+    *info = -4;
+    }
 
   if (*info != 0)
     {
@@ -94,7 +100,9 @@ magma_dgeqrf2_gpu
 
   minmn = std::min( m, n );
   if (minmn == 0)
+    {
     return *info;
+    }
 
   nb = magma_get_dgeqrf_nb( m, n );
 
