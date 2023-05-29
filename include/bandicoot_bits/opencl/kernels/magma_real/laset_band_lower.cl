@@ -67,7 +67,7 @@ COOT_FN(PREFIX,laset_band_lower)(const UWORD m,
                                  const UWORD A_offset,
                                  const UWORD lda)
   {
-  UWORD ibx = get_group_id(0) * MAGMA_LASET_BAND_NB;
+  UWORD ibx = get_group_id(0) * MAGMABLAS_LASET_BAND_NB;
   UWORD ind = ibx + get_local_id(0);
 
   A += A_offset + ind + ibx * lda;
@@ -79,7 +79,7 @@ COOT_FN(PREFIX,laset_band_lower)(const UWORD m,
     }
 
   #pragma unroll
-  for (int j=0; j < MAGMA_LASET_BAND_NB; j++)
+  for (int j=0; j < MAGMABLAS_LASET_BAND_NB; j++)
     {
     if (ibx + j < n && ind + j < m)
       {

@@ -51,7 +51,6 @@
 
 // Adaptations of magmablas_* functions to use existing bandicoot backend functionality.
 
-// Make sure these match the definitions in kernel_src.hpp!
 #define MAGMABLAS_BLK_X 64
 #define MAGMABLAS_BLK_Y 32
 
@@ -65,7 +64,7 @@
 
 #define MAGMABLAS_LASCL_NB 64
 
-#define MAGMA_LASET_BAND_NB 64
+#define MAGMABLAS_LASET_BAND_NB 64
 
 #define MAGMABLAS_LANSY_INF_BS 32
 #define MAGMABLAS_LANSY_MAX_BS 64
