@@ -71,7 +71,7 @@ det(dev_mem_t<eT> in, const uword n_rows, eT& out_val)
   eT P_det = 1;
   for (uword i = 0; i < n_rows; ++i)
     {
-    if ((ipiv2[i] - 1) != i)
+    if (uword(ipiv[i] - 1) != i)
       {
       P_det *= -1;
       }

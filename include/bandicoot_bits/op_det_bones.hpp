@@ -23,5 +23,5 @@ class op_det
   inline static bool apply_direct(typename T1::elem_type& out_val, const Base<typename T1::elem_type, T1>& expr);
 
   template<typename eT>
-  inline static eT apply_diagmat(const Col<eT>& X);
+  inline static eT apply_diagmat(const Mat<eT>& X);
   };

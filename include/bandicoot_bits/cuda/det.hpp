@@ -20,7 +20,7 @@
 template<typename eT>
 inline
 std::tuple<bool, std::string>
-det(dev_mem_t<eT> A, const uword n_rows, eT& out_val)
+det(dev_mem_t<eT> in, const uword n_rows, eT& out_val)
   {
   coot_extra_debug_sigprint();
 
@@ -155,7 +155,7 @@ det(dev_mem_t<eT> A, const uword n_rows, eT& out_val)
   CUfunction second_kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::prod);
   CUfunction second_kernel_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::prod_small);
 
-  const eT U_det = generic_reduce<eT, eT>(U, n_rows, "det", kernel, kernel_small, std::make_tuple(/* no extra args */), second_kernel, second_kernel_small, std::make_tuple(/* no extra args */));
+  const eT U_det = generic_reduce<eT, eT>(in, n_rows, "det", kernel, kernel_small, std::make_tuple(/* no extra args */), second_kernel, second_kernel_small, std::make_tuple(/* no extra args */));
 
   CUfunction p_kernel = get_rt().cuda_rt.get_kernel<s64>(oneway_integral_kernel_id::ipiv_det);
   CUfunction p_kernel_small = get_rt().cuda_rt.get_kernel<s64>(oneway_integral_kernel_id::ipiv_det_small);
@@ -163,6 +163,8 @@ det(dev_mem_t<eT> A, const uword n_rows, eT& out_val)
   CUfunction p_second_kernel = get_rt().cuda_rt.get_kernel<s64>(oneway_kernel_id::prod);
   CUfunction p_second_kernel_small = get_rt().cuda_rt.get_kernel<s64>(oneway_kernel_id::prod_small);
 
+  dev_mem_t<s64> ipiv_gpu;
+  ipiv_gpu.cuda_mem_ptr = ipiv;
   const s64 P_det = generic_reduce<s64, s64>(ipiv_gpu, n_rows, "det", p_kernel, p_kernel_small, std::make_tuple(/* no extra args */), p_second_kernel, p_second_kernel_small, std::make_tuple(/* no extra args */));
 
   get_rt().cuda_rt.synchronise();

@@ -27,7 +27,8 @@ op_det::apply_direct(typename T1::elem_type& out_val, const Base<typename T1::el
   if (strip_diagmat<T1>::do_diagmat)
     {
     const strip_diagmat<T1> strip(expr.get_ref());
-    out_val = op_det::apply_diagmat(strip.M);
+    const unwrap<typename strip_diagmat<T1>::stored_type> U(strip.M);
+    out_val = op_det::apply_diagmat(U.M);
     return true;
     }
 
@@ -54,9 +55,12 @@ op_det::apply_direct(typename T1::elem_type& out_val, const Base<typename T1::el
 template<typename eT>
 inline
 eT
-op_det::apply_diagmat(const Col<eT>& X)
+op_det::apply_diagmat(const Mat<eT>& X)
   {
   coot_extra_debug_sigprint();
 
-  eT val = coot_rt_t::prod_vec(X.get_dev_mem(false), X.n_elem);
+  // TODO: handle vec and non-vec cases
+  coot_debug_check( X.is_xvec == false, "det(): given object is not a diagmat! (internal error)" );
+
+  eT val = coot_rt_t::prod(X.get_dev_mem(false), X.n_elem);
   }
