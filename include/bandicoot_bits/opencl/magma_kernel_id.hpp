@@ -21,11 +21,23 @@ struct magma_real_kernel_id
     laset_lower,
     laset_upper,
 
+    laset_band_lower,
+    laset_band_upper,
+
     transpose_magma, // _magma is to avoid potential naming conflicts
     transpose_inplace_odd_magma,
     transpose_inplace_even_magma,
 
-    laswp
+    laswp,
+
+    lansy_inf_lower,
+    lansy_inf_upper,
+    lansy_max_lower,
+    lansy_max_upper,
+
+    lascl_full,
+    lascl_lower,
+    lascl_upper
     };
 
 
@@ -43,11 +55,23 @@ struct magma_real_kernel_id
     names.push_back("laset_lower");
     names.push_back("laset_upper");
 
+    names.push_back("laset_band_lower");
+    names.push_back("laset_band_upper");
+
     names.push_back("transpose_magma");
     names.push_back("transpose_inplace_odd_magma");
     names.push_back("transpose_inplace_even_magma");
 
     names.push_back("laswp");
+
+    names.push_back("lansy_inf_lower");
+    names.push_back("lansy_inf_upper");
+    names.push_back("lansy_max_lower");
+    names.push_back("lansy_max_upper");
+
+    names.push_back("lascl_full");
+    names.push_back("lascl_lower");
+    names.push_back("lascl_upper");
 
     return names;
     }

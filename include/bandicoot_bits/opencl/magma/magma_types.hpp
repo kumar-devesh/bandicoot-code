@@ -95,13 +95,13 @@ typedef enum {
     MagmaHessenberg    = 124   /* lascl */
 } magma_uplo_t;
 
+typedef magma_uplo_t magma_type_t;  /* lascl */
 
 typedef enum {
     MagmaLeft          = 141,
     MagmaRight         = 142,
     MagmaBothSides     = 143   /* trevc */
 } magma_side_t;
-
 
 typedef enum {
     MagmaNoTrans       = 111,
@@ -114,6 +114,17 @@ typedef enum {
     MagmaNonUnit       = 131,
     MagmaUnit          = 132
 } magma_diag_t;
+
+typedef enum {
+    MagmaOneNorm       = 171,  /* lange, lanhe */
+    MagmaRealOneNorm   = 172,
+    MagmaTwoNorm       = 173,
+    MagmaFrobeniusNorm = 174,
+    MagmaInfNorm       = 175,
+    MagmaRealInfNorm   = 176,
+    MagmaMaxNorm       = 177,
+    MagmaRealMaxNorm   = 178
+} magma_norm_t;
 
 typedef enum {
     MagmaNoVec         = 301,  /* geev, syev, gesvd */
@@ -129,6 +140,12 @@ typedef enum {
     MagmaForward       = 391,  /* larfb */
     MagmaBackward      = 392
 } magma_direct_t;
+
+typedef enum {
+    MagmaRangeAll      = 311,  /* syevx, etc. */
+    MagmaRangeV        = 312,
+    MagmaRangeI        = 313
+} magma_range_t;
 
 typedef enum {
     MagmaQ             = 322,  /* unmbr, ungbr */

@@ -60,6 +60,21 @@
 #endif
 
 
+
+#if defined(COOT_USE_OPENMP)
+  #if defined(__has_include)
+    #if __has_include(<omp.h>)
+      #include <omp.h>
+    #else
+      #undef COOT_USE_OPENMP
+      #pragma message ("WARNING: use of OpenMP disabled; omp.h header not found")
+    #endif
+  #else
+    #include <omp.h>
+  #endif
+#endif
+
+
 #if defined(COOT_USE_CXX11)
   #include <mutex>
 #endif
@@ -149,7 +164,6 @@ namespace coot
     {
     #include "bandicoot_bits/opencl/magma_kernel_id.hpp"
     #include "bandicoot_bits/opencl/runtime_bones.hpp"
-    #include "bandicoot_bits/opencl/kernel_src.hpp"
     #include "bandicoot_bits/opencl/error.hpp"
     #include "bandicoot_bits/opencl/type_to_dev_string.hpp"
     #include "bandicoot_bits/opencl/random_bones.hpp"
@@ -169,6 +183,7 @@ namespace coot
   namespace opencl
     {
     #include "bandicoot_bits/opencl/debug.hpp"
+    #include "bandicoot_bits/opencl/kernel_src.hpp"
     }
 
   #endif
@@ -310,6 +325,16 @@ namespace coot
     #include "bandicoot_bits/opencl/magma/sgesvd.hpp"
     #include "bandicoot_bits/opencl/magma/spotrf.hpp"
     #include "bandicoot_bits/opencl/magma/sgetrf.hpp"
+    #include "bandicoot_bits/opencl/magma/sormql2.hpp"
+    #include "bandicoot_bits/opencl/magma/sormqr2.hpp"
+    #include "bandicoot_bits/opencl/magma/sormtr.hpp"
+    #include "bandicoot_bits/opencl/magma/slaex3.hpp"
+    #include "bandicoot_bits/opencl/magma/slaex1.hpp"
+    #include "bandicoot_bits/opencl/magma/slaex0.hpp"
+    #include "bandicoot_bits/opencl/magma/sstedx.hpp"
+    #include "bandicoot_bits/opencl/magma/slatrd2.hpp"
+    #include "bandicoot_bits/opencl/magma/ssytrd2.hpp"
+    #include "bandicoot_bits/opencl/magma/ssyevd.hpp"
 
     #include "bandicoot_bits/opencl/magma/dlarfb.hpp"
     #include "bandicoot_bits/opencl/magma/dorgqr.hpp"
@@ -327,6 +352,16 @@ namespace coot
     #include "bandicoot_bits/opencl/magma/dgesvd.hpp"
     #include "bandicoot_bits/opencl/magma/dpotrf.hpp"
     #include "bandicoot_bits/opencl/magma/dgetrf.hpp"
+    #include "bandicoot_bits/opencl/magma/dormql2.hpp"
+    #include "bandicoot_bits/opencl/magma/dormqr2.hpp"
+    #include "bandicoot_bits/opencl/magma/dormtr.hpp"
+    #include "bandicoot_bits/opencl/magma/dlaex3.hpp"
+    #include "bandicoot_bits/opencl/magma/dlaex1.hpp"
+    #include "bandicoot_bits/opencl/magma/dlaex0.hpp"
+    #include "bandicoot_bits/opencl/magma/dstedx.hpp"
+    #include "bandicoot_bits/opencl/magma/dlatrd2.hpp"
+    #include "bandicoot_bits/opencl/magma/dsytrd2.hpp"
+    #include "bandicoot_bits/opencl/magma/dsyevd.hpp"
 
     namespace opencl
       {
@@ -370,7 +405,7 @@ namespace coot
       #include "bandicoot_bits/opencl/find.hpp"
       #include "bandicoot_bits/opencl/symmat.hpp"
       #include "bandicoot_bits/opencl/lu.hpp"
-//      #include "bandicoot_bits/opencl/eig.hpp"
+      #include "bandicoot_bits/opencl/eig_sym.hpp"
       }
   #endif
 
@@ -419,7 +454,7 @@ namespace coot
     #include "bandicoot_bits/cuda/find.hpp"
     #include "bandicoot_bits/cuda/symmat.hpp"
     #include "bandicoot_bits/cuda/lu.hpp"
-//    #include "bandicoot_bits/cuda/eig.hpp"
+    #include "bandicoot_bits/cuda/eig_sym.hpp"
     }
   #endif
 
@@ -498,6 +533,7 @@ namespace coot
   #include "bandicoot_bits/fn_find.hpp"
   #include "bandicoot_bits/fn_symmat.hpp"
   #include "bandicoot_bits/fn_lu.hpp"
+  #include "bandicoot_bits/fn_eig_sym.hpp"
 
 
   //

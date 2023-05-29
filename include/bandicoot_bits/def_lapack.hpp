@@ -248,6 +248,35 @@
   #define coot_sger   sger
   #define coot_dger   dger
 
+  #define coot_slaed2 slaed2
+  #define coot_dlaed2 dlaed2
+
+  #define coot_ssteqr ssteqr
+  #define coot_dsteqr dsteqr
+  #define coot_csteqr csteqr
+  #define coot_zsteqr zsteqr
+
+  #define coot_slanst slanst
+  #define coot_dlanst dlanst
+
+  #define coot_ssytrd ssytrd
+  #define coot_dsytrd dsytrd
+
+  #define coot_slamc3 slamc3
+  #define coot_dlamc3 dlamc3
+
+  #define coot_slaed4 slaed4
+  #define coot_dlaed4 dlaed4
+
+  #define coot_slamrg slamrg
+  #define coot_dlamrg dlamrg
+
+  #define coot_sorgtr sorgtr
+  #define coot_dorgtr dorgtr
+
+  #define coot_ssterf ssterf
+  #define coot_dsterf dsterf
+
 #else
 
   #define coot_sgetrf SGETRF
@@ -479,6 +508,35 @@
 
   #define coot_sger  SGER
   #define coot_dger  DGER
+
+  #define coot_slaed2 SLAED2
+  #define coot_dlaed2 DLAED2
+
+  #define coot_ssteqr SSTEQR
+  #define coot_dsteqr DSTEQR
+  #define coot_csteqr CSTEQR
+  #define coot_zsteqr ZSTEQR
+
+  #define coot_slanst SLANST
+  #define coot_dlanst DLANST
+
+  #define coot_ssytrd SSYTRD
+  #define coot_dsytrd DSYTRD
+
+  #define coot_slamc3 SLAMC3
+  #define coot_dlamc3 DLAMC3
+
+  #define coot_slaed4 SLAED4
+  #define coot_dlaed4 DLAED4
+
+  #define coot_slamrg SLAMRG
+  #define coot_dlamrg DLAMRG
+
+  #define coot_sorgtr SORGTR
+  #define coot_dorgtr DORGTR
+
+  #define coot_ssterf SSTERF
+  #define coot_dsterf DSTERF
 
 #endif
 
@@ -782,4 +840,42 @@ extern "C"
   // compute A <-- alpha * x * y^T + A
   void coot_fortran(coot_sger)(const blas_int* m, const blas_int* n, const float*  alpha, const float*  x, const blas_int* incx, const float*  y, const blas_int* incy, float*  A, const blas_int* lda);
   void coot_fortran(coot_dger)(const blas_int* m, const blas_int* n, const double* alpha, const double* x, const blas_int* incx, const double* y, const blas_int* incy, double* A, const blas_int* lda);
+
+  // merges two sets of eigenvalues together into a single sorted set
+  void coot_fortran(coot_slaed2)(blas_int* k, const blas_int* n, const blas_int* n1, float*  D, float*  Q, const blas_int* ldq, blas_int* indxq, float*  rho, const float*  Z, float*  dlamda, float*  W, float*  Q2, blas_int* indx, blas_int* indxc, blas_int* indxp, blas_int* coltyp, blas_int* info);
+  void coot_fortran(coot_dlaed2)(blas_int* k, const blas_int* n, const blas_int* n1, double* D, double* Q, const blas_int* ldq, blas_int* indxq, double* rho, const double* Z, double* dlamda, double* W, double* Q2, blas_int* indx, blas_int* indxc, blas_int* indxp, blas_int* coltyp, blas_int* info);
+
+  // compute all eigenvalues (and optionally eigenvectors) of symmetric tridiagonal matrix
+  void coot_fortran(coot_ssteqr)(const char* compz, const blas_int* n, float*  D, float*  E, float*  Z, const blas_int* ldz, float*  work, blas_int* info);
+  void coot_fortran(coot_dsteqr)(const char* compz, const blas_int* n, double* D, double* E, double* Z, const blas_int* ldz, double* work, blas_int* info);
+  void coot_fortran(coot_csteqr)(const char* compz, const blas_int* n, void*   D, void*   E, void*   Z, const blas_int* ldz, void*   work, blas_int* info);
+  void coot_fortran(coot_zsteqr)(const char* compz, const blas_int* n, void*   D, void*   E, void*   Z, const blas_int* ldz, void*   work, blas_int* info);
+
+  // compute 1-norm/Frobenius norm/inf norm of real symmetric tridiagonal matrix
+  float  coot_fortran(coot_slanst)(const char* norm, const blas_int* n, const float*  D, const float*  E);
+  double coot_fortran(coot_dlanst)(const char* norm, const blas_int* n, const double* D, const double* E);
+
+  // reduce real symmetric matrix to tridiagonal form
+  void coot_fortran(coot_ssytrd)(const char* uplo, const blas_int* n, float*  A, const blas_int* lda, float*  D, float*  E, float*  tau, float*  work, const blas_int* lwork, blas_int* info);
+  void coot_fortran(coot_dsytrd)(const char* uplo, const blas_int* n, double* A, const blas_int* lda, double* D, double* E, double* tau, double* work, const blas_int* lwork, blas_int* info);
+
+  // force A and B to be stored prior to doing the addition of A and B
+  float  coot_fortran(coot_slamc3)(const float*  A, const float*  B);
+  double coot_fortran(coot_dlamc3)(const double* A, const double* B);
+
+  // compute the i'th updated eigenvalue of a symmetric rank-one modification to the diagonal matrix in d
+  void coot_fortran(coot_slaed4)(const blas_int* n, const blas_int* i, const float*  D, const float*  Z, float*  delta, const float*  rho, float*  dlam, const blas_int* info);
+  void coot_fortran(coot_dlaed4)(const blas_int* n, const blas_int* i, const double* D, const double* Z, double* delta, const double* rho, double* dlam, const blas_int* info);
+
+  // create a permutation list to merge the element of A into a single set
+  void coot_fortran(coot_slamrg)(const blas_int* n1, const blas_int* n2, const float*  A, const blas_int* dtrd1, const blas_int* dtrd2, blas_int* index);
+  void coot_fortran(coot_dlamrg)(const blas_int* n1, const blas_int* n2, const double* A, const blas_int* dtrd1, const blas_int* dtrd2, blas_int* index);
+
+  // generate real orthogonal matrix as the product of dsytrd-generated elementary reflectors
+  void coot_fortran(coot_sorgtr)(const char* uplo, const blas_int* n, float*  A, const blas_int* lda, const float*  tau, float*  work, const blas_int* lwork, blas_int* info);
+  void coot_fortran(coot_dorgtr)(const char* uplo, const blas_int* n, double* A, const blas_int* lda, const double* tau, double* work, const blas_int* lwork, blas_int* info);
+
+  // compute all eigenvalues of symmetric tridiagonal matrix
+  void coot_fortran(coot_ssterf)(const blas_int* n, float*  D, float*  E, blas_int* info);
+  void coot_fortran(coot_dsterf)(const blas_int* n, double* D, double* E, blas_int* info);
   }
