@@ -59,17 +59,6 @@ using namespace coot;
 
 
 
-inline
-const char*
-lapack_vec_const(magma_vec_t magma_const)
-  {
-  REQUIRE( magma_const >= MagmaNoVec );
-  REQUIRE( magma_const <= MagmaOverwriteVec );
-  return get_magma2lapack_constants()[magma_const];
-  }
-
-
-
 typedef enum {
     MagmaSVD_all,
     MagmaSVD_query,

@@ -40,6 +40,16 @@
   #define coot_ssyrk ssyrk
   #define coot_dsyrk dsyrk
 
+  #define coot_scopy scopy
+  #define coot_dcopy dcopy
+  #define coot_ccopy ccopy
+  #define coot_zcopy zcopy
+
+  #define coot_sswap sswap
+  #define coot_dswap dswap
+  #define coot_cswap cswap
+  #define coot_zswap zswap
+
 #else
 
   #define coot_sgemm SGEMM
@@ -64,6 +74,16 @@
 
   #define coot_ssyrk SSYRK
   #define coot_dsyrk DSYRK
+
+  #define coot_scopy SCOPY
+  #define coot_dcopy DCOPY
+  #define coot_ccopy CCOPY
+  #define coot_zcopy ZCOPY
+
+  #define coot_sswap SSWAP
+  #define coot_dswap DSWAP
+  #define coot_cswap CSWAP
+  #define coot_zswap ZSWAP
 
 #endif
 
@@ -98,4 +118,16 @@ extern "C"
   // symmetric rank-k a*A*A' + b*C
   void coot_fortran(coot_ssyrk)(const char* uplo, const char* transA, const blas_int* n, const blas_int* k, const  float* alpha, const  float* A, const blas_int* ldA, const  float* beta,  float* C, const blas_int* ldC);
   void coot_fortran(coot_dsyrk)(const char* uplo, const char* transA, const blas_int* n, const blas_int* k, const double* alpha, const double* A, const blas_int* ldA, const double* beta, double* C, const blas_int* ldC);
+
+  // copy a vector X to Y
+  void coot_fortran(coot_scopy)(const blas_int* n, const float*  X, const blas_int* incx, float*  Y, const blas_int* incy);
+  void coot_fortran(coot_dcopy)(const blas_int* n, const double* X, const blas_int* incx, double* Y, const blas_int* incy);
+  void coot_fortran(coot_ccopy)(const blas_int* n, const void*   X, const blas_int* incx, void*   Y, const blas_int* incy);
+  void coot_fortran(coot_zcopy)(const blas_int* n, const void*   X, const blas_int* incx, void*   Y, const blas_int* incy);
+
+  // interchange two vectors
+  void coot_fortran(coot_sswap)(const blas_int* n, float*  dx, const blas_int* incx, float*  dy, const blas_int* incy);
+  void coot_fortran(coot_dswap)(const blas_int* n, double* dx, const blas_int* incx, double* dy, const blas_int* incy);
+  void coot_fortran(coot_cswap)(const blas_int* n, void*   dx, const blas_int* incx, void*   dy, const blas_int* incy);
+  void coot_fortran(coot_zswap)(const blas_int* n, void*   dx, const blas_int* incx, void*   dy, const blas_int* incy);
   }
