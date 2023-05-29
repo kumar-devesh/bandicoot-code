@@ -384,12 +384,12 @@ magmablas_laset_band(magma_uplo_t uplo, magma_int_t m, magma_int_t n, magma_int_
   if (uplo == MagmaUpper)
     {
     threads = size_t( std::min(k, n) );
-    grid = size_t( magma_ceildiv( std::min(m + k - 1, n), MAGMA_LASET_BAND_NB ) );
+    grid = size_t( magma_ceildiv( std::min(m + k - 1, n), MAGMABLAS_LASET_BAND_NB ) );
     }
   else
     {
     threads = size_t( std::min(k, m) );
-    grid = size_t( magma_ceildiv( std::min(m, n), MAGMA_LASET_BAND_NB ) );
+    grid = size_t( magma_ceildiv( std::min(m, n), MAGMABLAS_LASET_BAND_NB ) );
     }
   grid *= threads;
 
