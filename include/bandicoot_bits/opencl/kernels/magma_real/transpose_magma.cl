@@ -71,27 +71,27 @@ COOT_FN(PREFIX,transpose_magma)(const UWORD m,
   A += A_offset;
   AT += AT_offset;
 
-  __local eT1 sA[MAGMA_TRANS_NB][MAGMA_TRANS_NX+1];
+  __local eT1 sA[MAGMABLAS_TRANS_NB][MAGMABLAS_TRANS_NX+1];
 
   UWORD tx  = get_local_id(0);
   UWORD ty  = get_local_id(1);
-  UWORD ibx = get_group_id(0) * MAGMA_TRANS_NB;
-  UWORD iby = get_group_id(1) * MAGMA_TRANS_NB;
+  UWORD ibx = get_group_id(0) * MAGMABLAS_TRANS_NB;
+  UWORD iby = get_group_id(1) * MAGMABLAS_TRANS_NB;
   UWORD i, j;
 
   A  += ibx + tx + (iby + ty) * lda;
   AT += iby + tx + (ibx + ty) * ldat;
 
   #pragma unroll
-  for (int tile = 0; tile < MAGMA_TRANS_NB / MAGMA_TRANS_NX; ++tile)
+  for (int tile = 0; tile < MAGMABLAS_TRANS_NB / MAGMABLAS_TRANS_NX; ++tile)
     {
     // load NX-by-NB subtile transposed from A into sA
-    i = ibx + tx + tile * MAGMA_TRANS_NX;
+    i = ibx + tx + tile * MAGMABLAS_TRANS_NX;
     j = iby + ty;
     if (i < m)
       {
       #pragma unroll
-      for (int j2=0; j2 < MAGMA_TRANS_NB; j2 += MAGMA_TRANS_NY)
+      for (int j2=0; j2 < MAGMABLAS_TRANS_NB; j2 += MAGMABLAS_TRANS_NY)
         {
         if (j + j2 < n)
           {
@@ -104,14 +104,14 @@ COOT_FN(PREFIX,transpose_magma)(const UWORD m,
 
     // save NB-by-NX subtile from sA into AT
     i = iby + tx;
-    j = ibx + ty + tile * MAGMA_TRANS_NX;
+    j = ibx + ty + tile * MAGMABLAS_TRANS_NX;
     #pragma unroll
-    for (int i2 = 0; i2 < MAGMA_TRANS_NB; i2 += MAGMA_TRANS_NX)
+    for (int i2 = 0; i2 < MAGMABLAS_TRANS_NB; i2 += MAGMABLAS_TRANS_NX)
       {
       if (i + i2 < n)
         {
         #pragma unroll
-        for (int j2 = 0; j2 < MAGMA_TRANS_NX; j2 += MAGMA_TRANS_NY)
+        for (int j2 = 0; j2 < MAGMABLAS_TRANS_NX; j2 += MAGMABLAS_TRANS_NY)
           {
           if (j + j2 < m)
             {
@@ -124,7 +124,7 @@ COOT_FN(PREFIX,transpose_magma)(const UWORD m,
     barrier(CLK_LOCAL_MEM_FENCE);
 
     // move to next subtile
-    A  += MAGMA_TRANS_NX;
-    AT += MAGMA_TRANS_NX * ldat;
+    A  += MAGMABLAS_TRANS_NX;
+    AT += MAGMABLAS_TRANS_NX * ldat;
     }
   }

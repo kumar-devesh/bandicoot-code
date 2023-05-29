@@ -63,6 +63,12 @@
 //// Note that COOT_USE_CXX11 is automatically enabled when a C++11 compiler is detected.
 #endif
 
+#if !defined(COOT_USE_OPENMP)
+// #define COOT_USE_OPENMP
+//// Uncomment the above line to forcefully enable use of OpenMP for parallelisation.
+//// Note that COOT_USE_OPENMP is automatically enabled when a compiler supporting OpenMP 3.1 is detected.
+#endif
+
 // #define COOT_NO_DEBUG
 //// Uncomment the above line if you want to disable all run-time checks.
 //// This will result in faster code, but you first need to make sure that your code runs correctly!
