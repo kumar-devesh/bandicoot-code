@@ -258,7 +258,8 @@ kernel_src::init_oneway_source()
   std::vector<std::string> aux_function_filenames = {
       "accu_subgroup_reduce.cl",
       "min_subgroup_reduce.cl",
-      "max_subgroup_reduce.cl"
+      "max_subgroup_reduce.cl",
+      "prod_subgroup_reduce.cl"
   };
 
   std::string source = "";

@@ -157,7 +157,8 @@ get_cuda_oneway_kernel_src()
   std::vector<std::string> aux_function_filenames = {
       "accu_warp_reduce.cu",
       "min_warp_reduce.cu",
-      "max_warp_reduce.cu"
+      "max_warp_reduce.cu",
+      "prod_warp_reduce.cu"
   };
 
   std::string result = "";

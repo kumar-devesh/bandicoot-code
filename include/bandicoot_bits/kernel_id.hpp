@@ -96,6 +96,9 @@ struct oneway_kernel_id
     max_abs,
     max_abs_small,
     //
+    prod,
+    prod_small,
+    //
     trace,
     //
     ltri_set_zero,
@@ -188,6 +191,9 @@ struct oneway_kernel_id
     names.push_back("max_abs");
     names.push_back("max_abs_small");
 
+    names.push_back("prod");
+    names.push_back("prod_small");
+
     names.push_back("trace");
 
     names.push_back("ltri_set_zero");
@@ -266,6 +272,9 @@ struct oneway_real_kernel_id
     lu_extract_pivoted_l,
     lu_extract_p,
     //
+    diag_prod,
+    diag_prod_small,
+    //
     invalid_kernel
     };
 
@@ -298,6 +307,9 @@ struct oneway_real_kernel_id
     names.push_back("lu_extract_pivoted_l");
     names.push_back("lu_extract_p");
 
+    names.push_back("diag_prod");
+    names.push_back("diag_prod_small");
+
     return names;
     }
 
@@ -326,6 +338,9 @@ struct oneway_integral_kernel_id
     or_reduce,
     or_reduce_small,
     //
+    ipiv_det,
+    ipiv_det_small,
+    //
     invalid_kernel
     };
 
@@ -344,6 +359,9 @@ struct oneway_integral_kernel_id
     names.push_back("and_reduce_small");
     names.push_back("or_reduce");
     names.push_back("or_reduce_small");
+
+    names.push_back("ipiv_det");
+    names.push_back("ipiv_det_small");
 
     return names;
     }
