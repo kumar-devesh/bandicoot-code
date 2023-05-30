@@ -385,7 +385,9 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
 
   bool has_subgroup_extension = false;
   bool has_intel_subgroup_extension = false;
+  bool has_nv_device_attribute_query_extension = false;
   bool dev_has_subgroups = false;
+  bool dev_must_synchronise_subgroups = true;
 
   clGetDeviceInfo(in_dev_id, CL_DEVICE_VENDOR,              sizeof(dev_name1),           &dev_name1,   NULL);
   clGetDeviceInfo(in_dev_id, CL_DEVICE_NAME,                sizeof(dev_name2),           &dev_name2,   NULL);
@@ -419,6 +421,10 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
     else if (ext == "cl_intel_subgroups")
       {
       has_intel_subgroup_extension = true;
+      }
+    else if (ext == "cl_nv_device_attribute_query")
+      {
+      has_nv_device_attribute_query_extension = true;
       }
 
     last_space = next_space;
@@ -518,7 +524,21 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
                   dev_has_subgroups = false;
                   dev_subgroup_size = 0;
                   status = CL_SUCCESS;
-                  // TODO: on nvidia devices, the concept of subgroup does exist even though the driver sometimes does not support it.  We can surely exploit it.
+
+                  // Now, on nvidia devices, there is still the concept of "warp", and the nvidia OpenCL Programming Guide,
+                  // in section 3.4.3, points out that warp-synchronous programming without barriers is okay so long as the
+                  // memory is marked volatile.
+                  //
+                  // So, if we are on an nvidia card, we will enable subgroups with subgroup size equal to the warp size.
+                  if (has_nv_device_attribute_query_extension == true)
+                    {
+                    status = coot_nv_warp_size(in_dev_id, dev_subgroup_size);
+                    if (status == CL_SUCCESS && dev_subgroup_size > 0)
+                      {
+                      dev_has_subgroups = true;
+                      dev_must_synchronise_subgroups = false;
+                      }
+                    }
                   }
                 }
               }
@@ -542,29 +562,31 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
   if(print_info)
     {
     get_cerr_stream().flush();
-    get_cerr_stream() << "name1:          " << dev_name1 << std::endl;
-    get_cerr_stream() << "name2:          " << dev_name2 << std::endl;
-    get_cerr_stream() << "name3:          " << dev_name3 << std::endl;
-    get_cerr_stream() << "is_gpu:         " << (dev_type == CL_DEVICE_TYPE_GPU)  << std::endl;
-    get_cerr_stream() << "fp64:           " << dev_fp64 << std::endl;
-    get_cerr_stream() << "sizet_width:    " << dev_sizet_width  << std::endl;
-    get_cerr_stream() << "ptr_width:      " << dev_ptr_width << std::endl;
-    get_cerr_stream() << "n_units:        " << dev_n_units << std::endl;
-    get_cerr_stream() << "opencl_ver:     " << dev_opencl_ver << std::endl;
-  //get_cerr_stream() << "align:          " << dev_align  << std::endl;
-    get_cerr_stream() << "max_wg:         " << dev_max_wg << std::endl;
-    get_cerr_stream() << "subgroup_size:  " << dev_subgroup_size << std::endl;
+    get_cerr_stream() << "name1:                      " << dev_name1 << std::endl;
+    get_cerr_stream() << "name2:                      " << dev_name2 << std::endl;
+    get_cerr_stream() << "name3:                      " << dev_name3 << std::endl;
+    get_cerr_stream() << "is_gpu:                     " << (dev_type == CL_DEVICE_TYPE_GPU)  << std::endl;
+    get_cerr_stream() << "fp64:                       " << dev_fp64 << std::endl;
+    get_cerr_stream() << "sizet_width:                " << dev_sizet_width  << std::endl;
+    get_cerr_stream() << "ptr_width:                  " << dev_ptr_width << std::endl;
+    get_cerr_stream() << "n_units:                    " << dev_n_units << std::endl;
+    get_cerr_stream() << "opencl_ver:                 " << dev_opencl_ver << std::endl;
+  //get_cerr_stream() << "align:                      " << dev_align  << std::endl;
+    get_cerr_stream() << "max_wg:                     " << dev_max_wg << std::endl;
+    get_cerr_stream() << "subgroup_size:              " << dev_subgroup_size << std::endl;
+    get_cerr_stream() << "must_synchronise_subgroups: " << dev_must_synchronise_subgroups << std::endl;
     }
 
-  out_info.is_gpu         = (dev_type == CL_DEVICE_TYPE_GPU);
-  out_info.has_float64    = (dev_fp64 != 0);
-  out_info.has_sizet64    = (dev_sizet_width >= 8);
-  out_info.has_subgroups  = dev_has_subgroups;
-  out_info.ptr_width      = uword(dev_ptr_width);
-  out_info.n_units        = uword(dev_n_units);
-  out_info.opencl_ver     = uword(dev_opencl_ver);
-  out_info.max_wg         = uword(dev_max_wg);
-  out_info.subgroup_size  = uword(dev_subgroup_size);
+  out_info.is_gpu                     = (dev_type == CL_DEVICE_TYPE_GPU);
+  out_info.has_float64                = (dev_fp64 != 0);
+  out_info.has_sizet64                = (dev_sizet_width >= 8);
+  out_info.has_subgroups              = dev_has_subgroups;
+  out_info.must_synchronise_subgroups = dev_must_synchronise_subgroups;
+  out_info.ptr_width                  = uword(dev_ptr_width);
+  out_info.n_units                    = uword(dev_n_units);
+  out_info.opencl_ver                 = uword(dev_opencl_ver);
+  out_info.max_wg                     = uword(dev_max_wg);
+  out_info.subgroup_size              = uword(dev_subgroup_size);
 
   return (status == CL_SUCCESS);
   }
@@ -728,7 +750,7 @@ runtime_t::compile_kernels(const std::string& unique_host_id)
   std::vector<std::pair<std::string, cl_kernel*>> name_map;
   type_to_dev_string type_map;
   std::string source =
-      kernel_src::get_src_preamble(has_float64(), has_subgroups(), get_subgroup_size()) +
+      kernel_src::get_src_preamble(has_float64(), has_subgroups(), get_subgroup_size(), must_synchronise_subgroups()) +
       rt_common::get_zero_elem_kernel_src(zeroway_kernels, kernel_src::get_zeroway_source(), zeroway_kernel_id::get_names(), name_map, type_map) +
       rt_common::get_one_elem_real_kernel_src(oneway_real_kernels, kernel_src::get_oneway_real_source(), oneway_real_kernel_id::get_names(), "", name_map, type_map, has_float64()) +
       rt_common::get_one_elem_integral_kernel_src(oneway_integral_kernels, kernel_src::get_oneway_integral_source(), oneway_integral_kernel_id::get_names(), "", name_map, type_map) +
@@ -923,6 +945,15 @@ bool
 runtime_t::has_subgroups() const
   {
   return dev_info.has_subgroups;
+  }
+
+
+
+inline
+bool
+runtime_t::must_synchronise_subgroups() const
+  {
+  return dev_info.must_synchronise_subgroups;
   }
 
 

@@ -74,3 +74,22 @@ coot_sub_group_size(cl_kernel kernel, cl_device_id dev_id, const size_t input_si
   }
 
 #endif
+
+
+
+// Return the warp size, if the device is an nvidia device.
+
+inline
+cl_int
+coot_nv_warp_size(const cl_device_id dev_id, size_t& warp_size)
+  {
+#if defined(CL_DEVICE_WARP_SIZE_NV)
+  cl_uint warp_size_out;
+  cl_int status = clGetDeviceInfo(dev_id, CL_DEVICE_WARP_SIZE_NV, sizeof(cl_uint), (void*) &warp_size_out, NULL);
+  warp_size = (size_t) warp_size_out;
+  return status;
+#else
+  warp_size = 0;
+  return CL_SUCCESS;
+#endif
+  }
