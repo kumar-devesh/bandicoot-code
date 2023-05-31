@@ -23,6 +23,11 @@ TEMPLATE_TEST_CASE("symmatu_basic", "[symmat]", float, double, u32, s32, u64, s6
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(4, 4);
   x(0, 0) = 0;
   x(0, 1) = 1;
@@ -65,6 +70,11 @@ TEMPLATE_TEST_CASE("symmatu_inplace_basic", "[symmat]", float, double, u32, s32,
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(4, 4);
   x(0, 0) = 0;
   x(0, 1) = 1;
@@ -106,9 +116,9 @@ TEMPLATE_TEST_CASE("symmatu_inplace_basic", "[symmat]", float, double, u32, s32,
 
 TEST_CASE("symmatu_empty", "[symmat]")
   {
-  mat x;
+  fmat x;
 
-  mat y = symmatu(x);
+  fmat y = symmatu(x);
 
   REQUIRE( y.n_rows == 0 );
   REQUIRE( y.n_cols == 0 );
@@ -119,7 +129,7 @@ TEST_CASE("symmatu_empty", "[symmat]")
 
 TEST_CASE("symmatu_empty_inplace", "[symmat]")
   {
-  mat x;
+  fmat x;
 
   x = symmatu(x);
 
@@ -132,23 +142,23 @@ TEST_CASE("symmatu_empty_inplace", "[symmat]")
 
 TEST_CASE("symmatu_one_element", "[symmat]")
   {
-  mat x(1, 1);
+  fmat x(1, 1);
   x(0, 0) = 3.0;
 
-  mat y = symmatu(x);
+  fmat y = symmatu(x);
 
   REQUIRE( y.n_rows == 1 );
   REQUIRE( y.n_cols == 1 );
   REQUIRE( y.n_elem == 1 );
 
-  REQUIRE( double(y(0, 0)) == Approx(3.0) );
+  REQUIRE( float(y(0, 0)) == Approx(3.0) );
   }
 
 
 
 TEST_CASE("symmatu_one_element_inplace", "[symmat]")
   {
-  mat x(1, 1);
+  fmat x(1, 1);
   x(0, 0) = 3.0;
 
   x = symmatu(x);
@@ -157,7 +167,7 @@ TEST_CASE("symmatu_one_element_inplace", "[symmat]")
   REQUIRE( x.n_cols == 1 );
   REQUIRE( x.n_elem == 1 );
 
-  REQUIRE( double(x(0, 0)) == Approx(3.0) );
+  REQUIRE( float(x(0, 0)) == Approx(3.0) );
   }
 
 
@@ -165,6 +175,11 @@ TEST_CASE("symmatu_one_element_inplace", "[symmat]")
 TEMPLATE_TEST_CASE("symmatu_big_random", "[symmat]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(1500, 1500, distr_param(1, 1000));
 
@@ -188,6 +203,11 @@ TEMPLATE_TEST_CASE("symmatu_big_random", "[symmat]", float, double, u32, s32, u6
 TEMPLATE_TEST_CASE("symmatu_big_random_inplace", "[symmat]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(1500, 1500, distr_param(1, 1000));
   Mat<eT> x_ref(x);
@@ -213,6 +233,11 @@ TEMPLATE_TEST_CASE("symmatu_in_expr", "[symmat]", float, double, u32, s32, u64, 
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(153, 153, distr_param(1, 100));
 
   Mat<eT> y = repmat(symmatu(x), 3, 2);
@@ -234,6 +259,11 @@ TEMPLATE_TEST_CASE("symmatu_in_expr", "[symmat]", float, double, u32, s32, u64, 
 TEMPLATE_TEST_CASE("expr_in_symmatu", "[symmat]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(20, 40, distr_param(1, 100));
 
@@ -268,6 +298,11 @@ TEMPLATE_TEST_CASE
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x = randi<Mat<eT1>>(65, 65, distr_param(1, 10));
   Mat<eT2> y = symmatu(conv_to<Mat<eT2>>::from(x));
 
@@ -300,6 +335,11 @@ TEMPLATE_TEST_CASE
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x = randi<Mat<eT1>>(65, 65, distr_param(1, 10));
   Mat<eT2> y = conv_to<Mat<eT2>>::from(symmatu(x));
 
@@ -319,9 +359,9 @@ TEMPLATE_TEST_CASE
 
 TEST_CASE("symmatu_nonsquare_matrix_1", "[symmat]")
   {
-  mat x(5, 6);
+  fmat x(5, 6);
   x.zeros();
-  mat y;
+  fmat y;
 
   // Disable cerr output for this test.
   std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
@@ -339,9 +379,9 @@ TEST_CASE("symmatu_nonsquare_matrix_1", "[symmat]")
 
 TEST_CASE("symmatu_nonsquare_matrix_2", "[symmat]")
   {
-  mat x(5, 0);
+  fmat x(5, 0);
   x.zeros();
-  mat y;
+  fmat y;
 
   // Disable cerr output for this test.
   std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
@@ -359,9 +399,9 @@ TEST_CASE("symmatu_nonsquare_matrix_2", "[symmat]")
 
 TEST_CASE("symmatu_nonsquare_matrix_3", "[symmat]")
   {
-  mat x(0, 5);
+  fmat x(0, 5);
   x.zeros();
-  mat y;
+  fmat y;
 
   // Disable cerr output for this test.
   std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
@@ -382,6 +422,11 @@ TEST_CASE("symmatu_nonsquare_matrix_3", "[symmat]")
 TEMPLATE_TEST_CASE("symmatl_basic", "[symmat]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x(4, 4);
   x(0, 0) = 0;
@@ -425,6 +470,11 @@ TEMPLATE_TEST_CASE("symmatl_inplace_basic", "[symmat]", float, double, u32, s32,
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(4, 4);
   x(0, 0) = 0;
   x(1, 0) = 1;
@@ -466,9 +516,9 @@ TEMPLATE_TEST_CASE("symmatl_inplace_basic", "[symmat]", float, double, u32, s32,
 
 TEST_CASE("symmatl_empty", "[symmat]")
   {
-  mat x;
+  fmat x;
 
-  mat y = symmatl(x);
+  fmat y = symmatl(x);
 
   REQUIRE( y.n_rows == 0 );
   REQUIRE( y.n_cols == 0 );
@@ -479,7 +529,7 @@ TEST_CASE("symmatl_empty", "[symmat]")
 
 TEST_CASE("symmatl_empty_inplace", "[symmat]")
   {
-  mat x;
+  fmat x;
 
   x = symmatl(x);
 
@@ -492,23 +542,23 @@ TEST_CASE("symmatl_empty_inplace", "[symmat]")
 
 TEST_CASE("symmatl_one_element", "[symmat]")
   {
-  mat x(1, 1);
+  fmat x(1, 1);
   x(0, 0) = 3.0;
 
-  mat y = symmatl(x);
+  fmat y = symmatl(x);
 
   REQUIRE( y.n_rows == 1 );
   REQUIRE( y.n_cols == 1 );
   REQUIRE( y.n_elem == 1 );
 
-  REQUIRE( double(y(0, 0)) == Approx(3.0) );
+  REQUIRE( float(y(0, 0)) == Approx(3.0) );
   }
 
 
 
 TEST_CASE("symmatl_one_element_inplace", "[symmat]")
   {
-  mat x(1, 1);
+  fmat x(1, 1);
   x(0, 0) = 3.0;
 
   x = symmatl(x);
@@ -517,7 +567,7 @@ TEST_CASE("symmatl_one_element_inplace", "[symmat]")
   REQUIRE( x.n_cols == 1 );
   REQUIRE( x.n_elem == 1 );
 
-  REQUIRE( double(x(0, 0)) == Approx(3.0) );
+  REQUIRE( float(x(0, 0)) == Approx(3.0) );
   }
 
 
@@ -525,6 +575,11 @@ TEST_CASE("symmatl_one_element_inplace", "[symmat]")
 TEMPLATE_TEST_CASE("symmatl_big_random", "[symmat]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(1500, 1500, distr_param(1, 1000));
 
@@ -548,6 +603,11 @@ TEMPLATE_TEST_CASE("symmatl_big_random", "[symmat]", float, double, u32, s32, u6
 TEMPLATE_TEST_CASE("symmatl_big_random_inplace", "[symmat]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(1500, 1500, distr_param(1, 1000));
   Mat<eT> x_ref(x);
@@ -573,6 +633,11 @@ TEMPLATE_TEST_CASE("symmatl_in_expr", "[symmat]", float, double, u32, s32, u64, 
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = randi<Mat<eT>>(153, 153, distr_param(1, 100));
 
   Mat<eT> y = repmat(symmatl(x), 3, 2);
@@ -594,6 +659,11 @@ TEMPLATE_TEST_CASE("symmatl_in_expr", "[symmat]", float, double, u32, s32, u64, 
 TEMPLATE_TEST_CASE("expr_in_symmatl", "[symmat]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x = randi<Mat<eT>>(20, 40, distr_param(1, 100));
 
@@ -628,6 +698,11 @@ TEMPLATE_TEST_CASE
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x = randi<Mat<eT1>>(65, 65, distr_param(1, 10));
   Mat<eT2> y = symmatl(conv_to<Mat<eT2>>::from(x));
 
@@ -660,6 +735,11 @@ TEMPLATE_TEST_CASE
   typedef typename TestType::first_type eT1;
   typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x = randi<Mat<eT1>>(65, 65, distr_param(1, 10));
   Mat<eT2> y = conv_to<Mat<eT2>>::from(symmatl(x));
 
@@ -679,9 +759,9 @@ TEMPLATE_TEST_CASE
 
 TEST_CASE("symmatl_nonsquare_matrix_1", "[symmat]")
   {
-  mat x(5, 6);
+  fmat x(5, 6);
   x.zeros();
-  mat y;
+  fmat y;
 
   // Disable cerr output for this test.
   std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
@@ -699,9 +779,9 @@ TEST_CASE("symmatl_nonsquare_matrix_1", "[symmat]")
 
 TEST_CASE("symmatl_nonsquare_matrix_2", "[symmat]")
   {
-  mat x(5, 0);
+  fmat x(5, 0);
   x.zeros();
-  mat y;
+  fmat y;
 
   // Disable cerr output for this test.
   std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
@@ -719,9 +799,9 @@ TEST_CASE("symmatl_nonsquare_matrix_2", "[symmat]")
 
 TEST_CASE("symmatl_nonsquare_matrix_3", "[symmat]")
   {
-  mat x(0, 5);
+  fmat x(0, 5);
   x.zeros();
-  mat y;
+  fmat y;
 
   // Disable cerr output for this test.
   std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
