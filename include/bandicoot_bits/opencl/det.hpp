@@ -82,6 +82,9 @@ det(dev_mem_t<eT> in, const uword n_rows, eT& out_val)
   cl_kernel second_kernel = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::prod);
   cl_kernel second_kernel_small = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::prod_small);
 
+  // Force synchronisation of U in case MAGMA is not done yet.
+  get_rt().cl_rt.synchronise();
+
   // Now we can compute the determinant of U by using only the diagonal.
   const eT U_det = generic_reduce<eT, eT>(in, n_rows, "det", kernel, kernel_small, std::make_tuple(/* no extra args */), second_kernel, second_kernel_small, std::make_tuple(/* no extra args */));
 

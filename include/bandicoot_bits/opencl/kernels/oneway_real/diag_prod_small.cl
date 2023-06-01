@@ -24,7 +24,7 @@ COOT_FN(PREFIX,diag_prod_small)(__global const eT1* in_mem,
   UWORD i = get_group_id(0) * (get_local_size(0) * 2) + tid;
   const UWORD grid_size = get_local_size(0) * 2 * get_num_groups(0);
 
-  aux_mem[tid] = 0;
+  aux_mem[tid] = 1;
 
   while (i + get_local_size(0) < n_rows)
     {
