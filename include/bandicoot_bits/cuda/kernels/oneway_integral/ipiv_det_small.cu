@@ -33,7 +33,7 @@ COOT_FN(PREFIX,ipiv_det_small)(const eT1* in_mem,
     {
     const eT1 val1 = ((in_mem[i] - 1) == i) ? 1 : -1;
     aux_mem[tid] *= val1;
-    const eT1 val2 = ((in_mem[i + blockDim.x] - 1) == i) ? 1 : -1;
+    const eT1 val2 = ((in_mem[i + blockDim.x] - 1) == (i + blockDim.x)) ? 1 : -1;
     aux_mem[tid] *= val2;
     i += grid_size;
     }

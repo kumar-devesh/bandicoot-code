@@ -12,6 +12,9 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
+// Forward declaration of one-way kernel that we need.
+__device__ void COOT_FN(PREFIX,prod_warp_reduce)(volatile eT1* data, int tid);
+
 // this kernel is technically incorrect if the size is not a factor of 2!
 // Compute the determinant of a permutation matrix as given by getrf().
 __global__
@@ -35,7 +38,7 @@ COOT_FN(PREFIX,ipiv_det)(const eT1* in_mem,
     {
     const eT1 val1 = ((in_mem[i] - 1) == i) ? 1 : -1;
     aux_mem[tid] *= val1;
-    const eT1 val2 = ((in_mem[i + blockDim.x] - 1) == i) ? 1 : -1;
+    const eT1 val2 = ((in_mem[i + blockDim.x] - 1) == (i + blockDim.x)) ? 1 : -1;
     aux_mem[tid] *= val2;
     i += grid_size;
     }

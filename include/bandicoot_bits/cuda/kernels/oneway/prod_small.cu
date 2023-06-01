@@ -29,7 +29,7 @@ COOT_FN(PREFIX,prod_small)(const eT1* in_mem,
   while (i + blockDim.x < n_elem)
     {
     // copy to local shared memory
-    aux_mem[tid] *= in_mem[i] + in_mem[i + blockDim.x];
+    aux_mem[tid] *= in_mem[i] * in_mem[i + blockDim.x];
     i += grid_size;
     }
   if (i < n_elem)

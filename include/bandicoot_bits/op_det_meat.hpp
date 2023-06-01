@@ -36,7 +36,11 @@ op_det::apply_direct(typename T1::elem_type& out_val, const Base<typename T1::el
 
   coot_debug_check( (A.n_rows != A.n_cols), "det(): given matrix must be square sized" );
 
-  const uword N = A.n_rows;
+  if (A.n_rows == 0)
+    {
+    out_val = (eT) 1;
+    return true;
+    }
 
   // Note that Armadillo has specialised variants for extremely small matrices,
   // but here that is too much extra overhead (and the GPU wouldn't really be able
@@ -59,8 +63,9 @@ op_det::apply_diagmat(const Mat<eT>& X)
   {
   coot_extra_debug_sigprint();
 
-  // TODO: handle vec and non-vec cases
-  coot_debug_check( X.is_xvec == false, "det(): given object is not a diagmat! (internal error)" );
-
-  eT val = coot_rt_t::prod(X.get_dev_mem(false), X.n_elem);
+  if (X.n_rows == 1 || X.n_cols == 1)
+    return coot_rt_t::prod(X.get_dev_mem(false), X.n_elem);
+  else
+    return 0;
+//    return coot_rt_t::det_diag(X.get_dev_mem(false), X.n_elem);
   }
