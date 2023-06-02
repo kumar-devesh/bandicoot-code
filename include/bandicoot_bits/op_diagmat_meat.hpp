@@ -16,25 +16,31 @@
 
 
 
-template<typename out_eT, typename T1>
+template<typename T1>
 inline
 void
-op_diagmat::apply(Mat<out_eT>& out, const Op<T1, op_diagmat>& in)
+op_diagmat::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_diagmat>& in)
   {
   coot_extra_debug_sigprint();
 
+  unwrap<T1> U(in.m);
+  op_diagmat::apply_direct(out, U.M);
+  }
+
+
+
+template<typename out_eT, typename T1>
+inline
+void
+op_diagmat::apply(Mat<out_eT>& out, const Op<T1, op_diagmat>& in, const typename enable_if<is_same_type<out_eT, typename T1::elem_type>::no>::result* junk)
+  {
+  coot_extra_debug_sigprint();
+  coot_ignore(junk);
+
   // If the types are not the same, we have to force a conversion.
-  if (std::is_same<out_eT, typename T1::elem_type>::value)
-    {
-    unwrap<T1> U(in.m);
-    op_diagmat::apply_direct(out, U.M);
-    }
-  else
-    {
-    mtOp<out_eT, T1, mtop_conv_to> mtop(in.m);
-    unwrap<mtOp<out_eT, T1, mtop_conv_to>> U(mtop);
-    op_diagmat::apply_direct(out, U.M);
-    }
+  mtOp<out_eT, T1, mtop_conv_to> mtop(in.m);
+  unwrap<mtOp<out_eT, T1, mtop_conv_to>> U(mtop);
+  op_diagmat::apply_direct(out, U.M);
   }
 
 
@@ -113,28 +119,37 @@ op_diagmat::compute_n_cols(const Op<T1, op_diagmat>& op, const uword in_n_rows, 
 
 
 
-template<typename out_eT, typename T1>
+template<typename T1>
 inline
 void
-op_diagmat2::apply(Mat<out_eT>& out, const Op<T1, op_diagmat2>& in)
+op_diagmat2::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_diagmat2>& in)
   {
   coot_extra_debug_sigprint();
 
   const sword k = (in.aux_uword_b % 2 == 0) ? in.aux_uword_a : (-sword(in.aux_uword_a));
   const bool swap = (in.aux_uword_b >= 2);
 
+  unwrap<T1> U(in.m);
+  op_diagmat2::apply_direct(out, U.M, k, swap);
+  }
+
+
+
+template<typename out_eT, typename T1>
+inline
+void
+op_diagmat2::apply(Mat<out_eT>& out, const Op<T1, op_diagmat2>& in, const typename enable_if<is_same_type<out_eT, typename T1::elem_type>::no>::result* junk)
+  {
+  coot_extra_debug_sigprint();
+  coot_ignore(junk);
+
+  const sword k = (in.aux_uword_b % 2 == 0) ? in.aux_uword_a : (-sword(in.aux_uword_a));
+  const bool swap = (in.aux_uword_b >= 2);
+
   // If the types are not the same, we have to force a conversion.
-  if (std::is_same<out_eT, typename T1::elem_type>::value)
-    {
-    unwrap<T1> U(in.m);
-    op_diagmat2::apply_direct(out, U.M, k, swap);
-    }
-  else
-    {
-    mtOp<out_eT, T1, mtop_conv_to> mtop(in.m);
-    unwrap<mtOp<out_eT, T1, mtop_conv_to>> U(mtop);
-    op_diagmat2::apply_direct(out, U.M, k, swap);
-    }
+  mtOp<out_eT, T1, mtop_conv_to> mtop(in.m);
+  unwrap<mtOp<out_eT, T1, mtop_conv_to>> U(mtop);
+  op_diagmat2::apply_direct(out, U.M, k, swap);
   }
 
 
