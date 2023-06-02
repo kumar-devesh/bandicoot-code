@@ -2023,3 +2023,124 @@ TEMPLATE_TEST_CASE("diagvec_k_mat_alias", "[diag]", float, double, u32, s32, u64
     REQUIRE( arma::approx_equal(x_cpu, x2_cpu, "reldiff", 1e-6) );
     }
   }
+
+
+
+TEMPLATE_TEST_CASE
+  (
+  "diagvec_conv_to",
+  "[diag]",
+  (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>))
+  {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
+  Mat<eT1> x = randi<Mat<eT1>>(20, 20, distr_param(1, 20));
+  Col<eT2> y1 = conv_to<Col<eT2>>::from(diagvec(x));
+  Col<eT2> y2 = conv_to<Col<eT2>>::from(diagvec(x, 3));
+
+  Col<eT1> y1_ref_1 = diagvec(x);
+  Col<eT1> y2_ref_1 = diagvec(x, 3);
+
+  Col<eT2> y1_ref = conv_to<Col<eT2>>::from(y1_ref_1);
+  Col<eT2> y2_ref = conv_to<Col<eT2>>::from(y2_ref_1);
+
+  REQUIRE( y1.n_elem == y1_ref.n_elem );
+  REQUIRE( y2.n_elem == y2_ref.n_elem );
+
+  // Seemingly huge tolerance works for both integers and floats.
+  REQUIRE( all( abs( y1 - y1_ref ) < 1 ) == true );
+  REQUIRE( all( abs( y2 - y2_ref ) < 1 ) == true );
+  }
+
+
+
+TEMPLATE_TEST_CASE
+  (
+  "diagmat_conv_to_1",
+  "[diag]",
+  (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>))
+  {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
+  Col<eT1> x = randi<Mat<eT1>>(20, distr_param(1, 20));
+  Mat<eT2> y1 = conv_to<Mat<eT2>>::from(diagmat(x));
+  Mat<eT2> y2 = conv_to<Mat<eT2>>::from(diagmat(x, 3));
+
+  Mat<eT1> y1_ref_1 = diagmat(x);
+  Mat<eT1> y2_ref_1 = diagmat(x, 3);
+
+  Mat<eT2> y1_ref = conv_to<Mat<eT2>>::from(y1_ref_1);
+  Mat<eT2> y2_ref = conv_to<Mat<eT2>>::from(y2_ref_1);
+
+  REQUIRE( y1.n_rows == y1_ref.n_rows );
+  REQUIRE( y1.n_cols == y1_ref.n_cols );
+  REQUIRE( y2.n_rows == y2_ref.n_rows );
+  REQUIRE( y2.n_cols == y2_ref.n_cols );
+
+  // Seemingly huge tolerance works for both integers and floats.
+  REQUIRE( all( all( abs( y1 - y1_ref ) < 1 ) ) );
+  REQUIRE( all( all( abs( y2 - y2_ref ) < 1 ) ) );
+  }
+
+
+
+TEMPLATE_TEST_CASE
+  (
+  "diagmat_conv_to_2",
+  "[diag]",
+  (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>))
+  {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
+  Mat<eT1> x = randi<Mat<eT1>>(20, 20, distr_param(1, 20));
+  Mat<eT2> y1 = conv_to<Mat<eT2>>::from(diagmat(x));
+  Mat<eT2> y2 = conv_to<Mat<eT2>>::from(diagmat(x, 3));
+
+  Mat<eT1> y1_ref_1 = diagmat(x);
+  Mat<eT1> y2_ref_1 = diagmat(x, 3);
+
+  Mat<eT2> y1_ref = conv_to<Mat<eT2>>::from(y1_ref_1);
+  Mat<eT2> y2_ref = conv_to<Mat<eT2>>::from(y2_ref_1);
+
+  REQUIRE( y1.n_rows == y1_ref.n_rows );
+  REQUIRE( y1.n_cols == y1_ref.n_cols );
+  REQUIRE( y2.n_rows == y2_ref.n_rows );
+  REQUIRE( y2.n_cols == y2_ref.n_cols );
+
+  // Seemingly huge tolerance works for both integers and floats.
+  REQUIRE( all( all( abs( y1 - y1_ref ) < 1 ) ) );
+  REQUIRE( all( all( abs( y2 - y2_ref ) < 1 ) ) );
+  }
