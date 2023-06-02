@@ -375,6 +375,14 @@
 #endif
 
 
+#if !defined(COOT_DONT_USE_OPENMP)
+  #if (defined(_OPENMP) && (_OPENMP >= 201107))
+    #undef  COOT_USE_OPENMP
+    #define COOT_USE_OPENMP
+  #endif
+#endif
+
+
 #if defined(COOT_USE_CXX11) && (__cplusplus < 201103L)
   #undef  COOT_PRINT_CXX11_WARNING
   #define COOT_PRINT_CXX11_WARNING

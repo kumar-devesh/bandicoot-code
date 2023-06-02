@@ -14,9 +14,14 @@
 
 
 
+#define COOT_STRINGIFY(x) COOT_STRINGIFY_2(x)
+#define COOT_STRINGIFY_2(x) #x
+
+
+
 struct kernel_src
   {
-  static inline const std::string&  get_src_preamble(const bool has_float64, const bool has_subgroups, const size_t subgroup_size);
+  static inline const std::string&  get_src_preamble(const bool has_float64, const bool has_subgroups, const size_t subgroup_size, const bool must_synchronise_subgroups);
 
   static inline const std::string&  get_zeroway_source();
   static inline       std::string  init_zeroway_source();
@@ -46,7 +51,7 @@ struct kernel_src
 
 inline
 const std::string&
-kernel_src::get_src_preamble(const bool has_float64, const bool has_subgroups, const size_t subgroup_size)
+kernel_src::get_src_preamble(const bool has_float64, const bool has_subgroups, const size_t subgroup_size, const bool must_synchronise_subgroups)
   {
   char u32_max[32];
   char u64_max[32];
@@ -124,19 +129,23 @@ kernel_src::get_src_preamble(const bool has_float64, const bool has_subgroups, c
       std::string("")) +
   "\n"
   // MAGMA-specific macros.
-  "#define MAGMA_BLK_X 64 \n"
-  "#define MAGMA_BLK_Y 32 \n"
-  "#define MAGMA_TRANS_NX 32 \n"
-  "#define MAGMA_TRANS_NY 8 \n"
-  "#define MAGMA_TRANS_NB 32 \n"
-  "#define MAGMA_TRANS_INPLACE_NB 16 \n"
-  "#define MAGMABLAS_LASWP_MAX_PIVOTS 32 \n"
-  "#define MAGMABLAS_LASWP_NTHREADS 64 \n"
+  "#define MAGMABLAS_BLK_X " COOT_STRINGIFY(MAGMABLAS_BLK_X) " \n"
+  "#define MAGMABLAS_BLK_Y " COOT_STRINGIFY(MAGMABLAS_BLK_Y) " \n"
+  "#define MAGMABLAS_TRANS_NX " COOT_STRINGIFY(MAGMABLAS_TRANS_NX) " \n"
+  "#define MAGMABLAS_TRANS_NY " COOT_STRINGIFY(MAGMABLAS_TRANS_NY) " \n"
+  "#define MAGMABLAS_TRANS_NB " COOT_STRINGIFY(MAGMABLAS_TRANS_NB) " \n"
+  "#define MAGMABLAS_TRANS_INPLACE_NB " COOT_STRINGIFY(MAGMABLAS_TRANS_INPLACE_NB) " \n"
+  "#define MAGMABLAS_LASWP_MAX_PIVOTS " COOT_STRINGIFY(MAGMABLAS_LASWP_MAX_PIVOTS) " \n"
+  "#define MAGMABLAS_LASWP_NTHREADS " COOT_STRINGIFY(MAGMABLAS_LASWP_NTHREADS) " \n"
+  "#define MAGMABLAS_LASCL_NB " COOT_STRINGIFY(MAGMABLAS_LASCL_NB) " \n"
+  "#define MAGMABLAS_LASET_BAND_NB " COOT_STRINGIFY(MAGMABLAS_LASET_BAND_NB) " \n"
+  "#define MAGMABLAS_LANSY_INF_BS " COOT_STRINGIFY(MAGMABLAS_LANSY_INF_BS) " \n"
+  "#define MAGMABLAS_LANSY_MAX_BS " COOT_STRINGIFY(MAGMABLAS_LANSY_MAX_BS) " \n"
   "\n"
   "typedef struct \n"
   "  { \n"
   "  int npivots; \n"
-  "  int ipiv[MAGMABLAS_LASWP_MAX_PIVOTS]; \n"
+  "  int ipiv[" COOT_STRINGIFY(MAGMABLAS_LASWP_MAX_PIVOTS) "]; \n"
   "  } magmablas_laswp_params_t; \n"
   "\n"
   // Sometimes we need to approximate Armadillo functionality that uses
@@ -145,7 +154,7 @@ kernel_src::get_src_preamble(const bool has_float64, const bool has_subgroups, c
   // Utility function for subgroup barriers; this is needed in case subgroups
   // are not available.
   ((has_subgroups) ?
-      std::string("#define SUBGROUP_BARRIER sub_group_barrier") :
+      ((must_synchronise_subgroups) ? std::string("#define SUBGROUP_BARRIER sub_group_barrier") : std::string("#define SUBGROUP_BARRIER(x) ")) :
       std::string("#define SUBGROUP_BARRIER barrier")) + " \n"
   "#define SUBGROUP_SIZE " + std::string(subgroup_size_str) + " \n"
   "#define SUBGROUP_SIZE_NAME " + ((has_subgroups && subgroup_size < 128) ? std::string(subgroup_size_str) : "other") + " \n";

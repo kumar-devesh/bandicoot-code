@@ -64,10 +64,10 @@ svd
   // the number of singular values is equal to min(n_rows, n_cols).
   S.set_size(A.n_cols);
 
-  const std::tuple<bool, std::string>& result = coot_rt_t::svd(U.get_dev_mem(false),
-                                                               S.get_dev_mem(false),
-                                                               V.get_dev_mem(false),
-                                                               A.get_dev_mem(false),
+  const std::tuple<bool, std::string>& result = coot_rt_t::svd(U.get_dev_mem(true),
+                                                               S.get_dev_mem(true),
+                                                               V.get_dev_mem(true),
+                                                               A.get_dev_mem(true),
                                                                A.n_rows,
                                                                A.n_cols,
                                                                false);
@@ -130,10 +130,10 @@ svd
   // the number of singular values is equal to min(n_rows, n_cols).
   S.set_size(A.n_cols);
 
-  const std::tuple<bool, std::string>& result = coot_rt_t::svd(U.get_dev_mem(false),
-                                                               S.get_dev_mem(false),
-                                                               V.get_dev_mem(false),
-                                                               A.get_dev_mem(false),
+  const std::tuple<bool, std::string>& result = coot_rt_t::svd(U.get_dev_mem(true),
+                                                               S.get_dev_mem(true),
+                                                               V.get_dev_mem(true),
+                                                               A.get_dev_mem(true),
                                                                A.n_rows,
                                                                A.n_cols,
                                                                false);
@@ -208,10 +208,10 @@ svd
     {
     Mat<eT> A(X.get_ref());
 
-    const std::tuple<bool, std::string>& status = coot_rt_t::svd(U.get_dev_mem(false),
-                                                                 S.get_dev_mem(false),
-                                                                 V.get_dev_mem(false),
-                                                                 A.get_dev_mem(false),
+    const std::tuple<bool, std::string>& status = coot_rt_t::svd(U.get_dev_mem(true),
+                                                                 S.get_dev_mem(true),
+                                                                 V.get_dev_mem(true),
+                                                                 A.get_dev_mem(true),
                                                                  A.n_rows,
                                                                  A.n_cols,
                                                                  true);
@@ -235,10 +235,10 @@ svd
     Mat<eT> A(htrans(X.get_ref()));
 
     // Note that V and U are swapped here!
-    const std::tuple<bool, std::string>& status = coot_rt_t::svd(V.get_dev_mem(false),
-                                                                 S.get_dev_mem(false),
-                                                                 U.get_dev_mem(false),
-                                                                 A.get_dev_mem(false),
+    const std::tuple<bool, std::string>& status = coot_rt_t::svd(V.get_dev_mem(true),
+                                                                 S.get_dev_mem(true),
+                                                                 U.get_dev_mem(true),
+                                                                 A.get_dev_mem(true),
                                                                  A.n_rows,
                                                                  A.n_cols,
                                                                  true);
