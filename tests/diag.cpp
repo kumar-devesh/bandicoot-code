@@ -1700,6 +1700,115 @@ TEMPLATE_TEST_CASE("diagmat2_trans", "[diag]", float, double, u32, s32, u64, s64
 
 
 
+// diagmat(mat)
+
+TEMPLATE_TEST_CASE("diagmat_mat", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(50, 50, distr_param(10, 20));
+
+  Mat<eT> y = diagmat(x);
+
+  REQUIRE( y.n_rows == x.n_rows );
+  REQUIRE( y.n_cols == x.n_cols );
+
+  Col<eT> x_diag = x.diag();
+  Col<eT> y_diag = y.diag();
+
+  REQUIRE( all( x_diag == y_diag ) );
+  }
+
+
+
+// diagmat2(mat)
+
+TEMPLATE_TEST_CASE("diagmat2_mat", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(50, 50, distr_param(10, 20));
+
+  for (sword k = -49; k < 49; ++k)
+    {
+    Mat<eT> y = diagmat(x, k);
+
+    REQUIRE( y.n_rows == x.n_rows );
+    REQUIRE( y.n_cols == x.n_cols );
+
+    Col<eT> x_diag = x.diag(k);
+    Col<eT> y_diag = y.diag(k);
+
+    REQUIRE( all( x_diag == y_diag ) );
+    }
+  }
+
+
+
+// diagmat(trans(mat))
+
+TEMPLATE_TEST_CASE("diagmat_trans_mat", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(50, 50, distr_param(10, 20));
+
+  Mat<eT> y = diagmat(x.t());
+
+  REQUIRE( y.n_rows == x.n_rows );
+  REQUIRE( y.n_cols == x.n_cols );
+
+  Col<eT> x_diag = x.diag();
+  Col<eT> y_diag = y.diag();
+
+  REQUIRE( all( x_diag == y_diag ) );
+  }
+
+
+
+// diagmat2(trans(mat))
+
+TEMPLATE_TEST_CASE("diagmat2_trans_mat", "[diag]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randi<Mat<eT>>(50, 50, distr_param(10, 20));
+
+  for (sword k = -49; k < 49; ++k)
+    {
+    Mat<eT> y = diagmat(x.t(), k);
+
+    REQUIRE( y.n_rows == x.n_rows );
+    REQUIRE( y.n_cols == x.n_cols );
+
+    Col<eT> x_diag = x.diag(-k);
+    Col<eT> y_diag = y.diag(k);
+
+    REQUIRE( all( x_diag == y_diag ) );
+    }
+  }
+
+
 
 // diagvec(mat)
 
