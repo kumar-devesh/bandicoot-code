@@ -36,8 +36,8 @@ class op_diagmat2
 
   template<typename out_eT, typename T1> inline static void apply(Mat<out_eT>& out, const Op<T1, op_diagmat2>& in);
 
-  template<typename eT> inline static void apply_direct(Mat<eT>& out, const Mat<eT>& in, const sword k);
-  template<typename eT> inline static void apply_direct(Mat<eT>& out, const subview<eT>& in, const sword k);
+  template<typename eT> inline static void apply_direct(Mat<eT>& out, const Mat<eT>& in, const sword k, const bool swap);
+  template<typename eT> inline static void apply_direct(Mat<eT>& out, const subview<eT>& in, const sword k, const bool swap);
 
   template<typename T1> inline static uword compute_n_rows(const Op<T1, op_diagmat2>& op, const uword in_n_rows, const uword in_n_cols);
   template<typename T1> inline static uword compute_n_cols(const Op<T1, op_diagmat2>& op, const uword in_n_rows, const uword in_n_cols);

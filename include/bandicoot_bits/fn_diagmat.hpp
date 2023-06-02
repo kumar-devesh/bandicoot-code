@@ -88,7 +88,7 @@ diagmat(const Op<T1, op_htrans>& X, const sword k)
   coot_extra_debug_sigprint();
 
   const uword a = (std::abs)(k);
-  const uword b = (k < 0) ? 1 : 0;
+  const uword b = (k < 0) ? 3 : 2;
 
   return Op<T1, op_diagmat2>(X.m, a, b);
   }
@@ -131,7 +131,7 @@ diagmat(const Op<T1, op_htrans2>& X, const sword k)
   coot_extra_debug_sigprint();
 
   const uword a = (std::abs)(k);
-  const uword b = (k < 0) ? 1 : 0;
+  const uword b = (k < 0) ? 3 : 2;
 
   eOp<T1, eop_scalar_times> inner(X.m, X.aux);
   return Op<eOp<T1, eop_scalar_times>, op_diagmat2>(inner, a, b);
