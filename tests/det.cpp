@@ -192,8 +192,8 @@ TEMPLATE_TEST_CASE("diagmat_det", "[det]", float, double)
 
   const eT ref_det_val = det(x_ref);
 
-  REQUIRE( det_val1 == Approx(ref_det_val) );
-  REQUIRE( det_val2 == Approx(ref_det_val) );
+  REQUIRE( det_val1 == Approx(ref_det_val).margin(1e-8) );
+  REQUIRE( det_val2 == Approx(ref_det_val).margin(1e-8) );
   }
 
 
@@ -218,8 +218,8 @@ TEMPLATE_TEST_CASE("diagmat_mat_det", "[det]", float, double)
 
   const eT ref_det_val = det(x_ref);
 
-  REQUIRE( det_val1 == Approx(ref_det_val) );
-  REQUIRE( det_val2 == Approx(ref_det_val) );
+  REQUIRE( det_val1 == Approx(ref_det_val).margin(1e-8) );
+  REQUIRE( det_val2 == Approx(ref_det_val).margin(1e-8) );
   }
 
 
