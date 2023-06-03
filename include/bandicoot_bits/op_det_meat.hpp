@@ -45,7 +45,7 @@ op_det::apply_direct(typename T1::elem_type& out_val, const Base<typename T1::el
   // Note that Armadillo has specialised variants for extremely small matrices,
   // but here that is too much extra overhead (and the GPU wouldn't really be able
   // to take advantage of it anyway), so we just go full-out with the LU decomposition.
-  std::tuple<bool, std::string> result = coot_rt_t::det(A.get_dev_mem(false), A.n_rows, out_val);
+  std::tuple<bool, std::string> result = coot_rt_t::det(A.get_dev_mem(true), A.n_rows, out_val);
   if (std::get<0>(result) != true)
     {
     coot_debug_warn("det(): " + std::get<1>(result));
@@ -67,5 +67,4 @@ op_det::apply_diagmat(const Mat<eT>& X)
     return coot_rt_t::prod(X.get_dev_mem(false), X.n_elem);
   else
     return 0;
-//    return coot_rt_t::det_diag(X.get_dev_mem(false), X.n_elem);
   }
