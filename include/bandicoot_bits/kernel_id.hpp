@@ -71,6 +71,7 @@ struct oneway_kernel_id
     diag_inplace_minus_scalar,
     diag_inplace_mul_scalar,
     diag_inplace_div_scalar,
+    diag_inplace_div_scalar_pre,
     diag_inplace_mod_scalar,
     //
     extract_diag,
@@ -163,6 +164,7 @@ struct oneway_kernel_id
     names.push_back("diag_inplace_minus_scalar");
     names.push_back("diag_inplace_mul_scalar");
     names.push_back("diag_inplace_div_scalar");
+    names.push_back("diag_inplace_div_scalar_pre");
     names.push_back("diag_inplace_mod_scalar");
 
     names.push_back("extract_diag");
