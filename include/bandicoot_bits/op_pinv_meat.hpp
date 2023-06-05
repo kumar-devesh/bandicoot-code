@@ -39,7 +39,15 @@ inline
 void
 op_pinv::apply_direct_diag(Mat<eT2>& out, const Mat<eT1>& in)
   {
+  coot_extra_debug_sigprint();
 
+  // To take the psuedoinverse of a diagonal matrix, we just need to invert the elements.
+  out.zeros(in.n_rows, in.n_cols);
+
+  coot_rt_t::extract_diag(out.get_dev_mem(false), in.get_dev_mem(false), 0, in.n_rows, (std::min)(in.n_rows, in.n_cols));
+  coot_rt_t::inplace_op_diag(out.get_dev_mem(false), 0, (eT) 1, out.n_rows, (std::min)(out.n_rows, out.n_cols), oneway_kernel_id::diag_inplace_div_scalar_pre);
+
+  // TODO: now check for any NaNs to indicate success or failure
   }
 
 
