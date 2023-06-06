@@ -1,4 +1,4 @@
-// Copyright 2019 Ryan Curtin (http://www.ratml.org)
+// Copyright 2023 Ryan Curtin (http://www.ratml.org)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 template<typename eT>
 inline
 std::tuple<bool, std::string>
-lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_mem_t<eT> P, const uword n_rows, const uword n_cols)
+det(dev_mem_t<eT> in, const uword n_rows, eT& out_val)
   {
   coot_extra_debug_sigprint();
 
@@ -59,7 +59,7 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_
   status = cusolverDnXgetrf_bufferSize(get_rt().cuda_rt.cusolver_handle,
                                        NULL,
                                        n_rows,
-                                       n_cols,
+                                       n_rows,
                                        data_type,
                                        in.cuda_mem_ptr,
                                        n_rows,
@@ -72,11 +72,9 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_
     return std::make_tuple(false, "couldn't compute workspace size with cusolverDnXgetrf_bufferSize()");
     }
 
-  s64* ipiv = NULL;
-  const uword ipiv_size = std::min(n_rows, n_cols);
-
   // Allocate space for pivots.
-  status2 = cudaMalloc((void**) &ipiv, sizeof(s64) * ipiv_size);
+  s64* ipiv = NULL;
+  status2 = cudaMalloc((void**) &ipiv, sizeof(s64) * n_rows);
   if (status2 != cudaSuccess)
     {
     cudaFree(dev_info);
@@ -97,7 +95,7 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_
   status = cusolverDnXgetrf(get_rt().cuda_rt.cusolver_handle,
                             NULL,
                             n_rows,
-                            n_cols,
+                            n_rows,
                             data_type,
                             in.cuda_mem_ptr,
                             n_rows,
@@ -135,7 +133,7 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_
     oss << "parameter " << -info_result << " was incorrect in call to cusolverDnXgetrf()";
     return std::make_tuple(false, oss.str());
     }
-  else if (info_result > 0 && info_result < (int) std::max(n_rows, n_cols))
+  else if (info_result > 0 && info_result < (int) n_rows)
     {
     // Technically any positive info_result indicates a failed decomposition, but it looks like it randomly sometimes returns very large (invalid) numbers.
     // So... we ignore those.
@@ -144,96 +142,35 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_
     return std::make_tuple(false, oss.str());
     }
 
-  // First the pivoting needs to be "unwound" into a way where we can make P.
-  uword* ipiv2 = cpu_memory::acquire<uword>(n_rows);
-  for (uword i = 0; i < n_rows; ++i)
-    {
-    ipiv2[i] = i;
-    }
+  // Now the determinant is det(L) * det(U) * det(P);
+  // since L and U are triangular, then the determinant is the product of the diagonal values.
+  // Also, since L's diagonal is 1, then det(L) = 1.
+  // The determination of a permutation matrix is either 1 or -1,
+  // depending on whether the number of permutations is even or odd (respectively).
+  // Thus, the primary operation is just to compute det(U).
 
-  s64* ipiv_cpu = cpu_memory::acquire<s64>(ipiv_size);
-  status2 = cudaMemcpy(ipiv_cpu, ipiv, ipiv_size * sizeof(s64), cudaMemcpyDeviceToHost);
-  cudaFree(ipiv);
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::diag_prod);
+  CUfunction kernel_small = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::diag_prod_small);
 
-  if (status2 != cudaSuccess)
-    {
-    cpu_memory::release(ipiv2);
-    cpu_memory::release(ipiv_cpu);
-    return std::make_tuple(false, "couldn't copy pivot array from GPU");
-    }
+  CUfunction second_kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::prod);
+  CUfunction second_kernel_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::prod_small);
 
-  for (uword i = 0; i < ipiv_size; ++i)
-    {
-    const int k = ipiv_cpu[i] - 1; // cusolverDnXgetrf() returns one-indexed results
+  const eT U_det = generic_reduce<eT, eT>(in, n_rows, "det", kernel, kernel_small, std::make_tuple(/* no extra args */), second_kernel, second_kernel_small, std::make_tuple(/* no extra args */));
 
-    if (ipiv2[i] != ipiv2[k])
-      {
-      std::swap( ipiv2[i], ipiv2[k] );
-      }
-    }
+  CUfunction p_kernel = get_rt().cuda_rt.get_kernel<s64>(oneway_integral_kernel_id::ipiv_det);
+  CUfunction p_kernel_small = get_rt().cuda_rt.get_kernel<s64>(oneway_integral_kernel_id::ipiv_det_small);
 
-  dev_mem_t<uword> ipiv_gpu;
-  ipiv_gpu.cuda_mem_ptr = get_rt().cuda_rt.acquire_memory<uword>(n_rows);
-  copy_into_dev_mem(ipiv_gpu, ipiv2, n_rows);
-  cpu_memory::release(ipiv_cpu);
-  cpu_memory::release(ipiv2);
+  CUfunction p_second_kernel = get_rt().cuda_rt.get_kernel<s64>(oneway_kernel_id::prod);
+  CUfunction p_second_kernel_small = get_rt().cuda_rt.get_kernel<s64>(oneway_kernel_id::prod_small);
 
-  // Now extract the lower triangular part (excluding diagonal).  This is done with a custom kernel.
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(pivoting ? oneway_real_kernel_id::lu_extract_l : oneway_real_kernel_id::lu_extract_pivoted_l);
-
-  const void* pivot_args[] = { &(L.cuda_mem_ptr),
-                               &(U.cuda_mem_ptr),
-                               &(in.cuda_mem_ptr),
-                               (uword*) &n_rows,
-                               (uword*) &n_cols };
-
-  const void* nopivot_args[] = { &(L.cuda_mem_ptr),
-                                 &(U.cuda_mem_ptr),
-                                 &(in.cuda_mem_ptr),
-                                 (uword*) &n_rows,
-                                 (uword*) &n_cols,
-                                 &(ipiv_gpu.cuda_mem_ptr) };
-
-  const size_t max_rc = std::max(n_rows, n_cols);
-  const kernel_dims dims = two_dimensional_grid_dims(n_rows, max_rc);
-
-  CUresult status3 = cuLaunchKernel(
-      kernel,
-      dims.d[0], dims.d[1], dims.d[2], dims.d[3], dims.d[4], dims.d[5],
-      0, NULL, (pivoting ? (void**) pivot_args : (void**) nopivot_args), 0);
-
-  if (status3 != CUDA_SUCCESS)
-    {
-    get_rt().cuda_rt.release_memory(ipiv_gpu.cuda_mem_ptr);
-    return std::make_tuple(false, "cuLaunchKernel() failed for " + (pivoting ? std::string("lu_extract_l") : std::string("lu_extract_pivoted_l")) + " kernel");
-    }
-
-  // If pivoting was allowed, extract the permutation matrix.
-  if (pivoting)
-    {
-    kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::lu_extract_p);
-
-    const void* args2[] = {
-        &(P.cuda_mem_ptr),
-        &(ipiv_gpu.cuda_mem_ptr),
-        (uword*) &n_rows };
-
-    const kernel_dims dims2 = one_dimensional_grid_dims(n_rows);
-
-    status3 = cuLaunchKernel(
-        kernel,
-        dims2.d[0], dims2.d[1], dims2.d[2], dims2.d[3], dims2.d[4], dims2.d[5],
-        0, NULL, (void**) args2, 0);
-
-    if (status3 != CUDA_SUCCESS)
-      {
-      get_rt().cuda_rt.release_memory(ipiv_gpu.cuda_mem_ptr);
-      return std::make_tuple(false, "cuLaunchKernel() failed for lu_extract_p kernel");
-      }
-    }
+  dev_mem_t<s64> ipiv_gpu;
+  ipiv_gpu.cuda_mem_ptr = ipiv;
+  const s64 P_det = generic_reduce<s64, s64>(ipiv_gpu, n_rows, "det", p_kernel, p_kernel_small, std::make_tuple(/* no extra args */), p_second_kernel, p_second_kernel_small, std::make_tuple(/* no extra args */));
 
   get_rt().cuda_rt.synchronise();
   get_rt().cuda_rt.release_memory(ipiv_gpu.cuda_mem_ptr);
+
+  out_val = U_det * (eT) P_det;
 
   return std::make_tuple(true, "");
   }

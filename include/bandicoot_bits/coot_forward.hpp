@@ -101,6 +101,7 @@ class op_cov;
 class op_cor;
 class op_sort;
 class op_sort_vec;
+class op_det;
 
 class mtop_conv_to;
 class mtop_all;

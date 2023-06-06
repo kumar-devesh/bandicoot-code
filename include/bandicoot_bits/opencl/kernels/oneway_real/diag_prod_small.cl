@@ -12,27 +12,34 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
+// Compute the product of the elements on the diagonal of a matrix.
 __kernel
 void
-COOT_FN(PREFIX,vec_norm_1_small)(__global const eT1* in_mem,
-                                 const UWORD n_elem,
-                                 __global eT1* out_mem,
-                                 __local volatile eT1* aux_mem)
+COOT_FN(PREFIX,diag_prod_small)(__global const eT1* in_mem,
+                                const UWORD n_rows,
+                                __global eT1* out_mem,
+                                __local volatile eT1* aux_mem)
   {
   const UWORD tid = get_local_id(0);
   UWORD i = get_group_id(0) * (get_local_size(0) * 2) + tid;
   const UWORD grid_size = get_local_size(0) * 2 * get_num_groups(0);
 
-  aux_mem[tid] = 0;
+  aux_mem[tid] = 1;
 
-  while (i + get_local_size(0) < n_elem)
+  while (i + get_local_size(0) < n_rows)
     {
-    aux_mem[tid] += ET1_ABS(in_mem[i]) + ET1_ABS(in_mem[i + get_local_size(0)]);
+    const UWORD index1 = i * n_rows + i;
+    const eT1 v1 = in_mem[index1];
+    const UWORD index2 = (i + get_local_size(0)) * n_rows + (i + get_local_size(0));
+    const eT1 v2 = in_mem[index2];
+    aux_mem[tid] *= v1 * v2;
     i += grid_size;
     }
-  if (i < n_elem)
+  if (i < n_rows)
     {
-    aux_mem[tid] += ET1_ABS(in_mem[i]);
+    const UWORD index = i * n_rows + i;
+    const eT1 v = in_mem[index];
+    aux_mem[tid] *= v;
     }
 
   for (UWORD s = get_local_size(0) / 2; s > 0; s >>= 1)
@@ -41,7 +48,7 @@ COOT_FN(PREFIX,vec_norm_1_small)(__global const eT1* in_mem,
 
     if (tid < s)
       {
-      aux_mem[tid] += aux_mem[tid + s];
+      aux_mem[tid] *= aux_mem[tid + s];
       }
     }
 
