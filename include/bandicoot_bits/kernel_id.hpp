@@ -132,6 +132,9 @@ struct oneway_kernel_id
     symmatu_inplace,
     symmatl_inplace,
     //
+    replace,
+    reorder_cols,
+    //
     invalid_kernel
     };
 
@@ -224,6 +227,9 @@ struct oneway_kernel_id
     names.push_back("symmatu_inplace");
     names.push_back("symmatl_inplace");
 
+    names.push_back("replace");
+    names.push_back("reorder_cols");
+
     return names;
     }
 
@@ -261,6 +267,8 @@ struct oneway_real_kernel_id
     rel_isfinite,
     rel_isnonfinite,
     rel_isnan,
+    rel_any_nonfinite,
+    rel_any_nonfinite_small,
     //
     lu_extract_l,
     lu_extract_pivoted_l,
@@ -293,6 +301,8 @@ struct oneway_real_kernel_id
     names.push_back("rel_isfinite");
     names.push_back("rel_isnonfinite");
     names.push_back("rel_isnan");
+    names.push_back("rel_any_nonfinite");
+    names.push_back("rel_any_nonfinite_small");
 
     names.push_back("lu_extract_l");
     names.push_back("lu_extract_pivoted_l");
