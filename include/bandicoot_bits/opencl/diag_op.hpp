@@ -17,10 +17,10 @@
 /**
  * Extract the diagonal of a matrix into a column vector.
  */
-template<typename eT2, typename eT1>
+template<typename eT>
 inline
 void
-extract_diag(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword mem_offset, const uword n_rows, const uword len)
+extract_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword mem_offset, const uword n_rows, const uword len)
   {
   coot_extra_debug_sigprint();
 
@@ -28,7 +28,7 @@ extract_diag(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword mem_offset
 
   runtime_t::cq_guard guard;
 
-  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT2, eT1>(twoway_kernel_id::get_diag);
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::extract_diag);
 
   cl_int status = 0;
 
