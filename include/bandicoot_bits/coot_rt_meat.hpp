@@ -407,6 +407,37 @@ coot_rt_t::copy_subview(dev_mem_t<out_eT> dest, dev_mem_t<in_eT> src, const uwor
 template<typename eT>
 inline
 void
+coot_rt_t::reorder_cols(dev_mem_t<eT> out, const dev_mem_t<eT> mem, const uword n_rows, const dev_mem_t<uword> order, const uword out_n_cols)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    opencl::reorder_cols(out, mem, n_rows, order, out_n_cols);
+    #else
+    coot_stop_runtime_error("coot_rt::reorder_cols(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    cuda::reorder_cols(out, mem, n_rows, order, out_n_cols);
+    #else
+    coot_stop_runtime_error("coot_rt::reorder_cols(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::reorder_cols(): unknown backend");
+    }
+  }
+
+
+
+template<typename eT>
+inline
+void
 coot_rt_t::extract_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword in_mem_offset, const uword n_rows, const uword len)
   {
   coot_extra_debug_sigprint();
