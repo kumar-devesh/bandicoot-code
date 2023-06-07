@@ -96,6 +96,9 @@ class coot_rt_t
   template<typename eT1, typename eT2>
   static inline void inplace_op_subview(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword M_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const twoway_kernel_id::enum_id num, const char* identifier);
 
+  template<typename eT>
+  static inline void replace(dev_mem_t<eT> mem, const uword n_elem, const eT val_find, const eT val_replace);
+
   template<typename eT1, typename eT2>
   static inline void htrans(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword n_rows, const uword n_cols);
 

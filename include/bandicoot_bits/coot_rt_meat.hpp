@@ -683,6 +683,37 @@ coot_rt_t::inplace_op_subview(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, con
 
 
 
+template<typename eT>
+inline
+void
+coot_rt_t::replace(dev_mem_t<eT> mem, const uword n_elem, const eT val_find, const eT val_replace)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    opencl::replace(mem, n_elem, val_find, val_replace);
+    #else
+    coot_stop_runtime_error("coot_rt::replace(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    cuda::replace(mem, n_elem, val_find, val_replace);
+    #else
+    coot_stop_runtime_error("coot_rt::replace(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::replace(): unknown backend");
+    }
+  }
+
+
+
 template<typename eT1, typename eT2>
 inline
 void
