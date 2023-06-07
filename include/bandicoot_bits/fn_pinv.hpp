@@ -29,7 +29,7 @@ pinv
   {
   coot_extra_debug_sigprint();
 
-  return Op<T1, op_pinv>(X.get_ref());
+  return Op<T1, op_pinv>(X.get_ref(), typename T1::elem_type(0));
   }
 
 
@@ -54,17 +54,17 @@ pinv
 
   uword method_id = 0; // default
 
+  // We only support the standard method for now, but provide the option for compatibility with Armadillo.
   if (method != nullptr)
     {
     const char sig = method[0];
 
-    coot_debug_check( ((sig != 's') && (sig != 'd')), "pinv(): unknown method specified" );
+    coot_debug_check( (sig == 'd'), "pinv(): \"dc\" (divide and conquer) method not supported by Bandicoot" );
 
-    if (sig == 's') { method_id = 1; }
-    if (sig == 'd') { method_id = 2; }
+    coot_debug_check( ((sig != 's') && (sig != 'd')), "pinv(): unknown method specified" );
     }
 
-  return Op<T1, op_pinv>(X.get_ref(), eT(tol), method_id, uword(0));
+  return Op<T1, op_pinv>(X.get_ref(), eT(tol));
   }
 
 
@@ -86,28 +86,24 @@ pinv
   {
   coot_extra_debug_sigprint();
 
-  typedef typename T1::elem_type eT;
-
   uword method_id = 0; // default
 
   if (method != nullptr)
     {
     const char sig = method[0];
 
-    coot_debug_check( ((sig != 's') && (sig != 'd')), "pinv(): unknown method specified" );
+    coot_debug_check( (sig == 'd'), "pinv(): \"dc\" (divide and conquer) method not supported by Bandicoot" );
 
-    if (sig == 's') { method_id = 1; }
-    if (sig == 'd') { method_id = 2; }
+    coot_debug_check( ((sig != 's') && (sig != 'd')), "pinv(): unknown method specified" );
     }
 
-  const bool status = op_pinv::apply_direct(out, X.get_ref(), tol, method_id);
+  const std::tuple<bool, std::string> result = op_pinv::apply_direct(out, X.get_ref(), tol);
 
-  if (status == false)
+  if (std::get<0>(result) == false)
     {
     out.reset();
-    // TODO: better error message?
-    coot_debug_warn("pinv(): SVD failed");
+    coot_debug_warn("pinv(): " + std::get<1>(result));
     }
 
-  return status;
+  return true;
   }
