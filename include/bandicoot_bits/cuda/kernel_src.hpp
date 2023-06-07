@@ -82,6 +82,9 @@ get_cuda_src_preamble()
   "__device__ inline int  coot_type_max_u_float()  { return " + std::string(u32_max) + "; } \n"
   "__device__ inline long coot_type_max_u_double() { return " + std::string(u64_max) + "; } \n"
   "\n"
+  // Forward declaration used by some oneway_real kernels.
+  "__device__ void u32_or_warp_reduce(volatile unsigned int* data, int tid);"
+  "\n"
   ;
 
   return source;
