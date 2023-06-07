@@ -1131,6 +1131,39 @@ coot_rt_t::any_vec(const dev_mem_t<eT1> mem, const uword n_elem, const eT2 val, 
 
 
 
+template<typename eT>
+inline
+bool
+coot_rt_t::any_vec(const dev_mem_t<eT> mem, const uword n_elem, const eT val, const oneway_real_kernel_id::enum_id num, const oneway_real_kernel_id::enum_id num_small)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::any_vec(mem, n_elem, val, num, num_small);
+    #else
+    coot_stop_runtime_error("coot_rt::any_vec(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::any_vec(mem, n_elem, val, num, num_small);
+    #else
+    coot_stop_runtime_error("coot_rt::any_vec(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::any_vec(): unknown backend");
+    }
+
+  return false; // stop compilation warnings
+  }
+
+
+
 template<typename eT1, typename eT2>
 inline
 void

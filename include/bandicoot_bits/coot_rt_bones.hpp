@@ -138,6 +138,9 @@ class coot_rt_t
   template<typename eT1, typename eT2>
   static inline bool any_vec(const dev_mem_t<eT1> mem, const uword n_elem, const eT2 val, const twoway_kernel_id::enum_id num, const twoway_kernel_id::enum_id num_small);
 
+  template<typename eT>
+  static inline bool any_vec(const dev_mem_t<eT> mem, const uword n_elem, const eT val, const oneway_real_kernel_id::enum_id num, const oneway_real_kernel_id::enum_id num_small);
+
   template<typename eT1, typename eT2>
   static inline void any(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> in_mem, const uword n_rows, const uword n_cols, const eT2 val, const twoway_kernel_id::enum_id num, const bool colwise);
 
