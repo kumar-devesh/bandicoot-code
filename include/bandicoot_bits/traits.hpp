@@ -827,6 +827,42 @@ struct resolves_to_diagmat< Op<Op<T1, op_diagmat>, op_htrans2> >
 
 
 
+//
+
+template<typename T1>
+struct resolves_to_symmat
+  {
+  static constexpr bool value = false;
+  };
+
+template<typename T1>
+struct resolves_to_symmat< Op<T1, op_symmat> >
+  {
+  static constexpr bool value = true;
+  };
+
+template<typename T1, typename eop_type>
+struct resolves_to_symmat< eOp<Op<T1, op_symmat>, eop_type> >
+  {
+  static constexpr bool value = true;
+  };
+
+template<typename T1>
+struct resolves_to_symmat< Op<Op<T1, op_symmat>, op_htrans> >
+  {
+  static constexpr bool value = true;
+  };
+
+template<typename T1>
+struct resolves_to_symmat< Op<Op<T1, op_symmat>, op_htrans2> >
+  {
+  static constexpr bool value = true;
+  };
+
+
+
+//
+
 template<typename T>
 struct has_nested_op_traits
   {
