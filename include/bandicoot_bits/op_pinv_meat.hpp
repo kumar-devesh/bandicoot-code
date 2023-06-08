@@ -410,7 +410,17 @@ op_pinv::apply_direct_gen(Mat<eT>& out, Mat<eT>& in, const eT tol)
   // Create aliases for the filtered left/right singular vectors and filtered singular values.
   Mat<eT> filtered_U(U.get_dev_mem(false), U.n_rows, num_svs);
   Mat<eT> filtered_S(S.get_dev_mem(false), num_svs, 1);
-  Mat<eT> filtered_V(V.get_dev_mem(false), V.n_rows, num_svs);
+  // Unfortunately filtering V means shedding rows, not columns.
+  Mat<eT> filtered_V;
+  if (num_svs != V.n_rows)
+    {
+    filtered_V.set_size(num_svs, V.n_cols);
+    coot_rt_t::copy_subview(filtered_V.get_dev_mem(false), V.get_dev_mem(false), 0, 0, V.n_rows, V.n_cols, num_svs, V.n_cols);
+    }
+  else
+    {
+    filtered_V = Mat<eT>(V.get_dev_mem(false), num_svs, V.n_cols);
+    }
 
   //
   // 4. Invert singular values.
