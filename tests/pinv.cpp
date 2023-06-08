@@ -1023,33 +1023,386 @@ TEMPLATE_TEST_CASE
 
 
 
-
-//  - as matrix
-//  - as matrix with NaNs
-//  - as matrix with lots of other nonzero nondiagonal elements
-//  - as matrix with custom tolerance
-//  - as matrix with tolerance too larger
-//  - as matrix, empty
-//  - as matrix with trans
-//  - as matrix with scalar mul
-//  - as matrix with scalar mul and trans
-//  - as matrix, output alias
-
-
-
 //
 // tests for pinv() on symmetric matrices
 //
 
-//  - empty
-//  - random, symmetric, but also with op_symmat
-//  - random with op_symmat
-//  - random with op_symmat and transpose
-//  - random with op_symmat and transpose and scalar mul'
-//  - random with NaNs
-//  - random with custom tolerance
-//  - random with tolerance too large
-//  - alias
+
+
+TEST_CASE("empty_symmat_pinv", "[pinv]")
+  {
+  fmat x;
+
+  fmat out = pinv(symmatu(x));
+  fmat out2 = pinv(symmatl(x));
+  fmat out3;
+  fmat out4;
+  const bool status3 = pinv(out3, symmatu(x));
+  const bool status4 = pinv(out4, symmatl(x));
+
+  REQUIRE( status3 == true );
+  REQUIRE( status4 == true );
+
+  REQUIRE( out.n_rows == 0 );
+  REQUIRE( out.n_cols == 0 );
+  REQUIRE( out2.n_rows == 0 );
+  REQUIRE( out2.n_cols == 0 );
+  REQUIRE( out3.n_rows == 0 );
+  REQUIRE( out3.n_cols == 0 );
+  REQUIRE( out4.n_rows == 0 );
+  REQUIRE( out4.n_cols == 0 );
+  }
+
+
+
+// random symmetric matrix
+TEMPLATE_TEST_CASE("random_symmat_pinv", "[pinv]", float, double)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randu<Mat<eT>>(250, 250) - 0.5;
+  x.diag() += 2.0;
+
+  arma::Mat<eT> x_cpu(x);
+
+  Mat<eT> out = pinv(symmatu(x));
+  Mat<eT> out2 = pinv(symmatl(x));
+  Mat<eT> out3;
+  Mat<eT> out4;
+  const bool status3 = pinv(out3, symmatu(x));
+  const bool status4 = pinv(out4, symmatl(x));
+
+  REQUIRE( status3 == true );
+  REQUIRE( status4 == true );
+
+  arma::Mat<eT> out_ref = arma::pinv(arma::symmatu(x_cpu));
+  arma::Mat<eT> out2_ref = arma::pinv(arma::symmatl(x_cpu));
+
+  REQUIRE( out.n_rows == out_ref.n_rows );
+  REQUIRE( out.n_cols == out_ref.n_cols );
+  REQUIRE( out2.n_rows == out2_ref.n_rows );
+  REQUIRE( out2.n_cols == out2_ref.n_cols );
+  REQUIRE( out3.n_rows == out_ref.n_rows );
+  REQUIRE( out3.n_cols == out_ref.n_cols );
+  REQUIRE( out4.n_rows == out2_ref.n_rows );
+  REQUIRE( out4.n_cols == out2_ref.n_cols );
+
+  arma::Mat<eT> out_cpu(out);
+  arma::Mat<eT> out2_cpu(out2);
+  arma::Mat<eT> out3_cpu(out3);
+  arma::Mat<eT> out4_cpu(out4);
+
+  const eT tol = (is_same_type<eT, float>::value) ? 1e-5 : 1e-8;
+
+  REQUIRE( ( arma::norm( out_cpu - out_ref   ) / out_cpu.n_elem  ) <= tol );
+  REQUIRE( ( arma::norm( out2_cpu - out2_ref ) / out2_cpu.n_elem ) <= tol );
+  REQUIRE( ( arma::norm( out3_cpu - out_ref  ) / out3_cpu.n_elem ) <= tol );
+  REQUIRE( ( arma::norm( out4_cpu - out2_ref ) / out4_cpu.n_elem ) <= tol );
+  }
+
+
+
+// random transposed symmetric matrix
+TEMPLATE_TEST_CASE("random_trans_symmat_pinv", "[pinv]", float, double)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randu<Mat<eT>>(250, 250) - 0.5;
+  x.diag() += 2.0;
+
+  arma::Mat<eT> x_cpu(x);
+
+  Mat<eT> out = pinv(symmatu(x.t()));
+  Mat<eT> out2 = pinv(symmatl(x).t());
+  Mat<eT> out3;
+  Mat<eT> out4;
+  const bool status3 = pinv(out3, symmatu(x.t()));
+  const bool status4 = pinv(out4, symmatl(x).t());
+
+  REQUIRE( status3 == true );
+  REQUIRE( status4 == true );
+
+  arma::Mat<eT> out_ref = arma::pinv(arma::symmatu(x_cpu.t()));
+  arma::Mat<eT> out2_ref = arma::pinv(arma::symmatl(x_cpu).t());
+
+  REQUIRE( out.n_rows == out_ref.n_rows );
+  REQUIRE( out.n_cols == out_ref.n_cols );
+  REQUIRE( out2.n_rows == out2_ref.n_rows );
+  REQUIRE( out2.n_cols == out2_ref.n_cols );
+  REQUIRE( out3.n_rows == out_ref.n_rows );
+  REQUIRE( out3.n_cols == out_ref.n_cols );
+  REQUIRE( out4.n_rows == out2_ref.n_rows );
+  REQUIRE( out4.n_cols == out2_ref.n_cols );
+
+  arma::Mat<eT> out_cpu(out);
+  arma::Mat<eT> out2_cpu(out2);
+  arma::Mat<eT> out3_cpu(out3);
+  arma::Mat<eT> out4_cpu(out4);
+
+  const eT tol = (is_same_type<eT, float>::value) ? 1e-5 : 1e-8;
+
+  REQUIRE( ( arma::norm( out_cpu - out_ref   ) / out_cpu.n_elem  ) <= tol );
+  REQUIRE( ( arma::norm( out2_cpu - out2_ref ) / out2_cpu.n_elem ) <= tol );
+  REQUIRE( ( arma::norm( out3_cpu - out_ref  ) / out3_cpu.n_elem ) <= tol );
+  REQUIRE( ( arma::norm( out4_cpu - out2_ref ) / out4_cpu.n_elem ) <= tol );
+  }
+
+
+
+// random scaled transposed symmetric matrix
+TEMPLATE_TEST_CASE("random_scaled_trans_symmat_pinv", "[pinv]", float, double)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randu<Mat<eT>>(250, 250) - 0.5;
+  x.diag() += 2.0;
+
+  arma::Mat<eT> x_cpu(x);
+
+  Mat<eT> out = pinv(symmatu(3 * x.t()));
+  Mat<eT> out2 = pinv(3 * symmatl(x).t());
+  Mat<eT> out3;
+  Mat<eT> out4;
+  const bool status3 = pinv(out3, symmatu(3 * x.t()));
+  const bool status4 = pinv(out4, 3 * symmatl(x).t());
+
+  REQUIRE( status3 == true );
+  REQUIRE( status4 == true );
+
+  arma::Mat<eT> out_ref = arma::pinv(arma::symmatu(3 * x_cpu.t()));
+  arma::Mat<eT> out2_ref = arma::pinv(3 * arma::symmatl(x_cpu).t());
+
+  REQUIRE( out.n_rows == out_ref.n_rows );
+  REQUIRE( out.n_cols == out_ref.n_cols );
+  REQUIRE( out2.n_rows == out2_ref.n_rows );
+  REQUIRE( out2.n_cols == out2_ref.n_cols );
+  REQUIRE( out3.n_rows == out_ref.n_rows );
+  REQUIRE( out3.n_cols == out_ref.n_cols );
+  REQUIRE( out4.n_rows == out2_ref.n_rows );
+  REQUIRE( out4.n_cols == out2_ref.n_cols );
+
+  arma::Mat<eT> out_cpu(out);
+  arma::Mat<eT> out2_cpu(out2);
+  arma::Mat<eT> out3_cpu(out3);
+  arma::Mat<eT> out4_cpu(out4);
+
+  const eT tol = (is_same_type<eT, float>::value) ? 1e-5 : 1e-8;
+
+  REQUIRE( ( arma::norm( out_cpu - out_ref   ) / out_cpu.n_elem  ) <= tol );
+  REQUIRE( ( arma::norm( out2_cpu - out2_ref ) / out2_cpu.n_elem ) <= tol );
+  REQUIRE( ( arma::norm( out3_cpu - out_ref  ) / out3_cpu.n_elem ) <= tol );
+  REQUIRE( ( arma::norm( out4_cpu - out2_ref ) / out4_cpu.n_elem ) <= tol );
+  }
+
+
+
+// random symmetric matrix with NaNs (should fail)
+// TODO: this will not work until we do NaN checking for all decompositions
+// TODO: this should wait until we have something similar to ARMA_CHECK_NONFINITE
+/*
+TEMPLATE_TEST_CASE("random_nan_symmat_pinv", "[pinv]", float, double)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randu<Mat<eT>>(1011, 1011) + 1.0;
+  x(33, 66) = std::numeric_limits<eT>::quiet_NaN();
+
+  // Disable cerr output for this test.
+  std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
+  std::cerr.rdbuf(NULL);
+
+  Mat<eT> out, out2, out3, out4;
+
+  REQUIRE_THROWS( out = pinv(symmatu(x)) );
+  REQUIRE_THROWS( out2 = pinv(symmatl(x)) );
+  const bool status3 = pinv(out3, symmatu(x));
+  REQUIRE( status3 == false );
+  const bool status4 = pinv(out4, symmatl(x));
+  REQUIRE( status4 == false );
+
+  // Restore cerr output.
+  std::cerr.rdbuf(orig_cerr_buf);
+  }
+*/
+
+
+
+// random symmetric matrix with custom tolerance
+TEMPLATE_TEST_CASE("random_custom_tol_symmat_pinv", "[pinv]", float, double)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randu<Mat<eT>>(255, 255) + 1.0;
+  x.diag() += 2.0;
+
+  arma::Mat<eT> x_cpu(x);
+
+  Mat<eT> out = pinv(symmatu(x), 1.0);
+  Mat<eT> out2 = pinv(symmatl(x), 1.0);
+  Mat<eT> out3, out4;
+  const bool status3 = pinv(out3, symmatu(x), 1.0);
+  const bool status4 = pinv(out4, symmatl(x), 1.0);
+
+  REQUIRE( status3 == true );
+  REQUIRE( status4 == true );
+
+  arma::Mat<eT> out_ref = arma::pinv(arma::symmatu(x_cpu), 1.0);
+  arma::Mat<eT> out2_ref = arma::pinv(arma::symmatl(x_cpu), 1.0);
+
+  // Make sure the results match Armadillo.
+  REQUIRE( out.n_rows == out_ref.n_rows );
+  REQUIRE( out.n_cols == out_ref.n_cols );
+  REQUIRE( out2.n_rows == out2_ref.n_rows );
+  REQUIRE( out2.n_cols == out2_ref.n_cols );
+  REQUIRE( out3.n_rows == out_ref.n_rows );
+  REQUIRE( out3.n_cols == out_ref.n_cols );
+  REQUIRE( out4.n_rows == out2_ref.n_rows );
+  REQUIRE( out4.n_cols == out2_ref.n_cols );
+
+  arma::Mat<eT> out_cpu(out);
+  arma::Mat<eT> out2_cpu(out2);
+  arma::Mat<eT> out3_cpu(out3);
+  arma::Mat<eT> out4_cpu(out4);
+
+  const eT tol = (is_same_type<eT, float>::value) ? 1e-5 : 1e-8;
+
+  REQUIRE( ( arma::norm( out_cpu - out_ref   ) / out_cpu.n_elem  ) <= tol );
+  REQUIRE( ( arma::norm( out2_cpu - out2_ref ) / out2_cpu.n_elem ) <= tol );
+  REQUIRE( ( arma::norm( out3_cpu - out_ref  ) / out3_cpu.n_elem ) <= tol );
+  REQUIRE( ( arma::norm( out4_cpu - out2_ref ) / out4_cpu.n_elem ) <= tol );
+  }
+
+
+
+// random symmetric matrix with tolerance so large everything is filtered out
+TEMPLATE_TEST_CASE("random_too_large_tol_symmat_pinv", "[pinv]", float, double)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randu<Mat<eT>>(110, 110) + 1.0;
+  x.diag() += 2.0;
+
+  arma::Mat<eT> x_cpu(x);
+
+  Mat<eT> out = pinv(symmatu(x), 1e5);
+  Mat<eT> out2 = pinv(symmatl(x), 1e5);
+  Mat<eT> out3, out4;
+  const bool status3 = pinv(out3, symmatu(x), 1e5);
+  const bool status4 = pinv(out4, symmatl(x), 1e5);
+
+  REQUIRE( status3 == true );
+  REQUIRE( status4 == true );
+
+  REQUIRE( out.n_rows == x.n_rows );
+  REQUIRE( out.n_cols == x.n_cols );
+  REQUIRE( out2.n_rows == x.n_rows );
+  REQUIRE( out2.n_cols == x.n_cols );
+  REQUIRE( out3.n_rows == x.n_rows );
+  REQUIRE( out3.n_cols == x.n_cols );
+  REQUIRE( out4.n_rows == x.n_rows );
+  REQUIRE( out4.n_cols == x.n_cols );
+
+  REQUIRE( all( all( abs(out) < 1e-5 ) ) );
+  REQUIRE( all( all( abs(out2) < 1e-5 ) ) );
+  REQUIRE( all( all( abs(out3) < 1e-5 ) ) );
+  REQUIRE( all( all( abs(out4) < 1e-5 ) ) );
+  }
+
+
+
+// symmetric matrix pinv() into alias
+TEMPLATE_TEST_CASE("alias_symmat_pinv", "[pinv]", float, double)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randu<Mat<eT>>(255, 255) + 1.0;
+  x.diag() += 2.0;
+
+  Mat<eT> x_old(x);
+  Mat<eT> out_ref = pinv(symmatu(x));
+
+  x = pinv(symmatu(x));
+
+  REQUIRE( x.n_rows == out_ref.n_rows );
+  REQUIRE( x.n_cols == out_ref.n_cols );
+  REQUIRE( all( all( abs(x - out_ref) < 1e-4 ) ) );
+  }
+
+
+
+// symmetric matrix pinv() followed by conversion
+TEMPLATE_TEST_CASE
+  (
+  "conv_to_symmat_pinv",
+  "[pinv]",
+  (std::pair<float, double>),
+  (std::pair<double, float>)
+  )
+  {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
+  Mat<eT1> x = randu<Mat<eT1>>(100, 100) + 0.5;
+  x.diag() += 2.0;
+
+  Mat<eT2> out = conv_to<Mat<eT2>>::from(pinv(symmatu(x)));
+
+  Mat<eT1> out_pre_conv = pinv(symmatu(x));
+  Mat<eT2> out_ref = conv_to<Mat<eT2>>::from(out_pre_conv);
+
+  Mat<eT2> out2 = conv_to<Mat<eT2>>::from(pinv(symmatl(x)));
+
+  Mat<eT1> out2_pre_conv = pinv(symmatl(x));
+  Mat<eT2> out2_ref = conv_to<Mat<eT2>>::from(out2_pre_conv);
+
+  REQUIRE( out.n_rows == out_ref.n_rows );
+  REQUIRE( out.n_cols == out_ref.n_cols );
+  REQUIRE( out2.n_rows == out2_ref.n_rows );
+  REQUIRE( out2.n_cols == out2_ref.n_cols );
+
+  REQUIRE( all( all( abs(out - out_ref) < 1e-4 ) ) );
+  REQUIRE( all( all( abs(out2 - out2_ref) < 1e-4 ) ) );
+  }
 
 
 
@@ -1066,3 +1419,6 @@ TEMPLATE_TEST_CASE
 //  - nonsquare, rows > cols
 //  - nonsquare, rows < cols
 //  - alias
+
+
+// invalid method
