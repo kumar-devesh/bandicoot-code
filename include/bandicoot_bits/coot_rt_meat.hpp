@@ -1000,6 +1000,39 @@ coot_rt_t::accu_subview(const dev_mem_t<eT> mem, const uword M_n_rows, const uwo
 template<typename eT>
 inline
 eT
+coot_rt_t::prod(const dev_mem_t<eT> mem, const uword n_elem)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::prod(mem, n_elem);
+    #else
+    coot_stop_runtime_error("coot_rt::prod(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::prod(mem, n_elem);
+    #else
+    coot_stop_runtime_error("coot_rt::prod(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::prod(): unknown backend");
+    }
+
+  return eT(0); // fix warnings
+  }
+
+
+
+template<typename eT>
+inline
+eT
 coot_rt_t::min(const dev_mem_t<eT> mem, const uword n_elem)
   {
   coot_extra_debug_sigprint();
@@ -1412,6 +1445,40 @@ coot_rt_t::lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool piv
     }
 
   return std::make_tuple(false, ""); // fix warnings
+  }
+
+
+
+template<typename eT>
+inline
+std::tuple<bool, std::string>
+coot_rt_t::det(dev_mem_t<eT> A, const uword n_rows, eT& out_val)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::det(A, n_rows, out_val);
+    #else
+    coot_stop_runtime_error("coot_rt::det(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::det(A, n_rows, out_val);
+    #else
+    coot_stop_runtime_error("coot_rt::det(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::det(): unknown backend");
+    }
+
+  return std::make_tuple(false, ""); // fix warnings
+
   }
 
 

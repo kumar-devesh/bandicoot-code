@@ -251,6 +251,7 @@ namespace coot
   #include "bandicoot_bits/op_cor_bones.hpp"
   #include "bandicoot_bits/op_sort_bones.hpp"
   #include "bandicoot_bits/op_symmat_bones.hpp"
+  #include "bandicoot_bits/op_det_bones.hpp"
   #include "bandicoot_bits/op_pinv_bones.hpp"
 
   #include "bandicoot_bits/mtop_conv_to_bones.hpp"
@@ -407,6 +408,8 @@ namespace coot
       #include "bandicoot_bits/opencl/symmat.hpp"
       #include "bandicoot_bits/opencl/lu.hpp"
       #include "bandicoot_bits/opencl/eig_sym.hpp"
+      #include "bandicoot_bits/opencl/prod.hpp"
+      #include "bandicoot_bits/opencl/det.hpp"
       #include "bandicoot_bits/opencl/replace.hpp"
       #include "bandicoot_bits/opencl/reorder_cols.hpp"
       }
@@ -458,6 +461,8 @@ namespace coot
     #include "bandicoot_bits/cuda/symmat.hpp"
     #include "bandicoot_bits/cuda/lu.hpp"
     #include "bandicoot_bits/cuda/eig_sym.hpp"
+    #include "bandicoot_bits/cuda/prod.hpp"
+    #include "bandicoot_bits/cuda/det.hpp"
     #include "bandicoot_bits/cuda/replace.hpp"
     #include "bandicoot_bits/cuda/reorder_cols.hpp"
     }
@@ -539,6 +544,7 @@ namespace coot
   #include "bandicoot_bits/fn_symmat.hpp"
   #include "bandicoot_bits/fn_lu.hpp"
   #include "bandicoot_bits/fn_eig_sym.hpp"
+  #include "bandicoot_bits/fn_det.hpp"
   #include "bandicoot_bits/fn_pinv.hpp"
 
 
@@ -594,6 +600,7 @@ namespace coot
   #include "bandicoot_bits/op_cor_meat.hpp"
   #include "bandicoot_bits/op_sort_meat.hpp"
   #include "bandicoot_bits/op_symmat_meat.hpp"
+  #include "bandicoot_bits/op_det_meat.hpp"
   #include "bandicoot_bits/op_pinv_meat.hpp"
 
   #include "bandicoot_bits/mtop_conv_to_meat.hpp"

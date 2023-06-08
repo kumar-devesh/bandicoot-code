@@ -127,6 +127,9 @@ class coot_rt_t
   static inline eT accu_subview(const dev_mem_t<eT> mem, const uword M_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols);
 
   template<typename eT>
+  static inline eT prod(const dev_mem_t<eT> mem, const uword n_elem);
+
+  template<typename eT>
   static inline eT min(const dev_mem_t<eT> mem, const uword n_elem);
 
   template<typename eT>
@@ -164,6 +167,9 @@ class coot_rt_t
 
   template<typename eT>
   static inline std::tuple<bool, std::string> lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_mem_t<eT> P, const uword n_rows, const uword n_cols);
+
+  template<typename eT>
+  static inline std::tuple<bool, std::string> det(dev_mem_t<eT> A, const uword n_rows, eT& out_val);
 
   template<typename eT>
   static inline std::tuple<bool, std::string> svd(dev_mem_t<eT> U, dev_mem_t<eT> S, dev_mem_t<eT> V, dev_mem_t<eT> A, const uword n_rows, const uword n_cols, const bool compute_u_vt);
