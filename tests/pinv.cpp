@@ -1410,15 +1410,341 @@ TEMPLATE_TEST_CASE
 // tests for pinv() on general matrices
 //
 
-//  - empty
-//  - random
-//  - random operation
-//  - random with NaNs
-//  - random with custom tolerance
-//  - random with tolerance too large
-//  - nonsquare, rows > cols
-//  - nonsquare, rows < cols
-//  - alias
+
+
+// make sure an empty matrix does not crash
+TEST_CASE("empty_pinv", "[pinv]")
+  {
+  fmat x;
+
+  fmat out = pinv(x);
+  fmat out2;
+  const bool status = pinv(out2, x);
+
+  REQUIRE( status == true );
+
+  REQUIRE( out.n_rows == 0 );
+  REQUIRE( out.n_cols == 0 );
+  REQUIRE( out2.n_rows == 0 );
+  REQUIRE( out2.n_cols == 0 );
+  }
+
+
+
+// compare a random general matrix with Armadillo
+TEMPLATE_TEST_CASE("arma_comparison_pinv", "[pinv]", float, double)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randu<Mat<eT>>(250, 250);
+  x.diag() += 1.0;
+
+  Mat<eT> out = pinv(x);
+  Mat<eT> out2;
+  const bool status = pinv(out2, x);
+
+  REQUIRE( status == true );
+
+  arma::Mat<eT> x_cpu(x);
+  arma::Mat<eT> out_ref = arma::pinv(x_cpu);
+
+  REQUIRE( out.n_rows == out_ref.n_rows );
+  REQUIRE( out.n_cols == out_ref.n_cols );
+  REQUIRE( out2.n_rows == out_ref.n_rows );
+  REQUIRE( out2.n_cols == out_ref.n_cols );
+
+  arma::Mat<eT> out_cpu(out);
+  arma::Mat<eT> out2_cpu(out2);
+
+  const eT tol = (is_same_type<eT, float>::value) ? 1e-5 : 1e-8;
+
+  REQUIRE( ( arma::norm( out_cpu - out_ref  ) / out_cpu.n_elem  ) <= tol );
+  REQUIRE( ( arma::norm( out2_cpu - out_ref ) / out2_cpu.n_elem ) <= tol );
+  }
+
+
+
+// take the pseudoinverse of an operation
+TEMPLATE_TEST_CASE("op_pinv", "[pinv]", float, double)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randu<Mat<eT>>(250, 250);
+  x.diag() += 1.0;
+
+  Mat<eT> y = 2 * (x.t() + 1);
+
+  Mat<eT> out = pinv(2 * (x.t() + 1));
+  Mat<eT> out2;
+  const bool status = pinv(out2, 2 * (x.t() + 1));
+
+  REQUIRE( status == true );
+
+  Mat<eT> ref = pinv(y);
+
+  REQUIRE( out.n_rows == ref.n_rows );
+  REQUIRE( out.n_cols == ref.n_cols );
+  REQUIRE( out2.n_rows == ref.n_rows );
+  REQUIRE( out2.n_cols == ref.n_cols );
+
+  arma::Mat<eT> ref_cpu(ref);
+  arma::Mat<eT> out_cpu(out);
+  arma::Mat<eT> out2_cpu(out2);
+
+  const eT tol = (is_same_type<eT, float>::value) ? 1e-5 : 1e-8;
+
+  REQUIRE( ( arma::norm( out_cpu - ref_cpu  ) / out_cpu.n_elem  ) <= tol );
+  REQUIRE( ( arma::norm( out2_cpu - ref_cpu ) / out2_cpu.n_elem ) <= tol );
+  }
+
+
+
+// compare with Armadillo when using a custom tolerance that will filter out some singular values
+TEMPLATE_TEST_CASE("custom_tol_pinv", "[pinv]", float, double)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randu<Mat<eT>>(700, 700);
+  x.diag() += 1.0;
+
+  Mat<eT> out = pinv(x, 1.0);
+  Mat<eT> out2;
+  const bool status = pinv(out2, x, 1.0);
+
+  REQUIRE( status == true );
+
+  arma::Mat<eT> x_cpu(x);
+
+  arma::Mat<eT> out_ref = pinv(x_cpu, 1.0);
+
+  REQUIRE( out.n_rows == out_ref.n_rows );
+  REQUIRE( out.n_cols == out_ref.n_cols );
+  REQUIRE( out2.n_rows == out_ref.n_rows );
+  REQUIRE( out2.n_cols == out_ref.n_cols );
+
+  arma::Mat<eT> out_cpu(out);
+  arma::Mat<eT> out2_cpu(out2);
+
+  const eT tol = (is_same_type<eT, float>::value) ? 1e-5 : 1e-8;
+
+  REQUIRE( ( arma::norm( out_cpu - out_ref  ) / out_cpu.n_elem  ) <= tol );
+  REQUIRE( ( arma::norm( out2_cpu - out_ref ) / out2_cpu.n_elem ) <= tol );
+  }
+
+
+
+// use a tolerance so large that all singular values are filtered out
+TEMPLATE_TEST_CASE("too_large_tol_pinv", "[pinv]", float, double)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randu<Mat<eT>>(1500, 1500);
+  x.diag() += 1.0;
+
+  Mat<eT> out = pinv(x, 100000.0);
+  Mat<eT> out2;
+  const bool status = pinv(out2, x, 100000.0);
+
+  REQUIRE( status == true );
+
+  REQUIRE( out.n_rows == x.n_rows );
+  REQUIRE( out.n_cols == x.n_cols );
+  REQUIRE( out2.n_rows == x.n_rows );
+  REQUIRE( out2.n_cols == x.n_cols );
+
+  REQUIRE( all( all( abs(out)  < 1e-5 ) ) );
+  REQUIRE( all( all( abs(out2) < 1e-5 ) ) );
+  }
+
+
+
+// take the pseudoinverse of a non-square matrix with rows > cols
+TEMPLATE_TEST_CASE("nonsquare_rows_gt_cols_pinv", "[pinv]", float, double)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randu<Mat<eT>>(1000, 655);
+  x.diag() += 1.0;
+
+  Mat<eT> out = pinv(x);
+  Mat<eT> out2;
+  const bool status = pinv(out2, x);
+
+  REQUIRE( status == true );
+
+  arma::Mat<eT> x_cpu(x);
+  arma::Mat<eT> out_ref = arma::pinv(x_cpu);
+
+  REQUIRE( out.n_rows == out_ref.n_rows );
+  REQUIRE( out.n_cols == out_ref.n_cols );
+  REQUIRE( out2.n_rows == out_ref.n_rows );
+  REQUIRE( out2.n_cols == out_ref.n_cols );
+
+  arma::Mat<eT> out_cpu(out);
+  arma::Mat<eT> out2_cpu(out2);
+
+  const eT tol = (is_same_type<eT, float>::value) ? 1e-5 : 1e-8;
+
+  REQUIRE( ( arma::norm( out_cpu - out_ref  ) / out_cpu.n_elem  ) <= tol );
+  REQUIRE( ( arma::norm( out2_cpu - out_ref ) / out2_cpu.n_elem ) <= tol );
+  }
+
+
+
+// take the pseudoinverse of a non-square matrix with cols > rows
+TEMPLATE_TEST_CASE("nonsquare_cols_gt_rows_pinv", "[pinv]", float, double)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randu<Mat<eT>>(655, 1000);
+  x.diag() += 1.0;
+
+  Mat<eT> out = pinv(x);
+  Mat<eT> out2;
+  const bool status = pinv(out2, x);
+
+  REQUIRE( status == true );
+
+  arma::Mat<eT> x_cpu(x);
+  arma::Mat<eT> out_ref = arma::pinv(x_cpu);
+
+  REQUIRE( out.n_rows == out_ref.n_rows );
+  REQUIRE( out.n_cols == out_ref.n_cols );
+  REQUIRE( out2.n_rows == out_ref.n_rows );
+  REQUIRE( out2.n_cols == out_ref.n_cols );
+
+  arma::Mat<eT> out_cpu(out);
+  arma::Mat<eT> out2_cpu(out2);
+
+  const eT tol = (is_same_type<eT, float>::value) ? 1e-5 : 1e-8;
+
+  REQUIRE( ( arma::norm( out_cpu - out_ref  ) / out_cpu.n_elem  ) <= tol );
+  REQUIRE( ( arma::norm( out2_cpu - out_ref ) / out2_cpu.n_elem ) <= tol );
+  }
+
+
+
+// take the pseudoinverse into an alias of the input
+TEMPLATE_TEST_CASE("alias_pinv", "[pinv]", float, double)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randu<Mat<eT>>(25, 25);
+  x.diag() += 1.0;
+
+  Mat<eT> x_orig(x);
+
+  x = pinv(x);
+  Mat<eT> ref = pinv(x_orig);
+
+  REQUIRE( x.n_rows == ref.n_rows );
+  REQUIRE( x.n_cols == ref.n_cols );
+
+  REQUIRE( all( all( abs(x - ref) < 1e-5 ) ) );
+  }
+
+
+
+// test conversions after pinv
+TEMPLATE_TEST_CASE
+  (
+  "conv_to_pinv",
+  "[pinv]",
+  (std::pair<float, double>),
+  (std::pair<double, float>)
+  )
+  {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
+  Mat<eT1> x = randu<Mat<eT1>>(256, 256);
+  x.diag() += 1.0;
+
+  Mat<eT2> out = conv_to<Mat<eT2>>::from(pinv(x));
+
+  Mat<eT1> out_pre_conv = pinv(x);
+  Mat<eT2> out_ref = conv_to<Mat<eT2>>::from(out_pre_conv);
+
+  REQUIRE( out.n_rows == out_ref.n_rows );
+  REQUIRE( out.n_cols == out_ref.n_cols );
+
+  REQUIRE( all( all( abs( out - out_ref ) < 1e-5 ) ) );
+  }
+
 
 
 // invalid method
+TEST_CASE("invalid_method_pinv", "[pinv]")
+  {
+  fmat x = randu<fmat>(10, 10);
+
+  // Disable cerr output for this test.
+  std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
+  std::cerr.rdbuf(NULL);
+
+  fmat out, out2;
+  bool status;
+
+  REQUIRE_THROWS( out = pinv(x, 1e-5, "hello") );
+  REQUIRE_THROWS( out = pinv(x, 1e-5, "test") );
+  REQUIRE_THROWS( status = pinv(out2, x, 1e-5, "hello") );
+  REQUIRE_THROWS( status = pinv(out2, x, 1e-5, "test") );
+
+  // Divide-and-conquer not supported (yet?).
+
+  REQUIRE_THROWS( out = pinv(x, 1e-5, "dc") );
+  REQUIRE_THROWS( status = pinv(out2, x, 1e-5, "dc") );
+
+  // Restore cerr output.
+  std::cerr.rdbuf(orig_cerr_buf);
+
+  // This one should work.
+  out = pinv(x, 1e-5, "s");
+  status = pinv(out2, x, 1e-5, "s");
+
+  REQUIRE( out.n_rows == x.n_rows );
+  REQUIRE( out.n_cols == x.n_cols );
+  REQUIRE( out2.n_rows == x.n_rows );
+  REQUIRE( out2.n_cols == x.n_cols );
+  REQUIRE( status == true );
+  }
