@@ -466,10 +466,10 @@ coot_rt_t::extract_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword i
 
 
 
-template<typename eT>
+template<typename eT2, typename eT1>
 inline
 void
-coot_rt_t::set_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword in_mem_offset, const uword n_rows, const uword len)
+coot_rt_t::set_diag(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword in_mem_offset, const uword n_rows, const uword len)
   {
   coot_extra_debug_sigprint();
 

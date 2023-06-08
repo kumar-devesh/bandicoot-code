@@ -1,4 +1,4 @@
-// Copyright 2023 Ryan Curtin (http://www.ratml.org/)
+// Copyright 2023 Ryan Curtin (http://www.ratml.org)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,17 +12,18 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-__global__
+__kernel
 void
-COOT_FN(PREFIX,set_diag)(eT1* out,
-                         const eT1* in,
+COOT_FN(PREFIX,set_diag)(__global eT2* out,
+                         const UWORD out_offset,
+                         __global const eT1* in,
                          const UWORD n_rows,
                          const UWORD len)
   {
-  const UWORD tid = blockIdx.x * blockDim.x + threadIdx.x;
+  const UWORD tid = get_global_id(0);
   if (tid < len)
     {
     const UWORD i = (n_rows + 1) * tid;
-    out[i] = in[tid];
+    out[i + out_offset] = (eT2) in[tid];
     }
   }

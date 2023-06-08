@@ -74,7 +74,6 @@ struct oneway_kernel_id
     diag_inplace_mod_scalar,
     //
     extract_diag,
-    set_diag,
     copy_diag,
     //
     mul_colwise,
@@ -169,7 +168,6 @@ struct oneway_kernel_id
     names.push_back("diag_inplace_mod_scalar");
 
     names.push_back("extract_diag");
-    names.push_back("set_diag");
     names.push_back("copy_diag");
 
     names.push_back("mul_colwise");
@@ -467,6 +465,7 @@ struct twoway_kernel_id
     clamp,
     //
     get_diag,
+    set_diag,
     //
     sum_colwise_conv_pre,
     sum_rowwise_conv_pre,
@@ -638,6 +637,7 @@ struct twoway_kernel_id
     names.push_back("clamp");
 
     names.push_back("get_diag");
+    names.push_back("set_diag");
 
     names.push_back("sum_colwise_conv_pre");
     names.push_back("sum_rowwise_conv_pre");
