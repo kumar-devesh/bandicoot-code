@@ -49,17 +49,31 @@ op_pinv::apply_direct(Mat<eT2>& out, const T1& in, const typename T1::elem_type 
   if (resolves_to_diagmat<T1>::value)
     {
     // Now detect whether it is stored in a vector or matrix.
-    strip_diagmat<T1> s1(in);
-    if (s1.M.n_rows > 1 && s1.M.n_cols > 1)
+    strip_diagmat<T1> S(in);
+    typedef typename strip_diagmat<T1>::stored_type ST1;
+    unwrap<ST1> U(S.M);
+    if (U.M.n_rows == 1 || U.M.n_cols == 1)
       {
-      return apply_direct_diag(out, s1.M, tol);
+      if (!U.is_alias(out))
+        {
+        return apply_direct_diag(out, U.M, tol);
+        }
+      else
+        {
+        // Aliases must be handled via a temporary.
+        Mat<eT2> tmp;
+        const std::tuple<bool, std::string> status = apply_direct_diag(tmp, U.M, tol);
+        out.steal_mem(tmp);
+        return status;
+        }
       }
     else
       {
       // Extract the diagonal into a standalone vector for easier processing.
-      const uword N = (std::min)(s1.M.n_rows, s1.M.n_cols);
+      // Note that aliases don't need to be handled since we are not operating on `in` now.
+      const uword N = (std::min)(U.M.n_rows, U.M.n_cols);
       Col<typename T1::elem_type> diag(N);
-      coot_rt_t::extract_diag(diag.get_dev_mem(false), s1.M.get_dev_mem(false), 0, s1.M.n_rows, N);
+      coot_rt_t::extract_diag(diag.get_dev_mem(false), U.M.get_dev_mem(false), 0, U.M.n_rows, N);
 
       return apply_direct_diag(out, diag, tol);
       }
@@ -111,6 +125,13 @@ op_pinv::apply_direct_diag(Mat<eT>& out, const Mat<eT>& in, const eT tol)
   coot_extra_debug_sigprint();
 
   coot_debug_check(in.n_rows != 1 && in.n_cols != 1, "op_pinv::apply_direct_diag_vec(): given input is not a vector (internal error)");
+
+  if (in.n_rows == 0 || in.n_cols == 0)
+    {
+    // Nothing to do.
+    out.reset();
+    return std::make_tuple(true, "");
+    }
 
   const uword N = (std::max)(in.n_rows, in.n_cols);
 
@@ -167,26 +188,52 @@ op_pinv::apply_direct_diag(Mat<eT2>& out, const Mat<eT1>& in, const eT1 tol, con
 
   coot_debug_check(in.n_rows != 1 && in.n_cols != 1, "op_pinv::apply_direct_diag_vec(): given input is not a vector (internal error)");
 
+  if (in.n_rows == 0 || in.n_cols == 0)
+    {
+    // Nothing to do.
+    out.reset();
+    return std::make_tuple(true, "");
+    }
+
   const uword N = (std::max)(in.n_rows, in.n_cols);
 
-  // We have to manually convert to eT2, but only after the operation is done.
-  // Thus, we have to operate on a temporary.
-  Mat<eT1> tmp(N, 1);
-  coot_rt_t::eop_scalar(tmp.get_dev_mem(false), in.get_dev_mem(false), N, (eT1) 0, (eT1) 1, twoway_kernel_id::equ_array_div_scalar_pre);
+  out.zeros(N, N);
 
-  // Check for any NaNs to indicate success or failure.
-  const bool status = coot_rt_t::any_vec(tmp.get_dev_mem(false), N, (eT1) 0, oneway_real_kernel_id::rel_any_nonfinite, oneway_real_kernel_id::rel_any_nonfinite_small);
+  // Check for any NaNs in the input.
+  const bool has_nans = coot_rt_t::any_vec(in.get_dev_mem(false), in.n_elem, (eT1) 0, oneway_real_kernel_id::rel_any_nonfinite, oneway_real_kernel_id::rel_any_nonfinite_small);
 
-  if (status == false)
+  if (has_nans == true)
     {
-    out.clear();
-    return std::make_tuple(false, "NaNs detected in inverted diagonal");
+    out.reset();
+    return std::make_tuple(false, "NaNs detected in input matrix");
     }
-  else
+
+  // Find the values that are below tolerance.
+  Mat<eT1> abs_in(in.n_rows, in.n_cols);
+  coot_rt_t::eop_scalar(abs_in.get_dev_mem(false), in.get_dev_mem(false), in.n_elem, (eT1) 0, (eT1) 0, twoway_kernel_id::equ_array_abs);
+
+  // Compute tolerance if not given.
+  eT1 tol_use = tol;
+  if (tol == (eT1) 0)
     {
-    out.zeros(N, N);
-    coot_rt_t::set_diag(out.get_dev_mem(false), tmp.get_dev_mem(false), 0, N, N);
+    const eT1 max_val = coot_rt_t::max(abs_in.get_dev_mem(false), abs_in.n_elem);
+    tol_use = abs_in.n_elem * max_val * std::numeric_limits<eT1>::epsilon();
     }
+
+  Mat<uword> tol_indicator(in.n_rows, in.n_cols);
+  coot_rt_t::relational_scalar_op(tol_indicator.get_dev_mem(false), abs_in.get_dev_mem(false), abs_in.n_elem, (eT1) tol_use, twoway_kernel_id::rel_gt_scalar, "pinv()");
+
+  // Now invert the diagonal.  Any zero values need to changed to 1, so as to not produce infs or nans.
+  Mat<eT1> out_vec(abs_in.n_rows, abs_in.n_cols);
+  coot_rt_t::copy_array(out_vec.get_dev_mem(false), in.get_dev_mem(false), in.n_elem);
+  coot_rt_t::replace(out_vec.get_dev_mem(false), out_vec.n_elem, (eT1) 0.0, (eT1) 1.0);
+  coot_rt_t::eop_scalar(out_vec.get_dev_mem(false), out_vec.get_dev_mem(false), in.n_elem, (eT1) 0, (eT1) 1, twoway_kernel_id::equ_array_div_scalar_pre);
+
+  // Zero out any values that are below the tolerance.
+  coot_rt_t::inplace_op_array(out_vec.get_dev_mem(false), tol_indicator.get_dev_mem(false), out_vec.n_elem, twoway_kernel_id::inplace_mul_array);
+
+  // Now set the diagonal of the other matrix.  This also performs the conversion.
+  coot_rt_t::set_diag(out.get_dev_mem(false), out_vec.get_dev_mem(false), 0, N, N);
 
   return std::make_tuple(true, "");
   }
@@ -199,6 +246,13 @@ std::tuple<bool, std::string>
 op_pinv::apply_direct_sym(Mat<eT>& out, Mat<eT>& in, const eT tol)
   {
   coot_extra_debug_sigprint();
+
+  if (in.n_rows == 0 || in.n_cols == 0)
+    {
+    // Nothing to do.
+    out.reset();
+    return std::make_tuple(true, "");
+    }
 
   Col<eT> eigvals(in.n_rows);
 
@@ -296,6 +350,13 @@ std::tuple<bool, std::string>
 op_pinv::apply_direct_gen(Mat<eT>& out, Mat<eT>& in, const eT tol)
   {
   coot_extra_debug_sigprint();
+
+  if (in.n_rows == 0 || in.n_cols == 0)
+    {
+    // Nothing to do.
+    out.reset();
+    return std::make_tuple(true, "");
+    }
 
   //
   // 1. Transpose input if needed so that n_rows >= n_cols.

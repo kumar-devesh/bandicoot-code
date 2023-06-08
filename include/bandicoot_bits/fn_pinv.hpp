@@ -52,8 +52,6 @@ pinv
 
   typedef typename T1::elem_type eT;
 
-  uword method_id = 0; // default
-
   // We only support the standard method for now, but provide the option for compatibility with Armadillo.
   if (method != nullptr)
     {
@@ -86,8 +84,6 @@ pinv
   {
   coot_extra_debug_sigprint();
 
-  uword method_id = 0; // default
-
   if (method != nullptr)
     {
     const char sig = method[0];
@@ -105,5 +101,5 @@ pinv
     coot_debug_warn("pinv(): " + std::get<1>(result));
     }
 
-  return true;
+  return std::get<0>(result);
   }
