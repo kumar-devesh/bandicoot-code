@@ -1132,8 +1132,10 @@ TEMPLATE_TEST_CASE("random_trans_symmat_pinv", "[pinv]", float, double)
   REQUIRE( status3 == true );
   REQUIRE( status4 == true );
 
-  arma::Mat<eT> out_ref = arma::pinv(arma::symmatu(x_cpu.t()));
-  arma::Mat<eT> out2_ref = arma::pinv(arma::symmatl(x_cpu).t());
+  arma::Mat<eT> in_ref = arma::symmatu(x_cpu.t());
+  arma::Mat<eT> out_ref = arma::pinv(in_ref);
+  arma::Mat<eT> in2_ref = arma::symmatl(x_cpu).t();
+  arma::Mat<eT> out2_ref = arma::pinv(in2_ref);
 
   REQUIRE( out.n_rows == out_ref.n_rows );
   REQUIRE( out.n_cols == out_ref.n_cols );
@@ -1184,8 +1186,10 @@ TEMPLATE_TEST_CASE("random_scaled_trans_symmat_pinv", "[pinv]", float, double)
   REQUIRE( status3 == true );
   REQUIRE( status4 == true );
 
-  arma::Mat<eT> out_ref = arma::pinv(arma::symmatu(3 * x_cpu.t()));
-  arma::Mat<eT> out2_ref = arma::pinv(3 * arma::symmatl(x_cpu).t());
+  arma::Mat<eT> in_ref = arma::symmatu(3 * x_cpu.t());
+  arma::Mat<eT> out_ref = arma::pinv(in_ref);
+  arma::Mat<eT> in2_ref = 3 * arma::symmatl(x_cpu).t();
+  arma::Mat<eT> out2_ref = arma::pinv(in2_ref);
 
   REQUIRE( out.n_rows == out_ref.n_rows );
   REQUIRE( out.n_cols == out_ref.n_cols );
