@@ -51,6 +51,11 @@ TEMPLATE_TEST_CASE("find_basic_2", "[find]", double, float, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x(100);
   x.zeros();
   x(53) = eT(1);
@@ -305,7 +310,7 @@ TEMPLATE_TEST_CASE("find_all_except_one_nonzero", "[find]", double, float, u32, 
 // find in empty vector
 TEST_CASE("find_empty_vector", "[find]")
   {
-  vec x;
+  fvec x;
 
   uvec y1 = find(x);
   uvec y2 = find(x, 0);

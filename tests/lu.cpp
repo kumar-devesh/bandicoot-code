@@ -23,6 +23,11 @@ TEMPLATE_TEST_CASE("lu_small", "[lu]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   // [[1, 3, 5, 7],
   //  [9, 2, 6, 8],
   //  [3, 4, 5, 6],
@@ -103,6 +108,11 @@ TEMPLATE_TEST_CASE("lu_random_large", "[lu]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   // Check random large square LU decompositions against Armadillo.
   for (uword t = 8; t < 13; ++t)
     {
@@ -144,6 +154,11 @@ TEMPLATE_TEST_CASE("lu_triangular", "[lu]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   arma::Mat<eT> X_cpu = arma::trimatu(arma::randu<arma::Mat<eT>>(503, 503));
   Mat<eT> X(X_cpu);
 
@@ -162,11 +177,11 @@ TEMPLATE_TEST_CASE("lu_triangular", "[lu]", float, double)
 
 TEST_CASE("lu_empty", "[lu]")
   {
-  mat X1;
-  mat X2(5, 0);
-  mat X3(0, 10);
+  fmat X1;
+  fmat X2(5, 0);
+  fmat X3(0, 10);
 
-  mat L, U;
+  fmat L, U;
 
   bool status = lu(L, U, X1);
 
@@ -199,6 +214,11 @@ TEMPLATE_TEST_CASE("lu_single_element", "[lu]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> X(1, 1);
   X(0, 0) = 5;
 
@@ -222,8 +242,10 @@ TEMPLATE_TEST_CASE("lu_random_sizes_arma_comparison", "[lu]", float, double)
   {
   typedef TestType eT;
 
-  const size_t seed = std::time(NULL);
-  arma::arma_rng::set_seed(seed);
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   arma::uvec x_sizes = arma::randi<arma::uvec>(15, arma::distr_param(100, 2000));
   arma::uvec y_sizes = arma::randi<arma::uvec>(15, arma::distr_param(100, 2000));
@@ -284,6 +306,11 @@ TEMPLATE_TEST_CASE("lu_random_sizes_arma_comparison", "[lu]", float, double)
 TEMPLATE_TEST_CASE("lup_small", "[lu]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   // [[1, 3, 5, 7],
   //  [9, 2, 6, 8],
@@ -367,6 +394,11 @@ TEMPLATE_TEST_CASE("lup_random_large", "[lu]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   // Check random large square LU decompositions against Armadillo.
   for (uword t = 8; t < 13; ++t)
     {
@@ -416,6 +448,11 @@ TEMPLATE_TEST_CASE("lup_triangular", "[lu]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   arma::Mat<eT> X_cpu = arma::trimatu(arma::randu<arma::Mat<eT>>(503, 503));
   Mat<eT> X(X_cpu);
 
@@ -434,11 +471,11 @@ TEMPLATE_TEST_CASE("lup_triangular", "[lu]", float, double)
 
 TEST_CASE("lup_empty", "[lu]")
   {
-  mat X1;
-  mat X2(5, 0);
-  mat X3(0, 10);
+  fmat X1;
+  fmat X2(5, 0);
+  fmat X3(0, 10);
 
-  mat L, U, P;
+  fmat L, U, P;
 
   bool status = lu(L, U, P, X1);
 
@@ -460,7 +497,7 @@ TEST_CASE("lup_empty", "[lu]")
   REQUIRE( P.n_rows == 5 );
   REQUIRE( P.n_cols == 5 );
   // The permutation matrix should be the identity matrix.
-  arma::mat P_cpu(P);
+  arma::fmat P_cpu(P);
   REQUIRE( P_cpu.is_diagmat() == true );
   REQUIRE( arma::all( P_cpu.diag() == 1.0 ) );
 
@@ -480,6 +517,11 @@ TEST_CASE("lup_empty", "[lu]")
 TEMPLATE_TEST_CASE("lup_single_element", "[lu]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> X(1, 1);
   X(0, 0) = 5;
@@ -506,6 +548,11 @@ TEMPLATE_TEST_CASE("lup_single_element", "[lu]", float, double)
 TEMPLATE_TEST_CASE("lup_random_sizes_arma_comparison", "[lu]", float, double)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   arma::uvec x_sizes = arma::randi<arma::uvec>(15, arma::distr_param(100, 2000));
   arma::uvec y_sizes = arma::randi<arma::uvec>(15, arma::distr_param(100, 2000));
