@@ -20,7 +20,7 @@ COOT_FN(PREFIX,cross)(__global eT2* out,
                       __global const eT1* A,
                       __global const eT1* B) // A and B should have 3 elements
   {
-  const UWORD idx = get_global_id(0);a
+  const UWORD idx = get_global_id(0);
 
   if (idx < 3)
     {
