@@ -209,6 +209,7 @@ inline
 void
 Mat<eT>::init(const uword new_n_rows, const uword new_n_cols)
   {
+  std::cout << "Initialize matrix to size " << new_n_rows << " x " << new_n_cols << " (" << this << ")\n";
   coot_extra_debug_sigprint( coot_str::format("new_n_rows = %d, new_n_cols = %d") % new_n_rows % new_n_cols );
 
   if( (n_rows == new_n_rows) && (n_cols == new_n_cols) )  { return; }
