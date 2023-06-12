@@ -25,8 +25,8 @@ COOT_FN(PREFIX,reorder_cols)(__global eT1* out_mem,
     {
     const UWORD in_col = ordering[out_col];
 
-          eT1* out_colptr = out_mem + (out_col * n_rows);
-    const eT1* in_colptr  = in_mem  + (in_col * n_rows);
+          __global eT1* out_colptr = out_mem + (out_col * n_rows);
+    const __global eT1* in_colptr  = in_mem  + (in_col * n_rows);
 
     #pragma unroll
     for (UWORD i = 0; i < n_rows; ++i)
