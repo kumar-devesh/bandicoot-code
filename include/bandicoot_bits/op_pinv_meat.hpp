@@ -49,8 +49,10 @@ op_pinv::apply_direct(Mat<eT2>& out, const T1& in, const typename T1::elem_type 
   if (resolves_to_diagmat<T1>::value)
     {
     // Now detect whether it is stored in a vector or matrix.
+    std::cout << "do strip_diagmat\n";
     strip_diagmat<T1> S(in);
     typedef typename strip_diagmat<T1>::stored_type ST1;
+    std::cout << "unwrap stored strip_diagmat object\n";
     unwrap<ST1> U(S.M);
     std::cout << "strip_diagmat result size " << U.M.n_rows << " x " << U.M.n_cols << "\n";
     if (U.M.n_rows == 1 || U.M.n_cols == 1)
