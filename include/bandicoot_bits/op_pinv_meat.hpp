@@ -52,6 +52,7 @@ op_pinv::apply_direct(Mat<eT2>& out, const T1& in, const typename T1::elem_type 
     strip_diagmat<T1> S(in);
     typedef typename strip_diagmat<T1>::stored_type ST1;
     unwrap<ST1> U(S.M);
+    std::cout << "strip_diagmat result size " << U.M.n_rows << " x " << U.M.n_cols << "\n";
     if (U.M.n_rows == 1 || U.M.n_cols == 1)
       {
       if (!U.is_alias(out))
@@ -134,6 +135,7 @@ op_pinv::apply_direct_diag(Mat<eT>& out, const Mat<eT>& in, const eT tol)
     }
 
   const uword N = (std::max)(in.n_rows, in.n_cols);
+  std::cout << "result matrix size is " << N << " x " << N << "\n";
 
   out.zeros(N, N);
 
