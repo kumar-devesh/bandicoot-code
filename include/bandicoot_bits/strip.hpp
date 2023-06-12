@@ -43,6 +43,7 @@ struct strip_diagmat< Op<T1, op_diagmat> >
     : M(X.m)
     {
     coot_extra_debug_sigprint();
+    std::cout << "strip_diagmat with outer diagmat\n";
     }
 
   static constexpr bool do_diagmat = true;
@@ -63,6 +64,7 @@ struct strip_diagmat< eOp<Op<T1, op_diagmat>, eop_type> >
     : M(X.m.Q.m, X.aux, X.aux_uword_a, X.aux_uword_b)
     {
     coot_extra_debug_sigprint();
+    std::cout << "strip_diagmat eop with internal diagmat\n";
     }
 
   static constexpr bool do_diagmat = true;
@@ -84,6 +86,7 @@ struct strip_diagmat< Op<Op<T1, op_diagmat>, op_htrans> >
     : M(X.m.m)
     {
     coot_extra_debug_sigprint();
+    std::cout << "strip_diagmat with outer htrans and inner diagmat\n";
     }
 
   static constexpr bool do_diagmat = true;
@@ -104,6 +107,7 @@ struct strip_diagmat< Op<Op<T1, op_diagmat>, op_strans> >
     : M(X.m.m)
     {
     coot_extra_debug_sigprint();
+    std::cout << "strip_diagmat with outer strans and inner diagmat\n";
     }
 
   static constexpr bool do_diagmat = true;
