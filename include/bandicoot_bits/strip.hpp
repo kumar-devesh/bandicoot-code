@@ -124,6 +124,8 @@ struct strip_diagmat< Op<Op<T1, op_diagmat>, op_htrans2> >
     : M(X.m.m, X.aux)
     {
     coot_extra_debug_sigprint();
+    std::cout << "scalar * X.t() strip_diagmat constructor done\n";
+    std::cout << "T1: " << typeid(T1).name() << "\n";
     }
 
   static constexpr bool do_diagmat = true;
