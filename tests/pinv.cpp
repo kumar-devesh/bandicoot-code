@@ -398,18 +398,27 @@ TEMPLATE_TEST_CASE("scaled_trans_diagonal_vec_pinv", "[pinv]", float, double)
   // Make a value negative because why not.
   x(33) *= -1.0;
 
+  std::cout << "scaled_trans_diagonal_vec_pinv out1\n";
   Mat<eT> out = pinv(3.0 * diagmat(x.t()));
+  std::cout << "scaled_trans_diagonal_vec_pinv out2\n";
   Mat<eT> out2 = pinv(diagmat(3.0 * x.t()));
+  std::cout << "scaled_trans_diagonal_vec_pinv out3\n";
   Mat<eT> out3 = pinv(3.0 * diagmat(x.t()).t());
+  std::cout << "scaled_trans_diagonal_vec_pinv out4\n";
   Mat<eT> out4 = pinv(diagmat(3.0 * x.t()).t());
   Mat<eT> out5;
   Mat<eT> out6;
   Mat<eT> out7;
   Mat<eT> out8;
+  std::cout << "scaled_trans_diagonal_vec_pinv out5\n";
   const bool status5 = pinv(out5, 3.0 * diagmat(x.t()));
+  std::cout << "scaled_trans_diagonal_vec_pinv out6\n";
   const bool status6 = pinv(out6, diagmat(3.0 * x.t()));
+  std::cout << "scaled_trans_diagonal_vec_pinv out7\n";
   const bool status7 = pinv(out7, 3.0 * diagmat(x.t()).t());
+  std::cout << "scaled_trans_diagonal_vec_pinv out8\n";
   const bool status8 = pinv(out8, diagmat(3.0 * x.t()).t());
+  std::cout << "done\n";
 
   REQUIRE( status5 == true );
   REQUIRE( status6 == true );
