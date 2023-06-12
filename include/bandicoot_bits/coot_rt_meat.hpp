@@ -2967,6 +2967,8 @@ inline
 void
 coot_rt_t::symmat(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword size, const uword lower)
   {
+  coot_extra_debug_sigprint();
+
   if (get_rt().backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
@@ -2986,5 +2988,36 @@ coot_rt_t::symmat(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword size,
   else
     {
     coot_stop_runtime_error("coot_rt::symmat(): unknown backend");
+    }
+  }
+
+
+
+template<typename eT1, typename eT2>
+inline
+void
+coot_rt_t::cross(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const dev_mem_t<eT1> B)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    opencl::cross(out, A, B);
+    #else
+    coot_stop_runtime_error("coot_rt::cross(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    cuda::cross(out, A, B);
+    #else
+    coot_stop_runtime_error("coot_rt::cross(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::cross(): unknown backend");
     }
   }
