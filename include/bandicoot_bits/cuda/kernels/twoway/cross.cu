@@ -30,7 +30,7 @@ COOT_FN(PREFIX,cross)(eT2* out,
     const UWORD b1_index = ((idx + 2) % 3);
     const UWORD b2_index = ((idx + 1) % 3);
 
-    const eT1 val = (A[a1_index] * B[b1_index]) - (A[a2_index] - B[b2_index]);
+    const eT1 val = (A[a1_index] * B[b1_index]) - (A[a2_index] * B[b2_index]);
     out[idx] = (eT2) val;
     }
   }
