@@ -151,6 +151,7 @@ op_pinv::apply_direct_diag(Mat<eT>& out, const Mat<eT>& in, const eT tol)
   // Find the values that are below tolerance.
   Mat<eT> abs_in(in.n_rows, in.n_cols);
   coot_rt_t::eop_scalar(abs_in.get_dev_mem(false), in.get_dev_mem(false), in.n_elem, (eT) 0, (eT) 0, twoway_kernel_id::equ_array_abs);
+  std::cout << "computed abs_in\n";
 
   // Compute tolerance if not given.
   eT tol_use = tol;
@@ -159,21 +160,28 @@ op_pinv::apply_direct_diag(Mat<eT>& out, const Mat<eT>& in, const eT tol)
     const eT max_val = coot_rt_t::max(abs_in.get_dev_mem(false), abs_in.n_elem);
     tol_use = abs_in.n_elem * max_val * std::numeric_limits<eT>::epsilon();
     }
+  std::cout << "tol_use is " << tol_use << "\n";
 
   Mat<uword> tol_indicator(in.n_rows, in.n_cols);
   coot_rt_t::relational_scalar_op(tol_indicator.get_dev_mem(false), abs_in.get_dev_mem(false), abs_in.n_elem, (eT) tol_use, twoway_kernel_id::rel_gt_scalar, "pinv()");
+  std::cout << "did tol_indicator computation\n";
 
   // Now invert the diagonal.  Any zero values need to changed to 1, so as to not produce infs or nans.
   Mat<eT> out_vec(abs_in.n_rows, abs_in.n_cols);
   coot_rt_t::copy_array(out_vec.get_dev_mem(false), in.get_dev_mem(false), in.n_elem);
+  std::cout << "did copy_array for out_vec\n";
   coot_rt_t::replace(out_vec.get_dev_mem(false), out_vec.n_elem, (eT) 0.0, (eT) 1.0);
+  std::cout << "did replace for out_vec\n";
   coot_rt_t::eop_scalar(out_vec.get_dev_mem(false), out_vec.get_dev_mem(false), in.n_elem, (eT) 0, (eT) 1, twoway_kernel_id::equ_array_div_scalar_pre);
+  std::cout << "did eop_scalar for out_vec\n";
 
   // Zero out any values that are below the tolerance.
   coot_rt_t::inplace_op_array(out_vec.get_dev_mem(false), tol_indicator.get_dev_mem(false), out_vec.n_elem, twoway_kernel_id::inplace_mul_array);
+  std::cout << "did inplace_op_array for out_vec filtering\n";
 
   // Now set the diagonal of the other matrix.
   coot_rt_t::set_diag(out.get_dev_mem(false), out_vec.get_dev_mem(false), 0, N, N);
+  std::cout << "did final out set_diag\n";
 
   return std::make_tuple(true, "");
   }
