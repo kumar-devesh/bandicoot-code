@@ -4,7 +4,7 @@
 #LIB_FLAGS = -lOpenCL -lclBLAS -larmadillo -llapack -lblas
 LIB_FLAGS = -lOpenCL -lclBLAS -lnvrtc -lcudart -lcublas -lcuda -lcurand -lcusolver -llapack -lblas -larmadillo
 
-CXX_FLAGS = -std=c++11 -Wshadow -Wall -pedantic -O0 -I../include/ -g -DCOOT_USE_U64S64 -DCOOT_EXTRA_DEBUG
+CXX_FLAGS = -std=c++11 -Wshadow -Wall -pedantic -O0 -I../include/ -g -DCOOT_USE_U64S64
 # To compile these tests, select a backend by uncommenting one of the following
 # lines.
 #BACKEND = CL_BACKEND
