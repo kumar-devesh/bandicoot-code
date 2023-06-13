@@ -44,6 +44,7 @@ struct strip_diagmat< Op<T1, op_diagmat> >
     {
     coot_extra_debug_sigprint();
     std::cout << "strip_diagmat with outer diagmat\n";
+    std::cout << "T1 type: " << typeid(T1).name() << "\n";
     }
 
   static constexpr bool do_diagmat = true;
