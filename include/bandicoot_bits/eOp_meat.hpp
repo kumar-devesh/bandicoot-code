@@ -68,6 +68,7 @@ inline
 eOp<T1, eop_type>::~eOp()
   {
   coot_extra_debug_sigprint();
+  std::cout << "free eOp " << this << "\n";
   }
 
 

@@ -796,7 +796,7 @@ Mat<eT>::operator=(const eOp<T1, eop_type>& X)
   // eop_core currently forcefully unwraps submatrices to matrices,
   // so currently there can't be dangerous aliasing with the out matrix
 
-  std::cout << "get size of eOp: " << X.get_n_rows() << " x " << X.get_n_cols() << "\n";
+  std::cout << "get size of eOp (" << &X << "): " << X.get_n_rows() << " x " << X.get_n_cols() << "\n";
   set_size(X.get_n_rows(), X.get_n_cols());
 
   eop_type::apply(*this, X);
