@@ -113,6 +113,8 @@ diagmat(const Op<T1, op_htrans2>& X)
 
   std::cout << "create new eop_scalar_times and strip htrans\n";
   eOp<T1, eop_scalar_times> inner(X.m, X.aux);
+  std::cout << "T1: " << typeid(T1).name() << "\n";
+  std::cout << "size of inner object is " << inner.get_n_rows() << " x " << inner.get_n_cols() << "\n";
   return Op<eOp<T1, eop_scalar_times>, op_diagmat>(inner);
   }
 
