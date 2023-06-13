@@ -111,6 +111,7 @@ diagmat(const Op<T1, op_htrans2>& X)
   {
   coot_extra_debug_sigprint();
 
+  std::cout << "create new eop_scalar_times and strip htrans\n";
   eOp<T1, eop_scalar_times> inner(X.m, X.aux);
   return Op<eOp<T1, eop_scalar_times>, op_diagmat>(inner);
   }
