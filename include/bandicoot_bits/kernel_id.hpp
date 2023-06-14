@@ -554,6 +554,8 @@ struct twoway_kernel_id
     symmatu,
     symmatl,
     //
+    cross,
+    //
     invalid_kernel
     };
 
@@ -725,6 +727,8 @@ struct twoway_kernel_id
 
     names.push_back("symmatu");
     names.push_back("symmatl");
+
+    names.push_back("cross");
 
     return names;
     }
