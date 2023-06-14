@@ -97,7 +97,7 @@ TEMPLATE_TEST_CASE("det_arma_comparison", "[det]", float, double)
 
     Mat<eT> x(dim, dim);
     x.randu();
-    x.diag() += 0.5;
+    x.diag() += 1.5;
 
     arma::Mat<eT> x_cpu(x);
 
