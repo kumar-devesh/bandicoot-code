@@ -95,32 +95,6 @@ diagmat(const Op<T1, op_htrans>& X, const sword k)
 
 
 
-// simplification: diagmat(scalar * Base.t()) -> diagmat(htrans2(Base))
-// this gives a form that partial_unwrap will be able to better handle
-
-template<typename T1>
-coot_warn_unused
-coot_inline
-typename
-enable_if2
-  <
-  is_coot_type<T1>::value,
-  const Op<eOp<T1, eop_scalar_times>, op_diagmat>
-  >::result
-diagmat(const Op<T1, op_htrans2>& X)
-  {
-  coot_extra_debug_sigprint();
-
-  std::cout << "create new eop_scalar_times and strip htrans\n";
-  eOp<T1, eop_scalar_times> inner(X.m, X.aux);
-  std::cout << "T1: " << typeid(T1).name() << "\n";
-  std::cout << "size of inner object is " << inner.get_n_rows() << " x " << inner.get_n_cols() << "\n";
-  std::cout << "inner addr is " << &inner << "\n";
-  return Op<eOp<T1, eop_scalar_times>, op_diagmat>(inner);
-  }
-
-
-
 template<typename T1>
 coot_warn_unused
 coot_inline
