@@ -20,7 +20,7 @@ reorder_cols(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword n_rows, cons
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::repmat(): OpenCL runtime not valid" );
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::reorder_cols(): OpenCL runtime not valid" );
 
   runtime_t::cq_guard guard;
 

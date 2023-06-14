@@ -1,4 +1,4 @@
-// Copyright 2021 Ryan Curtin (http://www.ratml.org/)
+// Copyright 2023 Ryan Curtin (http://www.ratml.org/)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ reorder_cols(dev_mem_t<eT> out, const dev_mem_t<eT> mem, const uword n_rows, con
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "coot::cuda::eig_sym(): cuda runtime not valid");
+  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "coot::cuda::reorder_cols(): CUDA runtime not valid");
 
   // If the input is empty, don't do anything.
   if (out_n_cols == 0 || n_rows == 0)
