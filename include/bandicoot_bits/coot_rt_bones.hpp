@@ -70,10 +70,13 @@ class coot_rt_t
   static inline void copy_subview(dev_mem_t<out_eT> dest, dev_mem_t<in_eT> src, const uword aux_row1, const uword aux_col1, const uword M_n_rows, const uword M_n_cols, const uword n_rows, const uword n_cols);
 
   template<typename eT>
-  static inline void extract_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword in_mem_offset, const uword n_rows, const uword len);
+  static inline void reorder_cols(dev_mem_t<eT> out, const dev_mem_t<eT> mem, const uword n_rows, const dev_mem_t<uword> order, const uword out_n_cols);
 
   template<typename eT>
-  static inline void set_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword in_mem_offset, const uword n_rows, const uword len);
+  static inline void extract_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword in_mem_offset, const uword n_rows, const uword len);
+
+  template<typename eT2, typename eT1>
+  static inline void set_diag(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword in_mem_offset, const uword n_rows, const uword len);
 
   template<typename eT>
   static inline void copy_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword out_mem_offset, const uword in_mem_offset, const uword out_n_rows, const uword in_n_rows, const uword len);
@@ -92,6 +95,9 @@ class coot_rt_t
 
   template<typename eT1, typename eT2>
   static inline void inplace_op_subview(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword M_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const twoway_kernel_id::enum_id num, const char* identifier);
+
+  template<typename eT>
+  static inline void replace(dev_mem_t<eT> mem, const uword n_elem, const eT val_find, const eT val_replace);
 
   template<typename eT1, typename eT2>
   static inline void htrans(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword n_rows, const uword n_cols);
@@ -140,6 +146,9 @@ class coot_rt_t
 
   template<typename eT1, typename eT2>
   static inline bool any_vec(const dev_mem_t<eT1> mem, const uword n_elem, const eT2 val, const twoway_kernel_id::enum_id num, const twoway_kernel_id::enum_id num_small);
+
+  template<typename eT>
+  static inline bool any_vec(const dev_mem_t<eT> mem, const uword n_elem, const eT val, const oneway_real_kernel_id::enum_id num, const oneway_real_kernel_id::enum_id num_small);
 
   template<typename eT1, typename eT2>
   static inline void any(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> in_mem, const uword n_rows, const uword n_cols, const eT2 val, const twoway_kernel_id::enum_id num, const bool colwise);

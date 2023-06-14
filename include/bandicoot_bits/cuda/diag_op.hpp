@@ -53,18 +53,18 @@ extract_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword mem_offset, 
 /**
  * Set a diagonal in a matrix to the values in a given vector.
  */
-template<typename eT>
+template<typename eT2, typename eT1>
 inline
 void
-set_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword mem_offset, const uword n_rows, const uword len)
+set_diag(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword mem_offset, const uword n_rows, const uword len)
   {
   coot_extra_debug_sigprint();
 
   if (len == 0) { return; }
 
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::set_diag);
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT2, eT1>(twoway_kernel_id::set_diag);
 
-  eT* start_mem = out.cuda_mem_ptr + mem_offset;
+  eT2* start_mem = out.cuda_mem_ptr + mem_offset;
   const void* args[] = {
       &start_mem,
       &(in.cuda_mem_ptr),
