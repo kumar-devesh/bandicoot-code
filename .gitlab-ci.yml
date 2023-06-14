@@ -26,11 +26,11 @@ test-cuda:
     cd tests
     make clean && BACKEND=CUDA_BACKEND make -j2
     export CUDA_VISIBLE_DEVICES=0
-    ./main [pinv]
-    #export CUDA_VISIBLE_DEVICES=1
-    #./main
-    #export CUDA_VISIBLE_DEVICES=2
-    #./main
+    ./main
+    export CUDA_VISIBLE_DEVICES=1
+    ./main
+    export CUDA_VISIBLE_DEVICES=2
+    ./main
 
 test-opencl:
   tags: [gpu]
@@ -40,4 +40,4 @@ test-opencl:
     cd tests
     make clean && BACKEND=CL_BACKEND make -j2
     export CUDA_VISIBLE_DEVICES=0
-    ./main [pinv]
+    ./main
