@@ -409,6 +409,7 @@ namespace coot
       #include "bandicoot_bits/opencl/eig_sym.hpp"
       #include "bandicoot_bits/opencl/prod.hpp"
       #include "bandicoot_bits/opencl/det.hpp"
+      #include "bandicoot_bits/opencl/rotate_180.hpp"
       }
   #endif
 
@@ -460,6 +461,7 @@ namespace coot
     #include "bandicoot_bits/cuda/eig_sym.hpp"
     #include "bandicoot_bits/cuda/prod.hpp"
     #include "bandicoot_bits/cuda/det.hpp"
+    #include "bandicoot_bits/cuda/rotate_180.hpp"
     }
   #endif
 
