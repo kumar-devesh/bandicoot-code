@@ -2988,3 +2988,32 @@ coot_rt_t::symmat(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword size,
     coot_stop_runtime_error("coot_rt::symmat(): unknown backend");
     }
   }
+
+
+
+template<typename eT>
+inline
+void
+coot_rt_t::rotate_180(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword n_rows, const uword n_cols)
+  {
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    opencl::rotate_180(out, in, n_rows, n_cols);
+    #else
+    coot_stop_runtime_error("coot_rt::rotate_180(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    cuda::rotate_180(out, in, n_rows, n_cols);
+    #else
+    coot_stop_runtime_error("coot_rt::rotate_180(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::rotate_180(): unknown backend");
+    }
+  }

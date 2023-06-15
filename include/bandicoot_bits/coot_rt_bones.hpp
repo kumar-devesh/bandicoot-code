@@ -311,6 +311,9 @@ class coot_rt_t
   template<typename eT1, typename eT2>
   static inline void symmat(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword size, const uword lower);
 
+  template<typename eT>
+  static inline void rotate_180(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword n_rows, const uword n_cols);
+
   static inline void synchronise();
 
   // RC-TODO: unified interface for some other operations?
