@@ -135,6 +135,8 @@ struct oneway_kernel_id
     symmatu_inplace,
     symmatl_inplace,
     //
+    rotate_180,
+    //
     invalid_kernel
     };
 
@@ -229,6 +231,8 @@ struct oneway_kernel_id
 
     names.push_back("symmatu_inplace");
     names.push_back("symmatl_inplace");
+
+    names.push_back("rotate_180");
 
     return names;
     }
