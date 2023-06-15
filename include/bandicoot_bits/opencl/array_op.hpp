@@ -110,7 +110,7 @@ copy_array(dev_mem_t<out_eT> dest, const dev_mem_t<in_eT> src, const uword n_ele
 template<typename eT>
 inline
 void
-copy_subview(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword aux_row1, const uword aux_col1, const uword M_n_rows, const uword M_n_cols, const uword n_rows, const uword n_cols)
+copy_subview(dev_mem_t<eT> dest, const uword dest_offset, const dev_mem_t<eT> src, const uword aux_row1, const uword aux_col1, const uword M_n_rows, const uword M_n_cols, const uword n_rows, const uword n_cols)
   {
   coot_extra_debug_sigprint();
 
@@ -126,8 +126,8 @@ copy_subview(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword aux_row1, 
 
   // TODO: is using clEnqueueCopyBufferRect actually faster than using a dedicated kernel?
 
-  size_t src_origin[3] = { aux_row1 * sizeof(eT), aux_col1, 0 };
-  size_t dst_origin[3] = { 0, 0, 0 };
+  size_t src_origin[3] = { aux_row1 * sizeof(eT),    aux_col1, 0 };
+  size_t dst_origin[3] = { dest_offset * sizeof(eT), 0,        0 };
 
   size_t region[3] = { n_rows * sizeof(eT), n_cols, 1 };
 
@@ -139,7 +139,7 @@ copy_subview(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword aux_row1, 
 
   cl_int status = clEnqueueCopyBufferRect(get_rt().cl_rt.get_cq(), src.cl_mem_ptr, dest.cl_mem_ptr, src_origin, dst_origin, region, src_row_pitch, src_slice_pitch, dst_row_pitch, dst_slice_pitch, 0, NULL, NULL);
 
-  coot_check_runtime_error( (status != 0), "coot::opencl::copy_subview(): couldn't copy buffer");
+  coot_check_cl_error( status, "coot::opencl::copy_subview(): couldn't copy buffer");
   }
 
 
@@ -147,7 +147,7 @@ copy_subview(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword aux_row1, 
 template<typename out_eT, typename in_eT>
 inline
 void
-copy_subview(dev_mem_t<out_eT> dest, const dev_mem_t<in_eT> src, const uword aux_row1, const uword aux_col1, const uword M_n_rows, const uword /* M_n_cols */, const uword n_rows, const uword n_cols)
+copy_subview(dev_mem_t<out_eT> dest, const uword dest_offset, const dev_mem_t<in_eT> src, const uword aux_row1, const uword aux_col1, const uword M_n_rows, const uword /* M_n_cols */, const uword n_rows, const uword n_cols)
   {
   coot_extra_debug_sigprint();
 
@@ -161,16 +161,18 @@ copy_subview(dev_mem_t<out_eT> dest, const dev_mem_t<in_eT> src, const uword aux
   runtime_t::adapt_uword a_M_n_rows(M_n_rows);
   runtime_t::adapt_uword a_n_rows(n_rows);
   runtime_t::adapt_uword a_n_cols(n_cols);
+  runtime_t::adapt_uword cl_dest_offset(dest_offset);
 
   cl_int status = 0;
 
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &(dest.cl_mem_ptr) );
-  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &( src.cl_mem_ptr) );
-  status |= clSetKernelArg(kernel, 2, a_aux_row1.size, a_aux_row1.addr   );
-  status |= clSetKernelArg(kernel, 3, a_aux_col1.size, a_aux_col1.addr   );
-  status |= clSetKernelArg(kernel, 4, a_M_n_rows.size, a_M_n_rows.addr   );
-  status |= clSetKernelArg(kernel, 5, a_n_rows.size,   a_n_rows.addr     );
-  status |= clSetKernelArg(kernel, 6, a_n_cols.size,   a_n_cols.addr     );
+  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem),      &(dest.cl_mem_ptr) );
+  status |= clSetKernelArg(kernel, 1, cl_dest_offset.size, cl_dest_offset.addr);
+  status |= clSetKernelArg(kernel, 2, sizeof(cl_mem),      &( src.cl_mem_ptr) );
+  status |= clSetKernelArg(kernel, 3, a_aux_row1.size,     a_aux_row1.addr   );
+  status |= clSetKernelArg(kernel, 4, a_aux_col1.size,     a_aux_col1.addr   );
+  status |= clSetKernelArg(kernel, 5, a_M_n_rows.size,     a_M_n_rows.addr   );
+  status |= clSetKernelArg(kernel, 6, a_n_rows.size,       a_n_rows.addr     );
+  status |= clSetKernelArg(kernel, 7, a_n_cols.size,       a_n_cols.addr     );
 
   const size_t global_work_size[2] = { n_rows, n_cols };
 
@@ -178,5 +180,56 @@ copy_subview(dev_mem_t<out_eT> dest, const dev_mem_t<in_eT> src, const uword aux
 
   status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 2, NULL, global_work_size, NULL, 0, NULL, NULL);
 
-  coot_check_runtime_error( (status != 0), "coot::opencl::copy_subview(): couldn't copy buffer");
+  coot_check_cl_error( status, "coot::opencl::copy_subview(): couldn't copy buffer");
+  }
+
+
+
+/**
+ * Use OpenCL to extract a subview into the place of another subview.
+ */
+template<typename eT>
+inline
+void
+copy_subview_to_subview(dev_mem_t<eT> dest,
+                        const uword dest_aux_row1,
+                        const uword dest_aux_col1,
+                        const uword dest_M_n_rows,
+                        const uword dest_M_n_cols,
+                        const dev_mem_t<eT> src,
+                        const uword src_aux_row1,
+                        const uword src_aux_col1,
+                        const uword src_M_n_rows,
+                        const uword src_M_n_cols,
+                        const uword n_rows,
+                        const uword n_cols)
+  {
+  coot_extra_debug_sigprint();
+
+  runtime_t::cq_guard guard;
+
+  // treat the matrix as an image rotated 90 degrees
+  // width  of img = number of rows
+  // height of img = number of cols
+
+  // whoever designed the API for clEnqueueCopyBufferRect() should be permanently removed from the gene pool;
+  // the starting row needs to be multiplied by the element size,
+  // because it was too logical to add a separate "size of element" argument
+
+  // TODO: is using clEnqueueCopyBufferRect actually faster than using a dedicated kernel?
+
+  size_t src_origin[3] = { src_aux_row1 * sizeof(eT),  src_aux_col1,  0 };
+  size_t dst_origin[3] = { dest_aux_row1 * sizeof(eT), dest_aux_col1, 0 };
+
+  size_t region[3] = { n_rows * sizeof(eT), n_cols, 1 };
+
+  size_t src_row_pitch   = sizeof(eT) * src_M_n_rows;
+  size_t src_slice_pitch = sizeof(eT) * src_M_n_cols * src_M_n_rows;
+
+  size_t dst_row_pitch   = sizeof(eT) * dest_M_n_rows;
+  size_t dst_slice_pitch = sizeof(eT) * dest_M_n_cols * dest_M_n_rows;
+
+  cl_int status = clEnqueueCopyBufferRect(get_rt().cl_rt.get_cq(), src.cl_mem_ptr, dest.cl_mem_ptr, src_origin, dst_origin, region, src_row_pitch, src_slice_pitch, dst_row_pitch, dst_slice_pitch, 0, NULL, NULL);
+
+  coot_check_cl_error( status, "coot::opencl::copy_subview_to_subview(): couldn't copy buffer");
   }

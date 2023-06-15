@@ -104,7 +104,7 @@ subview<eT>::inplace_op(const eT val, oneway_kernel_id::enum_id kernel)
 
   if(n_elem == 0)  { return; }
 
-  coot_rt_t::inplace_op_subview(m.dev_mem, val, aux_row1, aux_col1, n_rows, n_cols, m.n_rows, kernel);
+  coot_rt_t::inplace_op_subview(m.dev_mem, 0, val, aux_row1, aux_col1, n_rows, n_cols, m.n_rows, kernel);
   }
 
 
@@ -620,7 +620,7 @@ subview<eT>::extract(Mat<eT1>& out, const subview<eT>& in)
     return;
     }
 
-  coot_rt_t::copy_subview(out.get_dev_mem(false), in.m.get_dev_mem(false), in.aux_row1, in.aux_col1, in.m.n_rows, in.m.n_cols, in.n_rows, in.n_cols);
+  coot_rt_t::copy_subview(out.get_dev_mem(false), 0, in.m.get_dev_mem(false), in.aux_row1, in.aux_col1, in.m.n_rows, in.m.n_cols, in.n_rows, in.n_cols);
 
 //  size_t src_origin[3] = { in.aux_row1*sizeof(eT), in.aux_col1, 0 };
 //  size_t dst_origin[3] = { 0, 0, 0 };
