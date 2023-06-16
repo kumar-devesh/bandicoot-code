@@ -31,20 +31,16 @@ glue_conv2::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_conv2>& in)
 
   typedef typename T1::elem_type eT;
 
-  const Mat<eT>& A = (UA.M.n_elem >= UB.M.n_elem) ? UA.M : UB.M;
-  const Mat<eT>& K = (UA.M.n_elem >= UB.M.n_elem) ? UB.M : UA.M;
+  // We compute with A, the "constant" matrix, and K, the "kernel" that we rotate.
+  // Armadillo selects the "kernel" based on maximum number of elements.
+  // However, here we use the number of rows; our code that repacks A into a format where we can use gemvs to compute the result requires it.
+  const Mat<eT>& A = (UA.M.n_rows >= UB.M.n_rows) ? UA.M : UB.M;
+  const Mat<eT>& K = (UA.M.n_rows >= UB.M.n_rows) ? UB.M : UA.M;
 
   // The kernel "K" needs to be repacked into a vector in a specific way:
   // Specifically, we need to flip K and store it in a column-major form.
   Col<eT> K_mod(K.n_elem);
   coot_rt_t::rotate_180(K_mod.get_dev_mem(false), K.get_dev_mem(false), K.n_rows, K.n_cols);
-
-  // Assuming also that "full" is what we are doing.
-
-  const uword out_n_rows = A.n_rows + K.n_rows - 1;
-  const uword out_n_cols = A.n_cols + K.n_cols - 1;
-
-  out.set_size(out_n_rows, out_n_cols);
 
   // First let's start with the trivial implementation.
   // Here we treat the smaller matrix (the kernel, call it B) as a row vector.
@@ -56,14 +52,74 @@ glue_conv2::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_conv2>& in)
   // The output of the gemv call is a row of the output matrix.
   // Then we will iterate over rows (B.n_rows) and do the same thing to get each row of the output matrix.
 
+  Mat<eT> buffer;
+  const uword mode = in.aux_uword;
+
+  if (mode == 0)
+    {
+    // "full"
+    create_gemv_full_buffer(buffer, A, K);
+
+    const uword out_n_rows = A.n_rows + K.n_rows - 1;
+    const uword out_n_cols = A.n_cols + K.n_cols - 1;
+
+    out.set_size(out_n_rows, out_n_cols);
+    }
+  else
+    {
+    // "same"
+    create_gemv_same_buffer(buffer, A, K);
+
+    // The output is the same size as the input.
+    // TODO: what if we switched A and B?
+    out.set_size(A.n_rows, A.n_cols);
+    }
+
+//  buffer.print("buffer");
+
+  // Multiplying the flattened kernel with each row of the buffer will give us our results.
+  for (uword i = 0; i < out.n_cols; ++i)
+    {
+//    std::cout << "i " << i << "\n";
+//    std::cout << "A_offset: " << i * K_mod.n_rows << "\n";
+//    std::cout << "A_n_rows: " << K_mod.n_elem << "\n";
+//    std::cout << "lda: " << buffer.n_rows << "\n";
+//    std::cout << "A_n_cols: " << buffer.n_cols << "\n";
+    // Now multiply a batch of patches with the kernel.
+    coot_rt_t::gemv<eT, true>(out.get_dev_mem(false),
+                              i * out.n_rows,
+                              1,
+                              buffer.get_dev_mem(false),
+                              i * K.n_rows,
+                              K.n_elem, // this is the number of rows in each column
+                              buffer.n_rows, // this is the actual number of rows in `buffer`
+                              buffer.n_cols,
+                              K_mod.get_dev_mem(false),
+                              0,
+                              1,
+                              1.0,
+                              0.0);
+
+//    out.print("out");
+    }
+  }
+
+
+
+template<typename eT>
+inline
+void
+glue_conv2::create_gemv_full_buffer(Mat<eT>& buffer, const Mat<eT>& A, const Mat<eT>& K)
+  {
+  coot_extra_debug_sigprint();
+
   const uword kernel_rows = K.n_rows;
   const uword kernel_cols = K.n_cols;
 
-  // Before trying blocking, let's just duplicate everything.
   const uword buffer_n_rows = kernel_rows * (A.n_cols + 2 * (kernel_cols - 1));
   const uword buffer_n_cols = A.n_rows + kernel_rows - 1;
 
-  Mat<eT> buffer(buffer_n_rows, buffer_n_cols);
+  buffer.set_size(buffer_n_rows, buffer_n_cols);
 
   // The top and bottom rows of the buffer correspond to sections where K's columns do not fully overlap with A's columns.
   // We zero these out with operations equivalent to the following:
@@ -81,7 +137,7 @@ glue_conv2::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_conv2>& in)
   coot_rt_t::inplace_op_subview(buffer.get_dev_mem(false),
                                 0,
                                 (eT) 0,
-                                kernel_rows * (A.n_rows + kernel_cols - 1),
+                                kernel_rows * (A.n_cols + kernel_cols - 1),
                                 0,
                                 kernel_rows * (kernel_cols - 1),
                                 buffer.n_cols,
@@ -175,28 +231,43 @@ glue_conv2::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_conv2>& in)
                                   A.n_cols,
                                   kernel_rows,
                                   oneway_kernel_id::submat_inplace_set_scalar);
-
     }
+  }
 
-  for (uword i = 0; i < A.n_cols + kernel_cols - 1; ++i)
+
+
+template<typename eT>
+inline
+void
+glue_conv2::create_gemv_same_buffer(Mat<eT>& buffer, const Mat<eT>& A, const Mat<eT>& K)
+  {
+  coot_extra_debug_sigprint();
+
+  // This is the same as create_gemv_full_buffer()---but we don't need any of the zero padding.
+  // So we only need to consider the region where A and K overlap fully.
+
+  const uword kernel_rows = K.n_rows;
+
+  const uword buffer_n_rows = kernel_rows * A.n_cols;
+  const uword buffer_n_cols = A.n_rows;
+
+  buffer.set_size(buffer_n_rows, buffer_n_cols);
+
+  for (uword i = 0; i < A.n_rows - (kernel_rows - 1); ++i)
     {
-    // Now multiply a batch of patches with the kernel.
-    coot_rt_t::gemv<eT, true>(out.get_dev_mem(false),
-                              i * out.n_rows,
-                              1,
-                              buffer.get_dev_mem(false),
-                              i * kernel_cols,
-                              K_mod.n_elem, // this is the number of rows in each column
-                              buffer.n_rows, // this is the actual number of rows in `buffer`
-                              buffer.n_cols,
-                              K_mod.get_dev_mem(false),
-                              0,
-                              1,
-                              1.0,
-                              0.0);
+    // Copy each individual block.
+    // Equivalent to:
+    //    buffer.col(i) = vectorise(A.submat(i, 0, i + kernel_rows - 1, A.n_cols - 1))
+    coot_rt_t::copy_subview(buffer.get_dev_mem(false),
+                            i * buffer_n_rows,
+                            A.get_dev_mem(false),
+                            i,
+                            0,
+                            A.n_rows,
+                            A.n_cols,
+                            kernel_rows,
+                            A.n_cols);
     }
-
-  // It would be nice to also try this without the extraction step.
   }
 
 

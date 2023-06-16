@@ -22,6 +22,12 @@ class glue_conv2
   template<typename out_eT, typename T1, typename T2>
   inline static void apply(Mat<out_eT>& out, const Glue<T1, T2, glue_conv2>& in);
 
+  template<typename eT>
+  inline static void create_gemv_full_buffer(Mat<eT>& buffer, const Mat<eT>& A, const Mat<eT>& K);
+
+  template<typename eT>
+  inline static void create_gemv_same_buffer(Mat<eT>& buffer, const Mat<eT>& A, const Mat<eT>& K);
+
   template<typename T1, typename T2> inline static uword compute_n_rows(const Glue<T1, T2, glue_conv2>& glue, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols);
   template<typename T1, typename T2> inline static uword compute_n_cols(const Glue<T1, T2, glue_conv2>& glue, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols);
   };
