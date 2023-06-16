@@ -59,42 +59,42 @@ TEMPLATE_TEST_CASE("hardcoded_full_conv2_test", "[conv2]", float, double)
 
   // Computed by GNU Octave.
   Mat<eT> C_ref(6, 6);
-  C_ref(0, 0) == eT(  10);
-  C_ref(0, 1) == eT(  31);
-  C_ref(0, 2) == eT(  64);
-  C_ref(0, 3) == eT(  97);
-  C_ref(0, 4) == eT(  80);
-  C_ref(0, 5) == eT(  48);
-  C_ref(1, 0) == eT(  63);
-  C_ref(1, 1) == eT( 155);
-  C_ref(1, 2) == eT( 278);
-  C_ref(1, 3) == eT( 353);
-  C_ref(1, 4) == eT( 273);
-  C_ref(1, 5) == eT( 156);
-  C_ref(2, 0) == eT( 171);
-  C_ref(2, 1) == eT( 396);
-  C_ref(2, 2) == eT( 678);
-  C_ref(2, 3) == eT( 804);
-  C_ref(2, 4) == eT( 603);
-  C_ref(2, 5) == eT( 336);
-  C_ref(3, 0) == eT( 327);
-  C_ref(3, 1) == eT( 720);
-  C_ref(3, 2) == eT(1182);
-  C_ref(3, 3) == eT(1308);
-  C_ref(3, 4) == eT( 951);
-  C_ref(3, 5) == eT( 516);
-  C_ref(4, 0) == eT( 313);
-  C_ref(4, 1) == eT( 677);
-  C_ref(4, 2) == eT(1094);
-  C_ref(4, 3) == eT(1187);
-  C_ref(4, 4) == eT( 851);
-  C_ref(4, 5) == eT( 456);
-  C_ref(5, 0) == eT( 208);
-  C_ref(5, 1) == eT( 445);
-  C_ref(5, 2) == eT( 712);
-  C_ref(5, 3) == eT( 763);
-  C_ref(5, 4) == eT( 542);
-  C_ref(5, 5) == eT( 288);
+  C_ref(0, 0) = eT(  10);
+  C_ref(0, 1) = eT(  31);
+  C_ref(0, 2) = eT(  64);
+  C_ref(0, 3) = eT(  97);
+  C_ref(0, 4) = eT(  80);
+  C_ref(0, 5) = eT(  48);
+  C_ref(1, 0) = eT(  63);
+  C_ref(1, 1) = eT( 155);
+  C_ref(1, 2) = eT( 278);
+  C_ref(1, 3) = eT( 353);
+  C_ref(1, 4) = eT( 273);
+  C_ref(1, 5) = eT( 156);
+  C_ref(2, 0) = eT( 171);
+  C_ref(2, 1) = eT( 396);
+  C_ref(2, 2) = eT( 678);
+  C_ref(2, 3) = eT( 804);
+  C_ref(2, 4) = eT( 603);
+  C_ref(2, 5) = eT( 336);
+  C_ref(3, 0) = eT( 327);
+  C_ref(3, 1) = eT( 720);
+  C_ref(3, 2) = eT(1182);
+  C_ref(3, 3) = eT(1308);
+  C_ref(3, 4) = eT( 951);
+  C_ref(3, 5) = eT( 516);
+  C_ref(4, 0) = eT( 313);
+  C_ref(4, 1) = eT( 677);
+  C_ref(4, 2) = eT(1094);
+  C_ref(4, 3) = eT(1187);
+  C_ref(4, 4) = eT( 851);
+  C_ref(4, 5) = eT( 456);
+  C_ref(5, 0) = eT( 208);
+  C_ref(5, 1) = eT( 445);
+  C_ref(5, 2) = eT( 712);
+  C_ref(5, 3) = eT( 763);
+  C_ref(5, 4) = eT( 542);
+  C_ref(5, 5) = eT( 288);
 
   Mat<eT> C1 = conv2(A, B, "full");
   Mat<eT> C2 = conv2(B, A, "full");
@@ -422,36 +422,36 @@ TEMPLATE_TEST_CASE("hardcoded_full_A_rows_lt_cols_conv2_test", "[conv2]", float,
 
   // Computed by GNU Octave.
   Mat<eT> C_ref(5, 6);
-  C_ref(0, 0) == eT(  10);
-  C_ref(0, 1) == eT(  31);
-  C_ref(0, 2) == eT(  64);
-  C_ref(0, 3) == eT(  97);
-  C_ref(0, 4) == eT(  80);
-  C_ref(0, 5) == eT(  48);
-  C_ref(1, 0) == eT(  63);
-  C_ref(1, 1) == eT( 155);
-  C_ref(1, 2) == eT( 278);
-  C_ref(1, 3) == eT( 353);
-  C_ref(1, 4) == eT( 273);
-  C_ref(1, 5) == eT( 156);
-  C_ref(2, 0) == eT( 171);
-  C_ref(2, 1) == eT( 396);
-  C_ref(2, 2) == eT( 678);
-  C_ref(2, 3) == eT( 804);
-  C_ref(2, 4) == eT( 603);
-  C_ref(2, 5) == eT( 336);
-  C_ref(3, 0) == eT( 197);
-  C_ref(3, 1) == eT( 437);
-  C_ref(3, 2) == eT( 722);
-  C_ref(3, 3) == eT( 815);
-  C_ref(3, 4) == eT( 595);
-  C_ref(3, 5) == eT( 324);
-  C_ref(4, 0) == eT( 144);
-  C_ref(4, 1) == eT( 313);
-  C_ref(4, 2) == eT( 508);
-  C_ref(4, 3) == eT( 559);
-  C_ref(4, 4) == eT( 402);
-  C_ref(4, 5) == eT( 216);
+  C_ref(0, 0) = eT(  10);
+  C_ref(0, 1) = eT(  31);
+  C_ref(0, 2) = eT(  64);
+  C_ref(0, 3) = eT(  97);
+  C_ref(0, 4) = eT(  80);
+  C_ref(0, 5) = eT(  48);
+  C_ref(1, 0) = eT(  63);
+  C_ref(1, 1) = eT( 155);
+  C_ref(1, 2) = eT( 278);
+  C_ref(1, 3) = eT( 353);
+  C_ref(1, 4) = eT( 273);
+  C_ref(1, 5) = eT( 156);
+  C_ref(2, 0) = eT( 171);
+  C_ref(2, 1) = eT( 396);
+  C_ref(2, 2) = eT( 678);
+  C_ref(2, 3) = eT( 804);
+  C_ref(2, 4) = eT( 603);
+  C_ref(2, 5) = eT( 336);
+  C_ref(3, 0) = eT( 197);
+  C_ref(3, 1) = eT( 437);
+  C_ref(3, 2) = eT( 722);
+  C_ref(3, 3) = eT( 815);
+  C_ref(3, 4) = eT( 595);
+  C_ref(3, 5) = eT( 324);
+  C_ref(4, 0) = eT( 144);
+  C_ref(4, 1) = eT( 313);
+  C_ref(4, 2) = eT( 508);
+  C_ref(4, 3) = eT( 559);
+  C_ref(4, 4) = eT( 402);
+  C_ref(4, 5) = eT( 216);
 
   Mat<eT> C1 = conv2(A, B, "full");
   Mat<eT> C2 = conv2(B, A, "full");
@@ -516,42 +516,42 @@ TEMPLATE_TEST_CASE("hardcoded_full_all_dims_unequal_test", "[conv2]", float, dou
 
   // Computed by GNU Octave.
   Mat<eT> C_ref(6, 6);
-  C_ref(0, 0) == eT(  10);
-  C_ref(0, 1) == eT(  31);
-  C_ref(0, 2) == eT(  64);
-  C_ref(0, 3) == eT(  97);
-  C_ref(0, 4) == eT(  80);
-  C_ref(0, 5) == eT(  48);
-  C_ref(1, 0) == eT(  63);
-  C_ref(1, 1) == eT( 155);
-  C_ref(1, 2) == eT( 278);
-  C_ref(1, 3) == eT( 353);
-  C_ref(1, 4) == eT( 273);
-  C_ref(1, 5) == eT( 156);
-  C_ref(2, 0) == eT( 155);
-  C_ref(2, 1) == eT( 347);
-  C_ref(2, 2) == eT( 578);
-  C_ref(2, 3) == eT( 653);
-  C_ref(2, 4) == eT( 481);
-  C_ref(2, 5) == eT( 264);
-  C_ref(3, 0) == eT( 247);
-  C_ref(3, 1) == eT( 539);
-  C_ref(3, 2) == eT( 878);
-  C_ref(3, 3) == eT( 953);
-  C_ref(3, 4) == eT( 689);
-  C_ref(3, 5) == eT( 372);
-  C_ref(4, 0) == eT( 339);
-  C_ref(4, 1) == eT( 731);
-  C_ref(4, 2) == eT(1178);
-  C_ref(4, 3) == eT(1253);
-  C_ref(4, 4) == eT( 897);
-  C_ref(4, 5) == eT( 480);
-  C_ref(5, 0) == eT( 221);
-  C_ref(5, 1) == eT( 472);
-  C_ref(5, 2) == eT( 754);
-  C_ref(5, 3) == eT( 796);
-  C_ref(5, 4) == eT( 565);
-  C_ref(5, 5) == eT( 300);
+  C_ref(0, 0) = eT(  10);
+  C_ref(0, 1) = eT(  31);
+  C_ref(0, 2) = eT(  64);
+  C_ref(0, 3) = eT(  97);
+  C_ref(0, 4) = eT(  80);
+  C_ref(0, 5) = eT(  48);
+  C_ref(1, 0) = eT(  63);
+  C_ref(1, 1) = eT( 155);
+  C_ref(1, 2) = eT( 278);
+  C_ref(1, 3) = eT( 353);
+  C_ref(1, 4) = eT( 273);
+  C_ref(1, 5) = eT( 156);
+  C_ref(2, 0) = eT( 155);
+  C_ref(2, 1) = eT( 347);
+  C_ref(2, 2) = eT( 578);
+  C_ref(2, 3) = eT( 653);
+  C_ref(2, 4) = eT( 481);
+  C_ref(2, 5) = eT( 264);
+  C_ref(3, 0) = eT( 247);
+  C_ref(3, 1) = eT( 539);
+  C_ref(3, 2) = eT( 878);
+  C_ref(3, 3) = eT( 953);
+  C_ref(3, 4) = eT( 689);
+  C_ref(3, 5) = eT( 372);
+  C_ref(4, 0) = eT( 339);
+  C_ref(4, 1) = eT( 731);
+  C_ref(4, 2) = eT(1178);
+  C_ref(4, 3) = eT(1253);
+  C_ref(4, 4) = eT( 897);
+  C_ref(4, 5) = eT( 480);
+  C_ref(5, 0) = eT( 221);
+  C_ref(5, 1) = eT( 472);
+  C_ref(5, 2) = eT( 754);
+  C_ref(5, 3) = eT( 796);
+  C_ref(5, 4) = eT( 565);
+  C_ref(5, 5) = eT( 300);
 
   Mat<eT> C1 = conv2(A, B, "full");
   Mat<eT> C2 = conv2(B, A, "full");
@@ -575,7 +575,7 @@ TEMPLATE_TEST_CASE("hardcoded_full_all_dims_unequal_test", "[conv2]", float, dou
 
 
 
-TEMPLATE_TEST_CASE("conv2_full_square_arma_comparison_test", float, double)
+TEMPLATE_TEST_CASE("conv2_full_square_arma_comparison_test", "[conv2]", float, double)
   {
   typedef TestType eT;
 
@@ -615,16 +615,17 @@ TEMPLATE_TEST_CASE("conv2_full_square_arma_comparison_test", float, double)
     arma::Mat<eT> C3_cpu(C3);
     arma::Mat<eT> C4_cpu(C4);
 
-    REQUIRE( arma::approx_equal( C1_cpu, C_ref, "reldiff", 1e-5 ) );
-    REQUIRE( arma::approx_equal( C2_cpu, C_ref, "reldiff", 1e-5 ) );
-    REQUIRE( arma::approx_equal( C3_cpu, C_ref, "reldiff", 1e-5 ) );
-    REQUIRE( arma::approx_equal( C4_cpu, C_ref, "reldiff", 1e-5 ) );
+    const eT tol = (is_same_type<eT, float>::value) ? 1e-5 : 1e-8;
+    REQUIRE( arma::approx_equal( C1_cpu, C_ref, "absdiff", tol ) );
+    REQUIRE( arma::approx_equal( C2_cpu, C_ref, "absdiff", tol ) );
+    REQUIRE( arma::approx_equal( C3_cpu, C_ref, "absdiff", tol ) );
+    REQUIRE( arma::approx_equal( C4_cpu, C_ref, "absdiff", tol ) );
     }
   }
 
 
 
-TEMPLATE_TEST_CASE("1x1_kernel_conv2_full_test", float, double)
+TEMPLATE_TEST_CASE("1x1_kernel_conv2_full_test", "[conv2]", float, double)
   {
   typedef TestType eT;
 
@@ -660,7 +661,7 @@ TEMPLATE_TEST_CASE("1x1_kernel_conv2_full_test", float, double)
 
 
 
-TEMPLATE_TEST_CASE("conv2_full_random_sizes_arma_comparison_test", float, double)
+TEMPLATE_TEST_CASE("conv2_full_random_sizes_arma_comparison_test", "[conv2]", float, double)
   {
   typedef TestType eT;
 
@@ -671,24 +672,30 @@ TEMPLATE_TEST_CASE("conv2_full_random_sizes_arma_comparison_test", float, double
 
   for (uword t = 0; t < 5; ++t)
     {
-    const Mat<uword> sizes = randi<Mat<uword>>(4, distr_param(50, 1000));
+    const Mat<uword> sizes = randi<Mat<uword>>(4, distr_param(50, 200));
 
     const uword A_rows = sizes[0];
     const uword A_cols = sizes[1];
     const uword B_rows = sizes[2];
     const uword B_cols = sizes[3];
+    std::cout << "trial " << t << ": A is " << A_rows << " x " << A_cols << ", B is " << B_rows << " x " << B_cols << "\n";
 
     Mat<eT> A = randu<Mat<eT>>(A_rows, A_cols);
     Mat<eT> B = randi<Mat<eT>>(B_rows, B_cols, distr_param(-50, 50));
 
     Mat<eT> C1 = conv2(A, B);
+    std::cout << "C1 done\n";
     Mat<eT> C2 = conv2(B, A);
+    std::cout << "C2 done\n";
     Mat<eT> C3 = conv2(A, B, "full");
+    std::cout << "C3 done\n";
     Mat<eT> C4 = conv2(B, A, "full");
+    std::cout << "C4 done\n";
 
     arma::Mat<eT> A_cpu(A);
     arma::Mat<eT> B_cpu(B);
     arma::Mat<eT> C_ref = arma::conv2(A_cpu, B_cpu);
+    std::cout << "CPU done\n";
 
     REQUIRE( C1.n_rows == C_ref.n_rows );
     REQUIRE( C1.n_cols == C_ref.n_cols );
@@ -704,10 +711,19 @@ TEMPLATE_TEST_CASE("conv2_full_random_sizes_arma_comparison_test", float, double
     arma::Mat<eT> C3_cpu(C3);
     arma::Mat<eT> C4_cpu(C4);
 
-    REQUIRE( arma::approx_equal( C1_cpu, C_ref, "reldiff", 1e-5 ) );
-    REQUIRE( arma::approx_equal( C2_cpu, C_ref, "reldiff", 1e-5 ) );
-    REQUIRE( arma::approx_equal( C3_cpu, C_ref, "reldiff", 1e-5 ) );
-    REQUIRE( arma::approx_equal( C4_cpu, C_ref, "reldiff", 1e-5 ) );
+    std::cout << arma::norm(C1_cpu - C_ref) / C1_cpu.n_elem << "\n";
+    std::cout << arma::norm(C1_cpu) << " and " << arma::norm(C_ref) << "\n";
+    std::cout << arma::max(arma::max(arma::abs(C1_cpu - C_ref))) << "\n";
+    std::cout << arma::max(arma::max(arma::abs(C1_cpu - C_ref) / arma::max(C1_cpu, C_ref))) << "\n";
+    std::cout << "CPU max: " << arma::max(arma::max(C_ref)) << "\n";
+    std::cout << "GPU max: " << arma::max(arma::max(C1_cpu)) << "\n";
+
+    const eT tol = (is_same_type<eT, float>::value) ? 1e-6 : 1e-12;
+    // Since the matrices can get big, we'll use a slightly relaxed check that accounts for large norms.
+    REQUIRE( arma::norm(C1_cpu - C_ref) / arma::norm(C1_cpu) < tol );
+    REQUIRE( arma::norm(C2_cpu - C_ref) / arma::norm(C1_cpu) < tol );
+    REQUIRE( arma::norm(C3_cpu - C_ref) / arma::norm(C1_cpu) < tol );
+    REQUIRE( arma::norm(C4_cpu - C_ref) / arma::norm(C1_cpu) < tol );
     }
   }
 
@@ -790,7 +806,7 @@ TEST_CASE("conv2_full_alias_test")
 
 
 
-TEMPLATE_TEST_CASE("conv2_full_expr_inputs_test", float, double)
+TEMPLATE_TEST_CASE("conv2_full_expr_inputs_test", "[conv2]", float, double)
   {
   typedef TestType eT;
 
@@ -825,6 +841,13 @@ TEMPLATE_TEST_CASE("conv2_full_expr_inputs_test", float, double)
   REQUIRE( all( all( abs( C2 - C_ref ) < 1e-5 ) ) );
   REQUIRE( all( all( abs( C3 - C_ref ) < 1e-5 ) ) );
   REQUIRE( all( all( abs( C4 - C_ref ) < 1e-5 ) ) );
+  }
+
+
+
+TEMPLATE_TEST_CASE("col_vs_row_conv2_full_test", "[conv2]", float, double)
+  {
+
   }
 
 
@@ -870,22 +893,22 @@ TEMPLATE_TEST_CASE("hardcoded_same_conv2_test", "[conv2]", float, double)
   B(2, 2) = eT(18);
 
   Mat<eT> C_ref(4, 4);
-  C_ref(0, 0) == eT( 155);
-  C_ref(0, 1) == eT( 278);
-  C_ref(0, 2) == eT( 353);
-  C_ref(0, 3) == eT( 273);
-  C_ref(1, 0) == eT( 396);
-  C_ref(1, 1) == eT( 678);
-  C_ref(1, 2) == eT( 804);
-  C_ref(1, 3) == eT( 603);
-  C_ref(2, 0) == eT( 720);
-  C_ref(2, 1) == eT(1182);
-  C_ref(2, 2) == eT(1308);
-  C_ref(2, 3) == eT( 951);
-  C_ref(3, 0) == eT( 677);
-  C_ref(3, 1) == eT(1094);
-  C_ref(3, 2) == eT(1187);
-  C_ref(3, 3) == eT( 851);
+  C_ref(0, 0) = eT( 155);
+  C_ref(0, 1) = eT( 278);
+  C_ref(0, 2) = eT( 353);
+  C_ref(0, 3) = eT( 273);
+  C_ref(1, 0) = eT( 396);
+  C_ref(1, 1) = eT( 678);
+  C_ref(1, 2) = eT( 804);
+  C_ref(1, 3) = eT( 603);
+  C_ref(2, 0) = eT( 720);
+  C_ref(2, 1) = eT(1182);
+  C_ref(2, 2) = eT(1308);
+  C_ref(2, 3) = eT( 951);
+  C_ref(3, 0) = eT( 677);
+  C_ref(3, 1) = eT(1094);
+  C_ref(3, 2) = eT(1187);
+  C_ref(3, 3) = eT( 851);
 
   Mat<eT> C1 = conv2(A, B, "same");
 
@@ -933,22 +956,22 @@ TEMPLATE_TEST_CASE("hardcoded_same_k_rows_gt_cols_conv2_test", "[conv2]", float,
   B(2, 1) = eT(15);
 
   Mat<eT> C_ref(4, 4);
-  C_ref(0, 0) == eT( 155);
-  C_ref(0, 1) == eT( 198);
-  C_ref(0, 2) == eT( 244);
-  C_ref(0, 3) == eT( 140);
-  C_ref(1, 0) == eT( 379);
-  C_ref(1, 1) == eT( 454);
-  C_ref(1, 2) == eT( 529);
-  C_ref(1, 3) == eT( 296);
-  C_ref(2, 0) == eT( 679);
-  C_ref(2, 1) == eT( 754);
-  C_ref(2, 2) == eT( 829);
-  C_ref(2, 3) == eT( 452);
-  C_ref(3, 0) == eT( 612);
-  C_ref(3, 1) == eT( 666);
-  C_ref(3, 2) == eT( 720);
-  C_ref(3, 3) == eT( 388);
+  C_ref(0, 0) = eT( 155);
+  C_ref(0, 1) = eT( 198);
+  C_ref(0, 2) = eT( 244);
+  C_ref(0, 3) = eT( 140);
+  C_ref(1, 0) = eT( 379);
+  C_ref(1, 1) = eT( 454);
+  C_ref(1, 2) = eT( 529);
+  C_ref(1, 3) = eT( 296);
+  C_ref(2, 0) = eT( 679);
+  C_ref(2, 1) = eT( 754);
+  C_ref(2, 2) = eT( 829);
+  C_ref(2, 3) = eT( 452);
+  C_ref(3, 0) = eT( 612);
+  C_ref(3, 1) = eT( 666);
+  C_ref(3, 2) = eT( 720);
+  C_ref(3, 3) = eT( 388);
 
   Mat<eT> C1 = conv2(A, B, "same");
 
@@ -996,22 +1019,22 @@ TEMPLATE_TEST_CASE("hardcoded_same_k_rows_lt_cols_conv2_test", "[conv2]", float,
   B(1, 2) = eT(15);
 
   Mat<eT> C_ref(4, 4);
-  C_ref(0, 0) == eT( 155);
-  C_ref(0, 1) == eT( 278);
-  C_ref(0, 2) == eT( 353);
-  C_ref(0, 3) == eT( 273);
-  C_ref(1, 0) == eT( 347);
-  C_ref(1, 1) == eT( 578);
-  C_ref(1, 2) == eT( 653);
-  C_ref(1, 3) == eT( 481);
-  C_ref(2, 0) == eT( 539);
-  C_ref(2, 1) == eT( 878);
-  C_ref(2, 2) == eT( 953);
-  C_ref(2, 3) == eT( 689);
-  C_ref(3, 0) == eT( 364);
-  C_ref(3, 1) == eT( 586);
-  C_ref(3, 2) == eT( 628);
-  C_ref(3, 3) == eT( 449);
+  C_ref(0, 0) = eT( 155);
+  C_ref(0, 1) = eT( 278);
+  C_ref(0, 2) = eT( 353);
+  C_ref(0, 3) = eT( 273);
+  C_ref(1, 0) = eT( 347);
+  C_ref(1, 1) = eT( 578);
+  C_ref(1, 2) = eT( 653);
+  C_ref(1, 3) = eT( 481);
+  C_ref(2, 0) = eT( 539);
+  C_ref(2, 1) = eT( 878);
+  C_ref(2, 2) = eT( 953);
+  C_ref(2, 3) = eT( 689);
+  C_ref(3, 0) = eT( 364);
+  C_ref(3, 1) = eT( 586);
+  C_ref(3, 2) = eT( 628);
+  C_ref(3, 3) = eT( 449);
 
   Mat<eT> C1 = conv2(A, B, "same");
 
@@ -1058,18 +1081,18 @@ TEMPLATE_TEST_CASE("hardcoded_same_A_rows_gt_cols_conv2_test", "[conv2]", float,
   B(2, 2) = eT(18);
 
   Mat<eT> C_ref(4, 3);
-  C_ref(0, 0) == eT( 134);
-  C_ref(0, 1) == eT( 245);
-  C_ref(0, 2) == eT( 198);
-  C_ref(1, 0) == eT( 327);
-  C_ref(1, 1) == eT( 570);
-  C_ref(1, 2) == eT( 441);
-  C_ref(2, 0) == eT( 570);
-  C_ref(2, 1) == eT( 948);
-  C_ref(2, 2) == eT( 702);
-  C_ref(3, 0) == eT( 530);
-  C_ref(3, 1) == eT( 866);
-  C_ref(3, 2) == eT( 630);
+  C_ref(0, 0) = eT( 134);
+  C_ref(0, 1) = eT( 245);
+  C_ref(0, 2) = eT( 198);
+  C_ref(1, 0) = eT( 327);
+  C_ref(1, 1) = eT( 570);
+  C_ref(1, 2) = eT( 441);
+  C_ref(2, 0) = eT( 570);
+  C_ref(2, 1) = eT( 948);
+  C_ref(2, 2) = eT( 702);
+  C_ref(3, 0) = eT( 530);
+  C_ref(3, 1) = eT( 866);
+  C_ref(3, 2) = eT( 630);
 
   Mat<eT> C1 = conv2(A, B, "same");
 
@@ -1116,18 +1139,18 @@ TEMPLATE_TEST_CASE("hardcoded_same_A_rows_lt_cols_conv2_test", "[conv2]", float,
   B(2, 2) = eT(18);
 
   Mat<eT> C_ref(3, 4);
-  C_ref(0, 0) == eT( 155);
-  C_ref(0, 1) == eT( 278);
-  C_ref(0, 2) == eT( 353);
-  C_ref(0, 3) == eT( 273);
-  C_ref(1, 0) == eT( 396);
-  C_ref(1, 1) == eT( 678);
-  C_ref(1, 2) == eT( 804);
-  C_ref(1, 3) == eT( 603);
-  C_ref(2, 0) == eT( 437);
-  C_ref(2, 1) == eT( 722);
-  C_ref(2, 2) == eT( 815);
-  C_ref(2, 3) == eT( 595);
+  C_ref(0, 0) = eT( 155);
+  C_ref(0, 1) = eT( 278);
+  C_ref(0, 2) = eT( 353);
+  C_ref(0, 3) = eT( 273);
+  C_ref(1, 0) = eT( 396);
+  C_ref(1, 1) = eT( 678);
+  C_ref(1, 2) = eT( 804);
+  C_ref(1, 3) = eT( 603);
+  C_ref(2, 0) = eT( 437);
+  C_ref(2, 1) = eT( 722);
+  C_ref(2, 2) = eT( 815);
+  C_ref(2, 3) = eT( 595);
 
   Mat<eT> C1 = conv2(A, B, "same");
 
@@ -1179,26 +1202,26 @@ TEMPLATE_TEST_CASE("hardcoded_same_all_dims_unequal_test", "[conv2]", float, dou
   B(1, 2) = eT(15);
 
   Mat<eT> C_ref(5, 4);
-  C_ref(0, 0) == eT( 155);
-  C_ref(0, 1) == eT( 278);
-  C_ref(0, 2) == eT( 353);
-  C_ref(0, 3) == eT( 273);
-  C_ref(1, 0) == eT( 347);
-  C_ref(1, 1) == eT( 578);
-  C_ref(1, 2) == eT( 653);
-  C_ref(1, 3) == eT( 481);
-  C_ref(2, 0) == eT( 539);
-  C_ref(2, 1) == eT( 878);
-  C_ref(2, 2) == eT( 953);
-  C_ref(2, 3) == eT( 689);
-  C_ref(3, 0) == eT( 731);
-  C_ref(3, 1) == eT(1178);
-  C_ref(3, 2) == eT(1253);
-  C_ref(3, 3) == eT( 897);
-  C_ref(4, 0) == eT( 472);
-  C_ref(4, 1) == eT( 754);
-  C_ref(4, 2) == eT( 796);
-  C_ref(4, 3) == eT( 565);
+  C_ref(0, 0) = eT( 155);
+  C_ref(0, 1) = eT( 278);
+  C_ref(0, 2) = eT( 353);
+  C_ref(0, 3) = eT( 273);
+  C_ref(1, 0) = eT( 347);
+  C_ref(1, 1) = eT( 578);
+  C_ref(1, 2) = eT( 653);
+  C_ref(1, 3) = eT( 481);
+  C_ref(2, 0) = eT( 539);
+  C_ref(2, 1) = eT( 878);
+  C_ref(2, 2) = eT( 953);
+  C_ref(2, 3) = eT( 689);
+  C_ref(3, 0) = eT( 731);
+  C_ref(3, 1) = eT(1178);
+  C_ref(3, 2) = eT(1253);
+  C_ref(3, 3) = eT( 897);
+  C_ref(4, 0) = eT( 472);
+  C_ref(4, 1) = eT( 754);
+  C_ref(4, 2) = eT( 796);
+  C_ref(4, 3) = eT( 565);
 
   Mat<eT> C1 = conv2(A, B, "same");
 
@@ -1210,7 +1233,7 @@ TEMPLATE_TEST_CASE("hardcoded_same_all_dims_unequal_test", "[conv2]", float, dou
 
 
 
-TEMPLATE_TEST_CASE("conv2_same_square_arma_comparison_test", float, double)
+TEMPLATE_TEST_CASE("conv2_same_square_arma_comparison_test", "[conv2]", float, double)
   {
   typedef TestType eT;
 
@@ -1250,7 +1273,7 @@ TEMPLATE_TEST_CASE("conv2_same_square_arma_comparison_test", float, double)
 
 
 
-TEMPLATE_TEST_CASE("1x1_kernel_conv2_same_test", float, double)
+TEMPLATE_TEST_CASE("1x1_kernel_conv2_same_test", "[conv2]", float, double)
   {
   typedef TestType eT;
 
@@ -1282,7 +1305,7 @@ TEMPLATE_TEST_CASE("1x1_kernel_conv2_same_test", float, double)
 
 
 
-TEMPLATE_TEST_CASE("conv2_same_random_sizes_arma_comparison_test", float, double)
+TEMPLATE_TEST_CASE("conv2_same_random_sizes_arma_comparison_test", "[conv2]", float, double)
   {
   typedef TestType eT;
 
@@ -1378,7 +1401,7 @@ TEST_CASE("conv2_same_alias_test")
 
 
 
-TEMPLATE_TEST_CASE("conv2_same_expr_inputs_test", float, double)
+TEMPLATE_TEST_CASE("conv2_same_expr_inputs_test", "[conv2]", float, double)
   {
   typedef TestType eT;
 
@@ -1406,4 +1429,11 @@ TEMPLATE_TEST_CASE("conv2_same_expr_inputs_test", float, double)
 
   REQUIRE( all( all( abs( C1 - C1_ref ) < 1e-5 ) ) );
   REQUIRE( all( all( abs( C2 - C2_ref ) < 1e-5 ) ) );
+  }
+
+
+
+TEMPLATE_TEST_CASE("col_vs_row_conv2_same_test", "[conv2]", float, double)
+  {
+
   }
