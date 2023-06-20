@@ -68,23 +68,22 @@ glue_conv2::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_conv2>& in)
   else
     {
     // "same"
-    create_gemv_same_buffer(buffer, A, K);
-
-    // The output is the same size as the input.
-    // TODO: what if we switched A and B?
-    out.set_size(A.n_rows, A.n_cols);
+    // Note that we have to create the buffer differently depending on what the output size is.
+    if (&A == &UA.M)
+      {
+      create_gemv_same_buffer(buffer, A, K); // output size is A.size()
+      out.set_size(A.n_rows, A.n_cols);
+      }
+    else
+      {
+      create_gemv_same_buffer_small(buffer, A, K); // output size is K.size()
+      out.set_size(K.n_rows, K.n_cols);
+      }
     }
-
-//  buffer.print("buffer");
 
   // Multiplying the flattened kernel with each row of the buffer will give us our results.
   for (uword i = 0; i < out.n_cols; ++i)
     {
-//    std::cout << "i " << i << "\n";
-//    std::cout << "A_offset: " << i * K_mod.n_rows << "\n";
-//    std::cout << "A_n_rows: " << K_mod.n_elem << "\n";
-//    std::cout << "lda: " << buffer.n_rows << "\n";
-//    std::cout << "A_n_cols: " << buffer.n_cols << "\n";
     // Now multiply a batch of patches with the kernel.
     coot_rt_t::gemv<eT, true>(out.get_dev_mem(false),
                               i * out.n_rows,
@@ -99,8 +98,135 @@ glue_conv2::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_conv2>& in)
                               1,
                               1.0,
                               0.0);
+    }
+  }
 
-//    out.print("out");
+
+
+template<typename eT>
+inline
+void
+glue_conv2::fill_gemv_buffer_top_bottom(Mat<eT>& buffer, const uword buffer_top_padding, const uword buffer_bottom_padding, const uword kernel_rows)
+  {
+  // The top and bottom rows of the buffer correspond to sections where K's columns do not fully overlap with A's columns.
+  // We zero these out with operations equivalent to the following:
+  //    buffer.rows(0, kernel_rows * buffer_top_padding - 1) = 0
+  //    buffer.rows(buffer.n_rows - kernel_rows * buffer_bottom_padding, buffer.n_rows - 1) = 0
+  coot_rt_t::inplace_op_subview(buffer.get_dev_mem(false),
+                                0,
+                                (eT) 0,
+                                0,
+                                0,
+                                kernel_rows * buffer_top_padding,
+                                buffer.n_cols,
+                                buffer.n_rows,
+                                oneway_kernel_id::submat_inplace_set_scalar);
+  coot_rt_t::inplace_op_subview(buffer.get_dev_mem(false),
+                                0,
+                                (eT) 0,
+                                buffer.n_rows - (kernel_rows * buffer_bottom_padding),
+                                0,
+                                kernel_rows * buffer_bottom_padding,
+                                buffer.n_cols,
+                                buffer.n_rows,
+                                oneway_kernel_id::submat_inplace_set_scalar);
+  }
+
+
+
+// `i` is the index into the "full" buffer
+// `j` is the index of the column in `buffer` that we will use
+template<typename eT>
+inline
+void
+glue_conv2::fill_gemv_buffer_col(Mat<eT>& buffer, const uword i, const uword j, const Mat<eT>& A, const Mat<eT>& K, const uword buffer_top_padding, const uword A_col_offset)
+  {
+  const uword cols_to_copy = (std::min)(A.n_cols - A_col_offset, buffer.n_rows / K.n_rows);
+
+  if (i < K.n_rows - 1)
+    {
+    // This column corresponds to where K does not yet fully overlap A.
+    //
+    // Rows in the range [0, K.n_rows - i - 2] are filled with zeros.
+    // The way that we do this is a little bit clever, but treat buffer.col(j) as a matrix of size K.n_rows x A.n_cols (call it bufmat_j).
+    // Note that for buffer.col(j) we ignore the top and bottom row zero padding.
+    // Then, we can say:
+    //    bufmat_j.submat(0, 0, K.n_rows - i - 2, A.n_cols - 1) = 0
+    //    bufmat_j.submat(K.n_rows - i - 1, 0, K.n_rows, A.n_cols - 1) = A.submat(0, 0, i, A.n_cols - 1)
+    coot_rt_t::inplace_op_subview(buffer.get_dev_mem(false),
+                                  j * buffer.n_rows + K.n_rows * buffer_top_padding,
+                                  (eT) 0,
+                                  0,
+                                  0,
+                                  K.n_rows - i - 1,
+                                  cols_to_copy,
+                                  K.n_rows,
+                                  oneway_kernel_id::submat_inplace_set_scalar);
+
+    coot_rt_t::copy_subview_to_subview(buffer.get_dev_mem(false),
+                                       K.n_rows - i - 1 + ((j * buffer.n_rows) + K.n_rows * buffer_top_padding),
+                                       0,
+                                       K.n_rows,
+                                       A.n_cols,
+                                       A.get_dev_mem(false),
+                                       0,
+                                       A_col_offset,
+                                       A.n_rows,
+                                       A.n_cols,
+                                       i + 1,
+                                       cols_to_copy);
+    }
+  else if (i < A.n_rows)
+    {
+    // This column corresponds to the region where K fully overlaps A.
+    const uword A_row = i - (K.n_rows - 1);
+
+    // Copy each individual block.
+    // Equivalent to:
+    //    buffer.col(j) = vectorise(A.submat(A_row, 0, A_row + K.n_rows - 1, A.n_cols - 1))
+    // Note that for buffer.col(j) we ignore the top and bottom row zero padding.
+    coot_rt_t::copy_subview(buffer.get_dev_mem(false),
+                            j * buffer.n_rows + K.n_rows * buffer_top_padding,
+                            A.get_dev_mem(false),
+                            A_row,
+                            A_col_offset,
+                            A.n_rows,
+                            A.n_cols,
+                            K.n_rows,
+                            cols_to_copy);
+    }
+  else if (i < A.n_rows + 2 * (K.n_rows - 1))
+    {
+    // Each individual patch from A has its last (i - (kernel_rows + A.n_rows - 1) + 1) rows filled with zeros.
+    // (That's rows [(i - (kernel_rows + A.n_rows - 1) + 1), kernel_rows - 1].)
+    const uword num_zero_rows = i - A.n_rows + 1;
+
+    // The way that we do this is a little bit clever, but treat buffer.col(j) as a matrix of size kernel_rows x A.n_cols (call it bufmat_j).
+    // Then, we can say:
+    //    bufmat_j.submat(0, 0, K.n_rows - num_zero_rows - 1, A.n_cols - 1) = A.submat(i - K.n_rows - 1, 0, A.n_rows - 1, A.n_cols - 1)
+    //    bufmat_j.submat(K.n_rows - num_zero_rows, 0, K.n_rows - 1, A.n_cols - 1) = 0
+    // Note that for buffer.col(j) (or bufmat_j) we ignore the top and bottom zero padding.
+    coot_rt_t::copy_subview_to_subview(buffer.get_dev_mem(false),
+                                       j * buffer.n_rows + K.n_rows * buffer_top_padding,
+                                       0,
+                                       K.n_rows,
+                                       A.n_cols,
+                                       A.get_dev_mem(false),
+                                       i - (K.n_rows - 1),
+                                       A_col_offset,
+                                       A.n_rows,
+                                       A.n_cols,
+                                       K.n_rows - num_zero_rows,
+                                       cols_to_copy);
+    coot_rt_t::inplace_op_subview(buffer.get_dev_mem(false),
+                                  j * buffer.n_rows + K.n_rows * buffer_top_padding,
+                                  (eT) 0,
+                                  K.n_rows - num_zero_rows,
+                                  0,
+                                  num_zero_rows,
+                                  cols_to_copy,
+                                  K.n_rows,
+                                  oneway_kernel_id::submat_inplace_set_scalar);
     }
   }
 
@@ -113,124 +239,18 @@ glue_conv2::create_gemv_full_buffer(Mat<eT>& buffer, const Mat<eT>& A, const Mat
   {
   coot_extra_debug_sigprint();
 
-  const uword kernel_rows = K.n_rows;
-  const uword kernel_cols = K.n_cols;
-
-  const uword buffer_n_rows = kernel_rows * (A.n_cols + 2 * (kernel_cols - 1));
-  const uword buffer_n_cols = A.n_rows + kernel_rows - 1;
+  const uword buffer_n_rows = K.n_rows * (A.n_cols + 2 * (K.n_cols - 1));
+  const uword buffer_n_cols = A.n_rows + K.n_rows - 1;
 
   buffer.set_size(buffer_n_rows, buffer_n_cols);
 
-  // The top and bottom rows of the buffer correspond to sections where K's columns do not fully overlap with A's columns.
-  // We zero these out with operations equivalent to the following:
-  //    buffer.rows(0, kernel_rows * kernel_cols - 1) = 0
-  //    buffer.rows(kernel_rows * A.n_rows, kernel_rows * (A.n_rows + kernel_cols) - 1) = 0
-  coot_rt_t::inplace_op_subview(buffer.get_dev_mem(false),
-                                0,
-                                (eT) 0,
-                                0,
-                                0,
-                                kernel_rows * (kernel_cols - 1),
-                                buffer_n_cols,
-                                buffer.n_rows,
-                                oneway_kernel_id::submat_inplace_set_scalar);
-  coot_rt_t::inplace_op_subview(buffer.get_dev_mem(false),
-                                0,
-                                (eT) 0,
-                                kernel_rows * (A.n_cols + kernel_cols - 1),
-                                0,
-                                kernel_rows * (kernel_cols - 1),
-                                buffer.n_cols,
-                                buffer.n_rows,
-                                oneway_kernel_id::submat_inplace_set_scalar);
+  // Pad the top and bottom of the buffer with zeros to correspond to regions where K's columns do not fully overlap with A's columns.
+  fill_gemv_buffer_top_bottom(buffer, (K.n_cols - 1), (K.n_cols - 1), K.n_rows);
 
-  // First, consider the sections where K's rows do not fully overlap with A's rows.
-  for (uword i = 0; i < kernel_rows - 1; ++i)
+  // Fill each column of the buffer with patches of A.
+  for (size_t i = 0; i < buffer_n_cols; ++i)
     {
-    // Each individual patch has rows in the range [0, kernel_rows - i - 2] filled with zeros.
-    // The way that we do this is a little bit clever, but treat buffer.col(i) as a matrix of size kernel_rows x A.n_cols (call it bufmat_i).
-    // Note that for buffer.col(i) we ignore the top and bottom row zero padding.
-    // Then, we can say:
-    //    bufmat_i.submat(0, 0, kernel_rows - i - 2, A.n_cols - 1) = 0
-    //    bufmat_i.submat(kernel_rows - i - 1, 0, kernel_rows, A.n_cols - 1) = A.submat(0, 0, i, A.n_cols - 1)
-    coot_rt_t::inplace_op_subview(buffer.get_dev_mem(false),
-                                  i * buffer.n_rows + kernel_rows * (kernel_cols - 1),
-                                  (eT) 0,
-                                  0,
-                                  0,
-                                  kernel_rows - i - 1,
-                                  A.n_cols,
-                                  kernel_rows,
-                                  oneway_kernel_id::submat_inplace_set_scalar);
-
-    coot_rt_t::copy_subview_to_subview(buffer.get_dev_mem(false),
-                                       kernel_rows - i - 1 + (i * buffer.n_rows) + kernel_rows * (kernel_cols - 1),
-                                       0,
-                                       kernel_rows,
-                                       A.n_cols,
-                                       A.get_dev_mem(false),
-                                       0,
-                                       0,
-                                       A.n_rows,
-                                       A.n_cols,
-                                       i + 1,
-                                       A.n_cols);
-    }
-
-  // Now, consider the regions where A and K overlap fully.
-  for (uword i = kernel_rows - 1; i < A.n_rows; ++i)
-    {
-    const uword A_row = i - (kernel_rows - 1);
-
-    // Copy each individual block.
-    // Equivalent to:
-    //    buffer.col(i) = vectorise(A.submat(A_row, 0, A_row + kernel_rows - 1, A.n_cols - 1))
-    // Note that for buffer.col(i) we ignore the top and bottom row zero padding.
-    coot_rt_t::copy_subview(buffer.get_dev_mem(false),
-                            i * buffer_n_rows + kernel_rows * (kernel_cols - 1),
-                            A.get_dev_mem(false),
-                            A_row,
-                            0,
-                            A.n_rows,
-                            A.n_cols,
-                            kernel_rows,
-                            A.n_cols);
-    }
-
-  // Lastly, consider the regions where K has passed over A and no longer overlaps fully.
-  for (uword i = A.n_rows; i < buffer_n_cols; ++i)
-    {
-    // Each individual patch from A has its last (i - (kernel_rows + A.n_rows - 1) + 1) rows filled with zeros.
-    // (That's rows [(i - (kernel_rows + A.n_rows - 1) + 1), kernel_rows - 1].)
-    const uword num_zero_rows = i - A.n_rows + 1;
-
-    // The way that we do this is a little bit clever, but treat buffer.col(i) as a matrix of size kernel_rows x A.n_cols (call it bufmat_i).
-    // Then, we can say:
-    //    bufmat_i.submat(0, 0, kernel_rows - num_zero_rows - 1, A.n_cols - 1) = A.submat(i - kernel_rows - 1, 0, A.n_rows - 1, A.n_cols - 1)
-    //    bufmat_i.submat(kernel_rows - num_zero_rows, 0, kernel_rows - 1, A.n_cols - 1) = 0
-    // Note that for buffer.col(i) (or bufmat_i) we ignore the top and bottom zero padding.
-    coot_rt_t::copy_subview_to_subview(buffer.get_dev_mem(false),
-                                       i * buffer_n_rows + kernel_rows * (kernel_cols - 1),
-                                       0,
-                                       kernel_rows,
-                                       A.n_cols,
-                                       A.get_dev_mem(false),
-                                       i - (kernel_rows - 1),
-                                       0,
-                                       A.n_rows,
-                                       A.n_cols,
-                                       kernel_rows - num_zero_rows,
-                                       A.n_cols);
-
-    coot_rt_t::inplace_op_subview(buffer.get_dev_mem(false),
-                                  i * buffer.n_rows + kernel_rows * (kernel_cols - 1),
-                                  (eT) 0,
-                                  kernel_rows - num_zero_rows,
-                                  0,
-                                  num_zero_rows,
-                                  A.n_cols,
-                                  kernel_rows,
-                                  oneway_kernel_id::submat_inplace_set_scalar);
+    fill_gemv_buffer_col(buffer, i, i, A, K, (K.n_cols - 1), 0);
     }
   }
 
@@ -243,30 +263,69 @@ glue_conv2::create_gemv_same_buffer(Mat<eT>& buffer, const Mat<eT>& A, const Mat
   {
   coot_extra_debug_sigprint();
 
-  // This is the same as create_gemv_full_buffer()---but we don't need any of the zero padding.
+  // This is the same as create_gemv_full_buffer()---but the padding strategy is different.
+  // Since the output matrix size is the same as the input size, we need to have at least a little bit of padding.
+  // (No padding is the "valid" strategy.)
+  //
+  // We use the same logic as Armadillo/Octave for determining how much zero padding to apply on each side.
+
+  const uword start_row = uword( K.n_rows / 2 );
+  const uword start_col = uword( K.n_cols / 2 );
+
+  const uword start_col_padding = K.n_cols - start_col - 1;
+  const uword end_col_padding = K.n_cols - start_col_padding - 1;
+
   // So we only need to consider the region where A and K overlap fully.
 
-  const uword kernel_rows = K.n_rows;
-
-  const uword buffer_n_rows = kernel_rows * A.n_cols;
+  const uword buffer_n_rows = K.n_rows * (A.n_cols + K.n_cols - 1);
   const uword buffer_n_cols = A.n_rows;
 
   buffer.set_size(buffer_n_rows, buffer_n_cols);
 
-  for (uword i = 0; i < A.n_rows - (kernel_rows - 1); ++i)
+  // Pad the top and bottom of the buffer with zeros to correspond to regions where K's columns do not fully overlap with A's columns.
+  fill_gemv_buffer_top_bottom(buffer, start_col_padding, end_col_padding, K.n_rows);
+
+  for (uword i = 0; i < buffer_n_cols; ++i)
     {
-    // Copy each individual block.
-    // Equivalent to:
-    //    buffer.col(i) = vectorise(A.submat(i, 0, i + kernel_rows - 1, A.n_cols - 1))
-    coot_rt_t::copy_subview(buffer.get_dev_mem(false),
-                            i * buffer_n_rows,
-                            A.get_dev_mem(false),
-                            i,
-                            0,
-                            A.n_rows,
-                            A.n_cols,
-                            kernel_rows,
-                            A.n_cols);
+    fill_gemv_buffer_col(buffer, i + start_row, i, A, K, start_col_padding, 0);
+    }
+  }
+
+
+
+template<typename eT>
+inline
+void
+glue_conv2::create_gemv_same_buffer_small(Mat<eT>& buffer, const Mat<eT>& A, const Mat<eT>& K)
+  {
+  coot_extra_debug_sigprint();
+
+  // This is the same as create_gemv_same_buffer()---but here the output matrix is the size of K, not the size of A.
+  // Note that K.n_rows < A.n_rows.
+  //
+  // We use the same logic as Armadillo/Octave for determining how much zero padding to apply on each side.
+
+  // Total row size: A.n_rows + 2 * (K.n_rows - 1) - (K.n_rows + K.n_rows) --> leftover is A.n_rows
+  const uword start_row = uword( A.n_rows / 2 );
+  const uword start_col = uword( A.n_cols / 2 );
+
+  const uword start_col_padding = (start_col < K.n_cols) ? K.n_cols - start_col - 1 : 0;
+  const uword end_col_padding = (start_col < K.n_cols) ? (2 * K.n_cols - 1 - A.n_cols - start_col_padding) : 0;
+
+  // So we only need to consider the region where A and K overlap fully.
+
+  const uword buffer_n_rows = K.n_rows * (K.n_cols + K.n_cols - 1);
+  const uword buffer_n_cols = K.n_rows;
+
+  buffer.set_size(buffer_n_rows, buffer_n_cols);
+
+  // Pad the top and bottom of the buffer with zeros to correspond to regions where K's columns do not fully overlap with A's columns.
+  fill_gemv_buffer_top_bottom(buffer, start_col_padding, end_col_padding, K.n_rows);
+
+  const uword A_col_offset = (start_col > (K.n_cols - 1)) ? start_col - (K.n_cols - 1) : 0;
+  for (uword i = 0; i < buffer_n_cols; ++i)
+    {
+    fill_gemv_buffer_col(buffer, i + start_row, i, A, K, start_col_padding, A_col_offset);
     }
   }
 
