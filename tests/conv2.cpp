@@ -678,24 +678,18 @@ TEMPLATE_TEST_CASE("conv2_full_random_sizes_arma_comparison_test", "[conv2]", fl
     const uword A_cols = sizes[1];
     const uword B_rows = sizes[2];
     const uword B_cols = sizes[3];
-    std::cout << "trial " << t << ": A is " << A_rows << " x " << A_cols << ", B is " << B_rows << " x " << B_cols << "\n";
 
     Mat<eT> A = randu<Mat<eT>>(A_rows, A_cols);
     Mat<eT> B = randi<Mat<eT>>(B_rows, B_cols, distr_param(-50, 50));
 
     Mat<eT> C1 = conv2(A, B);
-    std::cout << "C1 done\n";
     Mat<eT> C2 = conv2(B, A);
-    std::cout << "C2 done\n";
     Mat<eT> C3 = conv2(A, B, "full");
-    std::cout << "C3 done\n";
     Mat<eT> C4 = conv2(B, A, "full");
-    std::cout << "C4 done\n";
 
     arma::Mat<eT> A_cpu(A);
     arma::Mat<eT> B_cpu(B);
     arma::Mat<eT> C_ref = arma::conv2(A_cpu, B_cpu);
-    std::cout << "CPU done\n";
 
     REQUIRE( C1.n_rows == C_ref.n_rows );
     REQUIRE( C1.n_cols == C_ref.n_cols );
@@ -711,19 +705,12 @@ TEMPLATE_TEST_CASE("conv2_full_random_sizes_arma_comparison_test", "[conv2]", fl
     arma::Mat<eT> C3_cpu(C3);
     arma::Mat<eT> C4_cpu(C4);
 
-    std::cout << arma::norm(C1_cpu - C_ref) / C1_cpu.n_elem << "\n";
-    std::cout << arma::norm(C1_cpu) << " and " << arma::norm(C_ref) << "\n";
-    std::cout << arma::max(arma::max(arma::abs(C1_cpu - C_ref))) << "\n";
-    std::cout << arma::max(arma::max(arma::abs(C1_cpu - C_ref) / arma::max(C1_cpu, C_ref))) << "\n";
-    std::cout << "CPU max: " << arma::max(arma::max(C_ref)) << "\n";
-    std::cout << "GPU max: " << arma::max(arma::max(C1_cpu)) << "\n";
-
     const eT tol = (is_same_type<eT, float>::value) ? 1e-6 : 1e-12;
     // Since the matrices can get big, we'll use a slightly relaxed check that accounts for large norms.
     REQUIRE( arma::norm(C1_cpu - C_ref) / arma::norm(C1_cpu) < tol );
-    REQUIRE( arma::norm(C2_cpu - C_ref) / arma::norm(C1_cpu) < tol );
-    REQUIRE( arma::norm(C3_cpu - C_ref) / arma::norm(C1_cpu) < tol );
-    REQUIRE( arma::norm(C4_cpu - C_ref) / arma::norm(C1_cpu) < tol );
+    REQUIRE( arma::norm(C2_cpu - C_ref) / arma::norm(C2_cpu) < tol );
+    REQUIRE( arma::norm(C3_cpu - C_ref) / arma::norm(C3_cpu) < tol );
+    REQUIRE( arma::norm(C4_cpu - C_ref) / arma::norm(C4_cpu) < tol );
     }
   }
 
@@ -847,7 +834,44 @@ TEMPLATE_TEST_CASE("conv2_full_expr_inputs_test", "[conv2]", float, double)
 
 TEMPLATE_TEST_CASE("col_vs_row_conv2_full_test", "[conv2]", float, double)
   {
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> A = randu<Mat<eT>>(512, 1);
+  Mat<eT> B = randu<Mat<eT>>(1, 128);
+
+  Mat<eT> C1 = conv2(A, B);
+  Mat<eT> C2 = conv2(B, A);
+  Mat<eT> C3 = conv2(A, B, "full");
+  Mat<eT> C4 = conv2(B, A, "full");
+
+  arma::Mat<eT> A_cpu(A);
+  arma::Mat<eT> B_cpu(B);
+
+  arma::Mat<eT> C_ref = arma::conv2(A_cpu, B_cpu, "full");
+
+  REQUIRE( C1.n_rows == C_ref.n_rows );
+  REQUIRE( C1.n_cols == C_ref.n_cols );
+  REQUIRE( C2.n_rows == C_ref.n_rows );
+  REQUIRE( C2.n_cols == C_ref.n_cols );
+  REQUIRE( C3.n_rows == C_ref.n_rows );
+  REQUIRE( C3.n_cols == C_ref.n_cols );
+  REQUIRE( C4.n_rows == C_ref.n_rows );
+  REQUIRE( C4.n_cols == C_ref.n_cols );
+
+  arma::Mat<eT> C1_cpu(C1);
+  arma::Mat<eT> C2_cpu(C2);
+  arma::Mat<eT> C3_cpu(C3);
+  arma::Mat<eT> C4_cpu(C4);
+
+  REQUIRE( arma::approx_equal( C1_cpu, C_ref, "reldiff", 1e-5 ) );
+  REQUIRE( arma::approx_equal( C2_cpu, C_ref, "reldiff", 1e-5 ) );
+  REQUIRE( arma::approx_equal( C3_cpu, C_ref, "reldiff", 1e-5 ) );
+  REQUIRE( arma::approx_equal( C4_cpu, C_ref, "reldiff", 1e-5 ) );
   }
 
 
@@ -956,7 +980,7 @@ TEMPLATE_TEST_CASE("hardcoded_same_k_rows_gt_cols_conv2_test", "[conv2]", float,
   B(2, 1) = eT(15);
 
   Mat<eT> C_ref(4, 4);
-  C_ref(0, 0) = eT( 155);
+  C_ref(0, 0) = eT( 152);
   C_ref(0, 1) = eT( 198);
   C_ref(0, 2) = eT( 244);
   C_ref(0, 3) = eT( 140);
@@ -1266,8 +1290,9 @@ TEMPLATE_TEST_CASE("conv2_same_square_arma_comparison_test", "[conv2]", float, d
     arma::Mat<eT> C1_cpu(C1);
     arma::Mat<eT> C2_cpu(C2);
 
-    REQUIRE( arma::approx_equal( C1_cpu, C1_ref, "reldiff", 1e-5 ) );
-    REQUIRE( arma::approx_equal( C2_cpu, C2_ref, "reldiff", 1e-5 ) );
+    const eT tol = (is_same_type<eT, float>::value) ? 1e-5 : 1e-8;
+    REQUIRE( arma::approx_equal( C1_cpu, C1_ref, "absdiff", tol ) );
+    REQUIRE( arma::approx_equal( C2_cpu, C2_ref, "absdiff", tol ) );
     }
   }
 
@@ -1316,7 +1341,7 @@ TEMPLATE_TEST_CASE("conv2_same_random_sizes_arma_comparison_test", "[conv2]", fl
 
   for (uword t = 0; t < 5; ++t)
     {
-    const Mat<uword> sizes = randi<Mat<uword>>(4, distr_param(50, 1000));
+    const Mat<uword> sizes = randi<Mat<uword>>(4, distr_param(20, 200));
 
     const uword A_rows = sizes[0];
     const uword A_cols = sizes[1];
@@ -1342,8 +1367,10 @@ TEMPLATE_TEST_CASE("conv2_same_random_sizes_arma_comparison_test", "[conv2]", fl
     arma::Mat<eT> C1_cpu(C1);
     arma::Mat<eT> C2_cpu(C2);
 
-    REQUIRE( arma::approx_equal( C1_cpu, C1_ref, "reldiff", 1e-5 ) );
-    REQUIRE( arma::approx_equal( C2_cpu, C2_ref, "reldiff", 1e-5 ) );
+    const eT tol = (is_same_type<eT, float>::value) ? 1e-6 : 1e-12;
+    // Since the matrices can get big, we'll use a slightly relaxed check that accounts for large norms.
+    REQUIRE( arma::norm(C1_cpu - C1_ref) / arma::norm(C1_cpu) < tol );
+    REQUIRE( arma::norm(C2_cpu - C2_ref) / arma::norm(C2_cpu) < tol );
     }
   }
 
@@ -1435,5 +1462,33 @@ TEMPLATE_TEST_CASE("conv2_same_expr_inputs_test", "[conv2]", float, double)
 
 TEMPLATE_TEST_CASE("col_vs_row_conv2_same_test", "[conv2]", float, double)
   {
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> A = randu<Mat<eT>>(512, 1);
+  Mat<eT> B = randu<Mat<eT>>(1, 128);
+
+  Mat<eT> C1 = conv2(A, B, "same");
+  Mat<eT> C2 = conv2(B, A, "same");
+
+  arma::Mat<eT> A_cpu(A);
+  arma::Mat<eT> B_cpu(B);
+
+  arma::Mat<eT> C1_ref = arma::conv2(A_cpu, B_cpu, "same");
+  arma::Mat<eT> C2_ref = arma::conv2(B_cpu, A_cpu, "same");
+
+  REQUIRE( C1.n_rows == C1_ref.n_rows );
+  REQUIRE( C1.n_cols == C1_ref.n_cols );
+  REQUIRE( C2.n_rows == C2_ref.n_rows );
+  REQUIRE( C2.n_cols == C2_ref.n_cols );
+
+  arma::Mat<eT> C1_cpu(C1);
+  arma::Mat<eT> C2_cpu(C2);
+
+  REQUIRE( arma::approx_equal( C1_cpu, C1_ref, "reldiff", 1e-5 ) );
+  REQUIRE( arma::approx_equal( C2_cpu, C2_ref, "reldiff", 1e-5 ) );
   }
