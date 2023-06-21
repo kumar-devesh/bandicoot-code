@@ -757,8 +757,9 @@ TEST_CASE("conv2_full_empty_test")
 
 TEST_CASE("conv2_full_alias_test")
   {
-  fmat a = randu<fmat>(150, 150);
-  fmat b = randu<fmat>(5, 5);
+  // Has to be large enough that we process the matrix in pieces.
+  fmat a = randu<fmat>(2000, 2000);
+  fmat b = randu<fmat>(50, 50);
 
   fmat a_orig(a);
 
@@ -1405,8 +1406,9 @@ TEST_CASE("conv2_same_empty_test")
 
 TEST_CASE("conv2_same_alias_test")
   {
-  fmat a = randu<fmat>(150, 150);
-  fmat b = randu<fmat>(5, 5);
+  // Has to be large enough that we process the matrix in pieces.
+  fmat a = randu<fmat>(2000, 2000);
+  fmat b = randu<fmat>(50, 50);
 
   fmat a_orig(a);
 
