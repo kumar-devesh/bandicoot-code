@@ -22,6 +22,9 @@ class glue_conv2
   template<typename out_eT, typename T1, typename T2>
   inline static void apply(Mat<out_eT>& out, const Glue<T1, T2, glue_conv2>& in);
 
+  template<typename eT>
+  inline static void apply_direct(Mat<eT>& out, const Mat<eT>& A_in, const Mat<eT>& B_in, const uword mode);
+
   // Utilities to compute buffer sizes.
   template<typename eT>
   inline static void get_gemv_full_sizes(const Mat<eT>& A, const Mat<eT>& K, uword& buffer_n_rows, uword& buffer_n_cols, uword& out_n_rows, uword& out_n_cols, uword& buffer_top_padding, uword& buffer_bottom_padding, uword& buffer_row_offset, uword& buffer_col_offset);

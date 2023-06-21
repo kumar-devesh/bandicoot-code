@@ -29,11 +29,35 @@ glue_conv2::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_conv2>& in)
 
   typedef typename T1::elem_type eT;
 
+  const uword mode = in.aux_uword;
+
+  if (is_same_type<out_eT, eT>::value)
+    {
+    apply_direct(out, UA.M, UB.M, mode);
+    }
+  else
+    {
+    Mat<eT> tmp;
+    apply_direct(tmp, UA.M, UB.M, mode);
+    out.set_size(tmp.n_rows, tmp.n_cols);
+    coot_rt_t::copy_array(out.get_dev_mem(false), tmp.get_dev_mem(false), tmp.n_elem);
+    }
+  }
+
+
+
+template<typename eT>
+inline
+void
+glue_conv2::apply_direct(Mat<eT>& out, const Mat<eT>& A_in, const Mat<eT>& B_in, const uword mode)
+  {
+  coot_extra_debug_sigprint();
+
   // We compute with A, the "constant" matrix, and K, the "kernel" that we rotate.
   // Armadillo selects the "kernel" based on maximum number of elements.
   // However, here we use the number of rows; our code that repacks A into a format where we can use gemvs to compute the result requires it.
-  const Mat<eT>& A = (UA.M.n_rows >= UB.M.n_rows) ? UA.M : UB.M;
-  const Mat<eT>& K = (UA.M.n_rows >= UB.M.n_rows) ? UB.M : UA.M;
+  const Mat<eT>& A = (A_in.n_rows >= B_in.n_rows) ? A_in : B_in;
+  const Mat<eT>& K = (A_in.n_rows >= B_in.n_rows) ? B_in : A_in;
 
   // If `A` is the same as `out`, we need to use a temporary matrix as output.
   Mat<eT> out_tmp;
@@ -55,7 +79,6 @@ glue_conv2::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_conv2>& in)
   // Then we will iterate over rows (B.n_rows) and do the same thing to get each row of the output matrix.
 
   Mat<eT> buffer;
-  const uword mode = in.aux_uword;
 
   // We want to restrict the size of our temporary buffer so that it's not larger than A and K combined.
   // But, we also need to make sure it's big enough to hold a single column of patches...
@@ -79,7 +102,7 @@ glue_conv2::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_conv2>& in)
     {
     // "same"
     // Note that we have to create the buffer differently depending on what the output size is.
-    if (&A == &UA.M)
+    if (&A == &A_in)
       {
       get_gemv_same_sizes(A, K, buffer_n_rows, buffer_n_cols, out_n_rows, out_n_cols, buffer_top_padding, buffer_bottom_padding, buffer_row_offset, buffer_col_offset);
       }
@@ -89,8 +112,15 @@ glue_conv2::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_conv2>& in)
       }
     }
 
-  const uword cols_per_batch = std::min(buffer_n_cols, max_buffer_size / buffer_n_rows); // rounds down
+  if (A.n_rows == 0 || A.n_cols == 0 || K.n_rows == 0 || K.n_cols == 0)
+    {
+    out_ref.reset();
+    return;
+    }
+
   out_ref.set_size(out_n_rows, out_n_cols);
+
+  const uword cols_per_batch = std::min(buffer_n_cols, max_buffer_size / buffer_n_rows); // rounds down
   buffer.set_size(buffer_n_rows, cols_per_batch);
 
   // Pad the top and bottom of the buffer with zeros to correspond to regions where K's columns do not fully overlap with A's columns.
