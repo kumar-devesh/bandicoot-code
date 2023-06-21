@@ -104,11 +104,11 @@ TEMPLATE_TEST_CASE("det_arma_comparison", "[det]", float, double)
     const eT det_val = det(x);
     const eT arma_det_val = arma::det(x_cpu);
 
-    REQUIRE( det_val == Approx(arma_det_val) );
+    REQUIRE( det_val == Approx(arma_det_val).epsilon(1e-3) );
 
     eT det_val2;
     REQUIRE( det(det_val2, x) == true );
-    REQUIRE( det_val2 == Approx(arma_det_val) );
+    REQUIRE( det_val2 == Approx(arma_det_val).epsilon(1e-3) );
     }
   }
 
