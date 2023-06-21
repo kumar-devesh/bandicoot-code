@@ -22,12 +22,10 @@ glue_conv2::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_conv2>& in)
   coot_extra_debug_sigprint();
 
   // This implementation is a pretty simple im2col-based implementation.
-  // TODO: handle transposed inputs and other delayed inputs or optimizations
 
+  // TODO: handle transposed inputs and other delayed inputs or optimizations
   unwrap<T1> UA(in.A);
   unwrap<T2> UB(in.B);
-
-  // TODO: handle aliases
 
   typedef typename T1::elem_type eT;
 
@@ -36,6 +34,10 @@ glue_conv2::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_conv2>& in)
   // However, here we use the number of rows; our code that repacks A into a format where we can use gemvs to compute the result requires it.
   const Mat<eT>& A = (UA.M.n_rows >= UB.M.n_rows) ? UA.M : UB.M;
   const Mat<eT>& K = (UA.M.n_rows >= UB.M.n_rows) ? UB.M : UA.M;
+
+  // If `A` is the same as `out`, we need to use a temporary matrix as output.
+  Mat<eT> out_tmp;
+  Mat<eT>& out_ref = (&A == &out) ? out_tmp : out;
 
   // The kernel "K" needs to be repacked into a vector in a specific way:
   // Specifically, we need to flip K and store it in a column-major form.
@@ -88,7 +90,7 @@ glue_conv2::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_conv2>& in)
     }
 
   const uword cols_per_batch = std::min(buffer_n_cols, max_buffer_size / buffer_n_rows); // rounds down
-  out.set_size(out_n_rows, out_n_cols);
+  out_ref.set_size(out_n_rows, out_n_cols);
   buffer.set_size(buffer_n_rows, cols_per_batch);
 
   // Pad the top and bottom of the buffer with zeros to correspond to regions where K's columns do not fully overlap with A's columns.
@@ -110,10 +112,10 @@ glue_conv2::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_conv2>& in)
       }
 
     // Multiply the flattened kernel with the patches of each row of the buffer to get the results.
-    for (uword i = 0; i < out.n_cols; ++i)
+    for (uword i = 0; i < out_ref.n_cols; ++i)
       {
-      coot_rt_t::gemv<eT, true>(out.get_dev_mem(false),
-                                i * out.n_rows + c,
+      coot_rt_t::gemv<eT, true>(out_ref.get_dev_mem(false),
+                                i * out_ref.n_rows + c,
                                 1,
                                 buffer.get_dev_mem(false),
                                 i * K.n_rows,
@@ -126,6 +128,12 @@ glue_conv2::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_conv2>& in)
                                 1.0,
                                 0.0);
       }
+    }
+
+  // Reset alias if needed.
+  if (&out_ref != &out)
+    {
+    out.steal_mem(out_ref);
     }
   }
 
