@@ -113,7 +113,7 @@ glue_conv2::apply_direct(Mat<eT>& out, const Mat<eT>& A_in, const Mat<eT>& B_in,
 
   if (A.n_rows == 0 || A.n_cols == 0 || K.n_rows == 0 || K.n_cols == 0)
     {
-    out_ref.reset();
+    out.reset();
     return;
     }
 
