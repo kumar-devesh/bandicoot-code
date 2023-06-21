@@ -22,6 +22,9 @@ class glue_conv2
   template<typename out_eT, typename T1, typename T2>
   inline static void apply(Mat<out_eT>& out, const Glue<T1, T2, glue_conv2>& in);
 
+  template<typename out_eT, typename eT>
+  inline static void apply_direct(Mat<out_eT>& out, const Mat<eT>& A_in, const Mat<eT>& B_in, const uword mode, const typename enable_if<is_same_type<out_eT, eT>::no>::result* junk = 0);
+
   template<typename eT>
   inline static void apply_direct(Mat<eT>& out, const Mat<eT>& A_in, const Mat<eT>& B_in, const uword mode);
 

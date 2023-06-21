@@ -27,21 +27,25 @@ glue_conv2::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_conv2>& in)
   unwrap<T1> UA(in.A);
   unwrap<T2> UB(in.B);
 
-  typedef typename T1::elem_type eT;
-
   const uword mode = in.aux_uword;
 
-  if (is_same_type<out_eT, eT>::value)
-    {
-    apply_direct(out, UA.M, UB.M, mode);
-    }
-  else
-    {
-    Mat<eT> tmp;
-    apply_direct(tmp, UA.M, UB.M, mode);
-    out.set_size(tmp.n_rows, tmp.n_cols);
-    coot_rt_t::copy_array(out.get_dev_mem(false), tmp.get_dev_mem(false), tmp.n_elem);
-    }
+  apply_direct(out, UA.M, UB.M, mode);
+  }
+
+
+
+template<typename out_eT, typename eT>
+inline
+void
+glue_conv2::apply_direct(Mat<out_eT>& out, const Mat<eT>& A_in, const Mat<eT>& B_in, const uword mode, const typename enable_if<is_same_type<out_eT, eT>::no>::result* junk)
+  {
+  coot_extra_debug_sigprint();
+  coot_ignore(junk);
+
+  Mat<eT> tmp;
+  apply_direct(tmp, A_in, B_in, mode);
+  out.set_size(tmp.n_rows, tmp.n_cols);
+  coot_rt_t::copy_array(out.get_dev_mem(false), tmp.get_dev_mem(false), tmp.n_elem);
   }
 
 
