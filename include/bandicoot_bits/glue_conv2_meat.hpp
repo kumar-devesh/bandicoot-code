@@ -67,11 +67,6 @@ glue_conv2::apply_direct(Mat<eT>& out, const Mat<eT>& A_in, const Mat<eT>& B_in,
   Mat<eT> out_tmp;
   Mat<eT>& out_ref = (&A == &out) ? out_tmp : out;
 
-  // The kernel "K" needs to be repacked into a vector in a specific way:
-  // Specifically, we need to flip K and store it in a column-major form.
-  Col<eT> K_mod(K.n_elem);
-  coot_rt_t::rotate_180(K_mod.get_dev_mem(false), K.get_dev_mem(false), K.n_rows, K.n_cols);
-
   // First let's start with the trivial implementation.
   // Here we treat the smaller matrix (the kernel, call it B) as a row vector.
   // Then, we have to create a "buffer" matrix with size A.n_rows x (B.n_cols * A.n_cols).
@@ -121,6 +116,11 @@ glue_conv2::apply_direct(Mat<eT>& out, const Mat<eT>& A_in, const Mat<eT>& B_in,
     out_ref.reset();
     return;
     }
+
+  // The kernel "K" needs to be repacked into a vector in a specific way:
+  // Specifically, we need to flip K and store it in a column-major form.
+  Col<eT> K_mod(K.n_elem);
+  coot_rt_t::rotate_180(K_mod.get_dev_mem(false), K.get_dev_mem(false), K.n_rows, K.n_cols);
 
   out_ref.set_size(out_n_rows, out_n_cols);
 
@@ -266,24 +266,31 @@ glue_conv2::fill_gemv_buffer_top_bottom(Mat<eT>& buffer, const uword buffer_top_
   // We zero these out with operations equivalent to the following:
   //    buffer.rows(0, kernel_rows * buffer_top_padding - 1) = 0
   //    buffer.rows(buffer.n_rows - kernel_rows * buffer_bottom_padding, buffer.n_rows - 1) = 0
-  coot_rt_t::inplace_op_subview(buffer.get_dev_mem(false),
-                                0,
-                                (eT) 0,
-                                0,
-                                0,
-                                kernel_rows * buffer_top_padding,
-                                buffer.n_cols,
-                                buffer.n_rows,
-                                oneway_kernel_id::submat_inplace_set_scalar);
-  coot_rt_t::inplace_op_subview(buffer.get_dev_mem(false),
-                                0,
-                                (eT) 0,
-                                buffer.n_rows - (kernel_rows * buffer_bottom_padding),
-                                0,
-                                kernel_rows * buffer_bottom_padding,
-                                buffer.n_cols,
-                                buffer.n_rows,
-                                oneway_kernel_id::submat_inplace_set_scalar);
+  if (buffer_top_padding > 0)
+    {
+    coot_rt_t::inplace_op_subview(buffer.get_dev_mem(false),
+                                  0,
+                                  (eT) 0,
+                                  0,
+                                  0,
+                                  kernel_rows * buffer_top_padding,
+                                  buffer.n_cols,
+                                  buffer.n_rows,
+                                  oneway_kernel_id::submat_inplace_set_scalar);
+    }
+
+  if (buffer_bottom_padding > 0)
+    {
+    coot_rt_t::inplace_op_subview(buffer.get_dev_mem(false),
+                                  0,
+                                  (eT) 0,
+                                  buffer.n_rows - (kernel_rows * buffer_bottom_padding),
+                                  0,
+                                  kernel_rows * buffer_bottom_padding,
+                                  buffer.n_cols,
+                                  buffer.n_rows,
+                                  oneway_kernel_id::submat_inplace_set_scalar);
+    }
   }
 
 
