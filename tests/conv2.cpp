@@ -716,7 +716,7 @@ TEMPLATE_TEST_CASE("conv2_full_random_sizes_arma_comparison_test", "[conv2]", fl
 
 
 
-TEST_CASE("conv2_full_empty_test")
+TEST_CASE("conv2_full_empty_test", "[conv2]")
   {
   fmat a;
   fmat b = randu<fmat>(3, 3);
@@ -755,7 +755,7 @@ TEST_CASE("conv2_full_empty_test")
 
 
 
-TEST_CASE("conv2_full_alias_test")
+TEST_CASE("conv2_full_alias_test", "[conv2]")
   {
   // Has to be large enough that we process the matrix in pieces.
   fmat a = randu<fmat>(2000, 2000);
@@ -1377,7 +1377,7 @@ TEMPLATE_TEST_CASE("conv2_same_random_sizes_arma_comparison_test", "[conv2]", fl
 
 
 
-TEST_CASE("conv2_same_empty_test")
+TEST_CASE("conv2_same_empty_test", "[conv2]")
   {
   fmat a;
   fmat b = randu<fmat>(3, 3);
@@ -1404,7 +1404,7 @@ TEST_CASE("conv2_same_empty_test")
 
 
 
-TEST_CASE("conv2_same_alias_test")
+TEST_CASE("conv2_same_alias_test", "[conv2]")
   {
   // Has to be large enough that we process the matrix in pieces.
   fmat a = randu<fmat>(2000, 2000);
