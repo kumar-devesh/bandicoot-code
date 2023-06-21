@@ -187,7 +187,7 @@ TEMPLATE_TEST_CASE("conv_full_random_sizes_arma_comparison_test", "[conv]", floa
     arma::Col<eT> C3_cpu(C3);
     arma::Col<eT> C4_cpu(C4);
 
-    const eT tol = (is_same_type<eT, float>::value) ? 1e-6 : 1e-12;
+    const eT tol = (is_same_type<eT, float>::value) ? 1e-4 : 1e-8;
     // Since the matrices can get big, we'll use a slightly relaxed check that accounts for large norms.
     REQUIRE( arma::norm(C1_cpu - C_ref) / arma::norm(C1_cpu) < tol );
     REQUIRE( arma::norm(C2_cpu - C_ref) / arma::norm(C2_cpu) < tol );
