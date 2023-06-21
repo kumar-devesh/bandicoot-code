@@ -102,6 +102,8 @@ class op_cor;
 class op_sort;
 class op_sort_vec;
 class op_det;
+class op_symmat;
+class op_pinv;
 
 class mtop_conv_to;
 class mtop_all;
@@ -139,6 +141,7 @@ class glue_cov;
 class glue_cor;
 class glue_join_cols;
 class glue_join_rows;
+class glue_cross;
 class glue_conv;
 class glue_conv2;
 

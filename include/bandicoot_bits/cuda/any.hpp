@@ -44,6 +44,35 @@ any_vec(const dev_mem_t<eT1> mem, const uword n_elem, const eT2 val, const twowa
 
 
 
+template<typename eT>
+inline
+bool
+any_vec(const dev_mem_t<eT> mem, const uword n_elem, const eT val, const oneway_real_kernel_id::enum_id num, const oneway_real_kernel_id::enum_id num_small)
+  {
+  coot_extra_debug_sigprint();
+
+  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "coot::cuda::any_vec(): CUDA runtime not valid" );
+
+  CUfunction k = get_rt().cuda_rt.get_kernel<eT>(num);
+  CUfunction k_small = get_rt().cuda_rt.get_kernel<eT>(num_small);
+  // Second (and later) passes use the "or" reduction.
+  CUfunction second_k = get_rt().cuda_rt.get_kernel<u32>(oneway_integral_kernel_id::or_reduce);
+  CUfunction second_k_small = get_rt().cuda_rt.get_kernel<u32>(oneway_integral_kernel_id::or_reduce_small);
+
+  u32 result = generic_reduce<eT, u32>(mem,
+                                       n_elem,
+                                       "any_vec",
+                                       k,
+                                       k_small,
+                                       std::make_tuple(val),
+                                       second_k,
+                                       second_k_small,
+                                       std::make_tuple(/* no extra args for second pass */));
+  return (result == 0) ? false : true;
+  }
+
+
+
 template<typename eT1, typename eT2>
 inline
 void

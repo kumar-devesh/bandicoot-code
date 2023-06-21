@@ -74,7 +74,6 @@ struct oneway_kernel_id
     diag_inplace_mod_scalar,
     //
     extract_diag,
-    set_diag,
     copy_diag,
     //
     mul_colwise,
@@ -135,6 +134,9 @@ struct oneway_kernel_id
     symmatu_inplace,
     symmatl_inplace,
     //
+    replace,
+    reorder_cols,
+    //
     rotate_180,
     //
     invalid_kernel
@@ -171,7 +173,6 @@ struct oneway_kernel_id
     names.push_back("diag_inplace_mod_scalar");
 
     names.push_back("extract_diag");
-    names.push_back("set_diag");
     names.push_back("copy_diag");
 
     names.push_back("mul_colwise");
@@ -232,6 +233,9 @@ struct oneway_kernel_id
     names.push_back("symmatu_inplace");
     names.push_back("symmatl_inplace");
 
+    names.push_back("replace");
+    names.push_back("reorder_cols");
+
     names.push_back("rotate_180");
 
     return names;
@@ -271,6 +275,8 @@ struct oneway_real_kernel_id
     rel_isfinite,
     rel_isnonfinite,
     rel_isnan,
+    rel_any_nonfinite,
+    rel_any_nonfinite_small,
     //
     lu_extract_l,
     lu_extract_pivoted_l,
@@ -306,6 +312,8 @@ struct oneway_real_kernel_id
     names.push_back("rel_isfinite");
     names.push_back("rel_isnonfinite");
     names.push_back("rel_isnan");
+    names.push_back("rel_any_nonfinite");
+    names.push_back("rel_any_nonfinite_small");
 
     names.push_back("lu_extract_l");
     names.push_back("lu_extract_pivoted_l");
@@ -479,6 +487,7 @@ struct twoway_kernel_id
     clamp,
     //
     get_diag,
+    set_diag,
     //
     sum_colwise_conv_pre,
     sum_rowwise_conv_pre,
@@ -548,6 +557,8 @@ struct twoway_kernel_id
     //
     symmatu,
     symmatl,
+    //
+    cross,
     //
     invalid_kernel
     };
@@ -650,6 +661,7 @@ struct twoway_kernel_id
     names.push_back("clamp");
 
     names.push_back("get_diag");
+    names.push_back("set_diag");
 
     names.push_back("sum_colwise_conv_pre");
     names.push_back("sum_rowwise_conv_pre");
@@ -719,6 +731,8 @@ struct twoway_kernel_id
 
     names.push_back("symmatu");
     names.push_back("symmatl");
+
+    names.push_back("cross");
 
     return names;
     }

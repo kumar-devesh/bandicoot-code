@@ -14,16 +14,15 @@
 
 __kernel
 void
-COOT_FN(PREFIX,set_diag)(__global eT1* out,
-                         const UWORD out_offset,
-                         __global const eT1* in,
-                         const UWORD n_rows,
-                         const UWORD len)
+COOT_FN(PREFIX,replace)(__global eT1* out,
+                        const eT1 val_find,
+                        const eT1 val_replace,
+                        const UWORD N)
   {
-  const UWORD tid = get_global_id(0);
-  if (tid < len)
+  const UWORD i = get_global_id(0);
+  if(i < N)
     {
-    const UWORD i = (n_rows + 1) * tid;
-    out[i + out_offset] = in[tid];
+    const eT1 val = out[i];
+    out[i] = (val == val_find) ? val_replace : val;
     }
   }
