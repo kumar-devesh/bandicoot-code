@@ -58,7 +58,7 @@ glue_conv2::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_conv2>& in)
   // We want to restrict the size of our temporary buffer so that it's not larger than A and K combined.
   // But, we also need to make sure it's big enough to hold a single column of patches...
   // (We also set a lower maximum size equivalent to an 1024x1024 matrix.)
-  const uword max_buffer_size = (std::max)((std::max)(A.n_elem + K.n_elem, K.n_elem * (A.n_cols + K.n_cols - 1)), 1048576);
+  uword max_buffer_size = (std::max)((std::max)(A.n_elem + K.n_elem, K.n_elem * (A.n_cols + K.n_cols - 1)), (uword) 1048576);
   uword buffer_n_rows = 0;
   uword buffer_n_cols = 0;
   uword out_n_rows = 0;
