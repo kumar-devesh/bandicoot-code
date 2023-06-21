@@ -1494,3 +1494,66 @@ TEMPLATE_TEST_CASE("col_vs_row_conv2_same_test", "[conv2]", float, double)
   REQUIRE( arma::approx_equal( C1_cpu, C1_ref, "reldiff", 1e-5 ) );
   REQUIRE( arma::approx_equal( C2_cpu, C2_ref, "reldiff", 1e-5 ) );
   }
+
+
+
+TEMPLATE_TEST_CASE
+  (
+  "conv2_conv_to_test",
+  "[conv2]",
+  (std::pair<float, double>),
+  (std::pair<double, float>)
+  )
+  {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
+  Mat<eT1> A = randu<Mat<eT1>>(200, 200);
+  Mat<eT1> B = randu<Mat<eT1>>(50, 50);
+
+  Mat<eT2> C1 = conv_to<Mat<eT2>>::from(conv2(A, B));
+  Mat<eT2> C2 = conv_to<Mat<eT2>>::from(conv2(B, A));
+  Mat<eT2> C3 = conv_to<Mat<eT2>>::from(conv2(A, B, "full"));
+  Mat<eT2> C4 = conv_to<Mat<eT2>>::from(conv2(B, A, "full"));
+  Mat<eT2> C5 = conv_to<Mat<eT2>>::from(conv2(A, B, "same"));
+  Mat<eT2> C6 = conv_to<Mat<eT2>>::from(conv2(B, A, "same"));
+
+  Mat<eT1> C1_pre_conv = conv2(A, B);
+  Mat<eT1> C2_pre_conv = conv2(B, A);
+  Mat<eT1> C3_pre_conv = conv2(A, B, "full");
+  Mat<eT1> C4_pre_conv = conv2(B, A, "full");
+  Mat<eT1> C5_pre_conv = conv2(A, B, "same");
+  Mat<eT1> C6_pre_conv = conv2(B, A, "same");
+
+  Mat<eT2> C1_ref = conv_to<Mat<eT2>>::from(C1_pre_conv);
+  Mat<eT2> C2_ref = conv_to<Mat<eT2>>::from(C2_pre_conv);
+  Mat<eT2> C3_ref = conv_to<Mat<eT2>>::from(C3_pre_conv);
+  Mat<eT2> C4_ref = conv_to<Mat<eT2>>::from(C4_pre_conv);
+  Mat<eT2> C5_ref = conv_to<Mat<eT2>>::from(C5_pre_conv);
+  Mat<eT2> C6_ref = conv_to<Mat<eT2>>::from(C6_pre_conv);
+
+  REQUIRE( C1.n_rows == C1_ref.n_rows );
+  REQUIRE( C1.n_cols == C1_ref.n_cols );
+  REQUIRE( C2.n_rows == C2_ref.n_rows );
+  REQUIRE( C2.n_cols == C2_ref.n_cols );
+  REQUIRE( C3.n_rows == C3_ref.n_rows );
+  REQUIRE( C3.n_cols == C3_ref.n_cols );
+  REQUIRE( C4.n_rows == C4_ref.n_rows );
+  REQUIRE( C4.n_cols == C4_ref.n_cols );
+  REQUIRE( C5.n_rows == C5_ref.n_rows );
+  REQUIRE( C5.n_cols == C5_ref.n_cols );
+  REQUIRE( C6.n_rows == C6_ref.n_rows );
+  REQUIRE( C6.n_cols == C6_ref.n_cols );
+
+  REQUIRE( all(all(abs(C1 - C1_ref) < 1e-5)) );
+  REQUIRE( all(all(abs(C2 - C2_ref) < 1e-5)) );
+  REQUIRE( all(all(abs(C3 - C3_ref) < 1e-5)) );
+  REQUIRE( all(all(abs(C4 - C4_ref) < 1e-5)) );
+  REQUIRE( all(all(abs(C5 - C5_ref) < 1e-5)) );
+  REQUIRE( all(all(abs(C6 - C6_ref) < 1e-5)) );
+  }
