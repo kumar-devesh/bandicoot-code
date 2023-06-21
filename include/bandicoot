@@ -413,13 +413,10 @@ namespace coot
       #include "bandicoot_bits/opencl/eig_sym.hpp"
       #include "bandicoot_bits/opencl/prod.hpp"
       #include "bandicoot_bits/opencl/det.hpp"
-<<<<<<< HEAD
-      #include "bandicoot_bits/opencl/rotate_180.hpp"
-=======
       #include "bandicoot_bits/opencl/replace.hpp"
       #include "bandicoot_bits/opencl/reorder_cols.hpp"
       #include "bandicoot_bits/opencl/cross.hpp"
->>>>>>> origin/unstable
+      #include "bandicoot_bits/opencl/rotate_180.hpp"
       }
   #endif
 
@@ -471,13 +468,10 @@ namespace coot
     #include "bandicoot_bits/cuda/eig_sym.hpp"
     #include "bandicoot_bits/cuda/prod.hpp"
     #include "bandicoot_bits/cuda/det.hpp"
-<<<<<<< HEAD
-    #include "bandicoot_bits/cuda/rotate_180.hpp"
-=======
     #include "bandicoot_bits/cuda/replace.hpp"
     #include "bandicoot_bits/cuda/reorder_cols.hpp"
     #include "bandicoot_bits/cuda/cross.hpp"
->>>>>>> origin/unstable
+    #include "bandicoot_bits/cuda/rotate_180.hpp"
     }
   #endif
 
@@ -558,12 +552,9 @@ namespace coot
   #include "bandicoot_bits/fn_lu.hpp"
   #include "bandicoot_bits/fn_eig_sym.hpp"
   #include "bandicoot_bits/fn_det.hpp"
-<<<<<<< HEAD
-  #include "bandicoot_bits/fn_conv.hpp"
-=======
   #include "bandicoot_bits/fn_pinv.hpp"
   #include "bandicoot_bits/fn_cross.hpp"
->>>>>>> origin/unstable
+  #include "bandicoot_bits/fn_conv.hpp"
 
 
   //
@@ -636,12 +627,9 @@ namespace coot
   #include "bandicoot_bits/glue_cor_meat.hpp"
   #include "bandicoot_bits/glue_join_cols_meat.hpp"
   #include "bandicoot_bits/glue_join_rows_meat.hpp"
-<<<<<<< HEAD
+  #include "bandicoot_bits/glue_cross_meat.hpp"
   #include "bandicoot_bits/glue_conv_meat.hpp"
   #include "bandicoot_bits/glue_conv2_meat.hpp"
-=======
-  #include "bandicoot_bits/glue_cross_meat.hpp"
->>>>>>> origin/unstable
 
   #include "bandicoot_bits/mtglue_relational_meat.hpp"
 
