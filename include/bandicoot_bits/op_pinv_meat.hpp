@@ -415,7 +415,7 @@ op_pinv::apply_direct_gen(Mat<eT>& out, Mat<eT>& in, const eT tol)
   if (num_svs != V.n_rows)
     {
     filtered_V.set_size(num_svs, V.n_cols);
-    coot_rt_t::copy_subview(filtered_V.get_dev_mem(false), V.get_dev_mem(false), 0, 0, V.n_rows, V.n_cols, num_svs, V.n_cols);
+    coot_rt_t::copy_subview(filtered_V.get_dev_mem(false), 0, V.get_dev_mem(false), 0, 0, V.n_rows, V.n_cols, num_svs, V.n_cols);
     }
   else
     {
