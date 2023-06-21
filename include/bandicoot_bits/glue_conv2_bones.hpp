@@ -22,20 +22,22 @@ class glue_conv2
   template<typename out_eT, typename T1, typename T2>
   inline static void apply(Mat<out_eT>& out, const Glue<T1, T2, glue_conv2>& in);
 
+  // Utilities to compute buffer sizes.
+  template<typename eT>
+  inline static void get_gemv_full_sizes(const Mat<eT>& A, const Mat<eT>& K, uword& buffer_n_rows, uword& buffer_n_cols, uword& out_n_rows, uword& out_n_cols, uword& buffer_top_padding, uword& buffer_bottom_padding, uword& buffer_row_offset, uword& buffer_col_offset);
+
+  template<typename eT>
+  inline static void get_gemv_same_sizes(const Mat<eT>& A, const Mat<eT>& K, uword& buffer_n_rows, uword& buffer_n_cols, uword& out_n_rows, uword& out_n_cols, uword& buffer_top_padding, uword& buffer_bottom_padding, uword& buffer_row_offset, uword& buffer_col_offset);
+
+  template<typename eT>
+  inline static void get_gemv_same_sizes_small(const Mat<eT>& A, const Mat<eT>& K, uword& buffer_n_rows, uword& buffer_n_cols, uword& out_n_rows, uword& out_n_cols, uword& buffer_top_padding, uword& buffer_bottom_padding, uword& buffer_row_offset, uword& buffer_col_offset);
+
+  // Utilities to fill the buffer.
   template<typename eT>
   inline static void fill_gemv_buffer_top_bottom(Mat<eT>& buffer, const uword buffer_top_padding, const uword buffer_bottom_padding, const uword kernel_rows);
 
   template<typename eT>
   inline static void fill_gemv_buffer_col(Mat<eT>& buffer, const uword i, const uword j, const Mat<eT>& A, const Mat<eT>& K, const uword buffer_top_padding, const uword A_col_offset);
-
-  template<typename eT>
-  inline static void create_gemv_full_buffer(Mat<eT>& buffer, const Mat<eT>& A, const Mat<eT>& K);
-
-  template<typename eT>
-  inline static void create_gemv_same_buffer(Mat<eT>& buffer, const Mat<eT>& A, const Mat<eT>& K);
-
-  template<typename eT>
-  inline static void create_gemv_same_buffer_small(Mat<eT>& buffer, const Mat<eT>& A, const Mat<eT>& K);
 
   template<typename T1, typename T2> inline static uword compute_n_rows(const Glue<T1, T2, glue_conv2>& glue, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols);
   template<typename T1, typename T2> inline static uword compute_n_cols(const Glue<T1, T2, glue_conv2>& glue, const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols);

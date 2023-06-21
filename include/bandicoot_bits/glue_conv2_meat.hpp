@@ -55,15 +55,22 @@ glue_conv2::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_conv2>& in)
   Mat<eT> buffer;
   const uword mode = in.aux_uword;
 
+  // We want to restrict the size of our temporary buffer so that it's not larger than A and K combined.
+  // But, we also need to make sure it's big enough to hold a single column of patches...
+  const uword max_buffer_size = (std::max)(A.n_elem + K.n_elem, K.n_elem * (A.n_cols + K.n_cols - 1));
+  uword buffer_n_rows = 0;
+  uword buffer_n_cols = 0;
+  uword out_n_rows = 0;
+  uword out_n_cols = 0;
+  uword buffer_top_padding = 0;
+  uword buffer_bottom_padding = 0;
+  uword buffer_row_offset = 0;
+  uword buffer_col_offset = 0;
+
   if (mode == 0)
     {
     // "full"
-    create_gemv_full_buffer(buffer, A, K);
-
-    const uword out_n_rows = A.n_rows + K.n_rows - 1;
-    const uword out_n_cols = A.n_cols + K.n_cols - 1;
-
-    out.set_size(out_n_rows, out_n_cols);
+    get_gemv_full_sizes(A, K, buffer_n_rows, buffer_n_cols, out_n_rows, out_n_cols, buffer_top_padding, buffer_bottom_padding, buffer_row_offset, buffer_col_offset);
     }
   else
     {
@@ -71,34 +78,138 @@ glue_conv2::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_conv2>& in)
     // Note that we have to create the buffer differently depending on what the output size is.
     if (&A == &UA.M)
       {
-      create_gemv_same_buffer(buffer, A, K); // output size is A.size()
-      out.set_size(A.n_rows, A.n_cols);
+      get_gemv_same_sizes(A, K, buffer_n_rows, buffer_n_cols, out_n_rows, out_n_cols, buffer_top_padding, buffer_bottom_padding, buffer_row_offset, buffer_col_offset);
       }
     else
       {
-      create_gemv_same_buffer_small(buffer, A, K); // output size is K.size()
-      out.set_size(K.n_rows, K.n_cols);
+      get_gemv_same_sizes_small(A, K, buffer_n_rows, buffer_n_cols, out_n_rows, out_n_cols, buffer_top_padding, buffer_bottom_padding, buffer_row_offset, buffer_col_offset);
       }
     }
 
-  // Multiplying the flattened kernel with each row of the buffer will give us our results.
-  for (uword i = 0; i < out.n_cols; ++i)
+  const uword cols_per_batch = std::min(buffer_n_cols, max_buffer_size / buffer_n_rows); // rounds down
+  out.set_size(out_n_rows, out_n_cols);
+  buffer.set_size(buffer_n_rows, cols_per_batch);
+
+  // Pad the top and bottom of the buffer with zeros to correspond to regions where K's columns do not fully overlap with A's columns.
+  fill_gemv_buffer_top_bottom(buffer, (K.n_cols - 1), (K.n_cols - 1), K.n_rows);
+
+  // Loop over chunks of the output matrix so that we don't exceed the temporary memory limit.
+  // Note that the terminology here is confusing:
+  //   `cols_per_batch` refers to the number of columns in `buffer`,
+  //   but each column of `buffer` corresponds to a *row* in `out`;
+  //   this is why we iterate from c = 0 to c = out_n_rows.
+  for (uword c = 0; c < out_n_rows; c += cols_per_batch)
     {
-    // Now multiply a batch of patches with the kernel.
-    coot_rt_t::gemv<eT, true>(out.get_dev_mem(false),
-                              i * out.n_rows,
-                              1,
-                              buffer.get_dev_mem(false),
-                              i * K.n_rows,
-                              K.n_elem, // this is the number of rows in each column
-                              buffer.n_rows, // this is the actual number of rows in `buffer`
-                              buffer.n_cols,
-                              K_mod.get_dev_mem(false),
-                              0,
-                              1,
-                              1.0,
-                              0.0);
+    const uword num_cols = (c + cols_per_batch > out_n_rows) ? (out_n_rows - c) : cols_per_batch;
+
+    // Now fill the buffer.
+    for (size_t i = c; i < c + num_cols; ++i)
+      {
+      fill_gemv_buffer_col(buffer, i + buffer_row_offset, i - c, A, K, buffer_top_padding, buffer_col_offset);
+      }
+
+    // Multiply the flattened kernel with the patches of each row of the buffer to get the results.
+    for (uword i = 0; i < out.n_cols; ++i)
+      {
+      coot_rt_t::gemv<eT, true>(out.get_dev_mem(false),
+                                i * out.n_rows + c,
+                                1,
+                                buffer.get_dev_mem(false),
+                                i * K.n_rows,
+                                K.n_elem, // this is the number of rows in each column
+                                buffer.n_rows, // this is the actual number of rows in `buffer`
+                                num_cols,
+                                K_mod.get_dev_mem(false),
+                                0,
+                                1,
+                                1.0,
+                                0.0);
+      }
     }
+  }
+
+
+
+template<typename eT>
+inline
+void
+glue_conv2::get_gemv_full_sizes(const Mat<eT>& A, const Mat<eT>& K, uword& buffer_n_rows, uword& buffer_n_cols, uword& out_n_rows, uword& out_n_cols, uword& buffer_top_padding, uword& buffer_bottom_padding, uword& buffer_row_offset, uword& buffer_col_offset)
+  {
+  coot_extra_debug_sigprint();
+
+  buffer_n_rows = K.n_rows * (A.n_cols + 2 * (K.n_cols - 1));
+  buffer_n_cols = A.n_rows + K.n_rows - 1;
+
+  out_n_rows = A.n_rows + K.n_rows - 1;
+  out_n_cols = A.n_cols + K.n_cols - 1;
+
+  buffer_top_padding = K.n_cols - 1;
+  buffer_bottom_padding = K.n_cols - 1;
+
+  buffer_row_offset = 0;
+  buffer_col_offset = 0;
+  }
+
+
+
+template<typename eT>
+inline
+void
+glue_conv2::get_gemv_same_sizes(const Mat<eT>& A, const Mat<eT>& K, uword& buffer_n_rows, uword& buffer_n_cols, uword& out_n_rows, uword& out_n_cols, uword& buffer_top_padding, uword& buffer_bottom_padding, uword& buffer_row_offset, uword& buffer_col_offset)
+  {
+  coot_extra_debug_sigprint();
+
+  // This is the same as create_gemv_full_buffer()---but here the output matrix is the size of A.
+  // Thus, there is some padding, but not as much as the "full" strategy.
+  //
+  // We use the same logic as Armadillo/Octave for determining how much zero padding to apply on each side.
+
+  buffer_n_rows = K.n_rows * (A.n_cols + K.n_cols - 1);
+  buffer_n_cols = A.n_rows;
+
+  out_n_rows = A.n_rows;
+  out_n_cols = A.n_cols;
+
+  const uword start_row = uword( K.n_rows / 2 );
+  const uword start_col = uword( K.n_cols / 2 );
+
+  buffer_top_padding = K.n_cols - start_col - 1;
+  buffer_bottom_padding = K.n_cols - buffer_top_padding - 1;
+
+  buffer_row_offset = start_row;
+  buffer_col_offset = 0;
+  }
+
+
+
+template<typename eT>
+inline
+void
+glue_conv2::get_gemv_same_sizes_small(const Mat<eT>& A, const Mat<eT>& K, uword& buffer_n_rows, uword& buffer_n_cols, uword& out_n_rows, uword& out_n_cols, uword& buffer_top_padding, uword& buffer_bottom_padding, uword& buffer_row_offset, uword& buffer_col_offset)
+  {
+  coot_extra_debug_sigprint();
+
+  // This is the same as create_gemv_same_buffer()---but here the output matrix is the size of K, not the size of A.
+  // Note that K.n_rows < A.n_rows.
+  //
+  // We use the same logic as Armadillo/Octave for determining how much zero padding to apply on each side.
+
+  buffer_n_rows = K.n_rows * (K.n_cols + K.n_cols - 1);
+  buffer_n_cols = K.n_rows;
+
+  out_n_rows = K.n_rows;
+  out_n_cols = K.n_cols;
+
+  const uword start_row = uword( A.n_rows / 2 );
+  const uword start_col = uword( A.n_cols / 2 );
+
+  // The buffer top padding for first full overlap is 0.
+  // We are looking for the place where `start_col + 1` rows overlap.
+  buffer_top_padding = (start_col < K.n_cols) ? K.n_cols - start_col - 1 : 0;
+  buffer_bottom_padding = (start_col < K.n_cols) ? (2 * K.n_cols - 1 - A.n_cols - buffer_top_padding) : 0;
+
+  buffer_row_offset = start_row;
+  buffer_col_offset = (start_col < (K.n_cols - 1)) ? 0 : (start_col - (K.n_cols - 1));
   }
 
 
@@ -227,105 +338,6 @@ glue_conv2::fill_gemv_buffer_col(Mat<eT>& buffer, const uword i, const uword j, 
                                   cols_to_copy,
                                   K.n_rows,
                                   oneway_kernel_id::submat_inplace_set_scalar);
-    }
-  }
-
-
-
-template<typename eT>
-inline
-void
-glue_conv2::create_gemv_full_buffer(Mat<eT>& buffer, const Mat<eT>& A, const Mat<eT>& K)
-  {
-  coot_extra_debug_sigprint();
-
-  const uword buffer_n_rows = K.n_rows * (A.n_cols + 2 * (K.n_cols - 1));
-  const uword buffer_n_cols = A.n_rows + K.n_rows - 1;
-
-  buffer.set_size(buffer_n_rows, buffer_n_cols);
-
-  // Pad the top and bottom of the buffer with zeros to correspond to regions where K's columns do not fully overlap with A's columns.
-  fill_gemv_buffer_top_bottom(buffer, (K.n_cols - 1), (K.n_cols - 1), K.n_rows);
-
-  // Fill each column of the buffer with patches of A.
-  for (size_t i = 0; i < buffer_n_cols; ++i)
-    {
-    fill_gemv_buffer_col(buffer, i, i, A, K, (K.n_cols - 1), 0);
-    }
-  }
-
-
-
-template<typename eT>
-inline
-void
-glue_conv2::create_gemv_same_buffer(Mat<eT>& buffer, const Mat<eT>& A, const Mat<eT>& K)
-  {
-  coot_extra_debug_sigprint();
-
-  // This is the same as create_gemv_full_buffer()---but the padding strategy is different.
-  // Since the output matrix size is the same as the input size, we need to have at least a little bit of padding.
-  // (No padding is the "valid" strategy.)
-  //
-  // We use the same logic as Armadillo/Octave for determining how much zero padding to apply on each side.
-
-  const uword start_row = uword( K.n_rows / 2 );
-  const uword start_col = uword( K.n_cols / 2 );
-
-  const uword start_col_padding = K.n_cols - start_col - 1;
-  const uword end_col_padding = K.n_cols - start_col_padding - 1;
-
-  // So we only need to consider the region where A and K overlap fully.
-
-  const uword buffer_n_rows = K.n_rows * (A.n_cols + K.n_cols - 1);
-  const uword buffer_n_cols = A.n_rows;
-
-  buffer.set_size(buffer_n_rows, buffer_n_cols);
-
-  // Pad the top and bottom of the buffer with zeros to correspond to regions where K's columns do not fully overlap with A's columns.
-  fill_gemv_buffer_top_bottom(buffer, start_col_padding, end_col_padding, K.n_rows);
-
-  for (uword i = 0; i < buffer_n_cols; ++i)
-    {
-    fill_gemv_buffer_col(buffer, i + start_row, i, A, K, start_col_padding, 0);
-    }
-  }
-
-
-
-template<typename eT>
-inline
-void
-glue_conv2::create_gemv_same_buffer_small(Mat<eT>& buffer, const Mat<eT>& A, const Mat<eT>& K)
-  {
-  coot_extra_debug_sigprint();
-
-  // This is the same as create_gemv_same_buffer()---but here the output matrix is the size of K, not the size of A.
-  // Note that K.n_rows < A.n_rows.
-  //
-  // We use the same logic as Armadillo/Octave for determining how much zero padding to apply on each side.
-
-  // Total row size: A.n_rows + 2 * (K.n_rows - 1) - (K.n_rows + K.n_rows) --> leftover is A.n_rows
-  const uword start_row = uword( A.n_rows / 2 );
-  const uword start_col = uword( A.n_cols / 2 );
-
-  const uword start_col_padding = (start_col < K.n_cols) ? K.n_cols - start_col - 1 : 0;
-  const uword end_col_padding = (start_col < K.n_cols) ? (2 * K.n_cols - 1 - A.n_cols - start_col_padding) : 0;
-
-  // So we only need to consider the region where A and K overlap fully.
-
-  const uword buffer_n_rows = K.n_rows * (K.n_cols + K.n_cols - 1);
-  const uword buffer_n_cols = K.n_rows;
-
-  buffer.set_size(buffer_n_rows, buffer_n_cols);
-
-  // Pad the top and bottom of the buffer with zeros to correspond to regions where K's columns do not fully overlap with A's columns.
-  fill_gemv_buffer_top_bottom(buffer, start_col_padding, end_col_padding, K.n_rows);
-
-  const uword A_col_offset = (start_col > (K.n_cols - 1)) ? start_col - (K.n_cols - 1) : 0;
-  for (uword i = 0; i < buffer_n_cols; ++i)
-    {
-    fill_gemv_buffer_col(buffer, i + start_row, i, A, K, start_col_padding, A_col_offset);
     }
   }
 
