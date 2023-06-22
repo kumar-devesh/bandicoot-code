@@ -89,7 +89,7 @@ inplace_op_array(dev_mem_t<eT2> dest, dev_mem_t<eT1> src, const uword n_elem, tw
 template<typename eT>
 inline
 void
-inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const uword m_n_rows, oneway_kernel_id::enum_id num)
+inplace_op_subview(dev_mem_t<eT> dest, const uword dest_offset, const eT val, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const uword m_n_rows, oneway_kernel_id::enum_id num)
   {
   coot_extra_debug_sigprint();
 
@@ -100,6 +100,7 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_row1, const
   const uword end_row = aux_row1 + n_rows - 1;
   const uword end_col = aux_col1 + n_cols - 1;
 
+  runtime_t::adapt_uword m_dest_offset(dest_offset);
   runtime_t::adapt_uword m_end_row(end_row);
   runtime_t::adapt_uword m_end_col(end_col);
   runtime_t::adapt_uword m_n_rows_a(m_n_rows);
@@ -108,11 +109,12 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_row1, const
 
   cl_int status = 0;
 
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &(dest.cl_mem_ptr));
-  status |= clSetKernelArg(kernel, 1, sizeof(eT),     &val);
-  status |= clSetKernelArg(kernel, 2,  m_end_row.size, m_end_row.addr);
-  status |= clSetKernelArg(kernel, 3,  m_end_col.size, m_end_col.addr);
-  status |= clSetKernelArg(kernel, 4, m_n_rows_a.size, m_n_rows_a.addr);
+  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem),     &(dest.cl_mem_ptr));
+  status |= clSetKernelArg(kernel, 1, m_dest_offset.size, m_dest_offset.addr);
+  status |= clSetKernelArg(kernel, 2, sizeof(eT),         &val);
+  status |= clSetKernelArg(kernel, 3, m_end_row.size,     m_end_row.addr);
+  status |= clSetKernelArg(kernel, 4, m_end_col.size,     m_end_col.addr);
+  status |= clSetKernelArg(kernel, 5, m_n_rows_a.size,    m_n_rows_a.addr);
   coot_check_cl_error(status, "coot::opencl::inplace_op_subview(): couldn't set kernel arguments");
 
   size_t global_work_offset[2] = { size_t(aux_row1), size_t(aux_col1) }; // starting point in parent matrix

@@ -142,6 +142,8 @@ class glue_cor;
 class glue_join_cols;
 class glue_join_rows;
 class glue_cross;
+class glue_conv;
+class glue_conv2;
 
 class glue_mixed_plus;
 class glue_mixed_minus;

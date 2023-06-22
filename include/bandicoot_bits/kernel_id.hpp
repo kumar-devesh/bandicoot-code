@@ -137,6 +137,8 @@ struct oneway_kernel_id
     replace,
     reorder_cols,
     //
+    rotate_180,
+    //
     invalid_kernel
     };
 
@@ -233,6 +235,8 @@ struct oneway_kernel_id
 
     names.push_back("replace");
     names.push_back("reorder_cols");
+
+    names.push_back("rotate_180");
 
     return names;
     }

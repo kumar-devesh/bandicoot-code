@@ -89,7 +89,7 @@ inplace_op_array(dev_mem_t<eT2> dest, dev_mem_t<eT1> src, const uword n_elem, tw
 template<typename eT>
 inline
 void
-inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const uword m_n_rows, oneway_kernel_id::enum_id num)
+inplace_op_subview(dev_mem_t<eT> dest, const uword dest_offset, const eT val, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const uword m_n_rows, oneway_kernel_id::enum_id num)
   {
   coot_extra_debug_sigprint();
 
@@ -101,8 +101,9 @@ inplace_op_subview(dev_mem_t<eT> dest, const eT val, const uword aux_row1, const
   // Get kernel.
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(num);
 
+  const eT* dest_ptr = dest.cuda_mem_ptr + dest_offset;
   const void* args[] = {
-      &(dest.cuda_mem_ptr),
+      &(dest_ptr),
       &val,
       (uword*) &end_row,
       (uword*) &end_col,

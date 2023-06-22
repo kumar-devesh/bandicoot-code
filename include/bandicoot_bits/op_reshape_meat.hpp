@@ -143,12 +143,12 @@ op_reshape::apply_direct(Mat<eT>& out, const subview<eT>& in, const uword new_n_
 
     if (in.n_elem > 0)
       {
-      coot_rt_t::copy_subview(out.get_dev_mem(false), in.m.get_dev_mem(false), in.aux_row1, in.aux_col1, in.m.n_rows, in.m.n_cols, in.n_rows, in.n_cols);
+      coot_rt_t::copy_subview(out.get_dev_mem(false), 0, in.m.get_dev_mem(false), in.aux_row1, in.aux_col1, in.m.n_rows, in.m.n_cols, in.n_rows, in.n_cols);
       }
     }
   else if (new_n_elem == in.n_elem && in.n_elem > 0)
     {
-    coot_rt_t::copy_subview(out.get_dev_mem(false), in.m.get_dev_mem(false), in.aux_row1, in.aux_col1, in.m.n_rows, in.m.n_cols, in.n_rows, in.n_cols);
+    coot_rt_t::copy_subview(out.get_dev_mem(false), 0, in.m.get_dev_mem(false), in.aux_row1, in.aux_col1, in.m.n_rows, in.m.n_cols, in.n_rows, in.n_cols);
     }
   else
     {
@@ -179,12 +179,12 @@ op_reshape::apply_direct(Mat<out_eT>& out, const subview<eT>& in, const uword ne
     coot_rt_t::inplace_op_scalar(out.get_dev_mem(false), out_eT(0), new_n_elem, oneway_kernel_id::inplace_set_scalar);
     if (in.n_elem > 0)
       {
-      coot_rt_t::copy_subview(out.get_dev_mem(false), in.m.get_dev_mem(false), in.aux_row1, in.aux_col1, in.m.n_rows, in.m.n_cols, in.n_rows, in.n_cols);
+      coot_rt_t::copy_subview(out.get_dev_mem(false), 0, in.m.get_dev_mem(false), in.aux_row1, in.aux_col1, in.m.n_rows, in.m.n_cols, in.n_rows, in.n_cols);
       }
     }
   else if (new_n_elem == in.n_elem && in.n_elem > 0)
     {
-    coot_rt_t::copy_subview(out.get_dev_mem(false), in.m.get_dev_mem(false), in.aux_row1, in.aux_col1, in.m.n_rows, in.m.n_cols, in.n_rows, in.n_cols);
+    coot_rt_t::copy_subview(out.get_dev_mem(false), 0, in.m.get_dev_mem(false), in.aux_row1, in.aux_col1, in.m.n_rows, in.m.n_cols, in.n_rows, in.n_cols);
     }
   else
     {
