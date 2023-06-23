@@ -616,7 +616,8 @@ Examples:
 <pre>
 fmat A(5, 5);
 A.randu();
-float x = A(1, 2); // note: try to avoid repeated individual element accesses
+<!-- TODO: comment color -->
+float x = A(1, 2); <font color="#0000bb">// note: try to avoid repeated individual element accesses!</font>
 
 fmat B = A + A;
 fmat C = A * B;
@@ -628,14 +629,21 @@ B.ones(5, 6);
 
 B.print("B:");
 
-// when using the OpenCL backend
+<!-- TODO: comment color -->
+<font color="#0000bb">// when using the OpenCL backend</font>
 cl_mem m_cl = clCreateBuffer(get_rt().cl_rt.get_context(), CL_MEM_READ_WRITE, sizeof(float) * 24, NULL, NULL);
 fmat H(wrap_mem_cl(m_cl), 4, 6);  // use auxiliary memory
 
-// when using the CUDA backend
+<!-- TODO: comment color -->
+<font color="#0000bb">// when using the CUDA backend</font>
 float* m_cuda;
 cudaMalloc(&amp;m_cuda, sizeof(float) * 24);
 fmat J(wrap_mem_cuda(m_cuda), 4, 6);  // use auxiliary memory
+
+<!-- TODO: comment color -->
+<font color="#0000bb">// convert from Armadillo</font>
+arma::fmat K(10, 10, arma::fill::randu);
+fmat L(K);
 </pre>
 </ul>
 </li>
