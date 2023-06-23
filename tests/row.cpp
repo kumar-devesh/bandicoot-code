@@ -311,3 +311,59 @@ TEST_CASE("row_invalid_size", "[row]")
   // This one needs to not throw.
   x = fmat(1, 10);
   }
+
+
+
+#ifdef COOT_USE_OPENCL
+
+TEMPLATE_TEST_CASE("row_advanced_cl", "[row]", u32, s32, u64, s64, float, double)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  if (coot::get_rt().backend != CL_BACKEND)
+    {
+    return;
+    }
+
+  Row<eT> x = randi<Row<eT>>(100, distr_param(1, 10));
+  cl_mem ptr = x.get_dev_mem(false).cl_mem_ptr;
+
+  Row<eT> y(wrap_mem_cl(ptr), 100);
+
+  REQUIRE( all(x == y) );
+  }
+
+#endif
+
+
+
+#ifdef COOT_USE_CUDA
+
+TEMPLATE_TEST_CASE("row_advanced_cuda", "[row]", u32, s32, u64, s64, float, double)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  if (coot::get_rt().backend != CUDA_BACKEND)
+    {
+    return;
+    }
+
+  Row<eT> x = randi<Row<eT>>(100, distr_param(1, 10));
+  eT* ptr = x.get_dev_mem(false).cuda_mem_ptr;
+
+  Row<eT> y(wrap_mem_cuda(ptr), 100);
+
+  REQUIRE( all(x == y) );
+  }
+
+#endif
