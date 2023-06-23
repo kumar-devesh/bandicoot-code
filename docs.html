@@ -1,1 +1,679 @@
-TODO
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<!--
+Copyright 2008-2023 Conrad Sanderson (http://conradsanderson.id.au)
+Copyright 2008-2023 National ICT Australia (NICTA)
+Copyright 2023 Ryan Curtin (http://ratml.org)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!-- TODO: change colors to something new -->
+<html>
+<head>
+  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
+  <title>Bandicoot: API Documentation</title>
+  <link rel="icon" href="armadillo_icon.png" type="image/png">
+  <style type="text/css">
+  <!--
+body
+  {
+  /* font-family: "Trebuchet MS", "Droid Sans", sans-serif; */
+  font-family: "Trebuchet MS", sans-serif;
+  color: #000000;
+  background-color: #FFFFFF;
+  /* font-size: 10pt; */
+  /* line-height: 120%; */
+  height: 110%;
+  }
+
+pre
+  {
+  font-family: "DejaVu Sans Mono", "Liberation Mono", "Andale Mono", "Bitstream Vera Sans Mono", "Luxi Mono", monospace;
+  /* font-size: smaller; */
+  color: #666666;
+  }
+
+a
+  {
+  text-decoration: none;
+  color: #498c05;
+  }
+
+a:hover
+  {
+  text-decoration: underline;
+  color: #498c05;
+  }
+
+a.menu
+  {
+  text-decoration: none;
+  color: #CCCCCC;
+  }
+
+a.menu:hover
+  {
+  text-decoration: none;
+  color: #498c05;
+  }
+
+a.latent, a.latent:hover, a.latent:active, a.latent:link, a.latent:visited
+  {
+  text-decoration: none;
+  border-bottom: 0px;
+  color: #000000;
+  }
+
+table
+  {
+  /* border: 1px solid #000; */
+  /* display: block; */
+  border-collapse: collapse;
+  }
+
+td.line
+  {
+  border-left: 2px solid rgb(204, 204, 204);
+  }
+
+.footertext
+  {
+  position: relative;
+  bottom: 0px;
+  }
+
+hr.greyline
+  {
+  color: rgb(204, 204, 204);
+  /* background-color: rgb(204, 204, 204); */
+  }
+
+
+#nobreak
+  {
+  white-space: nowrap;
+  }~
+
+.noindent
+  {
+  text-indent:    0px;
+  margin-left:    1ex;
+  margin-right:   0ex;
+  margin-top:     0ex;
+  margin-bottom:  0ex;
+  padding-left:   1ex;
+  padding-right:  0ex;
+  padding-top:    0ex;
+  padding-bottom: 0ex;
+  list-style:     disc;
+  }
+  -->
+  </style>
+</head>
+<body>
+
+
+
+<center>
+<table style="text-align: left; width: 80%; margin-left: auto; margin-right: auto;" border="0" cellpadding="0" cellspacing="0">
+<tbody>
+<tr>
+<td style="vertical-align: top;">
+
+
+<!-- BEGIN CONTENT -->
+
+
+<style type="text/css">
+<!--
+@media all
+  {
+  .pagebreak { }
+  .noprint   { }
+  }
+
+@media print
+  {
+  .pagebreak { page-break-before: always; }
+  .noprint   { display: none !important;  }
+  }
+-->
+</style>
+
+<a class="noprint" style="display:scroll; position:fixed; bottom:5px; right:5px;" href="#top"><font size=-1>[top]</font></a>
+
+<a name="top"></a>
+<big><b>API Documentation for Bandicoot 1.0</b></big>
+<br>
+<br>
+<br>
+
+
+<!-- TODO: rework -->
+<b>Preamble</b>
+<br>
+<br>
+<ul>
+<li>Bandicoot is a GPU-based linear algebra library that meant to be API-compatible with <a href="https://arma.sourceforge.net">Armadillo</a></li>
+<br>
+<li>Bandicoot supports the use of any OpenCL or CUDA device as a backend; see the <a href="#backend_configuration">backend configuration details</a></li>
+<br>
+<li>For converting Armadillo programs to Bandicoot, see the <a href="#arma_comparison">Armadillo/Bandicoot conversion guide</a></li>
+</ul>
+<table border="0" cellpadding="0" cellspacing="0">
+<tbody>
+<tr>
+<td style="text-align: left; vertical-align: top; width: 45%;">
+<ul>
+<li>
+For converting Matlab/Octave programs,
+see the <a href="#syntax">syntax conversion table</a>
+</li>
+<br>
+<li>
+First time users: please see the short <a href="#example_prog">example program</a>
+</li>
+<br>
+<li>
+If you discover any bugs or regressions, please <a href="http://arma.sourceforge.net/faq.html">report them</a>
+</li>
+<br>
+<li>
+History of <a href="#changelog">API additions</a>
+</li>
+</ul>
+</td>
+<td>
+&nbsp;
+</td>
+<td class="line" style="vertical-align: top;">
+<br>
+</td>
+<td style="text-align: left; vertical-align: top; width: 50%;">
+<ul>
+<li>
+Please cite the following papers if you use Bandicoot in your research and/or software.
+<br>
+Citations are useful for the continued development and maintenance of the library.
+<br>
+<br>
+<br><i>TODO: a technical report!</i>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+
+<br>
+<br>
+
+<b>Overview</b>
+<ul>
+<li><a href="#part_classes">matrix and vector classes</a></li>
+<li><a href="#part_membfns">member functions &amp; variables</a></li>
+<br>
+<li><a href="#part_gen">generated vectors&nbsp;/&nbsp;matrices</a></li>
+<li><a href="#part_fns">functions of vectors&nbsp;/&nbsp;matrices</a></li>
+<br>
+<li><a href="#part_decompdense">decompositions, factorisations, and inverses</a></li>
+<br>
+<li><a href="#part_sigproc">signal &amp; image processing</a></li>
+<li><a href="#part_stats">statistics and clustering</a></li>
+<li><a href="#part_misc">miscellaneous (constants, configuration)</a></li>
+</ul>
+<br>
+
+<a name="part_classes"></a>
+<b>Matrix and Vector Classes</b>
+<ul>
+<table>
+<tbody>
+<tr><td><a href="#Mat">Mat&lt;<i>type</i>&gt;, fmat, mat</a></td><td>&nbsp;</td><td>dense matrix class</td></tr>
+<tr><td><a href="#Col">Col&lt;<i>type</i>&gt;, fcolvec, fvec, colvec, vec</a></td><td>&nbsp;</td><td>dense column vector class</td></tr>
+<tr><td><a href="#Row">Row&lt;<i>type</i>&gt;, frowvec, rowvec</a></td><td>&nbsp;</td><td>dense row vector class</td></tr>
+<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><a href="#operators">operators</a></td><td>&nbsp;</td><td><code><big>+</big>&nbsp; <big>&minus;</big>&nbsp; <big>*</big>&nbsp; %&nbsp; /&nbsp; ==&nbsp; !=&nbsp; &lt;=&nbsp; &gt;=&nbsp; &lt;&nbsp; &gt;&nbsp; &amp;&amp;&nbsp; ||</code></td></tr>
+</tbody>
+</table>
+</ul>
+<br>
+
+<a name="part_membfns"></a>
+<b>Member Functions &amp; Variables</b>
+<ul>
+<table>
+<tbody>
+<tr><td><a href="#attributes">attributes</a></td><td>&nbsp;</td><td>.n_rows, .n_cols, .n_elem, .n_slices, ...</td></tr>
+<tr><td><a href="#element_access">element&nbsp;access</a></td><td>&nbsp;</td><td>element/object access via (), [] and .at()</td></tr>
+<tr><td><a href="#element_initialisation">element&nbsp;initialisation</a></td><td>&nbsp;</td><td>set elements via initialiser lists</td></tr>
+<tr><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td></tr>
+<tr><td><a href="#zeros_member">.zeros</a></td><td>&nbsp;</td><td>set all elements to zero</td></tr>
+<tr><td><a href="#ones_member">.ones</a></td><td>&nbsp;</td><td>set all elements to one</td></tr>
+<tr><td><a href="#eye_member">.eye</a></td><td>&nbsp;</td><td>set elements along main diagonal to one and off-diagonal elements to zero</td></tr>
+<tr><td><a href="#randu_randn_member">.randu&nbsp;/&nbsp;.randn</a></td><td>&nbsp;</td><td>set all elements to random values</td></tr>
+<tr><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td></tr>
+<tr><td><a href="#fill">.fill</a></td><td>&nbsp;</td><td>set all elements to specified value</td></tr>
+<tr><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td></tr>
+<tr><td><a href="#replace">.replace</a></td><td>&nbsp;</td><td>replace specific elements with a new value</td></tr>
+<tr><td><a href="#clamp_member">.clamp</a></td><td>&nbsp;</td><td>clamp values to lower and upper limits</td></tr>
+<tr><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td></tr>
+<tr><td><a href="#set_size">.set_size</a></td><td>&nbsp;</td><td>change size without keeping elements (fast)</td></tr>
+<tr><td><a href="#reshape_member">.reshape</a></td><td>&nbsp;</td><td>change size while keeping elements</td></tr>
+<tr><td><a href="#resize_member">.resize</a></td><td>&nbsp;</td><td>change size while keeping elements and preserving layout</td></tr>
+<tr><td><a href="#reset">.reset</a></td><td>&nbsp;</td><td>change size to empty</td></tr>
+<tr><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td></tr>
+<tr><td><a href="#submat">submatrix&nbsp;views</a></td><td>&nbsp;</td><td>read/write access to contiguous and non-contiguous submatrices</td></tr>
+<tr><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td></tr>
+<tr><td><a href="#diag">.diag</a></td><td>&nbsp;</td><td>read/write access to matrix diagonals</td></tr>
+<tr><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td></tr>
+<tr><td><a href="#iterators_mat">iterators&nbsp;(matrices)</a></td><td>&nbsp;</td><td>iterators and associated member functions for dense matrices and vectors</td></tr>
+<tr><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td></tr>
+<tr><td><a href="#t_st_members">.t&nbsp;/&nbsp;.st&nbsp;</a></td><td>&nbsp;</td><td>return matrix transpose</td></tr>
+<tr><td><a href="#eval_member">.eval</a></td><td>&nbsp;</td><td>force evaluation of delayed expression</td></tr>
+<tr><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td></tr>
+<tr><td><a href="#is_empty">.is_empty</a></td><td>&nbsp;</td><td>check whether object is empty</td></tr>
+<tr><td><a href="#is_vec">.is_vec</a></td><td>&nbsp;</td><td>check whether matrix is a vector</td></tr>
+<tr><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td></tr>
+<tr><td><a href="#is_square">.is_square</a></td><td>&nbsp;</td><td>check whether matrix is square sized</td></tr>
+<tr><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td></tr>
+<tr><td><a href="#print">.print</a></td><td>&nbsp;</td><td>print object to <i>std::cout</i> or user specified stream</td></tr>
+<tr><td><a href="#raw_print">.raw_print</a></td><td>&nbsp;</td><td>print object without formatting</td></tr>
+</tbody>
+</table>
+</ul>
+<br>
+
+<a name="part_gen"></a>
+<b>Generated Vectors&thinsp;/&thinsp;Matrices</b>
+<ul>
+<table>
+<tbody>
+<tr style="background-color: #F5F5F5;"><td><a href="#linspace">linspace</a></td><td>&nbsp;</td><td>generate vector with linearly spaced elements</td></tr>
+<tr><td><a href="#eye_standalone">eye</a></td><td>&nbsp;</td><td>generate identity matrix</td></tr>
+<tr><td><a href="#ones_standalone">ones</a></td><td>&nbsp;</td><td>generate object filled with ones</td></tr>
+<tr><td><a href="#zeros_standalone">zeros</a></td><td>&nbsp;</td><td>generate object filled with zeros</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#randu">randu</a></td><td>&nbsp;</td><td>generate object with random values (uniform distribution)</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#randn">randn</a></td><td>&nbsp;</td><td>generate object with random values (normal distribution)</td></tr>
+<tr><td><a href="#randi">randi</a></td><td>&nbsp;</td><td>generate object with random integer values in specified interval</td></tr>
+</tbody>
+</table>
+</ul>
+<br>
+
+<a name="part_fns"></a>
+<b>Functions of Vectors&thinsp;/&thinsp;Matrices</b>
+<ul>
+<table>
+<tbody>
+<tr style="background-color: #F5F5F5;"><td><a href="#abs">abs</a></td><td>&nbsp;</td><td>obtain magnitude of each element</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#accu">accu</a></td><td>&nbsp;</td><td>accumulate (sum) all elements</td></tr>
+<tr><td><a href="#all">all</a></td><td>&nbsp;</td><td>check whether all elements are non-zero, or satisfy a relational condition</td></tr>
+<tr><td><a href="#any">any</a></td><td>&nbsp;</td><td>check whether any element is non-zero, or satisfies a relational condition</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#as_scalar">as_scalar</a></td><td>&nbsp;</td><td>convert 1x1 matrix to pure scalar</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#clamp">clamp</a></td><td>&nbsp;</td><td>obtain clamped elements according to given limits</td></tr>
+<tr><td><a href="#conv_to">conv_to</a></td><td>&nbsp;</td><td>convert/cast between matrix types</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#cross">cross</a></td><td>&nbsp;</td><td>cross product</td></tr>
+<tr><td><a href="#det">det</a></td><td>&nbsp;</td><td>determinant</td></tr>
+<tr><td><a href="#diagmat">diagmat</a></td><td>&nbsp;</td><td>generate diagonal matrix from given matrix or vector</td></tr>
+<tr><td><a href="#diagvec">diagvec</a></td><td>&nbsp;</td><td>extract specified diagonal</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#dot">dot&nbsp;/&nbsp;cdot&nbsp;/&nbsp;norm_dot</a></td><td>&nbsp;</td><td>dot product</td></tr>
+<tr><td><a href="#find">find</a></td><td>&nbsp;</td><td>find indices of non-zero elements, or elements satisfying a relational condition</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#find_finite">find_finite</a></td><td>&nbsp;</td><td>find indices of finite elements</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#find_nonfinite">find_nonfinite</a></td><td>&nbsp;</td><td>find indices of non-finite elements</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#find_nan">find_nan</a></td><td>&nbsp;</td><td>find indices of NaN elements</td></tr>
+<tr><td><a href="#join">join_rows / join_cols</a></td><td>&nbsp;</td><td>concatenation of matrices</td></tr>
+<tr><td><a href="#min_and_max">min&nbsp;/&nbsp;max</a></td><td>&nbsp;</td><td>return extremum values</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#norm">norm</a></td><td>&nbsp;</td><td>various norms of vectors and matrices</td></tr>
+<tr><td><a href="#normalise">normalise</a></td><td>&nbsp;</td><td>normalise vectors to unit <i>p</i>-norm</td></tr>
+<tr><td><a href="#pow">pow</a></td><td>&nbsp;</td><td>element-wise power</td></tr>
+<tr><td><a href="#repmat">repmat</a></td><td>&nbsp;</td><td>replicate matrix in block-like fashion</td></tr>
+<tr><td><a href="#reshape">reshape</a></td><td>&nbsp;</td><td>change size while keeping elements</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#resize">resize</a></td><td>&nbsp;</td><td>change size while keeping elements and preserving layout</td></tr>
+<tr><td><a href="#size">size</a></td><td>&nbsp;</td><td>obtain dimensions of given object</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#sort">sort</a></td><td>&nbsp;</td><td>sort elements</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#sort_index">sort_index</a></td><td>&nbsp;</td><td>vector describing sorted order of elements</td></tr>
+<tr><td><a href="#sum">sum</a></td><td>&nbsp;</td><td>sum of elements</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#symmat">symmatu&nbsp;/&nbsp;symmatl</a></td><td>&nbsp;</td><td>generate symmetric matrix from given matrix</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#trace">trace</a></td><td>&nbsp;</td><td>sum of diagonal elements</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#trans">trans</a></td><td>&nbsp;</td><td>transpose of matrix</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#vectorise">vectorise</a></td><td>&nbsp;</td><td>flatten matrix into vector</td></tr>
+<tr><td><a href="#misc_fns">misc&nbsp;functions</a></td><td>&nbsp;</td><td>miscellaneous element-wise functions:&nbsp;exp,&nbsp;log,&nbsp;sqrt,&nbsp;round,&nbsp;sign,&nbsp;...</td></tr>
+<tr><td><a href="#trig_fns">trig&nbsp;functions</a></td><td>&nbsp;</td><td>trigonometric element-wise functions:&nbsp;cos,&nbsp;sin,&nbsp;tan,&nbsp;...</td></tr>
+</tbody>
+</table>
+</ul>
+<br>
+
+<a name="part_decompdense"></a>
+<b>Decompositions, Factorisations, and Inverses</b>
+<ul>
+<table>
+<tbody>
+<tr style="background-color: #F5F5F5;"><td><a href="#chol">chol</a></td><td>&nbsp;</td><td>Cholesky decomposition</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#eig_sym">eig_sym</a></td><td>&nbsp;</td><td>eigen decomposition of dense symmetric/hermitian matrix</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#lu">lu&nbsp;&nbsp;</a></td><td>&nbsp;</td><td>lower-upper decomposition</td></tr>
+<tr><td><a href="#pinv">pinv</a></td><td>&nbsp;</td><td>pseudo-inverse / generalised inverse</td></tr>
+<tr><td><a href="#svd">svd</a></td><td>&nbsp;</td><td>singular value decomposition</td></tr>
+</tbody>
+</table>
+</ul>
+<br>
+
+<a name="part_sigproc"></a>
+<b>Signal &amp; Image Processing</b>
+<ul>
+<table>
+<tbody>
+<tr style="background-color: #F5F5F5;"><td><a href="#conv">conv</a></td><td>&nbsp;</td><td>1D convolution</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#conv2">conv2</a></td><td>&nbsp;</td><td>2D convolution</td></tr>
+</tbody>
+</table>
+</ul>
+<br>
+
+<a name="part_stats"></a>
+<b>Statistics &amp; Clustering</b>
+<ul>
+<table>
+<tbody>
+<tr style="background-color: #F5F5F5;"><td><a href="#stats_fns">stats&nbsp;functions</a></td><td>&nbsp;</td><td>mean, median, standard deviation, variance</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#cov">cov</a></td><td>&nbsp;</td><td>covariance</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#cor">cor</a></td><td>&nbsp;</td><td>correlation</td></tr>
+</tbody>
+</table>
+</ul>
+<br>
+
+<a name="part_misc"></a>
+<b>Miscellaneous</b>
+<ul>
+<table>
+<tbody>
+<!-- TODO: write this section -->
+<tr><td><a href="#backend_configuration">backend configuration</a></td><td>&nbsp;</td><td>configuring the use of OpenCL or CUDA backends for Bandicoot</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#output_streams">output&nbsp;streams</a></td><td>&nbsp;</td><td>streams for printing warnings and errors</td></tr>
+<tr><td><a href="#uword">uword&nbsp;/&nbsp;sword</a></td><td>&nbsp;</td><td>shorthand for unsigned and signed integers</td></tr>
+<tr><td><a href="#syntax">Matlab/Bandicoot&nbsp;syntax&nbsp;differences</a></td><td>&nbsp;</td><td>examples of Matlab syntax and conceptually corresponding Bandicoot syntax</td></tr>
+<!-- TODO: write this section -->
+<tr><td><a href="#arma_comparison">Armadillo/Bandicoot&nbsp;differences</a></td><td>&nbsp;</td><td>conceptual differences between Bandicoot and Armadillo</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#example_prog">example&nbsp;program</a></td><td>&nbsp;</td><td>short example program</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#config_hpp">config.hpp</a></td><td>&nbsp;</td><td>configuration options</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#changelog">API&nbsp;additions</a></td><td>&nbsp;</td><td>API stability and list of API additions</td></tr>
+</tbody>
+</table>
+</ul>
+<br>
+
+
+<div class="pagebreak"></div>
+<hr class="greyline">
+<hr class="greyline">
+<br>
+<br>
+<font size=+1><b>Matrix and Vector Classes</b></font>
+<br>
+<br>
+
+
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="Mat"></a><b>Mat&lt;</b><i>type</i><b>&gt;</b>
+<br><b>mat</b>
+<br><b>cx_mat</b>
+<ul>
+<li>
+Classes for dense matrices, with elements stored in <a href="https://en.wikipedia.org/wiki/Column_major">column-major ordering</a> (ie. column by column) on the GPU
+</li>
+<br>
+<li>
+The root matrix class is <b>Mat&lt;</b><i>type</i><b>&gt;</b>, where <i>type</i> is one of:
+<ul>
+<li>
+<i>float</i>, <i>double</i>,
+<i>short</i>, <i>int</i>, <i>long</i>, and unsigned versions of <i>short</i>, <i>int</i>, <i>long</i>
+</li>
+<li>
+Bandicoot provides convenient <i>u32</i>, <i>u64</i>, <i>s32</i>, and <i>s64</i> types that can also be used
+</li>
+<li>
+<b>Important:</b> not all types are supported on all devices; runtime exceptions will be thrown if a type is not supported
+</li>
+</ul>
+</li>
+<br>
+<li>
+For convenience the following typedefs have been defined:
+<ul>
+<table style="text-align: left;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>fmat</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Mat&lt;float&gt;</code>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>mat</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Mat&lt;double&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;&nbsp;&nbsp;
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      <i><b>note:</b> not supported on all devices</i>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>dmat</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Mat&lt;double&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;&nbsp;&nbsp;
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      <i><b>note:</b> not supported on all devices</i>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>umat</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Mat&lt;<a href="#uword">uword</a>&gt;</code>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>imat</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Mat&lt;<a href="#uword">sword</a>&gt;</code>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</ul>
+</li>
+<br>
+<li>
+In this documentation the <i>fmat</i> type is used for convenience, speed, and portability;
+it is possible to use other types instead, eg. <i>mat</i>
+</li>
+<br>
+<li>
+Note that standard consumer GPUs may not have support for 64-bit floats (<code>double</code>),
+and if they do, they may not show speedup over CPU-based <a href="https://arma.sourceforge.net">Armadillo</a> matrices
+unless they are high-end GPUs
+</li>
+<br>
+<li>
+Functions which use more complex functionality (generally matrix decompositions) are only valid for the following types:
+<i>fmat</i>, <i>dmat</i>, <i>mat</i>
+</li>
+<br>
+<a name="constructors_mat"></a>
+<li>
+Constructors:
+<ul>
+<table>
+<tbody>
+<tr><td><code>fmat()</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>fmat(<i>n_rows</i>, <i>n_cols</i>)</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>fmat(size(<i>X</i>))</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>fmat(fmat)</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>fmat(arma::fmat)</code></td><td>&nbsp;</td><td>&nbsp;(convert from CPU-based Armadillo matrix)</td></tr>
+<tr><td><code>fmat(fvec)</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>fmat(frowvec)</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+</tbody>
+</table>
+</ul>
+</li>
+<br>
+<li>
+<b>Caveat:</b>
+<ul>
+<li>unlike Armadillo 10.5 and newer, the elements are <i>not</i> initialised;
+they may contain garbage values, including NaN
+<li>consider using <a href="#zeros">zeros()</a> or other functions to fill memory</li>
+<li><a href="#element_access">setting the elements one by one is generally very inefficient</a> and should be avoided if possible</li>
+</ul>
+</li>
+<br>
+<li>
+Each instance of <i>fmat</i> automatically allocates and releases internal memory on the GPU.
+All internally allocated memory used by an instance of <i>fmat</i> is automatically released as soon as the instance goes out of scope.
+For example, if an instance of <i>fmat</i> is declared inside a function, it will be automatically destroyed at the end of the function.
+To forcefully release memory at any point, use <a href="#reset">.reset()</a>; note that in normal use this is not required.
+</li>
+<br>
+<a name="adv_constructors_mat"></a>
+<li>
+Advanced constructors:
+<br>
+<br>
+<ul>
+<code>fmat(ptr_aux_mem, n_rows, n_cols)</code>
+<br>
+<br>
+<ul>
+Create a matrix using data from writable auxiliary (external) memory, where <i>ptr_aux_mem</i> is a pointer to the memory.
+This matrix will use the auxiliary memory directly (i.e., no copying);
+this can be dangerous unless you know what you are doing!
+<br>
+<br>
+Because multiple backends are supported, pass the <i>ptr_aux_mem</i> argument as follows:
+<ul>
+<li>
+<!-- TODO: more specific link? -->
+when using the <a href="#backend_configuration">OpenCL backend</a>, given some <i>cl_mem</i> object <i>p</i>, use <code>wrap_mem_cl(p)</code> as the first argument (<i>ptr_aux_mem</i>)
+</li>
+<li>
+when using the <a href="#backend_configuration">CUDA backend</a>, given some CUDA memory pointer <i>p</i>, use <code>wrap_mem_cuda(p)</code> as the first argument (<i>ptr_aux_mem</i>)
+</li>
+</ul>
+</ul>
+</ul>
+</li>
+<br>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A(5, 5);
+A.randu();
+float x = A(1, 2); // note: try to avoid repeated individual element accesses
+
+fmat B = A + A;
+fmat C = A * B;
+fmat D = A % B;
+
+B.zeros();
+B.set_size(10, 10);
+B.ones(5, 6);
+
+B.print("B:");
+
+// when using the OpenCL backend
+cl_mem m_cl = clCreateBuffer(get_rt().cl_rt.get_context(), CL_MEM_READ_WRITE, sizeof(float) * 24, NULL, NULL);
+fmat H(wrap_mem_cl(m_cl), 4, 6);  // use auxiliary memory
+
+// when using the CUDA backend
+float* m_cuda;
+cudaMalloc(&amp;m_cuda, sizeof(float) * 24);
+fmat J(wrap_mem_cuda(m_cuda), 4, 6);  // use auxiliary memory
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#attributes">matrix attributes</a></li>
+<li><a href="#element_access">accessing elements</a></li>
+<li><a href="#element_initialisation">initialising elements</a></li>
+<li><a href="#operators">math &amp; relational operators</a></li>
+<li><a href="#submat">submatrix views</a></li>
+<li><a href="#print">printing matrices</a></li>
+<li><a href="#iterators_mat">element iterators</a></li>
+<li><a href="#eval_member">.eval()</a></li>
+<li><a href="#conv_to">conv_to()</a> (convert between matrix types)</li>
+<li><a href="https://cplusplus.com/doc/tutorial/other_data_types/">explanation of <i>typedef</i></a> (cplusplus.com)
+<li><a href="#Col">Col class</a></li>
+<li><a href="#Row">Row class</a></li>
+<li><a href="#config_hpp">config.hpp</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+
+
+<!-- END CONTENT -->
+
+
+<hr>
+<br>
+<br>
+
+</td>
+</tr>
+</tbody>
+</table>
+</center>
+</body>
+</html>
