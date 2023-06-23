@@ -36,6 +36,9 @@ template<typename eT> class subview_cube;
 
 template<typename eT> class diagview;
 
+                      struct cl_mem_wrapper;
+template<typename eT> struct cuda_mem_wrapper;
+
 
 class SizeMat;
 // class SizeCube;

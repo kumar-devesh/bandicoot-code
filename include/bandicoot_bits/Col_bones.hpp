@@ -33,6 +33,10 @@ class Col : public Mat<eT>
   inline explicit Col(const uword in_rows, const uword in_cols);
   inline explicit Col(const SizeMat& s);
 
+  inline Col(dev_mem_t<eT>        aux_dev_mem, const uword N);
+  inline Col(cl_mem_wrapper       aux_dev_mem, const uword N);
+  inline Col(cuda_mem_wrapper<eT> aux_dev_mem, const uword N);
+
   inline                  Col(const Col& X);
   inline const Col& operator=(const Col& X);
 
