@@ -78,7 +78,7 @@ Row<eT>::Row(dev_mem_t<eT> aux_dev_mem, const uword N)
 
 template<typename eT>
 inline
-Row<eT>::Row(cl_mem_wrapper aux_dev_mem, const uword N)
+Row<eT>::Row(cl_mem aux_dev_mem, const uword N)
   : Mat<eT>(aux_dev_mem, 1, N)
   {
   coot_extra_debug_sigprint();
@@ -90,7 +90,7 @@ Row<eT>::Row(cl_mem_wrapper aux_dev_mem, const uword N)
 
 template<typename eT>
 inline
-Row<eT>::Row(cuda_mem_wrapper<eT> aux_dev_mem, const uword N)
+Row<eT>::Row(eT* aux_dev_mem, const uword N)
   : Mat<eT>(aux_dev_mem, 1, N)
   {
   coot_extra_debug_sigprint();

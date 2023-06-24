@@ -33,9 +33,9 @@ class Row : public Mat<eT>
   inline explicit Row(const uword in_rows, const uword in_cols);
   inline explicit Row(const SizeMat& s);
 
-  inline Row(dev_mem_t<eT>        aux_dev_mem, const uword N);
-  inline Row(cl_mem_wrapper       aux_dev_mem, const uword N);
-  inline Row(cuda_mem_wrapper<eT> aux_dev_mem, const uword N);
+  inline Row(dev_mem_t<eT> aux_dev_mem, const uword N);
+  inline Row(cl_mem        aux_dev_mem, const uword N);
+  inline Row(eT*           aux_dev_mem, const uword N);
 
   inline                  Row(const Row& X);
   inline const Row& operator=(const Row& X);

@@ -140,7 +140,6 @@ namespace coot
 
   #include "bandicoot_bits/debug.hpp"
   #include "bandicoot_bits/cpu_memory.hpp"
-  #include "bandicoot_bits/wrap_mem.hpp"
 
 
 

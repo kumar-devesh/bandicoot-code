@@ -78,7 +78,7 @@ Col<eT>::Col(dev_mem_t<eT> aux_dev_mem, const uword N)
 
 template<typename eT>
 inline
-Col<eT>::Col(cl_mem_wrapper aux_dev_mem, const uword N)
+Col<eT>::Col(cl_mem aux_dev_mem, const uword N)
   : Mat<eT>(aux_dev_mem, N, 1)
   {
   coot_extra_debug_sigprint();
@@ -90,7 +90,7 @@ Col<eT>::Col(cl_mem_wrapper aux_dev_mem, const uword N)
 
 template<typename eT>
 inline
-Col<eT>::Col(cuda_mem_wrapper<eT> aux_dev_mem, const uword N)
+Col<eT>::Col(eT* aux_dev_mem, const uword N)
   : Mat<eT>(aux_dev_mem, N, 1)
   {
   coot_extra_debug_sigprint();

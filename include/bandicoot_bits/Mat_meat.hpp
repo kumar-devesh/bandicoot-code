@@ -96,14 +96,16 @@ Mat<eT>::Mat(dev_mem_t<eT> aux_dev_mem, const uword in_n_rows, const uword in_n_
 
 template<typename eT>
 inline
-Mat<eT>::Mat(cl_mem_wrapper aux_dev_mem, const uword in_n_rows, const uword in_n_cols)
+Mat<eT>::Mat(cl_mem aux_dev_mem, const uword in_n_rows, const uword in_n_cols)
   : n_rows    (in_n_rows)
   , n_cols    (in_n_cols)
   , n_elem    (in_n_rows*in_n_cols)  // TODO: need to check whether the result fits
   , vec_state (0)
   , mem_state (1)
   {
-  this->dev_mem.cl_mem_ptr = aux_dev_mem.m;
+  this->dev_mem.cl_mem_ptr = aux_dev_mem;
+
+  coot_debug_check( get_rt().backend != CL_BACKEND, "Mat(): cannot wrap OpenCL memory when not using OpenCL backend");
 
   coot_extra_debug_sigprint_this(this);
   }
@@ -112,14 +114,16 @@ Mat<eT>::Mat(cl_mem_wrapper aux_dev_mem, const uword in_n_rows, const uword in_n
 
 template<typename eT>
 inline
-Mat<eT>::Mat(cuda_mem_wrapper<eT> aux_dev_mem, const uword in_n_rows, const uword in_n_cols)
+Mat<eT>::Mat(eT* aux_dev_mem, const uword in_n_rows, const uword in_n_cols)
   : n_rows    (in_n_rows)
   , n_cols    (in_n_cols)
   , n_elem    (in_n_rows*in_n_cols)  // TODO: need to check whether the result fits
   , vec_state (0)
   , mem_state (1)
   {
-  this->dev_mem.cuda_mem_ptr = aux_dev_mem.m;
+  this->dev_mem.cuda_mem_ptr = aux_dev_mem;
+
+  coot_debug_check( get_rt().backend != CUDA_BACKEND, "Mat(): cannot wrap CUDA memory when not using CUDA backend");
 
   coot_extra_debug_sigprint_this(this);
   }

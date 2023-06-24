@@ -333,7 +333,7 @@ TEMPLATE_TEST_CASE("row_advanced_cl", "[row]", u32, s32, u64, s64, float, double
   Row<eT> x = randi<Row<eT>>(100, distr_param(1, 10));
   cl_mem ptr = x.get_dev_mem(false).cl_mem_ptr;
 
-  Row<eT> y(wrap_mem_cl(ptr), 100);
+  Row<eT> y(ptr, 100);
 
   REQUIRE( all(x == y) );
   }
@@ -361,7 +361,7 @@ TEMPLATE_TEST_CASE("row_advanced_cuda", "[row]", u32, s32, u64, s64, float, doub
   Row<eT> x = randi<Row<eT>>(100, distr_param(1, 10));
   eT* ptr = x.get_dev_mem(false).cuda_mem_ptr;
 
-  Row<eT> y(wrap_mem_cuda(ptr), 100);
+  Row<eT> y(ptr, 100);
 
   REQUIRE( all(x == y) );
   }

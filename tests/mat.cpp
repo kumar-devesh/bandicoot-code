@@ -37,7 +37,7 @@ TEMPLATE_TEST_CASE("mat_advanced_cl", "[mat]", u32, s32, u64, s64, float, double
   Mat<eT> x = randi<Mat<eT>>(10, 10, distr_param(1, 10));
   cl_mem ptr = x.get_dev_mem(false).cl_mem_ptr;
 
-  Mat<eT> y(wrap_mem_cl(ptr), 10, 10);
+  Mat<eT> y(ptr, 10, 10);
 
   REQUIRE( all(all(x == y)) );
   }
@@ -65,7 +65,7 @@ TEMPLATE_TEST_CASE("mat_advanced_cuda", "[mat]", u32, s32, u64, s64, float, doub
   Mat<eT> x = randi<Mat<eT>>(10, 10, distr_param(1, 10));
   eT* ptr = x.get_dev_mem(false).cuda_mem_ptr;
 
-  Mat<eT> y(wrap_mem_cuda(ptr), 10, 10);
+  Mat<eT> y(ptr, 10, 10);
 
   REQUIRE( all(all(x == y)) );
   }

@@ -46,9 +46,9 @@ class Mat : public Base< eT, Mat<eT> >
   inline explicit Mat(const uword in_rows, const uword in_cols);
   inline explicit Mat(const SizeMat& s);
 
-  inline Mat(dev_mem_t<eT>        aux_dev_mem, const uword in_rows, const uword in_cols);
-  inline Mat(cl_mem_wrapper       aux_dev_mem, const uword in_rows, const uword in_cols);
-  inline Mat(cuda_mem_wrapper<eT> aux_dev_mem, const uword in_rows, const uword in_cols);
+  inline Mat(dev_mem_t<eT> aux_dev_mem, const uword in_rows, const uword in_cols);
+  inline Mat(cl_mem        aux_dev_mem, const uword in_rows, const uword in_cols); // OpenCL alias constructor
+  inline Mat(eT*           aux_dev_mem, const uword in_rows, const uword in_cols); // CUDA alias constructor
 
   inline dev_mem_t<eT> get_dev_mem(const bool sync = true) const;
 
