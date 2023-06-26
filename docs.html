@@ -256,7 +256,6 @@ Citations are useful for the continued development and maintenance of the librar
 <tbody>
 <tr><td><a href="#attributes">attributes</a></td><td>&nbsp;</td><td>.n_rows, .n_cols, .n_elem, .n_slices, ...</td></tr>
 <tr><td><a href="#element_access">element&nbsp;access</a></td><td>&nbsp;</td><td>element/object access via (), [] and .at()</td></tr>
-<tr><td><a href="#element_initialisation">element&nbsp;initialisation</a></td><td>&nbsp;</td><td>set elements via initialiser lists</td></tr>
 <tr><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td></tr>
 <tr><td><a href="#zeros_member">.zeros</a></td><td>&nbsp;</td><td>set all elements to zero</td></tr>
 <tr><td><a href="#ones_member">.ones</a></td><td>&nbsp;</td><td>set all elements to one</td></tr>
@@ -265,7 +264,6 @@ Citations are useful for the continued development and maintenance of the librar
 <tr><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td></tr>
 <tr><td><a href="#fill">.fill</a></td><td>&nbsp;</td><td>set all elements to specified value</td></tr>
 <tr><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td></tr>
-<tr><td><a href="#replace">.replace</a></td><td>&nbsp;</td><td>replace specific elements with a new value</td></tr>
 <tr><td><a href="#clamp_member">.clamp</a></td><td>&nbsp;</td><td>clamp values to lower and upper limits</td></tr>
 <tr><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td></tr>
 <tr><td><a href="#set_size">.set_size</a></td><td>&nbsp;</td><td>change size without keeping elements (fast)</td></tr>
@@ -276,8 +274,6 @@ Citations are useful for the continued development and maintenance of the librar
 <tr><td><a href="#submat">submatrix&nbsp;views</a></td><td>&nbsp;</td><td>read/write access to contiguous and non-contiguous submatrices</td></tr>
 <tr><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td></tr>
 <tr><td><a href="#diag">.diag</a></td><td>&nbsp;</td><td>read/write access to matrix diagonals</td></tr>
-<tr><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td></tr>
-<tr><td><a href="#iterators_mat">iterators&nbsp;(matrices)</a></td><td>&nbsp;</td><td>iterators and associated member functions for dense matrices and vectors</td></tr>
 <tr><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td></tr>
 <tr><td><a href="#t_st_members">.t&nbsp;/&nbsp;.st&nbsp;</a></td><td>&nbsp;</td><td>return matrix transpose</td></tr>
 <tr><td><a href="#eval_member">.eval</a></td><td>&nbsp;</td><td>force evaluation of delayed expression</td></tr>
@@ -429,8 +425,8 @@ Citations are useful for the continued development and maintenance of the librar
 
 <div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
 <a name="Mat"></a><b>Mat&lt;</b><i>type</i><b>&gt;</b>
+<br><b>fmat</b>
 <br><b>mat</b>
-<br><b>cx_mat</b>
 <ul>
 <li>
 Classes for dense matrices, with elements stored in <a href="https://en.wikipedia.org/wiki/Column_major">column-major ordering</a> (ie. column by column) on the GPU
@@ -466,6 +462,10 @@ For convenience the following typedefs have been defined:
       </td>
       <td style="vertical-align: top;">
       <code>Mat&lt;float&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
       </td>
     </tr>
     <tr>
@@ -512,6 +512,10 @@ For convenience the following typedefs have been defined:
       <td style="vertical-align: top;">
       <code>Mat&lt;<a href="#uword">uword</a>&gt;</code>
       </td>
+      <td style="vertical-align: top;">
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      </td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">
@@ -522,6 +526,70 @@ For convenience the following typedefs have been defined:
       </td>
       <td style="vertical-align: top;">
       <code>Mat&lt;<a href="#uword">sword</a>&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>u32_mat</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Mat&lt;u32&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>s32_mat</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Mat&lt;s32&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>u64_mat</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Mat&lt;u64&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>s64_mat</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Mat&lt;s64&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
       </td>
     </tr>
   </tbody>
@@ -595,14 +663,18 @@ This matrix will use the auxiliary memory directly (i.e., no copying);
 this can be dangerous unless you know what you are doing!
 <br>
 <br>
-Because multiple backends are supported, pass the <i>ptr_aux_mem</i> argument as follows:
+The <i>ptr_aux_mem</i> argument should be one of:
 <ul>
 <li>
-<!-- TODO: more specific link? -->
-when using the <a href="#backend_configuration">OpenCL backend</a>, given some <i>cl_mem</i> object <i>p</i>, use <code>wrap_mem_cl(p)</code> as the first argument (<i>ptr_aux_mem</i>)
+a memory pointer from another Bandicoot matrix obtained with <i>.get_dev_mem()</i>
 </li>
 <li>
-when using the <a href="#backend_configuration">CUDA backend</a>, given some CUDA memory pointer <i>p</i>, use <code>wrap_mem_cuda(p)</code> as the first argument (<i>ptr_aux_mem</i>)
+<!-- TODO: more specific link? -->
+a <i>cl_mem</i> object, if using the <a href="#backend_configuration">OpenCL backend</a>
+</li>
+<li>
+<!-- TODO: more specific link? -->
+a CUDA memory pointer (e.g. a <i>float*</i> for an <i>fmat</i>), if using the <a href="#backend_configuration">CUDA backend</a>
 </li>
 </ul>
 </ul>
@@ -630,6 +702,14 @@ B.ones(5, 6);
 B.print("B:");
 
 <!-- TODO: comment color -->
+<font color="#0000bb">// convert from Armadillo</font>
+arma::fmat C(10, 10, arma::fill::randu);
+fmat D(C);
+
+<!-- TODO: comment color -->
+<font color="#0000bb">// advanced constructors</font>
+
+<!-- TODO: comment color -->
 <font color="#0000bb">// when using the OpenCL backend</font>
 cl_mem m_cl = clCreateBuffer(get_rt().cl_rt.get_context(), CL_MEM_READ_WRITE, sizeof(float) * 24, NULL, NULL);
 fmat H(wrap_mem_cl(m_cl), 4, 6);  // use auxiliary memory
@@ -641,9 +721,8 @@ cudaMalloc(&amp;m_cuda, sizeof(float) * 24);
 fmat J(wrap_mem_cuda(m_cuda), 4, 6);  // use auxiliary memory
 
 <!-- TODO: comment color -->
-<font color="#0000bb">// convert from Armadillo</font>
-arma::fmat K(10, 10, arma::fill::randu);
-fmat L(K);
+<font color="#0000bb">// make an alias of another matrix</font>
+arma::fmat K(D.get_dev_mem(), D.n_rows, D.n_cols);
 </pre>
 </ul>
 </li>
@@ -668,6 +747,2104 @@ See also:
 </li>
 <br>
 </ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="Col"></a><b>Col&lt;</b><i>type</i><b>&gt;</b>
+<br><b>fvec</b>
+<br><b>vec</b>
+<ul>
+<li>
+Classes for column vectors (dense matrices with one column)
+</li>
+<br>
+<li>The <b>Col&lt;</b><i>type</i><b>&gt;</b> class is derived from the <b>Mat&lt;</b><i>type</i><b>&gt;</b> class
+and inherits most of the member functions
+</li>
+<br>
+<li>
+For convenience the following typedefs have been defined:
+<ul>
+<table style="text-align: left;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>fvec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top; text-align: right;">
+      <code>fcolvec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Col&lt;float&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>vec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top; text-align: right;">
+      <code>colvec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Col&lt;double&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;&nbsp;&nbsp;
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      <i><b>note:</b> not supported on all devices</i>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>dvec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top; text-align: right;">
+      <code>dcolvec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Col&lt;double&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;&nbsp;&nbsp;
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      <i><b>note:</b> not supported on all devices</i>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>uvec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top; text-align: right;">
+      <code>ucolvec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Col&lt;<a href="#uword">uword</a>&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>ivec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top; text-align: right;">
+      <code>icolvec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Col&lt;<a href="#uword">sword</a>&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>u32_vec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top; text-align: right;">
+      <code>u32_colvec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Col&lt;u32&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>s32_vec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top; text-align: right;">
+      <code>s32_colvec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Col&lt;s32&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>u64_vec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top; text-align: right;">
+      <code>u64_colvec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Col&lt;u64&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>s64_vec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top; text-align: right;">
+      <code>s64_colvec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Col&lt;s64&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      </td>
+    </tr>
+  </tbody>
+</table>
+</ul>
+</li>
+<br>
+<li>
+In this documentation, the <b><i>vec</i></b> and <b><i>colvec</i></b> types have the <b>same meaning</b> and are used <b>interchangeably</b>
+</li>
+<br>
+<li>
+In this documentation, the types <i>fvec</i> or <i>fcolvec</i> are used for convenience, speed, and portability; it is possible to use other types instead, eg. <i>vec</i>, <i>colvec</i>
+</li>
+<br>
+<li>
+Note that standard consumer GPUs may not have support for 64-bit floats (<code>double</code>), and if they do, they may not show speedup over CPU-based <a href="https://arma.sourceforge.net/">Armadillo</a> matrices unless they are high-end GPUs
+</li>
+<br>
+<li>
+Functions which take <i>Mat</i> as input can generally also take <i>Col</i> as input;
+main exceptions are functions which require square matrices
+</li>
+<br>
+<li>
+Constructors:
+<ul>
+<table>
+<tbody>
+<tr><td><code>fvec()</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>fvec(<i>n_elem</i>)</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>fvec(size(<i>X</i>))</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>fvec(fvec)</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>fvec(arma::fvec)</code></td><td>&nbsp;</td><td>(convert from CPU-based Armadillo vector)</td></tr>
+<tr><td><code>fvec(fmat)</code></td><td>&nbsp;</td><td>(<i>std::logic_error</i> exception is thrown if the given matrix has more than one column)</td></tr>
+</tbody>
+</table>
+</ul>
+</li>
+<br>
+<li>
+<b>Caveat:</b>
+<ul>
+<li>unlike Armadillo 10.5 and newer, the elements are <i>not</i> initialised; they may contain garbage values, including NaN
+<li>consider using <a href="#zeros">zeros()</a> or other functions to fill memory</li>
+<li><a href="#element_access">setting the elements one by one is generally very inefficient</a> and should be avoided if possible</li>
+</ul>
+</li>
+<br>
+<a name="adv_constructors_col"></a>
+<li>
+Advanced constructors:
+<br>
+<br>
+<ul>
+<code>fvec(ptr_aux_mem, number_of_elements)</code>
+<br>
+<br>
+<ul>
+Create a column vector using data from writable auxiliary (external) memory, where <i>ptr_aux_mem</i> is a pointer to the memory.
+This vector will directly use the auxiliary memory (ie. no copying); this can be dangerous unless you know what you are doing!
+<br>
+<br>
+The <i>ptr_aux_mem</i> argument should be one of:
+<ul>
+<li>
+a memory pointer from another Bandicoot matrix obtained with <i>.get_dev_mem()</i>
+</li>
+<li>
+<!-- TODO: more specific link? -->
+a <i>cl_mem</i> object, if using the <a href="#backend_configuration">OpenCL backend</a>
+</li>
+<li>
+<!-- TODO: more specific link? -->
+a CUDA memory pointer (e.g. a <i>float*</i> for an <i>fmat</i>), if using the <a href="#backend_configuration">CUDA backend</a>
+</li>
+</ul>
+</ul>
+</ul>
+</li>
+<br>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fvec x(10);
+fvec y(10, fill::ones);
+
+fmat A(10, 10, fill::randu);
+<!-- TODO: comment color -->
+fvec z = A.col(5); <font color="#0000bb">// extract a column vector</font>
+
+<!-- TODO: comment color -->
+<font color="#0000bb">// convert from Armadillo</font>
+arma::fvec d(100, arma::fill::randu);
+fvec e(d);
+</pre>
+</ul>
+</li>
+<br>
+<li>See also:
+<ul>
+<li><a href="#element_initialisation">element initialisation</a></li>
+<li><a href="#Mat">Mat class</a></li>
+<li><a href="#Row">Row class</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="Row"></a>
+<b>Row&lt;</b><i>type</i><b>&gt;</b>
+<br><b>frowvec</b>
+<br><b>rowvec</b>
+<ul>
+<li>
+Classes for row vectors (dense matrices with one row)
+</li>
+<br>
+<li>The template <b>Row&lt;</b><i>type</i><b>&gt;</b> class is derived from the <b>Mat&lt;</b><i>type</i><b>&gt;</b> class
+and inherits most of the member functions
+</li>
+<br>
+<li>
+For convenience the following typedefs have been defined:
+<ul>
+<table style="text-align: left;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>frowvec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Row&lt;float&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>rowvec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Row&lt;double&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;&nbsp;&nbsp;
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      <i><b>note:</b> not supported on all devices</i>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>drowvec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Row&lt;double&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;&nbsp;&nbsp;
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      <i><b>note:</b> not supported on all devices</i>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>urowvec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Row&lt;<a href="#uword">uword</a>&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>irowvec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Row&lt;<a href="#uword">sword</a>&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>u32_rowvec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Row&lt;u32&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>s32_rowvec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Row&lt;s32&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>u64_rowvec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Row&lt;u64&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">
+      <code>s64_rowvec</code>
+      </td>
+      <td style="vertical-align: top;">
+      &nbsp;=&nbsp;
+      </td>
+      <td style="vertical-align: top;">
+      <code>Row&lt;s64&gt;</code>
+      </td>
+      <td style="vertical-align: top;">
+      </td>
+      <td style="vertical-align: top; font-size: 85%">
+      </td>
+    </tr>
+  </tbody>
+</table>
+</ul>
+</li>
+<br>
+<li>
+In this documentation, the <i>frowvec</i> type is used for convenience, speed, and portability;
+it is possible to use other types instead, eg. <i>rowvec</i>
+</li>
+<br>
+<li>
+Note that standard consumer GPUs may not have support for 64-bit floats (<code>double</code>), and if they do, they may not show speedup over CPU-based <a href="https://arma.sourceforge.net/">Armadillo</a> matrices unless they are high-end GPUs
+</li>
+<br>
+<li>
+Functions which take <i>Mat</i> as input can generally also take <i>Row</i> as input.
+Main exceptions are functions which require square matrices
+</li>
+<br>
+<li>
+Constructors:
+<ul>
+<table>
+<tbody>
+<tr><td><code>frowvec()</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>frowvec(<i>n_elem</i>)</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>frowvec(size(<i>X</i>))</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>frowvec(frowvec)</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>frowvec(arma::fmat)</code></td><td>&nbsp;</td><td>(convert from CPU-based Armadillo row vector)</td></tr>
+<tr><td><code>frowvec(fmat)</code></td><td>&nbsp;</td><td>(<i>std::logic_error</i> exception is thrown if the given matrix has more than one row)</td></tr>
+</tbody>
+</table>
+</ul>
+</li>
+<br>
+<li>
+<b>Caveat:</b>
+<ul>
+<li>unlike Armadillo 10.5 and newer, the elements are <i>not</i> initialised; they may contain garbage values, including NaN
+<li>consider using <a href="#zeros">zeros()</a> or other functions to fill memory</li>
+<li><a href="#element_access">setting the elements one by one is generally very inefficient</a> and should be avoided if possible</li>
+</ul>
+</li>
+<br>
+<a name="adv_constructors_row"></a>
+<li>
+Advanced constructors:
+<br>
+<br>
+<ul>
+<code>frowvec(ptr_aux_mem, number_of_elements)</code>
+<br>
+<br>
+<ul>
+Create a row vector using data from writable auxiliary (external) memory, where <i>ptr_aux_mem</i> is a pointer to the memory.
+This vector will directly use the auxiliary memory (ie. no copying);
+this can be dangerous unless you know what you are doing!
+<br>
+<br>
+The <i>ptr_aux_mem</i> argument should be one of:
+<ul>
+<li>
+a memory pointer from another Bandicoot matrix obtained with <i>.get_dev_mem()</i>
+</li>
+<li>
+<!-- TODO: more specific link? -->
+a <i>cl_mem</i> object, if using the <a href="#backend_configuration">OpenCL backend</a>
+</li>
+<li>
+<!-- TODO: more specific link? -->
+a CUDA memory pointer (e.g. a <i>float*</i> for an <i>fmat</i>), if using the <a href="#backend_configuration">CUDA backend</a>
+</li>
+</ul>
+</ul>
+</ul>
+</li>
+<br>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+frowvec x(10);
+frowvec y(10, fill::ones);
+
+fmat    A(10, 10, fill::randu);
+<!-- TODO: comment color -->
+frowvec z = A.row(5); <font color="#0000bb">// extract a row vector</font>
+
+<!-- TODO: comment color -->
+<font color="#0000bb">// convert from Armadillo</font>
+arma::frowvec d(100, arma::fill::randu);
+fvec e(d);
+</pre>
+</ul>
+</li>
+<br>
+<li>See also:
+<ul>
+<li><a href="#element_initialisation">element initialisation</a></li>
+<li><a href="#Mat">Mat class</a></li>
+<li><a href="#Col">Col class</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="operators"></a>
+<b>operators:&nbsp; <code><big>+</big>&nbsp; <big>&minus;</big>&nbsp; <big>*</big>&nbsp; %&nbsp; /&nbsp; ==&nbsp; !=&nbsp; &lt;=&nbsp; &gt;=&nbsp; &lt;&nbsp; &gt;&nbsp; &amp;&amp;&nbsp; ||</code></b>
+<ul>
+<li>
+Overloaded operators for <i>Mat</i>, <i>Col</i>, and <i>Row</i> classes
+</li>
+<br>
+<li>
+Operations:
+<br>
+<br>
+<ul>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><code><b><big>+</big></b></code></td>
+      <td style="vertical-align: top;">&nbsp;&nbsp;&nbsp;<br>
+      </td>
+      <td style="vertical-align: top;">addition of two objects</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code><b><big>&minus;</big></b></code></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">subtraction of one object from another or negation of an object</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">&nbsp;</td>
+      <td style="vertical-align: top;">&nbsp;</td>
+      <td style="vertical-align: top;">&nbsp;</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code><b><big>*</big></b></code></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">matrix multiplication of two objects</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">&nbsp;</td>
+      <td style="vertical-align: top;">&nbsp;</td>
+      <td style="vertical-align: top;">&nbsp;</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code><b>%</b></code></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><a name="schur_product"></a>element-wise multiplication of two objects (Schur product)</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code><b>/</b></code></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">element-wise division of an object by another object or a scalar</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">&nbsp;</td>
+      <td style="vertical-align: top;">&nbsp;</td>
+      <td style="vertical-align: top;">&nbsp;</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code><b>==</b></code></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">element-wise equality evaluation of two objects; generates a matrix of type <i>umat</i></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code><b>!=</b></code></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">element-wise non-equality evaluation of two objects; generates a matrix of type <i>umat</i></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">&nbsp;</td>
+      <td style="vertical-align: top;">&nbsp;</td>
+      <td style="vertical-align: top;">&nbsp;</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code><b>&gt;=</b></code></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">element-wise "greater than or equal to" evaluation of two objects; generates a matrix of type <i>umat</i></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code><b>&lt;=</b></code></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">element-wise "less than or equal to" evaluation of two objects; generates a matrix/cube of type <i>umat</i></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">&nbsp;</td>
+      <td style="vertical-align: top;">&nbsp;</td>
+      <td style="vertical-align: top;">&nbsp;</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code><b>&gt;</b></code></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">element-wise "greater than" evaluation of two objects; generates a matrix of type <i>umat</i></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code><b>&lt;</b></code></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">element-wise "less than" evaluation of two objects; generates a matrix of type <i>umat</i></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">&nbsp;</td>
+      <td style="vertical-align: top;">&nbsp;</td>
+      <td style="vertical-align: top;">&nbsp;</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code><b>&amp;&amp;</b></code></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">element-wise logical AND evaluation of two objects; generates a matrix of type <i>umat</i></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code><b>||</b></code></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">element-wise logical OR evaluation of two objects; generates a matrix of type <i>umat</i></td>
+    </tr>
+  </tbody>
+</table>
+</ul>
+</li>
+<br>
+<li>
+For element-wise relational and logical operations
+(ie. <code><b>==</b></code>, <code><b>!=</b></code>, <code><b>&gt;=</b></code>, <code><b>&lt;=</b></code>, <code><b>&gt;</b></code>, <code><b>&lt;</b></code>, <code><b>&amp;&amp;</b></code>, <code><b>||</b></code>)
+each element in the generated object is either 0 or 1, depending on the result of the operation
+</li>
+<br>
+<li>
+<b>Caveat:</b>
+operators involving equality comparison (ie. <code><b>==</b></code>, <code><b>!=</b></code>, <code><b>&gt;=</b></code>, <code><b>&lt;=</b></code>)
+are not recommended for matrices of type <i>mat</i> or <i>fmat</i>,
+due to the necessarily <a href="https://en.wikipedia.org/wiki/Floating-point_arithmetic">limited precision of floating-point</a> element types
+</li>
+<br>
+<li>
+If incompatible object sizes are used, a <i>std::logic_error</i> exception is thrown
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(5, 10);
+fmat B = randu&lt;fmat&gt;(5, 10);
+fmat C = randu&lt;fmat&gt;(10, 5);
+
+fmat P = A + B;
+fmat Q = A - B;
+fmat R = -B;
+fmat S = A / 123.0;
+fmat T = A % B;
+fmat U = A * C;
+
+fmat V = A + B + A + B;
+
+imat AA = linspace&lt;imat&gt;(1, 9, 9);
+imat BB = linspace&lt;imat&gt;(9, 1, 9);
+
+<!-- TODO: comment color -->
+<font color="#0000bb">// compare elements</font>
+umat ZZ = (AA &gt;= BB);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#pow">pow()</a></li>
+<li><a href="#any">any()</a></li>
+<li><a href="#all">all()</a></li>
+<li><a href="#accu">accu()</a></li>
+<li><a href="#as_scalar">as_scalar()</a></li>
+<li><a href="#find">find()</a></li>
+<li><a href="#misc_fns">miscellaneous element-wise functions</a> &nbsp; (exp, log, sqrt, square, round, ...)</li>
+<li><a href="https://en.wikipedia.org/wiki/Floating-point_arithmetic">floating point arithmetic in Wikipedia</a></li>
+<li><a href="https://mathworld.wolfram.com/Floating-PointRepresentation.html">floating point representation in MathWorld</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+
+
+
+<div class="pagebreak"></div>
+<hr class="greyline">
+<hr class="greyline">
+<br>
+<br>
+<font size=+1><b>Member Functions &amp; Variables</b></font>
+<br>
+<br>
+
+
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="attributes"></a>
+<b>attributes</b>
+<ul>
+<table style="text-align: left;" border="0" cellpadding="0" cellspacing="0">
+<tbody>
+<tr>
+<td>
+<code><b>.n_rows</b></code>
+</td>
+<td>&nbsp;&nbsp;&nbsp;</td>
+<td>
+number of rows; present in <i>Mat</i>, <i>Col</i>, and <i>Row</i>
+</td>
+</tr>
+<tr>
+<td>
+<code><b>.n_cols</b></code>
+</td>
+<td>&nbsp;&nbsp;&nbsp;</td>
+<td>
+number of columns; present in <i>Mat</i>, <i>Col</i>, and <i>Row</i>
+</td>
+</tr>
+<tr>
+<td>
+<code><b>.n_elem</b></code>
+</td>
+<td>&nbsp;&nbsp;&nbsp;</td>
+<td>
+total number of elements; present in <i>Mat</i>, <i>Col</i>, and <i>Row</i>
+</td>
+</tr>
+</tbody>
+</table>
+</ul>
+<ul>
+<li>The variables are of type <a href="#uword">uword</a></li>
+<br>
+<li>
+The variables are read-only;
+to change the size, use
+<a href="#set_size">.set_size()</a>,
+<a href="#zeros_member">.zeros()</a>,
+<a href="#ones_member">.ones()</a>,
+or
+<a href="#reset">.reset()</a>
+</li>
+<br>
+<li>
+For the <i>Col</i> and <i>Row</i> classes, <i>n_elem</i> also indicates vector length</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat X(4,5);
+cout &lt;&lt; "X has " &lt;&lt; X.n_cols &lt;&lt; " columns" &lt;&lt; endl;
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#set_size">.set_size()</a></li>
+<li><a href="#zeros_member">.zeros()</a></li>
+<li><a href="#ones_member">.ones()</a></li>
+<li><a href="#reset">.reset()</a></li>
+<li><a href="#size">size()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="element_access"></a>
+<b>element access via (), [] and .at()</b>
+<ul>
+<li>
+Provide access to individual elements in a <i>Mat</i>, <i>Col</i>, or <i>Row</i>
+<br>
+<br>
+<ul>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+<tbody>
+<tr>
+<td style="vertical-align: top;">
+<code>(i)</code>
+</td>
+<td style="vertical-align: top;">&nbsp;<br>
+</td>
+<td style="vertical-align: top;">
+For <i>fvec</i> and <i>frowvec</i>, access the element stored at index <i>i</i>.
+For <i>fmat</i>, access the element/object stored at index <i>i</i> under the assumption of a flat layout,
+with column-major ordering of data (i.e. column by column).
+An exception is thrown if the requested element is out of bounds.
+</td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td style="vertical-align: top;">
+<code>.at(i)</code>&nbsp;&nbsp;or&nbsp;&nbsp;<code>[i]</code>&nbsp;
+</td>
+<td style="vertical-align: top;"><br>
+</td>
+<td style="vertical-align: top;">
+As for <code>(i)</code>, but without a bounds check; not recommended; see the caveats below
+</td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td style="vertical-align: top;">
+<code>(r,c)</code>
+</td>
+<td style="vertical-align: top;"><br>
+</td>
+<td style="vertical-align: top;">
+For <i>fmat</i>, access the element/object stored at row <i>r</i> and column <i>c</i>.
+An exception is thrown if the requested element is out of bounds.
+</td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td style="vertical-align: top;">
+<code>.at(r,c)</code>
+</td>
+<td style="vertical-align: top;"><br>
+</td>
+<td style="vertical-align: top;">
+As for <code>(r,c)</code>, but without a bounds check; not recommended; see the caveats below
+</td>
+<td style="vertical-align: top;"><br>
+</td>
+</tr>
+</tbody>
+</table>
+</ul>
+</li>
+<br>
+<li>
+<b>Important:</b>
+every element access involves a transfer from GPU memory to CPU memory;
+therefore, for efficiency, avoid repeated element access when possible;
+<!-- TODO: more specific link -->
+see <a href="#arma_comparison">the Armadillo conversion guide</a> for more details and suggestions.
+</li>
+<br>
+<li>
+The indices of elements are specified via the <a href="#uword">uword</a> type, which is a typedef for an <a href="#uword">unsigned integer type</a>.
+</li>
+<br>
+<li>
+<b>Caveats:</b>
+<ul>
+<li>
+accessing elements without bounds checks is slightly faster, but is not recommended until your code has been thoroughly debugged first
+</li>
+<li>
+indexing in C++ starts at 0
+</li>
+<li>accessing elements via <code>[r,c]</code> does not work correctly in C++;
+instead use <code>(r,c)</code> and <code>(r,c,s)</code>
+</li>
+</ul>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+<!-- TODO: comment color -->
+<font color="#0000bb">// remember that individual element accesses are slow and should be avoided;</font>
+<font color="#0000bb">// when possible, operate in batch instead of on individual elements!</font>
+fmat M(10, 10);
+M.randu();
+M(9, 9) = 123.0;
+float x = M(1, 2);
+
+fvec v(10);
+v.randu();
+v(9) = 123.0;
+float y = v(0);
+</pre>
+</ul>
+</li>
+<br>
+<li>See also:
+<ul>
+<!-- TODO: more specific link -->
+<li><a href="#arma_comparison">Armadillo conversion guide</a></li>
+<li><a href="#submat">submatrix views</a></li>
+<!-- TODO: ensure this section gets added -->
+<li><a href="#get_dev_mem">.get_dev_mem()</a></li>
+<li><a href="#config_hpp">config.hpp</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="zeros_member"></a>
+<table style="text-align: left;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><b>.zeros()</b></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td>&nbsp;</td>
+      <td style="vertical-align: top;">(member function of <i>Mat</i>, <i>Col</i>, and <i>Row</i>)
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><b>.zeros( n_elem )</b></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td>&nbsp;</td>
+      <td style="vertical-align: top;">(member function of <i>Col</i> and <i>Row</i>)
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><b>.zeros( n_rows, n_cols )</b></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td>&nbsp;</td>
+      <td style="vertical-align: top;">(member function of <i>Mat</i>)
+      </td>
+    </tr>
+  </tbody>
+</table>
+<ul>
+<li>
+Set the elements of an object to zero,
+optionally first changing the size to specified dimensions
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A;
+A.zeros(5, 10);
+
+fvec B;
+B.zeros(100);
+
+fmat C(5, 10);
+C.zeros();
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#zeros_standalone">zeros()</a> (standalone function)</li>
+<li><a href="#ones_member">.ones()</a></li>
+<li><a href="#randu_randn_member">.randu()</a></li>
+<li><a href="#fill">.fill()</a></li>
+<li><a href="#reset">.reset()</a></li>
+<li><a href="#set_size">.set_size()</a></li>
+<li><a href="#size">size()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="ones_member"></a>
+<table style="text-align: left;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><b>.ones()</b></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td>&nbsp;</td>
+      <td style="vertical-align: top;">(member function of <i>Mat</i>, <i>Col</i>, and <i>Row</i>)
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><b>.ones( n_elem )</b></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td>&nbsp;</td>
+      <td style="vertical-align: top;">(member function of <i>Col</i> and <i>Row</i>)
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><b>.ones( n_rows, n_cols )</b></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td>&nbsp;</td>
+      <td style="vertical-align: top;">(member function of <i>Mat</i>)
+      </td>
+    </tr>
+  </tbody>
+</table>
+<ul>
+<li>
+Set all the elements of an object to one,
+optionally first changing the size to specified dimensions
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A;
+A.ones(5, 10);
+
+fvec B;
+B.ones(100);
+
+fmat C(5, 10);
+C.ones();
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#ones_standalone">ones()</a> (standalone function)</li>
+<li><a href="#eye_member">.eye()</a></li>
+<li><a href="#zeros_member">.zeros()</a></li>
+<li><a href="#fill">.fill()</a></li>
+<li><a href="#randu_randn_member">.randu()</a></li>
+<li><a href="#size">size()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="eye_member"></a>
+<b>.eye()</b>
+<br>
+<b>.eye( n_rows, n_cols )</b>
+<ul>
+<li>
+Member functions of <i>Mat</i>
+</li>
+<br>
+<li>
+Set the elements along the main diagonal to one and off-diagonal elements to zero,
+optionally first changing the size to specified dimensions
+</li>
+<br>
+<li>
+An identity matrix is generated when <i>n_rows</i> = <i>n_cols</i>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A;
+A.eye(5, 5);
+
+fmat B(5, 5);
+B.eye();
+</pre>
+</ul>
+</li>
+<br>
+<li>See also:
+<ul>
+<li><a href="#ones_member">.ones()</a></li>
+<li><a href="#diag">.diag()</a></li>
+<li><a href="#diagmat">diagmat()</a></li>
+<li><a href="#diagvec">diagvec()</a></li>
+<li><a href="#eye_standalone">eye()</a> (standalone function)</li>
+<li><a href="#size">size()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="randu_randn_member"></a>
+<table style="text-align: left;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><b>.randu()</b></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td>&nbsp;</td>
+      <td style="vertical-align: top;">(member function of <i>Mat</i>, <i>Col</i>, and <i>Row</i>)
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><b>.randu( n_elem )</b></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td>&nbsp;</td>
+      <td style="vertical-align: top;">(member function of <i>Col</i> and <i>Row</i>)
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><b>.randu( n_rows, n_cols )</b></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td>&nbsp;</td>
+      <td style="vertical-align: top;">(member function of <i>Mat</i>)
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<table style="text-align: left;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><b>.randn()</b></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td>&nbsp;</td>
+      <td style="vertical-align: top;">(member function of <i>Mat</i>, <i>Col</i>, and <i>Row</i>)
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><b>.randn( n_elem )</b></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td>&nbsp;</td>
+      <td style="vertical-align: top;">(member function of <i>Col</i> and <i>Row</i>)
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><b>.randn( n_rows, n_cols )</b></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td>&nbsp;</td>
+      <td style="vertical-align: top;">(member function of <i>Mat</i>)
+      </td>
+    </tr>
+  </tbody>
+</table>
+<ul>
+<li>
+Set all the elements to random values,
+optionally first changing the size to specified dimensions
+</li>
+<br>
+<li><i>.randu()</i> uses a uniform distribution in the [0,1] interval
+</li>
+<br>
+<li><i>.randn()</i> uses a normal/Gaussian distribution with zero mean and unit variance
+</li>
+<br>
+<li>
+To change the RNG seed, use <i>coot_rng::set_seed(value)</i> or <i>coot_rng::set_seed_random()</i> functions
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A;
+A.randu(5, 10);
+
+fvec B;
+B.randu(100);
+
+fmat C(5, 10);
+C.randu();
+
+<!-- TODO: comment color -->
+coot_rng::set_seed_random(); <font color="#0000bb">// set the seed to a random value</font>
+coot_rng::set_seed(42);      <font color="#0000bb">// set the seed to a specific value </font>
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#randu">randu()</a> (standalone function with extended functionality)</li>
+<li><a href="#randn">randn()</a> (standalone function with extended functionality)</li>
+<li><a href="#fill">.fill()</a></li>
+<li><a href="#ones_member">.ones()</a></li>
+<li><a href="#zeros_member">.zeros()</a></li>
+<li><a href="#size">size()</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Uniform_distribution_(continuous)">uniform distribution in Wikipedia</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Normal_distribution">normal distribution in Wikipedia</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="fill"></a>
+<b>.fill( value )</b>
+<ul>
+<li>
+Member function of <i>Mat</i>, <i>Col</i>, and <i>Row</i>
+</li>
+<br>
+<li>Sets the elements to a specified value</li>
+<br>
+<li>The type of value must match the type of elements used by the container object (e.g. for <i>fmat</i> the type is <i>float</i>)
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A(5, 6);
+
+A.fill(123.0);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#ones_member">.ones()</a></li>
+<li><a href="#zeros_member">.zeros()</a></li>
+<li><a href="#randu_randn_member">.randu() &amp; .randn()</a></li>
+<li><a href="#constants">constants (pi, nan, inf, ...)</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="clamp_member"></a>
+<b>.clamp( min_value, max_value )</b>
+<ul>
+<li>
+Member function of <i>Mat</i>, <i>Col</i>, and <i>Row</i>
+</li>
+<br>
+<li>
+Clamp each element to the [<i>min_val</i>,&thinsp;<i>max_val</i>] interval;
+any value lower than <i>min_val</i> will be set to <i>min_val</i>, and any value higher than <i>max_val</i> will be set to <i>max_val</i>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A(5, 6);
+A.randu();
+
+A.clamp(0.2, 0.8);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#clamp">clamp()</a> (standalone function)</li>
+<li><a href="#operators">relational operators</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="set_size"></a>
+<table style="text-align: left;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><b>.set_size( n_elem )</b></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td>&nbsp;</td>
+      <td style="vertical-align: top;">(member function of <i>Col</i> and <i>Row</i>)
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><b>.set_size( n_rows, n_cols )</b></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td>&nbsp;</td>
+      <td style="vertical-align: top;">(member function of <i>Mat</i>)
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><b>.set_size( size(X) )</b></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td>&nbsp;</td>
+      <td style="vertical-align: top;">(member function of <i>Mat</i>, <i>Col</i>, and <i>Row</i>)
+      </td>
+    </tr>
+  </tbody>
+</table>
+<ul>
+<li>Change the size of an object, without explicitly preserving data and without initialising the elements (i.e. elements may contain garbage values, including NaN)</li>
+<br>
+<li>
+To initialise the elements to zero while changing the size, use <a href="#zeros_member">.zeros()</a> instead
+</li>
+<br>
+<li>
+To explicitly preserve data while changing the size, use <a href="#reshape_member">.reshape()</a> or <a href="#resize_member">.resize()</a> instead;
+<br><b>NOTE</b>: <i>.reshape()</i> and <i>.resize()</i> are considerably slower than <i>.set_size()</i>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+<!-- TODO: comment color -->
+fmat A;
+A.set_size(5, 10);      <font color="#0000bb">// or:  mat A(5, 10);</font>
+
+fmat B;
+B.set_size( size(A) );  <font color="#0000bb">// or:  mat B(size(A));</font>
+
+fvec v;
+v.set_size(100);        <font color="#0000bb">// or:  vec v(100);</font>
+</pre>
+</ul>
+</li>
+<br>
+<li>See also:
+<ul>
+<li><a href="#reset">.reset()</a></li>
+<li><a href="#reshape_member">.reshape()</a></li>
+<li><a href="#resize_member">.resize()</a></li>
+<li><a href="#zeros_member">.zeros()</a></li>
+<li><a href="#size">size()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="reshape_member"></a>
+<table style="text-align: left;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><b>.reshape( n_rows, n_cols )</b></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td>&nbsp;</td>
+      <td style="vertical-align: top;">(member function of <i>Mat</i>)
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><b>.reshape( size(X) )</b></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td>&nbsp;</td>
+      <td style="vertical-align: top;">(member function of <i>Mat</i>)
+      </td>
+    </tr>
+  </tbody>
+</table>
+<ul>
+<li>
+Recreate the object according to given size specifications,
+with the elements taken from the previous version of the object in a column-wise manner;
+the elements in the generated object are placed column-wise (i.e. the first column is filled up before filling the second column)
+</li>
+<br>
+<li>
+The layout of the elements in the recreated object will be different to the layout in the previous version of the object
+</li>
+<br>
+<li>
+If the total number of elements in the previous version of the object is less than the specified size,
+the extra elements in the recreated object are set to zero
+</li>
+<br>
+<li>
+If the total number of elements in the previous version of the object is greater than the specified size,
+only a subset of the elements is taken
+</li>
+<br>
+<li>
+<b>Caveats:</b>
+<ul>
+<li>
+to change the size without preserving data, use <a href="#set_size">.set_size()</a> instead, which is much faster
+</li>
+<li>
+to grow/shrink the object while preserving the elements <b>as well as</b> the layout of the elements,
+use <a href="#resize_member">.resize()</a> instead
+</li>
+<li>
+to flatten a matrix into a vector, use <a href="#vectorise">vectorise()</a> or <a href="#as_col_row">.as_col()&thinsp;/&thinsp;.as_row()</a> instead
+</li>
+</ul>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A(4, 5);
+A.randu();
+
+A.reshape(5, 4);
+</pre>
+</ul>
+</li>
+<br>
+<li>See also:
+<ul>
+<li><a href="#resize_member">.resize()</a></li>
+<li><a href="#set_size">.set_size()</a></li>
+<li><a href="#zeros_member">.zeros()</a></li>
+<li><a href="#reset">.reset()</a></li>
+<li><a href="#reshape">reshape()</a> (standalone function)</li>
+<li><a href="#vectorise">vectorise()</a></li>
+<li><a href="#size">size()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="resize_member"></a>
+<table style="text-align: left;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><b>.resize( n_elem )</b></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td>&nbsp;</td>
+      <td style="vertical-align: top;">(member function of <i>Col</i> and <i>Row</i>)
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><b>.resize( n_rows, n_cols )</b></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td>&nbsp;</td>
+      <td style="vertical-align: top;">(member function of <i>Mat</i>)
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><b>.resize( size(X) )</b></td>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td>&nbsp;</td>
+      <td style="vertical-align: top;">(member function of <i>Mat</i>, <i>Col</i>, and <i>Row</i>)
+      </td>
+    </tr>
+  </tbody>
+</table>
+<ul>
+<li>
+Recreate the object according to given size specifications, while preserving the elements as well as the layout of the elements
+</li>
+<br>
+<li>
+Can be used for growing or shrinking an object (i.e. adding/removing rows, and/or columns, and/or slices)
+</li>
+<br>
+<li>
+<b>Caveat:</b>
+to change the size without preserving data, use <a href="#set_size">.set_size()</a> instead, which is much faster
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A(4, 5);
+A.randu();
+
+A.resize(7, 6);
+</pre>
+</ul>
+</li>
+<br>
+<li>See also:
+<ul>
+<li><a href="#reshape_member">.reshape()</a></li>
+<li><a href="#set_size">.set_size()</a></li>
+<li><a href="#zeros_member">.zeros()</a></li>
+<li><a href="#reset">.reset()</a></li>
+<li><a href="#resize">resize()</a> (standalone function)</li>
+<li><a href="#vectorise">vectorise()</a></li>
+<li><a href="#size">size()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="reset"></a>
+<b>
+.reset()
+</b>
+<ul>
+<li>
+Reset the size to zero (the object will have no elements)
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A(5, 5);
+A.randu();
+
+A.reset();
+</pre>
+</ul>
+</li>
+<br>
+<li>See also:
+<ul>
+<li><a href="#set_size">.set_size()</a></li>
+<li><a href="#is_empty">.is_empty()</a></li>
+<li><a href="#zeros_member">.zeros()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="submat"></a>
+<b>submatrix views</b>
+<ul>
+<li>A collection of member functions of <i>Mat</i>, <i>Col</i> and <i>Row</i> classes that provide read/write access to submatrix views<br>
+<br>
+<li>contiguous views for matrix X:
+<br>
+<br>
+<ul>
+X.<b>col(&nbsp;</b>col_number<b>&nbsp;)</b><br>
+X.<b>row(&nbsp;</b>row_number<b>&nbsp;)</b><br>
+<br>
+X.<b>cols(&nbsp;</b>first_col<b>,</b>&nbsp;last_col<b>&nbsp;)</b><br>
+X.<b>rows(&nbsp;</b>first_row<b>,</b>&nbsp;last_row<b>&nbsp;)</b><br>
+<br>
+X.<b>submat(&nbsp;</b>first_row<b>,</b>&nbsp;first_col<b>,</b>&nbsp;last_row<b>,</b>&nbsp;last_col<b>&nbsp;)</b><br>
+<br>
+X<b>(&nbsp;span(</b>first_row<b>,</b>&nbsp;last_row<b>),&nbsp;span(</b>first_col<b>,</b>&nbsp;last_col<b>)&nbsp;)</b><br>
+<br>
+X<b>(&nbsp;</b>first_row<b>,</b>&nbsp;first_col<b>,&nbsp;size(</b>n_rows<b>,&nbsp;</b>n_cols<b>)&nbsp;)</b><br>
+X<b>(&nbsp;</b>first_row<b>,</b>&nbsp;first_col<b>,&nbsp;size(</b>Y<b>)&nbsp;)</b>&nbsp;&nbsp;&nbsp;&nbsp;<i>[&nbsp;Y&nbsp;is&nbsp;a&nbsp;matrix&nbsp;]</i><br>
+<br>
+X<b>(</b>&nbsp;<b>span(</b>first_row<b>,</b>&nbsp;last_row<b>),</b>&nbsp;col_number&nbsp;<b>)</b><br>
+X<b>(</b>&nbsp;row_number<b>,</b>&nbsp;<b>span(</b>first_col<b>,</b>&nbsp;last_col<b>)&nbsp;)</b><br>
+<br>
+X.<b>head_cols(&nbsp;</b>number_of_cols<b>&nbsp;)</b><br>
+X.<b>head_rows(&nbsp;</b>number_of_rows<b>&nbsp;)</b><br>
+<br>
+X.<b>tail_cols(&nbsp;</b>number_of_cols<b>&nbsp;)</b><br>
+X.<b>tail_rows(&nbsp;</b>number_of_rows<b>&nbsp;)</b><br>
+</ul>
+</li>
+
+<br>
+
+<li>
+contiguous views for vector V:
+<br>
+<br>
+<ul>
+V.<b>subvec(&nbsp;</b>first_index<b>,</b> last_index<b>&nbsp;)</b><br>
+<br>
+V.<b>subvec(&nbsp;</b>first_index<b>, size(</b>W<b>)&nbsp;)</b>&nbsp;&nbsp;&nbsp;&nbsp;<i>[&nbsp;W&nbsp;is&nbsp;a&nbsp;vector&nbsp;]</i><br>
+</ul>
+</li>
+
+<br>
+
+<li>related matrix views (documented separately)
+<ul>
+<br>
+X.<a href="#diag">diag()</a><br>
+X.<a href="#each_colrow">each_row()</a><br>
+X.<a href="#each_colrow">each_col()</a><br>
+</ul>
+</li>
+
+<br>
+<li>
+Instances of <i>span(start,end)</i> can be replaced by <i>span::all</i> to indicate the entire range
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A(5, 10);
+A.zeros();
+
+A.submat( 0,1, 2,3 )      = randu&lt;fmat&gt;(3, 3);
+A( span(0,2), span(1,3) ) = randu&lt;fmat&gt;(3, 3);
+A( 0,1, size(3,3) )       = randu&lt;fmat&gt;(3, 3);
+
+fmat B = A.submat( 0,1, 2,3 );
+fmat C = A( span(0,2), span(1,3) );
+fmat D = A( 0,1, size(3,3) );
+
+A.col(1)        = randu&lt;fmat&gt;(5,1);
+A(span::all, 1) = randu&lt;fmat&gt;(5,1);
+
+<!-- TODO: comment color -->
+<font color="#0000bb">// add 123 to the last 5 elements of vector a</font>
+vec a(10);
+a.randu();
+a.subvec(a.n_elem - 5, a.n_elem - 1) += 123.0;
+
+<!-- TODO: comment color -->
+<font color="#0000bb">// add 123 to the first 3 elements of column 2 of X</font>
+X.col(2).subvec(0, 2) += 123;
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#diag">diagonal views</a></li>
+<li><a href="#find">find()</a></li>
+<li><a href="#join">join_rows&thinsp;/&thinsp;cols&thinsp;/&thinsp;slices</a></li>
+<li><a href="#size">size()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="diag"></a>
+<b>.diag()</b>
+<br><b>.diag( k )</b>
+<ul>
+<li>
+Member function of <i>Mat</i>
+</li>
+<br>
+<li>
+Read/write access to a diagonal in a matrix
+</li>
+<br>
+<li>The argument <i>k</i> is optional; by default the main diagonal is accessed (<i>k&thinsp;=&thinsp;0</i>)</li>
+<br>
+<li>For <i>k&thinsp;&gt;&thinsp;0</i>, the <i>k</i>-th super-diagonal is accessed (top-right corner)</li>
+<br>
+<li>For <i>k&thinsp;&lt;&thinsp;0</i>, the <i>k</i>-th sub-diagonal is accessed (bottom-left corner)</li>
+<br>
+<li>The diagonal is interpreted as a column vector within expressions</li>
+<br>
+<li>
+<b>Note</b>: to calculate only the diagonal elements of a compound expression, use <a href="#diagvec">diagvec()</a> or <a href="#diagmat">diagmat()</a>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat X(5, 5);
+X.randu();
+
+fvec a = X.diag();
+fvec b = X.diag(1);
+fvec c = X.diag(-2);
+
+X.diag() = randu&lt;fvec&gt;(5);
+X.diag() += 6;
+X.diag().ones();
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#eye_member">.eye()</a></li>
+<li><a href="#diagvec">diagvec()</a></li>
+<li><a href="#diagmat">diagmat()</a></li>
+<li><a href="#submat">submatrix views</a></li>
+<li><a href="#trace">trace()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="t_st_members"></a>
+<b>
+.t()
+<br>.st()
+</b>
+<ul>
+<li>
+Member functions of any matrix or vector expression
+</li>
+<br>
+<li>
+<i>.t()</i> and </i>.st()</i> provide transposed copies of the matrix
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A(4, 5);
+A.randu();
+
+fmat B = A.t();
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#trans">trans()</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Transpose">transpose in Wikipedia</a></li>
+<li><a href="https://mathworld.wolfram.com/Transpose.html">transpose in MathWorld</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="eval_member"></a>
+<b>.eval()</b>
+<br>
+<ul>
+<li>
+Member function of any matrix or vector expression
+</li>
+<br>
+<li>
+Explicitly forces the evaluation of a delayed expression and outputs a matrix
+</li>
+<br>
+<li>
+This function should be used sparingly and only in cases where it is absolutely necessary;
+indiscriminate use can degrade performance
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(4,4);
+
+A.t().eval().print("A.t()");
+</pre>
+</ul>
+</li>
+<br>
+<li>See also:
+<ul>
+<li><a href="#as_scalar">as_scalar()</a></li>
+<li><a href="#Mat">Mat class</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="is_empty"></a>
+<b>.is_empty()</b>
+<ul>
+<li>Returns <i>true</i> if the object has no elements
+</li>
+<br>
+<li>Returns <i>false</i> if the object has one or more elements
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A(5, 5, fill::randu);
+cout &lt;&lt; A.is_empty() &lt;&lt; endl;
+
+A.reset();
+cout &lt;&lt; A.is_empty() &lt;&lt; endl;
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#is_square">.is_square()</a></li>
+<li><a href="#is_vec">.is_vec()</a></li>
+<li><a href="#reset">.reset()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="is_vec"></a>
+<b>.is_vec()</b>
+<br><b>.is_colvec()</b>
+<br><b>.is_rowvec()</b>
+<ul>
+<li>
+Member functions of <i>Mat</i>
+</li>
+<br>
+
+<li>.is_vec():
+<ul>
+<li>returns <i>true</i> if the matrix can be interpreted as a vector (either column or row vector)
+</li>
+<li>returns <i>false</i> if the matrix does not have exactly one column or one row
+</li>
+</ul>
+</li>
+<br>
+
+<li>.is_colvec():
+<ul>
+<li>returns <i>true</i> if the matrix can be interpreted as a column vector
+</li>
+<li>returns <i>false</i> if the matrix does not have exactly one column
+</li>
+</ul>
+</li>
+<br>
+
+<li>.is_rowvec():
+<ul>
+<li>returns <i>true</i> if the matrix can be interpreted as a row vector
+</li>
+<li>returns <i>false</i> if the matrix does not have exactly one row
+</li>
+</ul>
+</li>
+<br>
+
+<li><b>Caveat:</b> do not assume that the vector has elements if these functions return <i>true</i>; it is possible to have an empty vector (eg. 0x1)
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(1, 5);
+fmat B = randu&lt;fmat&gt;(5, 1);
+fmat C = randu&lt;fmat&gt;(5, 5);
+
+cout &lt;&lt; A.is_vec() &lt;&lt; endl;
+cout &lt;&lt; B.is_vec() &lt;&lt; endl;
+cout &lt;&lt; C.is_vec() &lt;&lt; endl;
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#is_empty">.is_empty()</a></li>
+<li><a href="#is_square">.is_square()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="is_square"></a>
+<b>.is_square()</b>
+<ul>
+<li>
+Member function of <i>Mat</i>
+</li>
+<br>
+<li>Returns <i>true</i> if the matrix is square, ie. number of rows is equal to the number of columns
+</li>
+<br>
+<li>Returns <i>false</i> if the matrix is not square
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(5, 5);
+fmat B = randu&lt;fmat&gt;(6, 7);
+
+cout &lt;&lt; A.is_square() &lt;&lt; endl;
+cout &lt;&lt; B.is_square() &lt;&lt; endl;
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#is_empty">.is_empty()</a></li>
+<li><a href="#is_vec">.is_vec()</a></li>
+<li><a href="#is_finite">.is_finite()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="print"></a>
+<b>.print()</b>
+<br><b>.print( header )</b>
+<br>
+<br><b>.print( stream )</b>
+<br><b>.print( stream, header )</b>
+<ul>
+<li>
+Member functions of <i>Mat</i>, <i>Col</i>, and <i>Row</i>
+</li>
+<br>
+<li>
+Print the contents of an object to the <i>std::cout</i> stream (default),
+or a user specified stream, with an optional header string
+</li>
+<br>
+<li>
+Objects can also be printed using the &lt;&lt; stream operator
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(5, 5);
+fmat B = randu&lt;fmat&gt;(6, 6);
+
+A.print();
+
+// print a transposed version of A
+A.t().print();
+
+// "B:" is the optional header line
+B.print("B:");
+
+cout &lt;&lt; A &lt;&lt; endl;
+
+cout &lt;&lt; "B:" &lt;&lt; endl;
+cout &lt;&lt; B &lt;&lt; endl;
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#raw_print">.raw_print()</a></li>
+<!-- TODO: check this link -->
+<li><a href="#output_streams">output streams</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="raw_print"></a>
+<b>.raw_print()</b>
+<br><b>.raw_print( header )</b>
+<br>
+<br><b>.raw_print( stream )</b>
+<br><b>.raw_print( stream, header )</b>
+<ul>
+<li>
+Member functions of <i>Mat</i>, <i>Col</i>, and <i>Row</i>
+</li>
+<br>
+<li>
+Similar to the <a href="#print">.print()</a> member function,
+with the difference that no formatting of the output is done; the stream's parameters such as precision, cell width, etc. can be set manually
+</li>
+<br>
+<li>
+If the cell width is set to zero, a space is printed between the elements
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(5, 5);
+
+cout.precision(11);
+cout.setf(ios::fixed);
+
+A.raw_print(cout, "A:");
+</pre>
+</ul>
+</li>
+<br>
+<li>See also:
+<ul>
+<li><a href="#print">.print()</a></li>
+<li><a href="https://en.cppreference.com/w/cpp/io/ios_base/fmtflags">std::ios_base::fmtflags</a> (cppreference.com)</li>
+<li><a href="https://cplusplus.com/reference/ios/ios_base/fmtflags/">std::ios_base::fmtflags</a> (cplusplus.com)</li>
+</ul>
+</li>
+<br>
+</ul>
+
 
 
 
