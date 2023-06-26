@@ -152,7 +152,7 @@ coot_rng::set_seed_random()
     }
   if(have_seed == false)
     {
-    // get better-than-nothing seeds in case reading /dev/urandom failed~
+    // get better-than-nothing seeds in case reading /dev/urandom failed
 
     const std::chrono::system_clock::time_point tp_now = std::chrono::system_clock::now();
 
