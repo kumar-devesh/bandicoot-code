@@ -110,3 +110,27 @@ TEMPLATE_TEST_CASE("ones_standalone_sizemat", "[ones]", float, double, u32, s32,
       }
     }
   }
+
+
+
+TEMPLATE_TEST_CASE("ones_standalone_row_col", "[ones]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Col<eT> x = ones<Col<eT>>(100);
+  Row<eT> y = ones<Row<eT>>(100);
+
+  REQUIRE( x.n_elem == 100 );
+  REQUIRE( y.n_elem == 100 );
+
+  for (uword i = 0; i < 100; ++i)
+    {
+    REQUIRE( eT(x[i]) == Approx(eT(1)) );
+    REQUIRE( eT(y[i]) == Approx(eT(1)) );
+    }
+  }
