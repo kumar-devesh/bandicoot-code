@@ -323,7 +323,7 @@ Citations are useful for the continued development and maintenance of the librar
 <tr><td><a href="#det">det</a></td><td>&nbsp;</td><td>determinant</td></tr>
 <tr><td><a href="#diagmat">diagmat</a></td><td>&nbsp;</td><td>generate diagonal matrix from given matrix or vector</td></tr>
 <tr><td><a href="#diagvec">diagvec</a></td><td>&nbsp;</td><td>extract specified diagonal</td></tr>
-<tr style="background-color: #F5F5F5;"><td><a href="#dot">dot&nbsp;/&nbsp;cdot&nbsp;/&nbsp;norm_dot</a></td><td>&nbsp;</td><td>dot product</td></tr>
+<tr style="background-color: #F5F5F5;"><td><a href="#dot">dot</a></td><td>&nbsp;</td><td>dot product</td></tr>
 <tr><td><a href="#find">find</a></td><td>&nbsp;</td><td>find indices of non-zero elements, or elements satisfying a relational condition</td></tr>
 <tr style="background-color: #F5F5F5;"><td><a href="#find_finite">find_finite</a></td><td>&nbsp;</td><td>find indices of finite elements</td></tr>
 <tr style="background-color: #F5F5F5;"><td><a href="#find_nonfinite">find_nonfinite</a></td><td>&nbsp;</td><td>find indices of non-finite elements</td></tr>
@@ -3241,6 +3241,1890 @@ coot_rng::set_seed(42);      <font color="#0000bb">// set the seed to a specific
 </li>
 <br>
 </ul>
+
+
+
+<div class="pagebreak"></div>
+<hr class="greyline">
+<hr class="greyline">
+<br>
+<br>
+<font size=+1><b>Functions of Vectors&thinsp;/&thinsp;Matrices</b></font>
+<br>
+<br>
+
+
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="abs"></a>
+<b>abs( X )</b>
+<ul>
+<li>
+Obtain the magnitude of each element
+</li>
+<br>
+<li>X and Y must have the same matrix type, such as <i>fmat</i> or <i>ivec</i></li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(5, 5);
+fmat B = abs(A);
+
+fvec X = linspace&lt;fvec&gt;(-5, 5, 11);
+fvec Y = abs(X);
+</pre>
+</ul>
+</li>
+<li>
+See also:
+<ul>
+<li><a href="#pow">pow()</a></li>
+<li><a href="#misc_fns">miscellaneous element-wise functions</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="accu"></a>
+<b>accu( X )</b>
+<ul>
+<li>
+Accumulate (sum) all elements of a vector or matrix
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(5, 6);
+fmat B = randu&lt;fmat&gt;(5, 6);
+
+float x = accu(A);
+
+float y = accu(A % B);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#sum">sum()</a></li>
+<li><a href="#trace">trace()</a></li>
+<li><a href="#stats_fns">mean()</a></li>
+<li><a href="#dot">dot()</a></li>
+<li><a href="#as_scalar">as_scalar()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="all"></a>
+<b>all( V )</b>
+<br><b>all( X )</b>
+<br><b>all( X, dim )</b>
+<ul>
+<li>For vector <i>V</i>, return <i>true</i> if all elements of the vector are non-zero or satisfy a relational condition</li>
+<br>
+<li>
+For matrix <i>X</i> and
+<ul>
+<li>
+<i>dim&thinsp;=&thinsp;0</i>, return a row vector (of type <a href="#Row">urowvec</a> or <a href="#Mat">umat</a>),
+with each element (0 or 1) indicating whether the corresponding column of <i>X</i> has all non-zero elements</li>
+<li>
+<i>dim&thinsp;=&thinsp;1</i>, return a column vector (of type <a href="#Col">ucolvec</a> or <a href="#Mat">umat</a>),
+with each element (0 or 1) indicating whether the corresponding row of <i>X</i> has all non-zero elements</li>
+</ul>
+</li>
+<br>
+<li>
+The <i>dim</i> argument is optional; by default <i>dim&thinsp;=&thinsp;0</i> is used
+</li>
+<br>
+<li>
+Relational operators can be used instead of <i>V</i> or <i>X</i>, eg. <i>A&thinsp;&gt;&thinsp;0.5</i>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fvec V = randu&lt;fvec&gt;(10);
+fmat X = randu&lt;fmat&gt;(5, 5);
+
+<!-- TODO: comment color -->
+<font color="#0000bb">// status1 will be set to true if vector V has all non-zero elements</font>
+bool status1 = all(V);
+
+<!-- TODO: comment color -->
+<font color="#0000bb">// status2 will be set to true if vector V has all elements greater than 0.5</font>
+bool status2 = all(V &gt; 0.5);
+
+<!-- TODO: comment color -->
+<font color="#0000bb">// status3 will be set to true if matrix X has all elements greater than 0.6;</font>
+<font color="#0000bb">// note the use of vectorise()</font>
+bool status3 = all(vectorise(X) &gt; 0.6);
+
+<!-- TODO: comment color -->
+<font color="#0000bb">// generate a row vector indicating which columns of X have all elements greater than 0.7</font>
+umat A = all(X &gt; 0.7);
+
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#any">any()</a></li>
+<li><a href="#find">find()</a></li>
+<li><a href="#conv_to">conv_to()</a> (convert between matrix/vector types)</li>
+<li><a href="#vectorise">vectorise()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="any"></a>
+<b>any( V )</b>
+<br><b>any( X )</b>
+<br><b>any( X, dim )</b>
+<ul>
+<li>For vector <i>V</i>, return <i>true</i> if any element of the vector is non-zero or satisfies a relational condition</li>
+<br>
+<li>
+For matrix <i>X</i> and
+<ul>
+<li>
+<i>dim&thinsp;=&thinsp;0</i>, return a row vector (of type <a href="#Row">urowvec</a> or <a href="#Mat">umat</a>),
+with each element (0 or 1) indicating whether the corresponding column of <i>X</i> has any non-zero elements</li>
+<li>
+<i>dim&thinsp;=&thinsp;1</i>, return a column vector (of type <a href="#Col">ucolvec</a> or <a href="#Mat">umat</a>),
+with each element (0 or 1) indicating whether the corresponding row of <i>X</i> has any non-zero elements</li>
+</ul>
+</li>
+<br>
+<li>
+The <i>dim</i> argument is optional; by default <i>dim&thinsp;=&thinsp;0</i> is used
+</li>
+<br>
+<li>
+Relational operators can be used instead of <i>V</i> or <i>X</i>, eg. <i>A&thinsp;&gt;&thinsp;0.9</i>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fvec V = randu&lt;fvec&gt;(10);
+fmat X = randu&lt;fmat&gt;(5, 5);
+
+<!-- TODO: comment color -->
+<font color="#0000bb">// status1 will be set to true if vector V has any non-zero elements</font>
+bool status1 = any(V);
+
+<!-- TODO: comment color -->
+<font color="#0000bb">// status2 will be set to true if vector V has any elements greater than 0.5</font>
+bool status2 = any(V &gt; 0.5);
+
+<!-- TODO: comment color -->
+<font color="#0000bb">// status3 will be set to true if matrix X has any elements greater than 0.6;</font>
+<font color="#0000bb">// note the use of vectorise()</font>
+bool status3 = any(vectorise(X) &gt; 0.6);
+
+<!-- TODO: comment color -->
+<font color="#0000bb">// generate a row vector indicating which columns of X have elements greater than 0.7</font>
+umat A = any(X &gt; 0.7);
+
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#all">all()</a></li>
+<li><a href="#find">find()</a></li>
+<li><a href="#conv_to">conv_to()</a> (convert between matrix/vector types)</li>
+<li><a href="#vectorise">vectorise()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="as_scalar"></a>
+<b>as_scalar( expression )</b>
+<ul>
+<li>
+Evaluate an expression that results in a 1x1 matrix,
+followed by converting the 1x1 matrix to a pure scalar
+</li>
+<br>
+<li>
+Optimised expression evaluations are automatically used when a binary or trinary expression is given (ie. 2 or 3 terms)
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+frowvec r = randu&lt;frowvec&gt;(5);
+fcolvec q = randu&lt;fcolvec&gt;(5);
+
+mat X(5, 5, fill::randu);
+
+<!-- TODO: comment color -->
+<font color="#0000bb">// examples of expressions which have optimised implementations</font>
+
+float a = as_scalar(r*q);
+float b = as_scalar(r*X*q);
+float c = as_scalar(r*diagmat(X)*q);
+float d = as_scalar(r*inv(diagmat(X))*q);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#vectorise">vectorise()</a></li>
+<li><a href="#accu">accu()</a></li>
+<li><a href="#trace">trace()</a></li>
+<li><a href="#dot">dot()</a></li>
+<li><a href="#norm">norm()</a></li>
+<li><a href="#conv_to">conv_to()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="clamp"></a>
+<b>clamp( X, min_val, max_val )</b>
+<ul>
+<li>
+Create a copy of <i>X</i> with each element clamped to the [<i>min_val</i>,&thinsp;<i>max_val</i>] interval;
+<br>any value lower than <i>min_val</i> will be set to <i>min_val</i>, and any value higher than <i>max_val</i> will be set to <i>max_val</i>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(5, 5);
+
+fmat B = clamp(A, 0.2,         0.8);
+
+fmat C = clamp(A, min(min(A)), 0.8);
+
+fmat D = clamp(A, 0.2, max(max(A)));
+</pre>
+</ul>
+</li>
+<li>
+See also:
+<ul>
+<li><a href="#clamp_member">.clamp()</a> (member function)</li>
+<li><a href="#find">find()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="conv_to"></a>
+<b>
+conv_to&lt; <i>type</i> &gt;::from( X )
+</b>
+<ul>
+<li>
+Convert (cast) from one matrix type to another (eg. <i>fmat</i> to <i>imat</i>)
+</li>
+<br>
+<li>
+Conversion between Armadillo and Bandicoot matrices/vectors is also possible
+</li>
+<br>
+<li>
+Conversion of a <i>fmat</i> object into <i>fcolvec</i> or <i>frowvec</i> is possible if the object can be interpreted as a vector
+</li>
+<br>
+<li>
+When <i>conv_to</i> is applied to an expression, the conversion operation will be fused with the expression computation when possible
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(5, 5);
+ mat B = conv_to&lt;mat&gt;::from(A);
+
+fmat C = randu&lt;fmat&gt;(10, 1);
+fcolvec x = conv_to&lt; fcolvec &gt;::from(C);
+
+<!-- TODO: comment color -->
+<font color="#0000bb">// convert from Armadillo object</font>
+arma::fmat D = conv_to&lt;arma::fmat&gt;::from(A);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#as_scalar">as_scalar()</a></li>
+<li><a href="#abs">abs()</a></li>
+<li><a href="#adv_constructors_mat">advanced constructors (matrices)</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="cross"></a>
+<b>cross( A, B )</b>
+<ul>
+<li>
+Calculate the cross product between A and B, under the assumption that A and B are 3 dimensional vectors
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fvec a = randu&lt;fvec&gt;(3);
+fvec b = randu&lt;fvec&gt;(3);
+
+fvec c = cross(a, b);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#dot">dot()</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Cross_product">Cross product in Wikipedia</a></li>
+<li><a href="https://mathworld.wolfram.com/CrossProduct.html">Cross product in MathWorld</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="det"></a>
+<table>
+<tbody>
+<tr><td><b>val = det( A )</b></td><td>&nbsp;&nbsp;&nbsp;</td><td>(form&nbsp;1)</td></tr>
+<tr><td><b>det( val, A )</b></td><td>&nbsp;&nbsp;&nbsp;</td><td>(form&nbsp;2)</td></tr>
+</tbody>
+</table>
+<ul>
+<li>Calculate the determinant of square matrix <i>A</i>, based on LU decomposition</li>
+<br>
+<li>form 1: return the determinant</li>
+<br>
+<li>form 2: store the calculated determinant in <i>val</i> and return a bool indicating success</li>
+<br>
+<li>If <i>A</i> is not square sized, a <i>std::logic_error</i> exception is thrown</li>
+<br>
+<li>If the calculation fails:
+<ul>
+<li><i>val = det(A)</i> throws a <i>std::runtime_error</i> exception</li>
+<li><i>det(val,A)</i> returns a bool set to <i>false</i> (exception is not thrown)</li>
+</ul>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(5, 5);
+
+<!-- TODO: comment color -->
+float val1 = det(A);         <font color = "#0000bb">// form 1</font>
+
+float val2;
+bool success = det(val2, A); <font color = "#0000bb">// form 2</font>
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="https://mathworld.wolfram.com/Determinant.html">determinant in MathWorld</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Determinant">determinant in Wikipedia</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="diagmat"></a>
+<b>diagmat( V )</b>
+<br><b>diagmat( V, k )</b>
+<br>
+<br><b>diagmat( X )</b>
+<br><b>diagmat( X, k )</b>
+<ul>
+<li>
+Generate a diagonal matrix from vector <i>V</i> or matrix <i>X</i>
+</li>
+<br>
+<li>
+Given vector <i>V</i>, generate a square matrix with the <i>k</i>-th diagonal containing a copy of the vector; all other elements are set to zero
+</li>
+<br>
+<li>
+Given matrix <i>X</i>, generate a matrix with the <i>k</i>-th diagonal containing a copy of the <i>k</i>-th diagonal of <i>X</i>; all other elements are set to zero
+</li>
+<br>
+<li>
+If <i>X</i> is an expression, the evaluation of the expression aims to calculate only the diagonal elements
+</li>
+<br>
+<li>
+The argument <i>k</i> is optional; by default the main diagonal is used (<i>k&thinsp;=&thinsp;0</i>)
+</li>
+<br>
+<li>
+For <i>k&thinsp;&gt;&thinsp;0</i>, the <i>k</i>-th super-diagonal is used (above main diagonal, towards top-right corner)
+</li>
+<br>
+<li>
+For <i>k&thinsp;&lt;&thinsp;0</i>, the <i>k</i>-th sub-diagonal is used (below main diagonal, towards bottom-left corner)
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(5, 5);
+fmat B = diagmat(A);
+fmat C = diagmat(A,1);
+
+fvec v = randu&lt;fvec&gt;(5);
+fmat D = diagmat(v);
+fmat E = diagmat(v,1);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#diag">.diag()</a></li>
+<li><a href="#diagvec">diagvec()</a></li>
+<li><a href="#trace">trace()</a></li>
+<li><a href="#symmat">symmatu() / symmatl()</a></li>
+<li><a href="#reshape">reshape()</a></li>
+<li><a href="#vectorise">vectorise()</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Diagonal_matrix">diagonal matrix in Wikipedia</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="diagvec"></a>
+<b>diagvec( X )</b>
+<br><b>diagvec( X, k )</b>
+<ul>
+<li>
+Extract the <i>k</i>-th diagonal from matrix <i>X</i>
+</li>
+<br>
+<li>
+If <i>X</i> is an expression, the evaluation of the expression aims to calculate only the diagonal elements
+</li>
+<br>
+<li>
+The argument <i>k</i> is optional; by default the main diagonal is extracted (<i>k&thinsp;=&thinsp;0</i>)
+</li>
+<br>
+<li>For <i>k&thinsp;&gt;&thinsp;0</i>, the <i>k</i>-th super-diagonal is extracted (top-right corner)</li>
+<br>
+<li>For <i>k&thinsp;&lt;&thinsp;0</i>, the <i>k</i>-th sub-diagonal is extracted (bottom-left corner)</li>
+<br>
+<li>
+The extracted diagonal is interpreted as a column vector
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(5, 5);
+
+fvec d = diagvec(A);
+</pre>
+</ul>
+</li>
+<br>
+<li>See also:
+<ul>
+<li><a href="#diag">.diag()</a></li>
+<li><a href="#diagmat">diagmat()</a></li>
+<li><a href="#trace">trace()</a></li>
+<li><a href="#vectorise">vectorise()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="dot"></a>
+<b>dot( A, B )</b>
+<ul>
+<li>
+Dot product of <i>A</i> and <i>B</i>, treating <i>A</i> and <i>B</i> as vectors
+</li>
+<br>
+<li>
+<b>Caveat:</b> <a href="#norm">norm()</a> is more robust for calculating the norm, as it handles underflows and overflows
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fvec a = randu&lt;fvec&gt;(10);
+fvec b = randu&lt;fvec&gt;(10);
+
+float x = dot(a,b);
+</pre>
+</ul>
+</li>
+<br>
+<li>See also:
+<ul>
+<li><a href="#norm">norm()</a></li>
+<li><a href="#as_scalar">as_scalar()</a></li>
+<li><a href="#cross">cross()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="find"></a>
+<b>find( X )</b>
+<br><b>find( X, k )</b>
+<br><b>find( X, k, s )</b>
+<ul>
+<li>Return a column vector containing the indices of elements of <i>X</i> that are non-zero or satisfy a relational condition</li>
+<br>
+<li>The output vector must have the type <a href="#Col">uvec</a>
+(i.e. the indices are stored as unsigned integers of type <a href="#uword">uword</a>)
+</li>
+<br>
+<li>
+<i>X</i> is interpreted as a vector, with column-by-column ordering of the elements of <i>X</i>
+</li>
+<br>
+<li>Relational operators can be used instead of <i>X</i>, eg. <i>A&thinsp;&gt;&thinsp;0.5</i>
+</li>
+<br>
+<li>If <i>k&thinsp;=&thinsp;0</i> (default), return the indices of all non-zero elements, otherwise return at most <i>k</i> of their indices</li>
+<br>
+<li>If <i>s&thinsp;=&thinsp;"first"</i> (default), return at most the first <i>k</i> indices of the non-zero elements
+</li>
+<br>
+<li>If <i>s&thinsp;=&thinsp;"last"</i>, return at most the last <i>k</i> indices of the non-zero elements
+</li>
+<br>
+<li>
+<b>Caveats:</b>
+<ul>
+<li>to clamp values to an interval, <a href="#clamp">clamp()</a> is more efficient</li>
+</ul>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(5, 5);
+fmat B = randu&lt;fmat&gt;(5, 5);
+
+uvec q1 = find(A &gt; B);
+uvec q2 = find(A &gt; 0.5);
+uvec q3 = find(A &gt; 0.5, 3, "last");
+
+<!-- TODO: comment color -->
+<font color="#0000bb">// change elements of A greater than 0.5 to 1</font>
+A.elem( find(A &gt; 0.5) ).ones();
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#all">all()</a></li>
+<li><a href="#any">any()</a></li>
+<li><a href="#clamp">clamp()</a></li>
+<li><a href="#find_finite">find_finite()</a></li>
+<li><a href="#find_nonfinite">find_nonfinite()</a></li>
+<li><a href="#find_nan">find_nan()</a></li>
+<li><a href="#find_unique">find_unique()</a></li>
+<li><a href="#sort_index">sort_index()</a></li>
+<li><a href="#submat">submatrix views</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="find_finite"></a>
+<b>find_finite( X )</b>
+<ul>
+<li>Return a column vector containing the indices of elements of <i>X</i> that are finite (i.e. not &plusmn;Inf and not NaN)</li>
+<br>
+<li>The output vector must have the type <a href="#Col">uvec</a>
+(i.e. the indices are stored as unsigned integers of type <a href="#uword">uword</a>)
+</li>
+<br>
+<li>
+<i>X</i> is interpreted as a vector, with column-by-column ordering of the elements of <i>X</i>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(5, 5);
+
+A(1, 1) = datum::inf;
+
+<!-- TODO: comment color -->
+<font color="#0000bb">// find only finite elements</font>
+uvec f = find_finite(A);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#find">find()</a></li>
+<li><a href="#find_nonfinite">find_nonfinite()</a></li>
+<li><a href="#find_nan">find_nan()</a></li>
+<li><a href="#submat">submatrix views</a></li>
+<li><a href="#constants">constants (pi, nan, inf, ...)</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="find_nonfinite"></a>
+<b>find_nonfinite( X )</b>
+<ul>
+<li>Return a column vector containing the indices of elements of <i>X</i> that are non-finite (i.e. &plusmn;Inf or NaN)</li>
+<br>
+<li>The output vector must have the type <a href="#Col">uvec</a>
+(i.e. the indices are stored as unsigned integers of type <a href="#uword">uword</a>)
+</li>
+<br>
+<li>
+<i>X</i> is interpreted as a vector, with column-by-column ordering of the elements of <i>X</i>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(5, 5);
+
+A(1, 1) = datum::inf;
+A(2, 2) = datum::nan;
+
+<!-- TODO: comment color -->
+<font color="#0000bb">// return indices of two non-finite elements</font>
+uvec f = find_nonfinite(A);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#find">find()</a></li>
+<li><a href="#find_finite">find_finite()</a></li>
+<li><a href="#find_nan">find_nan()</a></li>
+<li><a href="#submat">submatrix views</a></li>
+<li><a href="#constants">constants (pi, nan, inf, ...)</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="find_nan"></a>
+<b>find_nan( X )</b>
+<ul>
+<li>Return a column vector containing the indices of elements of <i>X</i> that are NaN (not-a-number)</li>
+<br>
+<li>The output vector must have the type <a href="#Col">uvec</a>
+(i.e. the indices are stored as unsigned integers of type <a href="#uword">uword</a>)
+</li>
+<br>
+<li>
+<i>X</i> is interpreted as a vector, with column-by-column ordering of the elements of <i>X</i>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(5, 5);
+
+A(2, 3) = datum::nan;
+
+<!-- TODO: comment color -->
+<font color="#0000bb">// indices will be { 17 }</font>
+uvec indices = find_nan(A);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#find">find()</a></li>
+<li><a href="#find_finite">find_finite()</a></li>
+<li><a href="#find_nonfinite">find_nonfinite()</a></li>
+<li><a href="#constants">constants (pi, nan, inf, ...)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/NaN">NaN</a> in Wikipedia</li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="join"></a>
+<table>
+<tbody>
+<tr>
+<td>
+<b>join_rows( A, B )</b>
+<br><b>join_rows( A, B, C )</b>
+<br><b>join_rows( A, B, C, D )</b>
+<br>&nbsp;
+<br><b>join_cols( A, B )</b>
+<br><b>join_cols( A, B, C )</b>
+<br><b>join_cols( A, B, C, D )</b>
+</td>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td>
+<b>join_horiz( A, B )</b>
+<br><b>join_horiz( A, B, C )</b>
+<br><b>join_horiz( A, B, C, D )</b>
+<br>&nbsp;
+<br><b>join_vert( A, B )</b>
+<br><b>join_vert( A, B, C )</b>
+<br><b>join_vert( A, B, C, D )</b>
+</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>
+<i>join_rows()</i> and <i>join_horiz()</i>: horizontal concatenation;
+join the corresponding rows of the given matrices;
+the given matrices must have the same number of rows
+</li>
+<br>
+<li>
+<i>join_cols()</i> and <i>join_vert()</i>: vertical concatenation;
+join the corresponding columns of the given matrices;
+the given matrices must have the same number of columns
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(4, 5);
+fmat B = randu&lt;fmat&gt;(4, 6);
+fmat C = randu&lt;fmat&gt;(6, 5);
+
+fmat AB = join_rows(A, B);
+fmat AC = join_cols(A, C);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#submat">submatrix views</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="min_and_max"></a>
+<table>
+<tbody>
+<tr>
+<td>
+<b>min( V )</b>
+<br><b>min( M )</b>
+<br><b>min( M, dim )</b>
+<br><b>min( Q )</b>
+<br><b>min( Q, dim )</b>
+<br><b>min( A, B )</b>
+</td>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td>
+<b>max( V )</b>
+<br><b>max( M )</b>
+<br><b>max( M, dim )</b>
+<br><b>max( Q )</b>
+<br><b>max( Q, dim )</b>
+<br><b>max( A, B )</b>
+</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>
+For vector <i>V</i>, return the extremum value
+</li>
+<br>
+<li>
+For matrix <i>M</i>, return the extremum value for each column (<i>dim&thinsp;=&thinsp;0</i>), or each row (<i>dim&thinsp;=&thinsp;1</i>)
+</li>
+<br>
+<li>
+The <i>dim</i> argument is optional; by default <i>dim&thinsp;=&thinsp;0</i> is used
+</li>
+<br>
+<li>
+For two matrices <i>A</i> and <i>B</i>, return a matrix containing element-wise extremum values
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fcolvec v = randu&lt;fcolvec&gt;(10);
+float x = max(v);
+
+fmat M = randu&lt;fmat&gt;(10, 10);
+
+frowvec a = max(M);
+frowvec b = max(M, 0);
+fcolvec c = max(M, 1);
+
+<!-- TODO: comment color -->
+<font color="#0000bb">// element-wise maximum</font>
+fmat X = randu&lt;fmat&gt;(5, 6);
+fmat Y = randu&lt;fmat&gt;(5, 6);
+<!-- TODO: comment color -->
+fmat Z = coot::max(X, Y); <font color="#0000bb">// use coot:: prefix to distinguish from std::max()</font>
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#clamp">clamp()</a>
+<li><a href="#stats_fns">statistics functions</a>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="norm"></a>
+<b>norm( X )</b>
+<br><b>norm( X, p )</b>
+<ul>
+<li>
+Compute the <i>p</i>-norm of <i>X</i>, where <i>X</i> is a vector or matrix
+</li>
+<br>
+<li>
+For vectors, <i>p</i> is an integer &ge;&thinsp;1, or one of: <code>"-inf"</code>, <code>"inf"</code>, <code>"fro"</code>
+</li>
+<br>
+<li>
+For matrices, <i>p</i> is one of: 1, 2, <code>"inf"</code>, <code>"fro"</code>
+</li>
+<br>
+<li>
+<code>"-inf"</code> is the minimum quasi-norm, <code>"inf"</code> is the maximum norm, <code>"fro"</code> is the Frobenius norm
+</li>
+<br>
+<li>
+The argument <i>p</i> is optional; by default <i>p&thinsp;=&thinsp;2</i> is used
+</li>
+<br>
+<li>
+For vector norm with <i>p&thinsp;=&thinsp;2</i> and matrix norm with <i>p&thinsp;=&thinsp;"fro"</i>, a robust algorithm is used to reduce the likelihood of underflows and overflows
+</li>
+<br>
+<li>
+<b>Caveats:</b>
+<ul>
+<li>to obtain the zero/Hamming pseudo-norm (the number of non-zero elements), use this expression: <code><a href="#accu">accu</a>(X&nbsp;!=&nbsp;0)</code></li>
+<li>matrix 2-norm (spectral norm) is based on SVD, which is computationally intensive for large matrices</li>
+</ul>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fvec q = randu&lt;fvec&gt;(5);
+
+float x = norm(q, 2);
+float y = norm(q, "inf");
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#normalise">normalise()</a></li>
+<li><a href="#dot">dot()</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Norm_(mathematics)">vector norm in Wikipedia</a></li>
+<li><a href="https://mathworld.wolfram.com/VectorNorm.html">vector norm in MathWorld</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Matrix_norm">matrix norm in Wikipedia</a></li>
+<li><a href="https://mathworld.wolfram.com/MatrixNorm.html">matrix norm in MathWorld</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="normalise"></a>
+<b>normalise( V )</b>
+<br><b>normalise( V, p )</b>
+<br>
+<br><b>normalise( X )</b>
+<br><b>normalise( X, p )</b>
+<br><b>normalise( X, p, dim )</b>
+<ul>
+<li>For vector <i>V</i>, return its normalised version (ie. having unit <i>p</i>-norm)</li>
+<br>
+<li>
+For matrix <i>X</i>, return its normalised version, where each column (<i>dim&thinsp;=&thinsp;0</i>) or row (<i>dim&thinsp;=&thinsp;1</i>) has been normalised to have unit <i>p</i>-norm</li>
+<br>
+<li>
+The <i>p</i> argument is optional; by default <i>p&thinsp;=&thinsp;2</i> is used
+</li>
+<br>
+<li>
+The <i>dim</i> argument is optional; by default <i>dim&thinsp;=&thinsp;0</i> is used
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fvec A = randu&lt;fvec&gt;(10);
+fvec B = normalise(A);
+fvec C = normalise(A, 1);
+
+fmat X = randu&lt;fmat&gt;(5, 6);
+fmat Y = normalise(X);
+fmat Z = normalise(X, 2, 1);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#norm">norm()</a></li>
+<li><a href="#dot">dot()</a></li>
+<li><a href="https://mathworld.wolfram.com/NormalizedVector.html">Normalised vector in MathWorld</a>
+<li><a href="https://en.wikipedia.org/wiki/Unit_vector">Unit vector in Wikipedia</a>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="pow"></a>
+<table>
+<tbody>
+<tr><td><b>pow( A, scalar )</b></td><td>&nbsp;&nbsp;&nbsp;</td><td>(form&nbsp;1)</td></tr>
+</tbody>
+</table>
+<ul>
+<li>Element-wise power operation: raise all elements in <i>A</i> to the power denoted by the given scalar</li>
+<br>
+<li><b>Caveat</b>:
+<ul>
+<li>to raise all elements to the power 2, use <a href="#misc_fns">square()</a> instead</li>
+</ul>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(5, 6);
+fmat B = pow(A, 3.45);
+
+frowvec R = randu&lt;frowvec&gt;(6);
+frowvec S = pow(R, -1.0);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#abs">abs()</a></li>
+<li><a href="#misc_fns">miscellaneous element-wise functions</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="repmat"></a>
+<b>repmat( A, num_copies_per_row, num_copies_per_col )</b>
+<ul>
+<li>Generate a matrix by replicating matrix <i>A</i> in a block-like fashion</li>
+<br>
+<li>The generated matrix has the following size:
+<ul>
+<table border="0">
+<tbody>
+<tr><td>n_rows</td><td>&nbsp;=&nbsp;</td><td>num_copies_per_row</td><td>&times;</td><td>A.n_rows</td></tr>
+<tr><td>n_cols</td><td>&nbsp;=&nbsp;</td><td>num_copies_per_col</td><td>&times;</td><td>A.n_cols</td></tr>
+</tbody>
+</table>
+</ul>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(2, 3);
+
+fmat B = repmat(A, 4, 5);
+</pre>
+</ul>
+</li>
+<li>See also:
+<ul>
+<li><a href="#reshape">reshape()</a></li>
+<li><a href="#resize">resize()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="reshape"></a>
+<b>reshape( X, n_rows, n_cols )</b>
+<br><b>reshape( X, size(Y) )</b>
+<ul>
+<li>
+Generate a vector/matrix with given size specifications,
+whose elements are taken from the given object in a column-wise manner;
+the elements in the generated object are placed column-wise (i.e. the first column is filled up before filling the second column)
+</li>
+<br>
+<li>
+The layout of the elements in the generated object will be different to the layout in the given object
+</li>
+<br>
+<li>
+If the total number of elements in the given object is less than the specified size,
+the remaining elements in the generated object are set to zero
+</li>
+<br>
+<li>
+If the total number of elements in the given object is greater than the specified size,
+only a subset of elements is taken from the given object
+</li>
+<br>
+<li>
+<b>Caveats:</b>
+<ul>
+<li>
+to change the size without preserving data, use <a href="#set_size">.set_size()</a> instead, which is much faster
+</li>
+<li>
+to grow/shrink a matrix while preserving the elements <b>as well as</b> the layout of the elements,
+use <a href="#resize">resize()</a> instead
+</li>
+<li>
+to flatten a matrix into a vector, use <a href="#vectorise">vectorise()</a> instead
+</li>
+</ul>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(10, 5);
+
+fmat B = reshape(A, 5, 10);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#reshape_member">.reshape()</a> (member function)</li>
+<li><a href="#set_size">.set_size()</a></li>
+<li><a href="#resize">resize()</a></li>
+<li><a href="#vectorise">vectorise()</a></li>
+<li><a href="#as_scalar">as_scalar()</a></li>
+<li><a href="#conv_to">conv_to()</a></li>
+<li><a href="#diagmat">diagmat()</a></li>
+<li><a href="#repmat">repmat()</a></li>
+<li><a href="#size">size()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="resize"></a>
+<b>resize( X, n_rows, n_cols )</b>
+<br><b>resize( X, size(Y) )</b>
+<ul>
+<li>
+Generate a vector/matrix with given size specifications,
+whose elements as well as the layout of the elements are taken from the given object
+</li>
+<br>
+<li>
+<b>Caveat:</b>
+to change the size without preserving data, use <a href="#set_size">.set_size()</a> instead, which is much faster
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(4, 5);
+
+fmat B = resize(A, 7, 6);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#resize_member">.resize()</a> (member function of Mat)</li>
+<li><a href="#set_size">.set_size()</a> (member function of Mat)</li>
+<li><a href="#reshape">reshape()</a></li>
+<li><a href="#vectorise">vectorise()</a></li>
+<li><a href="#as_scalar">as_scalar()</a></li>
+<li><a href="#conv_to">conv_to()</a></li>
+<li><a href="#repmat">repmat()</a></li>
+<li><a href="#size">size()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="size"></a>
+<b>size(&nbsp;X&nbsp;)</b>
+<br>
+<b>size(&nbsp;n_rows,&nbsp;n_cols&nbsp;)</b>
+<ul>
+<li>
+Obtain the dimensions of object <i>X</i>, or explicitly specify the dimensions
+</li>
+<br>
+<li>
+The dimensions can be used in conjunction with:
+<ul>
+<li><a href="#part_a">object constructors</a></li>
+<li><a href="#part_b">functions for changing size</a></li>
+<li><a href="#part_c">generator functions</a></li>
+<li><a href="#submat">submatrix views</a></li>
+</ul>
+</li>
+<br>
+<li>
+The dimensions support simple arithmetic operations; they can also be printed and compared for equality/inequality
+</li>
+<br>
+<li>
+<b>Caveat:</b> to prevent interference from <a href="https://en.cppreference.com/w/cpp/iterator/size"><i>std::size()</i></a> in C++17,
+preface Bandicoot's <i>size()</i> with the <i>arma</i> namespace qualification, eg. <i>coot::size(X)</i>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A(5,6);
+
+fmat B = zeros&lt;fmat&gt;(size(A));
+
+fmat C;
+C.randu(size(A));
+
+fmat D = ones&lt;fmat&gt;(size(A));
+
+fmat E = ones&lt;fmat&gt;(10, 20);
+<!-- TODO: comment color -->
+E(3, 4, size(C)) = C;    <font color="#0000bb">// access submatrix of E</font>
+
+fmat F( size(A) + size(E) );
+
+fmat G( size(A) * 2 );
+
+cout &lt;&lt; "size of A: " &lt;&lt; size(A) &lt;&lt; endl;
+
+bool is_same_size = (size(A) == size(E));
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#attributes">attributes</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="sort"></a>
+<b>sort( V )</b>
+<br><b>sort( V, sort_direction )</b>
+<br>
+<br><b>sort( X )</b>
+<br><b>sort( X, sort_direction )</b>
+<br><b>sort( X, sort_direction, dim )</b>
+<br>
+<ul>
+<li>For vector <i>V</i>, return a vector which is a sorted version of the input vector</li>
+<br>
+<li>For matrix <i>X</i>, return a matrix with the elements of the input matrix sorted in each column (<i>dim&thinsp;=&thinsp;0</i>), or each row (<i>dim&thinsp;=&thinsp;1</i>)</li>
+<br>
+<li>
+The <i>dim</i> argument is optional; by default <i>dim&thinsp;=&thinsp;0</i> is used
+</li>
+<br>
+<li>The <i>sort_direction</i> argument is optional; <i>sort_direction</i> is either <code>"ascend"</code> or <code>"descend"</code>; by default <code>"ascend"</code> is used</li>
+<br>
+<li>The sorting algorithm used is radix sort</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(10, 10);
+fmat B = sort(A);
+</pre>
+</ul>
+</li>
+<li>
+See also:
+<ul>
+<li><a href="#sort_index">sort_index()</a></li>
+<li><a href="#randi">randi()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="sort_index"></a>
+<b>sort_index( X )</b>
+<br><b>sort_index( X, sort_direction )</b>
+<br>
+<br><b>stable_sort_index( X )</b>
+<br><b>stable_sort_index( X, sort_direction )</b>
+<ul>
+<li>Return a vector which describes the sorted order of the elements of <i>X</i>
+(i.e. it contains the indices of the elements of <i>X</i>)
+</li>
+<br>
+<li>The output vector must have the type <a href="#Col">uvec</a>
+(i.e. the indices are stored as unsigned integers of type <a href="#uword">uword</a>)
+</li>
+<br>
+<li>
+<i>X</i> is interpreted as a vector, with column-by-column ordering of the elements of <i>X</i>
+</li>
+<br>
+<li>The <i>sort_direction</i> argument is optional; <i>sort_direction</i> is either <code>"ascend"</code> or <code>"descend"</code>; by default <code>"ascend"</code> is used</li>
+<br>
+<li>The <i>stable_sort_index()</i> variant preserves the relative order of elements with equivalent values</li>
+<br>
+<li>The sorting algorithm used is radix sort</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fvec q = randu&lt;fvec&gt;(10);
+
+uvec indices = sort_index(q);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#sort">sort()</a></li>
+<li><a href="#find">find()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="sum"></a>
+<b>sum( V )</b>
+<br><b>sum( M )</b>
+<br><b>sum( M, dim )</b>
+<ul>
+<li>
+For vector <i>V</i>, return the sum of all elements
+</li>
+<br>
+<li>
+For matrix <i>M</i>, return the sum of elements in each column (<i>dim&thinsp;=&thinsp;0</i>), or each row (<i>dim&thinsp;=&thinsp;1</i>)
+</li>
+<br>
+<li>
+The <i>dim</i> argument is optional; by default <i>dim&thinsp;=&thinsp;0</i> is used
+</li>
+<br>
+<li>
+<b>Caveat:</b> to get a sum of all the elements regardless of the object type (i.e. vector or matrix), use <a href="#accu">accu()</a> instead
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fcolvec v = randu&lt;fcolvec&gt;(10);
+float x = sum(v);
+
+fmat M = randu&lt;fmat&gt;(10, 10);
+
+frowvec a = sum(M);
+frowvec b = sum(M, 0);
+fcolvec c = sum(M, 1);
+
+<!-- TODO: comment color -->
+float y = accu(M);   <font color="#0000bb">// find the overall sum regardless of object type</font>
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#accu">accu()</a></li>
+<li><a href="#trace">trace()</a></li>
+<li><a href="#stats_fns">mean()</a></li>
+<li><a href="#as_scalar">as_scalar()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="symmat"></a>
+<b>symmatu( A )</b>
+<br><b>symmatl( A )</b>
+<ul>
+<li>
+<i>symmatu(A)</i>: generate symmetric matrix from square matrix <i>A</i>, by reflecting the upper triangle to the lower triangle
+</li>
+<br>
+<li>
+<i>symmatl(A)</i>: generate symmetric matrix from square matrix <i>A</i>, by reflecting the lower triangle to the upper triangle
+</li>
+<br>
+<li>
+If <i>A</i> is non-square, a <i>std::logic_error</i> exception is thrown
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(5, 5);
+
+fmat B = symmatu(A);
+fmat C = symmatl(A);
+</pre>
+</ul>
+</li>
+<br>
+<li>See also:
+<ul>
+<li><a href="#diagmat">diagmat()</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Symmetric_matrix">Symmetric matrix in Wikipedia</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="trace"></a>
+<b>trace( X )</b>
+<ul>
+<li>
+Sum of the elements on the main diagonal of matrix <i>X</i>
+</li>
+<br>
+<li>
+If <i>X</i> is an expression, the evaluation of the expression aims to calculate only the diagonal elements
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(5, 5);
+
+float x = trace(A);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#accu">accu()</a></li>
+<li><a href="#as_scalar">as_scalar()</a></li>
+<li><a href="#diag">.diag()</a></li>
+<li><a href="#diagvec">diagvec()</a></li>
+<li><a href="#diagmat">diagmat()</a></li>
+<li><a href="#sum">sum()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="trans"></a>
+<b>trans( A )</b>
+<br><b>strans( A )</b>
+<ul>
+<li>Compute a transposed copy of the matrix</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(5, 10);
+
+fmat B = trans(A);
+<!-- TODO: comment color -->
+fmat C = A.t();    <font color="#0000bb">// equivalent to trans(A), but more compact</font>
+</pre>
+</ul>
+</li>
+<br>
+<li>See also:
+<ul>
+<li><a href="#t_st_members">.t()</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Transpose">transpose in Wikipedia</a></li>
+<li><a href="https://mathworld.wolfram.com/Transpose.html">transpose in MathWorld</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="vectorise"></a>
+<b>vectorise( X )</b>
+<br><b>vectorise( X, dim )</b>
+<ul>
+<li>
+Generate a flattened version of matrix <i>X</i>
+</li>
+<br>
+<li>
+The argument <i>dim</i> is optional; by default <i>dim&thinsp;=&thinsp;0</i> is used
+</li>
+<br>
+<li>
+For <i>dim&thinsp;=&thinsp;0</i>, the elements are copied from <i>X</i> column-wise, resulting in a column vector; equivalent to concatenating all the columns of <i>X</i>
+</li>
+<br>
+<li>
+For <i>dim&thinsp;=&thinsp;1</i>, the elements are copied from <i>X</i> row-wise, resulting in a row vector; equivalent to concatenating all the rows of <i>X</i>
+</li>
+<br>
+<li>
+<b>Caveat:</b> column-wise vectorisation is faster than row-wise vectorisation
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat X = randu&lt;fmat&gt;(4, 5);
+
+fvec v = vectorise(X);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#reshape">reshape()</a></li>
+<li><a href="#resize">resize()</a></li>
+<li><a href="#diagvec">diagvec()</a></li>
+<li><a href="#as_scalar">as_scalar()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="misc_fns"></a>
+<b>miscellaneous element-wise functions:</b>
+<ul>
+<table border="0" cellpadding="0" cellspacing="0">
+<tr><td><b>exp      </b></td><td>&nbsp;&nbsp;&nbsp;</td><td><b>log      </b></td><td>&nbsp;&nbsp;&nbsp;</td><td><b>square</b></td><td>&nbsp;&nbsp;&nbsp;</td><td><b>floor </b></td><td>&nbsp;&nbsp;&nbsp;</td><td><b>erf   </b></td><td>&nbsp;&nbsp;&nbsp;</td><td><b>sign  </b></td><td>&nbsp;&nbsp;&nbsp;</td><td><b>&nbsp;</b></td></tr>
+<tr><td><b>exp2     </b></td><td>&nbsp;&nbsp;&nbsp;</td><td><b>log2     </b></td><td>&nbsp;&nbsp;&nbsp;</td><td><b>sqrt</b></td><td>&nbsp;&nbsp;&nbsp;</td><td><b>ceil  </b></td><td>&nbsp;&nbsp;&nbsp;</td><td><b>erfc  </b></td><td>&nbsp;&nbsp;&nbsp;</td><td><b>lgamma</b></td><td>&nbsp;&nbsp;&nbsp;</td><td><b>&nbsp;</b></td></tr>
+<tr><td><b>exp10    </b></td><td>&nbsp;&nbsp;&nbsp;</td><td><b>log10    </b></td><td>&nbsp;&nbsp;&nbsp;</td><td><b>&nbsp;</b></td><td>&nbsp;&nbsp;&nbsp;</td><td><b>round </b></td><td>&nbsp;&nbsp;&nbsp;</td><td><b>&nbsp;</b></td><td>&nbsp;&nbsp;&nbsp;</td><td><b>&nbsp;</b></td><td>&nbsp;&nbsp;&nbsp;</td><td><b>&nbsp;</b></td></tr>
+<tr><td><b>trunc_exp</b></td><td>&nbsp;&nbsp;&nbsp;</td><td><b>trunc_log</b></td><td>&nbsp;&nbsp;&nbsp;</td><td><b>&nbsp;</b></td><td>&nbsp;&nbsp;&nbsp;</td><td><b>trunc </b></td><td>&nbsp;&nbsp;&nbsp;</td><td><b>&nbsp;</b></td><td>&nbsp;&nbsp;&nbsp;</td><td><b>&nbsp;</b></td><td>&nbsp;&nbsp;&nbsp;</td><td><b>&nbsp;</b></td></tr>
+</table>
+</ul>
+<ul>
+<li>
+Apply a function to each element
+</li>
+<br>
+<li>
+Usage:
+<ul>
+<li><i>B&thinsp;=&thinsp;fn(A)</i>, where <i>fn(A)</i> is one of the functions below</li>
+<li><i>A</i> and <i>B</i> must have the same matrix or vector type, such as <i>fmat</i> or <i>ivec</i></li>
+</ul>
+<br>
+<table style="text-align: left;" border="0" cellpadding="2" cellspacing="2">
+<tbody>
+  <tr style="background-color: #F5F5F5;">
+    <td style="vertical-align: top; text-align: right;">
+       <code>exp(A)</code><sup>&nbsp;</sup>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      base-e exponential: <i>e<sup>&thinsp;x</sup></i>
+    </td>
+  </tr>
+  <tr style="background-color: #F5F5F5;">
+    <td style="vertical-align: top; text-align: right;">
+       <code>exp2(A)</code><sup>&nbsp;</sup>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      base-2 exponential: <i>2<sup>&thinsp;x</sup></i>
+    </td>
+  </tr>
+  <tr style="background-color: #F5F5F5;">
+    <td style="vertical-align: top; text-align: right;">
+       <code>exp10(A)</code><sup>&nbsp;</sup>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      base-10 exponential: <i>10<sup>&thinsp;x</sup></i>
+    </td>
+  </tr>
+  <tr style="background-color: #F5F5F5;">
+    <td style="vertical-align: top; text-align: right;">
+      <code>trunc_exp(A)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      base-e exponential,
+      truncated to avoid infinity &nbsp; <font size=-1>(only for <i>float</i> and <i>double</i> elements)</font>
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top; text-align: right;">
+       <code>log(A)</code><sub>&nbsp;</sub>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      natural log: <i>log<sub>e</sub>&thinsp;x</i>
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top; text-align: right;">
+       <code>log2(A)</code><sub>&nbsp;</sub>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      base-2 log: <i>log<sub><small>2</small></sub>&thinsp;x</i>
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top; text-align: right;">
+       <code>log10(A)</code><sub>&nbsp;</sub>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      base-10 log: <i>log<sub><small>10</small></sub>&thinsp;x</i>
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top; text-align: right;">
+      <code>trunc_log(A)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      natural log,
+      truncated to avoid &plusmn;infinity &nbsp; <font size=-1>(only for <i>float</i> and <i>double</i> elements)</font>
+    </td>
+  </tr>
+  <tr style="background-color: #F5F5F5;">
+    <td style="vertical-align: top; text-align: right;">
+      <code>square(A)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      square: <i>x<sup><small>&thinsp;2</small></sup></i>
+    </td>
+  </tr>
+  <tr style="background-color: #F5F5F5;">
+    <td style="vertical-align: top; text-align: right;">
+       <code>sqrt(A)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      square root: <i>&radic;x</i>
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top; text-align: right;">
+      <code>floor(A)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      largest integral value that is not greater than the input value
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top; text-align: right;">
+      <code>ceil(A)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      smallest integral value that is not less than the input value
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top; text-align: right;">
+      <code>round(A)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      round to nearest integer, with halfway cases rounded away from zero
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top; text-align: right;">
+      <code>trunc(A)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      round to nearest integer, towards zero
+    </td>
+  </tr>
+  <tr style="background-color: #F5F5F5;">
+    <td style="vertical-align: top; text-align: right;">
+      <code>erf(A)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      error function &nbsp; <font size=-1>(only for <i>float</i> and <i>double</i> elements)</font>
+    </td>
+  </tr>
+  <tr style="background-color: #F5F5F5;">
+    <td style="vertical-align: top; text-align: right;">
+      <code>erfc(A)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      complementary error function &nbsp; <font size=-1>(only for <i>float</i> and <i>double</i> elements)</font>
+    </td>
+  </tr>
+  <tr style="background-color: #F5F5F5;">
+    <td style="vertical-align: top; text-align: right;">
+      <code>lgamma(A)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      natural log of the absolute value of gamma function &nbsp; <font size=-1>(only for <i>float</i> and <i>double</i> elements)</font>
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top; text-align: right;">
+      <code>sign(A)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      signum function;
+      for each element <i>a</i> in <i>A</i>, the corresponding element <i>b</i> in <i>B</i> is:
+      <ul>
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tbody>
+      <tr><td>              </td><td>&#9127;&nbsp;</td><td style="text-align: right;">&minus;1</td><td>&nbsp;if <i>a</i> &lt; 0</td></tr>
+      <tr><td>b&nbsp;=&nbsp;</td><td>&#9128;&nbsp;</td><td style="text-align: right;">       0</td><td>&nbsp;if <i>a</i> =    0</td></tr>
+      <tr><td>              </td><td>&#9129;&nbsp;</td><td style="text-align: right;">      +1</td><td>&nbsp;if <i>a</i> &gt; 0</td></tr>
+      </tbody>
+      </table>
+      </ul>
+      if <i>a</i> is complex and non-zero, then <i>b</i> = <i>a</i> / abs(<i>a</i>)
+    </td>
+  </tr>
+</tbody>
+</table>
+</li>
+<br>
+<li>
+<b>Caveat:</b>
+all of the above functions are applied element-wise, where each element is treated independently
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(5, 5);
+fmat B = exp(A);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#abs">abs()</a></li>
+<li><a href="#pow">pow()</a></li>
+<li><a href="#clamp">clamp()</a></li>
+<li><a href="#trig_fns">trigonometric functions</a></li>
+<li><a href="#stats_fns">statistics functions</a></li>
+<li><a href="#constants">miscellaneous constants</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="trig_fns"></a>
+<b>trigonometric element-wise functions (cos, sin, tan, ...)</b>
+<ul>
+<li>
+For single argument functions, <i>B = trig_fn(A)</i>, where <i>trig_fn</i> is applied to each element in <i>A</i>, with <i>trig_fn</i> as one of:
+<ul>
+<li>
+<i>cos</i>, <i>acos</i>, <i>cosh</i>, <i>acosh</i>
+</li>
+<li>
+<i>sin</i>, <i>asin</i>, <i>sinh</i>, <i>asinh</i>
+</li>
+<li>
+<i>tan</i>, <i>atan</i>, <i>tanh</i>, <i>atanh</i>
+</li>
+<li>
+<i>sinc</i>, defined as sinc(x) = sin(&pi;x)&thinsp;/&thinsp;(&pi;x) for x&thinsp;&ne;&thinsp;0, and sinc(x)&thinsp;=&thinsp;1 for x&thinsp;=&thinsp;0
+</li>
+</ul>
+</li>
+<br>
+<li>
+For dual argument functions, apply the function to each tuple of two corresponding elements in <i>X</i> and <i>Y</i>:
+<ul>
+<li><i>Z = atan2(Y, X)</i></li>
+<li><i>Z = hypot(X, Y)</i></li>
+</ul>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat X = randu&lt;fmat&gt;(5, 5);
+fmat Y = cos(X);
+</pre>
+</ul>
+</li>
+<li>
+See also:
+<ul>
+<li><a href="#misc_fns">miscellaneous element-wise functions</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Trigonometric_functions">trigonometric functions in Wikipedia</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Atan2">atan2 function in Wikipedia</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Hypot">hypot function in Wikipedia</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Sinc_function">sinc function in Wikipedia</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
 
 
 <!-- END CONTENT -->
