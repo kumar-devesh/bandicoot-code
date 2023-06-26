@@ -66,6 +66,42 @@ Col<eT>::Col(const SizeMat& s)
 
 template<typename eT>
 inline
+Col<eT>::Col(dev_mem_t<eT> aux_dev_mem, const uword N)
+  : Mat<eT>(aux_dev_mem, N, 1)
+  {
+  coot_extra_debug_sigprint();
+
+  access::rw(Mat<eT>::vec_state) = 1;
+  }
+
+
+
+template<typename eT>
+inline
+Col<eT>::Col(cl_mem aux_dev_mem, const uword N)
+  : Mat<eT>(aux_dev_mem, N, 1)
+  {
+  coot_extra_debug_sigprint();
+
+  access::rw(Mat<eT>::vec_state) = 1;
+  }
+
+
+
+template<typename eT>
+inline
+Col<eT>::Col(eT* aux_dev_mem, const uword N)
+  : Mat<eT>(aux_dev_mem, N, 1)
+  {
+  coot_extra_debug_sigprint();
+
+  access::rw(Mat<eT>::vec_state) = 1;
+  }
+
+
+
+template<typename eT>
+inline
 Col<eT>::Col(const Col<eT>& X)
   : Mat<eT>(X.n_rows, 1)
   {
