@@ -490,3 +490,19 @@ TEMPLATE_TEST_CASE
   REQUIRE( arma::approx_equal( y2_vec.subvec(0, 24), x_conv_vec, "absdiff", 1e-5 ) );
   REQUIRE( arma::max( arma::max( arma::abs( y2_vec.subvec(25, 41) ) ) ) == eT2(0) );
   }
+
+
+
+TEST_CASE("member_reshape_sizemat", "[reshape]")
+  {
+  fmat A(10, 10);
+  A.randu();
+
+  fmat B(100, 1);
+  B.randu();
+
+  B.reshape(size(A));
+
+  REQUIRE( B.n_rows == A.n_rows );
+  REQUIRE( B.n_cols == A.n_cols );
+  }

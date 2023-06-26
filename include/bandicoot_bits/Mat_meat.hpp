@@ -1958,6 +1958,18 @@ Mat<eT>::reshape(const uword new_n_rows, const uword new_n_cols)
 template<typename eT>
 inline
 void
+Mat<eT>::reshape(const SizeMat& s)
+  {
+  coot_extra_debug_sigprint();
+
+  reshape(s.n_rows, s.n_cols);
+  }
+
+
+
+template<typename eT>
+inline
+void
 Mat<eT>::resize(const uword new_n_rows, const uword new_n_cols)
   {
   coot_extra_debug_sigprint();
