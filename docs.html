@@ -2847,6 +2847,401 @@ A.raw_print(cout, "A:");
 
 
 
+<div class="pagebreak"></div>
+<hr class="greyline">
+<hr class="greyline">
+<br>
+<br>
+<font size=+1><b>Generated Vectors&thinsp;/&thinsp;Matrices</b></font>
+<br>
+<br>
+
+
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="linspace"></a>
+<b>linspace( start, end )</b>
+<br><b>linspace( start, end, N )</b>
+<ul>
+<li>
+Generate a vector with <i>N</i> elements;
+the values of the elements are linearly spaced from <i>start</i> to (and including) <i>end</i>
+</li>
+<br>
+<li>
+The argument <i>N</i> is optional; by default <i>N = 100</i>
+</li>
+<br>
+<li>
+Usage:
+<ul>
+<li>fvec v = linspace(start, end, N)</li>
+<li><i>vector_type</i> v = linspace&lt;<i>vector_type</i>&gt;(start, end, N)</li>
+</ul>
+</li>
+<br>
+<li>
+<b>Caveat:</b> for <i>N&nbsp;=&nbsp;1</i>, the generated vector will have a single element equal to <i>end</i>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+   fvec a = linspace(0, 5, 6);
+
+frowvec b = linspace&lt;frowvec&gt;(5, 0, 6);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#ones_standalone">ones()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="eye_standalone"></a>
+<b>eye( n_rows, n_cols )</b>
+<br> 
+<b>eye( size(X) )</b>
+<ul> 
+<li>
+Generate a matrix with the elements along the main diagonal set to one
+and off-diagonal elements set to zero
+</li>
+<br>
+<li>
+An identity matrix is generated when <i>n_rows</i> = <i>n_cols</i>
+</li>
+<br>
+<li>
+Usage:
+<ul>
+<li>mat X = eye( n_rows, n_cols )</li>
+<li><i>matrix_type</i> X = eye&lt;<i>matrix_type</i>&gt;( n_rows, n_cols )</li>
+<li><i>matrix_type</i> Y = eye&lt;<i>matrix_type</i>&gt;( size(X) )</li>
+</ul>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+  fmat A = eye(5,5);
+
+  fmat B = 123.0 * eye&lt;fmat&gt;(5,5);
+
+  imat C = eye&lt;imat&gt;( size(B) );
+</pre>
+</ul>
+</li>
+<br>
+<li>See also:
+<ul>
+<li><a href="#eye_member">.eye()</a> (member function of Mat)</li>
+<li><a href="#diag">.diag()</a></li>
+<li><a href="#ones_standalone">ones()</a></li>
+<li><a href="#diagmat">diagmat()</a></li>
+<li><a href="#diagvec">diagvec()</a></li>
+<li><a href="#size">size()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="ones_standalone"></a>
+<b>
+ones( n_elem )
+<br>ones( n_rows, n_cols )
+<br>ones( size(X) )
+</b>
+<ul>
+<li>
+Generate a vector or matrix with all elements set to one
+</li>
+<br>
+<li>
+Usage:
+<ul>
+<li><i>vector_type</i> v = ones&lt;<i>vector_type</i>&gt;( n_elem )</li>
+<li><i>matrix_type</i> X = ones&lt;<i>matrix_type</i>&gt;( n_rows, n_cols )</li>
+<li><i>matrix_type</i> Y = ones&lt;<i>matrix_type</i>&gt;( size(X) )</li>
+</ul>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+   fvec v = ones(10);
+   uvec u = ones&lt;uvec&gt;(10);
+frowvec r = ones&lt;frowvec&gt;(10);
+
+fmat A = ones(5,6);
+imat B = ones&lt;imat&gt;(5,6);
+umat C = ones&lt;umat&gt;(5,6);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#ones_member">.ones()</a> (member function of <i>Mat</i>, <i>Col</i>, <i>Row</i> and <i>Cube</i>)</li>
+<li><a href="#fill">.fill()</a></li>
+<li><a href="#eye_standalone">eye()</a></li>
+<li><a href="#linspace">linspace()</a></li>
+<li><a href="#zeros_standalone">zeros()</a></li>
+<li><a href="#randu">randu()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="zeros_standalone"></a>
+<b>zeros( n_elem )</b>
+<br><b>zeros( n_rows, n_cols )</b>
+<br><b>zeros( size(X) )</b>
+<ul>
+<li>
+Generate a vector or matrix with the elements set to zero
+</li>
+<br>
+<li>
+Usage:
+<ul>
+<li><i>vector_type</i> v = zeros&lt;<i>vector_type</i>&gt;( n_elem )</li>
+<li><i>matrix_type</i> X = zeros&lt;<i>matrix_type</i>&gt;( n_rows, n_cols )</li>
+<li><i>matrix_type</i> Y = zeros&lt;<i>matrix_type</i>&gt;( size(X) )</li>
+</ul>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+   fvec v = zeros(10);
+   uvec u = zeros&lt;uvec&gt;(10);
+frowvec r = zeros&lt;rowvec&gt;(10);
+
+fmat A = zeros(5,6);
+imat B = zeros&lt;imat&gt;(5,6);
+umat C = zeros&lt;umat&gt;(5,6);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#zeros_member">.zeros()</a> (member function of <i>Mat</i>, <i>Col</i>, <i>Row</i>, <i>SpMat</i> and <i>Cube</i>)</li>
+<li><a href="#fill">.fill()</a></li>
+<li><a href="#ones_standalone">ones()</a></li>
+<li><a href="#randu">randu()</a></li>
+<li><a href="#size">size()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="randu"></a>
+<b>randu( n_elem )</b>
+<br><b>randu( n_rows, n_cols )</b>
+<br><b>randu( size(X) )</b>
+<ul>
+<li>
+Generate a vector or matrix with the elements set to random <b>floating point</b> values uniformly distributed in the [0,1] interval
+</li>
+<br>
+<li>
+Usage:
+<ul>
+<li><i>vector_type</i> v = randu&lt;<i>vector_type</i>&gt;( n_elem )</li>
+<br>
+<li><i>matrix_type</i> X = randu&lt;<i>matrix_type</i>&gt;( n_rows, n_cols )</li>
+</ul>
+</li>
+<br>
+<li>
+To change the RNG seed, use <i>coot_rng::set_seed(value)</i> or <i>coot_rng::set_seed_random()</i> functions
+</li>
+<br>
+<li>
+<b>Caveat:</b> to generate a matrix with random integer values instead of floating point values, use <a href="#randi">randi()</a> instead
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fvec v1 = randu(5);
+
+frowvec r1 = randu&lt;rowvec&gt;(5);
+
+fmat A1 = randu(5, 6);
+
+mat B1 = randu&lt;mat&gt;(5, 6);
+mat B2 = randu&lt;mat&gt;(5, 6, distr_param(10,20));
+
+<!-- TODO: comment color -->
+coot_rng::set_seed_random(); <font color="#0000bb">// set the seed to a random value</font>
+coot_rng::set_seed(42);      <font color="#0000bb">// set the seed to a specific value</font>
+</pre>
+</ul>
+</li>
+<li>See also:
+<ul>
+<li><a href="#randu_randn_member">.randu()</a> (member function)</li>
+<li><a href="#randn">randn()</a></li>
+<li><a href="#randi">randi()</a></li>
+<li><a href="#ones_standalone">ones()</a></li>
+<li><a href="#zeros_standalone">zeros()</a></li>
+<li><a href="#size">size()</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Uniform_distribution_(continuous)">uniform distribution in Wikipedia</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="randn"></a>
+<b>randn( n_elem )</b>
+<br><b>randn( n_elem, distr_param(mu,sd) )</b>
+<br>
+<br><b>randn( n_rows, n_cols )</b>
+<br><b>randn( n_rows, n_cols, distr_param(mu,sd) )</b>
+<br>
+<br><b>randn( size(X) )</b>
+<br><b>randn( size(X), distr_param(mu,sd) )</b>
+<ul>
+<li>
+Generate a vector or matrix with the elements set to random values with normal&thinsp;/&thinsp;Gaussian distribution, parameterised by mean <i>mu</i> and standard deviation <i>sd</i>
+</li>
+<br>
+<li>The default distribution parameters are <i>mu&thinsp;=&thinsp;0</i> and <i>sd&thinsp;=&thinsp;1</i>
+</li>
+<br>
+<li>
+Usage:
+<ul>
+<li><i>vector_type</i> v = randn&lt;<i>vector_type</i>&gt;( n_elem )</li>
+<li><i>vector_type</i> v = randn&lt;<i>vector_type</i>&gt;( n_elem, distr_param(mu,sd) )</li>
+<br>
+<li><i>matrix_type</i> X = randn&lt;<i>matrix_type</i>&gt;( n_rows, n_cols )</li>
+<li><i>matrix_type</i> X = randn&lt;<i>matrix_type</i>&gt;( n_rows, n_cols, distr_param(mu,sd) )</li>
+</ul>
+</li>
+<br>
+<li>
+To change the RNG seed, use <i>coot_rng::set_seed(value)</i> or <i>coot_rng::set_seed_random()</i> functions
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fvec v1 = randn(5);
+fvec v2 = randn(5, distr_param(10,5));
+
+frowvec r1 = randn&lt;rowvec&gt;(5);
+frowvec r2 = randn&lt;rowvec&gt;(5, distr_param(10,5));
+
+fmat A1 = randn(5, 6);
+fmat A2 = randn(5, 6, distr_param(10,5));
+
+mat B1 = randn&lt;mat&gt;(5, 6);
+mat B2 = randn&lt;mat&gt;(5, 6, distr_param(10,5));
+
+<!-- TODO: comment color -->
+coot_rng::set_seed_random(); <font color="#0000bb">// set the seed to a random value</font>
+coot_rng::set_seed(42);      <font color="#0000bb">// set the seed to a specific value</font>
+</pre>
+</ul>
+</li>
+<li>See also:
+<ul>
+<li><a href="#randu_randn_member">.randn()</a> (member function)</li>
+<li><a href="#randu">randu()</a></li>
+<li><a href="#randi">randi()</a></li>
+<li><a href="#size">size()</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Normal_distribution">normal distribution in Wikipedia</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="randi"></a>
+<b>randi( n_elem )</b>
+<br><b>randi( n_elem, distr_param(a,b) )</b>
+<br>
+<br><b>randi( n_rows, n_cols )</b>
+<br><b>randi( n_rows, n_cols, distr_param(a,b) )</b>
+<br>
+<br><b>randi( size(X) )</b>
+<br><b>randi( size(X), distr_param(a,b) )</b>
+<ul>
+<li>
+Generate a vector or matrix with the elements set to random <b>integer</b> values uniformly distributed in the [a,b] interval
+</li>
+<br>
+<li>The default distribution parameters are <i>a&thinsp;=&thinsp;0</i> and <i>b&thinsp;=&thinsp;maximum_int</i>
+</li>
+<br>
+<li>
+Usage:
+<ul>
+<li><i>vector_type</i> v = randi&lt;<i>vector_type</i>&gt;( n_elem )</li>
+<li><i>vector_type</i> v = randi&lt;<i>vector_type</i>&gt;( n_elem, distr_param(a,b) )</li>
+<br>
+<li><i>matrix_type</i> X = randi&lt;<i>matrix_type</i>&gt;( n_rows, n_cols )</li>
+<li><i>matrix_type</i> X = randi&lt;<i>matrix_type</i>&gt;( n_rows, n_cols, distr_param(a,b) )</li>
+</ul>
+</li>
+<br>
+<li>
+To change the RNG seed, use <i>coot_rng::set_seed(value)</i> or <i>coot_rng::set_seed_random()</i> functions
+</li>
+<br>
+<li>
+<b>Caveat:</b> to generate a matrix with random floating point values (ie. <i>float</i> or <i>double</i>) instead of integers, use <a href="#randu">randu()</a> instead~
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+imat A1 = randi(5, 6);
+imat A2 = randi(5, 6, distr_param(-10, +20));
+
+fmat B1 = randi&lt;fmat&gt;(5, 6);
+fmat B2 = randi&lt;fmat&gt;(5, 6, distr_param(-10, +20));
+
+<!-- TODO: comment color -->
+coot_rng::set_seed_random(); <font color="#0000bb">// set the seed to a random value</font>
+coot_rng::set_seed(42);      <font color="#0000bb">// set the seed to a specific value</font>
+</pre>
+</ul>
+</li>
+<li>See also:
+<ul>
+<li><a href="#randu">randu()</a></li>
+<li><a href="#ones_standalone">ones()</a></li>
+<li><a href="#zeros_standalone">zeros()</a></li>
+<li><a href="#size">size()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
 
 <!-- END CONTENT -->
 
