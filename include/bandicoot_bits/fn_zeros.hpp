@@ -45,6 +45,25 @@ template<typename T>
 coot_warn_unused
 inline
 T
+zeros(const uword n_elem, const typename coot_Mat_Col_Row_only<T>::result* junk = nullptr)
+  {
+  coot_extra_debug_sigprint();
+  coot_ignore(junk);
+
+  const uword n_rows = (is_Row<T>::value) ? uword(1) : n_elem;
+  const uword n_cols = (is_Row<T>::value) ? n_elem   : uword(1);
+
+  T out(n_rows, n_cols);
+  out.zeros();
+  return out;
+  }
+
+
+
+template<typename T>
+coot_warn_unused
+inline
+T
 zeros(const SizeMat& s, const typename coot_Mat_Col_Row_only<T>::result* junk = nullptr)
   {
   coot_extra_debug_sigprint();
