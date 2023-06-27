@@ -5127,6 +5127,312 @@ See also:
 
 
 
+<div class="pagebreak"></div>
+<hr class="greyline">
+<hr class="greyline">
+<br>
+<br>
+<font size=+1><b>Decompositions, Factorisations, and Inverses</b></font>
+<br>
+<br>
+
+
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="chol"></a>
+<table>
+<tr><td><b>R = chol(       X                   )</b></td><td>&nbsp;&nbsp;&nbsp;</td><td>(form&nbsp;1)</td></tr>
+<tr><td><b>    chol( R,    X                   )</b></td><td>&nbsp;&nbsp;&nbsp;</td><td>(form&nbsp;2)</td></tr>
+</table>
+<ul>
+<li>
+Cholesky decomposition of symmetric/hermitian matrix <i>X</i> into triangular matrix <i>R</i>
+</li>
+<br>
+<li>
+By default, <i>R</i> is upper triangular
+</li>
+<br>
+<li>
+<i>X</i> is required to be positive definite
+</li>
+<br>
+<li>
+The decomposition has the form <i>X = R.t() * R</i>
+</li>
+<br>
+<li>If the decomposition fails:
+<ul>
+<li>the form <i>R = chol(X)</i> resets <i>R</i> and throws a <i>std::runtime_error</i> exception</li>
+<li>the form <i>chol(X, R)</i> resets <i>R</i> and returns a bool set to <i>false</i> (exception is not thrown)</li>
+</ul>
+</li>
+<br>
+<li>
+<b>Caveat:</b> there is no explicit check that <i>X</i> is symmetric or positive definite
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(5, 5);
+fmat X = A.t() * A;
+
+mat R1 = chol(X);
+mat R2;
+bool ok = chol(R2, X);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#lu">lu()</a></li>
+<li><a href="https://mathworld.wolfram.com/CholeskyDecomposition.html">Cholesky decomposition in MathWorld</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Cholesky_decomposition">Cholesky decomposition in Wikipedia</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Definite_matrix">Definite matrix in Wikipedia</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="eig_sym"></a>
+<b>vec eigval = eig_sym( X )</b>
+<br>
+<br><b>eig_sym( eigval,  X )</b>
+<br>
+<br><b>eig_sym( eigval, eigvec, X )</b>
+<ul>
+<li>Eigendecomposition symmetric/hermitian matrix <i>X</i></li>
+<br>
+<li>The eigenvalues and corresponding eigenvectors are stored in <i>eigval</i> and <i>eigvec</i>, respectively</li>
+<br>
+<li>The eigenvalues are in ascending order</li>
+<br>
+<li>The eigenvectors are stored as column vectors</li>
+<br>
+<li>If <i>X</i> is not square sized, a <i>std::logic_error</i> exception is thrown</li>
+<br>
+<li>If the decomposition fails:
+<ul>
+<li><i>eigval = eig_sym(X)</i> resets <i>eigval</i> and throws a <i>std::runtime_error</i> exception</li>
+<li><i>eig_sym(eigval,X)</i> resets <i>eigval</i> and returns a bool set to <i>false</i> (exception is not thrown)</li>
+<li><i>eig_sym(eigval,eigvec,X)</i> resets <i>eigval</i> &amp; <i>eigvec</i> and returns a bool set to <i>false</i> (exception is not thrown)</li>
+</ul>
+</li>
+<br>
+<li><b>Caveats:</b>
+<br>
+<ul>
+<li>there is no explicit check whether <i>X</i> is symmetric/hermitian</li>
+<li>if eigenvectors are not necessary, it is more efficient to use a form that does not compute them (i.e. <i>eig_sym(eigval, X)</i>)</li>
+</ul>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+<!-- TODO: comment color -->
+<font color="#0000bb">// for matrices with real elements</font>
+
+fmat A = randu&lt;fmat&gt;(50, 50);
+<!-- TODO: comment color -->
+fmat B = A.t()*A;  <font color="#0000bb">// generate a symmetric matrix</font>
+
+fvec eigval;
+fmat eigvec;
+
+eig_sym(eigval, eigvec, B);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#svd">svd()</a></li>
+<li><a href="https://mathworld.wolfram.com/EigenDecomposition.html">eigen decomposition in MathWorld</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors">eigenvalues &amp; eigenvectors in Wikipedia</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Divide-and-conquer_eigenvalue_algorithm">divide &amp; conquer eigenvalue algorithm in Wikipedia</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="lu"></a>
+<b>lu( L, U, P, X )</b>
+<br><b>lu( L, U, X )</b>
+<ul>
+<li>
+Lower-upper decomposition (with partial pivoting) of matrix <i>X</i>
+</li>
+<br>
+<li>
+The first form provides
+a lower-triangular matrix <i>L</i>,
+an upper-triangular matrix <i>U</i>,
+and a permutation matrix <i>P</i>,
+such that <i>P.t()*L*U&nbsp;=&nbsp;X</i>
+</li>
+<br>
+<li>
+The second form provides permuted <i>L</i> and <i>U</i>, such that <i>L*U = X</i>;
+note that in this case <i>L</i> is generally not lower-triangular
+</li>
+<br>
+<li>
+If the decomposition fails:
+<ul>
+<li><i>lu(L,U,P,X)</i> resets <i>L</i>, <i>U</i>, <i>P</i> and returns a bool set to <i>false</i> (exception is not thrown)</li>
+<li><i>lu(L,U,X)</i> resets <i>L</i>, <i>U</i>  and returns a bool set to <i>false</i> (exception is not thrown)</li>
+</ul>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(5, 5);
+
+fmat L, U, P;
+
+lu(L, U, P, A);
+
+fmat B = P.t() * L * U;
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#chol">chol()</a></li>
+<li><a href="https://en.wikipedia.org/wiki/LU_decomposition">LU decomposition in Wikipedia</a></li>
+<li><a href="https://mathworld.wolfram.com/LUDecomposition.html">LU decomposition in MathWorld</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="pinv"></a>
+<b>B = pinv( A )</b>
+<br><b>B = pinv( A, tolerance )</b>
+<br>
+<br><b>pinv( B, A )</b>
+<br><b>pinv( B, A, tolerance )</b>
+<ul>
+<li>Moore-Penrose pseudo-inverse (generalised inverse) of matrix <i>A</i></li>
+<br>
+<li>
+The computation is based on singular value decomposition
+</li>
+<br>
+<li>The <i>tolerance</i> argument is optional</li>
+<br>
+<li>The default <i>tolerance</i> is set to <i>max_rc&thinsp;&middot;&thinsp;max_sv&thinsp;&middot;&thinsp;epsilon</i>, where:
+<ul>
+<li><i>mar_rc</i> = max(A.n_rows,&thinsp;A.n_cols)</li>
+<li><i>max_sv</i> = maximum singular value of <i>A</i></li>
+<li><i>epsilon</i> = difference between 1 and the least value greater than 1 that is representable</li>
+</ul>
+</li>
+<br>
+<li>Any singular values less than <i>tolerance</i> are treated as zero</li>
+<br>
+<li>If the decomposition fails:
+<ul>
+<li><i>B = pinv(A)</i> resets <i>B</i> and throws a <i>std::runtime_error</i> exception</li>
+<li><i>pinv(B,A)</i> resets <i>B</i> and returns a bool set to <i>false</i> (exception is not thrown)</li>
+</ul>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(4, 5);
+
+<!-- TODO: comment color -->
+fmat B = pinv(A);        <font color="#0000bb">// use default tolerance</font>
+
+fmat C = pinv(A, 0.01);  <font color="#0000bb">// set tolerance to 0.01</font>
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#constants">datum::eps</a></li>
+<li><a href="https://mathworld.wolfram.com/Pseudoinverse.html">Pseudoinverse in MathWorld</a></li>
+<li><a href="https://mathworld.wolfram.com/Moore-PenroseMatrixInverse.html">Moore-Penrose Matrix Inverse in MathWorld</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Moore-Penrose_inverse">Moore-Penrose inverse in Wikipedia</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="svd"></a>
+<b>s = svd( X )</b>
+<br>
+<br><b>svd( s, X )</b>
+<br>
+<br><b>svd( U, s, V, X )</b>
+<ul>
+<li>
+Singular value decomposition of matrix <i>X</i> into vector of singular values <i>s</i> and matrices of left/right singular vectors <i>U</i>, <i>V</i>
+</li>
+<br>
+<li>If <i>X</i> is square, it can be reconstructed using <i>X = U*diagmat(s)*V.t()</i>
+</li>
+<br>
+<li>
+The singular values are in descending order
+</li>
+<br>
+<li>
+If the decomposition fails, the output objects are reset and:
+<ul>
+<li><i>s = svd(X)</i> resets <i>s</i> and throws a <i>std::runtime_error</i> exception</li>
+<li><i>svd(s,X)</i> resets <i>s</i> and returns a bool set to <i>false</i> (exception is not thrown)</li>
+<li><i>svd(U,s,V,X)</i> resets <i>U</i>, <i>s</i>, <i>V</i> and returns a bool set to <i>false</i> (exception is not thrown)</li>
+</ul>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat X = randu&lt;fmat&gt;(5, 5);
+
+fmat U;
+fvec s;
+fmat V;
+
+svd(U, s, V, X);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#eig_sym">eig_sym()</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Singular_value_decomposition">singular value decomposition in Wikipedia</a></li>
+<li><a href="https://mathworld.wolfram.com/SingularValueDecomposition.html">singular value decomposition in MathWorld</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+
+
 <!-- END CONTENT -->
 
 
