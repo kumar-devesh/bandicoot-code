@@ -5433,6 +5433,127 @@ See also:
 
 
 
+<div class="pagebreak"></div>
+<hr class="greyline">
+<hr class="greyline">
+<br>
+<br>
+<font size=+1><b>Signal &amp; Image Processing</b></font>
+<br>
+<br>
+
+
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="conv"></a>
+<b>conv( A, B )</b>
+<br><b>conv( A, B, shape )</b>
+<ul>
+<li>
+1D convolution of vectors <i>A</i> and <i>B</i>
+</li>
+<br>
+<li>
+The orientation of the result vector is the same as the orientation of <i>A</i> (ie. either column or row vector)
+</li>
+<br>
+<li>
+The <i>shape</i> argument is optional; it is one of:
+<ul>
+<ul>
+<table>
+<tbody>
+<tr><td style="text-align: right;"><code>"full"</code></td><td>&nbsp;=&nbsp;</td><td>return the full convolution (<b>default setting</b>), with the size equal to <i>A.n_elem&thinsp;+&thinsp;B.n_elem&thinsp;-&thinsp;1</i></td></tr>
+<tr><td style="text-align: right;"><code>"same"</code></td><td>&nbsp;=&nbsp;</td><td>return the central part of the convolution, with the same size as vector <i>A</i></td></tr>
+</tbody>
+</table>
+</ul>
+</ul>
+</li>
+<br>
+<li>
+The convolution operation is also equivalent to FIR filtering
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fvec A = randu&lt;fvec&gt;(256);
+
+fvec B = randu&lt;fvec&gt;(16);
+
+fvec C = conv(A, B);
+
+fvec D = conv(A, B, "same");
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#conv2">conv2()</a></li>
+<li><a href="#cor">cor()</a></li>
+<li><a href="https://mathworld.wolfram.com/Convolution.html">Convolution in MathWorld</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Convolution">Convolution in Wikipedia</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Finite_impulse_response">FIR filter in Wikipedia</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="conv2"></a>
+<b>conv2( A, B )</b>
+<br><b>conv2( A, B, shape )</b>
+<ul>
+<li>
+2D convolution of matrices <i>A</i> and <i>B</i>
+</li>
+<br>
+<li>
+The <i>shape</i> argument is optional; it is one of:
+<ul>
+<ul>
+<table>
+<tbody>
+<tr><td style="text-align: right;"><code>"full"</code></td><td>&nbsp;=&nbsp;</td><td>return the full convolution (<b>default setting</b>), with the size equal to <i>size(A)&thinsp;+&thinsp;size(B)&thinsp;-&thinsp;1</i></td></tr>
+<tr><td style="text-align: right;"><code>"same"</code></td><td>&nbsp;=&nbsp;</td><td>return the central part of the convolution, with the same size as matrix <i>A</i></td></tr>
+</tbody>
+</table>
+</ul>
+</ul>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(256, 256);
+
+fmat B = randu&lt;fmat&gt;(16, 16);
+
+fmat C = conv2(A, B);
+
+fmat D = conv2(A, B, "same");
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#conv">conv()</a></li>
+<li><a href="https://mathworld.wolfram.com/Convolution.html">Convolution in MathWorld</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Convolution">Convolution in Wikipedia</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Kernel_%28image_processing%29">Kernel (image processing) in Wikipedia</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+
 <!-- END CONTENT -->
 
 
