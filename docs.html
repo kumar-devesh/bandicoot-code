@@ -5554,6 +5554,319 @@ See also:
 </ul>
 
 
+
+<div class="pagebreak"></div>
+<hr class="greyline">
+<hr class="greyline">
+<br>
+<br>
+<font size=+1><b>Statistics &amp; Clustering</b></font>
+<br>
+<br>
+
+
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="stats_fns"></a>
+<b>mean, median, stddev, var, range</b>
+<ul>
+<table style="text-align: left;" border="0" cellpadding="0" cellspacing="0">
+<tbody>
+  <tr>
+    <td style="vertical-align: top;">
+       <b>mean( V )</b>
+       <br><b>mean( M )</b>
+       <br><b>mean( M, dim )</b>
+       <br>
+       <br>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;&nbsp;&nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &#9131;&nbsp;<br>
+      &#9130;&nbsp;<br>
+      &#9132;&nbsp;&nbsp;mean (average value)<br>
+      &#9130;&nbsp;<br>
+      &#9133;&nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+       <b>median( V )</b>
+       <br><b>median( M )</b>
+       <br><b>median( M, dim )</b>
+       <br>
+       <br>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;&nbsp;&nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &#9131;&nbsp;<br>
+      &#9132;&nbsp;&nbsp;median<br>
+      &#9133;&nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+       <b>stddev( V )</b>
+       <br><b>stddev( V, norm_type )</b>
+       <br><b>stddev( M )</b>
+       <br><b>stddev( M, norm_type )</b>
+       <br><b>stddev( M, norm_type, dim )</b>
+       <br>
+       <br>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;&nbsp;&nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &#9131;&nbsp;<br>
+      &#9130;&nbsp;<br>
+      &#9132;&nbsp;&nbsp;standard deviation<br>
+      &#9130;&nbsp;<br>
+      &#9133;&nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+       <b>var( V )</b>
+       <br><b>var( V, norm_type )</b>
+       <br><b>var( M )</b>
+       <br><b>var( M, norm_type )</b>
+       <br><b>var( M, norm_type, dim )</b>
+       <br>
+       <br>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;&nbsp;&nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &#9131;&nbsp;<br>
+      &#9130;&nbsp;<br>
+      &#9132;&nbsp;&nbsp;variance<br>
+      &#9130;&nbsp;<br>
+      &#9133;&nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+       <b>range( V )</b>
+       <br><b>range( M )</b>
+       <br><b>range( M, dim )</b>
+       <br>
+       <br>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;&nbsp;&nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &#9131;&nbsp;<br>
+      &#9132;&nbsp;&nbsp;range (difference between max and min)<br>
+      &#9133;&nbsp;
+    </td>
+  </tr>
+</tbody>
+</table>
+<li>
+For vector <i>V</i>, return the statistic calculated using all the elements of the vector
+</li>
+<br>
+<li>
+For matrix <i>M</i>, find the statistic for each column (<i>dim&thinsp;=&thinsp;0</i>), or each row (<i>dim&thinsp;=&thinsp;1</i>)
+</li>
+<br>
+<li>
+The <i>dim</i> argument is optional; by default <i>dim&thinsp;=&thinsp;0</i> is used
+</li>
+<br>
+<li>
+The <i>norm_type</i> argument is optional; by default <i>norm_type&thinsp;=&thinsp;0</i> is used
+</li>
+<br>
+<li>
+For the <i>var()</i> and <i>stddev()</i> functions:
+<ul>
+<li>the default <i>norm_type&thinsp;=&thinsp;0</i> performs normalisation using <i>N-1</i> (where <i>N</i> is the number of samples), providing the best unbiased estimator</li>
+<li>using <i>norm_type&thinsp;=&thinsp;1</i> performs normalisation using <i>N</i>, which provides the second moment around the mean</li>
+</ul>
+</li>
+<br>
+<li>
+<b>Caveat:</b>
+to obtain statistics for integer matrices/vectors (eg. <a href="#Mat">umat</a>, <a href="#Mat">imat</a>, <a href="#Col">uvec</a>, <a href="#Col">ivec</a>),
+convert to a matrix/vector with floating point values (eg. <a href="#Mat">mat</a>, <a href="#Col">vec</a>) using the <a href="#conv_to">conv_to()</a> function
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat A = randu&lt;fmat&gt;(5, 5);
+
+fmat B  = mean(A);
+fmat C  = var(A);
+float m = mean(mean(A));
+
+fvec v = randu&lt;fvec&gt;(5);
+float x = var(v);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#cov">cov()</a></li>
+<li><a href="#cor">cor()</a></li>
+<li><a href="#min_and_max">min() &amp; max()</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="cov"></a>
+<b>cov( X, Y )</b>
+<br><b>cov( X, Y, norm_type )</b>
+<br>
+<br><b>cov( X )</b>
+<br><b>cov( X, norm_type )</b>
+<ul>
+<li>
+For two matrix arguments <i>X</i> and <i>Y</i>,
+if each row of <i>X</i> and <i>Y</i>  is an observation and each column is a variable,
+the <i>(i,j)</i>-th entry of <i>cov(X,Y)</i> is the covariance between the <i>i</i>-th variable in <i>X</i> and the <i>j</i>-th variable in <i>Y</i>
+</li>
+<br>
+<li>
+For vector arguments, the type of vector is ignored and each element in the vector is treated as an observation
+</li>
+<br>
+<li>
+For matrices, <i>X</i> and <i>Y</i> must have the same dimensions
+</li>
+<br>
+<li>
+For vectors, <i>X</i> and <i>Y</i> must have the same number of elements
+</li>
+<br>
+<li>
+<i>cov(X)</i> is equivalent to <i>cov(X, X)</i>
+</li>
+<br>
+<li>
+The <i>norm_type</i> argument is optional; by default <i>norm_type&thinsp;=&thinsp;0</i> is used
+</li>
+<br>
+<li>
+the <i>norm_type</i> argument controls the type of normalisation used, with <i>N</i> denoting the number of observations:
+<ul>
+<li>
+for <i>norm_type&thinsp;=&thinsp;0</i>, normalisation is done using <i>N-1</i>,
+providing the best unbiased estimation of the covariance matrix (if the observations are from a normal distribution)
+</li>
+<li>
+for <i>norm_type&thinsp;=&thinsp;1</i>, normalisation is done using <i>N</i>,
+which provides the second moment matrix of the observations about their mean
+</li>
+</ul>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat X = randu&lt;fmat&gt;(4, 5);
+fmat Y = randu&lt;fmat&gt;(4, 5);
+
+fmat C = cov(X, Y);
+fmat D = cov(X, Y, 1);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#cor">cor()</a></li>
+<li><a href="#stats_fns">statistics functions</a></li>
+<li><a href="https://mathworld.wolfram.com/Covariance.html">Covariance in MathWorld</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="cor"></a>
+<b>cor( X, Y )</b>
+<br><b>cor( X, Y, norm_type )</b>
+<br>
+<br><b>cor( X )</b>
+<br><b>cor( X, norm_type )</b>
+<ul>
+<li>
+For two matrix arguments <i>X</i> and <i>Y</i>,
+if each row of <i>X</i> and <i>Y</i>  is an observation and each column is a variable,
+the <i>(i,j)</i>-th entry of <i>cor(X,Y)</i> is the correlation coefficient between the <i>i</i>-th variable in <i>X</i> and the <i>j</i>-th variable in <i>Y</i>
+</li>
+<br>
+<li>
+For vector arguments, the type of vector is ignored and each element in the vector is treated as an observation
+</li>
+<br>
+<li>
+For matrices, <i>X</i> and <i>Y</i> must have the same dimensions
+</li>
+<br>
+<li>
+For vectors, <i>X</i> and <i>Y</i> must have the same number of elements
+</li>
+<br>
+<li>
+<i>cor(X)</i> is equivalent to <i>cor(X, X)</i>
+</li>
+<br>
+<li>
+The <i>norm_type</i> argument is optional; by default <i>norm_type&thinsp;=&thinsp;0</i> is used
+</li>
+<br>
+<li>
+the <i>norm_type</i> argument controls the type of normalisation used, with <i>N</i> denoting the number of observations:
+<ul>
+<li>for <i>norm_type&thinsp;=&thinsp;0</i>, normalisation is done using <i>N-1</i></li>
+<li>for <i>norm_type&thinsp;=&thinsp;1</i>, normalisation is done using <i>N</i></li>
+</ul>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+fmat X = randu&lt;fmat&gt;(4, 5);
+fmat Y = randu&lt;fmat&gt;(4, 5);
+
+fmat R = cor(X, Y);
+fmat S = cor(X, Y, 1);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#cov">cov()</a></li>
+<li><a href="#conv">conv()</a></li>
+<li><a href="#stats_fns">statistics functions</a></li>
+<li><a href="https://mathworld.wolfram.com/Correlation.html">Correlation in MathWorld</a></li>
+<li><a href="https://mathworld.wolfram.com/Autocorrelation.html">Autocorrelation in MathWorld</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+
 <!-- END CONTENT -->
 
 
