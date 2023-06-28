@@ -1,4 +1,4 @@
-// Copyright 2019 Ryan Curtin (http://www.ratml.org/)
+// Copyright 2023 Ryan Curtin (http://www.ratml.org/)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 using namespace coot;
 
 template<typename eT>
-void test_eye(const uword n_rows, const uword n_cols)
+void test_ones(const uword n_rows, const uword n_cols)
   {
   if (!coot_rt_t::is_supported_type<eT>())
     {
@@ -26,56 +26,49 @@ void test_eye(const uword n_rows, const uword n_cols)
     }
 
   Mat<eT> x(n_rows, n_cols);
-  x.eye();
+  x.ones();
 
   for (uword c = 0; c < n_cols; ++c)
     {
     for (uword r = 0; r < n_rows; ++r)
       {
-      if (r == c)
-        {
-        REQUIRE( eT(x(r, c)) == Approx(eT(1)) );
-        }
-      else
-        {
-        REQUIRE( eT(x(r, c)) == eT(0) );
-        }
+      REQUIRE( eT(x(r, c)) == Approx(eT(1)) );
       }
     }
   }
 
 
 
-TEMPLATE_TEST_CASE("eye_1", "[eye]", float, double, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("ones_1", "[ones]", float, double, u32, s32, u64, s64)
   {
-  test_eye<TestType>(5, 5);
+  test_ones<TestType>(5, 5);
   }
 
 
 
-TEMPLATE_TEST_CASE("eye_2", "[eye]", float, double, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("ones_2", "[ones]", float, double, u32, s32, u64, s64)
   {
-  test_eye<TestType>(10, 50);
+  test_ones<TestType>(10, 50);
   }
 
 
 
-TEMPLATE_TEST_CASE("eye_3", "[eye]", float, double, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("ones_3", "[ones]", float, double, u32, s32, u64, s64)
   {
-  test_eye<TestType>(50, 10);
+  test_ones<TestType>(50, 10);
   }
 
 
 
-TEMPLATE_TEST_CASE("eye_empty", "[eye]", float, double, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("ones_empty", "[ones]", float, double, u32, s32, u64, s64)
   {
   // This just checks that there is no crash.
-  test_eye<TestType>(0, 0);
+  test_ones<TestType>(0, 0);
   }
 
 
 
-TEMPLATE_TEST_CASE("eye_standalone", "[eye]", float, double, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("ones_standalone", "[ones]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
@@ -84,27 +77,20 @@ TEMPLATE_TEST_CASE("eye_standalone", "[eye]", float, double, u32, s32, u64, s64)
     return;
     }
 
-  Mat<eT> x = eye<Mat<eT>>(10, 10);
+  Mat<eT> x = ones<Mat<eT>>(10, 10);
 
   for (uword c = 0; c < x.n_cols; ++c)
     {
     for (uword r = 0; r < x.n_rows; ++r)
       {
-      if (r == c)
-        {
-        REQUIRE( eT(x(r, c)) == Approx(eT(1)) );
-        }
-      else
-        {
-        REQUIRE( eT(x(r, c)) == eT(0) );
-        }
+      REQUIRE( eT(x(r, c)) == Approx(eT(1)) );
       }
     }
   }
 
 
 
-TEMPLATE_TEST_CASE("eye_standalone_sizemat", "[eye]", float, double, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("ones_standalone_sizemat", "[ones]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
@@ -114,20 +100,37 @@ TEMPLATE_TEST_CASE("eye_standalone_sizemat", "[eye]", float, double, u32, s32, u
     }
 
   Mat<eT> y(10, 10);
-  Mat<eT> x = eye<Mat<eT>>(size(y));
+  Mat<eT> x = ones<Mat<eT>>(size(y));
 
   for (uword c = 0; c < x.n_cols; ++c)
     {
     for (uword r = 0; r < x.n_rows; ++r)
       {
-      if (r == c)
-        {
-        REQUIRE( eT(x(r, c)) == Approx(eT(1)) );
-        }
-      else
-        {
-        REQUIRE( eT(x(r, c)) == eT(0) );
-        }
+      REQUIRE( eT(x(r, c)) == Approx(eT(1)) );
       }
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("ones_standalone_row_col", "[ones]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Col<eT> x = ones<Col<eT>>(100);
+  Row<eT> y = ones<Row<eT>>(100);
+
+  REQUIRE( x.n_elem == 100 );
+  REQUIRE( y.n_elem == 100 );
+
+  for (uword i = 0; i < 100; ++i)
+    {
+    REQUIRE( eT(x[i]) == Approx(eT(1)) );
+    REQUIRE( eT(y[i]) == Approx(eT(1)) );
     }
   }
