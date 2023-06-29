@@ -5970,6 +5970,8 @@ See also:
 </table>
 <br>
 <ul>
+<li><i>coot_init()</i> returns a boolean indicating whether or not initialisation was successful</li>
+<br>
 <li>if <i>print_info</i> is set to <i>true</i>, information about the selected GPU device will be printed</li>
 <br>
 <li>for the <i>"opencl"</i> initialisations, <i>platform_id</i> and <i>device_id</i> specify the desired OpenCL platform and device IDs; available platforms and devices can be listed using the <a href="https://github.com/Oblomov/clinfo">clinfo</a> command-line utility, available in most package managers: <i>clinfo -l</i></li>
@@ -5985,6 +5987,10 @@ See also:
 <li><i>coot_init()</i> can only be called once</li>
 <li>if either caveat above is violated when calling <i>coot_init()</i>, a <i>std::runtime_error</i> exception will be thrown</li>
 </ul>
+<br>
+<li>
+At any time, all asychronous operations can be forced to complete by calling <i>coot_synchronise()</i>
+</li>
 <br>
 <li>
 See also:
