@@ -276,6 +276,8 @@ Citations are useful for the continued development and maintenance of the librar
 <tr><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td></tr>
 <tr><td><a href="#submat">submatrix&nbsp;views</a></td><td>&nbsp;</td><td>read/write access to contiguous and non-contiguous submatrices</td></tr>
 <tr><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td></tr>
+<tr><td><a href="#get_dev_mem">.get_dev_mem()</a></td><td>&nbsp;</td><td>get underlying raw GPU memory pointer</td></tr>
+<tr><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td></tr>
 <tr><td><a href="#diag">.diag</a></td><td>&nbsp;</td><td>read/write access to matrix diagonals</td></tr>
 <tr><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td><td><small><small>&nbsp;</small></small></td></tr>
 <tr><td><a href="#t_st_members">.t&nbsp;/&nbsp;.st&nbsp;</a></td><td>&nbsp;</td><td>return matrix transpose</td></tr>
@@ -731,7 +733,7 @@ See also:
 <li><a href="#operators">math &amp; relational operators</a></li>
 <li><a href="#submat">submatrix views</a></li>
 <li><a href="#print">printing matrices</a></li>
-<li><a href="#iterators_mat">element iterators</a></li>
+<li><a href="#get_dev_mem">.get_dev_mem()</a></li>
 <li><a href="#eval_member">.eval()</a></li>
 <li><a href="#conv_to">conv_to()</a> (convert between matrix types)</li>
 <li><a href="https://cplusplus.com/doc/tutorial/other_data_types/">explanation of <i>typedef</i></a> (cplusplus.com)
@@ -2449,6 +2451,55 @@ See also:
 </ul>
 </li>
 <br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="get_dev_mem"></a>
+<b>.get_dev_mem()</b>
+<br><b>.get_dev_mem( synchronise ) </b>
+<ul>
+<li>
+Member function of <i>Mat</i>, <i>Col</i>, and <i>Row</i>
+</li>
+<br>
+<li>
+Obtain <code>dev_mem_t</code> object that holds raw GPU memory pointers
+</li>
+<br>
+<li>
+By default, all asynchronous GPU operations are forced to complete, unless <i>synchronise</i> is passed as <i>false</i>
+</li>
+<br>
+<li>
+Depending on <a href="#backend_configuration">backend configuration</a>, underlying GPU memory may be accessed as
+<ul>
+<li><code>.get_dev_mem().cl_mem_ptr</code> for the OpenCL backend; this has type <i>cl_mem</i></li>
+<li><code>.get_dev_mem().cuda_mem_ptr</code> for the CUDA backend; for a matrix type <i>Mat&lt;eT&gt;</i>, this has type <i>eT*</i> (e.g. for <i>fmat</i> the type will be <i>float*</i>)</li>
+</ul>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+<font class="comment">// when using the OpenCL backend</font>
+fmat A = randu&lt;fmat&gt;(3, 4);
+cl_mem A_mem = A.get_dev_mem().cl_mem_ptr;
+
+<font class="comment">// when using the CUDA backend</font>
+fmat B = randu&lt;fmat&gt;(3, 4);
+float* B_mem = B.get_dev_mem().cuda_mem_ptr;
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#backend_configuration">backend configuration</a></li>
+<li><a href="#adv_constructors_mat">advanced constructors (matrices)</a></li>
+<li><a href="#adv_constructors_col">advanced constructors (vectors)</a></li>
+</ul>
+</li>
 </ul>
 
 <div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
