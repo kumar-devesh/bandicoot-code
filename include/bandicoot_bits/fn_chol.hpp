@@ -14,7 +14,6 @@
 
 
 
-// TODO: add other versions
 template<typename T1>
 inline
 bool
@@ -24,11 +23,36 @@ chol(Mat<typename T1::elem_type>& out, const Base<typename T1::elem_type, T1>& X
 
   out = X.get_ref();
 
+  coot_debug_check( out.n_rows != out.n_cols, "chol(): given matrix must be square sized" );
+
+  std::tuple<bool, std::string> result = coot_rt_t::chol(out.get_dev_mem(true), out.n_rows);
+  if (std::get<0>(result) == false)
+    {
+    out.reset();
+    coot_warn_debug("coot::chol(): " + std::get<1>(result));
+    }
+
+  return std::get<0>(result);
+  }
+
+
+
+template<typename T1>
+inline
+Mat<typename T1::elem_type>
+chol(const Base<typename T1::elem_type, T1>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  Mat<typename T1::elem_type> out(X.get_ref());
+
+  coot_debug_check( out.n_rows != out.n_cols, "chol(): given matrix must be square sized" );
+
   std::tuple<bool, std::string> result = coot_rt_t::chol(out.get_dev_mem(true), out.n_rows);
   if (std::get<0>(result) == false)
     {
     coot_stop_runtime_error("coot::chol(): " + std::get<1>(result));
     }
 
-  return true;
+  return out;
   }
