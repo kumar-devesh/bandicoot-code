@@ -159,7 +159,6 @@ hr.greyline
 <br>
 
 
-<!-- TODO: rework -->
 <b>Preamble</b>
 <br>
 <br>
@@ -396,15 +395,15 @@ Citations are useful for the continued development and maintenance of the librar
 <ul>
 <table>
 <tbody>
-<!-- TODO: write this section -->
 <tr><td><a href="#backend_configuration">backend configuration</a></td><td>&nbsp;</td><td>configuring the use of OpenCL or CUDA backends for Bandicoot</td></tr>
 <tr style="background-color: #F5F5F5;"><td><a href="#output_streams">output&nbsp;streams</a></td><td>&nbsp;</td><td>streams for printing warnings and errors</td></tr>
 <tr><td><a href="#uword">uword&nbsp;/&nbsp;sword</a></td><td>&nbsp;</td><td>shorthand for unsigned and signed integers</td></tr>
 <tr><td><a href="#syntax">Matlab/Bandicoot&nbsp;syntax&nbsp;differences</a></td><td>&nbsp;</td><td>examples of Matlab syntax and conceptually corresponding Bandicoot syntax</td></tr>
-<!-- TODO: write this section -->
 <tr><td><a href="#arma_comparison">Armadillo/Bandicoot&nbsp;differences</a></td><td>&nbsp;</td><td>conceptual differences between Bandicoot and Armadillo</td></tr>
 <tr style="background-color: #F5F5F5;"><td><a href="#example_prog">example&nbsp;program</a></td><td>&nbsp;</td><td>short example program</td></tr>
 <tr style="background-color: #F5F5F5;"><td><a href="#config_hpp">config.hpp</a></td><td>&nbsp;</td><td>configuration options</td></tr>
+<tr><td><a href="#direct_linking">direct linking</a></td><td>&nbsp;</td><td>guide to linking without using the wrapper library</td></tr>
+<tr><td><a href="#kernel_cache">kernel cache</a></td><td>&nbsp;</td><td>infrastructure for caching compiled GPU kernel functions</td></tr>
 <tr style="background-color: #F5F5F5;"><td><a href="#changelog">API&nbsp;additions</a></td><td>&nbsp;</td><td>API stability and list of API additions</td></tr>
 </tbody>
 </table>
@@ -669,11 +668,9 @@ The <i>ptr_aux_mem</i> argument should be one of:
 a memory pointer from another Bandicoot matrix obtained with <i>.get_dev_mem()</i>
 </li>
 <li>
-<!-- TODO: more specific link? -->
 a <i>cl_mem</i> object, if using the <a href="#backend_configuration">OpenCL backend</a>
 </li>
 <li>
-<!-- TODO: more specific link? -->
 a CUDA memory pointer (e.g. a <i>float*</i> for an <i>fmat</i>), if using the <a href="#backend_configuration">CUDA backend</a>
 </li>
 </ul>
@@ -1026,11 +1023,9 @@ The <i>ptr_aux_mem</i> argument should be one of:
 a memory pointer from another Bandicoot matrix obtained with <i>.get_dev_mem()</i>
 </li>
 <li>
-<!-- TODO: more specific link? -->
 a <i>cl_mem</i> object, if using the <a href="#backend_configuration">OpenCL backend</a>
 </li>
 <li>
-<!-- TODO: more specific link? -->
 a CUDA memory pointer (e.g. a <i>float*</i> for an <i>fmat</i>), if using the <a href="#backend_configuration">CUDA backend</a>
 </li>
 </ul>
@@ -1291,11 +1286,9 @@ The <i>ptr_aux_mem</i> argument should be one of:
 a memory pointer from another Bandicoot matrix obtained with <i>.get_dev_mem()</i>
 </li>
 <li>
-<!-- TODO: more specific link? -->
 a <i>cl_mem</i> object, if using the <a href="#backend_configuration">OpenCL backend</a>
 </li>
 <li>
-<!-- TODO: more specific link? -->
 a CUDA memory pointer (e.g. a <i>float*</i> for an <i>fmat</i>), if using the <a href="#backend_configuration">CUDA backend</a>
 </li>
 </ul>
@@ -1692,7 +1685,6 @@ As for <code>(r,c)</code>, but without a bounds check; not recommended; see the 
 <b>Important:</b>
 every element access involves a transfer from GPU memory to CPU memory;
 therefore, for efficiency, avoid repeated element access when possible;
-<!-- TODO: more specific link -->
 see <a href="#arma_comparison">the Armadillo conversion guide</a> for more details and suggestions.
 </li>
 <br>
@@ -1737,7 +1729,6 @@ float y = v(0);
 <br>
 <li>See also:
 <ul>
-<!-- TODO: more specific link -->
 <li><a href="#arma_comparison">Armadillo conversion guide</a></li>
 <li><a href="#submat">submatrix views</a></li>
 <!-- TODO: ensure this section gets added -->
@@ -2793,7 +2784,6 @@ cout &lt;&lt; B &lt;&lt; endl;
 See also:
 <ul>
 <li><a href="#raw_print">.raw_print()</a></li>
-<!-- TODO: check this link -->
 <li><a href="#output_streams">output streams</a></li>
 </ul>
 </li>
@@ -4470,7 +4460,7 @@ The dimensions support simple arithmetic operations; they can also be printed an
 <br>
 <li>
 <b>Caveat:</b> to prevent interference from <a href="https://en.cppreference.com/w/cpp/iterator/size"><i>std::size()</i></a> in C++17,
-preface Bandicoot's <i>size()</i> with the <i>arma</i> namespace qualification, eg. <i>coot::size(X)</i>
+preface Bandicoot's <i>size()</i> with the <i>coot</i> namespace qualification, eg. <i>coot::size(X)</i>
 </li>
 <br>
 <li>
@@ -5865,6 +5855,2020 @@ See also:
 </li>
 <br>
 </ul>
+
+
+
+<div class="pagebreak"></div>
+<hr class="greyline">
+<hr class="greyline">
+<br>
+<br>
+<font size=+1><b>Miscellaneous</b></font>
+<br>
+<br>
+
+
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="backend_configuration"></a>
+<b>backend configuration</b>
+<br>
+<ul>
+<li>Bandicoot can use either CUDA or OpenCL as a hardware backend</li>
+<br>
+<li>To enable CUDA or OpenCL, set the <code><i>COOT_USE_CUDA</i></code> or <code><i>COOT_USE_OPENCL</i></code> macros in the <a href="#config_hpp">Bandicoot configuration</a></li>
+<br>
+<li>If both backends are enabled, select the default backend by setting the <code><i>COOT_DEFAULT_BACKEND</i></code> macro to the desired backend (e.g. <code>#define COOT_BACKEND CL_BACKEND</code>)</li>
+<br>
+<li>By default, at the time of first usage, Bandicoot will automatically initialise to use the first available device with the default backend</li>
+<br>
+<li>Bandicoot can also be manually initialised using the <code>coot_init()</code> function:
+<br>
+<br>
+<table style="text-align: left;" border="0" cellpadding="0" cellspacing="0">
+<tbody>
+  <tr>
+    <td style="vertical-align: top;">
+      <b>coot_init( )</b>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;&nbsp;&nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      default initialization
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <b>coot_init( print_info )</b>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;&nbsp;&nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      initialize to default backend, optionally printing information about the chosen GPU device
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <b>coot_init( "opencl", print_info )</b>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;&nbsp;&nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      initialize to OpenCL backend; <code>COOT_USE_OPENCL</code> must be enabled
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <b>coot_init( "opencl", print_info, platform_id, device_id )</b>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;&nbsp;&nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      use a specific OpenCL platform ID and device ID
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <b>coot_init( "cuda", print_info )</b>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;&nbsp;&nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      initialize to CUDA backend; <code>COOT_USE_CUDA</code> must be enabled
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <b>coot_init( "cuda", print_info, device_id )</b>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;&nbsp;&nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      use specific CUDA device ID
+    </td>
+  </tr>
+</tbody>
+</table>
+<br>
+<ul>
+<li>if <i>print_info</i> is set to <i>true</i>, information about the selected GPU device will be printed</li>
+<br>
+<li>for the <i>"opencl"</i> initialisations, <i>platform_id</i> and <i>device_id</i> specify the desired OpenCL platform and device IDs; available platforms and devices can be listed using the <a href="https://github.com/Oblomov/clinfo">clinfo</a> command-line utility, available in most package managers: <i>clinfo -l</i></li>
+<br>
+<li>for the <i>"cuda"</i> initialisations, <i>device_id</i> specifies the desired CUDA device; available device IDs can be listed with the <a href="https://developer.nvidia.com/nvidia-system-management-interface">nvidia-smi</a> command-line utility</li>
+</ul>
+</li>
+<br>
+<li>
+<b>Caveats:</b>
+<ul>
+<li>calling <i>coot_init()</i> manually <i>must</i> be done before any other Bandicoot operations</li>
+<li><i>coot_init()</i> can only be called once</li>
+<li>if either caveat above is violated when calling <i>coot_init()</i>, a <i>std::runtime_error</i> exception will be thrown</li>
+</ul>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/CUDA">CUDA in Wikipedia</a></li>
+<li><a href="https://en.wikipedia.org/wiki/OpenCL">OpenCL in Wikipedia</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="constants"></a>
+<b>constants (pi, inf, eps, ...)</b>
+<br>
+<ul>
+<table style="text-align: left;" border="0" cellpadding="2" cellspacing="2">
+<tbody>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::pi</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &pi;, the ratio of any circle's circumference to its diameter
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::tau</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &tau;, the ratio of any circle's circumference to its radius (equivalent to 2&pi;)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::inf</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &infin;, infinity
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::nan</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &ldquo;not a number&rdquo; (NaN); <b>caveat:</b> NaN is not equal to anything, even itself
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">&nbsp;</td>
+    <td style="vertical-align: top;">&nbsp;</td>
+    <td style="vertical-align: top;">&nbsp;</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::eps</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      machine epsilon; approximately 2.2204e-16; difference between 1 and the next representable value
+      <!-- machine epsilon: the difference between 1 and the value least greater than 1 that is representable  (type and machine dependent) -->
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::e</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      base of the natural logarithm
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::sqrt2</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      square root of 2
+    </td>
+  </tr>
+  <!--
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::sqrt2pi</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      square root of 2&pi;
+    </td>
+  </tr>
+  -->
+  <tr>
+    <td style="vertical-align: top;">&nbsp;</td>
+    <td style="vertical-align: top;">&nbsp;</td>
+    <td style="vertical-align: top;">&nbsp;</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::log_min</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      log of minimum non-zero value (type and machine dependent)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::log_max</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      log of maximum value  (type and machine dependent)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::euler</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      Euler's constant, aka Euler-Mascheroni constant
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">&nbsp;</td>
+    <td style="vertical-align: top;">&nbsp;</td>
+    <td style="vertical-align: top;">&nbsp;</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::gratio</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      golden ratio
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::m_u</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      atomic mass constant (in kg)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::N_A</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      Avogadro constant
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">&nbsp;</td>
+    <td style="vertical-align: top;">&nbsp;</td>
+    <td style="vertical-align: top;">&nbsp;</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::k</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      Boltzmann constant (in joules per kelvin)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::k_evk</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      Boltzmann constant (in eV/K)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::a_0</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      Bohr radius (in meters)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">&nbsp;</td>
+    <td style="vertical-align: top;">&nbsp;</td>
+    <td style="vertical-align: top;">&nbsp;</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::mu_B</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      Bohr magneton
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::Z_0</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      characteristic impedance of vacuum (in ohms)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::G_0</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      conductance quantum (in siemens)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">&nbsp;</td>
+    <td style="vertical-align: top;">&nbsp;</td>
+    <td style="vertical-align: top;">&nbsp;</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::k_e</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      Coulomb's constant (in meters per farad)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::eps_0</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      electric constant (in farads per meter)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::m_e</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      electron mass (in kg)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">&nbsp;</td>
+    <td style="vertical-align: top;">&nbsp;</td>
+    <td style="vertical-align: top;">&nbsp;</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::eV</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      electron volt (in joules)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::ec</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      elementary charge (in coulombs)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::F</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      Faraday constant (in coulombs)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">&nbsp;</td>
+    <td style="vertical-align: top;">&nbsp;</td>
+    <td style="vertical-align: top;">&nbsp;</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::alpha</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      fine-structure constant
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::alpha_inv</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      inverse fine-structure constant
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::K_J</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      Josephson constant
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">&nbsp;</td>
+    <td style="vertical-align: top;">&nbsp;</td>
+    <td style="vertical-align: top;">&nbsp;</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::mu_0</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      magnetic constant (in henries per meter)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::phi_0</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      magnetic flux quantum (in webers)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::R</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      molar gas constant (in joules per mole kelvin)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">&nbsp;</td>
+    <td style="vertical-align: top;">&nbsp;</td>
+    <td style="vertical-align: top;">&nbsp;</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::G</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      Newtonian constant of gravitation (in newton square meters per kilogram squared)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::h</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      Planck constant (in joule seconds)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::h_bar</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      Planck constant over 2 pi, aka reduced Planck constant (in joule seconds)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">&nbsp;</td>
+    <td style="vertical-align: top;">&nbsp;</td>
+    <td style="vertical-align: top;">&nbsp;</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::m_p</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      proton mass (in kg)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::R_inf</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      Rydberg constant (in reciprocal meters)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::c_0</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      speed of light in vacuum (in meters per second)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">&nbsp;</td>
+    <td style="vertical-align: top;">&nbsp;</td>
+    <td style="vertical-align: top;">&nbsp;</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::sigma</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      Stefan-Boltzmann constant
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::R_k</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      von Klitzing constant (in ohms)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>datum::b</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      Wien wavelength displacement law constant
+    </td>
+  </tr>
+</tbody>
+</table>
+<br>
+<li>
+The constants are stored in the <i>Datum&lt;type&gt;</i> class,
+where <i>type</i> is either <i>float</i> or <i>double</i>;
+<br>
+for convenience,
+<i>Datum&lt;double&gt;</i> is typedefed as <i>datum</i>,
+and
+<i>Datum&lt;float&gt;</i> is typedefed as <i>fdatum</i>
+</li>
+<br>
+<li>
+<b>Caveat:</b>
+<code>datum::nan</code> is not equal to anything, even itself;
+to check whether a scalar <i>x</i> is finite,
+use <a href="https://en.cppreference.com/w/cpp/numeric/math/isfinite">std::isfinite</a>(<i>x</i>)
+</li>
+<br>
+<li>
+The physical constants were mainly taken from
+<a href="https://physics.nist.gov/cuu/Constants">NIST 2018 CODATA values</a>,
+and some from
+<a href="https://www.wolframalpha.com">WolframAlpha</a> (as of 2009-06-23)
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+cout &lt;&lt; "speed of light = " &lt;&lt; datum::c_0 &lt;&lt; endl;
+
+cout &lt;&lt; "log_max for floats = ";
+cout &lt;&lt; fdatum::log_max &lt;&lt; endl;
+
+cout &lt;&lt; "log_max for doubles = ";
+cout &lt;&lt; datum::log_max &lt;&lt; endl;
+</pre>
+</ul>
+</li>
+<li>
+See also:
+<ul>
+<li><a href="#fill">.fill()</a></li>
+<li><a href="https://en.wikipedia.org/wiki/NaN">NaN</a> in Wikipedia</li>
+<li><a href="https://en.wikipedia.org/wiki/Physical_constant">physical constant</a> in Wikipedia</li>
+<li><a href="https://en.wikipedia.org/wiki/Turn_(angle)">replacement of 2&pi; with &tau;</a> in Wikipedia</li>
+<li><a href="https://tauday.com/tau-manifesto">The Tau Manifesto</a> by Michael Hartl</li>
+<li><a href="https://cplusplus.com/reference/limits/numeric_limits/">std::numeric_limits</a> in cplusplus.com</li>
+<li><a href="https://en.cppreference.com/w/cpp/types/numeric_limits">std::numeric_limits</a> in cppreference.com</li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="wall_clock"></a>
+<b>wall_clock</b>
+<ul>
+<li>
+Simple timer class for measuring the number of elapsed seconds
+</li>
+<br>
+<li>
+An instance of the class has two member functions:
+<br>
+<br>
+<table style="text-align: left;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <b><code>.tic()</code></b>
+      </td>
+      <td style="vertical-align: top;">&nbsp;<br>
+      </td>
+      <td style="vertical-align: top;">
+      start the timer
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+      <b><code>.toc()</code></b>
+      </td>
+      <td style="vertical-align: top;">&nbsp;<br>
+      </td>
+      <td style="vertical-align: top;">
+      return the number of seconds since the last call to <code>.tic()</code>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</li>
+<br>
+<li>
+Examples:
+<ul>
+<pre>
+wall_clock timer;
+
+timer.tic();
+
+// ... do something ...
+
+double n = timer.toc();
+
+cout &lt;&lt; "number of seconds: " &lt;&lt; n &lt;&lt; endl;
+</pre>
+</ul>
+</li>
+<li>
+See also:
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Elapsed_real_time">elapsed real time</a> in Wikipedia</li>
+</ul>
+</li>
+</ul>
+<br>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="output_streams"></a>
+<a name="logging"></a>
+<b>output streams</b>
+<ul>
+<li>
+The default stream for printing matrices and cubes is <code>std::cout</code>
+<br>the stream can be changed via the <code>COOT_COUT_STREAM</code> define; see <a href="#config_hpp">config.hpp</a>
+</li>
+<br>
+<li>
+The default stream for printing warnings and errors is <code>std::cerr</code>
+<br>the stream can be changed via the <code>COOT_CERR_STREAM</code> define; see <a href="#config_hpp">config.hpp</a>
+</li>
+<br>
+<li>
+Whether warnings are printed is controlled by the <code>COOT_PRINT_ERRORS</code> and <code>COOT_DONT_PRINT_ERRORS</code> defines; see <a href="#config_hpp">config.hpp</a>
+</li>
+<br>
+<li>
+The <code>COOT_DONT_PRINT_ERRORS</code> define takes precedence over the <code>COOT_PRINT_ERRORS</code> define
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#config_hpp">config.hpp</a></li>
+<li><a href="#print">.print()</a></li>
+<li><a href="https://cplusplus.com/reference/iostream/cout/">std::cout</a></li>
+<li><a href="https://cplusplus.com/reference/iostream/cerr/">std::cerr</a></li>
+<li><a href="https://cplusplus.com/reference/ostream/ostream/">std::ostream</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="uword"></a>
+<b>uword</b>, <b>sword</b>
+<ul>
+<li><i>uword</i> is a typedef for an unsigned integer type; it is used for matrix <a href="#element_access">indices</a> as well as all internal counters and loops</li>
+<br>
+<li><i>sword</i> is a typedef for a signed integer type</li>
+<br>
+<li>The minimum width of both <i>uword</i> and <i>sword</i> is either 32 or 64 bits:
+<ul>
+<li>the default width is 32 bits on 32-bit platforms</li>
+<li>the default width is 64 bits on 64-bit platforms</li>
+<li>on most systems, <i>uword</i> is a typedef for <i>size_t</i></li>
+</ul>
+</li>
+<br>
+<li>
+<b>Caveat:</b> the Bandicoot <i>uword</i> and <i>sword</i> types are not guaranteed to be the same as the Armadillo <i>arma::uword</i> and <i>arma::sword</i> types
+</li>
+<br>
+<li>See also:
+<ul>
+<li><a href="https://cplusplus.com/doc/tutorial/variables/">C++ variable types</a></li>
+<li><a href="https://cplusplus.com/doc/tutorial/other_data_types/">explanation of <i>typedef</i></a></li>
+<li><a href="#Mat">imat &amp; umat</a> matrix types
+<li><a href="#Col">ivec &amp; uvec</a> vector types
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="syntax"></a>
+<b>Examples of Matlab/Octave syntax and conceptually corresponding Bandicoot syntax</b>
+<br>
+<br>
+<ul>
+<table style="text-align: left;" border="0" cellpadding="2" cellspacing="2">
+<tbody>
+  <tr>
+    <td style="vertical-align: top;">
+      <b>Matlab/Octave</b>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <b>Bandicoot</b>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <b>Notes</b>
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>A(1, 1)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <code>A(0, 0)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      indexing in Bandicoot starts at 0
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>A(k, k)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <code>A(k-1, k-1)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>size(A,1)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <code>A<a href="#attributes">.n_rows</a></code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      read only
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>size(A,2)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <code>A<a href="#attributes">.n_cols</a></code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>numel(A)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <code>A<a href="#attributes">.n_elem</a></code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>A(:, k)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <code>A<a href="#submat">.col</a>(k)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+this is a conceptual example only;
+exact conversion from Matlab/Octave to Bandicoot syntax
+will require taking into account that indexing starts at 0
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>A(k, :)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <code>A<a href="#submat">.row</a>(k)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>A(:, p:q)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <code>A<a href="#submat">.cols</a>(p, q)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>A(p:q, :)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <code>A<a href="#submat">.rows</a>(p, q)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>A(p:q, r:s)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <code>A(&nbsp;<a href="#submat">span</a>(p,q),&nbsp;<a href="#submat">span</a>(r,s)&nbsp;)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      A(&nbsp;span(first_row,&nbsp;last_row), span(first_col,&nbsp;last_col)&nbsp;)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>A'</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <code>A<a href="#t_st_members">.t()</a> or <a href="#trans">trans</a>(A)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      matrix transpose / Hermitian transpose
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>A&nbsp;=&nbsp;zeros(size(A))</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <code>A<a href="#zeros_member">.zeros()</a></code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>A&nbsp;=&nbsp;ones(size(A))</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <code>A.<a href="#ones_member">ones()</a></code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>A = zeros(k)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <code>A = <a href="#zeros_standalone">zeros</a>&lt;fmat&gt;(k,k)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>A = ones(k)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <code>A = <a href="#ones_standalone">ones</a>&lt;fmat&gt;(k,k)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>A .* B</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <code>A % B</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <a href="#operators">element-wise multiplication</a>
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>A ./ B</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <code>A / B</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <a href="#operators">element-wise division</a>
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>A = A + 1;</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <code>A++</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>A = A - 1;</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <code>A--</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>X = A(:)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <code>X = <a href="#vectorise">vectorise</a>(A)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>X = [&nbsp;A&nbsp;&nbsp;B&nbsp;]</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <code>X = <a href="#join">join_horiz</a>(A,B)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>X = [&nbsp;A;&nbsp;B&nbsp;]</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <code>X = <a href="#join">join_vert</a>(A,B)</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>A</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <code>cout <font size=-1>&lt;&lt;</font> A <font size=-1>&lt;&lt;</font> endl;</code>
+      <br><font size=-1>or</font>
+      <br><code>A<a href="#print">.print</a>("A =");</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      <code>A&nbsp;=&nbsp;randn(2,3);
+      <br>B&nbsp;=&nbsp;randn(4,5);</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      <code>fmat&nbsp;A&nbsp;=&nbsp;randn(2,3);
+      <br>fmat&nbsp;B&nbsp;=&nbsp;randn(4,5);</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: center;">
+      &nbsp;
+    </td>
+  </tr>
+</tbody>
+</table>
+</ul>
+<br>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="arma_comparison"></a>
+<b>Armadillo/Bandicoot conversion guide</b>
+<ul>
+<li>Bandicoot is meant to be a GPU-accelerated linear algebra library that is API-compatible with Armadillo and thus can function as a drop-in replacement; <i>however,</i> due to the different architecture of the GPU and other constraints, it is <b>not always</b> a benefit to use Bandicoot instead of Armadillo</li>
+<br>
+<li>The first run of any Bandicoot program requires compiling all Bandicoot kernel functions for the given device, which can be a time-consuming process; kernels are cached and subsequent runs will use the cache</li>
+<ul>
+<li>Upgrading Bandicoot versions may incur recompilation of kernels</li>
+<li>Using a new backend for the first time may incur recompilation of kernels</li>
+<li>Using a new device may incur recompilation of kernels</li>
+<li>For more information see the <a href="kernel_cache">kernel cache</a> documentation</li>
+</ul>
+<br>
+<li>Where possible, use batch operations with Bandicoot; e.g., use <code>A += 1</code> instead of <code>for (uword i = 0; i &lt; A.n_elem; ++i) { A[i] += 1; }</code></li>
+<br>
+<li>GPUs are best suited for operations on large matrices, so small matrices (e.g. less than 100 elements) may not show significant speedup</li>
+<br>
+<li>Individual element access (such as <code>A.at(i, j)</code>) requires a transfer between the GPU and CPU; when adapting Armadillo code to Bandicoot, these should be avoided wherever possible
+<ul>
+<li>If such operations cannot be avoided, consider temporarily transferring the entire Bandicoot matrix back to memory by creating an Armadillo matrix with <a href="#conv_to">conv_to&lt;arma::fmat&gt;()</a> or similar</li>
+</ul>
+<br>
+<li>Consumer-level GPUs are not designed for intensive linear algebra operations and thus may not show significant speedup; the best results will be obtained with high-end hardware</li>
+<br>
+<li>Most GPUs show better performance with 32-bit floating point elements (e.g. <i>float</i> instead of <i>double</i>), so using <i>fmat</i> instead of <i>mat</i> is recommended wherever possible</li>
+<br>
+<li>If support you need for a conversion is not available, please <a href="faq.html">file a bug report</a> so that the support can be prioritised</li>
+</ul>
+<br>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="example_prog"></a>
+<b>example program</b>
+<br>
+<ul>
+<pre>
+#include &lt;iostream&gt;
+#include &lt;bandicoot&gt;
+
+using namespace std;
+using namespace coot;
+
+int main()
+  {
+  fmat A = randu&lt;fmat&gt;(4, 5);
+  fmat B = randu&lt;fmat&gt;(4, 5);
+
+  cout &lt;&lt; A * B.t() &lt;&lt; endl;
+
+  return 0;
+  }
+</pre>
+<li>
+If the above program is stored as <i>example.cpp</i>,
+under Linux and macOS it can be compiled using:
+<br>
+<ul><code>g++ example.cpp -o example -std=c++11 -O2 -lbandicoot</code></ul>
+</li>
+<br>
+<li>
+Bandicoot extensively uses template meta-programming,
+so it's recommended to enable optimisation when compiling programs (eg. use the -O2 or -O3 options for GCC or clang)
+</li>
+<br>
+<!-- TODO: coot.sourceforge.net link? -->
+<li>See the <a href="faq.html">Questions</a> page for more info on compiling and linking</li>
+<br>
+<li>If coming from <a href="https://arma.sourceforge.net/">Armadillo</a>, be sure to check the <a href="#arma_comparison">Armadillo/Bandicoot differences</a> for advice on writing efficient code</li>
+<br>
+<li>See also the example program that comes with the Bandicoot archive</li>
+</ul>
+<br>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="config_hpp"></a>
+<b>config.hpp</b>
+<br>
+<ul>
+<li>
+Bandicoot can be configured via editing the file <i>include/bandicoot_bits/config.hpp</i>
+</li>
+<br>
+<li>
+Specific functionality can be enabled or disabled by uncommenting or commenting out a particular <i>#define</i>, listed below.
+</li>
+<br>
+<li>
+Some options can also be specified by explicitly defining them <b>before</b> including the bandicoot header.
+</li>
+<br>
+<table style="text-align: left;" border="0" cellpadding="2" cellspacing="2">
+<tbody>
+  <tr>
+    <td style="vertical-align: top;">
+<code>COOT_DONT_USE_WRAPPER</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+Disable going through the run-time Bandicoot wrapper library (<i>libbandicoot.so</i>) when calling GPU-specific functions.
+Overrides <code><i>COOT_USE_WRAPPER</i></code>.
+You will need to <a href="#direct_linking">directly link</a> with GPU libraries (e.g. <code><i>-lOpenCL -lclBLAS</i></code> or similar depending on <a href="#backend_configuration">backend configuration</a>)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+<code>COOT_USE_WRAPPER</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+Enable use of Bandicoot wrapper library, which allows linking against all enabled backends with <code><i>-lbandicoot</i></code> only.
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+<code>COOT_USE_OPENCL</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+Enable use of OpenCL as a GPU backend.  Note that either <code>COOT_USE_OPENCL</code> or <code>COOT_USE_CUDA</code> must be enabled.
+OpenCL headers and clBLAS headers must be available on the system.
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+<code>COOT_USE_CUDA</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+Enable use of CUDA as a GPU backend.  Note that either <code>COOT_USE_OPENCL</code> or <code>COOT_USE_CUDA</code> must be enabled.
+The CUDA toolkit must be available on the system.
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+<code>COOT_DEFAULT_BACKEND</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+Set the backend that Bandicoot will use.  This is only necessary if multiple backends are enabled; that is, when both <code>COOT_USE_OPENCL</code> and <code>COOT_USE_CUDA</code> are enabled.  This should be set to either <code>CUDA_BACKEND</code> or <code>CL_BACKEND</code> (e.g. <code>#define COOT_BACKEND CUDA_BACKEND</code>).  See also the <a href="#backend_configuration">backend configuration</a> documentation.
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+<code>COOT_USE_OPENMP</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+Use OpenMP for parallelisation of some CPU-based parts of Bandicoot functionalities.
+Automatically enabled when using a compiler which has OpenMP 3.1+ active (eg. the <code>-fopenmp</code> option for gcc and clang).
+<i>Note:</i> this may not have a noticeable effect on performance since most Bandicoot implementations do not use the CPU heavily or at all.
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+<code>COOT_DONT_USE_OPENMP</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+Disable use of OpenMP for parallelisation; overrides <code><i>COOT_USE_OPENMP</i></code>.
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+<code>COOT_KERNEL_CACHE_DIR</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+If defined, specifies a custom directory to use for the <a href="#kernel_cache">kernel cache</a>.
+Distribution packagers may choose to specify <code>COOT_SYSTEM_KERNEL_CACHE_DIR</code>, though it is overridden by <code>COOT_KERNEL_CACHE_DIR</code> if specified.
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+<code>COOT_BLAS_CAPITALS</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+Use capitalised (uppercase) BLAS and LAPACK function names (eg. DGEMM vs dgemm)
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+<code>COOT_BLAS_UNDERSCORE</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+Append an underscore to BLAS and LAPACK function names (eg. dgemm_ vs dgemm). Enabled by default.
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+<code>COOT_BLAS_LONG</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+Use "long" instead of "int" when calling BLAS and LAPACK functions
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+<code>COOT_BLAS_LONG_LONG</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+Use "long&nbsp;long" instead of "int" when calling BLAS and LAPACK functions
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+<a name="config_hpp_coot_no_debug"></a>
+<code>COOT_NO_DEBUG</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+Disable all run-time checks, including size conformance and <a href="#element_access">bounds checks</a>.
+NOT RECOMMENDED.
+DO NOT USE UNLESS YOU KNOW WHAT YOU ARE DOING AND ARE WILLING TO RISK THE DOWNSIDES.
+Keeping run-time checks enabled during development and deployment greatly aids in finding mistakes in your code.
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+<code>COOT_EXTRA_DEBUG</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+Print out the trace of internal functions used for evaluating expressions.
+Not recommended for normal use.
+This is mainly useful for debugging the library.
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+<code>COOT_COUT_STREAM</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+The default stream used for printing matrices and cubes by <a href="#print">.print()</a>.
+Must be always enabled.
+By default defined to <i>std::cout</i>
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+<code>COOT_CERR_STREAM</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+The default stream used for printing warnings and errors.
+Must be always enabled.
+By default defined to <i>std::cerr</i>
+    </td>
+  </tr>
+</tbody>
+</table>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#element_access">element access</a></li>
+<li><a href="#uword">uword/sword</a></li>
+<li><a href="#output_streams">output streams</a></li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="direct_linking"></a>
+<b>direct linking</b>
+<br>
+<ul>
+<li>If <code><i>COOT_USE_WRAPPER</i></code> is not defined (or <code><i>COOT_DONT_USE_WRAPPER</i></code> is defined), then Bandicoot will need to be linked against all dependencies of its backends</li>
+<br>
+<li>Unfortunately this could be a lot of dependencies depending on <a href="#config_hpp">configuration options</a>; so, enabling <code><i>COOT_USE_WRAPPER</i></code> is the default and is recommended</li>
+<br>
+<li>Regardless of <a href="#backend_configuration">backend configuration</a>, these libraries must always be linked against:</li>
+<ul>
+<li><code>-larmadillo</code> (assuming <code><i>ARMA_USE_WRAPPER</i></code> is enabled; see the <a href="https://arma.sourceforge.net/faq.html#linking">Armadillo linking FAQ</a>)
+</ul>
+<br>
+<li>If <code><i>COOT_USE_OPENCL</i></code> is set (i.e. the OpenCL backend is enabled), these libraries must be linked against:
+<ul>
+<li><code>-lOpenCL</code> (core OpenCL support)</li>
+<li><code>-lclBLAS</code> (clBLAS for BLAS operations)</li>
+</ul>
+<br>
+<li>If <code><i>COOT_USE_CUDA</i></code> is set (i.e. the CUDA backend is enabled), these libraries must be linked against:
+<ul>
+<li><code>-lcuda</code> (core CUDA support)</li>
+<li><code>-lcudart</code> (CUDA runtime library)</li>
+<li><code>-lnvrtc</code> (runtime compilation of CUDA kernels)</li>
+<li><code>-lcublas</code> (cuBLAS for BLAS operations)</li>
+<li><code>-lcusolver</code> (cuSolverDn for decompositions and factorisations)</li>
+<li><code>-lcurand</code> (cuRand for random number generation)</li>
+</ul>
+</li>
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="kernel_cache"></a>
+<b>kernel cache</b>
+<ul>
+<li>In order to perform GPU-based linear algebra, Bandicoot must first compile GPU kernel functions to a particular device</li>
+<br>
+<li>The first time Bandicoot is run on a system, all GPU kernel functions will be compiled; <b>this can take a long time!</b> (usually less than 3-5 minutes)</li>
+<br>
+<li>Compiled kernels are stored in disk in the <i>kernel cache</i> for later reuse</li>
+<br>
+<li>Compiled kernels are specific to Bandicoot version, backend, and device; thus, if any of those three factors change, recompilation will be triggered; see the <a href="#backend_configuration">backend configuration</a> documentation for more details</li>
+<br>
+<li>The default location to store the kernel cache is
+<ul>
+<li><code>~/.bandicoot/cache/</code> on Linux and OS X and UNIX-like systems</li>
+<li><code>%APPDATA%\bandicoot\cache</code> on Windows (e.g. <code>C:\Users\Username\AppData\bandicoot\cache</code>)</li>
+</ul>
+<br>
+<li>Custom locations can be specified with the <code>COOT_KERNEL_CACHE_DIR</code> <a href="#config_hpp">configuration variable</a></li>
+</ul>
+<br>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="api_additions"></a>
+<a name="changelog"></a>
+<b>History of API Additions, Changes and Deprecations</b>
+<br>
+<ul>
+<li>API Stability and Version Policy:
+<br>
+<br>
+<ul>
+<li>
+Each release of Bandicoot has its public API (functions, classes, constants) described in the accompanying API documentation specific to that release.
+</li>
+<br>
+<li>
+Each release of Bandicoot has its full version specified as <i>A.B.C</i>, where <i>A</i> is a major version number, <i>B</i> is a minor version number, and <i>C</i> is a patch level (indicating bug fixes).
+The version specification has explicit meaning, similar to <a href="https://semver.org/">Semantic Versioning</a>, as follows:
+</li>
+<br>
+<ul>
+<li>
+Within a major version (eg. 1), each minor version (eg. 1.1) has a public API that strongly strives to be <b>backwards compatible</b> (at the source level) with the public API of preceding minor versions.
+For example, user code written for version 1.0 should work with version 1.1, 1.2, etc.
+However, later minor versions may have more features (API additions and extensions) than preceding minor versions.
+As such, user code <i>specifically</i> written for version 1.2 may not work with 1.1.
+</li>
+<br>
+<li>
+An increase in the patch level, while the major and minor versions are retained, indicates modifications to the code and/or documentation which aim to fix bugs without altering the public API.
+</li>
+<br>
+<li>
+We don't like changes to existing public API and strongly prefer not to break any user software.
+However, to allow evolution, the public API may be altered in future major versions while remaining backwards compatible in as many cases as possible
+(eg. major version 2 may have slightly different public API than major version 1).
+</li>
+</ul>
+<br>
+<li>
+<b>Caveat:</b>
+the above policy applies only to the public API described in the documentation.
+Any functionality within Bandicoot which is <u>not explicitly</u> described in the public API documentation is considered as internal implementation details,
+and may be changed or removed without notice.
+</li>
+</ul>
+</li>
+
+<!--
+<br>
+<li>
+<a name="deprecated"></a>
+List of deprecated functionality; this functionality will be <b>removed</b> in version A.B:
+<ul>
+<li>
+...
+</li>
+</ul>
+</li>
+-->
+
+<br>
+<br>
+<li>
+List of additions and changes for each version:
+<br>
+<br>
+<ul>
+
+
+
+<a name="version_1_0_0"></a>
+<li>Version 1.0:
+<ul>
+<li>first stable release!</li>
+</ul>
+</li>
+<br>
 
 
 <!-- END CONTENT -->
