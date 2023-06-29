@@ -17,12 +17,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-<!-- TODO: change colors to something new -->
 <html>
 <head>
   <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
   <title>Bandicoot: API Documentation</title>
-  <link rel="icon" href="armadillo_icon.png" type="image/png">
+  <link rel="icon" href="bandicoot_icon.png" type="image/png">
   <style type="text/css">
   <!--
 body
@@ -46,13 +45,13 @@ pre
 a
   {
   text-decoration: none;
-  color: #498c05;
+  color: #8f22ff;
   }
 
 a:hover
   {
   text-decoration: underline;
-  color: #498c05;
+  color: #8f22ff;
   }
 
 a.menu
@@ -64,7 +63,7 @@ a.menu
 a.menu:hover
   {
   text-decoration: none;
-  color: #498c05;
+  color: #8f22ff;
   }
 
 a.latent, a.latent:hover, a.latent:active, a.latent:link, a.latent:visited
@@ -102,7 +101,7 @@ hr.greyline
 #nobreak
   {
   white-space: nowrap;
-  }~
+  }
 
 .noindent
   {
@@ -116,6 +115,11 @@ hr.greyline
   padding-top:    0ex;
   padding-bottom: 0ex;
   list-style:     disc;
+  }
+
+font.comment
+  {
+  color: #501ed0;
   }
   -->
   </style>
@@ -685,8 +689,7 @@ Examples:
 <pre>
 fmat A(5, 5);
 A.randu();
-<!-- TODO: comment color -->
-float x = A(1, 2); <font color="#0000bb">// note: try to avoid repeated individual element accesses!</font>
+float x = A(1, 2); <font class="comment">// note: try to avoid repeated individual element accesses!</font>
 
 fmat B = A + A;
 fmat C = A * B;
@@ -698,27 +701,22 @@ B.ones(5, 6);
 
 B.print("B:");
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// convert from Armadillo</font>
+<font class="comment">// convert from Armadillo</font>
 arma::fmat C(10, 10, arma::fill::randu);
 fmat D(C);
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// advanced constructors</font>
+<font class="comment">// advanced constructors</font>
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// when using the OpenCL backend</font>
+<font class="comment">// when using the OpenCL backend</font>
 cl_mem m_cl = clCreateBuffer(get_rt().cl_rt.get_context(), CL_MEM_READ_WRITE, sizeof(float) * 24, NULL, NULL);
 fmat H(wrap_mem_cl(m_cl), 4, 6);  // use auxiliary memory
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// when using the CUDA backend</font>
+<font class="comment">// when using the CUDA backend</font>
 float* m_cuda;
 cudaMalloc(&amp;m_cuda, sizeof(float) * 24);
 fmat J(wrap_mem_cuda(m_cuda), 4, 6);  // use auxiliary memory
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// make an alias of another matrix</font>
+<font class="comment">// make an alias of another matrix</font>
 arma::fmat K(D.get_dev_mem(), D.n_rows, D.n_cols);
 </pre>
 </ul>
@@ -1042,11 +1040,9 @@ fvec x(10);
 fvec y(10, fill::ones);
 
 fmat A(10, 10, fill::randu);
-<!-- TODO: comment color -->
-fvec z = A.col(5); <font color="#0000bb">// extract a column vector</font>
+fvec z = A.col(5); <font class="comment">// extract a column vector</font>
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// convert from Armadillo</font>
+<font class="comment">// convert from Armadillo</font>
 arma::fvec d(100, arma::fill::randu);
 fvec e(d);
 </pre>
@@ -1305,11 +1301,9 @@ frowvec x(10);
 frowvec y(10, fill::ones);
 
 fmat    A(10, 10, fill::randu);
-<!-- TODO: comment color -->
-frowvec z = A.row(5); <font color="#0000bb">// extract a row vector</font>
+frowvec z = A.row(5); <font class="comment">// extract a row vector</font>
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// convert from Armadillo</font>
+<font class="comment">// convert from Armadillo</font>
 arma::frowvec d(100, arma::fill::randu);
 fvec e(d);
 </pre>
@@ -1491,8 +1485,7 @@ fmat V = A + B + A + B;
 imat AA = linspace&lt;imat&gt;(1, 9, 9);
 imat BB = linspace&lt;imat&gt;(9, 1, 9);
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// compare elements</font>
+<font class="comment">// compare elements</font>
 umat ZZ = (AA &gt;= BB);
 </pre>
 </ul>
@@ -1711,9 +1704,8 @@ instead use <code>(r,c)</code> and <code>(r,c,s)</code>
 Examples:
 <ul>
 <pre>
-<!-- TODO: comment color -->
-<font color="#0000bb">// remember that individual element accesses are slow and should be avoided;</font>
-<font color="#0000bb">// when possible, operate in batch instead of on individual elements!</font>
+<font class="comment">// remember that individual element accesses are slow and should be avoided;</font>
+<font class="comment">// when possible, operate in batch instead of on individual elements!</font>
 fmat M(10, 10);
 M.randu();
 M(9, 9) = 123.0;
@@ -2005,9 +1997,8 @@ B.randu(100);
 fmat C(5, 10);
 C.randu();
 
-<!-- TODO: comment color -->
-coot_rng::set_seed_random(); <font color="#0000bb">// set the seed to a random value</font>
-coot_rng::set_seed(42);      <font color="#0000bb">// set the seed to a specific value </font>
+coot_rng::set_seed_random(); <font class="comment">// set the seed to a random value</font>
+coot_rng::set_seed(42);      <font class="comment">// set the seed to a specific value </font>
 </pre>
 </ul>
 </li>
@@ -2145,15 +2136,14 @@ To explicitly preserve data while changing the size, use <a href="#reshape_membe
 Examples:
 <ul>
 <pre>
-<!-- TODO: comment color -->
 fmat A;
-A.set_size(5, 10);      <font color="#0000bb">// or:  mat A(5, 10);</font>
+A.set_size(5, 10);      <font class="comment">// or:  mat A(5, 10);</font>
 
 fmat B;
-B.set_size( size(A) );  <font color="#0000bb">// or:  mat B(size(A));</font>
+B.set_size( size(A) );  <font class="comment">// or:  mat B(size(A));</font>
 
 fvec v;
-v.set_size(100);        <font color="#0000bb">// or:  vec v(100);</font>
+v.set_size(100);        <font class="comment">// or:  vec v(100);</font>
 </pre>
 </ul>
 </li>
@@ -2438,14 +2428,12 @@ fmat D = A( 0,1, size(3,3) );
 A.col(1)        = randu&lt;fmat&gt;(5,1);
 A(span::all, 1) = randu&lt;fmat&gt;(5,1);
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// add 123 to the last 5 elements of vector a</font>
+<font class="comment">// add 123 to the last 5 elements of vector a</font>
 vec a(10);
 a.randu();
 a.subvec(a.n_elem - 5, a.n_elem - 1) += 123.0;
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// add 123 to the first 3 elements of column 2 of X</font>
+<font class="comment">// add 123 to the first 3 elements of column 2 of X</font>
 X.col(2).subvec(0, 2) += 123;
 </pre>
 </ul>
@@ -3081,9 +3069,8 @@ fmat A1 = randu(5, 6);
 mat B1 = randu&lt;mat&gt;(5, 6);
 mat B2 = randu&lt;mat&gt;(5, 6, distr_param(10,20));
 
-<!-- TODO: comment color -->
-coot_rng::set_seed_random(); <font color="#0000bb">// set the seed to a random value</font>
-coot_rng::set_seed(42);      <font color="#0000bb">// set the seed to a specific value</font>
+coot_rng::set_seed_random(); <font class="comment">// set the seed to a random value</font>
+coot_rng::set_seed(42);      <font class="comment">// set the seed to a specific value</font>
 </pre>
 </ul>
 </li>
@@ -3150,9 +3137,8 @@ fmat A2 = randn(5, 6, distr_param(10,5));
 mat B1 = randn&lt;mat&gt;(5, 6);
 mat B2 = randn&lt;mat&gt;(5, 6, distr_param(10,5));
 
-<!-- TODO: comment color -->
-coot_rng::set_seed_random(); <font color="#0000bb">// set the seed to a random value</font>
-coot_rng::set_seed(42);      <font color="#0000bb">// set the seed to a specific value</font>
+coot_rng::set_seed_random(); <font class="comment">// set the seed to a random value</font>
+coot_rng::set_seed(42);      <font class="comment">// set the seed to a specific value</font>
 </pre>
 </ul>
 </li>
@@ -3215,9 +3201,8 @@ imat A2 = randi(5, 6, distr_param(-10, +20));
 fmat B1 = randi&lt;fmat&gt;(5, 6);
 fmat B2 = randi&lt;fmat&gt;(5, 6, distr_param(-10, +20));
 
-<!-- TODO: comment color -->
-coot_rng::set_seed_random(); <font color="#0000bb">// set the seed to a random value</font>
-coot_rng::set_seed(42);      <font color="#0000bb">// set the seed to a specific value</font>
+coot_rng::set_seed_random(); <font class="comment">// set the seed to a random value</font>
+coot_rng::set_seed(42);      <font class="comment">// set the seed to a specific value</font>
 </pre>
 </ul>
 </li>
@@ -3347,21 +3332,17 @@ Examples:
 fvec V = randu&lt;fvec&gt;(10);
 fmat X = randu&lt;fmat&gt;(5, 5);
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// status1 will be set to true if vector V has all non-zero elements</font>
+<font class="comment">// status1 will be set to true if vector V has all non-zero elements</font>
 bool status1 = all(V);
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// status2 will be set to true if vector V has all elements greater than 0.5</font>
+<font class="comment">// status2 will be set to true if vector V has all elements greater than 0.5</font>
 bool status2 = all(V &gt; 0.5);
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// status3 will be set to true if matrix X has all elements greater than 0.6;</font>
-<font color="#0000bb">// note the use of vectorise()</font>
+<font class="comment">// status3 will be set to true if matrix X has all elements greater than 0.6;</font>
+<font class="comment">// note the use of vectorise()</font>
 bool status3 = all(vectorise(X) &gt; 0.6);
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// generate a row vector indicating which columns of X have all elements greater than 0.7</font>
+<font class="comment">// generate a row vector indicating which columns of X have all elements greater than 0.7</font>
 umat A = all(X &gt; 0.7);
 
 </pre>
@@ -3415,21 +3396,17 @@ Examples:
 fvec V = randu&lt;fvec&gt;(10);
 fmat X = randu&lt;fmat&gt;(5, 5);
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// status1 will be set to true if vector V has any non-zero elements</font>
+<font class="comment">// status1 will be set to true if vector V has any non-zero elements</font>
 bool status1 = any(V);
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// status2 will be set to true if vector V has any elements greater than 0.5</font>
+<font class="comment">// status2 will be set to true if vector V has any elements greater than 0.5</font>
 bool status2 = any(V &gt; 0.5);
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// status3 will be set to true if matrix X has any elements greater than 0.6;</font>
-<font color="#0000bb">// note the use of vectorise()</font>
+<font class="comment">// status3 will be set to true if matrix X has any elements greater than 0.6;</font>
+<font class="comment">// note the use of vectorise()</font>
 bool status3 = any(vectorise(X) &gt; 0.6);
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// generate a row vector indicating which columns of X have elements greater than 0.7</font>
+<font class="comment">// generate a row vector indicating which columns of X have elements greater than 0.7</font>
 umat A = any(X &gt; 0.7);
 
 </pre>
@@ -3470,8 +3447,7 @@ fcolvec q = randu&lt;fcolvec&gt;(5);
 
 mat X(5, 5, fill::randu);
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// examples of expressions which have optimised implementations</font>
+<font class="comment">// examples of expressions which have optimised implementations</font>
 
 float a = as_scalar(r*q);
 float b = as_scalar(r*X*q);
@@ -3558,8 +3534,7 @@ fmat A = randu&lt;fmat&gt;(5, 5);
 fmat C = randu&lt;fmat&gt;(10, 1);
 fcolvec x = conv_to&lt; fcolvec &gt;::from(C);
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// convert from Armadillo object</font>
+<font class="comment">// convert from Armadillo object</font>
 arma::fmat D = conv_to&lt;arma::fmat&gt;::from(A);
 </pre>
 </ul>
@@ -3637,7 +3612,6 @@ Examples:
 <pre>
 fmat A = randu&lt;fmat&gt;(5, 5);
 
-<!-- TODO: comment color -->
 float val1 = det(A);         <font color = "#0000bb">// form 1</font>
 
 float val2;
@@ -3848,8 +3822,7 @@ uvec q1 = find(A &gt; B);
 uvec q2 = find(A &gt; 0.5);
 uvec q3 = find(A &gt; 0.5, 3, "last");
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// change elements of A greater than 0.5 to 1</font>
+<font class="comment">// change elements of A greater than 0.5 to 1</font>
 A.elem( find(A &gt; 0.5) ).ones();
 </pre>
 </ul>
@@ -3894,8 +3867,7 @@ fmat A = randu&lt;fmat&gt;(5, 5);
 
 A(1, 1) = datum::inf;
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// find only finite elements</font>
+<font class="comment">// find only finite elements</font>
 uvec f = find_finite(A);
 </pre>
 </ul>
@@ -3937,8 +3909,7 @@ fmat A = randu&lt;fmat&gt;(5, 5);
 A(1, 1) = datum::inf;
 A(2, 2) = datum::nan;
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// return indices of two non-finite elements</font>
+<font class="comment">// return indices of two non-finite elements</font>
 uvec f = find_nonfinite(A);
 </pre>
 </ul>
@@ -3979,8 +3950,7 @@ fmat A = randu&lt;fmat&gt;(5, 5);
 
 A(2, 3) = datum::nan;
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// indices will be { 17 }</font>
+<font class="comment">// indices will be { 17 }</font>
 uvec indices = find_nan(A);
 </pre>
 </ul>
@@ -4117,12 +4087,10 @@ frowvec a = max(M);
 frowvec b = max(M, 0);
 fcolvec c = max(M, 1);
 
-<!-- TODO: comment color -->
-<font color="#0000bb">// element-wise maximum</font>
+<font class="comment">// element-wise maximum</font>
 fmat X = randu&lt;fmat&gt;(5, 6);
 fmat Y = randu&lt;fmat&gt;(5, 6);
-<!-- TODO: comment color -->
-fmat Z = coot::max(X, Y); <font color="#0000bb">// use coot:: prefix to distinguish from std::max()</font>
+fmat Z = coot::max(X, Y); <font class="comment">// use coot:: prefix to distinguish from std::max()</font>
 </pre>
 </ul>
 </li>
@@ -4477,8 +4445,7 @@ C.randu(size(A));
 fmat D = ones&lt;fmat&gt;(size(A));
 
 fmat E = ones&lt;fmat&gt;(10, 20);
-<!-- TODO: comment color -->
-E(3, 4, size(C)) = C;    <font color="#0000bb">// access submatrix of E</font>
+E(3, 4, size(C)) = C;    <font class="comment">// access submatrix of E</font>
 
 fmat F( size(A) + size(E) );
 
@@ -4623,8 +4590,7 @@ frowvec a = sum(M);
 frowvec b = sum(M, 0);
 fcolvec c = sum(M, 1);
 
-<!-- TODO: comment color -->
-float y = accu(M);   <font color="#0000bb">// find the overall sum regardless of object type</font>
+float y = accu(M);   <font class="comment">// find the overall sum regardless of object type</font>
 </pre>
 </ul>
 </li>
@@ -4730,8 +4696,7 @@ Examples:
 fmat A = randu&lt;fmat&gt;(5, 10);
 
 fmat B = trans(A);
-<!-- TODO: comment color -->
-fmat C = A.t();    <font color="#0000bb">// equivalent to trans(A), but more compact</font>
+fmat C = A.t();    <font class="comment">// equivalent to trans(A), but more compact</font>
 </pre>
 </ul>
 </li>
@@ -5225,12 +5190,10 @@ See also:
 Examples:
 <ul>
 <pre>
-<!-- TODO: comment color -->
-<font color="#0000bb">// for matrices with real elements</font>
+<font class="comment">// for matrices with real elements</font>
 
 fmat A = randu&lt;fmat&gt;(50, 50);
-<!-- TODO: comment color -->
-fmat B = A.t()*A;  <font color="#0000bb">// generate a symmetric matrix</font>
+fmat B = A.t()*A;  <font class="comment">// generate a symmetric matrix</font>
 
 fvec eigval;
 fmat eigvec;
@@ -5347,10 +5310,9 @@ Examples:
 <pre>
 fmat A = randu&lt;fmat&gt;(4, 5);
 
-<!-- TODO: comment color -->
-fmat B = pinv(A);        <font color="#0000bb">// use default tolerance</font>
+fmat B = pinv(A);        <font class="comment">// use default tolerance</font>
 
-fmat C = pinv(A, 0.01);  <font color="#0000bb">// set tolerance to 0.01</font>
+fmat C = pinv(A, 0.01);  <font class="comment">// set tolerance to 0.01</font>
 </pre>
 </ul>
 </li>
