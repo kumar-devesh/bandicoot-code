@@ -26,6 +26,7 @@ class coot_rt_t
   public:
 
   coot_backend_t backend;
+  bool initialised;
 
   #if defined(COOT_USE_OPENCL)
   opencl::runtime_t cl_rt;
@@ -310,9 +311,41 @@ class coot_rt_t
   // RC-TODO: unified interface for some other operations?
   };
 
+
+
 // Store coot_rt_t as a singleton.
-inline coot_rt_t& get_rt()
+inline coot_rt_t& get_rt_internal()
   {
   static coot_rt_t rt;
   return rt;
+  }
+
+
+
+inline coot_rt_t& get_rt()
+  {
+  coot_rt_t& rt = get_rt_internal();
+  if (!rt.initialised)
+    {
+    rt.init();
+    }
+
+  return rt;
+  }
+
+
+
+inline bool init_rt(const bool print_info)
+  {
+  coot_rt_t& rt = get_rt_internal();
+  return rt.init(print_info);
+  }
+
+
+
+inline bool init_rt(const coot_backend_t backend, const bool print_info, const uword platform_id, const uword device_id)
+  {
+  coot_rt_t& rt = get_rt_internal();
+  rt.backend = backend;
+  return rt.init(print_info, platform_id, device_id);
   }

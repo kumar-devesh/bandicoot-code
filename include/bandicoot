@@ -201,6 +201,7 @@ namespace coot
   #endif
 
   #include "bandicoot_bits/coot_rt_bones.hpp"
+  #include "bandicoot_bits/coot_init.hpp"
 
   //
   // class prototypes
