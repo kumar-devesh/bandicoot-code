@@ -696,8 +696,6 @@ coot_assert_blas_size(const T1& A, const T2& B)
         out << '\n';
         out << "@ coot_config::wrapper    = " << coot_config::wrapper  << '\n';
         out << "@ coot_config::cxx11      = " << coot_config::cxx11    << '\n';
-        out << "@ coot_config::lapack     = " << coot_config::lapack       << '\n';
-        out << "@ coot_config::blas       = " << coot_config::blas         << '\n';
         out << "@ coot_config::extra_code = " << coot_config::extra_code   << '\n';
         out << "@ sizeof(void*)    = " << sizeof(void*)    << '\n';
         out << "@ sizeof(int)      = " << sizeof(int)      << '\n';
