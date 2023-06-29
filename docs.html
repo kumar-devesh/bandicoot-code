@@ -7306,6 +7306,7 @@ will require taking into account that indexing starts at 0
 <li>Individual element access (such as <code>A.at(i, j)</code>) requires a transfer between the GPU and CPU; when adapting Armadillo code to Bandicoot, these should be avoided wherever possible
 <ul>
 <li>If such operations cannot be avoided, consider temporarily transferring the entire Bandicoot matrix back to memory by creating an Armadillo matrix with <a href="#conv_to">conv_to&lt;arma::fmat&gt;()</a> or similar</li>
+<li>For this reason, unlike Armadillo, Bandicoot does not provide iterators: they are guaranteed to be inefficient</li>
 </ul>
 <br>
 <li>Consumer-level GPUs are not designed for intensive linear algebra operations and thus may not show significant speedup; the best results will be obtained with high-end hardware</li>
