@@ -45,6 +45,37 @@ any_vec(const dev_mem_t<eT1> mem, const uword n_elem, const eT2 val, const twowa
 
 
 
+// Determine whether any elements in the memory satisfy the conditions imposed by the kernel `num` (and its small version `num_small`).
+template<typename eT>
+inline
+bool
+any_vec(const dev_mem_t<eT> mem, const uword n_elem, const eT val, const oneway_real_kernel_id::enum_id num, const oneway_real_kernel_id::enum_id num_small)
+  {
+  coot_extra_debug_sigprint();
+
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::any_vec(): OpenCL runtime not valid" );
+
+  cl_kernel k = get_rt().cl_rt.get_kernel<eT>(num);
+  cl_kernel k_small = get_rt().cl_rt.get_kernel<eT>(num_small);
+  // Second (and later) passes use the "and" reduction.
+  cl_kernel second_k = get_rt().cl_rt.get_kernel<u32>(oneway_integral_kernel_id::or_reduce);
+  cl_kernel second_k_small = get_rt().cl_rt.get_kernel<u32>(oneway_integral_kernel_id::or_reduce_small);
+
+  u32 result = generic_reduce<eT, u32>(mem,
+                                       n_elem,
+                                       "any",
+                                       k,
+                                       k_small,
+                                       std::make_tuple(val),
+                                       second_k,
+                                       second_k_small,
+                                       std::make_tuple(/* no extra args for second pass */));
+
+  return (result == 0) ? false : true;
+  }
+
+
+
 template<typename eT1, typename eT2>
 inline
 void

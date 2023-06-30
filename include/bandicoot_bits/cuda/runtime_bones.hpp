@@ -22,9 +22,6 @@ struct runtime_t
 
   inline ~runtime_t();
 
-  template<typename eT, typename higher_eT1, typename higher_eT2>
-  inline std::string substitute_types(const std::string& source, const std::string& prefix);
-
   inline std::string unique_host_device_id() const;
 
   inline bool load_cached_kernels(const std::string& unique_host_device_id, const size_t kernel_size);

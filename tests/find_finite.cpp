@@ -21,6 +21,11 @@ TEMPLATE_TEST_CASE("find_finite_basic", "[find_finite]", double, float)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x(100);
   x.fill(std::numeric_limits<eT>::infinity());
   x(76) = std::numeric_limits<eT>::quiet_NaN();
@@ -46,6 +51,11 @@ TEMPLATE_TEST_CASE("find_finite_basic", "[find_finite]", double, float)
 TEMPLATE_TEST_CASE("find_finite_basic_2", "[find_finite]", double, float)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x(100);
   x.fill(std::numeric_limits<eT>::infinity());
@@ -78,6 +88,11 @@ TEMPLATE_TEST_CASE("find_finite_basic_2", "[find_finite]", double, float)
 TEMPLATE_TEST_CASE("find_finite_10", "[find_finite]", double, float)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x(1000);
   x.fill(std::numeric_limits<eT>::infinity());
@@ -153,6 +168,11 @@ TEMPLATE_TEST_CASE("top_5_finite_values", "[find_finite]", double, float)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x(1000);
   x.fill(std::numeric_limits<eT>::quiet_NaN());
   x(0) = eT(1);
@@ -191,6 +211,11 @@ TEMPLATE_TEST_CASE("bottom_5_finite_values", "[find_finite]", double, float)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x(1000);
   x.fill(std::numeric_limits<eT>::infinity());
   x(0) = eT(1);
@@ -221,6 +246,11 @@ TEMPLATE_TEST_CASE("find_finite_all_finite", "[find_finite]", double, float)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x = randi<Col<eT>>(150, distr_param(-100, 100));
 
   uvec y1 = find_finite(x);
@@ -247,6 +277,11 @@ TEMPLATE_TEST_CASE("find_finite_all_finite", "[find_finite]", double, float)
 TEMPLATE_TEST_CASE("find_finite_all_except_one_finite", "[find_finite]", double, float)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x = randi<Col<eT>>(150, distr_param(10, 1000));
   x(37) = eT(std::numeric_limits<eT>::quiet_NaN());
@@ -277,7 +312,7 @@ TEMPLATE_TEST_CASE("find_finite_all_except_one_finite", "[find_finite]", double,
 // find in empty vector
 TEST_CASE("find_finite_empty_vector", "[find_finite]")
   {
-  vec x;
+  fvec x;
 
   uvec y1 = find_finite(x);
   uvec y2 = find_finite(x, 0);
@@ -295,8 +330,8 @@ TEST_CASE("find_finite_empty_vector", "[find_finite]")
 // find in matrix, check column major
 TEST_CASE("col_major_find_finite", "[find_finite]")
   {
-  mat x(10, 12);
-  x.fill(std::numeric_limits<double>::infinity());
+  fmat x(10, 12);
+  x.fill(std::numeric_limits<float>::infinity());
 
   x(5, 6) = 1;
   x(3, 1) = 1;
@@ -340,6 +375,11 @@ TEMPLATE_TEST_CASE("find_finite_k_greater_than_nonzeros", "[find_finite]", doubl
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x(5000);
   x.fill(std::numeric_limits<eT>::quiet_NaN());
 
@@ -369,6 +409,11 @@ TEMPLATE_TEST_CASE("find_finite_k_greater_than_nonzeros", "[find_finite]", doubl
 TEMPLATE_TEST_CASE("find_finite_inside_expression", "[find_finite]", double, float)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x = randi<Col<eT>>(1000, distr_param(0, 2));
   x(55) = std::numeric_limits<eT>::infinity();
@@ -409,6 +454,11 @@ TEMPLATE_TEST_CASE("find_finite_inside_find_finite", "[find_finite]", double, fl
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x = randi<Col<eT>>(1000, distr_param(0, 2));
   x(55) = std::numeric_limits<eT>::infinity();
   x(155) = std::numeric_limits<eT>::infinity();
@@ -442,7 +492,7 @@ TEMPLATE_TEST_CASE("find_finite_inside_find_finite", "[find_finite]", double, fl
 // invalid direction for find
 TEST_CASE("find_finite_invalid_direction", "[find_finite]")
   {
-  vec x;
+  fvec x;
   uvec y;
 
   // Suppress error output.
@@ -463,6 +513,11 @@ TEST_CASE("find_finite_invalid_direction", "[find_finite]")
 TEMPLATE_TEST_CASE("find_finite_integers", "[find_finite]", u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x = randi<Col<eT>>(15000, distr_param(0, 1000));
 

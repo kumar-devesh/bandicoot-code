@@ -16,28 +16,37 @@
 
 
 
-template<typename out_eT, typename T1>
+template<typename T1>
 inline
 void
-op_diagvec::apply(Mat<out_eT>& out, const Op<T1, op_diagvec>& in)
+op_diagvec::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_diagvec>& in)
   {
   coot_extra_debug_sigprint();
 
   // Extract diagonal id.
   const sword k = (in.aux_uword_b == 0) ? sword(in.aux_uword_a) : -sword(in.aux_uword_a);
 
+  unwrap<T1> U(in.m);
+  op_diagvec::apply_direct(out, U.M, k);
+  }
+
+
+
+template<typename out_eT, typename T1>
+inline
+void
+op_diagvec::apply(Mat<out_eT>& out, const Op<T1, op_diagvec>& in, const typename enable_if<is_same_type<out_eT, typename T1::elem_type>::no>::result* junk)
+  {
+  coot_extra_debug_sigprint();
+  coot_ignore(junk);
+
+  // Extract diagonal id.
+  const sword k = (in.aux_uword_b == 0) ? sword(in.aux_uword_a) : -sword(in.aux_uword_a);
+
   // If the types are not the same, we have to force a conversion.
-  if (std::is_same<out_eT, typename T1::elem_type>::value)
-    {
-    unwrap<T1> U(in.m);
-    op_diagvec::apply_direct(out, U.M, k);
-    }
-  else
-    {
-    mtOp<out_eT, T1, mtop_conv_to> mtop(in.m);
-    unwrap<mtOp<out_eT, T1, mtop_conv_to>> U(mtop);
-    op_diagvec::apply_direct(out, U.M, k);
-    }
+  mtOp<out_eT, T1, mtop_conv_to> mtop(in.m);
+  unwrap<mtOp<out_eT, T1, mtop_conv_to>> U(mtop);
+  op_diagvec::apply_direct(out, U.M, k);
   }
 
 

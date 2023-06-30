@@ -27,4 +27,6 @@ struct coot_rng
   // seed handling
 
   static inline void set_seed(const u64 seed);
+
+  static inline void set_seed_random();
   };

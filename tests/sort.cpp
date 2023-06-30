@@ -21,6 +21,11 @@ TEMPLATE_TEST_CASE("simple_sort_test", "[sort]", float, double, u32, s32, u64, s
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x(10);
   x(0) = 6;
   x(1) = 5;
@@ -79,6 +84,11 @@ TEMPLATE_TEST_CASE("random_vector_float_data_test", "[sort]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x = (std::numeric_limits<eT>::max() / 2) * (2 * randu<Col<eT>>(50000) - 0.5);
 
   Col<eT> x1_asc = sort(x);
@@ -109,6 +119,11 @@ TEMPLATE_TEST_CASE("random_vector_float_data_test", "[sort]", float, double)
 TEMPLATE_TEST_CASE("random_vector_integer_data_test", "[sort]", u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x;
   if (std::is_same<eT, u32>::value)
@@ -168,6 +183,11 @@ TEMPLATE_TEST_CASE("identical_data_sort_test", "[sort]", float, double, u32, s32
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x(10000);
   x.zeros();
 
@@ -210,20 +230,20 @@ TEST_CASE("empty_data_sort", "[sort]")
 // sort one element data
 TEST_CASE("one_elem_sort", "[sort]")
   {
-  vec x(1);
+  fvec x(1);
   x(0) = 1.0;
 
-  vec y1 = sort(x);
-  vec y2 = sort(x, "ascend");
-  vec y3 = sort(x, "descend");
+  fvec y1 = sort(x);
+  fvec y2 = sort(x, "ascend");
+  fvec y3 = sort(x, "descend");
 
   REQUIRE( y1.n_elem == 1 );
   REQUIRE( y2.n_elem == 1 );
   REQUIRE( y3.n_elem == 1 );
 
-  REQUIRE( double(y1[0]) == Approx(1.0) );
-  REQUIRE( double(y2[0]) == Approx(1.0) );
-  REQUIRE( double(y3[0]) == Approx(1.0) );
+  REQUIRE( float(y1[0]) == Approx(1.0) );
+  REQUIRE( float(y2[0]) == Approx(1.0) );
+  REQUIRE( float(y3[0]) == Approx(1.0) );
   }
 
 
@@ -231,27 +251,27 @@ TEST_CASE("one_elem_sort", "[sort]")
 // sort an expression
 TEST_CASE("sort_expr", "[sort]")
   {
-  vec x = randu<vec>(1023);
+  fvec x = randu<fvec>(1023);
 
-  vec x_mod = 3 * (x + 4);
+  fvec x_mod = 3 * (x + 4);
 
-  vec y1 = sort(3 * (x + 4));
-  vec y2 = sort(3 * (x + 4), "ascend");
-  vec y3 = sort(3 * (x + 4), "descend");
+  fvec y1 = sort(3 * (x + 4));
+  fvec y2 = sort(3 * (x + 4), "ascend");
+  fvec y3 = sort(3 * (x + 4), "descend");
 
   REQUIRE( y1.n_elem == 1023 );
   REQUIRE( y2.n_elem == 1023 );
   REQUIRE( y3.n_elem == 1023 );
 
-  vec y_asc_ref = sort(x_mod, "ascend");
-  vec y_desc_ref = sort(x_mod, "descend");
+  fvec y_asc_ref = sort(x_mod, "ascend");
+  fvec y_desc_ref = sort(x_mod, "descend");
 
-  arma::vec y1_cpu(y1);
-  arma::vec y2_cpu(y2);
-  arma::vec y3_cpu(y3);
+  arma::fvec y1_cpu(y1);
+  arma::fvec y2_cpu(y2);
+  arma::fvec y3_cpu(y3);
 
-  arma::vec y_asc_ref_cpu(y_asc_ref);
-  arma::vec y_desc_ref_cpu(y_desc_ref);
+  arma::fvec y_asc_ref_cpu(y_asc_ref);
+  arma::fvec y_desc_ref_cpu(y_desc_ref);
 
   REQUIRE( arma::approx_equal( y1_cpu, y_asc_ref_cpu, "reldiff", 1e-5 ) );
   REQUIRE( arma::approx_equal( y2_cpu, y_asc_ref_cpu, "reldiff", 1e-5 ) );
@@ -263,17 +283,17 @@ TEST_CASE("sort_expr", "[sort]")
 // sort inside expression
 TEST_CASE("sort_inside_expr", "[sort]")
   {
-  vec x = randu<vec>(1025);
+  fvec x = randu<fvec>(1025);
 
-  vec x_sorted_asc = sort(x, "ascend");
-  vec x_sorted_desc = sort(x, "descend");
+  fvec x_sorted_asc = sort(x, "ascend");
+  fvec x_sorted_desc = sort(x, "descend");
 
-  mat y1 = repmat(sort(x), 2, 3);
-  mat y2 = repmat(sort(x, "ascend"), 2, 3);
-  mat y3 = repmat(sort(x, "descend"), 2, 3);
+  fmat y1 = repmat(sort(x), 2, 3);
+  fmat y2 = repmat(sort(x, "ascend"), 2, 3);
+  fmat y3 = repmat(sort(x, "descend"), 2, 3);
 
-  mat y_asc_ref = repmat(x_sorted_asc, 2, 3);
-  mat y_desc_ref = repmat(x_sorted_desc, 2, 3);
+  fmat y_asc_ref = repmat(x_sorted_asc, 2, 3);
+  fmat y_desc_ref = repmat(x_sorted_desc, 2, 3);
 
   REQUIRE( y1.n_rows == y_asc_ref.n_rows );
   REQUIRE( y1.n_cols == y_asc_ref.n_cols );
@@ -282,12 +302,12 @@ TEST_CASE("sort_inside_expr", "[sort]")
   REQUIRE( y3.n_rows == y_desc_ref.n_rows );
   REQUIRE( y3.n_cols == y_desc_ref.n_cols );
 
-  arma::mat y1_cpu(y1);
-  arma::mat y2_cpu(y2);
-  arma::mat y3_cpu(y3);
+  arma::fmat y1_cpu(y1);
+  arma::fmat y2_cpu(y2);
+  arma::fmat y3_cpu(y3);
 
-  arma::mat y_asc_ref_cpu(y_asc_ref);
-  arma::mat y_desc_ref_cpu(y_desc_ref);
+  arma::fmat y_asc_ref_cpu(y_asc_ref);
+  arma::fmat y_desc_ref_cpu(y_desc_ref);
 
   REQUIRE( arma::approx_equal( y1_cpu, y_asc_ref_cpu, "reldiff", 1e-5 ) );
   REQUIRE( arma::approx_equal( y2_cpu, y_asc_ref_cpu, "reldiff", 1e-5 ) );
@@ -299,8 +319,8 @@ TEST_CASE("sort_inside_expr", "[sort]")
 // incorrect sort direction should throw exception
 TEST_CASE("invalid_sort_direction", "[sort]")
   {
-  vec x = randu<vec>(10);
-  vec y;
+  fvec x = randu<fvec>(10);
+  fvec y;
 
   // Disable cerr output for this test.
   std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
@@ -320,6 +340,11 @@ TEST_CASE("invalid_sort_direction", "[sort]")
 TEMPLATE_TEST_CASE("simple_mat_sort_test", "[sort]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   // [[10, 11,  5, 14,  8]
   //  [ 0, 13,  7,  9,  1]
@@ -486,6 +511,11 @@ TEMPLATE_TEST_CASE("random_mat_vector_float_data_test", "[sort]", float, double)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x = (std::numeric_limits<eT>::max() / 2) * (2 * randu<Mat<eT>>(323, 600) - 0.5);
 
   Mat<eT> x1 = sort(x);
@@ -540,6 +570,11 @@ TEMPLATE_TEST_CASE("random_mat_vector_float_data_test", "[sort]", float, double)
 TEMPLATE_TEST_CASE("random_mat_vector_integer_data_test", "[sort]", u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Mat<eT> x;
   if (std::is_same<eT, u32>::value)
@@ -623,6 +658,11 @@ TEMPLATE_TEST_CASE("identical_data_mat_sort_test", "[sort]", float, double, u32,
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(150, 200);
   x.zeros();
 
@@ -672,15 +712,15 @@ TEMPLATE_TEST_CASE("identical_data_mat_sort_test", "[sort]", float, double, u32,
 // sort empty data
 TEST_CASE("empty_data_mat_sort", "[sort]")
   {
-  mat x;
+  fmat x;
 
-  mat y1 = sort(x);
-  mat y2 = sort(x, "ascend");
-  mat y3 = sort(x, "ascend", 0);
-  mat y4 = sort(x, "ascend", 1);
-  mat y5 = sort(x, "descend");
-  mat y6 = sort(x, "descend", 0);
-  mat y7 = sort(x, "descend", 1);
+  fmat y1 = sort(x);
+  fmat y2 = sort(x, "ascend");
+  fmat y3 = sort(x, "ascend", 0);
+  fmat y4 = sort(x, "ascend", 1);
+  fmat y5 = sort(x, "descend");
+  fmat y6 = sort(x, "descend", 0);
+  fmat y7 = sort(x, "descend", 1);
 
   REQUIRE( y1.n_rows == 0 );
   REQUIRE( y1.n_cols == 0 );
@@ -703,16 +743,16 @@ TEST_CASE("empty_data_mat_sort", "[sort]")
 // sort one element data
 TEST_CASE("one_elem_mat_sort", "[sort]")
   {
-  mat x(1, 1);
+  fmat x(1, 1);
   x(0) = 1.0;
 
-  mat y1 = sort(x);
-  mat y2 = sort(x, "ascend");
-  mat y3 = sort(x, "ascend", 0);
-  mat y4 = sort(x, "ascend", 1);
-  mat y5 = sort(x, "descend");
-  mat y6 = sort(x, "descend", 0);
-  mat y7 = sort(x, "descend", 1);
+  fmat y1 = sort(x);
+  fmat y2 = sort(x, "ascend");
+  fmat y3 = sort(x, "ascend", 0);
+  fmat y4 = sort(x, "ascend", 1);
+  fmat y5 = sort(x, "descend");
+  fmat y6 = sort(x, "descend", 0);
+  fmat y7 = sort(x, "descend", 1);
 
   REQUIRE( y1.n_rows == 1 );
   REQUIRE( y1.n_cols == 1 );
@@ -729,13 +769,13 @@ TEST_CASE("one_elem_mat_sort", "[sort]")
   REQUIRE( y7.n_rows == 1 );
   REQUIRE( y7.n_cols == 1 );
 
-  REQUIRE( double(y1(0, 0)) == Approx(1.0) );
-  REQUIRE( double(y2(0, 0)) == Approx(1.0) );
-  REQUIRE( double(y3(0, 0)) == Approx(1.0) );
-  REQUIRE( double(y4(0, 0)) == Approx(1.0) );
-  REQUIRE( double(y5(0, 0)) == Approx(1.0) );
-  REQUIRE( double(y6(0, 0)) == Approx(1.0) );
-  REQUIRE( double(y7(0, 0)) == Approx(1.0) );
+  REQUIRE( float(y1(0, 0)) == Approx(1.0) );
+  REQUIRE( float(y2(0, 0)) == Approx(1.0) );
+  REQUIRE( float(y3(0, 0)) == Approx(1.0) );
+  REQUIRE( float(y4(0, 0)) == Approx(1.0) );
+  REQUIRE( float(y5(0, 0)) == Approx(1.0) );
+  REQUIRE( float(y6(0, 0)) == Approx(1.0) );
+  REQUIRE( float(y7(0, 0)) == Approx(1.0) );
   }
 
 
@@ -743,17 +783,17 @@ TEST_CASE("one_elem_mat_sort", "[sort]")
 // sort an expression
 TEST_CASE("sort_mat_expr", "[sort]")
   {
-  mat x = randu<mat>(63, 125);
+  fmat x = randu<fmat>(63, 125);
 
-  mat x_mod = 3 * (x.t() + 4);
+  fmat x_mod = 3 * (x.t() + 4);
 
-  mat y1 = sort(3 * (x.t() + 4));
-  mat y2 = sort(3 * (x.t() + 4), "ascend");
-  mat y3 = sort(3 * (x.t() + 4), "ascend", 0);
-  mat y4 = sort(3 * (x.t() + 4), "ascend", 1);
-  mat y5 = sort(3 * (x.t() + 4), "descend");
-  mat y6 = sort(3 * (x.t() + 4), "descend", 0);
-  mat y7 = sort(3 * (x.t() + 4), "descend", 1);
+  fmat y1 = sort(3 * (x.t() + 4));
+  fmat y2 = sort(3 * (x.t() + 4), "ascend");
+  fmat y3 = sort(3 * (x.t() + 4), "ascend", 0);
+  fmat y4 = sort(3 * (x.t() + 4), "ascend", 1);
+  fmat y5 = sort(3 * (x.t() + 4), "descend");
+  fmat y6 = sort(3 * (x.t() + 4), "descend", 0);
+  fmat y7 = sort(3 * (x.t() + 4), "descend", 1);
 
   REQUIRE( y1.n_rows == x.n_cols );
   REQUIRE( y1.n_cols == x.n_rows );
@@ -770,23 +810,23 @@ TEST_CASE("sort_mat_expr", "[sort]")
   REQUIRE( y7.n_rows == x.n_cols );
   REQUIRE( y7.n_cols == x.n_rows );
 
-  mat y1_ref = sort(x_mod, "ascend", 0);
-  mat y2_ref = sort(x_mod, "ascend", 1);
-  mat y3_ref = sort(x_mod, "descend", 0);
-  mat y4_ref = sort(x_mod, "descend", 1);
+  fmat y1_ref = sort(x_mod, "ascend", 0);
+  fmat y2_ref = sort(x_mod, "ascend", 1);
+  fmat y3_ref = sort(x_mod, "descend", 0);
+  fmat y4_ref = sort(x_mod, "descend", 1);
 
-  arma::mat y1_cpu(y1);
-  arma::mat y2_cpu(y2);
-  arma::mat y3_cpu(y3);
-  arma::mat y4_cpu(y4);
-  arma::mat y5_cpu(y5);
-  arma::mat y6_cpu(y6);
-  arma::mat y7_cpu(y7);
+  arma::fmat y1_cpu(y1);
+  arma::fmat y2_cpu(y2);
+  arma::fmat y3_cpu(y3);
+  arma::fmat y4_cpu(y4);
+  arma::fmat y5_cpu(y5);
+  arma::fmat y6_cpu(y6);
+  arma::fmat y7_cpu(y7);
 
-  arma::mat y1_ref_cpu(y1_ref);
-  arma::mat y2_ref_cpu(y2_ref);
-  arma::mat y3_ref_cpu(y3_ref);
-  arma::mat y4_ref_cpu(y4_ref);
+  arma::fmat y1_ref_cpu(y1_ref);
+  arma::fmat y2_ref_cpu(y2_ref);
+  arma::fmat y3_ref_cpu(y3_ref);
+  arma::fmat y4_ref_cpu(y4_ref);
 
   REQUIRE( arma::approx_equal( y1_cpu, y1_ref_cpu, "reldiff", 1e-5 ) );
   REQUIRE( arma::approx_equal( y2_cpu, y1_ref_cpu, "reldiff", 1e-5 ) );
@@ -802,25 +842,25 @@ TEST_CASE("sort_mat_expr", "[sort]")
 // sort inside expression
 TEST_CASE("sort_mat_inside_expr", "[sort]")
   {
-  mat x = randu<mat>(133, 255);
+  fmat x = randu<fmat>(133, 255);
 
-  mat x_sorted_col_asc = sort(x, "ascend", 0);
-  mat x_sorted_row_asc = sort(x, "ascend", 1);
-  mat x_sorted_col_desc = sort(x, "descend", 0);
-  mat x_sorted_row_desc = sort(x, "descend", 1);
+  fmat x_sorted_col_asc = sort(x, "ascend", 0);
+  fmat x_sorted_row_asc = sort(x, "ascend", 1);
+  fmat x_sorted_col_desc = sort(x, "descend", 0);
+  fmat x_sorted_row_desc = sort(x, "descend", 1);
 
-  mat y1 = repmat(sort(x), 2, 3);
-  mat y2 = repmat(sort(x, "ascend"), 2, 3);
-  mat y3 = repmat(sort(x, "ascend", 0), 2, 3);
-  mat y4 = repmat(sort(x, "ascend", 1), 2, 3);
-  mat y5 = repmat(sort(x, "descend"), 2, 3);
-  mat y6 = repmat(sort(x, "descend", 0), 2, 3);
-  mat y7 = repmat(sort(x, "descend", 1), 2, 3);
+  fmat y1 = repmat(sort(x), 2, 3);
+  fmat y2 = repmat(sort(x, "ascend"), 2, 3);
+  fmat y3 = repmat(sort(x, "ascend", 0), 2, 3);
+  fmat y4 = repmat(sort(x, "ascend", 1), 2, 3);
+  fmat y5 = repmat(sort(x, "descend"), 2, 3);
+  fmat y6 = repmat(sort(x, "descend", 0), 2, 3);
+  fmat y7 = repmat(sort(x, "descend", 1), 2, 3);
 
-  mat y1_ref = repmat(x_sorted_col_asc, 2, 3);
-  mat y2_ref = repmat(x_sorted_row_asc, 2, 3);
-  mat y3_ref = repmat(x_sorted_col_desc, 2, 3);
-  mat y4_ref = repmat(x_sorted_row_desc, 2, 3);
+  fmat y1_ref = repmat(x_sorted_col_asc, 2, 3);
+  fmat y2_ref = repmat(x_sorted_row_asc, 2, 3);
+  fmat y3_ref = repmat(x_sorted_col_desc, 2, 3);
+  fmat y4_ref = repmat(x_sorted_row_desc, 2, 3);
 
   REQUIRE( y1.n_rows == y1_ref.n_rows );
   REQUIRE( y1.n_cols == y1_ref.n_cols );
@@ -837,18 +877,18 @@ TEST_CASE("sort_mat_inside_expr", "[sort]")
   REQUIRE( y7.n_rows == y4_ref.n_rows );
   REQUIRE( y7.n_cols == y4_ref.n_cols );
 
-  arma::mat y1_cpu(y1);
-  arma::mat y2_cpu(y2);
-  arma::mat y3_cpu(y3);
-  arma::mat y4_cpu(y4);
-  arma::mat y5_cpu(y5);
-  arma::mat y6_cpu(y6);
-  arma::mat y7_cpu(y7);
+  arma::fmat y1_cpu(y1);
+  arma::fmat y2_cpu(y2);
+  arma::fmat y3_cpu(y3);
+  arma::fmat y4_cpu(y4);
+  arma::fmat y5_cpu(y5);
+  arma::fmat y6_cpu(y6);
+  arma::fmat y7_cpu(y7);
 
-  arma::mat y1_ref_cpu(y1_ref);
-  arma::mat y2_ref_cpu(y2_ref);
-  arma::mat y3_ref_cpu(y3_ref);
-  arma::mat y4_ref_cpu(y4_ref);
+  arma::fmat y1_ref_cpu(y1_ref);
+  arma::fmat y2_ref_cpu(y2_ref);
+  arma::fmat y3_ref_cpu(y3_ref);
+  arma::fmat y4_ref_cpu(y4_ref);
 
   REQUIRE( arma::approx_equal( y1_cpu, y1_ref_cpu, "reldiff", 1e-5 ) );
   REQUIRE( arma::approx_equal( y2_cpu, y1_ref_cpu, "reldiff", 1e-5 ) );
@@ -864,8 +904,8 @@ TEST_CASE("sort_mat_inside_expr", "[sort]")
 // incorrect sort direction should throw exception
 TEST_CASE("invalid_mat_sort_direction", "[sort]")
   {
-  mat x = randu<mat>(10, 8);
-  mat y;
+  fmat x = randu<fmat>(10, 8);
+  fmat y;
 
   // Disable cerr output for this test.
   std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
@@ -885,8 +925,8 @@ TEST_CASE("invalid_mat_sort_direction", "[sort]")
 // invalid sort dimension should throw exception
 TEST_CASE("invalid_mat_sort_dim", "[sort]")
   {
-  mat x = randu<mat>(10, 8);
-  mat y;
+  fmat x = randu<fmat>(10, 8);
+  fmat y;
 
   // Disable cerr output for this test.
   std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
@@ -904,26 +944,26 @@ TEST_CASE("invalid_mat_sort_dim", "[sort]")
 // test that sorting does not change the original matrix
 TEST_CASE("sort_does_not_affect_original", "[sort]")
   {
-  vec x = randu<vec>(1000);
-  vec x_old = x;
+  fvec x = randu<fvec>(1000);
+  fvec x_old = x;
 
-  vec y = sort(x);
+  fvec y = sort(x);
 
-  arma::vec x_cpu(x);
-  arma::vec x_old_cpu(x_old);
+  arma::fvec x_cpu(x);
+  arma::fvec x_old_cpu(x_old);
 
   REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
 
   x = x_old;
   y = sort(x, "ascend");
 
-  x_cpu = arma::vec(x);
+  x_cpu = arma::fvec(x);
   REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
 
   x = x_old;
   y = sort(x, "descend");
 
-  x_cpu = arma::vec(x);
+  x_cpu = arma::fvec(x);
   REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
   }
 
@@ -931,49 +971,49 @@ TEST_CASE("sort_does_not_affect_original", "[sort]")
 
 TEST_CASE("sort_mat_does_not_affect_original", "[sort]")
   {
-  mat x = randu<mat>(1000);
-  mat x_old = x;
+  fmat x = randu<fmat>(1000);
+  fmat x_old = x;
 
-  mat y = sort(x);
+  fmat y = sort(x);
 
-  arma::mat x_cpu(x);
-  arma::mat x_old_cpu(x_old);
+  arma::fmat x_cpu(x);
+  arma::fmat x_old_cpu(x_old);
 
   REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
 
   x = x_old;
   y = sort(x, "ascend");
 
-  x_cpu = arma::mat(x);
+  x_cpu = arma::fmat(x);
   REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
 
   x = x_old;
   y = sort(x, "ascend", 0);
 
-  x_cpu = arma::mat(x);
+  x_cpu = arma::fmat(x);
   REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
 
   x = x_old;
   y = sort(x, "ascend", 1);
 
-  x_cpu = arma::mat(x);
+  x_cpu = arma::fmat(x);
   REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
 
   x = x_old;
   y = sort(x, "descend");
 
-  x_cpu = arma::mat(x);
+  x_cpu = arma::fmat(x);
   REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
 
   x = x_old;
   y = sort(x, "descend", 0);
 
-  x_cpu = arma::mat(x);
+  x_cpu = arma::fmat(x);
   REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
 
   x = x_old;
   y = sort(x, "descend", 1);
 
-  x_cpu = arma::mat(x);
+  x_cpu = arma::fmat(x);
   REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
   }

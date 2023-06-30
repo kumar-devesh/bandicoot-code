@@ -82,6 +82,9 @@ get_cuda_src_preamble()
   "__device__ inline int  coot_type_max_u_float()  { return " + std::string(u32_max) + "; } \n"
   "__device__ inline long coot_type_max_u_double() { return " + std::string(u64_max) + "; } \n"
   "\n"
+  // Forward declaration used by some oneway_real kernels.
+  "__device__ void u32_or_warp_reduce(volatile unsigned int* data, int tid);"
+  "\n"
   ;
 
   return source;
@@ -157,7 +160,8 @@ get_cuda_oneway_kernel_src()
   std::vector<std::string> aux_function_filenames = {
       "accu_warp_reduce.cu",
       "min_warp_reduce.cu",
-      "max_warp_reduce.cu"
+      "max_warp_reduce.cu",
+      "prod_warp_reduce.cu"
   };
 
   std::string result = "";

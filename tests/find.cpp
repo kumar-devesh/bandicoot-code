@@ -21,6 +21,11 @@ TEMPLATE_TEST_CASE("find_basic", "[find]", double, float, u32, s32, u64, s64)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x(100);
   x.zeros();
   x(53) = eT(1);
@@ -45,6 +50,11 @@ TEMPLATE_TEST_CASE("find_basic", "[find]", double, float, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("find_basic_2", "[find]", double, float, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x(100);
   x.zeros();
@@ -76,6 +86,11 @@ TEMPLATE_TEST_CASE("find_basic_2", "[find]", double, float, u32, s32, u64, s64)
 TEMPLATE_TEST_CASE("find_10_nonzeros", "[find]", double, float, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x(1000);
   x.zeros();
@@ -151,6 +166,11 @@ TEMPLATE_TEST_CASE("top_5_nonzeros", "[find]", double, float, u32, s32, u64, s64
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x(1000);
   x.zeros();
   x(0) = eT(1);
@@ -189,6 +209,11 @@ TEMPLATE_TEST_CASE("bottom_5_nonzeros", "[find]", double, float, u32, s32, u64, 
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x(1000);
   x.zeros();
   x(0) = eT(1);
@@ -219,6 +244,11 @@ TEMPLATE_TEST_CASE("find_all_nonzero", "[find]", double, float, u32, s32, u64, s
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x = randi<Col<eT>>(150, distr_param(10, 1000));
 
   uvec y1 = find(x);
@@ -245,6 +275,11 @@ TEMPLATE_TEST_CASE("find_all_nonzero", "[find]", double, float, u32, s32, u64, s
 TEMPLATE_TEST_CASE("find_all_except_one_nonzero", "[find]", double, float, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x = randi<Col<eT>>(150, distr_param(10, 1000));
   x(37) = eT(0);
@@ -275,7 +310,7 @@ TEMPLATE_TEST_CASE("find_all_except_one_nonzero", "[find]", double, float, u32, 
 // find in empty vector
 TEST_CASE("find_empty_vector", "[find]")
   {
-  vec x;
+  fvec x;
 
   uvec y1 = find(x);
   uvec y2 = find(x, 0);
@@ -293,7 +328,7 @@ TEST_CASE("find_empty_vector", "[find]")
 // find in matrix, check column major
 TEST_CASE("col_major_find", "[find]")
   {
-  mat x(10, 12);
+  fmat x(10, 12);
   x.zeros();
 
   x(5, 6) = 1;
@@ -338,6 +373,11 @@ TEMPLATE_TEST_CASE("find_k_greater_than_nonzeros", "[find]", double, float, u32,
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x(5000);
   x.zeros();
 
@@ -368,6 +408,11 @@ TEMPLATE_TEST_CASE("find_relational_operators", "[find]", double, float, u32, s3
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x = linspace<Col<eT>>(0, 9, 10);
 
   uvec y1 = find(x);
@@ -397,6 +442,11 @@ TEMPLATE_TEST_CASE("find_relational_operators", "[find]", double, float, u32, s3
 TEMPLATE_TEST_CASE("find_inside_expression", "[find]", double, float, u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x = randi<Col<eT>>(1000, distr_param(0, 2));
 
@@ -431,6 +481,11 @@ TEMPLATE_TEST_CASE("find_inside_find", "[find]", double, float, u32, s32, u64, s
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x = randi<Col<eT>>(1000, distr_param(0, 2));
 
   uvec z_ref = find(x, 10, "first");
@@ -458,7 +513,7 @@ TEMPLATE_TEST_CASE("find_inside_find", "[find]", double, float, u32, s32, u64, s
 // invalid direction for find
 TEST_CASE("find_invalid_direction", "[find]")
   {
-  vec x;
+  fvec x;
   uvec y;
 
   // Suppress error output.

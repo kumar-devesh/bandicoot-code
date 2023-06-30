@@ -18,21 +18,18 @@
 
 
 
-template<typename T> struct uint_type { };
+template<typename T, bool integral> struct uint_type_helper { };
 
-template<> struct uint_type<u8>     { typedef u8 result;  };
-template<> struct uint_type<s8>     { typedef u8 result;  };
+template<typename T> struct uint_type_helper<T, true> { typedef typename std::make_unsigned<T>::type result; };
 
-template<> struct uint_type<u16>    { typedef u16 result; };
-template<> struct uint_type<s16>    { typedef u16 result; };
-
-template<> struct uint_type<float>  { typedef u32 result; };
-template<> struct uint_type<u32>    { typedef u32 result; };
-template<> struct uint_type<s32>    { typedef u32 result; };
-
-template<> struct uint_type<double> { typedef u64 result; };
-template<> struct uint_type<u64>    { typedef u64 result; };
-template<> struct uint_type<s64>    { typedef u64 result; };
-
+template<> struct uint_type_helper<float,  false> { typedef u32  result; };
+template<> struct uint_type_helper<double, false> { typedef u64  result; };
 // Used sometimes by the kernel generation utilities to avoid specifying an unnecessary type.
-template<> struct uint_type<void>   { typedef void result; };
+template<> struct uint_type_helper<void,   false> { typedef void result; };
+
+
+
+template<typename T> struct uint_type
+  {
+  typedef typename uint_type_helper<T, std::is_integral<T>::value>::result result;
+  };
