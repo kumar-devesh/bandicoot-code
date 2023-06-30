@@ -72,3 +72,62 @@ TEMPLATE_TEST_CASE("eye_empty", "[eye]", float, double, u32, s32, u64, s64)
   // This just checks that there is no crash.
   test_eye<TestType>(0, 0);
   }
+
+
+
+TEMPLATE_TEST_CASE("eye_standalone", "[eye]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = eye<Mat<eT>>(10, 10);
+
+  for (uword c = 0; c < x.n_cols; ++c)
+    {
+    for (uword r = 0; r < x.n_rows; ++r)
+      {
+      if (r == c)
+        {
+        REQUIRE( eT(x(r, c)) == Approx(eT(1)) );
+        }
+      else
+        {
+        REQUIRE( eT(x(r, c)) == eT(0) );
+        }
+      }
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("eye_standalone_sizemat", "[eye]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> y(10, 10);
+  Mat<eT> x = eye<Mat<eT>>(size(y));
+
+  for (uword c = 0; c < x.n_cols; ++c)
+    {
+    for (uword r = 0; r < x.n_rows; ++r)
+      {
+      if (r == c)
+        {
+        REQUIRE( eT(x(r, c)) == Approx(eT(1)) );
+        }
+      else
+        {
+        REQUIRE( eT(x(r, c)) == eT(0) );
+        }
+      }
+    }
+  }

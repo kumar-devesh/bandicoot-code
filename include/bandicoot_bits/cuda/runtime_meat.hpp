@@ -357,7 +357,43 @@ runtime_t::get_kernel(const rt_common::kernels_t<HeldType>& k, const EnumType nu
   else if(is_same_type<eT1,s64   >::yes)  { return get_kernel<eTs...>(k.s64_kernels, num); }
   else if(is_same_type<eT1,float >::yes)  { return get_kernel<eTs...>(  k.f_kernels, num); }
   else if(is_same_type<eT1,double>::yes)  { return get_kernel<eTs...>(  k.d_kernels, num); }
-  else { coot_debug_check(true, "unsupported element type" ); }
+  else if(is_same_type<eT1,uword >::yes)
+    {
+    // this can happen if uword != u32 or u64
+    if (sizeof(uword) == sizeof(u32))
+      {
+      return get_kernel<eTs...>(k.u32_kernels, num);
+      }
+    else if (sizeof(uword) == sizeof(u64))
+      {
+      return get_kernel<eTs...>(k.u64_kernels, num);
+      }
+    else
+      {
+      // hopefully nobody ever, ever, ever sees this
+      throw std::invalid_argument("coot::cuda_rt.get_kernel(): unknown size for uword");
+      }
+    }
+  else if(is_same_type<eT1,sword >::yes)
+    {
+    if (sizeof(sword) == sizeof(s32))
+      {
+      return get_kernel<eTs...>(k.s32_kernels, num);
+      }
+    else if (sizeof(sword) == sizeof(s64))
+      {
+      return get_kernel<eTs...>(k.s64_kernels, num);
+      }
+    else
+      {
+      // hopefully nobody ever, ever, ever sees this
+      throw std::invalid_argument("coot::cuda_rt.get_kernel(): unknown size for sword");
+      }
+    }
+  else
+    {
+    coot_debug_check(true, "unsupported element type" );
+    }
   }
 
 
@@ -377,7 +413,43 @@ runtime_t::get_kernel(const rt_common::kernels_t<std::vector<CUfunction>>& k, co
   else if(is_same_type<eT,s64   >::yes)  { return k.s64_kernels.at(num); }
   else if(is_same_type<eT,float >::yes)  { return   k.f_kernels.at(num); }
   else if(is_same_type<eT,double>::yes)  { return   k.d_kernels.at(num); }
-  else { coot_debug_check(true, "unsupported element type" ); }
+  else if(is_same_type<eT,uword >::yes)
+    {
+    // this can happen if uword != u32 or u64
+    if (sizeof(uword) == sizeof(u32))
+      {
+      return k.u32_kernels.at(num);
+      }
+    else if (sizeof(uword) == sizeof(u64))
+      {
+      return k.u64_kernels.at(num);
+      }
+    else
+      {
+      // hopefully nobody ever, ever, ever sees this
+      throw std::invalid_argument("coot::cuda_rt.get_kernel(): unknown size for uword");
+      }
+    }
+  else if(is_same_type<eT,sword >::yes)
+    {
+    if (sizeof(sword) == sizeof(s32))
+      {
+      return k.s32_kernels.at(num);
+      }
+    else if (sizeof(sword) == sizeof(s64))
+      {
+      return k.s64_kernels.at(num);
+      }
+    else
+      {
+      // hopefully nobody ever, ever, ever sees this
+      throw std::invalid_argument("coot::cuda_rt.get_kernel(): unknown size for sword");
+      }
+    }
+  else
+    {
+    coot_debug_check(true, "unsupported element type" );
+    }
   }
 
 

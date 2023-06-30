@@ -74,7 +74,6 @@ struct oneway_kernel_id
     diag_inplace_mod_scalar,
     //
     extract_diag,
-    set_diag,
     copy_diag,
     //
     mul_colwise,
@@ -95,6 +94,9 @@ struct oneway_kernel_id
     max_small,
     max_abs,
     max_abs_small,
+    //
+    prod,
+    prod_small,
     //
     trace,
     //
@@ -132,6 +134,11 @@ struct oneway_kernel_id
     symmatu_inplace,
     symmatl_inplace,
     //
+    replace,
+    reorder_cols,
+    //
+    rotate_180,
+    //
     invalid_kernel
     };
 
@@ -166,7 +173,6 @@ struct oneway_kernel_id
     names.push_back("diag_inplace_mod_scalar");
 
     names.push_back("extract_diag");
-    names.push_back("set_diag");
     names.push_back("copy_diag");
 
     names.push_back("mul_colwise");
@@ -187,6 +193,9 @@ struct oneway_kernel_id
     names.push_back("max_small");
     names.push_back("max_abs");
     names.push_back("max_abs_small");
+
+    names.push_back("prod");
+    names.push_back("prod_small");
 
     names.push_back("trace");
 
@@ -223,6 +232,11 @@ struct oneway_kernel_id
 
     names.push_back("symmatu_inplace");
     names.push_back("symmatl_inplace");
+
+    names.push_back("replace");
+    names.push_back("reorder_cols");
+
+    names.push_back("rotate_180");
 
     return names;
     }
@@ -261,10 +275,15 @@ struct oneway_real_kernel_id
     rel_isfinite,
     rel_isnonfinite,
     rel_isnan,
+    rel_any_nonfinite,
+    rel_any_nonfinite_small,
     //
     lu_extract_l,
     lu_extract_pivoted_l,
     lu_extract_p,
+    //
+    diag_prod,
+    diag_prod_small,
     //
     invalid_kernel
     };
@@ -293,10 +312,15 @@ struct oneway_real_kernel_id
     names.push_back("rel_isfinite");
     names.push_back("rel_isnonfinite");
     names.push_back("rel_isnan");
+    names.push_back("rel_any_nonfinite");
+    names.push_back("rel_any_nonfinite_small");
 
     names.push_back("lu_extract_l");
     names.push_back("lu_extract_pivoted_l");
     names.push_back("lu_extract_p");
+
+    names.push_back("diag_prod");
+    names.push_back("diag_prod_small");
 
     return names;
     }
@@ -326,6 +350,9 @@ struct oneway_integral_kernel_id
     or_reduce,
     or_reduce_small,
     //
+    ipiv_det,
+    ipiv_det_small,
+    //
     invalid_kernel
     };
 
@@ -344,6 +371,9 @@ struct oneway_integral_kernel_id
     names.push_back("and_reduce_small");
     names.push_back("or_reduce");
     names.push_back("or_reduce_small");
+
+    names.push_back("ipiv_det");
+    names.push_back("ipiv_det_small");
 
     return names;
     }
@@ -457,6 +487,7 @@ struct twoway_kernel_id
     clamp,
     //
     get_diag,
+    set_diag,
     //
     sum_colwise_conv_pre,
     sum_rowwise_conv_pre,
@@ -526,6 +557,8 @@ struct twoway_kernel_id
     //
     symmatu,
     symmatl,
+    //
+    cross,
     //
     invalid_kernel
     };
@@ -628,6 +661,7 @@ struct twoway_kernel_id
     names.push_back("clamp");
 
     names.push_back("get_diag");
+    names.push_back("set_diag");
 
     names.push_back("sum_colwise_conv_pre");
     names.push_back("sum_rowwise_conv_pre");
@@ -697,6 +731,8 @@ struct twoway_kernel_id
 
     names.push_back("symmatu");
     names.push_back("symmatl");
+
+    names.push_back("cross");
 
     return names;
     }

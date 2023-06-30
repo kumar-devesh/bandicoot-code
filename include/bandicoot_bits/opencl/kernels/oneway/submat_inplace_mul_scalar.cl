@@ -15,6 +15,7 @@
 __kernel
 void
 COOT_FN(PREFIX,submat_inplace_mul_scalar)(__global eT1* out,
+                                          const UWORD out_offset,
                                           const eT1 val,
                                           const UWORD end_row,
                                           const UWORD end_col,
@@ -24,6 +25,6 @@ COOT_FN(PREFIX,submat_inplace_mul_scalar)(__global eT1* out,
   const UWORD col = get_global_id(1); // col in the parent matrix
   if( (row <= end_row) && (col <= end_col) )
     {
-    out[row + col*n_rows] *= val;
+    out[row + col*n_rows + out_offset] *= val;
     }
   }

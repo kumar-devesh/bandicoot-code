@@ -157,7 +157,16 @@ kernel_src::get_src_preamble(const bool has_float64, const bool has_subgroups, c
       ((must_synchronise_subgroups) ? std::string("#define SUBGROUP_BARRIER sub_group_barrier") : std::string("#define SUBGROUP_BARRIER(x) ")) :
       std::string("#define SUBGROUP_BARRIER barrier")) + " \n"
   "#define SUBGROUP_SIZE " + std::string(subgroup_size_str) + " \n"
-  "#define SUBGROUP_SIZE_NAME " + ((has_subgroups && subgroup_size < 128) ? std::string(subgroup_size_str) : "other") + " \n";
+  "#define SUBGROUP_SIZE_NAME " + ((has_subgroups && subgroup_size < 128) ? std::string(subgroup_size_str) : "other") +
+  "\n"
+  // Forward declarations that may be needed.
+  "void u32_or_subgroup_reduce_other(__local volatile uint* data, UWORD tid); \n"
+  "void u32_or_subgroup_reduce_8(__local volatile uint* data, UWORD tid); \n"
+  "void u32_or_subgroup_reduce_16(__local volatile uint* data, UWORD tid); \n"
+  "void u32_or_subgroup_reduce_32(__local volatile uint* data, UWORD tid); \n"
+  "void u32_or_subgroup_reduce_64(__local volatile uint* data, UWORD tid); \n"
+  "void u32_or_subgroup_reduce_128(__local volatile uint* data, UWORD tid); \n"
+  "\n"
   ;
 
   return source;
@@ -267,7 +276,8 @@ kernel_src::init_oneway_source()
   std::vector<std::string> aux_function_filenames = {
       "accu_subgroup_reduce.cl",
       "min_subgroup_reduce.cl",
-      "max_subgroup_reduce.cl"
+      "max_subgroup_reduce.cl",
+      "prod_subgroup_reduce.cl"
   };
 
   std::string source = "";
