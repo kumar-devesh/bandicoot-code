@@ -153,8 +153,9 @@ TEMPLATE_TEST_CASE("chol_4", "[chol]", float, double)
     return;
     }
 
-  Mat<eT> x = randu<Mat<eT>>(100, 100);
+  Mat<eT> x = randu<Mat<eT>>(50, 50);
   Mat<eT> y = x.t() * x;
+  y.diag() += 3.0;
 
   Mat<eT> z = chol(y);
 
@@ -166,18 +167,18 @@ TEMPLATE_TEST_CASE("chol_4", "[chol]", float, double)
     {
     for (uword r = c + 1; r < 50; ++r)
       {
-      REQUIRE( eT(y(r, c)) == eT(0) );
+      REQUIRE( eT(z(r, c)) == eT(0) );
       }
     }
 
   // Now check that we can recompute the original matrix.
-  Mat<eT> z = y.t() * y;
+  Mat<eT> w = z.t() * z;
 
   for (uword c = 0; c < 50; ++c)
     {
     for (uword r = 0; r < 50; ++r)
       {
-      REQUIRE( eT(z(r, c)) == Approx(eT(x(r, c))) );
+      REQUIRE( eT(w(r, c)) == Approx(eT(y(r, c))) );
       }
     }
   }
@@ -207,7 +208,8 @@ TEST_CASE("nonsquare_chol", "[chol]")
   std::cerr.rdbuf(NULL);
 
   fmat g;
-  REQUIRE( chol(g, f) == false );
+  bool result;
+  REQUIRE_THROWS( result = chol(g, f) );
   REQUIRE_THROWS( g = chol(f) );
 
   // Restore cerr output.
