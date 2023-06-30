@@ -15,6 +15,7 @@
 __kernel
 void
 COOT_FN(PREFIX,submat_extract)(__global eT2* out,
+                               const UWORD out_offset,
                                __global const eT1* in,
                                const UWORD in_start_row,
                                const UWORD in_start_col,
@@ -28,6 +29,6 @@ COOT_FN(PREFIX,submat_extract)(__global eT2* out,
     {
     const UWORD  in_index = (in_start_row + row) + ((in_start_col + col) * in_n_rows);
     const UWORD out_index = row + col * out_n_rows;
-    out[out_index] = (eT2) in[in_index];
+    out[out_index + out_offset] = (eT2) in[in_index];
     }
   }

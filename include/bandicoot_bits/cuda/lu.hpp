@@ -205,7 +205,7 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_
   if (status3 != CUDA_SUCCESS)
     {
     get_rt().cuda_rt.release_memory(ipiv_gpu.cuda_mem_ptr);
-    return std::make_tuple(false, "coot::cuda::lu(): cuLaunchKernel() failed for " + (pivoting ? std::string("lu_extract_l") : std::string("lu_extract_pivoted_l")) + " kernel");
+    return std::make_tuple(false, "cuLaunchKernel() failed for " + (pivoting ? std::string("lu_extract_l") : std::string("lu_extract_pivoted_l")) + " kernel");
     }
 
   // If pivoting was allowed, extract the permutation matrix.

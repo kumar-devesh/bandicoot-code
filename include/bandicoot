@@ -253,6 +253,8 @@ namespace coot
   #include "bandicoot_bits/op_cor_bones.hpp"
   #include "bandicoot_bits/op_sort_bones.hpp"
   #include "bandicoot_bits/op_symmat_bones.hpp"
+  #include "bandicoot_bits/op_det_bones.hpp"
+  #include "bandicoot_bits/op_pinv_bones.hpp"
 
   #include "bandicoot_bits/mtop_conv_to_bones.hpp"
   #include "bandicoot_bits/mtop_all_bones.hpp"
@@ -269,6 +271,9 @@ namespace coot
   #include "bandicoot_bits/glue_cor_bones.hpp"
   #include "bandicoot_bits/glue_join_cols_bones.hpp"
   #include "bandicoot_bits/glue_join_rows_bones.hpp"
+  #include "bandicoot_bits/glue_cross_bones.hpp"
+  #include "bandicoot_bits/glue_conv_bones.hpp"
+  #include "bandicoot_bits/glue_conv2_bones.hpp"
 
   #include "bandicoot_bits/mtglue_relational_bones.hpp"
 
@@ -408,6 +413,12 @@ namespace coot
       #include "bandicoot_bits/opencl/symmat.hpp"
       #include "bandicoot_bits/opencl/lu.hpp"
       #include "bandicoot_bits/opencl/eig_sym.hpp"
+      #include "bandicoot_bits/opencl/prod.hpp"
+      #include "bandicoot_bits/opencl/det.hpp"
+      #include "bandicoot_bits/opencl/replace.hpp"
+      #include "bandicoot_bits/opencl/reorder_cols.hpp"
+      #include "bandicoot_bits/opencl/cross.hpp"
+      #include "bandicoot_bits/opencl/rotate_180.hpp"
       }
   #endif
 
@@ -457,6 +468,12 @@ namespace coot
     #include "bandicoot_bits/cuda/symmat.hpp"
     #include "bandicoot_bits/cuda/lu.hpp"
     #include "bandicoot_bits/cuda/eig_sym.hpp"
+    #include "bandicoot_bits/cuda/prod.hpp"
+    #include "bandicoot_bits/cuda/det.hpp"
+    #include "bandicoot_bits/cuda/replace.hpp"
+    #include "bandicoot_bits/cuda/reorder_cols.hpp"
+    #include "bandicoot_bits/cuda/cross.hpp"
+    #include "bandicoot_bits/cuda/rotate_180.hpp"
     }
   #endif
 
@@ -505,6 +522,9 @@ namespace coot
   #include "bandicoot_bits/fn_conv_to.hpp"
   #include "bandicoot_bits/fn_min.hpp"
   #include "bandicoot_bits/fn_max.hpp"
+  #include "bandicoot_bits/fn_eye.hpp"
+  #include "bandicoot_bits/fn_zeros.hpp"
+  #include "bandicoot_bits/fn_ones.hpp"
   #include "bandicoot_bits/fn_randu.hpp"
   #include "bandicoot_bits/fn_randn.hpp"
   #include "bandicoot_bits/fn_randi.hpp"
@@ -536,6 +556,10 @@ namespace coot
   #include "bandicoot_bits/fn_symmat.hpp"
   #include "bandicoot_bits/fn_lu.hpp"
   #include "bandicoot_bits/fn_eig_sym.hpp"
+  #include "bandicoot_bits/fn_det.hpp"
+  #include "bandicoot_bits/fn_pinv.hpp"
+  #include "bandicoot_bits/fn_cross.hpp"
+  #include "bandicoot_bits/fn_conv.hpp"
 
 
   //
@@ -590,6 +614,8 @@ namespace coot
   #include "bandicoot_bits/op_cor_meat.hpp"
   #include "bandicoot_bits/op_sort_meat.hpp"
   #include "bandicoot_bits/op_symmat_meat.hpp"
+  #include "bandicoot_bits/op_det_meat.hpp"
+  #include "bandicoot_bits/op_pinv_meat.hpp"
 
   #include "bandicoot_bits/mtop_conv_to_meat.hpp"
   #include "bandicoot_bits/mtop_all_meat.hpp"
@@ -606,6 +632,9 @@ namespace coot
   #include "bandicoot_bits/glue_cor_meat.hpp"
   #include "bandicoot_bits/glue_join_cols_meat.hpp"
   #include "bandicoot_bits/glue_join_rows_meat.hpp"
+  #include "bandicoot_bits/glue_cross_meat.hpp"
+  #include "bandicoot_bits/glue_conv_meat.hpp"
+  #include "bandicoot_bits/glue_conv2_meat.hpp"
 
   #include "bandicoot_bits/mtglue_relational_meat.hpp"
 

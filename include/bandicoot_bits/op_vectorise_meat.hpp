@@ -95,13 +95,13 @@ op_vectorise_col::apply_direct(Mat<out_eT>& out, const subview<eT>& sv, const bo
   if(&out == &(sv.m))
     {
     Mat<out_eT> tmp(new_n_rows, new_n_cols);
-    arrayops::copy_subview(tmp.get_dev_mem(false), sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
+    arrayops::copy_subview(tmp.get_dev_mem(false), 0, sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
     out.steal_mem(tmp);
     }
   else
     {
     out.set_size(new_n_rows, new_n_cols);
-    arrayops::copy_subview(out.get_dev_mem(false), sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
+    arrayops::copy_subview(out.get_dev_mem(false), 0, sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
     }
   }
 
@@ -243,13 +243,13 @@ op_vectorise_row::apply_direct(Mat<eT>& out, const subview<eT>& sv)
   if(&out == &(sv.m))
     {
     Mat<eT> tmp(1, sv.n_elem);
-    arrayops::copy_subview(tmp.get_dev_mem(false), sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
+    arrayops::copy_subview(tmp.get_dev_mem(false), 0, sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
     out.steal_mem(tmp);
     }
   else
     {
     out.set_size(1, sv.n_elem);
-    arrayops::copy_subview(out.get_dev_mem(false), sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
+    arrayops::copy_subview(out.get_dev_mem(false), 0, sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
     }
   }
 
@@ -285,7 +285,7 @@ op_vectorise_row::apply_direct(Mat<out_eT>& out, const subview<eT>& sv, const ty
   coot_ignore(junk);
 
   out.set_size(1, sv.n_elem);
-  arrayops::copy_subview(out.get_dev_mem(false), sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
+  arrayops::copy_subview(out.get_dev_mem(false), 0, sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
   }
 
 

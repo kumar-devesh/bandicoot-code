@@ -72,9 +72,9 @@ magma_dlaex0
   {
   magma_int_t ione = 1;
   magma_range_t range2;
-  magma_int_t curlvl, i, indxq;
+  magma_int_t i, indxq;
   magma_int_t j, k, matsiz, msd2, smlsiz;
-  magma_int_t submat, subpbs, tlvls;
+  magma_int_t submat, subpbs;
 
   // Test the input parameters.
   *info = 0;
@@ -108,7 +108,6 @@ magma_dlaex0
   // the leading elements of IWORK.
   iwork[0] = n;
   subpbs= 1;
-  tlvls = 0;
   while (iwork[subpbs - 1] > smlsiz)
     {
     for (j = subpbs; j > 0; --j)
@@ -116,7 +115,6 @@ magma_dlaex0
       iwork[2*j - 1] = (iwork[j-1]+1)/2;
       iwork[2*j - 2] = iwork[j-1]/2;
       }
-    ++tlvls;
     subpbs *= 2;
     }
   for (j=1; j < subpbs; ++j)
@@ -166,7 +164,6 @@ magma_dlaex0
 
   // Successively merge eigensystems of adjacent submatrices
   // into eigensystem for the corresponding larger matrix.
-  curlvl = 1;
   while (subpbs > 1)
     {
     for (i=0; i < subpbs-1; i += 2)
@@ -212,7 +209,6 @@ magma_dlaex0
       }
 
     subpbs /= 2;
-    ++curlvl;
     }
 
   // Re-merge the eigenvalues/vectors which were deflated at the final

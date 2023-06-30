@@ -1,4 +1,4 @@
-// Copyright 2023 Ryan Curtin (http://www.ratml.org/)
+// Copyright 2019 Ryan Curtin (http://www.ratml.org/)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,17 +12,14 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-__global__
+__device__
 void
-COOT_FN(PREFIX,set_diag)(eT1* out,
-                         const eT1* in,
-                         const UWORD n_rows,
-                         const UWORD len)
+COOT_FN(PREFIX,prod_warp_reduce)(volatile eT1* data, int tid)
   {
-  const UWORD tid = blockIdx.x * blockDim.x + threadIdx.x;
-  if (tid < len)
-    {
-    const UWORD i = (n_rows + 1) * tid;
-    out[i] = in[tid];
-    }
+  data[tid] *= data[tid + 32];
+  data[tid] *= data[tid + 16];
+  data[tid] *= data[tid + 8];
+  data[tid] *= data[tid + 4];
+  data[tid] *= data[tid + 2];
+  data[tid] *= data[tid + 1];
   }

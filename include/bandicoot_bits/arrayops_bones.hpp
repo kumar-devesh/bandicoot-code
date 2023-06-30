@@ -24,7 +24,7 @@ class arrayops
 
   template<typename out_eT, typename in_eT>
   inline static void
-  copy_subview(dev_mem_t<out_eT> dest, const dev_mem_t<in_eT> src, const uword aux_row1, const uword aux_col1, const uword M_n_rows, const uword M_n_cols, const uword n_rows, const uword n_cols);
+  copy_subview(dev_mem_t<out_eT> dest, const uword dest_offset, const dev_mem_t<in_eT> src, const uword aux_row1, const uword aux_col1, const uword M_n_rows, const uword M_n_cols, const uword n_rows, const uword n_cols);
 
 
   //

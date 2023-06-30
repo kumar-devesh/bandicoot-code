@@ -642,6 +642,7 @@ struct is_supported_elem_type
     is_u64<T1>::value ||
     is_s64<T1>::value ||
     is_uword<T1>::value ||
+    is_sword<T1>::value ||
     is_float<T1>::value ||
     is_double<T1>::value ||
     is_supported_complex_float<T1>::value ||
@@ -670,23 +671,31 @@ struct is_supported_kernel_elem_type
     is_s32<T1>::value ||
     is_u64<T1>::value ||
     is_s64<T1>::value ||
+    is_uword<T1>::value ||
+    is_sword<T1>::value ||
     is_float<T1>::value ||
     is_double<T1>::value;
   };
 
 
+template<typename T, bool is_integral>
+struct is_signed_helper
+  {
+  static const bool value = true; // should only be used by float/double/similar
+  };
+
+template<typename T>
+struct is_signed_helper<T, true>
+  {
+  static const bool value = std::is_signed<T>::value;
+  };
 
 template<typename T>
 struct is_signed
   {
-  static const bool value = true;
+  static const bool value = is_signed_helper<T, std::is_integral<T>::value>::value;
   };
 
-
-template<> struct is_signed<u8>     { static const bool value = false; };
-template<> struct is_signed<u16>    { static const bool value = false; };
-template<> struct is_signed<u32>    { static const bool value = false; };
-template<> struct is_signed<u64>    { static const bool value = false; };
 
 
 template<typename T>
@@ -826,6 +835,42 @@ struct resolves_to_diagmat< Op<Op<T1, op_diagmat>, op_htrans2> >
   };
 
 
+
+//
+
+template<typename T1>
+struct resolves_to_symmat
+  {
+  static constexpr bool value = false;
+  };
+
+template<typename T1>
+struct resolves_to_symmat< Op<T1, op_symmat> >
+  {
+  static constexpr bool value = true;
+  };
+
+template<typename T1, typename eop_type>
+struct resolves_to_symmat< eOp<Op<T1, op_symmat>, eop_type> >
+  {
+  static constexpr bool value = true;
+  };
+
+template<typename T1>
+struct resolves_to_symmat< Op<Op<T1, op_symmat>, op_htrans> >
+  {
+  static constexpr bool value = true;
+  };
+
+template<typename T1>
+struct resolves_to_symmat< Op<Op<T1, op_symmat>, op_htrans2> >
+  {
+  static constexpr bool value = true;
+  };
+
+
+
+//
 
 template<typename T>
 struct has_nested_op_traits

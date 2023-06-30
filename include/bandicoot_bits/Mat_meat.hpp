@@ -96,6 +96,42 @@ Mat<eT>::Mat(dev_mem_t<eT> aux_dev_mem, const uword in_n_rows, const uword in_n_
 
 template<typename eT>
 inline
+Mat<eT>::Mat(cl_mem aux_dev_mem, const uword in_n_rows, const uword in_n_cols)
+  : n_rows    (in_n_rows)
+  , n_cols    (in_n_cols)
+  , n_elem    (in_n_rows*in_n_cols)  // TODO: need to check whether the result fits
+  , vec_state (0)
+  , mem_state (1)
+  {
+  this->dev_mem.cl_mem_ptr = aux_dev_mem;
+
+  coot_debug_check( get_rt().backend != CL_BACKEND, "Mat(): cannot wrap OpenCL memory when not using OpenCL backend");
+
+  coot_extra_debug_sigprint_this(this);
+  }
+
+
+
+template<typename eT>
+inline
+Mat<eT>::Mat(eT* aux_dev_mem, const uword in_n_rows, const uword in_n_cols)
+  : n_rows    (in_n_rows)
+  , n_cols    (in_n_cols)
+  , n_elem    (in_n_rows*in_n_cols)  // TODO: need to check whether the result fits
+  , vec_state (0)
+  , mem_state (1)
+  {
+  this->dev_mem.cuda_mem_ptr = aux_dev_mem;
+
+  coot_debug_check( get_rt().backend != CUDA_BACKEND, "Mat(): cannot wrap CUDA memory when not using CUDA backend");
+
+  coot_extra_debug_sigprint_this(this);
+  }
+
+
+
+template<typename eT>
+inline
 dev_mem_t<eT>
 Mat<eT>::get_dev_mem(const bool sync) const
   {
@@ -1915,6 +1951,18 @@ Mat<eT>::reshape(const uword new_n_rows, const uword new_n_cols)
     {
     op_reshape::apply_direct(*this, *this, new_n_rows, new_n_cols);
     }
+  }
+
+
+
+template<typename eT>
+inline
+void
+Mat<eT>::reshape(const SizeMat& s)
+  {
+  coot_extra_debug_sigprint();
+
+  reshape(s.n_rows, s.n_cols);
   }
 
 
