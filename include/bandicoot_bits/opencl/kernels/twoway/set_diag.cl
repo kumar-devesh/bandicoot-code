@@ -14,7 +14,7 @@
 
 __kernel
 void
-COOT_FN(PREFIX,set_diag)(__global eT1* out,
+COOT_FN(PREFIX,set_diag)(__global eT2* out,
                          const UWORD out_offset,
                          __global const eT1* in,
                          const UWORD n_rows,
@@ -24,6 +24,6 @@ COOT_FN(PREFIX,set_diag)(__global eT1* out,
   if (tid < len)
     {
     const UWORD i = (n_rows + 1) * tid;
-    out[i + out_offset] = in[tid];
+    out[i + out_offset] = (eT2) in[tid];
     }
   }

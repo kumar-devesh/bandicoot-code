@@ -337,8 +337,8 @@ get_one_elem_integral_kernel_src(kernels_t<std::vector<KernelType>>& kernels,
   {
   const std::string u32_src = substitute_types<TypeMapper, u32, higher_eT1, higher_eT2>(source, prefix + "u32_", type_map);
   const std::string s32_src = substitute_types<TypeMapper, s32, higher_eT1, higher_eT2>(source, prefix + "s32_", type_map);
-  const std::string u64_src = substitute_types<TypeMapper, u32, higher_eT1, higher_eT2>(source, prefix + "u64_", type_map);
-  const std::string s64_src = substitute_types<TypeMapper, s32, higher_eT1, higher_eT2>(source, prefix + "s64_", type_map);
+  const std::string u64_src = substitute_types<TypeMapper, u64, higher_eT1, higher_eT2>(source, prefix + "u64_", type_map);
+  const std::string s64_src = substitute_types<TypeMapper, s64, higher_eT1, higher_eT2>(source, prefix + "s64_", type_map);
 
   init_one_elem_integral_kernel_map(kernels, name_map, kernel_names, prefix);
 

@@ -21,6 +21,11 @@ TEMPLATE_TEST_CASE("simple_sort_index_test", "[sort_index]", float, double, u32,
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x(10);
   x(0) = 6;
   x(1) = 5;
@@ -115,6 +120,11 @@ TEMPLATE_TEST_CASE("random_vector_float_data_index_test", "[sort_index]", float,
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x = (std::numeric_limits<eT>::max() / 2) * (2 * randu<Col<eT>>(50000) - 0.5);
 
   uvec x1_asc = sort_index(x);
@@ -164,6 +174,11 @@ TEMPLATE_TEST_CASE("random_vector_float_data_index_test", "[sort_index]", float,
 TEMPLATE_TEST_CASE("random_vector_integer_data_index_test", "[sort_index]", u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x;
   if (std::is_same<eT, u32>::value)
@@ -242,6 +257,11 @@ TEMPLATE_TEST_CASE("identical_data_sort_index_test", "[sort_index]", float, doub
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x(10000);
   x.zeros();
 
@@ -274,7 +294,7 @@ TEMPLATE_TEST_CASE("identical_data_sort_index_test", "[sort_index]", float, doub
 // sort empty data
 TEST_CASE("empty_data_sort_index", "[sort_index]")
   {
-  vec x;
+  fvec x;
 
   uvec y1 = sort_index(x);
   uvec y2 = sort_index(x, "ascend");
@@ -296,7 +316,7 @@ TEST_CASE("empty_data_sort_index", "[sort_index]")
 // sort one element data
 TEST_CASE("one_elem_sort_index", "[sort_index]")
   {
-  vec x(1);
+  fvec x(1);
   x(0) = 1.0;
 
   uvec y1 = sort_index(x);
@@ -326,9 +346,9 @@ TEST_CASE("one_elem_sort_index", "[sort_index]")
 // sort an expression
 TEST_CASE("sort_index_expr", "[sort_index]")
   {
-  vec x = randu<vec>(1023);
+  fvec x = randu<fvec>(1023);
 
-  vec x_mod = 3 * (x + 4);
+  fvec x_mod = 3 * (x + 4);
 
   uvec y1 = sort_index(3 * (x + 4));
   uvec y2 = sort_index(3 * (x + 4), "ascend");
@@ -362,7 +382,7 @@ TEST_CASE("sort_index_expr", "[sort_index]")
 // sort inside expression
 TEST_CASE("sort_index_inside_expr", "[sort_index]")
   {
-  vec x = randu<vec>(1025);
+  fvec x = randu<fvec>(1025);
 
   uvec x_sorted_asc = sort_index(x, "ascend");
   uvec x_sorted_desc = sort_index(x, "descend");
@@ -407,7 +427,7 @@ TEST_CASE("sort_index_inside_expr", "[sort_index]")
 // incorrect sort direction should throw exception
 TEST_CASE("invalid_sort_index_direction", "[sort_index]")
   {
-  vec x = randu<vec>(10);
+  fvec x = randu<fvec>(10);
   uvec y;
 
   // Disable cerr output for this test.
@@ -430,38 +450,38 @@ TEST_CASE("invalid_sort_index_direction", "[sort_index]")
 // test that sorting does not change the original matrix
 TEST_CASE("sort_index_does_not_affect_original", "[sort]")
   {
-  vec x = randu<vec>(1000);
-  vec x_old = x;
+  fvec x = randu<fvec>(1000);
+  fvec x_old = x;
 
   uvec y = sort_index(x);
 
-  arma::vec x_cpu(x);
-  arma::vec x_old_cpu(x_old);
+  arma::fvec x_cpu(x);
+  arma::fvec x_old_cpu(x_old);
 
   REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
 
   x = x_old;
   y = sort_index(x, "ascend");
 
-  x_cpu = arma::vec(x);
+  x_cpu = arma::fvec(x);
   REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
 
   x = x_old;
   y = sort_index(x, "descend");
 
-  x_cpu = arma::vec(x);
+  x_cpu = arma::fvec(x);
   REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
 
   x = x_old;
   y = stable_sort_index(x, "ascend");
 
-  x_cpu = arma::vec(x);
+  x_cpu = arma::fvec(x);
   REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
 
   x = x_old;
   y = stable_sort_index(x, "descend");
 
-  x_cpu = arma::vec(x);
+  x_cpu = arma::fvec(x);
   REQUIRE( arma::approx_equal( x_cpu, x_old_cpu, "reldiff", 1e-5 ) );
   }
 
@@ -470,6 +490,11 @@ TEST_CASE("sort_index_does_not_affect_original", "[sort]")
 TEMPLATE_TEST_CASE("duplicate_elements_signed_stable_sort_index_test", "[sort_index]", float, double, s32, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Row<eT> x = randi<Row<eT>>(1033, distr_param(-10000, 10000));
 

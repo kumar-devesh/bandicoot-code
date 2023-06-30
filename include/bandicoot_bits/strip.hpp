@@ -52,6 +52,26 @@ struct strip_diagmat< Op<T1, op_diagmat> >
 
 
 
+// Turn an op_htrans2 (scalar * X.t()) into just (scalar * X)
+template<typename T1>
+struct strip_diagmat< Op<Op<T1, op_htrans2>, op_diagmat> >
+  {
+  typedef eOp<T1, eop_scalar_times> stored_type;
+
+  inline
+  strip_diagmat(const Op<Op<T1, op_htrans2>, op_diagmat>& X)
+    : M(X.m.m, X.m.aux)
+    {
+    coot_extra_debug_sigprint();
+    }
+
+  static constexpr bool do_diagmat = true;
+
+  const eOp<T1, eop_scalar_times> M;
+  };
+
+
+
 // push eOps through the diagmat
 template<typename T1, typename eop_type>
 struct strip_diagmat< eOp<Op<T1, op_diagmat>, eop_type> >

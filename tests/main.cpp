@@ -46,7 +46,14 @@ main(int argc, char** argv)
   coot::get_rt().init(true);
 
   const size_t seed = size_t(session.config().rngSeed());
-  coot::coot_rng::set_seed(seed);
+  if (seed == 0)
+    {
+    coot::coot_rng::set_seed_random();
+    }
+  else
+    {
+    coot::coot_rng::set_seed(seed);
+    }
 
   return session.run();
   }

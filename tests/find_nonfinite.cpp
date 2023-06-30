@@ -21,6 +21,11 @@ TEMPLATE_TEST_CASE("find_nonfinite_basic", "[find_nonfinite]", double, float)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x = randu<Col<eT>>(100) - 0.5;
   x(53) = std::numeric_limits<eT>::quiet_NaN();
 
@@ -44,6 +49,11 @@ TEMPLATE_TEST_CASE("find_nonfinite_basic", "[find_nonfinite]", double, float)
 TEMPLATE_TEST_CASE("find_nonfinite_basic_2", "[find_nonfinite]", double, float)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x = randi<Col<eT>>(100, distr_param(-5, 5));
   x(53) = std::numeric_limits<eT>::quiet_NaN();
@@ -74,6 +84,11 @@ TEMPLATE_TEST_CASE("find_nonfinite_basic_2", "[find_nonfinite]", double, float)
 TEMPLATE_TEST_CASE("find_nonfinite_10", "[find_nonfinite]", double, float)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x = randi<Col<eT>>(1000, distr_param(-3, 3));
   x(0) = std::numeric_limits<eT>::infinity();
@@ -149,6 +164,11 @@ TEMPLATE_TEST_CASE("top_5_nonfinite_values", "[find_nonfinite]", double, float)
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x = randu<Col<eT>>(1000);
   x(0) = std::numeric_limits<eT>::quiet_NaN();
   x(11) = std::numeric_limits<eT>::quiet_NaN();
@@ -186,6 +206,11 @@ TEMPLATE_TEST_CASE("bottom_5_nonfinite_values", "[find_nonfinite]", double, floa
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x = randu<Col<eT>>(1000);
   x(0) = std::numeric_limits<eT>::quiet_NaN();
   x(11) = std::numeric_limits<eT>::quiet_NaN();
@@ -215,6 +240,11 @@ TEMPLATE_TEST_CASE("find_nonfinite_all_nonfinite", "[find_nonfinite]", double, f
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x(150);
   x.fill(std::numeric_limits<eT>::infinity());
 
@@ -242,6 +272,11 @@ TEMPLATE_TEST_CASE("find_nonfinite_all_nonfinite", "[find_nonfinite]", double, f
 TEMPLATE_TEST_CASE("find_nonfinite_all_except_one_nonfinite", "[find_nonfinite]", double, float)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x(150);
   x.fill(std::numeric_limits<eT>::quiet_NaN());
@@ -273,7 +308,7 @@ TEMPLATE_TEST_CASE("find_nonfinite_all_except_one_nonfinite", "[find_nonfinite]"
 // find in empty vector
 TEST_CASE("find_nonfinite_empty_vector", "[find_nonfinite]")
   {
-  vec x;
+  fvec x;
 
   uvec y1 = find_nonfinite(x);
   uvec y2 = find_nonfinite(x, 0);
@@ -291,11 +326,11 @@ TEST_CASE("find_nonfinite_empty_vector", "[find_nonfinite]")
 // find in matrix, check column major
 TEST_CASE("col_major_find_nonfinite", "[find_nonfinite]")
   {
-  mat x(10, 12);
+  fmat x(10, 12);
   x.zeros();
 
-  x(5, 6) = std::numeric_limits<double>::infinity();
-  x(3, 1) = std::numeric_limits<double>::quiet_NaN();
+  x(5, 6) = std::numeric_limits<float>::infinity();
+  x(3, 1) = std::numeric_limits<float>::quiet_NaN();
 
   uvec y1 = find_nonfinite(x);
   uvec y2 = find_nonfinite(x, 0);
@@ -336,6 +371,11 @@ TEMPLATE_TEST_CASE("find_nonfinite_k_greater_than_nonzeros", "[find_nonfinite]",
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x = randu<Col<eT>>(5000);
 
   for (uword i = 0; i < 500; ++i)
@@ -364,6 +404,11 @@ TEMPLATE_TEST_CASE("find_nonfinite_k_greater_than_nonzeros", "[find_nonfinite]",
 TEMPLATE_TEST_CASE("find_nonfinite_inside_expression", "[find_nonfinite]", double, float)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x = randi<Col<eT>>(1000, distr_param(0, 2));
   x(55) = std::numeric_limits<eT>::infinity();
@@ -404,6 +449,11 @@ TEMPLATE_TEST_CASE("find_nonfinite_inside_find_nonfinite", "[find_nonfinite]", d
   {
   typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Col<eT> x = randi<Col<eT>>(1000, distr_param(0, 2));
   x(55) = std::numeric_limits<eT>::infinity();
   x(155) = std::numeric_limits<eT>::infinity();
@@ -437,7 +487,7 @@ TEMPLATE_TEST_CASE("find_nonfinite_inside_find_nonfinite", "[find_nonfinite]", d
 // invalid direction for find
 TEST_CASE("find_nonfinite_invalid_direction", "[find_finite]")
   {
-  vec x;
+  fvec x;
   uvec y;
 
   // Suppress error output.
@@ -458,6 +508,11 @@ TEST_CASE("find_nonfinite_invalid_direction", "[find_finite]")
 TEMPLATE_TEST_CASE("find_nonfinite_integers", "[find_nonfinite]", u32, s32, u64, s64)
   {
   typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
   Col<eT> x = randi<Col<eT>>(15000, distr_param(0, 1000));
 
