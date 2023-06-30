@@ -25,6 +25,11 @@ chol(Mat<typename T1::elem_type>& out, const Base<typename T1::elem_type, T1>& X
 
   coot_debug_check( out.n_rows != out.n_cols, "chol(): given matrix must be square sized" );
 
+  if (out.n_rows == 0 || out.n_cols == 0)
+    {
+    return true; // nothing to do, matrix is empty
+    }
+
   std::tuple<bool, std::string> result = coot_rt_t::chol(out.get_dev_mem(true), out.n_rows);
   if (std::get<0>(result) == false)
     {
@@ -47,6 +52,11 @@ chol(const Base<typename T1::elem_type, T1>& X)
   Mat<typename T1::elem_type> out(X.get_ref());
 
   coot_debug_check( out.n_rows != out.n_cols, "chol(): given matrix must be square sized" );
+
+  if (out.n_rows == 0 || out.n_cols == 0)
+    {
+    return out; // nothing to do, matrix is empty
+    }
 
   std::tuple<bool, std::string> result = coot_rt_t::chol(out.get_dev_mem(true), out.n_rows);
   if (std::get<0>(result) == false)
