@@ -15,19 +15,18 @@
 
 ## NOTE: If you prefer to link your programs _directly_ with OpenBLAS, BLAS or LAPACK,
 ## NOTE: do not use this installer.
-## NOTE: To use Armadillo without installation, compile your programs along these lines:
-## NOTE: g++ prog.cpp -o prog -O2 -I /home/user/armadillo-12.2.0/include -DARMA_DONT_USE_WRAPPER -lopenblas -llapack
-## NOTE: The above command line assumes that you have unpacked the armadillo archive into /home/user/  
-## NOTE: You will need to adjust this for newer versions of Armadillo (ie. "12.2.0" needs to be changed),
-## NOTE: and/or if you have unpacked the armadillo archive into a different directory.
-## NOTE: Replace -lopenblas with -lblas if you don't have OpenBLAS.
-## NOTE: On macOS, replace -lblas -llapack with -framework Accelerate
-## NOTE: More details: https://arma.sourceforge.net/faq.html
+## NOTE: To use Bandicoot without installation, compile your programs along these lines:
+## NOTE: g++ prog.cpp -o prog -O2 -I /home/user/bandicoot-1.0.0/include -DCOOT_DONT_USE_WRAPPER -DCOOT_USE_OPENCL -larmadillo -lOpenCL -lclBLAS
+## NOTE: The above command line assumes that you have unpacked the Bandicoot code archive into /home/user/
+## NOTE: You will need to adjust this for newer versions of Bandicoot (ie. "1.0.0" needs to be changed),
+## NOTE: and/or if you have unpacked the Bandicoot archive into a different directory.
+## NOTE: On macOS, replace -lOpenCL with -framework OpenCL
+## NOTE: More details: https://coot.sourceforge.net/docs.html#direct_linking
 
 
 cmake_minimum_required(VERSION 3.6 FATAL_ERROR)
 
-if(NOT (${CMAKE_MAJOR_VERSION} LESS 3))
+if(${CMAKE_MAJOR_VERSION} GREATER_EQUAL 3)
   if(POLICY CMP0025)
     # enable differentiation between vanilla Clang and AppleClang
     cmake_policy(SET CMP0025 NEW)
@@ -48,7 +47,7 @@ set(COOT_USE_WRAPPER true)
 
 # the settings below will be automatically configured by the rest of this script
 
-set(COOT_USE_OPENCL     true)  # TODO
+set(COOT_USE_OPENCL     false)
 set(COOT_USE_CUDA       false)
 
 
@@ -114,9 +113,17 @@ option(ALLOW_BLAS_LAPACK_MACOS "Allow detection of BLAS and LAPACK on macOS" OFF
 ## Example use on the command line:
 ## cmake -D ALLOW_BLAS_LAPACK_MACOS=true .
 
+option(FIND_OPENCL "Search for an OpenCL implementation" ON)
+## Example use on the command line:
+## cmake -D FIND_OPENCL=false .
+
+option(FIND_CUDA "Search for a CUDA implementation" ON)
+## Example use on the command line:
+## cmake -D FIND_CUDA=false .
+
 option(BUILD_TESTS "Build tests" ON)
 ## you can also disable building the tests directly on the command line:
-## cmake -D BUILD_TESTS=OFF .
+## cmake -D BUILD_TESTS=false .
 ##
 ## to run the tests on the command line:
 ## make
@@ -338,7 +345,6 @@ else()
   endif()
 endif()
 
-
 if(NOT COOT_HAS_LAPACK)
   message(STATUS "")
   message(STATUS "*** ERROR: No LAPACK compatible library has been found.")
@@ -356,10 +362,111 @@ if(NOT COOT_HAS_LAPACK)
   message(FATAL_ERROR "no LAPACK compatible library has been found")
 endif()
 
+################################################################################
+# Backend configuration
+
+if(FIND_OPENCL)
+  find_package(OpenCL)
+  if(OpenCL_FOUND)
+    set(COOT_USE_OPENCL true)
+
+    set(COOT_LIBS ${COOT_LIBS} ${OpenCL_LIBRARIES})
+    include_directories(${OpenCL_INCLUDE_DIRS})
+
+    # Now try to find clBLAS.
+    include(COOT_FindCLBLAS)
+    if(CLBLAS_FOUND)
+
+    else()
+      message(STATUS "")
+      message(STATUS "*** ERROR: clBLAS not found.")
+      message(STATUS "")
+      message(STATUS "*** NOTE: if you do not want OpenCL support, rerun CMake with the FIND_OPENCL option off:")
+      message(STATUS "*** NOTE: cmake -D FIND_OPENCL=OFF .")
+
+      message(FATAL_ERROR "clBLAS has not been found")
+    endif()
+  endif()
+endif()
+
+if(FIND_CUDA)
+
+  if(${CMAKE_VERSION} VERSION_LESS 3.17)
+    # Use older FindCUDA module because FindCUDAToolkit is not available.
+    find_package(CUDA)
+
+    # We also need NVRTC, which the old FindCUDA package does not find.
+    find_library(CUDA_nvrtc_LIBRARY nvrtc ${CUDA_TOOLKIT_ROOT_DIR})
+  else()
+    # Use newer FindCUDAToolkit module.
+    find_package(CUDAToolkit)
+
+    # Extract new-style CMake libraries to old-style (to match the older FindCUDA script).
+    set(CUDA_FOUND CUDAToolkit_FOUND)
+    set(CUDA_LIBRARIES CUDA::cudart)
+    set(CUDA_CUBLAS_LIBRARIES CUDA::cublas)
+    set(CUDA_curand_LIBRARY CUDA::curand)
+    set(CUDA_cusolver_LIBRARY CUDA::cusolver)
+    set(CUDA_nvrtc_LIBRARY CUDA::nvrtc)
+    set(CUDA_INCLUDE_DIRS CUDA::toolkit)
+  endif()
+
+  if(CUDA_FOUND)
+    # Make sure all dependencies are located.
+    set(COOT_USE_CUDA TRUE)
+
+    if(NOT CUDA_LIBRARIES)
+      set(COOT_USE_CUDA false)
+      message(STATUS "*** WARNING: CUDA runtime libraries (libcudart) not found")
+    endif()
+
+    if(NOT CUDA_CUBLAS_LIBRARIES)
+      set(COOT_USE_CUDA false)
+      message(STATUS "*** WARNING: CUDA cuBLAS library not found")
+    endif()
+
+    if(NOT CUDA_curand_LIBRARY)
+      set(COOT_USE_CUDA false)
+      message(STATUS "*** WARNING: CUDA curand library not found")
+    endif()
+
+    if(NOT CUDA_cusolver_LIBRARY)
+      set(COOT_USE_CUDA false)
+      message(STATUS "*** WARNING: CUDA cuSolver library not found")
+    endif()
+
+    if(NOT CUDA_nvrtc_LIBRARY)
+      set(COOT_USE_CUDA false)
+      message(STATUS "*** WARNING: CUDA NVRTC library not found")
+    endif()
+
+    if(NOT COOT_USE_CUDA)
+      message(STATUS "*** WARNING: CUDA backend not enabled")
+    else()
+      set(COOT_LIBS ${COOT_LIBS} ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES} ${CUDA_curand_LIBRARY} ${CUDA_cusolver_LIBRARY} ${CUDA_nvrtc_LIBRARY})
+      include_directories(${CUDA_INCLUDE_DIRS})
+    endif()
+  endif()
+endif()
+
+# Configure default backend.
+if(COOT_USE_CUDA AND COOT_USE_OPENCL)
+  # If we have a CUDA device, the OpenCL driver is almost certainly better.
+  set(COOT_DEFAULT_BACKEND "CUDA_BACKEND")
+elseif(COOT_USE_CUDA)
+  set(COOT_DEFAULT_BACKEND "CUDA_BACKEND")
+elseif(COOT_USE_OPENCL)
+  set(COOT_DEFAULT_BACKEND} "CL_BACKEND")
+endif()
+
+
 
 message(STATUS "")
 message(STATUS "*** Result of configuration:")
-message(STATUS "*** COOT_USE_WRAPPER    = ${COOT_USE_WRAPPER}")
+message(STATUS "*** COOT_USE_WRAPPER     = ${COOT_USE_WRAPPER}")
+message(STATUS "*** COOT_USE_OPENCL      = ${COOT_USE_OPENCL}")
+message(STATUS "*** COOT_USE_CUDA        = ${COOT_USE_CUDA}")
+message(STATUS "*** COOT_DEFAULT_BACKEND = ${COOT_DEFAULT_BACKEND}")
 message(STATUS "")
 message(STATUS "*** Bandicoot wrapper library will use the following libraries:")
 message(STATUS "*** COOT_LIBS = ${COOT_LIBS}")
@@ -407,7 +514,6 @@ add_library(
   )
 
 target_link_libraries(bandicoot ${COOT_LIBS})
-# target_include_directories(armadillo INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
 target_include_directories(bandicoot INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/tmp/include> $<INSTALL_INTERFACE:include>)
 set_target_properties(bandicoot PROPERTIES VERSION ${COOT_VERSION_MAJOR}.${COOT_VERSION_MINOR}.${COOT_VERSION_PATCH} SOVERSION ${COOT_VERSION_MAJOR})
 

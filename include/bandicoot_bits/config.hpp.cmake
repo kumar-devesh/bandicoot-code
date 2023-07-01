@@ -24,6 +24,14 @@
 //// Bandicoot requires CUDA, CUDART, cuBLAS, cuRAND, cuSolver, and NVRTC.
 #endif
 
+#if !defined(COOT_DEFAULT_BACKEND)
+#cmakedefine COOT_DEFAULT_BACKEND @COOT_DEFAULT_BACKEND@
+//// This defines the backend that Bandicoot will use by default.
+//// It takes values either CL_BACKEND or CUDA_BACKEND;
+//// if set to CL_BACKEND, then COOT_USE_OPENCL must be defined;
+//// if set to CUDA_BACKEND, then COOT_USE_CUDA must be defined.
+#endif
+
 #cmakedefine COOT_USE_WRAPPER
 //// Comment out the above line if you're getting linking errors when compiling your programs,
 //// or if you prefer to directly link with LAPACK, BLAS + etc instead of the Bandicoot runtime library.
