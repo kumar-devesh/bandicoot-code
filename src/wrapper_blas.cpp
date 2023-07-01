@@ -20,30 +20,8 @@
 #undef COOT_USE_WRAPPER
 
 #include "bandicoot_bits/compiler_setup.hpp"
-
-#if defined(COOT_USE_OPENCL)
-  #if defined(__APPLE__)
-    #include <OpenCL/opencl.h>
-  #else
-    #include <CL/opencl.h>
-  #endif
-
-
-  // TODO: make this conditional on clBLAS being present
-  #include <clBLAS.h>
-#endif
-
-// Import CUDA headers if needed.
-#if defined(COOT_USE_CUDA)
-  #include <cuda.h>
-  #include <cuda_runtime_api.h>
-  #include <cuda_runtime.h>
-  #include <cublas_v2.h>
-  #include <nvrtc.h>
-  #include <curand.h>
-  #include <cusolverDn.h>
-#endif
-
+#include "bandicoot_bits/include_opencl.hpp"
+#include "bandicoot_bits/include_cuda.hpp"
 #include "bandicoot_bits/typedef_elem.hpp"
 
 namespace coot
