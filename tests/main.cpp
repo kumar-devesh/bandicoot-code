@@ -21,6 +21,8 @@
 #define CATCH_CONFIG_RUNNER  // we will define main()
 #include "catch.hpp"
 
+using namespace coot;
+
 int
 main(int argc, char** argv)
   {
@@ -32,27 +34,27 @@ main(int argc, char** argv)
     return returnCode;
     }
 
-  std::cout << "Bandicoot version: " << coot::coot_version::as_string() << '\n';
+  std::cout << "Bandicoot version: " << coot_version::as_string() << '\n';
 
-  if (coot::get_rt().backend == coot::CL_BACKEND)
+  if (COOT_DEFAULT_BACKEND == CL_BACKEND)
     {
     std::cout << "Run with OpenCL backend:\n";
     }
-  else if (coot::get_rt().backend == coot::CUDA_BACKEND)
+  else if (COOT_DEFAULT_BACKEND == CUDA_BACKEND)
     {
     std::cout << "Run with CUDA backend:\n";
     }
 
-  coot::get_rt().init(true);
+  coot_init(true);
 
   const size_t seed = size_t(session.config().rngSeed());
   if (seed == 0)
     {
-    coot::coot_rng::set_seed_random();
+    coot_rng::set_seed_random();
     }
   else
     {
-    coot::coot_rng::set_seed(seed);
+    coot_rng::set_seed(seed);
     }
 
   return session.run();
