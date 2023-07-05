@@ -40,10 +40,8 @@ class Row : public Mat<eT>
   inline                  Row(const Row& X);
   inline const Row& operator=(const Row& X);
 
-  #if defined(COOT_USE_CXX11)
   inline                  Row(Row&& X);
   inline const Row& operator=(Row&& X);
-  #endif
 
   template<typename T1> inline            Row(const Base<eT, T1>& X);
   template<typename T1> inline Row& operator=(const Base<eT, T1>& X);

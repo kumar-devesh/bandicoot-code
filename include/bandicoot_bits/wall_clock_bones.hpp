@@ -20,20 +20,13 @@ class wall_clock
   inline  wall_clock();
   inline ~wall_clock();
 
-  inline void   tic();  // start the timer
-  inline double toc();  // return the number of seconds since the last call to tic()
+                   inline void   tic();  // start the timer
+  coot_warn_unused inline double toc();  // return the number of seconds since the last call to tic()
 
 
   private:
 
-  bool valid;
-
-  #if defined(COOT_USE_CXX11)
-    std::chrono::steady_clock::time_point chrono_time1;
-  #elif defined(COOT_HAVE_GETTIMEOFDAY)
-    struct timeval posix_time1;
-    struct timeval posix_time2;
-  #else
-    std::clock_t time1;
-  #endif
+  bool valid = false;
+  
+  std::chrono::steady_clock::time_point chrono_time1;
   };

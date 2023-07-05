@@ -508,8 +508,6 @@ Mat<eT>::operator/=(const Mat<eT>& X)
 
 
 
-#if defined(COOT_USE_CXX11)
-
 template<typename eT>
 inline
 Mat<eT>::Mat(Mat&& X)
@@ -537,8 +535,6 @@ Mat<eT>::operator=(Mat<eT>&& X)
 
   return *this;
   }
-
-#endif
 
 
 

@@ -20,14 +20,8 @@
 
 #include <armadillo>
 
-#if (ARMA_VERSION_MAJOR < 7)
-  #error "Armadillo version 7.100 or later is required"
- // TODO: use a more fine-grained minimum version (eg. 6.500)
-#endif
-
-// TODO: this warning seems wrong
-#if !defined(ARMA_USE_U64S64)
-  #pragma message("WARNING: present installation of Armadillo doesn't have 64 bit integers enabled")
+#if (ARMA_VERSION_MAJOR < 10)
+  #error "Armadillo version 10.1 or newer is required"
 #endif
 
 
@@ -35,14 +29,7 @@
 #define CL_USE_DEPRECATED_OPENCL_1_2_APIS
 
 
-#if defined(ARMA_USE_CXX11)
-  #undef  COOT_USE_CXX11
-  #define COOT_USE_CXX11
-#endif
-
-
-// TODO: the following includes are probably not necessary as a lot of Armadillo functionality is being reused
-
+#include "bandicoot_bits/compiler_check.hpp"
 #include "bandicoot_bits/config.hpp"
 #include "bandicoot_bits/compiler_setup.hpp"
 
@@ -75,9 +62,7 @@
 #endif
 
 
-#if defined(COOT_USE_CXX11)
-  #include <mutex>
-#endif
+#include <mutex>
 
 
 // Import CUDA headers if needed.

@@ -140,12 +140,8 @@ runtime_t::lock()
   {
   coot_extra_debug_sigprint();
 
-  #if defined(COOT_USE_CXX11)
-    {
-    coot_extra_debug_print("coot::cl_rt: calling mutex.lock()");
-    mutex.lock();
-    }
-  #endif
+  coot_extra_debug_print("coot::cl_rt: calling mutex.lock()");
+  mutex.lock();
   }
 
 
@@ -157,12 +153,8 @@ runtime_t::unlock()
   {
   coot_extra_debug_sigprint();
 
-  #if defined(COOT_USE_CXX11)
-    {
-    coot_extra_debug_print("coot::cl_rt: calling mutex.unlock()");
-    mutex.unlock();
-    }
-  #endif
+  coot_extra_debug_print("coot::cl_rt: calling mutex.unlock()");
+  mutex.unlock();
   }
 
 
