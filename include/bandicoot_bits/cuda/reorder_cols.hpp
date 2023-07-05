@@ -40,7 +40,7 @@ reorder_cols(dev_mem_t<eT> out, const dev_mem_t<eT> mem, const uword n_rows, con
 
   const kernel_dims dims = one_dimensional_grid_dims(out_n_cols);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],

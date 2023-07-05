@@ -37,7 +37,7 @@ inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, oneway_k
 
   const kernel_dims dims = one_dimensional_grid_dims(n_elem);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],
@@ -70,7 +70,7 @@ inplace_op_array(dev_mem_t<eT2> dest, dev_mem_t<eT1> src, const uword n_elem, tw
 
   const kernel_dims dims = one_dimensional_grid_dims(n_elem);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],
@@ -113,7 +113,7 @@ inplace_op_subview(dev_mem_t<eT> dest, const uword dest_offset, const eT val, co
 
   const kernel_dims dims = two_dimensional_grid_dims(n_rows, n_cols);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],
@@ -150,7 +150,7 @@ inplace_op_diag(dev_mem_t<eT> dest, const uword mem_offset, const eT val, const 
 
   const kernel_dims dims = one_dimensional_grid_dims(len);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],
@@ -187,7 +187,7 @@ inplace_op_subview(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword M_
 
   const kernel_dims dims = two_dimensional_grid_dims(n_rows, n_cols);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],

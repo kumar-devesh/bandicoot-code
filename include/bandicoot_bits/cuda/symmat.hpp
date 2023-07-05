@@ -48,7 +48,7 @@ symmat(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword size, const uwor
     args = args_separate;
     }
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       k, dims.d[0], dims.d[1], dims.d[2], dims.d[3], dims.d[4], dims.d[5],
       0, NULL, (void**) args, 0);
 

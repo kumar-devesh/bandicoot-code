@@ -37,7 +37,7 @@ var(dev_mem_t<eT> out, const dev_mem_t<eT> in, const dev_mem_t<eT> means, const 
 
   const kernel_dims dims = one_dimensional_grid_dims((dim == 0) ? n_cols : n_rows);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],
@@ -73,7 +73,7 @@ var_subview(dev_mem_t<eT> out, const dev_mem_t<eT> in, const dev_mem_t<eT> means
 
   const kernel_dims dims = one_dimensional_grid_dims((dim == 0) ? n_cols : n_rows);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],

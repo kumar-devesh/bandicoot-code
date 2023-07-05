@@ -25,19 +25,19 @@ htrans(dev_mem_t<float> out, const dev_mem_t<float> in, const uword n_rows, cons
   float alpha = 1.0;
   float beta = 0.0;
 
-  result = cublasSgeam(get_rt().cuda_rt.cublas_handle,
-                       CUBLAS_OP_C,
-                       CUBLAS_OP_N,
-                       n_cols,
-                       n_rows,
-                       &alpha,
-                       in.cuda_mem_ptr,
-                       n_rows,
-                       &beta,
-                       /* should be ignored */ in.cuda_mem_ptr,
-                       /* should be ignored */ n_cols,
-                       out.cuda_mem_ptr,
-                       n_cols);
+  result = coot_wrapper(cublasSgeam)(get_rt().cuda_rt.cublas_handle,
+                                     CUBLAS_OP_C,
+                                     CUBLAS_OP_N,
+                                     n_cols,
+                                     n_rows,
+                                     &alpha,
+                                     in.cuda_mem_ptr,
+                                     n_rows,
+                                     &beta,
+                                     /* should be ignored */ in.cuda_mem_ptr,
+                                     /* should be ignored */ n_cols,
+                                     out.cuda_mem_ptr,
+                                     n_cols);
 
 
   coot_check_cublas_error( result, "coot::cuda::htrans(): call to cublasSgeam() failed" );
@@ -57,19 +57,19 @@ htrans(dev_mem_t<double> out, const dev_mem_t<double> in, const uword n_rows, co
   double alpha = 1.0;
   double beta = 0.0;
 
-  result = cublasDgeam(get_rt().cuda_rt.cublas_handle,
-                       CUBLAS_OP_C,
-                       CUBLAS_OP_N,
-                       n_cols,
-                       n_rows,
-                       &alpha,
-                       in.cuda_mem_ptr,
-                       n_rows,
-                       &beta,
-                       /* should be ignored */ in.cuda_mem_ptr,
-                       /* should be ignored */ n_cols,
-                       out.cuda_mem_ptr,
-                       n_cols);
+  result = coot_wrapper(cublasDgeam)(get_rt().cuda_rt.cublas_handle,
+                                     CUBLAS_OP_C,
+                                     CUBLAS_OP_N,
+                                     n_cols,
+                                     n_rows,
+                                     &alpha,
+                                     in.cuda_mem_ptr,
+                                     n_rows,
+                                     &beta,
+                                     /* should be ignored */ in.cuda_mem_ptr,
+                                     /* should be ignored */ n_cols,
+                                     out.cuda_mem_ptr,
+                                     n_cols);
 
   coot_check_cublas_error( result, "coot::cuda::htrans(): call to cublasDgeam() failed" );
   }
@@ -95,7 +95,7 @@ htrans(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword n_rows, const uw
 
   const kernel_dims dims = two_dimensional_grid_dims(n_rows, n_cols);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],
@@ -120,19 +120,19 @@ strans(dev_mem_t<float> out, const dev_mem_t<float> in, const uword n_rows, cons
   float alpha = 1.0;
   float beta = 0.0;
 
-  result = cublasSgeam(get_rt().cuda_rt.cublas_handle,
-                       CUBLAS_OP_T,
-                       CUBLAS_OP_N,
-                       n_cols,
-                       n_rows,
-                       &alpha,
-                       in.cuda_mem_ptr,
-                       n_rows,
-                       &beta,
-                       /* should be ignored */ in.cuda_mem_ptr,
-                       /* should be ignored */ n_cols,
-                       out.cuda_mem_ptr,
-                       n_cols);
+  result = coot_wrapper(cublasSgeam)(get_rt().cuda_rt.cublas_handle,
+                                     CUBLAS_OP_T,
+                                     CUBLAS_OP_N,
+                                     n_cols,
+                                     n_rows,
+                                     &alpha,
+                                     in.cuda_mem_ptr,
+                                     n_rows,
+                                     &beta,
+                                     /* should be ignored */ in.cuda_mem_ptr,
+                                     /* should be ignored */ n_cols,
+                                     out.cuda_mem_ptr,
+                                     n_cols);
 
   coot_check_cublas_error( result, "coot::cuda::strans(): call to cublasSgeam() failed" );
   }
@@ -151,19 +151,19 @@ strans(dev_mem_t<double> out, const dev_mem_t<double> in, const uword n_rows, co
   double alpha = 1.0;
   double beta = 0.0;
 
-  result = cublasDgeam(get_rt().cuda_rt.cublas_handle,
-                       CUBLAS_OP_T,
-                       CUBLAS_OP_N,
-                       n_cols,
-                       n_rows,
-                       &alpha,
-                       in.cuda_mem_ptr,
-                       n_rows,
-                       &beta,
-                       /* should be ignored */ in.cuda_mem_ptr,
-                       /* should be ignored */ n_cols,
-                       out.cuda_mem_ptr,
-                       n_cols);
+  result = coot_wrapper(cublasDgeam)(get_rt().cuda_rt.cublas_handle,
+                                     CUBLAS_OP_T,
+                                     CUBLAS_OP_N,
+                                     n_cols,
+                                     n_rows,
+                                     &alpha,
+                                     in.cuda_mem_ptr,
+                                     n_rows,
+                                     &beta,
+                                     /* should be ignored */ in.cuda_mem_ptr,
+                                     /* should be ignored */ n_cols,
+                                     out.cuda_mem_ptr,
+                                     n_cols);
 
   coot_check_cublas_error( result, "coot::cuda::strans(): call to cublasDgeam() failed" );
   }
@@ -189,7 +189,7 @@ strans(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword n_rows, const uw
 
   const kernel_dims dims = two_dimensional_grid_dims(n_rows, n_cols);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],

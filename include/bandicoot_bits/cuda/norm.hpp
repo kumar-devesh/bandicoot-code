@@ -51,7 +51,7 @@ vec_norm_2(dev_mem_t<float> mem, const uword n_elem)
   coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "cuda runtime not valid" );
 
   float result;
-  cublasStatus_t status = cublasSnrm2(get_rt().cuda_rt.cublas_handle, n_elem, mem.cuda_mem_ptr, 1, &result);
+  cublasStatus_t status = coot_wrapper(cublasSnrm2)(get_rt().cuda_rt.cublas_handle, n_elem, mem.cuda_mem_ptr, 1, &result);
 
   coot_check_cublas_error( status, "coot::cuda::vec_norm_2(): call to cublasSnrm2() failed" );
 
@@ -69,7 +69,7 @@ vec_norm_2(dev_mem_t<double> mem, const uword n_elem)
   coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "cuda runtime not valid" );
 
   double result;
-  cublasStatus_t status = cublasDnrm2(get_rt().cuda_rt.cublas_handle, n_elem, mem.cuda_mem_ptr, 1, &result);
+  cublasStatus_t status = coot_wrapper(cublasDnrm2)(get_rt().cuda_rt.cublas_handle, n_elem, mem.cuda_mem_ptr, 1, &result);
 
   coot_check_cublas_error( status, "coot::cuda::vec_norm_2(): call to cublasDnrm2() failed" );
 

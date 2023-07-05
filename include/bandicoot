@@ -170,6 +170,13 @@ namespace coot
   #endif
 
   #if defined(COOT_USE_CUDA)
+
+  #include "bandicoot_bits/cuda/def_cuda.hpp"
+  #include "bandicoot_bits/cuda/def_nvrtc.hpp"
+  #include "bandicoot_bits/cuda/def_cublas.hpp"
+  #include "bandicoot_bits/cuda/def_curand.hpp"
+  #include "bandicoot_bits/cuda/def_cusolver.hpp"
+
   namespace cuda
     {
     #include "bandicoot_bits/cuda/runtime_bones.hpp"
