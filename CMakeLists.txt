@@ -514,6 +514,11 @@ add_library(
   ${PROJECT_SOURCE_DIR}/src/wrapper_lapack.cpp
   ${PROJECT_SOURCE_DIR}/src/wrapper_opencl.cpp
   ${PROJECT_SOURCE_DIR}/src/wrapper_clblas.cpp
+  ${PROJECT_SOURCE_DIR}/src/wrapper_cuda.cpp
+  ${PROJECT_SOURCE_DIR}/src/wrapper_nvrtc.cpp
+  ${PROJECT_SOURCE_DIR}/src/wrapper_cublas.cpp
+  ${PROJECT_SOURCE_DIR}/src/wrapper_curand.cpp
+  ${PROJECT_SOURCE_DIR}/src/wrapper_cusolver.cpp
   )
 
 target_link_libraries(bandicoot PRIVATE ${COOT_LIBS})
