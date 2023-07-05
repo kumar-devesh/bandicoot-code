@@ -27,6 +27,7 @@ coot_sub_group_size(cl_kernel kernel, cl_device_id dev_id, const size_t input_si
   {
   // OpenCL 2.0 moved this into the base specification, so the KHR suffix is
   // deprecated.
+  std::cout << "-- calling clGetKernelSubGroupInfo()\n";
   return clGetKernelSubGroupInfo(kernel,
                                  dev_id,
                                  CL_KERNEL_MAX_SUB_GROUP_SIZE_FOR_NDRANGE,
@@ -45,6 +46,7 @@ coot_sub_group_size(cl_kernel kernel, cl_device_id dev_id, const size_t input_si
   {
   // This is a version of OpenCL where subgroups are available, but only as an
   // extension.
+  std::cout << "-- calling clGetKernelSubGroupInfoKHR()\n";
   return clGetKernelSubGroupInfoKHR(kernel,
                                     dev_id,
                                     CL_KERNEL_MAX_SUB_GROUP_SIZE_FOR_NDRANGE,
@@ -65,6 +67,8 @@ coot_sub_group_size(cl_kernel kernel, cl_device_id dev_id, const size_t input_si
   coot_ignore(dev_id);
   coot_ignore(input_size);
 
+  std::cout << "-- doing nothing because CL_VERSION_2_1 is not defined and we don't have extensions\n";
+
   // Subgroups are not available, so assume a subgroup size of 0.
   // (This is bad because it does not allow us to do subgroup-level
   // synchronization operations, which are way less overhead than regular
@@ -84,11 +88,13 @@ cl_int
 coot_nv_warp_size(const cl_device_id dev_id, size_t& warp_size)
   {
 #if defined(CL_DEVICE_WARP_SIZE_NV)
+  std::cout << "-- in coot_nv_warp_size() with CL_DEVICE_WARP_SIZE_NV\n";
   cl_uint warp_size_out;
   cl_int status = clGetDeviceInfo(dev_id, CL_DEVICE_WARP_SIZE_NV, sizeof(cl_uint), (void*) &warp_size_out, NULL);
   warp_size = (size_t) warp_size_out;
   return status;
 #else
+  std::cout << "-- in coot_nv_warp_size() without CL_DEVICE_WARP_SIZE_NV\n";
   warp_size = 0;
   return CL_SUCCESS;
 #endif
