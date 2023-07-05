@@ -89,9 +89,6 @@
 
 
 #if defined(__APPLE__) || defined(__apple_build_version__)
-  #undef  COOT_BLAS_SDOT_BUG
-  #define COOT_BLAS_SDOT_BUG
-
   #undef  COOT_HAVE_POSIX_MEMALIGN
   #undef  COOT_USE_EXTERN_CXX11_RNG
   // TODO: thread local storage (TLS) (eg. "extern thread_local") appears currently broken on Mac OS X
