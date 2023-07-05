@@ -109,7 +109,7 @@ namespace coot
   #include "bandicoot_bits/constants.hpp"
   #include "bandicoot_bits/dev_mem_t.hpp"
   #include "bandicoot_bits/distr_param.hpp"
-  
+
 
 
   //
@@ -137,6 +137,10 @@ namespace coot
     }
 
   #if defined(COOT_USE_OPENCL)
+
+  #include "bandicoot_bits/opencl/def_opencl.hpp"
+  #include "bandicoot_bits/opencl/def_clblas.hpp"
+
   namespace opencl
     {
     #include "bandicoot_bits/opencl/magma_kernel_id.hpp"

@@ -31,15 +31,15 @@ reorder_cols(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword n_rows, cons
 
   cl_int status = 0;
 
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem),        &(out.cl_mem_ptr));
-  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem),        &(in.cl_mem_ptr));
-  status |= clSetKernelArg(kernel, 2, local_n_rows.size,     local_n_rows.addr);
-  status |= clSetKernelArg(kernel, 3, sizeof(cl_mem),        &(ordering.cl_mem_ptr));
-  status |= clSetKernelArg(kernel, 4, local_out_n_cols.size, local_out_n_cols.addr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem),        &(out.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(cl_mem),        &(in.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(kernel, 2, local_n_rows.size,     local_n_rows.addr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 3, sizeof(cl_mem),        &(ordering.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(kernel, 4, local_out_n_cols.size, local_out_n_cols.addr);
 
   const size_t global_work_size = size_t(out_n_cols);
 
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
 
   coot_check_runtime_error( (status != 0), "coot::opencl::reorder_cols(): couldn't execute kernel" );
   }

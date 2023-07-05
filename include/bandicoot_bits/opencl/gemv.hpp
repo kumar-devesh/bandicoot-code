@@ -83,27 +83,27 @@ struct gemv
 
     cl_int status = 0;
 
-    status |= clblasSgemv(clblasColumnMajor,
-                          transA,
-                          M,
-                          N,
-                          alpha,
-                          A.cl_mem_ptr,
-                          cl_A_offset,
-                          cl_lda,
-                          x.cl_mem_ptr,
-                          cl_x_offset,
-                          cl_incx,
-                          beta,
-                          y.cl_mem_ptr,
-                          cl_y_offset,
-                          cl_incy,
-                          1,
-                          &queue,
-                          0,
-                          NULL,
-                          NULL);
-    status |= clFlush(queue);
+    status |= coot_wrapper(clblasSgemv)(clblasColumnMajor,
+                                        transA,
+                                        M,
+                                        N,
+                                        alpha,
+                                        A.cl_mem_ptr,
+                                        cl_A_offset,
+                                        cl_lda,
+                                        x.cl_mem_ptr,
+                                        cl_x_offset,
+                                        cl_incx,
+                                        beta,
+                                        y.cl_mem_ptr,
+                                        cl_y_offset,
+                                        cl_incy,
+                                        1,
+                                        &queue,
+                                        0,
+                                        NULL,
+                                        NULL);
+    status |= coot_wrapper(clFlush)(queue);
 
     coot_check_cl_error(status, "coot::opencl::gemv(): eT = float");
     }
@@ -150,27 +150,27 @@ struct gemv
 
     cl_int status = 0;
 
-    status |= clblasDgemv(clblasColumnMajor,
-                          transA,
-                          M,
-                          N,
-                          alpha,
-                          A.cl_mem_ptr,
-                          cl_A_offset,
-                          cl_lda,
-                          x.cl_mem_ptr,
-                          cl_x_offset,
-                          cl_incx,
-                          beta,
-                          y.cl_mem_ptr,
-                          cl_y_offset,
-                          cl_incy,
-                          1,
-                          &queue,
-                          0,
-                          NULL,
-                          NULL);
-    status |= clFlush(queue);
+    status |= coot_wrapper(clblasDgemv)(clblasColumnMajor,
+                                        transA,
+                                        M,
+                                        N,
+                                        alpha,
+                                        A.cl_mem_ptr,
+                                        cl_A_offset,
+                                        cl_lda,
+                                        x.cl_mem_ptr,
+                                        cl_x_offset,
+                                        cl_incx,
+                                        beta,
+                                        y.cl_mem_ptr,
+                                        cl_y_offset,
+                                        cl_incy,
+                                        1,
+                                        &queue,
+                                        0,
+                                        NULL,
+                                        NULL);
+    status |= coot_wrapper(clFlush)(queue);
 
     coot_check_cl_error(status, "coot::opencl::gemv(): eT = double");
     }

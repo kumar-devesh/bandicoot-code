@@ -35,13 +35,13 @@ eye(dev_mem_t<eT> dest, const uword n_rows, const uword n_cols)
 
   cl_int status = 0;
 
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem),    &(dest.cl_mem_ptr));
-  status |= clSetKernelArg(kernel, 1, local_n_rows.size, local_n_rows.addr);
-  status |= clSetKernelArg(kernel, 2, local_n_cols.size, local_n_cols.addr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem),    &(dest.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(kernel, 1, local_n_rows.size, local_n_rows.addr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 2, local_n_cols.size, local_n_cols.addr);
 
   const size_t global_work_size[2] = { size_t(n_rows), size_t(n_cols) };
 
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 2, NULL, global_work_size, NULL, 0, NULL, NULL);
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 2, NULL, global_work_size, NULL, 0, NULL, NULL);
 
   coot_check_runtime_error( (status != 0), "coot::opencl::eye(): couldn't execute kernel" );
   }

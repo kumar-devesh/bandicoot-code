@@ -40,16 +40,16 @@ mean(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword n_rows, const uword
   runtime_t::adapt_uword A_n_rows(n_rows);
   runtime_t::adapt_uword A_n_cols(n_cols);
 
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &(out.cl_mem_ptr));
-  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &(A.cl_mem_ptr)  );
-  status |= clSetKernelArg(kernel, 2, A_n_rows.size,  A_n_rows.addr    );
-  status |= clSetKernelArg(kernel, 3, A_n_cols.size,  A_n_cols.addr    );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem), &(out.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(cl_mem), &(A.cl_mem_ptr)  );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 2, A_n_rows.size,  A_n_rows.addr    );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 3, A_n_cols.size,  A_n_cols.addr    );
 
   const size_t k1_work_dim       = 1;
   const size_t k1_work_offset[1] = { 0 };
   const size_t k1_work_size[1]   = { (dim == 0) ? size_t(n_cols) : size_t(n_rows) };
 
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
 
   coot_check_cl_error(status, "coot::opencl::mean(): failed to run kernel");
   }
@@ -87,19 +87,19 @@ mean_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword M_n_rows, c
   runtime_t::adapt_uword sub_n_rows(n_rows);
   runtime_t::adapt_uword sub_n_cols(n_cols);
 
-  status |= clSetKernelArg(k1, 0,    sizeof(cl_mem),  &(out.cl_mem_ptr));
-  status |= clSetKernelArg(k1, 1,    sizeof(cl_mem),  &(A.cl_mem_ptr)  );
-  status |= clSetKernelArg(k1, 2,  sv_m_n_rows.size,  sv_m_n_rows.addr );
-  status |= clSetKernelArg(k1, 3, cl_start_row.size, cl_start_row.addr );
-  status |= clSetKernelArg(k1, 4, cl_start_col.size, cl_start_col.addr );
-  status |= clSetKernelArg(k1, 5,   sub_n_rows.size,   sub_n_rows.addr );
-  status |= clSetKernelArg(k1, 6,   sub_n_cols.size,   sub_n_cols.addr );
+  status |= coot_wrapper(clSetKernelArg)(k1, 0,    sizeof(cl_mem),  &(out.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(k1, 1,    sizeof(cl_mem),  &(A.cl_mem_ptr)  );
+  status |= coot_wrapper(clSetKernelArg)(k1, 2,  sv_m_n_rows.size,  sv_m_n_rows.addr );
+  status |= coot_wrapper(clSetKernelArg)(k1, 3, cl_start_row.size, cl_start_row.addr );
+  status |= coot_wrapper(clSetKernelArg)(k1, 4, cl_start_col.size, cl_start_col.addr );
+  status |= coot_wrapper(clSetKernelArg)(k1, 5,   sub_n_rows.size,   sub_n_rows.addr );
+  status |= coot_wrapper(clSetKernelArg)(k1, 6,   sub_n_cols.size,   sub_n_cols.addr );
 
   const size_t k1_work_dim       = 1;
   const size_t k1_work_offset[1] = { 0 };
   const size_t k1_work_size[1]   = { (dim == 0) ? size_t(n_cols) : size_t(n_rows) };
 
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), k1, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), k1, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
 
   coot_check_cl_error(status, "coot::opencl::mean_subview(): failed to run kernel");
   }

@@ -97,15 +97,15 @@ mul_diag
 
   cl_int status = 0;
 
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &(C_mem.cl_mem_ptr)  );
-  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &(diag_arg_ptr)      );
-  status |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &(mat_arg_ptr)       );
-  status |= clSetKernelArg(kernel, 3, sizeof(eT),     &alpha               );
-  status |= clSetKernelArg(kernel, 4, cl_n_rows.size, cl_n_rows.addr       );
-  status |= clSetKernelArg(kernel, 5, cl_n_cols.size, cl_n_cols.addr       );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem), &(C_mem.cl_mem_ptr)  );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(cl_mem), &(diag_arg_ptr)      );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 2, sizeof(cl_mem), &(mat_arg_ptr)       );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 3, sizeof(eT),     &alpha               );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 4, cl_n_rows.size, cl_n_rows.addr       );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 5, cl_n_cols.size, cl_n_cols.addr       );
   coot_check_cl_error(status, "coot::opencl::mul_diag(): couldn't set kernel arguments");
 
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
 
   coot_check_cl_error(status, "coot::opencl::mul_diag(): couldn't execute kernel");
   }

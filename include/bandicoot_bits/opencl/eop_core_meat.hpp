@@ -32,15 +32,15 @@ eop_scalar(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword n_elem, co
 
   cl_int status = 0;
 
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &dest.cl_mem_ptr);
-  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), & src.cl_mem_ptr);
-  status |= clSetKernelArg(kernel, 2, sizeof(eT1),    &aux_val_pre    );
-  status |= clSetKernelArg(kernel, 3, sizeof(eT2),    &aux_val_post   );
-  status |= clSetKernelArg(kernel, 4, N.size,         N.addr          );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem), &dest.cl_mem_ptr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(cl_mem), & src.cl_mem_ptr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 2, sizeof(eT1),    &aux_val_pre    );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 3, sizeof(eT2),    &aux_val_post   );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 4, N.size,         N.addr          );
 
   size_t work_size = size_t(n_elem);
 
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &work_size, NULL, 0, NULL, NULL);
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &work_size, NULL, 0, NULL, NULL);
 
   coot_check_runtime_error( (status != CL_SUCCESS), "coot::opencl::eop_scalar(): couldn't execute kernel");
   }
