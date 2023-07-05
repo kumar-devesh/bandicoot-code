@@ -376,7 +376,8 @@ if(FIND_OPENCL)
     # Now try to find clBLAS.
     include(COOT_FindCLBLAS)
     if(CLBLAS_FOUND)
-
+      set(COOT_LIBS ${COOT_LIBS} ${CLBLAS_LIBRARIES})
+      include_directories(${CLBLAS_INCLUDE_DIRS})
     else()
       message(STATUS "")
       message(STATUS "*** ERROR: clBLAS not found.")
@@ -511,11 +512,19 @@ add_library(
   bandicoot
   ${PROJECT_SOURCE_DIR}/src/wrapper_blas.cpp
   ${PROJECT_SOURCE_DIR}/src/wrapper_lapack.cpp
+  ${PROJECT_SOURCE_DIR}/src/wrapper_opencl.cpp
+  ${PROJECT_SOURCE_DIR}/src/wrapper_clblas.cpp
   )
 
-target_link_libraries(bandicoot ${COOT_LIBS})
+target_link_libraries(bandicoot PRIVATE ${COOT_LIBS})
 target_include_directories(bandicoot INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/tmp/include> $<INSTALL_INTERFACE:include>)
 set_target_properties(bandicoot PROPERTIES VERSION ${COOT_VERSION_MAJOR}.${COOT_VERSION_MINOR}.${COOT_VERSION_PATCH} SOVERSION ${COOT_VERSION_MAJOR})
+
+if(BUILD_TESTS)
+  message(STATUS "*** configuring tests")
+  enable_testing()
+  add_subdirectory(tests)
+endif()
 
 
 ################################################################################
@@ -606,12 +615,3 @@ message(STATUS "Generating '${PROJECT_BINARY_DIR}/tmp/misc/bandicoot.pc'")
 configure_file(${PROJECT_BINARY_DIR}/tmp/misc/bandicoot.pc.in "${PROJECT_BINARY_DIR}/tmp/misc/bandicoot.pc" @ONLY)
 
 install(FILES "${PROJECT_BINARY_DIR}/tmp/misc/bandicoot.pc" DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
-
-
-# smoke test
-
-if(BUILD_TESTS)
-  message(STATUS "*** configuring tests")
-  enable_testing()
-  add_subdirectory(tests)
-endif()
