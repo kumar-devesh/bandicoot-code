@@ -28,7 +28,7 @@ diagview<eT>::~diagview()
 
 
 template<typename eT>
-arma_inline
+coot_inline
 diagview<eT>::diagview(const Mat<eT>& in_m, const uword in_row_offset, const uword in_col_offset, const uword in_len)
   : m         (in_m                                       )
   , mem_offset(in_row_offset + in_col_offset * in_m.n_rows)
