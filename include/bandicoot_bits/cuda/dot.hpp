@@ -42,7 +42,7 @@ dot(dev_mem_t<eT1> mem1, dev_mem_t<eT2> mem2, const uword n_elem)
     double result;
     cublasStatus_t status = coot_wrapper(cublasDdot)(get_rt().cuda_rt.cublas_handle, n_elem, (double*) mem1.cuda_mem_ptr, 1, (double*) mem2.cuda_mem_ptr, 1, &result);
 
-    coot_check_cublas_error( status, "coot::cuda::dot() call to cublasDdot() failed" );
+    coot_check_cublas_error( status, "coot::cuda::dot(): call to cublasDdot() failed" );
     return result;
     }
   else
