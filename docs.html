@@ -641,7 +641,7 @@ Constructors:
 <ul>
 <li>unlike Armadillo 10.5 and newer, the elements are <i>not</i> initialised;
 they may contain garbage values, including NaN
-<li>consider using <a href="#zeros">zeros()</a> or other functions to fill memory</li>
+<li>consider using <a href="#zeros_standalone">zeros()</a> or other functions to fill memory</li>
 <li><a href="#element_access">setting the elements one by one is generally very inefficient</a> and should be avoided if possible</li>
 </ul>
 </li>
@@ -729,7 +729,6 @@ See also:
 <ul>
 <li><a href="#attributes">matrix attributes</a></li>
 <li><a href="#element_access">accessing elements</a></li>
-<li><a href="#element_initialisation">initialising elements</a></li>
 <li><a href="#operators">math &amp; relational operators</a></li>
 <li><a href="#submat">submatrix views</a></li>
 <li><a href="#print">printing matrices</a></li>
@@ -994,7 +993,7 @@ Constructors:
 <b>Caveat:</b>
 <ul>
 <li>unlike Armadillo 10.5 and newer, the elements are <i>not</i> initialised; they may contain garbage values, including NaN
-<li>consider using <a href="#zeros">zeros()</a> or other functions to fill memory</li>
+<li>consider using <a href="#zeros_standalone">zeros()</a> or other functions to fill memory</li>
 <li><a href="#element_access">setting the elements one by one is generally very inefficient</a> and should be avoided if possible</li>
 </ul>
 </li>
@@ -1049,7 +1048,6 @@ fvec e(d);
 <br>
 <li>See also:
 <ul>
-<li><a href="#element_initialisation">element initialisation</a></li>
 <li><a href="#Mat">Mat class</a></li>
 <li><a href="#Row">Row class</a></li>
 </ul>
@@ -1254,7 +1252,7 @@ Constructors:
 <b>Caveat:</b>
 <ul>
 <li>unlike Armadillo 10.5 and newer, the elements are <i>not</i> initialised; they may contain garbage values, including NaN
-<li>consider using <a href="#zeros">zeros()</a> or other functions to fill memory</li>
+<li>consider using <a href="#zeros_standalone">zeros()</a> or other functions to fill memory</li>
 <li><a href="#element_access">setting the elements one by one is generally very inefficient</a> and should be avoided if possible</li>
 </ul>
 </li>
@@ -1310,7 +1308,6 @@ fvec e(d);
 <br>
 <li>See also:
 <ul>
-<li><a href="#element_initialisation">element initialisation</a></li>
 <li><a href="#Mat">Mat class</a></li>
 <li><a href="#Col">Col class</a></li>
 </ul>
@@ -2211,7 +2208,7 @@ to grow/shrink the object while preserving the elements <b>as well as</b> the la
 use <a href="#resize_member">.resize()</a> instead
 </li>
 <li>
-to flatten a matrix into a vector, use <a href="#vectorise">vectorise()</a> or <a href="#as_col_row">.as_col()&thinsp;/&thinsp;.as_row()</a> instead
+to flatten a matrix into a vector, use <a href="#vectorise">vectorise()</a> instead
 </li>
 </ul>
 </li>
@@ -2763,7 +2760,6 @@ See also:
 <ul>
 <li><a href="#is_empty">.is_empty()</a></li>
 <li><a href="#is_vec">.is_vec()</a></li>
-<li><a href="#is_finite">.is_finite()</a></li>
 </ul>
 </li>
 <br>
@@ -3880,7 +3876,6 @@ See also:
 <li><a href="#find_finite">find_finite()</a></li>
 <li><a href="#find_nonfinite">find_nonfinite()</a></li>
 <li><a href="#find_nan">find_nan()</a></li>
-<li><a href="#find_unique">find_unique()</a></li>
 <li><a href="#sort_index">sort_index()</a></li>
 <li><a href="#submat">submatrix views</a></li>
 </ul>
@@ -4458,8 +4453,8 @@ Obtain the dimensions of object <i>X</i>, or explicitly specify the dimensions
 <li>
 The dimensions can be used in conjunction with:
 <ul>
-<li><a href="#part_a">object constructors</a></li>
-<li><a href="#part_b">functions for changing size</a></li>
+<li>object constructors: <a href="#Mat">Mat</a>, <a href="#Col">Col</a>, <a href="#Row">Row</a></li>
+<li>functions for changing size: <a href="#set_size">set_size()</a>, <a href="#reshape">reshape()</a>, <a href="#resize">resize()</a>, etc.</li>
 <li><a href="#submat">submatrix views</a></li>
 </ul>
 </li>
@@ -7293,7 +7288,7 @@ will require taking into account that indexing starts at 0
 <li>Upgrading Bandicoot versions may incur recompilation of kernels</li>
 <li>Using a new backend for the first time may incur recompilation of kernels</li>
 <li>Using a new device may incur recompilation of kernels</li>
-<li>For more information see the <a href="kernel_cache">kernel cache</a> documentation</li>
+<li>For more information see the <a href="#kernel_cache">kernel cache</a> documentation</li>
 </ul>
 <br>
 <li>Where possible, use batch operations with Bandicoot; e.g., use <code>A += 1</code> instead of <code>for (uword i = 0; i &lt; A.n_elem; ++i) { A[i] += 1; }</code></li>
