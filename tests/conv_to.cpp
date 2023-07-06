@@ -12,6 +12,7 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
+#include <armadillo>
 #include <bandicoot>
 #include "catch.hpp"
 #include <typeinfo>

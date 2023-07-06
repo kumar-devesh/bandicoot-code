@@ -13,6 +13,8 @@
 // ------------------------------------------------------------------------
 
 #include <bandicoot>
+// Armadillo is intentionally included after Bandicoot, to ensure that include order does not matter.
+#include <armadillo>
 #include "catch.hpp"
 
 using namespace coot;
