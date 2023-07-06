@@ -1,4 +1,6 @@
-// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
+// SPDX-License-Identifier: Apache-2.0
+//
+// Copyright 2023 Ryan Curtin (http://ratml.org)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,47 +15,40 @@
 // ------------------------------------------------------------------------
 
 
+
+template<typename T>
+coot_warn_unused
 inline
-wall_clock::wall_clock()
+T
+eye(const uword n_rows, const uword n_cols, const typename coot_Mat_Col_Row_only<T>::result* junk = nullptr)
   {
   coot_extra_debug_sigprint();
+  coot_ignore(junk);
+
+  if (is_Col<T>::value)
+    {
+    coot_debug_check( (n_cols != 1), "eye(): incompatible size" );
+    }
+  else if (is_Row<T>::value)
+    {
+    coot_debug_check( (n_rows != 1), "eye(): incompatible size" );
+    }
+
+  T out(n_rows, n_cols);
+  out.eye();
+  return out;
   }
 
 
 
+template<typename T>
+coot_warn_unused
 inline
-wall_clock::~wall_clock()
+T
+eye(const SizeMat& s, const typename coot_Mat_Col_Row_only<T>::result* junk = nullptr)
   {
   coot_extra_debug_sigprint();
-  }
+  coot_ignore(junk);
 
-
-
-inline
-void
-wall_clock::tic()
-  {
-  coot_extra_debug_sigprint();
-
-  chrono_time1 = std::chrono::steady_clock::now();
-  valid = true;
-  }
-
-
-
-inline
-double
-wall_clock::toc()
-  {
-  coot_extra_debug_sigprint();
-
-  if(valid == false)  { return double(0); }
-
-  const std::chrono::steady_clock::time_point chrono_time2 = std::chrono::steady_clock::now();
-
-  typedef std::chrono::duration<double> duration_type;
-
-  const duration_type chrono_span = std::chrono::duration_cast< duration_type >(chrono_time2 - chrono_time1);
-
-  return chrono_span.count();
+  return eye<T>(s.n_rows, s.n_cols);
   }

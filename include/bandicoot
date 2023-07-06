@@ -18,31 +18,14 @@
 
 #include <cassert>  // TODO: remove this after all of the code has been adapted
 
-#include <armadillo>
-
-#if (ARMA_VERSION_MAJOR < 7)
-  #error "Armadillo version 7.100 or later is required"
- // TODO: use a more fine-grained minimum version (eg. 6.500)
-#endif
-
-// TODO: this warning seems wrong
-#if !defined(ARMA_USE_U64S64)
-  #pragma message("WARNING: present installation of Armadillo doesn't have 64 bit integers enabled")
-#endif
+#include <armadillo>  // TODO: make use of Armadillo optional?
 
 
 #undef  CL_USE_DEPRECATED_OPENCL_1_2_APIS
 #define CL_USE_DEPRECATED_OPENCL_1_2_APIS
 
 
-#if defined(ARMA_USE_CXX11)
-  #undef  COOT_USE_CXX11
-  #define COOT_USE_CXX11
-#endif
-
-
-// TODO: the following includes are probably not necessary as a lot of Armadillo functionality is being reused
-
+#include "bandicoot_bits/compiler_check.hpp"
 #include "bandicoot_bits/config.hpp"
 #include "bandicoot_bits/compiler_setup.hpp"
 
@@ -75,9 +58,7 @@
 #endif
 
 
-#if defined(COOT_USE_CXX11)
-  #include <mutex>
-#endif
+#include <mutex>
 
 
 // Import CUDA headers if needed.
@@ -201,6 +182,8 @@ namespace coot
   #endif
 
   #include "bandicoot_bits/coot_rt_bones.hpp"
+  #include "bandicoot_bits/coot_init.hpp"
+  #include "bandicoot_bits/coot_synchronise.hpp"
 
   //
   // class prototypes
@@ -520,6 +503,9 @@ namespace coot
   #include "bandicoot_bits/fn_conv_to.hpp"
   #include "bandicoot_bits/fn_min.hpp"
   #include "bandicoot_bits/fn_max.hpp"
+  #include "bandicoot_bits/fn_eye.hpp"
+  #include "bandicoot_bits/fn_zeros.hpp"
+  #include "bandicoot_bits/fn_ones.hpp"
   #include "bandicoot_bits/fn_randu.hpp"
   #include "bandicoot_bits/fn_randn.hpp"
   #include "bandicoot_bits/fn_randi.hpp"

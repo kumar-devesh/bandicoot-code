@@ -27,6 +27,7 @@ coot_rt_t::coot_rt_t()
   {
   coot_extra_debug_sigprint_this(this);
   backend = COOT_DEFAULT_BACKEND;
+  initialised = false;
   }
 
 
@@ -41,27 +42,36 @@ coot_rt_t::init(const bool print_info)
   // TODO: config file may exist in several places: (1) globally accessible, such as /etc/bandicoot_config, or locally, such as ~/.config/bandicoot_config
   // TODO: use case: user puts code on a server which has a different configuration than the user's workstation
 
-  if (get_rt().backend == CL_BACKEND)
+  // prevent recursive initialisation
+  initialised = true;
+
+  if (backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
-    return get_rt().cl_rt.init(false, 0, 0, print_info);
+    initialised = cl_rt.init(false, 0, 0, print_info);
+    return initialised;
     #else
+    initialised = false;
     coot_stop_runtime_error("coot_rt::init(): OpenCL backend not enabled");
     #endif
     }
-  else if (get_rt().backend == CUDA_BACKEND)
+  else if (backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    return get_rt().cuda_rt.init(false, 0, 0, print_info);
+    initialised = cuda_rt.init(false, 0, 0, print_info);
+    return initialised;
     #else
+    initialised = false;
     coot_stop_runtime_error("coot_rt::init(): CUDA backend not enabled");
     #endif
     }
   else
     {
+    initialised = false;
     coot_stop_runtime_error("coot_rt::init(): unknown backend");
     }
 
+  initialised = false;
   return false;
   }
 
@@ -116,27 +126,36 @@ coot_rt_t::init(const std::string filename, const bool print_info)
     if(print_info)  { std::cout << "coot::opencl::runtime::init(): wanted_platform = " << wanted_platform << "   wanted_device = " << wanted_device << std::endl; }
     }
 
-  if (get_rt().backend == CL_BACKEND)
+  // prevent recursive initialisation
+  initialised = true;
+
+  if (backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
-    return get_rt().cl_rt.init(true, wanted_platform, wanted_device, print_info);
+    initialised = cl_rt.init(true, wanted_platform, wanted_device, print_info);
+    return initialised;
     #else
+    initialised = false;
     coot_stop_runtime_error("coot_rt::init(): OpenCL backend not enabled");
     #endif
     }
-  else if (get_rt().backend == CUDA_BACKEND)
+  else if (backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    return get_rt().cuda_rt.init(true, wanted_platform, wanted_device, print_info);
+    initialised = cuda_rt.init(true, wanted_platform, wanted_device, print_info);
+    return initialised;
     #else
+    initialised = false;
     coot_stop_runtime_error("coot_rt::init(): CUDA backend not enabled");
     #endif
     }
   else
     {
+    initialised = false;
     coot_stop_runtime_error("coot_rt::init(): unknown backend");
     }
 
+  initialised = false;
   return false;
   }
 
@@ -146,28 +165,37 @@ inline
 bool
 coot_rt_t::init(const uword wanted_platform, const uword wanted_device, const bool print_info)
   {
-  if (get_rt().backend == CL_BACKEND)
+  // prevent recursive initialisation
+  initialised = true;
+
+  if (backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
-    return get_rt().cl_rt.init(true, wanted_platform, wanted_device, print_info);
+    initialised = cl_rt.init(true, wanted_platform, wanted_device, print_info);
+    return initialised;
     #else
+    initialised = false;
     coot_stop_runtime_error("coot_rt::init(): OpenCL backend not enabled");
 
     #endif
     }
-  else if (get_rt().backend == CUDA_BACKEND)
+  else if (backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    return get_rt().cuda_rt.init(true, wanted_platform, wanted_device, print_info);
+    initialised = cuda_rt.init(true, wanted_platform, wanted_device, print_info);
+    return initialised;
     #else
+    initialised = false;
     coot_stop_runtime_error("coot_rt::init(): CUDA backend not enabled");
     #endif
     }
   else
     {
+    initialised = false;
     coot_stop_runtime_error("coot_rt::init(): unknown backend");
     }
 
+  initialised = false;
   return false;
   }
 

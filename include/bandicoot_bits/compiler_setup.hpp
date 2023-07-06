@@ -69,18 +69,6 @@
 
 #undef COOT_GOOD_COMPILER
 
-#undef COOT_HAVE_GETTIMEOFDAY
-#undef COOT_HAVE_SNPRINTF
-#undef COOT_HAVE_ISFINITE
-#undef COOT_HAVE_LOG1P
-#undef COOT_HAVE_ISINF
-#undef COOT_HAVE_ISNAN
-
-
-#if (defined(_POSIX_C_SOURCE) && (_POSIX_C_SOURCE >= 200112L))
-  #define COOT_HAVE_GETTIMEOFDAY
-#endif
-
 
 #if ( defined(_POSIX_ADVISORY_INFO) && (_POSIX_ADVISORY_INFO >= 200112L) )
   #undef  COOT_HAVE_POSIX_MEMALIGN
@@ -89,12 +77,8 @@
 
 
 #if defined(__APPLE__) || defined(__apple_build_version__)
-  #undef  COOT_BLAS_SDOT_BUG
-  #define COOT_BLAS_SDOT_BUG
-
-  #undef  COOT_HAVE_POSIX_MEMALIGN
-  #undef  COOT_USE_EXTERN_CXX11_RNG
-  // TODO: thread local storage (TLS) (eg. "extern thread_local") appears currently broken on Mac OS X
+  // #undef  COOT_HAVE_POSIX_MEMALIGN
+  // NOTE: posix_memalign() is available since macOS 10.6 (late 2009 onwards)
 #endif
 
 
@@ -111,36 +95,24 @@
   #define COOT_FNSIG  __FUNCSIG__
 #elif defined(__INTEL_COMPILER)
   #define COOT_FNSIG  __FUNCTION__
-#elif defined(COOT_USE_CXX11)
-  #define COOT_FNSIG  __func__
 #else
-  #define COOT_FNSIG  "(unknown)"
+  #define COOT_FNSIG  __func__
 #endif
 
 
 #if (defined(__GNUG__) || defined(__GNUC__)) && (defined(__clang__) || defined(__INTEL_COMPILER) || defined(__NVCC__) || defined(__CUDACC__) || defined(__PGI) || defined(__PATHSCALE__) || defined(__ARMCC_VERSION) || defined(__IBMCPP__))
-  #undef  COOT_FAKE_GCC
-  #define COOT_FAKE_GCC
+  #undef  COOT_DETECTED_FAKE_GCC
+  #define COOT_DETECTED_FAKE_GCC
 #endif
 
 
-#if defined(__GNUG__) && !defined(COOT_FAKE_GCC)
+#if defined(__GNUG__) && !defined(COOT_DETECTED_FAKE_GCC)
 
   #undef  COOT_GCC_VERSION
   #define COOT_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 
-  #if (COOT_GCC_VERSION < 40400)
-    #error "*** Need a newer compiler ***"
-  #endif
-
-  #if (COOT_GCC_VERSION < 40600)
-    #undef  COOT_PRINT_CXX98_WARNING
-    #define COOT_PRINT_CXX98_WARNING
-  #endif
-
-  #if ( (COOT_GCC_VERSION >= 40700) && (COOT_GCC_VERSION <= 40701) )
-    #error "gcc versions 4.7.0 and 4.7.1 are unsupported; use 4.7.2 or later"
-    // due to http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53549
+  #if (COOT_GCC_VERSION < 40800)
+    #error "*** newer compiler required; need gcc 4.8 or later ***"
   #endif
 
   #define COOT_GOOD_COMPILER
@@ -155,46 +127,26 @@
   #undef  coot_inline
   #undef  coot_noinline
 
-  #define coot_hot                __attribute__((__hot__))
-  #define coot_cold               __attribute__((__cold__))
-  #define coot_aligned            __attribute__((__aligned__))
-  #define coot_align_mem          __attribute__((__aligned__(16)))
-  #define coot_warn_unused        __attribute__((__warn_unused_result__))
-  #define coot_deprecated         __attribute__((__deprecated__))
-  #define coot_malloc             __attribute__((__malloc__))
-  #define coot_inline      inline __attribute__((__always_inline__))
-  #define coot_noinline           __attribute__((__noinline__))
-
-  #undef  COOT_HAVE_ALIGNED_ATTRIBUTE
-  #define COOT_HAVE_ALIGNED_ATTRIBUTE
-
-  #if defined(COOT_USE_CXX11)
-    #if (COOT_GCC_VERSION < 40800)
-      #undef  COOT_PRINT_CXX11_WARNING
-      #define COOT_PRINT_CXX11_WARNING
-    #endif
-  #endif
-
-  #if !defined(COOT_USE_CXX11) && (defined(_POSIX_C_SOURCE) && (_POSIX_C_SOURCE >= 200112L))
-    #define COOT_HAVE_SNPRINTF
-    #define COOT_HAVE_ISFINITE
-    #define COOT_HAVE_LOG1P
-    #define COOT_HAVE_ISINF
-    #define COOT_HAVE_ISNAN
-  #endif
-
-  #undef COOT_GCC_VERSION
+  #define coot_hot         __attribute__((__hot__))
+  #define coot_cold        __attribute__((__cold__))
+  #define coot_aligned     __attribute__((__aligned__))
+  #define coot_align_mem   __attribute__((__aligned__(16)))
+  #define coot_warn_unused __attribute__((__warn_unused_result__))
+  #define coot_deprecated  __attribute__((__deprecated__))
+  #define coot_malloc      __attribute__((__malloc__))
+  #define coot_inline      __attribute__((__always_inline__)) inline 
+  #define coot_noinline    __attribute__((__noinline__))
 
 #endif
 
 
 #if defined(__clang__) && (defined(__INTEL_COMPILER) || defined(__NVCC__) || defined(__CUDACC__) || defined(__PGI) || defined(__PATHSCALE__) || defined(__ARMCC_VERSION) || defined(__IBMCPP__))
-  #undef  COOT_FAKE_CLANG
-  #define COOT_FAKE_CLANG
+  #undef  COOT_DETECTED_FAKE_CLANG
+  #define COOT_DETECTED_FAKE_CLANG
 #endif
 
 
-#if defined(__clang__) && !defined(COOT_FAKE_CLANG)
+#if defined(__clang__) && !defined(COOT_DETECTED_FAKE_CLANG)
 
   #define COOT_GOOD_COMPILER
 
@@ -230,7 +182,7 @@
 
   #if __has_attribute(__always_inline__)
     #undef  coot_inline
-    #define coot_inline inline __attribute__((__always_inline__))
+    #define coot_inline __attribute__((__always_inline__)) inline
   #endif
 
   #if __has_attribute(__noinline__)
@@ -246,18 +198,13 @@
   #if __has_attribute(__cold__)
     #undef  coot_cold
     #define coot_cold __attribute__((__cold__))
+  #elif __has_attribute(__minsize__)
+    #undef  coot_cold
+    #define coot_cold __attribute__((__minsize__))
   #endif
 
   // #pragma clang diagnostic push
   // #pragma clang diagnostic ignored "-Wignored-attributes"
-
-  #if !defined(COOT_USE_CXX11) && (defined(_POSIX_C_SOURCE) && (_POSIX_C_SOURCE >= 200112L))
-    #define COOT_HAVE_SNPRINTF
-    #define COOT_HAVE_ISFINITE
-    #define COOT_HAVE_LOG1P
-    #define COOT_HAVE_ISINF
-    #define COOT_HAVE_ISNAN
-  #endif
 
 #endif
 
@@ -268,15 +215,8 @@
     #error "*** Need a newer compiler ***"
   #endif
 
-  #if (__INTEL_COMPILER < 1300)
+  #if (__INTEL_COMPILER < 1500)
     #error "*** Need a newer compiler ***"
-  #endif
-
-  #if defined(COOT_USE_CXX11)
-    #if (__INTEL_COMPILER < 1500)
-      #undef  COOT_PRINT_CXX11_WARNING
-      #define COOT_PRINT_CXX11_WARNING
-    #endif
   #endif
 
 #endif
@@ -284,20 +224,8 @@
 
 #if defined(_MSC_VER)
 
-  #if (_MSC_VER < 1700)
+  #if (_MSC_VER < 1900)
     #error "*** Need a newer compiler ***"
-  #endif
-
-  #if (_MSC_VER < 1800)
-    #undef  COOT_PRINT_CXX98_WARNING
-    #define COOT_PRINT_CXX98_WARNING
-  #endif
-
-  #if defined(COOT_USE_CXX11)
-    #if (_MSC_VER < 1900)
-      #undef  COOT_PRINT_CXX11_WARNING
-      #define COOT_PRINT_CXX11_WARNING
-    #endif
   #endif
 
   #undef  coot_deprecated
@@ -356,22 +284,10 @@
   // http://www.oracle.com/technetwork/server-storage/solarisstudio/training/index-jsp-141991.html
   // http://www.oracle.com/technetwork/server-storage/solarisstudio/documentation/cplusplus-faq-355066.html
 
-  #if (__SUNPRO_CC < 0x5100)
+  #if (__SUNPRO_CC < 0x5140)
     #error "*** Need a newer compiler ***"
   #endif
 
-  #if defined(COOT_USE_CXX11)
-    #if (__SUNPRO_CC < 0x5130)
-      #undef  COOT_PRINT_CXX11_WARNING
-      #define COOT_PRINT_CXX11_WARNING
-    #endif
-  #endif
-
-#endif
-
-
-#if defined(COOT_USE_CXX11) && defined(__CYGWIN__) && !defined(COOT_DONT_PRINT_CXX11_WARNING)
-  #pragma message ("WARNING: Cygwin may have incomplete support for C++11 features.")
 #endif
 
 
@@ -383,44 +299,65 @@
 #endif
 
 
-#if defined(COOT_USE_CXX11) && (__cplusplus < 201103L)
-  #undef  COOT_PRINT_CXX11_WARNING
-  #define COOT_PRINT_CXX11_WARNING
+#if ( defined(COOT_USE_OPENMP) && (!defined(_OPENMP) || (defined(_OPENMP) && (_OPENMP < 201107))) )
+  // OpenMP 3.0 required for parallelisation of loops with unsigned integers
+  // OpenMP 3.1 required for atomic read and atomic write
+  #undef  COOT_USE_OPENMP
+  #undef  COOT_PRINT_OPENMP_WARNING
+  #define COOT_PRINT_OPENMP_WARNING
 #endif
 
 
-#if defined(COOT_PRINT_CXX98_WARNING) && !defined(COOT_DONT_PRINT_CXX98_WARNING)
-  #pragma message ("WARNING: this compiler is OUTDATED and has INCOMPLETE support for the C++ standard;")
-  #pragma message ("WARNING: if something breaks, you get to keep all the pieces.")
+#if defined(COOT_PRINT_OPENMP_WARNING) && !defined(COOT_DONT_PRINT_OPENMP_WARNING)
+  #pragma message ("WARNING: use of OpenMP disabled; compiler support for OpenMP 3.1+ not detected")
+  
+  #if (defined(_OPENMP) && (_OPENMP < 201107))
+    #pragma message ("NOTE: your compiler has an outdated version of OpenMP")
+    #pragma message ("NOTE: consider upgrading to a better compiler")
+  #endif
 #endif
 
 
-#if defined(COOT_PRINT_CXX11_WARNING) && !defined(COOT_DONT_PRINT_CXX11_WARNING)
-  #pragma message ("WARNING: use of C++11 features has been enabled,")
-  #pragma message ("WARNING: but this compiler has INCOMPLETE support for C++11;")
-  #pragma message ("WARNING: if something breaks, you get to keep all the pieces.")
-  #pragma message ("WARNING: to forcefully prevent Bandicoot from using C++11 features,")
-  #pragma message ("WARNING: #define COOT_DONT_USE_CXX11 before #include <bandicoot>")
+#if defined(COOT_USE_OPENMP)
+  #if (defined(COOT_GCC_VERSION) && (COOT_GCC_VERSION < 50400))
+    // due to https://gcc.gnu.org/bugzilla/show_bug.cgi?id=57580
+    #undef COOT_USE_OPENMP
+    #if !defined(COOT_DONT_PRINT_OPENMP_WARNING)
+      #pragma message ("WARNING: use of OpenMP disabled due to compiler bug in gcc <= 5.3")
+    #endif
+  #endif
 #endif
 
 
-#undef COOT_PRINT_CXX98_WARNING
-#undef COOT_PRINT_CXX11_WARNING
 
+// cleanup
+
+#undef COOT_DETECTED_FAKE_GCC
+#undef COOT_DETECTED_FAKE_CLANG
+#undef COOT_GCC_VERSION
+#undef COOT_PRINT_OPENMP_WARNING
+
+
+
+// undefine conflicting macros
 
 #if defined(log2)
   #undef log2
-  #pragma message ("WARNING: detected 'log2' macro and undefined it")
+  #pragma message ("WARNING: undefined conflicting 'log2' macro")
 #endif
 
-
-
-//
-// whoever defined macros with the names "min" and "max" should be permanently removed from the gene pool
+#if defined(check)
+  #undef check
+  #pragma message ("WARNING: undefined conflicting 'check' macro")
+#endif
 
 #if defined(min) || defined(max)
   #undef min
   #undef max
-  #pragma message ("WARNING: detected 'min' and/or 'max' macros and undefined them;")
-  #pragma message ("WARNING: you may wish to define NOMINMAX before including any windows header")
+  #pragma message ("WARNING: undefined conflicting 'min' and/or 'max' macros;")
+  #pragma message ("WARNING: suggest to define NOMINMAX before including any windows header")
 #endif
+
+// https://sourceware.org/bugzilla/show_bug.cgi?id=19239
+#undef minor
+#undef major

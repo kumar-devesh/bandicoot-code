@@ -66,6 +66,42 @@ Row<eT>::Row(const SizeMat& s)
 
 template<typename eT>
 inline
+Row<eT>::Row(dev_mem_t<eT> aux_dev_mem, const uword N)
+  : Mat<eT>(aux_dev_mem, 1, N)
+  {
+  coot_extra_debug_sigprint();
+
+  access::rw(Mat<eT>::vec_state) = 2;
+  }
+
+
+
+template<typename eT>
+inline
+Row<eT>::Row(cl_mem aux_dev_mem, const uword N)
+  : Mat<eT>(aux_dev_mem, 1, N)
+  {
+  coot_extra_debug_sigprint();
+
+  access::rw(Mat<eT>::vec_state) = 2;
+  }
+
+
+
+template<typename eT>
+inline
+Row<eT>::Row(eT* aux_dev_mem, const uword N)
+  : Mat<eT>(aux_dev_mem, 1, N)
+  {
+  coot_extra_debug_sigprint();
+
+  access::rw(Mat<eT>::vec_state) = 2;
+  }
+
+
+
+template<typename eT>
+inline
 Row<eT>::Row(const Row<eT>& X)
   : Mat<eT>(1, X.n_cols)
   {

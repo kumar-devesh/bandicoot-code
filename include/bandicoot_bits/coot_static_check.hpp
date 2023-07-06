@@ -14,44 +14,8 @@
 
 
 
-template<bool ERROR___INCORRECT_OR_UNSUPPORTED_TYPE>
-struct coot_type_check_cxx1998
-  {
-  coot_inline
-  static
-  void
-  apply()
-    {
-    static const char
-    junk[ ERROR___INCORRECT_OR_UNSUPPORTED_TYPE ? -1 : +1 ];
-    }
-  };
+#undef  coot_static_check
+#define coot_static_check(condition, message)  static_assert( !(condition), #message )
 
-
-
-template<>
-struct coot_type_check_cxx1998<false>
-  {
-  coot_inline
-  static
-  void
-  apply()
-    {
-    }
-  };
-
-
-
-#if defined(COOT_USE_CXX11)
-
-  #define coot_static_check(condition, message)  static_assert( !(condition), #message )
-
-  #define coot_type_check(condition)  static_assert( !(condition), "error: incorrect or unsupported type" )
-
-#else
-
-  #define coot_static_check(condition, message)  static const char message[ (condition) ? -1 : +1 ]
-
-  #define coot_type_check(condition)  coot_type_check_cxx1998<condition>::apply()
-
-#endif
+#undef  coot_type_check
+#define coot_type_check(condition)  static_assert( !(condition), "error: incorrect or unsupported type" )

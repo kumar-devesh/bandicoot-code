@@ -1,4 +1,4 @@
-// Copyright 2019 Ryan Curtin <ryan@ratml.org>
+// Copyright 2023 Ryan Curtin (http://www.ratml.org/)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,20 +13,12 @@
 // ------------------------------------------------------------------------
 
 
-struct coot_rng
+
+inline
+void
+coot_synchronise()
   {
-  template<typename eT>
-  static inline void fill_randu(dev_mem_t<eT> dest, const uword n);
+  coot_extra_debug_sigprint();
 
-  template<typename eT>
-  static inline void fill_randn(dev_mem_t<eT> dest, const uword n, const distr_param& param = distr_param());
-
-  template<typename eT>
-  static inline void fill_randi(dev_mem_t<eT> dest, const uword n, const distr_param& param = distr_param());
-
-  // seed handling
-
-  static inline void set_seed(const u64 seed);
-
-  static inline void set_seed_random();
-  };
+  get_rt().synchronise();
+  }

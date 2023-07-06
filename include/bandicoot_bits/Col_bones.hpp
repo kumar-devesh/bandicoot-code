@@ -33,13 +33,15 @@ class Col : public Mat<eT>
   inline explicit Col(const uword in_rows, const uword in_cols);
   inline explicit Col(const SizeMat& s);
 
+  inline Col(dev_mem_t<eT> aux_dev_mem, const uword N);
+  inline Col(cl_mem        aux_dev_mem, const uword N);
+  inline Col(eT*           aux_dev_mem, const uword N);
+
   inline                  Col(const Col& X);
   inline const Col& operator=(const Col& X);
 
-  #if defined(COOT_USE_CXX11)
   inline                  Col(Col&& X);
   inline const Col& operator=(Col&& X);
-  #endif
 
   template<typename T1> inline            Col(const Base<eT, T1>& X);
   template<typename T1> inline Col& operator=(const Base<eT, T1>& X);

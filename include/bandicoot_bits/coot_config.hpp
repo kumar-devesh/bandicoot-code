@@ -16,20 +16,6 @@
 
 struct coot_config
   {
-  #if defined(COOT_USE_LAPACK)
-    static const bool lapack = true;
-  #else
-    static const bool lapack = false;
-  #endif
-
-
-  #if defined(COOT_USE_BLAS)
-    static const bool blas = true;
-  #else
-    static const bool blas = false;
-  #endif
-
-
   #if defined(COOT_NO_DEBUG)
     static const bool debug = false;
   #else
@@ -59,13 +45,6 @@ struct coot_config
     static const bool extra_code = true;
   #else
     static const bool extra_code = false;
-  #endif
-
-
-  #if defined(COOT_USE_CXX11)
-    static const bool cxx11 = true;
-  #else
-    static const bool cxx11 = false;
   #endif
 
 

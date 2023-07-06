@@ -140,12 +140,8 @@ runtime_t::lock()
   {
   coot_extra_debug_sigprint();
 
-  #if defined(COOT_USE_CXX11)
-    {
-    coot_extra_debug_print("coot::cl_rt: calling mutex.lock()");
-    mutex.lock();
-    }
-  #endif
+  coot_extra_debug_print("coot::cl_rt: calling mutex.lock()");
+  mutex.lock();
   }
 
 
@@ -157,12 +153,8 @@ runtime_t::unlock()
   {
   coot_extra_debug_sigprint();
 
-  #if defined(COOT_USE_CXX11)
-    {
-    coot_extra_debug_print("coot::cl_rt: calling mutex.unlock()");
-    mutex.unlock();
-    }
-  #endif
+  coot_extra_debug_print("coot::cl_rt: calling mutex.unlock()");
+  mutex.unlock();
   }
 
 
@@ -707,7 +699,6 @@ runtime_t::load_cached_kernels(const std::string& unique_host_device_id, const s
   cl_int binary_status, errcode_ret;
   runtime_t::program_wrapper prog_holder;  // program_wrapper will automatically call clReleaseProgram() when it goes out of scope
   prog_holder.prog = clCreateProgramWithBinary(ctxt, 1, &dev_id, &kernel_size, (const unsigned char**) &kernel_buffer, &binary_status, &errcode_ret);
-  get_cerr_stream() << "errcode_ret " << errcode_ret << " binary-status " << binary_status << "\n";
   if (errcode_ret != CL_SUCCESS)
     {
     coot_debug_warn(coot_cl_error::as_string(errcode_ret));
@@ -1189,6 +1180,41 @@ runtime_t::get_kernel(const rt_common::kernels_t<HeldType>& k, const EnumType nu
 
     return get_kernel<eTs...>(k.d_kernels, num);
     }
+  else if(is_same_type<eT1, uword>::yes)
+    {
+    // only encountered if uword != u32 or u64; but we need to figure out how large a uword is
+    // (this can happen if, e.g., u32 == unsigned int and u64 == unsigned long long but uword == unsigned long)
+    if (sizeof(uword) == sizeof(u32))
+      {
+      return get_kernel<eTs...>(k.u32_kernels, num);
+      }
+    else if (sizeof(uword) == sizeof(u64))
+      {
+      return get_kernel<eTs...>(k.u64_kernels, num);
+      }
+    else
+      {
+      // hopefully nobody ever, ever, ever sees this
+      throw std::invalid_argument("coot::cl_rt.get_kernel(): unknown size for uword");
+      }
+    }
+  else if(is_same_type<eT1, sword>::yes)
+    {
+    // only encountered if sword != s32 or s64
+    if (sizeof(sword) == sizeof(s32))
+      {
+      return get_kernel<eTs...>(k.s32_kernels, num);
+      }
+    else if (sizeof(sword) == sizeof(s64))
+      {
+      return get_kernel<eTs...>(k.s64_kernels, num);
+      }
+    else
+      {
+      // hopefully nobody ever, ever, ever sees this
+      throw std::invalid_argument("coot::cl_rt.get_kernel(): unknown size for sword");
+      }
+    }
 
   throw std::invalid_argument("coot::cl_rt.get_kernel(): unsupported element type");
   }
@@ -1228,6 +1254,41 @@ runtime_t::get_kernel(const rt_common::kernels_t<std::vector<cl_kernel>>& k, con
 
     return k.d_kernels.at(num);
     }
+  else if(is_same_type<eT, uword>::yes)
+    {
+    // only encountered if uword != u32 or u64; but we need to figure out how large a uword is
+    // (this can happen if, e.g., u32 == unsigned int and u64 == unsigned long long but uword == unsigned long)
+    if (sizeof(uword) == sizeof(u32))
+      {
+      return k.u32_kernels.at(num);
+      }
+    else if (sizeof(uword) == sizeof(u64))
+      {
+      return k.u64_kernels.at(num);
+      }
+    else
+      {
+      // hopefully nobody ever, ever, ever sees this
+      throw std::invalid_argument("coot::cl_rt.get_kernel(): unknown size for uword");
+      }
+    }
+  else if(is_same_type<eT, sword>::yes)
+    {
+    // only encountered if sword != s32 or s64
+    if (sizeof(sword) == sizeof(s32))
+      {
+      return k.s32_kernels.at(num);
+      }
+    else if (sizeof(sword) == sizeof(s64))
+      {
+      return k.s64_kernels.at(num);
+      }
+    else
+      {
+      // hopefully nobody ever, ever, ever sees this
+      throw std::invalid_argument("coot::cl_rt.get_kernel(): unknown size for sword");
+      }
+    }
 
   throw std::invalid_argument("coot::cl_rt.get_kernel(): unsupported element type");
   }
@@ -1239,6 +1300,42 @@ inline
 cl_mem
 runtime_t::get_xorwow_state() const
   {
+  // It's possible that uword and sword may be different types altogether than
+  // u32/s32/u64/s64.  In this case, we need to find the width of them and call
+  // the appropriate overload.
+  if (is_same_type<eT, uword>::yes)
+    {
+    if (sizeof(uword) == sizeof(u32))
+      {
+      return get_xorwow_state<u32>();
+      }
+    else if (sizeof(uword) == sizeof(u64))
+      {
+      return get_xorwow_state<u64>();
+      }
+    else
+      {
+      // hopefully nobody ever, ever, ever sees this error
+      coot_stop_runtime_error("coot::cl_rt.get_xorwow_state(): unknown size for uword");
+      }
+    }
+  else if (is_same_type<eT, sword>::yes)
+    {
+    if (sizeof(sword) == sizeof(s32))
+      {
+      return get_xorwow_state<s32>();
+      }
+    else if (sizeof(sword) == sizeof(s64))
+      {
+      return get_xorwow_state<s64>();
+      }
+    else
+      {
+      // hopefully nobody ever, ever, ever sees this error
+      coot_stop_runtime_error("coot::cl_rt.get_xorwow_state(): unknown size for sword");
+      }
+    }
+
   std::ostringstream oss;
   oss << "coot::cl_rt.get_xorwow_state(): no RNG available for type " << typeid(eT).name();
   coot_stop_runtime_error(oss.str());

@@ -642,6 +642,7 @@ struct is_supported_elem_type
     is_u64<T1>::value ||
     is_s64<T1>::value ||
     is_uword<T1>::value ||
+    is_sword<T1>::value ||
     is_float<T1>::value ||
     is_double<T1>::value ||
     is_supported_complex_float<T1>::value ||
@@ -670,23 +671,31 @@ struct is_supported_kernel_elem_type
     is_s32<T1>::value ||
     is_u64<T1>::value ||
     is_s64<T1>::value ||
+    is_uword<T1>::value ||
+    is_sword<T1>::value ||
     is_float<T1>::value ||
     is_double<T1>::value;
   };
 
 
+template<typename T, bool is_integral>
+struct is_signed_helper
+  {
+  static const bool value = true; // should only be used by float/double/similar
+  };
+
+template<typename T>
+struct is_signed_helper<T, true>
+  {
+  static const bool value = std::is_signed<T>::value;
+  };
 
 template<typename T>
 struct is_signed
   {
-  static const bool value = true;
+  static const bool value = is_signed_helper<T, std::is_integral<T>::value>::value;
   };
 
-
-template<> struct is_signed<u8>     { static const bool value = false; };
-template<> struct is_signed<u16>    { static const bool value = false; };
-template<> struct is_signed<u32>    { static const bool value = false; };
-template<> struct is_signed<u64>    { static const bool value = false; };
 
 
 template<typename T>

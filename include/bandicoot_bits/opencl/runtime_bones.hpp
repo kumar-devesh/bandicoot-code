@@ -59,10 +59,8 @@ class runtime_t
 
   inline bool init(const bool manual_selection, const uword wanted_platform, const uword wanted_device, const bool print_info);
 
-  #if defined(COOT_USE_CXX11)
                    runtime_t(const runtime_t&) = delete;
   runtime_t&       operator=(const runtime_t&) = delete;
-  #endif
 
   inline uword get_n_units()        const;
   inline uword get_max_wg()         const;
@@ -80,13 +78,13 @@ class runtime_t
   inline void release_memory(cl_mem dev_mem);
 
   template<typename eT>
-  inline constexpr bool is_supported_type(const typename enable_if<is_supported_kernel_elem_type<eT>::value && !is_double<eT>::value>::result* junk = 0) { return true; }
+  inline constexpr bool is_supported_type(const typename enable_if<is_supported_kernel_elem_type<eT>::value && !is_double<eT>::value>::result* junk = 0) const { return true; }
 
   template<typename eT>
   inline bool is_supported_type(const typename enable_if<is_double<eT>::value>::result* junk = 0) { return has_float64(); }
 
   template<typename eT>
-  inline constexpr bool is_supported_type(const typename enable_if<!is_supported_kernel_elem_type<eT>::value>::result* junk = 0) { return false; }
+  inline constexpr bool is_supported_type(const typename enable_if<!is_supported_kernel_elem_type<eT>::value>::result* junk = 0) const { return false; }
 
   inline void synchronise();
 
@@ -160,9 +158,7 @@ class runtime_t
   coot_aligned cl_mem   philox_state;
   coot_aligned size_t   num_rng_threads;
 
-  #if defined(COOT_USE_CXX11)
   coot_aligned std::recursive_mutex mutex;
-  #endif
 
   inline void   lock();  // NOTE: do not call this function directly; instead instantiate the cq_guard class inside a relevant scope
   inline void unlock();  // NOTE: do not call this function directly; it's automatically called when an instance of cq_guard goes out of scope
@@ -211,10 +207,8 @@ class runtime_t::program_wrapper
   inline  program_wrapper();
   inline ~program_wrapper();
 
-  #if defined(COOT_USE_CXX11)
                    program_wrapper(const program_wrapper&) = delete;
   program_wrapper&       operator=(const program_wrapper&) = delete;
-  #endif
   };
 
 
@@ -225,10 +219,8 @@ class runtime_t::cq_guard
   inline  cq_guard();
   inline ~cq_guard();
 
-  #if defined(COOT_USE_CXX11)
              cq_guard(const cq_guard&) = delete;
   cq_guard& operator=(const cq_guard&) = delete;
-  #endif
   };
 
 
