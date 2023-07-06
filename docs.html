@@ -5934,7 +5934,7 @@ See also:
   </tr>
   <tr>
     <td style="vertical-align: top;">
-      <b>coot_init( "opencl", print_info, platform_id, device_id )</b>
+      <b>coot_init( "opencl", print_info, platform_id, dev_id )</b>
     </td>
     <td style="vertical-align: top;">
       &nbsp;&nbsp;&nbsp;
@@ -5956,7 +5956,7 @@ See also:
   </tr>
   <tr>
     <td style="vertical-align: top;">
-      <b>coot_init( "cuda", print_info, device_id )</b>
+      <b>coot_init( "cuda", print_info, dev_id )</b>
     </td>
     <td style="vertical-align: top;">
       &nbsp;&nbsp;&nbsp;
@@ -5973,9 +5973,9 @@ See also:
 <br>
 <li>if <i>print_info</i> is set to <i>true</i>, information about the selected GPU device will be printed</li>
 <br>
-<li>for the <i>"opencl"</i> initialisations, <i>platform_id</i> and <i>device_id</i> specify the desired OpenCL platform and device IDs; available platforms and devices can be listed using the <a href="https://github.com/Oblomov/clinfo">clinfo</a> command-line utility, available in most package managers: <i>clinfo -l</i></li>
+<li>for the <i>"opencl"</i> initialisations, <i>platform_id</i> and <i>dev_id</i> specify the desired OpenCL platform and device IDs; available platforms and devices can be listed using the <a href="https://github.com/Oblomov/clinfo">clinfo</a> command-line utility, available in most package managers: <i>clinfo -l</i></li>
 <br>
-<li>for the <i>"cuda"</i> initialisations, <i>device_id</i> specifies the desired CUDA device; available device IDs can be listed with the <a href="https://developer.nvidia.com/nvidia-system-management-interface">nvidia-smi</a> command-line utility</li>
+<li>for the <i>"cuda"</i> initialisations, <i>dev_id</i> specifies the desired CUDA device; available device IDs can be listed with the <a href="https://developer.nvidia.com/nvidia-system-management-interface">nvidia-smi</a> command-line utility</li>
 </ul>
 </li>
 <br>
