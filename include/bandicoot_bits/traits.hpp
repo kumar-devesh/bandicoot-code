@@ -102,6 +102,42 @@ struct is_Col< const Col<eT> >
 
 
 template<typename T>
+struct is_arma_Mat
+  { static const bool value = false; };
+
+template<typename eT>
+struct is_arma_Mat< arma::Mat<eT> >
+  { static const bool value = true; };
+
+template<typename eT>
+struct is_arma_Mat< const arma::Mat<eT> >
+  { static const bool value = true; };
+
+template<typename eT>
+struct is_arma_Mat< arma::Col<eT> >
+  { static const bool value = true; };
+
+template<typename eT>
+struct is_arma_Mat< const arma::Col<eT> >
+  { static const bool value = true; };
+
+template<typename eT>
+struct is_arma_Mat< arma::Row<eT> >
+  { static const bool value = true; };
+
+template<typename eT>
+struct is_arma_Mat< const arma::Row<eT> >
+  { static const bool value = true; };
+
+
+
+//
+//
+//
+
+
+
+template<typename T>
 struct is_subview
   { static const bool value = false; };
 
