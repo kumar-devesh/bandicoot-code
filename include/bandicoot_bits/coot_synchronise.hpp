@@ -1,4 +1,4 @@
-// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2023 Ryan Curtin (http://www.ratml.org/)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,20 +13,12 @@
 // ------------------------------------------------------------------------
 
 
-class wall_clock
+
+inline
+void
+coot_synchronise()
   {
-  public:
+  coot_extra_debug_sigprint();
 
-  inline  wall_clock();
-  inline ~wall_clock();
-
-                   inline void   tic();  // start the timer
-  coot_warn_unused inline double toc();  // return the number of seconds since the last call to tic()
-
-
-  private:
-
-  bool valid = false;
-  
-  std::chrono::steady_clock::time_point chrono_time1;
-  };
+  get_rt().synchronise();
+  }

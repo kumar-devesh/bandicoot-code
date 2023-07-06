@@ -74,10 +74,8 @@ class Mat : public Base< eT, Mat<eT> >
   inline const Mat& operator%=(const Mat& X);
   inline const Mat& operator/=(const Mat& X);
 
-  #if defined(COOT_USE_CXX11)
   inline                  Mat(Mat&& X);
   inline const Mat& operator=(Mat&& X);
-  #endif
 
   inline void steal_mem(Mat& X);  // only for writing code internal to bandicoot
 

@@ -72,44 +72,8 @@
 
 
 // need both signed and unsigned versions of size_t
-
-#if defined(COOT_USE_CXX11)
-
-  typedef          std::size_t                         uword;
-  typedef typename std::make_signed<std::size_t>::type sword;
-
-  // TODO: if POSIX detected, use ssize_t ?
-
-#elif defined(SIZE_MAX)
-
-  #if   (SIZE_MAX == 0xffffffffU)
-    typedef u32 uword;
-    typedef s32 sword;
-  #elif (SIZE_MAX == 0xffffffffffffffffU)
-    typedef u64 uword;
-    typedef s64 sword;
-  #else
-    #undef  COOT_UWORD_NOT_DEFINED
-    #define COOT_UWORD_NOT_DEFINED
-  #endif
-
-#endif
-
-
-#if (!defined(SIZE_MAX) || defined(COOT_UWORD_NOT_DEFINED))
-
-  template<size_t width> struct gen_uword_type     { typedef u32 result; };
-  template<>             struct gen_uword_type<8u> { typedef u64 result; };
-
-  template<size_t width> struct gen_sword_type     { typedef s32 result; };
-  template<>             struct gen_sword_type<8u> { typedef s64 result; };
-
-  typedef typename gen_uword_type<sizeof(std::size_t)>::result uword;
-  typedef typename gen_sword_type<sizeof(std::size_t)>::result sword;
-
-  #undef COOT_UWORD_NOT_DEFINED
-
-#endif
+typedef          std::size_t                         uword;
+typedef typename std::make_signed<std::size_t>::type sword;
 
 
 #if   defined(COOT_BLAS_LONG_LONG)

@@ -65,12 +65,6 @@
 // #define COOT_BLAS_LONG_LONG
 //// Uncomment the above line if your BLAS and LAPACK libraries use "long long" instead of "int"
 
-#if !defined(COOT_USE_CXX11)
-// #define COOT_USE_CXX11
-//// Uncomment the above line to forcefully enable use of C++11 features (eg. initialiser lists).
-//// Note that COOT_USE_CXX11 is automatically enabled when a C++11 compiler is detected.
-#endif
-
 #if !defined(COOT_USE_OPENMP)
 // #define COOT_USE_OPENMP
 //// Uncomment the above line to forcefully enable use of OpenMP for parallelisation.
@@ -78,11 +72,9 @@
 #endif
 
 // #define COOT_NO_DEBUG
-//// Uncomment the above line if you want to disable all run-time checks.
-//// This will result in faster code, but you first need to make sure that your code runs correctly!
-//// We strongly recommend to have the run-time checks enabled during development,
-//// as this greatly aids in finding mistakes in your code, and hence speeds up development.
-//// We recommend that run-time checks be disabled _only_ for the shipped version of your program.
+//// Uncomment the above line to disable all run-time checks. NOT RECOMMENDED.
+//// It is strongly recommended that run-time checks are enabled during development,
+//// as this greatly aids in finding mistakes in your code.
 
 // #define COOT_EXTRA_DEBUG
 //// Uncomment the above line if you want to see the function traces of how Bandicoot evaluates expressions.
@@ -114,33 +106,8 @@
 //// Comment out the above line if you don't want errors and warnings printed (eg. failed decompositions)
 #endif
 
-#if defined(COOT_DONT_USE_LAPACK)
-  #undef COOT_USE_LAPACK
-#endif
-
-#if defined(COOT_DONT_USE_BLAS)
-  #undef COOT_USE_BLAS
-#endif
-
 #if defined(COOT_DONT_USE_WRAPPER)
   #undef COOT_USE_WRAPPER
-#endif
-
-#if defined(COOT_DONT_USE_CXX11)
-  #undef COOT_USE_CXX11
-  #undef COOT_USE_EXTERN_CXX11_RNG
-#endif
-
-#if defined(COOT_USE_WRAPPER)
-  #if defined(COOT_USE_CXX11)
-    #if !defined(COOT_USE_EXTERN_CXX11_RNG)
-      // #define COOT_USE_EXTERN_CXX11_RNG
-    #endif
-  #endif
-#endif
-
-#if defined(COOT_DONT_USE_EXTERN_CXX11_RNG)
-  #undef COOT_USE_EXTERN_CXX11_RNG
 #endif
 
 #if defined(COOT_DONT_PRINT_ERRORS)
