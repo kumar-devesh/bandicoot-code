@@ -30,13 +30,21 @@ COOT_FN(PREFIX,dot)(twoway_promoted_eT* out_mem,
 
   while (i + blockDim.x < n_elem)
     {
-    aux_mem[tid] += (((twoway_promoted_eT) A[i]) * ((twoway_promoted_eT) B[i])) +
-        (((twoway_promoted_eT) A[i + blockDim.x]) * (((twoway_promoted_eT) B[i + blockDim.x]))); // copy to local shared memory
+    const twoway_promoted_eT A_i1 = (twoway_promoted_eT) A[i];
+    const twoway_promoted_eT B_i1 = (twoway_promoted_eT) B[i];
+
+    const twoway_promoted_eT A_i2 = (twoway_promoted_eT) A[i + blockDim.x];
+    const twoway_promoted_eT B_i2 = (twoway_promoted_eT) B[i + blockDim.x];
+
+    aux_mem[tid] += (A_i1 * B_i1) + (A_i2 * B_i2); // copy to local shared memory
     i += grid_size;
     }
   if (i < n_elem)
     {
-    aux_mem[tid] += (((twoway_promoted_eT) A[i]) * ((twoway_promoted_eT) B[i]));
+    const twoway_promoted_eT A_i1 = (twoway_promoted_eT) A[i];
+    const twoway_promoted_eT B_i1 = (twoway_promoted_eT) B[i];
+
+    aux_mem[tid] += (A_i1 * B_i1);
     }
   __syncthreads();
 
