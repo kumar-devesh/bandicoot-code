@@ -12,7 +12,12 @@ file(GLOB TEST_SOURCES "*.cpp")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 add_executable(bandicoot_test ${TEST_SOURCES})
 target_include_directories(bandicoot_test PRIVATE ${PROJECT_BINARY_DIR}/tmp/include/ ${CMAKE_REQUIRED_INCLUDES} ${COOT_INCLUDE_DIRS} ${ARMADILLO_INCLUDE_DIRS})
-target_link_libraries(bandicoot_test PRIVATE bandicoot ${ARMADILLO_LIBRARIES})
+if(COOT_USE_WRAPPER)
+  target_link_libraries(bandicoot_test PRIVATE bandicoot ${ARMADILLO_LIBRARIES})
+else()
+  # Link directly against dependencies.
+  target_link_libraries(bandicoot_test PRIVATE ${COOT_LIBS} ${COOT_LIBS_NOPRINT} ${ARMADILLO_LIBRARIES})
+endif()
 enable_testing()
 
 add_test(NAME bandicoot_test COMMAND bandicoot_test)
