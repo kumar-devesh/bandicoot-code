@@ -18,11 +18,7 @@
 
 #include <cassert>  // TODO: remove this after all of the code has been adapted
 
-#include <armadillo>
-
-#if (ARMA_VERSION_MAJOR < 10)
-  #error "Armadillo version 10.1 or newer is required"
-#endif
+#include <armadillo>  // TODO: make use of Armadillo optional?
 
 
 #undef  CL_USE_DEPRECATED_OPENCL_1_2_APIS
