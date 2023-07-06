@@ -121,6 +121,10 @@ option(FIND_CUDA "Search for a CUDA implementation" ON)
 ## Example use on the command line:
 ## cmake -D FIND_CUDA=false .
 
+set(DEFAULT_BACKEND "" CACHE STRING "Default backend to use; must be \"CUDA_BACKEND\" or \"CL_BACKEND\"")
+## Example use on the command line:
+## cmake -D DEFAULT_BACKEND="CL_BACKEND" .
+
 option(BUILD_TESTS "Build tests" ON)
 ## you can also disable building the tests directly on the command line:
 ## cmake -D BUILD_TESTS=false .
@@ -388,6 +392,8 @@ if(FIND_OPENCL)
       message(FATAL_ERROR "clBLAS has not been found")
     endif()
   endif()
+else()
+  message(STATUS "*** NOTE: not searching for OpenCL because FIND_OPENCL was set to OFF")
 endif()
 
 if(FIND_CUDA)
@@ -448,16 +454,57 @@ if(FIND_CUDA)
       include_directories(${CUDA_INCLUDE_DIRS})
     endif()
   endif()
+else()
+  message(STATUS "*** NOTE: not searching for CUDA backend because FIND_CUDA was set to OFF")
 endif()
 
-# Configure default backend.
-if(COOT_USE_CUDA AND COOT_USE_OPENCL)
-  # If we have a CUDA device, the OpenCL driver is almost certainly better.
-  set(COOT_DEFAULT_BACKEND "CUDA_BACKEND")
-elseif(COOT_USE_CUDA)
-  set(COOT_DEFAULT_BACKEND "CUDA_BACKEND")
-elseif(COOT_USE_OPENCL)
-  set(COOT_DEFAULT_BACKEND} "CL_BACKEND")
+if(NOT DEFAULT_BACKEND)
+  # Configure default backend.
+  if(COOT_USE_CUDA AND COOT_USE_OPENCL)
+    # If we have a CUDA device, the OpenCL driver is almost certainly better.
+    set(COOT_DEFAULT_BACKEND "CUDA_BACKEND")
+  elseif(COOT_USE_CUDA)
+    set(COOT_DEFAULT_BACKEND "CUDA_BACKEND")
+  elseif(COOT_USE_OPENCL)
+    set(COOT_DEFAULT_BACKEND} "CL_BACKEND")
+  endif()
+else()
+  # Check the user's specified default backend.
+  if((NOT ${DEFAULT_BACKEND} MATCHES "CUDA_BACKEND") AND
+     (NOT ${DEFAULT_BACKEND} MATCHES "CL_BACKEND"))
+    message(STATUS "")
+    message(STATUS "*** ERROR: unknown DEFAULT_BACKEND \"${DEFAULT_BACKEND}\"")
+    message(STATUS "*** ERROR: must be \"CUDA_BACKEND\" or \"CL_BACKEND\"")
+    message(STATUS "")
+    message(FATAL_ERROR "unknown DEFAULT_BACKEND; see output above")
+  elseif(${DEFAULT_BACKEND} MATCHES "CUDA_BACKEND")
+    # Make sure the CUDA backend is available.
+    if(NOT COOT_USE_CUDA)
+      message(STATUS "")
+      message(STATUS "*** ERROR: cannot specify \"CUDA_BACKEND\" as DEFAULT_BACKEND: the CUDA backend is not enabled")
+      message(STATUS "*** ERROR: if you want to use the CUDA backend as the default backend, ensure that CUDA is found")
+      message(STATUS "")
+      message(FATAL_ERROR "cannot use CUDA_BACKEND as DEFAULT_BACKEND: CUDA not found")
+    endif()
+  else() # CL_BACKEND
+    if(NOT COOT_USE_OPENCL)
+      message(STATUS "")
+      message(STATUS "*** ERROR: cannot specify \"CL_BACKEND\" as DEFAULT_BACKEND; the OpenCL backend is not enabled")
+      message(STATUS "*** ERROR: if you want to use the OpenCL backend as the default backend, ensure that OpenCL is found")
+      message(STATUS "")
+      message(FATAL_ERROR "cannot use CL_BACKEND as DEFAULT_BACKEND: OpenCL not found")
+    endif()
+  endif()
+
+  set(COOT_DEFAULT_BACKEND ${DEFAULT_BACKEND})
+endif()
+
+if(NOT COOT_USE_CUDA AND NOT COOT_USE_OPENCL)
+  message(STATUS "")
+  message(STATUS "*** ERROR: at least one backend must be enabled")
+  message(STATUS "*** ERROR: make sure either OpenCL or CUDA can be found")
+  message(STATUS "")
+  message(FATAL_ERROR "no OpenCL or CUDA backend found")
 endif()
 
 
