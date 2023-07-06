@@ -40,10 +40,8 @@ class Col : public Mat<eT>
   inline                  Col(const Col& X);
   inline const Col& operator=(const Col& X);
 
-  #if defined(COOT_USE_CXX11)
   inline                  Col(Col&& X);
   inline const Col& operator=(Col&& X);
-  #endif
 
   template<typename T1> inline            Col(const Base<eT, T1>& X);
   template<typename T1> inline Col& operator=(const Base<eT, T1>& X);

@@ -16,38 +16,9 @@
 
 namespace coot_str
   {
-
-  #if ( defined(COOT_USE_CXX11) || defined(COOT_HAVE_SNPRINTF) )
-
-    #define coot_snprintf std::snprintf
-
-  #else
-
-    // better-than-nothing emulation of C99 snprintf(),
-    // with correct return value and null-terminated output string.
-    // note that _snprintf() provided by MS is not a good substitute for snprintf()
-
-    inline
-    int
-    coot_snprintf(char* out, size_t size, const char* fmt, ...)
-      {
-      size_t i;
-
-      for(i=0; i<size; ++i)
-        {
-        out[i] = fmt[i];
-        if(fmt[i] == char(0))
-          break;
-        }
-
-      if(size > 0)
-        out[size-1] = char(0);
-
-      return int(i);
-      }
-
-  #endif
-
+  
+  // TODO: import newer code from Armadillo
+  
   class format
     {
     public:
@@ -133,7 +104,7 @@ namespace coot_str
         buffer = new char[buffer_size];
         }
 
-      required_size = coot_snprintf(buffer, size_t(buffer_size), X.A.A.c_str(), X.B);
+      required_size = std::snprintf(buffer, size_t(buffer_size), X.A.A.c_str(), X.B);
 
       if(required_size < buffer_size)
         {
@@ -185,7 +156,7 @@ namespace coot_str
         buffer = new char[buffer_size];
         }
 
-      required_size = coot_snprintf(buffer, size_t(buffer_size), X.A.A.A.c_str(), X.A.B, X.B);
+      required_size = std::snprintf(buffer, size_t(buffer_size), X.A.A.A.c_str(), X.A.B, X.B);
 
       if(required_size < buffer_size)
         {
@@ -237,7 +208,7 @@ namespace coot_str
         buffer = new char[buffer_size];
         }
 
-      required_size = coot_snprintf(buffer, size_t(buffer_size), X.A.A.A.A.c_str(), X.A.A.B, X.A.B, X.B);
+      required_size = std::snprintf(buffer, size_t(buffer_size), X.A.A.A.A.c_str(), X.A.A.B, X.A.B, X.B);
 
       if(required_size < buffer_size)
         {
@@ -289,7 +260,7 @@ namespace coot_str
         buffer = new char[buffer_size];
         }
 
-      required_size = coot_snprintf(buffer, size_t(buffer_size), X.A.A.A.A.A.c_str(), X.A.A.A.B, X.A.A.B, X.A.B, X.B);
+      required_size = std::snprintf(buffer, size_t(buffer_size), X.A.A.A.A.A.c_str(), X.A.A.A.B, X.A.A.B, X.A.B, X.B);
 
       if(required_size < buffer_size)
         {
@@ -341,7 +312,7 @@ namespace coot_str
         buffer = new char[buffer_size];
         }
 
-      required_size = coot_snprintf(buffer, size_t(buffer_size), X.A.A.A.A.A.A.c_str(), X.A.A.A.A.B, X.A.A.A.B, X.A.A.B, X.A.B, X.B);
+      required_size = std::snprintf(buffer, size_t(buffer_size), X.A.A.A.A.A.A.c_str(), X.A.A.A.A.B, X.A.A.A.B, X.A.A.B, X.A.B, X.B);
 
       if(required_size < buffer_size)
         {
@@ -393,7 +364,7 @@ namespace coot_str
         buffer = new char[buffer_size];
         }
 
-      required_size = coot_snprintf(buffer, size_t(buffer_size), X.A.A.A.A.A.A.A.c_str(), X.A.A.A.A.A.B, X.A.A.A.A.B, X.A.A.A.B, X.A.A.B, X.A.B, X.B);
+      required_size = std::snprintf(buffer, size_t(buffer_size), X.A.A.A.A.A.A.A.c_str(), X.A.A.A.A.A.B, X.A.A.A.A.B, X.A.A.A.B, X.A.A.B, X.A.B, X.B);
 
       if(required_size < buffer_size)
         {
