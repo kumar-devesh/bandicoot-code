@@ -502,25 +502,20 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
 
               // Extract the subgroup size, if available.  Before OpenCL 2.0,
               // subgroups were an extension.
-              std::cout << "-- check for subgroups\n";
               if (tmp_cpu_mem[2] /* opencl_ver */ >= 210)
                 {
-                std::cout << "-- OpenCL version is >= 210, so set it to true\n";
                 dev_has_subgroups = true;
                 }
               else
                 {
-                std::cout << "-- OpenCL version is " << tmp_cpu_mem[2] << "; has subgroup extension " << has_subgroup_extension << "; has intel subgroup extension " << has_intel_subgroup_extension << "\n";
                 dev_has_subgroups = has_subgroup_extension || has_intel_subgroup_extension;
                 }
 
               if (dev_has_subgroups)
                 {
-                std::cout << "-- we have subgroups\n";
                 // It seems possible this could be different per kernel, but we'll hope not.
                 // We'll choose an input size that is larger than any reasonable subgroup size.
                 status = coot_sub_group_size(tmp_kernel, in_dev_id, 32768, dev_subgroup_size);
-                std::cout << "-- subgroup size from coot_sub_group_size is " << dev_subgroup_size << "\n";
 
                 // It's not pointed out in the standards, but sometimes CL_INVALID_OPERATION will be returned if for some reason subgroups are not supported despite it being part of the standard.
                 // (I am looking at you, nvidia OpenCL driver.)
@@ -529,7 +524,6 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
                   dev_has_subgroups = false;
                   dev_subgroup_size = 0;
                   status = CL_SUCCESS;
-                  std::cout << "-- got CL_INVALID_OPERATION\n";
 
                   // Now, on nvidia devices, there is still the concept of "warp", and the nvidia OpenCL Programming Guide,
                   // in section 3.4.3, points out that warp-synchronous programming without barriers is okay so long as the
@@ -538,19 +532,13 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
                   // So, if we are on an nvidia card, we will enable subgroups with subgroup size equal to the warp size.
                   if (has_nv_device_attribute_query_extension == true)
                     {
-                    std::cout << "-- has NV device attribute query extension\n";
                     status = coot_nv_warp_size(in_dev_id, dev_subgroup_size);
-                    std::cout << "-- coot_nv_warp_size() returned " << status << " with warp size " << dev_subgroup_size << "\n";
                     if (status == CL_SUCCESS && dev_subgroup_size > 0)
                       {
                       dev_has_subgroups = true;
                       dev_must_synchronise_subgroups = false;
                       }
                     }
-                  }
-                else
-                  {
-                  std::cout << "-- did not get CL_INVALID_OPERATION, instead got " << status << "\n";
                   }
                 }
               }
