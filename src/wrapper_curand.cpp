@@ -68,49 +68,49 @@ namespace coot
 
 
 
-    extern curandStatus_t coot_wrapper(curandGenerate)(curandGenerator_t generator,
-                                                       unsigned int* outputPtr,
-                                                       size_t num)
+    extern curandStatus_t wrapper_curandGenerate(curandGenerator_t generator,
+                                                 unsigned int* outputPtr,
+                                                 size_t num)
       {
       return curandGenerate(generator, outputPtr, num);
       }
 
 
 
-    extern curandStatus_t coot_wrapper(curandGenerateUniform)(curandGenerator_t generator,
-                                                              float* outputPtr,
-                                                              size_t num)
+    extern curandStatus_t wrapper_curandGenerateUniform(curandGenerator_t generator,
+                                                        float* outputPtr,
+                                                        size_t num)
       {
       return curandGenerateUniform(generator, outputPtr, num);
       }
 
 
 
-    extern curandStatus_t coot_wrapper(curandGenerateUniformDouble)(curandGenerator_t generator,
-                                                                    double* outputPtr,
-                                                                    size_t num)
+    extern curandStatus_t wrapper_curandGenerateUniformDouble(curandGenerator_t generator,
+                                                              double* outputPtr,
+                                                              size_t num)
       {
       return curandGenerateUniformDouble(generator, outputPtr, num);
       }
 
 
 
-    extern curandStatus_t coot_wrapper(curandGenerateNormal)(curandGenerator_t generator,
-                                                             float* outputPtr,
-                                                             size_t n,
-                                                             float mean,
-                                                             float stddev)
+    extern curandStatus_t wrapper_curandGenerateNormal(curandGenerator_t generator,
+                                                       float* outputPtr,
+                                                       size_t n,
+                                                       float mean,
+                                                       float stddev)
       {
       return curandGenerateNormal(generator, outputPtr, n, mean, stddev);
       }
 
 
 
-    extern curandStatus_t coot_wrapper(curandGenerateNormalDouble)(curandGenerator_t generator,
-                                                                   double* outputPtr,
-                                                                   size_t n,
-                                                                   double mean,
-                                                                   double stddev)
+    extern curandStatus_t wrapper_curandGenerateNormalDouble(curandGenerator_t generator,
+                                                             double* outputPtr,
+                                                             size_t n,
+                                                             double mean,
+                                                             double stddev)
       {
       return curandGenerateNormalDouble(generator, outputPtr, n, mean, stddev);
       }
