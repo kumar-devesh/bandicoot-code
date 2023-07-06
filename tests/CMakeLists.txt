@@ -4,7 +4,6 @@ if(${CMAKE_VERSION} VERSION_LESS 3.18)
 endif()
 
 find_package(Armadillo REQUIRED)
-include_directories(${ARMADILLO_INCLUDE_DIRS})
 
 # The CMake documentation says this is a bad idea, and I don't care.
 # Your build system should have a way to just include all the files in a directory as build dependencies.
@@ -12,6 +11,7 @@ include_directories(${ARMADILLO_INCLUDE_DIRS})
 file(GLOB TEST_SOURCES "*.cpp")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 add_executable(bandicoot_test ${TEST_SOURCES})
+target_include_directories(bandicoot_test PRIVATE ${PROJECT_BINARY_DIR}/tmp/include/ ${CMAKE_REQUIRED_INCLUDES} ${COOT_INCLUDE_DIRS} ${ARMADILLO_INCLUDE_DIRS})
 target_link_libraries(bandicoot_test PRIVATE bandicoot ${ARMADILLO_LIBRARIES})
 enable_testing()
 

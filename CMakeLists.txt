@@ -375,13 +375,13 @@ if(FIND_OPENCL)
     set(COOT_USE_OPENCL true)
 
     set(COOT_LIBS ${COOT_LIBS} ${OpenCL_LIBRARIES})
-    include_directories(${OpenCL_INCLUDE_DIRS})
+    set(COOT_INCLUDE_DIRS ${COOT_INCLUDE_DIRS} ${OpenCL_INCLUDE_DIRS})
 
     # Now try to find clBLAS.
     include(COOT_FindCLBLAS)
     if(CLBLAS_FOUND)
       set(COOT_LIBS ${COOT_LIBS} ${CLBLAS_LIBRARIES})
-      include_directories(${CLBLAS_INCLUDE_DIRS})
+      set(COOT_INCLUDE_DIRS ${COOT_INCLUDE_DIRS} ${CLBLAS_INCLUDE_DIRS})
     else()
       message(STATUS "")
       message(STATUS "*** ERROR: clBLAS not found.")
@@ -421,7 +421,7 @@ if(FIND_CUDA)
     set(CUDA_curand_LIBRARY CUDA::curand)
     set(CUDA_cusolver_LIBRARY CUDA::cusolver)
     set(CUDA_nvrtc_LIBRARY CUDA::nvrtc)
-    set(CUDA_INCLUDE_DIRS CUDA::toolkit)
+    set(CUDA_INCLUDE_DIRS "") # There is no need to have a specific include directory---linking against the imported target is sufficient.
 
     # However, we want to print to the user the specific things they are linking against, because they may read the output.
     # We have to therefore recover the path explicitly.
@@ -487,7 +487,7 @@ if(FIND_CUDA)
       set(COOT_LIBS ${COOT_LIBS} ${CUDA_LIBS})
       set(COOT_LIBS_NOPRINT ${COOT_LIBS_NOPRINT} ${CUDA_LIBS_NOPRINT})
       set(COOT_LIBS_PRINT ${COOT_LIBS_PRINT} ${CUDA_LIBS_PRINT})
-      include_directories(${CUDA_INCLUDE_DIRS})
+      set(COOT_INCLUDE_DIRS ${COOT_INCLUDE_DIRS} ${CUDA_INCLUDE_DIRS})
     endif()
 
 endif()
@@ -564,8 +564,6 @@ file(COPY ${PROJECT_SOURCE_DIR}/include/ DESTINATION ${PROJECT_BINARY_DIR}/tmp/i
 message(STATUS "Generating ${PROJECT_BINARY_DIR}/tmp/include/config.hpp")
 configure_file(${PROJECT_BINARY_DIR}/tmp/include/bandicoot_bits/config.hpp.cmake ${PROJECT_BINARY_DIR}/tmp/include/bandicoot_bits/config.hpp)
 
-include_directories(${PROJECT_BINARY_DIR}/tmp/include/ ${CMAKE_REQUIRED_INCLUDES})
-
 ## necessary when linking with Intel MKL on Linux systems
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-as-needed")
@@ -606,6 +604,7 @@ add_library(
   )
 
 target_link_libraries(bandicoot PRIVATE ${COOT_LIBS} ${COOT_LIBS_NOPRINT})
+target_include_directories(bandicoot PRIVATE ${PROJECT_BINARY_DIR}/tmp/include/ ${CMAKE_REQUIRED_INCLUDES} ${COOT_INCLUDE_DIRS})
 target_include_directories(bandicoot INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/tmp/include> $<INSTALL_INTERFACE:include>)
 set_target_properties(bandicoot PROPERTIES VERSION ${COOT_VERSION_MAJOR}.${COOT_VERSION_MINOR}.${COOT_VERSION_PATCH} SOVERSION ${COOT_VERSION_MAJOR})
 
