@@ -10,6 +10,7 @@ include_directories(${ARMADILLO_INCLUDE_DIRS})
 # Your build system should have a way to just include all the files in a directory as build dependencies.
 # Note that my don't-care attitude here means that if you add a new test file, you really need to reconfigure with CMake altogether.
 file(GLOB TEST_SOURCES "*.cpp")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 add_executable(bandicoot_test ${TEST_SOURCES})
 target_link_libraries(bandicoot_test PRIVATE bandicoot ${ARMADILLO_LIBRARIES})
 enable_testing()
