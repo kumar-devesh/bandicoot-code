@@ -28,10 +28,10 @@ init_xorwow_state(cl_mem xorwow_state, const size_t num_rng_threads, const u64 s
 
   // Since the states are relatively small, and we only do the seeding once, we'll initialize the values on the CPU, then copy them over.
   // We ensure that all values are odd.
-  arma::Row<eT> cpu_state(6 * num_rng_threads, arma::fill::none);
+  eT* cpu_state = new eT[6 * num_rng_threads];
   const eT trunc_seed = eT(seed);
   typename preferred_rng<eT>::result rng(trunc_seed);
-  for (size_t i = 0; i < cpu_state.n_elem; ++i)
+  for (size_t i = 0; i < 6 * num_rng_threads; ++i)
     {
     eT val = rng();
     if (val % 2 == 0)
@@ -42,7 +42,8 @@ init_xorwow_state(cl_mem xorwow_state, const size_t num_rng_threads, const u64 s
   // Copy the state to the GPU memory.
   dev_mem_t<eT> m;
   m.cl_mem_ptr = xorwow_state;
-  copy_into_dev_mem(m, cpu_state.memptr(), 6 * num_rng_threads);
+  copy_into_dev_mem(m, cpu_state, 6 * num_rng_threads);
+  delete[] cpu_state;
   }
 
 
@@ -55,7 +56,8 @@ init_philox_state(cl_mem philox_state, const size_t num_rng_threads, const u64 s
 
   // Since the states are small, we seed on the CPU, and then transfer the memory.
   // For now we always initialize the counters to 0.  (TODO: should this be an option?)
-  arma::Row<u32> cpu_state(6 * num_rng_threads, arma::fill::zeros);
+  u32* cpu_state = new u32[6 * num_rng_threads];
+  memset(cpu_state, 0, sizeof(u32) * 6 * num_rng_threads);
   const u32 trunc_seed = u32(seed);
   preferred_rng<u32>::result rng(trunc_seed);
   for (size_t i = 0; i < num_rng_threads; ++i)
@@ -67,7 +69,8 @@ init_philox_state(cl_mem philox_state, const size_t num_rng_threads, const u64 s
   // Copy the state to the GPU.
   dev_mem_t<u32> m;
   m.cl_mem_ptr = philox_state;
-  copy_into_dev_mem(m, cpu_state.memptr(), 6 * num_rng_threads);
+  copy_into_dev_mem(m, cpu_state, 6 * num_rng_threads);
+  delete[] cpu_state;
   }
 
 
