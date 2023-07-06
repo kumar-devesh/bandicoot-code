@@ -663,7 +663,7 @@ Advanced constructors:
 <br>
 <br>
 <ul>
-Create a matrix using data from writable auxiliary (external) memory, where <i>ptr_aux_mem</i> is a pointer to the memory.
+Create a matrix using data from writable auxiliary (external) GPU memory, where <i>ptr_aux_mem</i> is a pointer to the memory.
 This matrix will use the auxiliary memory directly (i.e., no copying);
 this can be dangerous unless you know what you are doing!
 <br>
@@ -962,11 +962,7 @@ For convenience the following typedefs have been defined:
 </li>
 <br>
 <li>
-In this documentation, the <b><i>vec</i></b> and <b><i>colvec</i></b> types have the <b>same meaning</b> and are used <b>interchangeably</b>
-</li>
-<br>
-<li>
-In this documentation, the types <i>fvec</i> or <i>fcolvec</i> are used for convenience, speed, and portability; it is possible to use other types instead, eg. <i>vec</i>, <i>colvec</i>
+In this documentation, the types <i>fvec</i> or <i>fcolvec</i> are used for convenience, speed, and portability; it is possible to use other types instead, e.g. <i>vec</i>, <i>colvec</i>; note that the <i>fvec</i> and <i>fcolvec</i> have the <i>same meaning</i> and are used <i>interchangeably</i>
 </li>
 <br>
 <li>
@@ -1013,7 +1009,7 @@ Advanced constructors:
 <br>
 <br>
 <ul>
-Create a column vector using data from writable auxiliary (external) memory, where <i>ptr_aux_mem</i> is a pointer to the memory.
+Create a column vector using data from writable auxiliary (external) GPU memory, where <i>ptr_aux_mem</i> is a pointer to the memory.
 This vector will directly use the auxiliary memory (ie. no copying); this can be dangerous unless you know what you are doing!
 <br>
 <br>
@@ -1273,7 +1269,7 @@ Advanced constructors:
 <br>
 <br>
 <ul>
-Create a row vector using data from writable auxiliary (external) memory, where <i>ptr_aux_mem</i> is a pointer to the memory.
+Create a row vector using data from writable auxiliary (external) GPU memory, where <i>ptr_aux_mem</i> is a pointer to the memory.
 This vector will directly use the auxiliary memory (ie. no copying);
 this can be dangerous unless you know what you are doing!
 <br>
@@ -1697,7 +1693,7 @@ accessing elements without bounds checks is slightly faster, but is not recommen
 indexing in C++ starts at 0
 </li>
 <li>accessing elements via <code>[r,c]</code> does not work correctly in C++;
-instead use <code>(r,c)</code> and <code>(r,c,s)</code>
+instead use <code>(r,c)</code>
 </li>
 </ul>
 </li>
@@ -2007,7 +2003,7 @@ coot_rng::set_seed(42);      <font class="comment">// set the seed to a specific
 <li>
 See also:
 <ul>
-<li><a href="#randu">randu()</a> (standalone function with extended functionality)</li>
+<li><a href="#randu">randu()</a> (standalone function)</li>
 <li><a href="#randn">randn()</a> (standalone function with extended functionality)</li>
 <li><a href="#fill">.fill()</a></li>
 <li><a href="#ones_member">.ones()</a></li>
@@ -2282,7 +2278,7 @@ Recreate the object according to given size specifications, while preserving the
 </li>
 <br>
 <li>
-Can be used for growing or shrinking an object (i.e. adding/removing rows, and/or columns, and/or slices)
+Can be used for growing or shrinking an object (i.e. adding/removing rows, and/or columns)
 </li>
 <br>
 <li>
@@ -2401,8 +2397,6 @@ V.<b>subvec(&nbsp;</b>first_index<b>, size(</b>W<b>)&nbsp;)</b>&nbsp;&nbsp;&nbsp
 <ul>
 <br>
 X.<a href="#diag">diag()</a><br>
-X.<a href="#each_colrow">each_row()</a><br>
-X.<a href="#each_colrow">each_col()</a><br>
 </ul>
 </li>
 
@@ -3021,7 +3015,7 @@ umat C = ones&lt;umat&gt;(5,6);
 <li>
 See also:
 <ul>
-<li><a href="#ones_member">.ones()</a> (member function of <i>Mat</i>, <i>Col</i>, <i>Row</i> and <i>Cube</i>)</li>
+<li><a href="#ones_member">.ones()</a> (member function of <i>Mat</i>, <i>Col</i>, and <i>Row</i>)</li>
 <li><a href="#fill">.fill()</a></li>
 <li><a href="#eye_standalone">eye()</a></li>
 <li><a href="#linspace">linspace()</a></li>
@@ -3069,7 +3063,7 @@ umat C = zeros&lt;umat&gt;(5,6);
 <li>
 See also:
 <ul>
-<li><a href="#zeros_member">.zeros()</a> (member function of <i>Mat</i>, <i>Col</i>, <i>Row</i>, <i>SpMat</i> and <i>Cube</i>)</li>
+<li><a href="#zeros_member">.zeros()</a> (member function of <i>Mat</i>, <i>Col</i>, and <i>Row</i>)</li>
 <li><a href="#fill">.fill()</a></li>
 <li><a href="#ones_standalone">ones()</a></li>
 <li><a href="#randu">randu()</a></li>
@@ -3238,7 +3232,7 @@ To change the RNG seed, use <i>coot_rng::set_seed(value)</i> or <i>coot_rng::set
 </li>
 <br>
 <li>
-<b>Caveat:</b> to generate a matrix with random floating point values (ie. <i>float</i> or <i>double</i>) instead of integers, use <a href="#randu">randu()</a> instead~
+<b>Caveat:</b> to generate a matrix with random floating point values (ie. <i>float</i> or <i>double</i>) instead of integers, use <a href="#randu">randu()</a> instead
 </li>
 <br>
 <li>
@@ -3495,7 +3489,7 @@ Examples:
 frowvec r = randu&lt;frowvec&gt;(5);
 fcolvec q = randu&lt;fcolvec&gt;(5);
 
-mat X(5, 5, fill::randu);
+fmat X(5, 5, fill::randu);
 
 <font class="comment">// examples of expressions which have optimised implementations</font>
 
@@ -3537,9 +3531,7 @@ Examples:
 fmat A = randu&lt;fmat&gt;(5, 5);
 
 fmat B = clamp(A, 0.2,         0.8);
-
 fmat C = clamp(A, min(min(A)), 0.8);
-
 fmat D = clamp(A, 0.2, max(max(A)));
 </pre>
 </ul>
@@ -3574,6 +3566,8 @@ Conversion of a <i>fmat</i> object into <i>fcolvec</i> or <i>frowvec</i> is poss
 <br>
 <li>
 When <i>conv_to</i> is applied to an expression, the conversion operation will be fused with the expression computation when possible
+</li>
+<br>
 <li>
 Examples:
 <ul>
@@ -3596,6 +3590,7 @@ See also:
 <li><a href="#as_scalar">as_scalar()</a></li>
 <li><a href="#abs">abs()</a></li>
 <li><a href="#adv_constructors_mat">advanced constructors (matrices)</a></li>
+<li><a href="#arma_comparison">Armadillo/Bandicoot conversion guide</a></li>
 </ul>
 </li>
 <br>
@@ -3871,9 +3866,6 @@ fmat B = randu&lt;fmat&gt;(5, 5);
 uvec q1 = find(A &gt; B);
 uvec q2 = find(A &gt; 0.5);
 uvec q3 = find(A &gt; 0.5, 3, "last");
-
-<font class="comment">// change elements of A greater than 0.5 to 1</font>
-A.elem( find(A &gt; 0.5) ).ones();
 </pre>
 </ul>
 </li>
@@ -4467,7 +4459,6 @@ The dimensions can be used in conjunction with:
 <ul>
 <li><a href="#part_a">object constructors</a></li>
 <li><a href="#part_b">functions for changing size</a></li>
-<li><a href="#part_c">generator functions</a></li>
 <li><a href="#submat">submatrix views</a></li>
 </ul>
 </li>
@@ -6691,7 +6682,7 @@ See also:
 <ul>
 <li>the default width is 32 bits on 32-bit platforms</li>
 <li>the default width is 64 bits on 64-bit platforms</li>
-<li>on most systems, <i>uword</i> is a typedef for <i>size_t</i></li>
+<li><i>uword</i> is a typedef for <i>size_t</i></li>
 </ul>
 </li>
 <br>
@@ -7797,7 +7788,7 @@ See also:
 <ul>
 <li>In order to perform GPU-based linear algebra, Bandicoot must first compile GPU kernel functions to a particular device</li>
 <br>
-<li>The first time Bandicoot is run on a system, all GPU kernel functions will be compiled; <b>this can take a long time!</b> (usually less than 3-5 minutes)</li>
+<li>The first time Bandicoot is run on a system, all GPU kernel functions will be compiled; <b>this can take a long time!</b> (usually less than 5 minutes)</li>
 <br>
 <li>Compiled kernels are stored in disk in the <i>kernel cache</i> for later reuse</li>
 <br>
