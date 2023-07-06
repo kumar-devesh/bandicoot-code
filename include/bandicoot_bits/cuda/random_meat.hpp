@@ -61,7 +61,7 @@ fill_randu(dev_mem_t<float> dest, const uword n)
 
   if (n == 0) { return; }
 
-  curandStatus_t result = curandGenerateUniform(get_rt().cuda_rt.xorwow_rand, dest.cuda_mem_ptr, n);
+  curandStatus_t result = coot_wrapper(curandGenerateUniform)(get_rt().cuda_rt.xorwow_rand, dest.cuda_mem_ptr, n);
   coot_check_curand_error(result, "coot::cuda::fill_randu(): curandGenerateUniform() failed");
   }
 
@@ -76,7 +76,7 @@ fill_randu(dev_mem_t<double> dest, const uword n)
 
   if (n == 0) { return; }
 
-  curandStatus_t result = curandGenerateUniformDouble(get_rt().cuda_rt.xorwow_rand, dest.cuda_mem_ptr, n);
+  curandStatus_t result = coot_wrapper(curandGenerateUniformDouble)(get_rt().cuda_rt.xorwow_rand, dest.cuda_mem_ptr, n);
   coot_check_curand_error(result, "coot::cuda::fill_randu(): curandGenerateUniform() failed");
   }
 
@@ -126,7 +126,7 @@ fill_randn(dev_mem_t<float> dest, const uword n, const double mu, const double s
 
   if (n == 0) { return; }
 
-  curandStatus_t result = curandGenerateNormal(get_rt().cuda_rt.philox_rand, dest.cuda_mem_ptr, n, mu, sd);
+  curandStatus_t result = coot_wrapper(curandGenerateNormal)(get_rt().cuda_rt.philox_rand, dest.cuda_mem_ptr, n, mu, sd);
   coot_check_curand_error(result, "coot::cuda::fill_randn(): curandGenerateNormal() failed");
   }
 
@@ -141,7 +141,7 @@ fill_randn(dev_mem_t<double> dest, const uword n, const double mu, const double 
 
   if (n == 0) { return; }
 
-  curandStatus_t result = curandGenerateNormalDouble(get_rt().cuda_rt.philox_rand, dest.cuda_mem_ptr, n, mu, sd);
+  curandStatus_t result = coot_wrapper(curandGenerateNormalDouble)(get_rt().cuda_rt.philox_rand, dest.cuda_mem_ptr, n, mu, sd);
   coot_check_curand_error(result, "coot::cuda::fill_randn(): curandGenerateNormalDouble() failed");
   }
 
@@ -169,7 +169,7 @@ fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int hi, const 
   u32_dest.cuda_mem_ptr = (u32*) dest.cuda_mem_ptr;
 
   const u32 range = (bounded_hi - lo);
-  curandStatus_t result = curandGenerate(get_rt().cuda_rt.xorwow_rand, u32_dest.cuda_mem_ptr, n);
+  curandStatus_t result = coot_wrapper(curandGenerate)(get_rt().cuda_rt.xorwow_rand, u32_dest.cuda_mem_ptr, n);
   coot_check_curand_error(result, "coot::cuda::fill_randi(): curandGenerate() failed");
 
   // [0, u32_MAX] --> [0, range] (only needed if range != u32_MAX)
@@ -212,7 +212,7 @@ fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int hi, const 
 
   const u64 range = (hi - lo);
   // We use the 32-bit XORWOW generator, but just generate a sequence of twice the usual length (since we are generating for u64s not u32s).
-  curandStatus_t result = curandGenerate(get_rt().cuda_rt.xorwow_rand, (u32*) dest.cuda_mem_ptr, 2 * n);
+  curandStatus_t result = coot_wrapper(curandGenerate)(get_rt().cuda_rt.xorwow_rand, (u32*) dest.cuda_mem_ptr, 2 * n);
   coot_check_curand_error(result, "coot::cuda::fill_randi(): curandGenerate() failed");
 
   // [0, u64_MAX] --> [0, range] (only needed if range != u64_MAX)
