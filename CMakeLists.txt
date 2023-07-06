@@ -125,9 +125,9 @@ set(DEFAULT_BACKEND "" CACHE STRING "Default backend to use; must be \"CUDA_BACK
 ## Example use on the command line:
 ## cmake -D DEFAULT_BACKEND="CL_BACKEND" .
 
-option(BUILD_TESTS "Build tests" ON)
-## you can also disable building the tests directly on the command line:
-## cmake -D BUILD_TESTS=false .
+option(BUILD_TESTS "Build tests" OFF)
+## you can also enable building the tests directly on the command line:
+## cmake -D BUILD_TESTS=true .
 ##
 ## to run the tests on the command line:
 ## make
@@ -404,18 +404,52 @@ if(FIND_CUDA)
 
     # We also need NVRTC, which the old FindCUDA package does not find.
     find_library(CUDA_nvrtc_LIBRARY nvrtc ${CUDA_TOOLKIT_ROOT_DIR})
+
+    set(CUDA_LIBS ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES} ${CUDA_curand_LIBRARY} ${CUDA_cusolver_LIBRARY} ${CUDA_nvrtc_LIBRARY})
   else()
     # Use newer FindCUDAToolkit module.
     find_package(CUDAToolkit)
 
-    # Extract new-style CMake libraries to old-style (to match the older FindCUDA script).
     set(CUDA_FOUND CUDAToolkit_FOUND)
+
+    # Note that these variables will all contain the literal strings listed here.
+    # That will cause CMake to link against the imported target, instead of just the library.
+    # It's good to do that, because it's possible that each imported target may need to link against more than just the individual library.
+    # (That is, it may have dependencies itself, and so linking against "CUDA::cudart" may link against more than one library.)
     set(CUDA_LIBRARIES CUDA::cudart)
     set(CUDA_CUBLAS_LIBRARIES CUDA::cublas)
     set(CUDA_curand_LIBRARY CUDA::curand)
     set(CUDA_cusolver_LIBRARY CUDA::cusolver)
     set(CUDA_nvrtc_LIBRARY CUDA::nvrtc)
     set(CUDA_INCLUDE_DIRS CUDA::toolkit)
+
+    # However, we want to print to the user the specific things they are linking against, because they may read the output.
+    # We have to therefore recover the path explicitly.
+    get_target_property(CUDART_LOC CUDA::cudart IMPORTED_LOCATION)
+    get_target_property(CUBLAS_LOC CUDA::cublas IMPORTED_LOCATION)
+    get_target_property(CURAND_LOC CUDA::curand IMPORTED_LOCATION)
+    get_target_property(CUSOLVER_LOC CUDA::cusolver IMPORTED_LOCATION)
+    get_target_property(NVRTC_LOC CUDA::nvrtc IMPORTED_LOCATION)
+
+    set(CUDA_LIBS_NOPRINT CUDA::cudart CUDA::cublas CUDA::curand CUDA::cusolver CUDA::nvrtc)
+    set(CUDA_LIBS_PRINT ${CUDART_LOC} ${CUBLAS_LOC} ${CURAND_LOC} ${CUSOLVER_LOC} ${NVRTC_LOC})
+
+    # Set these so the next section succeeds.
+    if(NOT CUDA_LIBRARIES)
+      set(CUDA_LIBRARIES TRUE)
+    endif()
+    if(NOT CUDA_CUBLAS_LIBRARIES)
+      set(CUDA_CUBLAS_LIBRARIES TRUE)
+    endif()
+    if(NOT CUDA_curand_LIBRARY)
+      set(CUDA_curand_LIBRARY TRUE)
+    endif()
+    if(NOT CUDA_cusolver_LIBRARY)
+      set(CUDA_cusolver_LIBRARY TRUE)
+    endif()
+    if(NOT CUDA_nvrtc_LIBRARY)
+      set(CUDA_nvrtc_LIBRARY TRUE)
+    endif()
   endif()
 
   if(CUDA_FOUND)
@@ -450,10 +484,13 @@ if(FIND_CUDA)
     if(NOT COOT_USE_CUDA)
       message(STATUS "*** WARNING: CUDA backend not enabled")
     else()
-      set(COOT_LIBS ${COOT_LIBS} ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES} ${CUDA_curand_LIBRARY} ${CUDA_cusolver_LIBRARY} ${CUDA_nvrtc_LIBRARY})
+      set(COOT_LIBS ${COOT_LIBS} ${CUDA_LIBS})
+      set(COOT_LIBS_NOPRINT ${COOT_LIBS_NOPRINT} ${CUDA_LIBS_NOPRINT})
+      set(COOT_LIBS_PRINT ${COOT_LIBS_PRINT} ${CUDA_LIBS_PRINT})
       include_directories(${CUDA_INCLUDE_DIRS})
     endif()
-  endif()
+
+endif()
 else()
   message(STATUS "*** NOTE: not searching for CUDA backend because FIND_CUDA was set to OFF")
 endif()
@@ -517,7 +554,7 @@ message(STATUS "*** COOT_USE_CUDA        = ${COOT_USE_CUDA}")
 message(STATUS "*** COOT_DEFAULT_BACKEND = ${COOT_DEFAULT_BACKEND}")
 message(STATUS "")
 message(STATUS "*** Bandicoot wrapper library will use the following libraries:")
-message(STATUS "*** COOT_LIBS = ${COOT_LIBS}")
+message(STATUS "*** COOT_LIBS = ${COOT_LIBS};${COOT_LIBS_PRINT}")
 message(STATUS "")
 
 
@@ -568,12 +605,14 @@ add_library(
   ${PROJECT_SOURCE_DIR}/src/wrapper_cusolver.cpp
   )
 
-target_link_libraries(bandicoot PRIVATE ${COOT_LIBS})
+target_link_libraries(bandicoot PRIVATE ${COOT_LIBS} ${COOT_LIBS_NOPRINT})
 target_include_directories(bandicoot INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/tmp/include> $<INSTALL_INTERFACE:include>)
 set_target_properties(bandicoot PROPERTIES VERSION ${COOT_VERSION_MAJOR}.${COOT_VERSION_MINOR}.${COOT_VERSION_PATCH} SOVERSION ${COOT_VERSION_MAJOR})
 
 if(BUILD_TESTS)
+  message(STATUS "")
   message(STATUS "*** configuring tests")
+  message(STATUS "")
   enable_testing()
   add_subdirectory(tests)
 endif()
