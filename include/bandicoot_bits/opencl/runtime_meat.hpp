@@ -524,7 +524,7 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
 
                 // It's not pointed out in the standards, but sometimes CL_INVALID_OPERATION will be returned if for some reason subgroups are not supported despite it being part of the standard.
                 // (I am looking at you, nvidia OpenCL driver.)
-                if (status == CL_INVALID_OPERATION)
+                if (status == CL_INVALID_OPERATION || dev_subgroup_size == 0)
                   {
                   dev_has_subgroups = false;
                   dev_subgroup_size = 0;
