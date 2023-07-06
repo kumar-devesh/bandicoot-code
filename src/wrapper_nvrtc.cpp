@@ -39,8 +39,8 @@ namespace coot
                                            const char* src,
                                            const char* name,
                                            int numHeaders,
-                                           const char** headers,
-                                           const char** includeNames)
+                                           const char* const* headers,
+                                           const char* const* includeNames)
       {
       return nvrtcCreateProgram(prog, src, name, numHeaders, headers, includeNames);
       }
@@ -49,7 +49,7 @@ namespace coot
 
     nvrtcResult wrapper_nvrtcCompileProgram(nvrtcProgram prog,
                                             int numOptions,
-                                            const char** options)
+                                            const char* const* options)
       {
       return nvrtcCompileProgram(prog, numOptions, options);
       }

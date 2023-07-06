@@ -23,14 +23,14 @@ extern "C"
                                                       const char* src,
                                                       const char* name,
                                                       int numHeaders,
-                                                      const char** headers,
-                                                      const char** includeNames);
+                                                      const char* const* headers,
+                                                      const char* const* includeNames);
 
 
 
   extern nvrtcResult coot_wrapper(nvrtcCompileProgram)(nvrtcProgram prog,
                                                        int numOptions,
-                                                       const char** options);
+                                                       const char* const* options);
 
 
 
