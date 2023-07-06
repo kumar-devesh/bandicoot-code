@@ -7763,7 +7763,7 @@ See also:
 <ul>
 <li>If <code><i>COOT_USE_WRAPPER</i></code> is not defined (or <code><i>COOT_DONT_USE_WRAPPER</i></code> is defined), then Bandicoot will need to be linked against all dependencies of its backends</li>
 <br>
-<li>Unfortunately this could be a lot of dependencies depending on <a href="#config_hpp">configuration options</a>; so, enabling <code><i>COOT_USE_WRAPPER</i></code> is the default and is recommended</li>
+<li>Unfortunately this could be a lot of dependencies depending on <a href="#config_hpp">configuration options</a>; so, enabling <code><i>COOT_USE_WRAPPER</i></code> is the default and is recommended; when <code><i>COOT_USE_WRAPPER</i></code> is enabled, linking only requires <code>-lbandicoot</code></li>
 <br>
 <li>Regardless of <a href="#backend_configuration">backend configuration</a>, these libraries must always be linked against:</li>
 <ul>
