@@ -19,7 +19,7 @@
 
 // coot_sub_group_size(k): get the subgroup size of a given kernel, if subgroups
 // are supported; otherwise return 0.
-#if defined(CL_VERSION_2_1)
+#if defined(CL_VERSION_2_1) || defined(CL_VERSION_3_0)
 
 inline
 cl_int

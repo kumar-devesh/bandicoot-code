@@ -425,14 +425,14 @@ TEMPLATE_TEST_CASE("vec_x_matrix_cov", "[cov]", float, double)
   arma::Mat<eT> c7_cpu(c7);
   arma::Mat<eT> c8_cpu(c8);
 
-  REQUIRE( arma::approx_equal( c1_cpu, c1_ref_cpu, "reldiff", tolerance<eT>::value ) );
-  REQUIRE( arma::approx_equal( c2_cpu, c2_ref_cpu, "reldiff", tolerance<eT>::value ) );
-  REQUIRE( arma::approx_equal( c3_cpu, c3_ref_cpu, "reldiff", tolerance<eT>::value ) );
-  REQUIRE( arma::approx_equal( c4_cpu, c4_ref_cpu, "reldiff", tolerance<eT>::value ) );
-  REQUIRE( arma::approx_equal( c5_cpu, c5_ref_cpu, "reldiff", tolerance<eT>::value ) );
-  REQUIRE( arma::approx_equal( c6_cpu, c6_ref_cpu, "reldiff", tolerance<eT>::value ) );
-  REQUIRE( arma::approx_equal( c7_cpu, c7_ref_cpu, "reldiff", tolerance<eT>::value ) );
-  REQUIRE( arma::approx_equal( c8_cpu, c8_ref_cpu, "reldiff", tolerance<eT>::value ) );
+  REQUIRE( arma::norm( c1_cpu - c1_ref_cpu, 2 ) <= (eT) tolerance<eT>::value );
+  REQUIRE( arma::norm( c2_cpu - c2_ref_cpu, 2 ) <= (eT) tolerance<eT>::value );
+  REQUIRE( arma::norm( c3_cpu - c3_ref_cpu, 2 ) <= (eT) tolerance<eT>::value );
+  REQUIRE( arma::norm( c4_cpu - c4_ref_cpu, 2 ) <= (eT) tolerance<eT>::value );
+  REQUIRE( arma::norm( c5_cpu - c5_ref_cpu, 2 ) <= (eT) tolerance<eT>::value );
+  REQUIRE( arma::norm( c6_cpu - c6_ref_cpu, 2 ) <= (eT) tolerance<eT>::value );
+  REQUIRE( arma::norm( c7_cpu - c7_ref_cpu, 2 ) <= (eT) tolerance<eT>::value );
+  REQUIRE( arma::norm( c8_cpu - c8_ref_cpu, 2 ) <= (eT) tolerance<eT>::value );
   }
 
 
