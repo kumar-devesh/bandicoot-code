@@ -402,53 +402,57 @@ if(FIND_CUDA)
     # Use older FindCUDA module because FindCUDAToolkit is not available.
     find_package(CUDA)
 
-    # We also need NVRTC, which the old FindCUDA package does not find.
-    find_library(CUDA_nvrtc_LIBRARY nvrtc ${CUDA_TOOLKIT_ROOT_DIR})
+    if(CUDA_FOUND)
+      # We also need NVRTC, which the old FindCUDA package does not find.
+      find_library(CUDA_nvrtc_LIBRARY nvrtc ${CUDA_TOOLKIT_ROOT_DIR})
 
-    set(CUDA_LIBS ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES} ${CUDA_curand_LIBRARY} ${CUDA_cusolver_LIBRARY} ${CUDA_nvrtc_LIBRARY})
+      set(CUDA_LIBS ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES} ${CUDA_curand_LIBRARY} ${CUDA_cusolver_LIBRARY} ${CUDA_nvrtc_LIBRARY})
+    endif()
   else()
     # Use newer FindCUDAToolkit module.
     find_package(CUDAToolkit)
 
     set(CUDA_FOUND CUDAToolkit_FOUND)
 
-    # Note that these variables will all contain the literal strings listed here.
-    # That will cause CMake to link against the imported target, instead of just the library.
-    # It's good to do that, because it's possible that each imported target may need to link against more than just the individual library.
-    # (That is, it may have dependencies itself, and so linking against "CUDA::cudart" may link against more than one library.)
-    set(CUDA_LIBRARIES CUDA::cudart)
-    set(CUDA_CUBLAS_LIBRARIES CUDA::cublas)
-    set(CUDA_curand_LIBRARY CUDA::curand)
-    set(CUDA_cusolver_LIBRARY CUDA::cusolver)
-    set(CUDA_nvrtc_LIBRARY CUDA::nvrtc)
-    set(CUDA_INCLUDE_DIRS "") # There is no need to have a specific include directory---linking against the imported target is sufficient.
+    if(CUDAToolkit_FOUND)
+      # Note that these variables will all contain the literal strings listed here.
+      # That will cause CMake to link against the imported target, instead of just the library.
+      # It's good to do that, because it's possible that each imported target may need to link against more than just the individual library.
+      # (That is, it may have dependencies itself, and so linking against "CUDA::cudart" may link against more than one library.)
+      set(CUDA_LIBRARIES CUDA::cudart)
+      set(CUDA_CUBLAS_LIBRARIES CUDA::cublas)
+      set(CUDA_curand_LIBRARY CUDA::curand)
+      set(CUDA_cusolver_LIBRARY CUDA::cusolver)
+      set(CUDA_nvrtc_LIBRARY CUDA::nvrtc)
+      set(CUDA_INCLUDE_DIRS "") # There is no need to have a specific include directory---linking against the imported target is sufficient.
 
-    # However, we want to print to the user the specific things they are linking against, because they may read the output.
-    # We have to therefore recover the path explicitly.
-    get_target_property(CUDART_LOC CUDA::cudart IMPORTED_LOCATION)
-    get_target_property(CUBLAS_LOC CUDA::cublas IMPORTED_LOCATION)
-    get_target_property(CURAND_LOC CUDA::curand IMPORTED_LOCATION)
-    get_target_property(CUSOLVER_LOC CUDA::cusolver IMPORTED_LOCATION)
-    get_target_property(NVRTC_LOC CUDA::nvrtc IMPORTED_LOCATION)
+      # However, we want to print to the user the specific things they are linking against, because they may read the output.
+      # We have to therefore recover the path explicitly.
+      get_target_property(CUDART_LOC CUDA::cudart IMPORTED_LOCATION)
+      get_target_property(CUBLAS_LOC CUDA::cublas IMPORTED_LOCATION)
+      get_target_property(CURAND_LOC CUDA::curand IMPORTED_LOCATION)
+      get_target_property(CUSOLVER_LOC CUDA::cusolver IMPORTED_LOCATION)
+      get_target_property(NVRTC_LOC CUDA::nvrtc IMPORTED_LOCATION)
 
-    set(CUDA_LIBS_NOPRINT CUDA::cudart CUDA::cublas CUDA::curand CUDA::cusolver CUDA::nvrtc)
-    set(CUDA_LIBS_PRINT ${CUDART_LOC} ${CUBLAS_LOC} ${CURAND_LOC} ${CUSOLVER_LOC} ${NVRTC_LOC})
+      set(CUDA_LIBS_NOPRINT CUDA::cudart CUDA::cublas CUDA::curand CUDA::cusolver CUDA::nvrtc)
+      set(CUDA_LIBS_PRINT ${CUDART_LOC} ${CUBLAS_LOC} ${CURAND_LOC} ${CUSOLVER_LOC} ${NVRTC_LOC})
 
-    # Set these so the next section succeeds.
-    if(NOT CUDA_LIBRARIES)
-      set(CUDA_LIBRARIES TRUE)
-    endif()
-    if(NOT CUDA_CUBLAS_LIBRARIES)
-      set(CUDA_CUBLAS_LIBRARIES TRUE)
-    endif()
-    if(NOT CUDA_curand_LIBRARY)
-      set(CUDA_curand_LIBRARY TRUE)
-    endif()
-    if(NOT CUDA_cusolver_LIBRARY)
-      set(CUDA_cusolver_LIBRARY TRUE)
-    endif()
-    if(NOT CUDA_nvrtc_LIBRARY)
-      set(CUDA_nvrtc_LIBRARY TRUE)
+      # Set these so the next section succeeds.
+      if(NOT CUDA_LIBRARIES)
+        set(CUDA_LIBRARIES TRUE)
+      endif()
+      if(NOT CUDA_CUBLAS_LIBRARIES)
+        set(CUDA_CUBLAS_LIBRARIES TRUE)
+      endif()
+      if(NOT CUDA_curand_LIBRARY)
+        set(CUDA_curand_LIBRARY TRUE)
+      endif()
+      if(NOT CUDA_cusolver_LIBRARY)
+        set(CUDA_cusolver_LIBRARY TRUE)
+      endif()
+      if(NOT CUDA_nvrtc_LIBRARY)
+        set(CUDA_nvrtc_LIBRARY TRUE)
+      endif()
     endif()
   endif()
 
