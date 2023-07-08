@@ -211,8 +211,8 @@ if(APPLE)
     message(STATUS "")
 
     if(BLAS_FOUND AND LAPACK_FOUND)
-      set(COOT_LIBS ${ARMA_LIBS} ${BLAS_LIBRARIES})
-      set(COOT_LIBS ${ARMA_LIBS} ${LAPACK_LIBRARIES})
+      set(COOT_LIBS ${COOT_LIBS} ${BLAS_LIBRARIES})
+      set(COOT_LIBS ${COOT_LIBS} ${LAPACK_LIBRARIES})
       set(COOT_USE_ACCELERATE false)
     endif()
 
