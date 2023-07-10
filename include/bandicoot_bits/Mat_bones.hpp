@@ -199,17 +199,17 @@ class Mat : public Base< eT, Mat<eT> >
   coot_inline uword get_n_cols() const;
   coot_inline uword get_n_elem() const;
 
-  inline coot_warn_unused MatValProxy<eT> operator[] (const uword ii);
-  inline coot_warn_unused eT              operator[] (const uword ii) const;
-  inline coot_warn_unused MatValProxy<eT> at         (const uword ii);
-  inline coot_warn_unused eT              at         (const uword ii) const;
-  inline coot_warn_unused MatValProxy<eT> operator() (const uword ii);
-  inline coot_warn_unused eT              operator() (const uword ii) const;
+  coot_warn_unused inline MatValProxy<eT> operator[] (const uword ii);
+  coot_warn_unused inline eT              operator[] (const uword ii) const;
+  coot_warn_unused inline MatValProxy<eT> at         (const uword ii);
+  coot_warn_unused inline eT              at         (const uword ii) const;
+  coot_warn_unused inline MatValProxy<eT> operator() (const uword ii);
+  coot_warn_unused inline eT              operator() (const uword ii) const;
 
-  inline coot_warn_unused MatValProxy<eT> at         (const uword in_row, const uword in_col);
-  inline coot_warn_unused eT              at         (const uword in_row, const uword in_col) const;
-  inline coot_warn_unused MatValProxy<eT> operator() (const uword in_row, const uword in_col);
-  inline coot_warn_unused eT              operator() (const uword in_row, const uword in_col) const;
+  coot_warn_unused inline MatValProxy<eT> at         (const uword in_row, const uword in_col);
+  coot_warn_unused inline eT              at         (const uword in_row, const uword in_col) const;
+  coot_warn_unused inline MatValProxy<eT> operator() (const uword in_row, const uword in_col);
+  coot_warn_unused inline eT              operator() (const uword in_row, const uword in_col) const;
 
   coot_inline       subview_row<eT> row(const uword row_num);
   coot_inline const subview_row<eT> row(const uword row_num) const;

@@ -2071,7 +2071,6 @@ Mat<eT>::impl_print(const std::string extra_text) const
 
 
 template<typename eT>
-coot_warn_unused
 inline
 bool
 Mat<eT>::is_vec() const
@@ -2082,7 +2081,6 @@ Mat<eT>::is_vec() const
 
 
 template<typename eT>
-coot_warn_unused
 inline
 bool
 Mat<eT>::is_colvec() const
@@ -2093,7 +2091,6 @@ Mat<eT>::is_colvec() const
 
 
 template<typename eT>
-coot_warn_unused
 inline
 bool
 Mat<eT>::is_rowvec() const
@@ -2104,7 +2101,6 @@ Mat<eT>::is_rowvec() const
 
 
 template<typename eT>
-coot_warn_unused
 inline
 bool
 Mat<eT>::is_square() const
@@ -2115,7 +2111,6 @@ Mat<eT>::is_square() const
 
 
 template<typename eT>
-coot_warn_unused
 inline
 bool
 Mat<eT>::is_empty() const
@@ -2157,8 +2152,7 @@ Mat<eT>::get_n_elem() const
 
 // linear element accessor without bounds check; this is very slow - do not use it unless absolutely necessary
 template<typename eT>
-coot_inline
-coot_warn_unused
+inline
 MatValProxy<eT>
 Mat<eT>::operator[] (const uword ii)
   {
@@ -2170,7 +2164,6 @@ Mat<eT>::operator[] (const uword ii)
 // linear element accessor without bounds check; this is very slow - do not use it unless absolutely necessary
 template<typename eT>
 inline
-coot_warn_unused
 eT
 Mat<eT>::operator[] (const uword ii) const
   {
@@ -2181,8 +2174,7 @@ Mat<eT>::operator[] (const uword ii) const
 
 // linear element accessor without bounds check; this is very slow - do not use it unless absolutely necessary
 template<typename eT>
-coot_inline
-coot_warn_unused
+inline
 MatValProxy<eT>
 Mat<eT>::at(const uword ii)
   {
@@ -2193,8 +2185,7 @@ Mat<eT>::at(const uword ii)
 
 // linear element accessor without bounds check; this is very slow - do not use it unless absolutely necessary
 template<typename eT>
-coot_inline
-coot_warn_unused
+inline
 eT
 Mat<eT>::at(const uword ii) const
   {
@@ -2205,8 +2196,7 @@ Mat<eT>::at(const uword ii) const
 
 // linear element accessor with bounds check; this is very slow - do not use it unless absolutely necessary
 template<typename eT>
-coot_inline
-coot_warn_unused
+inline
 MatValProxy<eT>
 Mat<eT>::operator() (const uword ii)
   {
@@ -2219,8 +2209,7 @@ Mat<eT>::operator() (const uword ii)
 
 // linear element accessor with bounds check; this is very slow - do not use it unless absolutely necessary
 template<typename eT>
-coot_inline
-coot_warn_unused
+inline
 eT
 Mat<eT>::operator() (const uword ii) const
   {
@@ -2232,8 +2221,7 @@ Mat<eT>::operator() (const uword ii) const
 
 
 template<typename eT>
-coot_inline
-coot_warn_unused
+inline
 MatValProxy<eT>
 Mat<eT>::at(const uword in_row, const uword in_col)
   {
@@ -2243,8 +2231,7 @@ Mat<eT>::at(const uword in_row, const uword in_col)
 
 
 template<typename eT>
-coot_inline
-coot_warn_unused
+inline
 eT
 Mat<eT>::at(const uword in_row, const uword in_col) const
   {
@@ -2254,8 +2241,7 @@ Mat<eT>::at(const uword in_row, const uword in_col) const
 
 
 template<typename eT>
-coot_inline
-coot_warn_unused
+inline
 MatValProxy<eT>
 Mat<eT>::operator() (const uword in_row, const uword in_col)
   {
@@ -2267,8 +2253,7 @@ Mat<eT>::operator() (const uword in_row, const uword in_col)
 
 
 template<typename eT>
-coot_inline
-coot_warn_unused
+inline
 eT
 Mat<eT>::operator() (const uword in_row, const uword in_col) const
   {

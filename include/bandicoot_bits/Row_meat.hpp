@@ -289,7 +289,7 @@ Row<eT>::operator arma::Row<eT>() const
 
 
 template<typename eT>
-coot_inline
+inline
 const Op<Row<eT>, op_htrans>
 Row<eT>::t() const
   {
@@ -299,7 +299,7 @@ Row<eT>::t() const
 
 
 template<typename eT>
-coot_inline
+inline
 const Op<Row<eT>, op_htrans>
 Row<eT>::ht() const
   {
@@ -309,7 +309,7 @@ Row<eT>::ht() const
 
 
 template<typename eT>
-coot_inline
+inline
 const Op<Row<eT>, op_strans>
 Row<eT>::st() const
   {

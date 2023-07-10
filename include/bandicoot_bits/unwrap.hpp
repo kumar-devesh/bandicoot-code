@@ -316,7 +316,7 @@ struct partial_unwrap< Op< Mat<eT>, op_htrans2> >
 
   inline eT get_val() const { return val; }
 
-  coot_hot coot_inline bool is_alias(const Mat<eT>& X) const { return (void_ptr(&X) == void_ptr(&M)); }
+  coot_inline bool is_alias(const Mat<eT>& X) const { return (void_ptr(&X) == void_ptr(&M)); }
 
   static const bool do_trans = true;
   static const bool do_times = true;
@@ -342,7 +342,7 @@ struct partial_unwrap< eOp<Mat<eT>, eop_scalar_times> >
 
   inline eT get_val() const { return val; }
 
-  coot_hot coot_inline bool is_alias(const Mat<eT>& X) const { return (void_ptr(&X) == void_ptr(&M)); }
+  coot_inline bool is_alias(const Mat<eT>& X) const { return (void_ptr(&X) == void_ptr(&M)); }
 
   static const bool do_trans = false;
   static const bool do_times = true;
@@ -395,7 +395,7 @@ struct partial_unwrap< mtOp<eT, T1, mtop_type> >
 
   inline eT get_val() const { return Q.get_val(); }
 
-  coot_hot coot_inline bool is_alias(const Mat<eT>& X) const { return false; }
+  coot_inline bool is_alias(const Mat<eT>& X) const { return false; }
 
   static const bool do_trans = partial_unwrap<T1>::do_trans;
   static const bool do_times = partial_unwrap<T1>::do_times;

@@ -16,7 +16,7 @@
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 const Op<T1, op_symmat>
 symmatu(const Base<typename T1::elem_type, T1>& X, const bool do_conj = true)
   {
@@ -30,7 +30,7 @@ symmatu(const Base<typename T1::elem_type, T1>& X, const bool do_conj = true)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 const Op<T1, op_symmat>
 symmatl(const Base<typename T1::elem_type, T1>& X, const bool do_conj = true)
   {

@@ -17,7 +17,7 @@
 template<typename derived>
 struct Base_inv_yes
   {
-  coot_inline const Op<derived, op_inv> i() const;   // matrix inverse
+  coot_warn_unused inline const Op<derived, op_inv> i() const;   // matrix inverse
   };
 
 
@@ -41,14 +41,14 @@ struct Base_inv<derived, false> { typedef Base_inv_no<derived>  result; };
 template<typename elem_type, typename derived>
 struct Base_eval_Mat
   {
-  coot_inline const derived& eval() const;
+  coot_warn_unused inline const derived& eval() const;
   };
 
 
 template<typename elem_type, typename derived>
 struct Base_eval_expr
   {
-  coot_inline Mat<elem_type> eval() const;   // force the immediate evaluation of a delayed expression
+  coot_warn_unused inline Mat<elem_type> eval() const;   // force the immediate evaluation of a delayed expression
   };
 
 
@@ -66,18 +66,18 @@ struct Base_eval<elem_type, derived, false> { typedef Base_eval_expr<elem_type, 
 template<typename derived>
 struct Base_trans_cx
   {
-  coot_inline const Op<derived, op_htrans>  t() const;
-  coot_inline const Op<derived, op_htrans> ht() const;
-  coot_inline const Op<derived, op_strans> st() const;  // simple transpose: no complex conjugates
+  coot_warn_unused inline const Op<derived, op_htrans>  t() const;
+  coot_warn_unused inline const Op<derived, op_htrans> ht() const;
+  coot_warn_unused inline const Op<derived, op_strans> st() const;  // simple transpose: no complex conjugates
   };
 
 
 template<typename derived>
 struct Base_trans_default
   {
-  coot_inline const Op<derived, op_htrans>  t() const;
-  coot_inline const Op<derived, op_htrans> ht() const;
-  coot_inline const Op<derived, op_htrans> st() const;  // return op_htrans instead of op_strans, as it's handled better by matrix multiplication code
+  coot_warn_unused inline const Op<derived, op_htrans>  t() const;
+  coot_warn_unused inline const Op<derived, op_htrans> ht() const;
+  coot_warn_unused inline const Op<derived, op_htrans> st() const;  // return op_htrans instead of op_strans, as it's handled better by matrix multiplication code
   };
 
 
@@ -106,9 +106,9 @@ struct Base
   inline void raw_print(                           const std::string extra_text = "") const;
   inline void raw_print(std::ostream& user_stream, const std::string extra_text = "") const;
 
-//   inline coot_warn_unused elem_type min() const;
-//   inline coot_warn_unused elem_type max() const;
-//
-//   inline coot_warn_unused uword index_min() const;
-//   inline coot_warn_unused uword index_max() const;
+  // coot_warn_unused inline elem_type min() const;
+  // coot_warn_unused inline elem_type max() const;
+  // 
+  // coot_warn_unused inline uword index_min() const;
+  // coot_warn_unused inline uword index_max() const;
   };
