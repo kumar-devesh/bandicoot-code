@@ -542,7 +542,6 @@ subview<eT>::check_overlap(const subview<eT>& x) const
 
 
 template<typename eT>
-coot_warn_unused
 inline
 bool
 subview<eT>::is_vec() const
@@ -553,7 +552,6 @@ subview<eT>::is_vec() const
 
 
 template<typename eT>
-coot_warn_unused
 inline
 bool
 subview<eT>::is_colvec() const
@@ -564,7 +562,6 @@ subview<eT>::is_colvec() const
 
 
 template<typename eT>
-coot_warn_unused
 inline
 bool
 subview<eT>::is_rowvec() const
@@ -575,7 +572,6 @@ subview<eT>::is_rowvec() const
 
 
 template<typename eT>
-coot_warn_unused
 inline
 bool
 subview<eT>::is_square() const
@@ -586,7 +582,6 @@ subview<eT>::is_square() const
 
 
 template<typename eT>
-coot_warn_unused
 inline
 bool
 subview<eT>::is_empty() const

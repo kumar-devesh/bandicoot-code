@@ -289,7 +289,7 @@ Col<eT>::operator arma::Col<eT>() const
 
 
 template<typename eT>
-coot_inline
+inline
 const Op<Col<eT>, op_htrans>
 Col<eT>::t() const
   {
@@ -299,7 +299,7 @@ Col<eT>::t() const
 
 
 template<typename eT>
-coot_inline
+inline
 const Op<Col<eT>, op_htrans>
 Col<eT>::ht() const
   {
@@ -309,7 +309,7 @@ Col<eT>::ht() const
 
 
 template<typename eT>
-coot_inline
+inline
 const Op<Col<eT>, op_strans>
 Col<eT>::st() const
   {

@@ -16,7 +16,7 @@
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 const mtOp<uword, T1, mtop_sort_index>
 sort_index
   (
@@ -32,7 +32,7 @@ sort_index
 
 template<typename T1, typename T2>
 coot_warn_unused
-coot_inline
+inline
 typename
 enable_if2
   <
@@ -58,7 +58,7 @@ sort_index
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 const mtOp<uword, T1, mtop_sort_index>
 stable_sort_index
   (
@@ -74,7 +74,7 @@ stable_sort_index
 
 template<typename T1, typename T2>
 coot_warn_unused
-coot_inline
+inline
 typename
 enable_if2
   <

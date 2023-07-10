@@ -43,6 +43,7 @@ chol(Mat<typename T1::elem_type>& out, const Base<typename T1::elem_type, T1>& X
 
 
 template<typename T1>
+coot_warn_unused
 inline
 Mat<typename T1::elem_type>
 chol(const Base<typename T1::elem_type, T1>& X)

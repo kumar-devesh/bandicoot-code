@@ -16,7 +16,7 @@
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 const Op<T1, op_htrans>
 trans(const Base<typename T1::elem_type,T1>& X)
   {
@@ -29,7 +29,7 @@ trans(const Base<typename T1::elem_type,T1>& X)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 const Op<T1, op_htrans>
 htrans(const Base<typename T1::elem_type,T1>& X)
   {
@@ -44,7 +44,7 @@ htrans(const Base<typename T1::elem_type,T1>& X)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename
 enable_if2
   <
@@ -62,7 +62,7 @@ trans(const Op<T1, op_diagmat>& X)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename
 enable_if2
   <

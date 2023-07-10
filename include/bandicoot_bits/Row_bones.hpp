@@ -58,9 +58,9 @@ class Row : public Mat<eT>
 
   inline explicit operator arma::Row<eT> () const;
 
-  coot_inline const Op<Row<eT>, op_htrans>  t() const;
-  coot_inline const Op<Row<eT>, op_htrans> ht() const;
-  coot_inline const Op<Row<eT>, op_strans> st() const;
+  coot_warn_unused inline const Op<Row<eT>, op_htrans>  t() const;
+  coot_warn_unused inline const Op<Row<eT>, op_htrans> ht() const;
+  coot_warn_unused inline const Op<Row<eT>, op_strans> st() const;
 
   using Mat<eT>::cols;
   using Mat<eT>::operator();

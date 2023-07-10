@@ -16,7 +16,7 @@
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 const Op<T1, op_max>
 max
   (
@@ -37,7 +37,7 @@ max
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 const Op<T1, op_max>
 max
   (

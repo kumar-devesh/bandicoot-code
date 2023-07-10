@@ -21,7 +21,7 @@
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename
 enable_if2
   <

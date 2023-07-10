@@ -296,19 +296,19 @@
 #endif
 
 
-// #if defined(COOT_HAVE_CXX14)
-//   #undef  coot_deprecated
-//   #define coot_deprecated [[deprecated]]
-// 
-//   #undef  coot_frown
-//   #define coot_frown(msg) [[deprecated(msg)]]
-// #endif
+#if defined(COOT_HAVE_CXX14)
+  #undef  coot_deprecated
+  #define coot_deprecated [[deprecated]]
+
+  #undef  coot_frown
+  #define coot_frown(msg) [[deprecated(msg)]]
+#endif
 
 
-// #if defined(COOT_HAVE_CXX17)
-//   #undef  coot_warn_unused
-//   #define coot_warn_unused  [[nodiscard]]
-// #endif
+#if defined(COOT_HAVE_CXX17)
+  #undef  coot_warn_unused
+  #define coot_warn_unused  [[nodiscard]]
+#endif
 
 
 #if !defined(COOT_DONT_USE_OPENMP)

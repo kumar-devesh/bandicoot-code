@@ -62,6 +62,7 @@ eig_sym
 
 // Compute eigenvalues only into new object
 template<typename T1>
+coot_warn_unused
 inline
 Col<typename T1::elem_type>
 eig_sym
