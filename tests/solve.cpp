@@ -32,7 +32,7 @@ TEMPLATE_TEST_CASE("trivial_diagonal_solve", "[solve]", float, double)
   Mat<eT> A(10, 10, fill::eye);
   Col<eT> B(10, fill::ones);
 
-  Col<eT> X1 = solve(X1, A, B);
+  Col<eT> X1 = solve(A, B);
   Col<eT> X2;
   const bool status = solve(X2, A, B);
 
@@ -70,11 +70,11 @@ TEMPLATE_TEST_CASE("trivial_large_diagonal_solve", "[solve]", float, double)
 
   REQUIRE( X1.n_rows == B.n_rows );
   REQUIRE( X1.n_cols == B.n_cols );
-  REQUIRE( all( abs(X1 - 1) < 1e-5 ) );
+  REQUIRE( all( all( abs(X1 - 1) < 1e-5 ) ) );
 
   REQUIRE( X2.n_rows == B.n_rows );
   REQUIRE( X2.n_cols == B.n_cols );
-  REQUIRE( all( abs(X2 - 1) < 1e-5 ) );
+  REQUIRE( all( all( abs(X2 - 1) < 1e-5 ) ) );
   }
 
 
@@ -99,7 +99,6 @@ TEMPLATE_TEST_CASE("hardcoded_solve", "[solve]", float, double)
   //  [4, 5, 6]
   //  [7, 8, 9]]
   Mat<eT> B = reshape(linspace<Col<eT>>(1, 9, 9), 3, 3).t();
-1
 
   Mat<eT> X1 = solve(A, B);
   Mat<eT> X2;
@@ -114,25 +113,25 @@ TEMPLATE_TEST_CASE("hardcoded_solve", "[solve]", float, double)
   REQUIRE( X2.n_cols == 3 );
 
   // Computed by GNU Octave: A \ B
-  REQUIRE( eT(X1(0, 0)) = eT(-0.17672413793) );
-  REQUIRE( eT(X1(1, 0)) = eT( 0.09482758621) );
-  REQUIRE( eT(X1(2, 0)) = eT( 0.36637931034) );
-  REQUIRE( eT(X1(0, 1)) = eT(-0.12068965517) );
-  REQUIRE( eT(X1(1, 1)) = eT( 0.13793103448) );
-  REQUIRE( eT(X1(2, 1)) = eT( 0.18103448276) );
-  REQUIRE( eT(X1(0, 2)) = eT( 0.36637931034) );
-  REQUIRE( eT(X1(1, 2)) = eT( 0.39655172414) );
-  REQUIRE( eT(X1(2, 2)) = eT( 0.42672413793) );
+  REQUIRE( eT(X1(0, 0)) == eT(-0.17672413793) );
+  REQUIRE( eT(X1(1, 0)) == eT( 0.09482758621) );
+  REQUIRE( eT(X1(2, 0)) == eT( 0.36637931034) );
+  REQUIRE( eT(X1(0, 1)) == eT(-0.12068965517) );
+  REQUIRE( eT(X1(1, 1)) == eT( 0.13793103448) );
+  REQUIRE( eT(X1(2, 1)) == eT( 0.18103448276) );
+  REQUIRE( eT(X1(0, 2)) == eT( 0.36637931034) );
+  REQUIRE( eT(X1(1, 2)) == eT( 0.39655172414) );
+  REQUIRE( eT(X1(2, 2)) == eT( 0.42672413793) );
 
-  REQUIRE( eT(X2(0, 0)) = eT(-0.17672413793) );
-  REQUIRE( eT(X2(1, 0)) = eT( 0.09482758621) );
-  REQUIRE( eT(X2(2, 0)) = eT( 0.36637931034) );
-  REQUIRE( eT(X2(0, 1)) = eT(-0.12068965517) );
-  REQUIRE( eT(X2(1, 1)) = eT( 0.13793103448) );
-  REQUIRE( eT(X2(2, 1)) = eT( 0.18103448276) );
-  REQUIRE( eT(X2(0, 2)) = eT( 0.36637931034) );
-  REQUIRE( eT(X2(1, 2)) = eT( 0.39655172414) );
-  REQUIRE( eT(X2(2, 2)) = eT( 0.42672413793) );
+  REQUIRE( eT(X2(0, 0)) == eT(-0.17672413793) );
+  REQUIRE( eT(X2(1, 0)) == eT( 0.09482758621) );
+  REQUIRE( eT(X2(2, 0)) == eT( 0.36637931034) );
+  REQUIRE( eT(X2(0, 1)) == eT(-0.12068965517) );
+  REQUIRE( eT(X2(1, 1)) == eT( 0.13793103448) );
+  REQUIRE( eT(X2(2, 1)) == eT( 0.18103448276) );
+  REQUIRE( eT(X2(0, 2)) == eT( 0.36637931034) );
+  REQUIRE( eT(X2(1, 2)) == eT( 0.39655172414) );
+  REQUIRE( eT(X2(2, 2)) == eT( 0.42672413793) );
   }
 
 
@@ -168,8 +167,8 @@ TEMPLATE_TEST_CASE("random_square_solve", "[solve]", float, double)
   Mat<eT> B2_rec = A * X2;
 
   const eT tol = (is_float<eT>::value) ? 1e-3 : 1e-6;
-  REQUIRE( sum( abs(B - B1_rec) ) / B1_rec.n_elem < tol );
-  REQUIRE( sum( abs(B - B2_rec) ) / B2_rec.n_elem < tol );
+  REQUIRE( accu( abs(B - B1_rec) ) / B1_rec.n_elem < tol );
+  REQUIRE( accu( abs(B - B2_rec) ) / B2_rec.n_elem < tol );
   }
 
 
@@ -205,8 +204,8 @@ TEMPLATE_TEST_CASE("random_fast_square_solve", "[solve]", float, double)
   Mat<eT> B2_rec = A * X2;
 
   const eT tol = (is_float<eT>::value) ? 1e-3 : 1e-6;
-  REQUIRE( sum( abs(B - B1_rec) ) / B1_rec.n_elem < tol );
-  REQUIRE( sum( abs(B - B2_rec) ) / B2_rec.n_elem < tol );
+  REQUIRE( accu( abs(B - B1_rec) ) / B1_rec.n_elem < tol );
+  REQUIRE( accu( abs(B - B2_rec) ) / B2_rec.n_elem < tol );
   }
 
 
@@ -241,8 +240,8 @@ TEMPLATE_TEST_CASE("random_square_trans_solve", "[solve]", float, double)
   Mat<eT> B2_rec = A.t() * X2;
 
   const eT tol = (is_float<eT>::value) ? 1e-3 : 1e-6;
-  REQUIRE( sum( abs(B - B1_rec) ) / B1_rec.n_elem < tol );
-  REQUIRE( sum( abs(B - B2_rec) ) / B2_rec.n_elem < tol );
+  REQUIRE( accu( abs(B - B1_rec) ) / B1_rec.n_elem < tol );
+  REQUIRE( accu( abs(B - B2_rec) ) / B2_rec.n_elem < tol );
   }
 
 
@@ -277,8 +276,8 @@ TEMPLATE_TEST_CASE("random_square_htrans2_solve", "[solve]", float, double)
   Mat<eT> B2_rec = 3 * A.t() * X2;
 
   const eT tol = (is_float<eT>::value) ? 1e-3 : 1e-6;
-  REQUIRE( sum( abs(B - B1_rec) ) / B1_rec.n_elem < tol );
-  REQUIRE( sum( abs(B - B2_rec) ) / B2_rec.n_elem < tol );
+  REQUIRE( accu( abs(B - B1_rec) ) / B1_rec.n_elem < tol );
+  REQUIRE( accu( abs(B - B2_rec) ) / B2_rec.n_elem < tol );
   }
 
 
@@ -315,18 +314,11 @@ TEMPLATE_TEST_CASE("1x1_solve", "[solve]", float, double)
 // solve empty matrix
 TEST_CASE("empty_solve", "[solve]")
   {
-  typedef TestType eT;
+  fmat A;
+  fmat B;
 
-  if (!coot_rt_t::is_supported_type<eT>())
-    {
-    return;
-    }
-
-  Mat<eT> A;
-  Mat<eT> B;
-
-  Mat<eT> X1 = solve(A, B);
-  Mat<eT> X2;
+  fmat X1 = solve(A, B);
+  fmat X2;
   const bool status = solve(X2, A, B);
 
   REQUIRE( status == true );
@@ -368,8 +360,8 @@ TEMPLATE_TEST_CASE("solve_expr", "[solve]", float, double)
 
   Mat<eT> X_ref = solve(A_ref, B_ref);
 
-  REQUIRE( all( abs( X1 - X_ref ) < 1e-5 ) );
-  REQUIRE( all( abs( X2 - X_ref ) < 1e-5 ) );
+  REQUIRE( all( all( abs( X1 - X_ref ) < 1e-5 ) ) );
+  REQUIRE( all( all( abs( X2 - X_ref ) < 1e-5 ) ) );
   }
 
 
@@ -403,7 +395,7 @@ TEMPLATE_TEST_CASE
   Mat<eT1> X_pre_conv = solve(A, B);
   Mat<eT2> X_ref = conv_to<Mat<eT2>>::from(X_pre_conv);
 
-  REQUIRE( all( abs( X - X_ref ) < 1e-5 ) );
+  REQUIRE( all( all( abs( X - X_ref ) < 1e-5 ) ) );
   }
 
 
@@ -411,21 +403,14 @@ TEMPLATE_TEST_CASE
 // non-square should throw exception
 TEST_CASE("nonsquare_solve_exception", "[solve]")
   {
-  typedef TestType eT;
-
-  if (!coot_rt_t::is_supported_type<eT>())
-    {
-    return;
-    }
-
-  Mat<eT> A(250, 500, fill::randu);
-  Mat<eT> B(250, 400, fill::randu);
+  fmat A(250, 500, fill::randu);
+  fmat B(250, 400, fill::randu);
 
   // Disable cerr output for this test.
   std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
   std::cerr.rdbuf(NULL);
 
-  Mat<eT> X;
+  fmat X;
   bool status;
   REQUIRE_THROWS( X = solve(A, B) );
   REQUIRE_THROWS( status = solve(X, A, B) );
@@ -457,14 +442,14 @@ TEMPLATE_TEST_CASE("output_input_alias_solve", "[solve]", float, double)
 
   REQUIRE( B.n_rows == X_ref.n_rows );
   REQUIRE( B.n_cols == X_ref.n_cols );
-  REQUIRE( all( abs( B - X_ref ) < 1e-5 ) );
+  REQUIRE( all( all( abs( B - X_ref ) < 1e-5 ) ) );
 
   B = B_orig;
   const bool status = solve(B, A, B);
 
   REQUIRE( B.n_rows == X_ref.n_rows );
   REQUIRE( B.n_cols == X_ref.n_cols );
-  REQUIRE( all( abs( B - X_ref ) < 1e-5 ) );
+  REQUIRE( all( all( abs( B - X_ref ) < 1e-5 ) ) );
   }
 
 
@@ -491,7 +476,7 @@ TEMPLATE_TEST_CASE("output_A_alias_solve", "[solve]", float, double)
 
   REQUIRE( A.n_rows == X_ref.n_rows );
   REQUIRE( A.n_cols == X_ref.n_cols );
-  REQUIRE( all( abs( A - X_ref ) < 1e-5 ) );
+  REQUIRE( all( all( abs( A - X_ref ) < 1e-5 ) ) );
 
   A = A_orig;
   const bool status = solve(A, A, B);
@@ -499,7 +484,7 @@ TEMPLATE_TEST_CASE("output_A_alias_solve", "[solve]", float, double)
   REQUIRE( status == true );
   REQUIRE( A.n_rows == X_ref.n_rows );
   REQUIRE( A.n_cols == X_ref.n_cols );
-  REQUIRE( all( abs( A - X_ref ) < 1e-5 ) );
+  REQUIRE( all( all( abs( A - X_ref ) < 1e-5 ) ) );
   }
 
 
@@ -524,7 +509,7 @@ TEMPLATE_TEST_CASE("same_input_alias_solve", "[solve]", float, double)
 
   REQUIRE( A.n_rows == X_ref.n_rows );
   REQUIRE( A.n_cols == X_ref.n_cols );
-  REQUIRE( all( abs( A - X_ref ) < 1e-5 ) );
+  REQUIRE( all( all( abs( A - X_ref ) < 1e-5 ) ) );
 
   A = A_orig;
 
@@ -532,5 +517,5 @@ TEMPLATE_TEST_CASE("same_input_alias_solve", "[solve]", float, double)
 
   REQUIRE( A.n_rows == X_ref.n_rows );
   REQUIRE( A.n_cols == X_ref.n_cols );
-  REQUIRE( all( abs( A - X_ref ) < 1e-5 ) );
+  REQUIRE( all( all( abs( A - X_ref ) < 1e-5 ) ) );
   }

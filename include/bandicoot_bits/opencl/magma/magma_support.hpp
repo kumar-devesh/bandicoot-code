@@ -1250,7 +1250,7 @@ magma_dtrsv
 
   cl_int err = coot_wrapper(clblasDtrsv)(clblasColumnMajor,
                                          clblas_uplo_const( uplo ),
-                                         clblas_trans_const( trans ),
+                                         clblas_trans_const( transA ),
                                          clblas_diag_const( diag ),
                                          n,
                                          dA,
@@ -1264,7 +1264,7 @@ magma_dtrsv
                                          0,
                                          NULL,
                                          get_g_event());
-  clFlush(queue);
+  coot_wrapper(clFlush)(queue);
   check_error(err);
   }
 
@@ -1275,7 +1275,7 @@ void
 magma_strsv
   (
   magma_uplo_t uplo,
-  magma_trans_t trans,
+  magma_trans_t transA,
   magma_diag_t diag,
   magma_int_t n,
   magmaFloat_const_ptr dA,
@@ -1292,7 +1292,7 @@ magma_strsv
 
   cl_int err = coot_wrapper(clblasStrsv)(clblasColumnMajor,
                                          clblas_uplo_const( uplo ),
-                                         clblas_trans_const( trans ),
+                                         clblas_trans_const( transA ),
                                          clblas_diag_const( diag ),
                                          n,
                                          dA,
@@ -1303,9 +1303,10 @@ magma_strsv
                                          incx,
                                          1,
                                          &queue,
+                                         0,
                                          NULL,
                                          get_g_event());
-  clFlush(queue);
+  coot_wrapper(clFlush)(queue);
   check_error(err);
   }
 

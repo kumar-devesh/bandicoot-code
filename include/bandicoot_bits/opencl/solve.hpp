@@ -42,7 +42,7 @@ solve_square_fast(dev_mem_t<eT> A, const bool trans_A, dev_mem_t<eT> B, const uw
     {
     status = magma_sgetrf_gpu(n_rows,
                               n_cols,
-                              in.cl_mem_ptr,
+                              A.cl_mem_ptr,
                               0,
                               n_rows,
                               ipiv,
@@ -52,7 +52,7 @@ solve_square_fast(dev_mem_t<eT> A, const bool trans_A, dev_mem_t<eT> B, const uw
     {
     status = magma_dgetrf_gpu(n_rows,
                               n_cols,
-                              in.cl_mem_ptr,
+                              A.cl_mem_ptr,
                               0,
                               n_rows,
                               ipiv,
@@ -93,7 +93,7 @@ solve_square_fast(dev_mem_t<eT> A, const bool trans_A, dev_mem_t<eT> B, const uw
                               ipiv,
                               B.cl_mem_ptr,
                               n_rows,
-                              info);
+                              &info);
     }
   else if (is_double<eT>::value)
     {
@@ -105,7 +105,7 @@ solve_square_fast(dev_mem_t<eT> A, const bool trans_A, dev_mem_t<eT> B, const uw
                               ipiv,
                               B.cl_mem_ptr,
                               n_rows,
-                              info);
+                              &info);
     }
   else
     {

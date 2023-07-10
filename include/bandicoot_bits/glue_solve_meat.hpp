@@ -31,10 +31,10 @@ glue_solve::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_solve>& in)
 
 
 
-template<typename out_eT, typename T1, typename T2>
+template<typename out_eT, typename eT, typename T1, typename T2>
 inline
 std::tuple<bool, std::string>
-glue_solve::apply(Mat<out_eT>& out, const Base<eT, T1>& A_expr, const Base<eT, T2>& B_expr, const uword flags, const typename enable_if<!is_same_type<eT, out_eT>::value>::type* junk = 0)
+glue_solve::apply(Mat<out_eT>& out, const Base<eT, T1>& A_expr, const Base<eT, T2>& B_expr, const uword flags, const typename enable_if<!is_same_type<eT, out_eT>::value>::result* junk)
   {
   coot_extra_debug_sigprint();
   coot_ignore(junk);
@@ -47,6 +47,8 @@ glue_solve::apply(Mat<out_eT>& out, const Base<eT, T1>& A_expr, const Base<eT, T
     out.set_size(tmp_out.n_rows, tmp_out.n_cols);
     coot_rt_t::copy_array(out.get_dev_mem(false), tmp_out.get_dev_mem(false), tmp_out.n_elem);
     }
+
+  return result;
   }
 
 
@@ -63,15 +65,15 @@ glue_solve::apply(Mat<eT>& out, const Base<eT, T1>& A_expr, const Base<eT, T2>& 
   out = B_expr.get_ref(); // form B into `out`; solve_square_fast() will overwrite with the result
   Mat<eT> A(A_expr.get_ref()); // A needs to be unwrapped into a new matrix, that will be destroyed during computation
 
-  return coot_rt_t::solve_square_fast(A, false, out.get_dev_mem(false), out.n_rows, out.n_cols);
+  return coot_rt_t::solve_square_fast(A.get_dev_mem(true), false, out.get_dev_mem(true), out.n_rows, out.n_cols);
   }
 
 
 
-template<typename out_eT, typename T1, typename T2>
+template<typename eT, typename T1, typename T2>
 inline
 std::tuple<bool, std::string>
-glue_solve::apply(Mat<out_eT>& out, const Base<eT, Op<T1, op_htrans>>& A_expr, const Base<eT, T2>& B_expr, const uword flags)
+glue_solve::apply(Mat<eT>& out, const Base<eT, Op<T1, op_htrans>>& A_expr, const Base<eT, T2>& B_expr, const uword flags)
   {
   coot_extra_debug_sigprint();
 
@@ -80,15 +82,15 @@ glue_solve::apply(Mat<out_eT>& out, const Base<eT, Op<T1, op_htrans>>& A_expr, c
   out = B_expr.get_ref(); // form B into `out`; solve_square_fast() will overwrite with the result
   Mat<eT> A(A_expr.get_ref().m); // A needs to be unwrapped into a new matrix, that will be destroyed during computation
 
-  return coot_rt_t::solve_square_fast(A, true, out.get_dev_mem(false), out.n_rows, out.n_cols);
+  return coot_rt_t::solve_square_fast(A.get_dev_mem(true), true, out.get_dev_mem(true), out.n_rows, out.n_cols);
   }
 
 
 
-template<typename out_eT, typename T1, typename T2>
+template<typename eT, typename T1, typename T2>
 inline
 std::tuple<bool, std::string>
-glue_solve::apply(Mat<out_eT>& out, const Base<eT, Op<T1, op_htrans2>>& A_expr, const Base<eT, T2>& B_expr, const uword flags)
+glue_solve::apply(Mat<eT>& out, const Base<eT, Op<T1, op_htrans2>>& A_expr, const Base<eT, T2>& B_expr, const uword flags)
   {
   coot_extra_debug_sigprint();
 
@@ -97,12 +99,14 @@ glue_solve::apply(Mat<out_eT>& out, const Base<eT, Op<T1, op_htrans2>>& A_expr, 
   out = B_expr.get_ref(); // form B into `out`; solve_square_fast() will overwrite with the result
   Mat<eT> A(A_expr.get_ref().m); // A needs to be unwrapped into a new matrix, that will be destroyed during computation
 
-  const std::tuple<bool, std::string> result = coot_rt_t::solve_square_fast(A, true, out.get_dev_mem(false), out.n_rows, out.n_cols);
+  const std::tuple<bool, std::string> result = coot_rt_t::solve_square_fast(A.get_dev_mem(true), true, out.get_dev_mem(true), out.n_rows, out.n_cols);
   if (std::get<0>(result) == true)
     {
     // the result needs to be divided by the scalar
     coot_rt_t::inplace_op_scalar(out.get_dev_mem(false), A_expr.get_ref().aux, out.n_elem, oneway_kernel_id::inplace_div_scalar);
     }
+
+  return result;
   }
 
 

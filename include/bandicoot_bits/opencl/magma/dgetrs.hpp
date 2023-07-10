@@ -117,13 +117,6 @@ magma_dgetrs_gpu
     return *info;
     }
 
-  magma_dmalloc_cpu( &work, n * nrhs );
-  if ( work == NULL )
-    {
-    *info = MAGMA_ERR_HOST_ALLOC;
-    return *info;
-    }
-
   magma_queue_t queue = magma_queue_create();
 
   i1 = 1;
@@ -133,9 +126,7 @@ magma_dgetrs_gpu
     inc = 1;
 
     /* Solve A * X = B. */
-    magma_dgetmatrix( n, nrhs, dB, 0, lddb, work, n, queue );
-    coot_fortran(coot_dlaswp)( &nrhs, work, &n, &i1, &i2, ipiv, &inc );
-    magma_dsetmatrix( n, nrhs, work, n, dB, 0, lddb, queue );
+    magmablas_dlaswp( nrhs, dB, 0, lddb, i1, i2, ipiv, inc, queue );
 
     if ( nrhs == 1)
       {
@@ -164,13 +155,10 @@ magma_dgetrs_gpu
       magma_dtrsm( MagmaLeft, MagmaLower, trans, MagmaUnit,    n, nrhs, c_one, dA, 0, ldda, dB, 0, lddb, queue );
       }
 
-    magma_dgetmatrix( n, nrhs, dB, 0, lddb, work, n, queue );
-    coot_fortran(coot_dlaswp)( &nrhs, work, &n, &i1, &i2, ipiv, &inc );
-    magma_dsetmatrix( n, nrhs, work, n, dB, 0, lddb, queue );
+    magmablas_dlaswp( nrhs, dB, 0, lddb, i1, i2, ipiv, inc, queue );
     }
 
   magma_queue_destroy( queue );
-  magma_free_cpu( work );
 
   return *info;
   }
