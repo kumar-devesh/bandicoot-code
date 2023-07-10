@@ -180,6 +180,9 @@ class coot_rt_t
   static inline std::tuple<bool, std::string> eig_sym(dev_mem_t<eT> mem, const uword n_rows, const bool eigenvectors, dev_mem_t<eT> eigenvalues);
 
   template<typename eT>
+  static inline std::tuple<bool, std::string> solve_square_fast(dev_mem_t<eT> A, const bool trans_A, dev_mem_t<eT> B, const uword n_rows, const uword n_cols);
+
+  template<typename eT>
   static inline void copy_from_dev_mem(eT* dest, const dev_mem_t<eT> src, const uword N);
 
   template<typename eT>

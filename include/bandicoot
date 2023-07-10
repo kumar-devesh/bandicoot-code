@@ -324,6 +324,7 @@ namespace coot
     #include "bandicoot_bits/opencl/magma/slatrd2.hpp"
     #include "bandicoot_bits/opencl/magma/ssytrd2.hpp"
     #include "bandicoot_bits/opencl/magma/ssyevd.hpp"
+    #include "bandicoot_bits/opencl/magma/sgetrs.hpp"
 
     #include "bandicoot_bits/opencl/magma/dlarfb.hpp"
     #include "bandicoot_bits/opencl/magma/dorgqr.hpp"
@@ -351,6 +352,7 @@ namespace coot
     #include "bandicoot_bits/opencl/magma/dlatrd2.hpp"
     #include "bandicoot_bits/opencl/magma/dsytrd2.hpp"
     #include "bandicoot_bits/opencl/magma/dsyevd.hpp"
+    #include "bandicoot_bits/opencl/magma/dgetrs.hpp"
 
     namespace opencl
       {
@@ -401,6 +403,7 @@ namespace coot
       #include "bandicoot_bits/opencl/reorder_cols.hpp"
       #include "bandicoot_bits/opencl/cross.hpp"
       #include "bandicoot_bits/opencl/rotate_180.hpp"
+      #include "bandicoot_bits/opencl/solve.hpp"
       }
   #endif
 
@@ -456,6 +459,7 @@ namespace coot
     #include "bandicoot_bits/cuda/reorder_cols.hpp"
     #include "bandicoot_bits/cuda/cross.hpp"
     #include "bandicoot_bits/cuda/rotate_180.hpp"
+    #include "bandicoot_bits/cuda/solve.hpp"
     }
   #endif
 
