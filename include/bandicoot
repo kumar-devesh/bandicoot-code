@@ -51,8 +51,8 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <iomanip>
-#include <limits.h>
-#include <float.h>
+#include <limits>
+#include <cfloat>
 #include <iostream>
 #include <fstream>
 #include <complex>
