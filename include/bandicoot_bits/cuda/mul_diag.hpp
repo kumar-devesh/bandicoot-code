@@ -98,7 +98,7 @@ mul_diag
       (uword*) &C_n_rows,
       (uword*) &C_n_cols };
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],

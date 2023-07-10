@@ -69,7 +69,7 @@ sort_index_vec(dev_mem_t<uword> out, dev_mem_t<eT> A, const uword n_elem, const 
       &(tmp_mem_index.cuda_mem_ptr),
       (uword*) &n_elem };
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       1, 1, 1, pow2_num_threads, 1, 1,
       aux_mem_size,

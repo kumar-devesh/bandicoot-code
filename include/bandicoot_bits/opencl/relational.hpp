@@ -32,15 +32,15 @@ relational_scalar_op(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> in_mem, cons
 
   cl_int status = 0;
 
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &out_mem.cl_mem_ptr);
-  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &in_mem.cl_mem_ptr );
-  status |= clSetKernelArg(kernel, 2, N.size,         N.addr             );
-  status |= clSetKernelArg(kernel, 3, sizeof(eT2),    &val               );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem), &out_mem.cl_mem_ptr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(cl_mem), &in_mem.cl_mem_ptr );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 2, N.size,         N.addr             );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 3, sizeof(eT2),    &val               );
   coot_check_cl_error(status, "coot::opencl::relational_scalar_op() (" + name + "): couldn't set kernel arguments");
 
   size_t work_size = size_t(n_elem);
 
-  status = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &work_size, NULL, 0, NULL, NULL);
+  status = coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &work_size, NULL, 0, NULL, NULL);
 
   coot_check_cl_error(status, "coot::opencl::relational_scalar_op() (" + name + "): couldn't execute kernel");
   }
@@ -65,15 +65,15 @@ relational_unary_array_op(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> in_mem,
 
   cl_int status = 0;
 
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &out_mem.cl_mem_ptr);
-  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &in_mem.cl_mem_ptr );
-  status |= clSetKernelArg(kernel, 2, N.size,         N.addr             );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem), &out_mem.cl_mem_ptr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(cl_mem), &in_mem.cl_mem_ptr );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 2, N.size,         N.addr             );
 
   coot_check_cl_error(status, "coot::opencl::relational_unary_array_op() (" + name + "): couldn't set kernel arguments");
 
   size_t work_size = size_t(n_elem);
 
-  status = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &work_size, NULL, 0, NULL, NULL);
+  status = coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &work_size, NULL, 0, NULL, NULL);
 
   coot_check_cl_error(status, "coot::opencl::relational_unary_array_op() (" + name + "): couldn't execute kernel");
   }
@@ -98,15 +98,15 @@ relational_array_op(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> X_mem, const 
 
   cl_int status = 0;
 
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &out_mem.cl_mem_ptr);
-  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &X_mem.cl_mem_ptr  );
-  status |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &Y_mem.cl_mem_ptr  );
-  status |= clSetKernelArg(kernel, 3, N.size,         N.addr             );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem), &out_mem.cl_mem_ptr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(cl_mem), &X_mem.cl_mem_ptr  );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 2, sizeof(cl_mem), &Y_mem.cl_mem_ptr  );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 3, N.size,         N.addr             );
   coot_check_cl_error(status, "coot::opencl::relational_array_op() (" + name + "): couldn't set kernel arguments");
 
   size_t work_size = size_t(n_elem);
 
-  status = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &work_size, NULL, 0, NULL, NULL);
+  status = coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &work_size, NULL, 0, NULL, NULL);
 
   coot_check_cl_error(status, "coot::opencl::relational_array_op() (" + name + "): couldn't execute kernel");
   }

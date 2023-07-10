@@ -102,14 +102,14 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_
   runtime_t::adapt_uword dev_n_rows(n_rows);
   runtime_t::adapt_uword dev_n_cols(n_cols);
 
-  status2  = clSetKernelArg(kernel, 0, sizeof(cl_mem), &(L.cl_mem_ptr));
-  status2 |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &(U.cl_mem_ptr));
-  status2 |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &(in.cl_mem_ptr));
-  status2 |= clSetKernelArg(kernel, 3, dev_n_rows.size, dev_n_rows.addr);
-  status2 |= clSetKernelArg(kernel, 4, dev_n_cols.size, dev_n_cols.addr);
+  status2  = coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem), &(L.cl_mem_ptr));
+  status2 |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(cl_mem), &(U.cl_mem_ptr));
+  status2 |= coot_wrapper(clSetKernelArg)(kernel, 2, sizeof(cl_mem), &(in.cl_mem_ptr));
+  status2 |= coot_wrapper(clSetKernelArg)(kernel, 3, dev_n_rows.size, dev_n_rows.addr);
+  status2 |= coot_wrapper(clSetKernelArg)(kernel, 4, dev_n_cols.size, dev_n_cols.addr);
   if (!pivoting)
     {
-    status2 |= clSetKernelArg(kernel, 5, sizeof(cl_mem), &(ipiv_gpu.cl_mem_ptr));
+    status2 |= coot_wrapper(clSetKernelArg)(kernel, 5, sizeof(cl_mem), &(ipiv_gpu.cl_mem_ptr));
     }
 
   if (status2 != CL_SUCCESS)
@@ -121,7 +121,7 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_
   size_t global_work_offset[2] = { 0, 0 };
   size_t global_work_size[2] = { size_t(n_rows), size_t(std::max(n_rows, n_cols)) };
 
-  status2 = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 2, global_work_offset, global_work_size, NULL, 0, NULL, NULL);
+  status2 = coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 2, global_work_offset, global_work_size, NULL, 0, NULL, NULL);
 
   if (status2 != CL_SUCCESS)
     {
@@ -134,9 +134,9 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_
     {
     kernel = get_rt().cl_rt.get_kernel<eT>(oneway_real_kernel_id::lu_extract_p);
 
-    status2  = clSetKernelArg(kernel, 0, sizeof(cl_mem),    &(P.cl_mem_ptr));
-    status2 |= clSetKernelArg(kernel, 1, sizeof(cl_mem),    &(ipiv_gpu.cl_mem_ptr));
-    status2 |= clSetKernelArg(kernel, 2, dev_n_rows.size,   dev_n_rows.addr);
+    status2  = coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem),    &(P.cl_mem_ptr));
+    status2 |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(cl_mem),    &(ipiv_gpu.cl_mem_ptr));
+    status2 |= coot_wrapper(clSetKernelArg)(kernel, 2, dev_n_rows.size,   dev_n_rows.addr);
 
     if (status2 != CL_SUCCESS)
       {
@@ -147,7 +147,7 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_
     size_t global_work_offset_2 = 0;
     size_t global_work_size_2   = n_rows;
 
-    status2 = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, &global_work_offset_2, &global_work_size_2, NULL, 0, NULL, NULL);
+    status2 = coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 1, &global_work_offset_2, &global_work_size_2, NULL, 0, NULL, NULL);
 
     if (status2 != CL_SUCCESS)
       {

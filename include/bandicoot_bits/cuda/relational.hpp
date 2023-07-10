@@ -36,7 +36,7 @@ relational_scalar_op(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> in_mem, cons
 
   const kernel_dims dims = one_dimensional_grid_dims(n_elem);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],
@@ -70,7 +70,7 @@ relational_unary_array_op(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> in_mem,
 
   const kernel_dims dims = one_dimensional_grid_dims(n_elem);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],
@@ -104,7 +104,7 @@ relational_array_op(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> X_mem, const 
 
   const kernel_dims dims = one_dimensional_grid_dims(n_elem);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],

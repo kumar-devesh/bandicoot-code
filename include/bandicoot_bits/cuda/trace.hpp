@@ -40,7 +40,7 @@ trace(dev_mem_t<eT> mem, const uword n_rows, const uword n_cols)
       (uword*) &n_rows,
       (uword*) &diag_len };
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       // TODO: better trace() kernel
       1, 1, 1, // grid dims

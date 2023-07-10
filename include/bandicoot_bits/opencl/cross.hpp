@@ -32,13 +32,13 @@ cross(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const dev_mem_t<eT1> B)
 
   cl_int status = 0;
 
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &(out.cl_mem_ptr));
-  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &(A.cl_mem_ptr));
-  status |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &(B.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem), &(out.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(cl_mem), &(A.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(kernel, 2, sizeof(cl_mem), &(B.cl_mem_ptr));
 
   const size_t global_work_size = 3;
 
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
 
   coot_check_runtime_error( (status != 0), "coot::opencl::cross(): couldn't execute kernel" );
   }

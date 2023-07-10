@@ -48,7 +48,7 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_
 
   // This is an additional error code for cusolverDn; but it is an error code on the device...
   int* dev_info = NULL;
-  status2 = cudaMalloc((void**) &dev_info, sizeof(int));
+  status2 = coot_wrapper(cudaMalloc)((void**) &dev_info, sizeof(int));
   if (status2 != cudaSuccess)
     {
     return std::make_tuple(false, "couldn't cudaMalloc() device info holder");
@@ -56,19 +56,19 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_
 
   size_t host_workspace_size = 0;
   size_t gpu_workspace_size = 0;
-  status = cusolverDnXgetrf_bufferSize(get_rt().cuda_rt.cusolver_handle,
-                                       NULL,
-                                       n_rows,
-                                       n_cols,
-                                       data_type,
-                                       in.cuda_mem_ptr,
-                                       n_rows,
-                                       data_type,
-                                       &gpu_workspace_size,
-                                       &host_workspace_size);
+  status = coot_wrapper(cusolverDnXgetrf_bufferSize)(get_rt().cuda_rt.cusolver_handle,
+                                                     NULL,
+                                                     n_rows,
+                                                     n_cols,
+                                                     data_type,
+                                                     in.cuda_mem_ptr,
+                                                     n_rows,
+                                                     data_type,
+                                                     &gpu_workspace_size,
+                                                     &host_workspace_size);
   if (status != CUSOLVER_STATUS_SUCCESS)
     {
-    cudaFree(dev_info);
+    coot_wrapper(cudaFree)(dev_info);
     return std::make_tuple(false, "couldn't compute workspace size with cusolverDnXgetrf_bufferSize()");
     }
 
@@ -76,56 +76,56 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_
   const uword ipiv_size = std::min(n_rows, n_cols);
 
   // Allocate space for pivots.
-  status2 = cudaMalloc((void**) &ipiv, sizeof(s64) * ipiv_size);
+  status2 = coot_wrapper(cudaMalloc)((void**) &ipiv, sizeof(s64) * ipiv_size);
   if (status2 != cudaSuccess)
     {
-    cudaFree(dev_info);
+    coot_wrapper(cudaFree)(dev_info);
     return std::make_tuple(false, "couldn't cudaMalloc() pivot array");
     }
 
   void* gpu_workspace = NULL;
-  status2 = cudaMalloc((void**) &gpu_workspace, gpu_workspace_size);
+  status2 = coot_wrapper(cudaMalloc)((void**) &gpu_workspace, gpu_workspace_size);
   if (status2 != cudaSuccess)
     {
-    cudaFree(dev_info);
-    cudaFree(ipiv);
+    coot_wrapper(cudaFree)(dev_info);
+    coot_wrapper(cudaFree)(ipiv);
     return std::make_tuple(false, "couldn't cudaMalloc() GPU workspace memory");
     }
 
   char* host_workspace = cpu_memory::acquire<char>(host_workspace_size);
 
-  status = cusolverDnXgetrf(get_rt().cuda_rt.cusolver_handle,
-                            NULL,
-                            n_rows,
-                            n_cols,
-                            data_type,
-                            in.cuda_mem_ptr,
-                            n_rows,
-                            ipiv,
-                            data_type,
-                            gpu_workspace,
-                            gpu_workspace_size,
-                            (void*) host_workspace,
-                            host_workspace_size,
-                            dev_info);
+  status = coot_wrapper(cusolverDnXgetrf)(get_rt().cuda_rt.cusolver_handle,
+                                          NULL,
+                                          n_rows,
+                                          n_cols,
+                                          data_type,
+                                          in.cuda_mem_ptr,
+                                          n_rows,
+                                          ipiv,
+                                          data_type,
+                                          gpu_workspace,
+                                          gpu_workspace_size,
+                                          (void*) host_workspace,
+                                          host_workspace_size,
+                                          dev_info);
 
-  cudaFree(gpu_workspace);
+  coot_wrapper(cudaFree)(gpu_workspace);
   cpu_memory::release(host_workspace);
 
   if (status != CUSOLVER_STATUS_SUCCESS)
     {
-    cudaFree(dev_info);
-    cudaFree(ipiv);
+    coot_wrapper(cudaFree)(dev_info);
+    coot_wrapper(cudaFree)(ipiv);
     return std::make_tuple(false, "factorisation via cusolverDnXgetrf() failed");
     }
 
   // Check whether the factorisation was successful.
   int info_result;
-  status2 = cudaMemcpy(&info_result, dev_info, sizeof(int), cudaMemcpyDeviceToHost);
-  cudaFree(dev_info);
+  status2 = coot_wrapper(cudaMemcpy)(&info_result, dev_info, sizeof(int), cudaMemcpyDeviceToHost);
+  coot_wrapper(cudaFree)(dev_info);
   if (status2 != cudaSuccess)
     {
-    cudaFree(ipiv);
+    coot_wrapper(cudaFree)(ipiv);
     return std::make_tuple(false, "couldn't copy device info holder to host");
     }
 
@@ -152,8 +152,8 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_
     }
 
   s64* ipiv_cpu = cpu_memory::acquire<s64>(ipiv_size);
-  status2 = cudaMemcpy(ipiv_cpu, ipiv, ipiv_size * sizeof(s64), cudaMemcpyDeviceToHost);
-  cudaFree(ipiv);
+  status2 = coot_wrapper(cudaMemcpy)(ipiv_cpu, ipiv, ipiv_size * sizeof(s64), cudaMemcpyDeviceToHost);
+  coot_wrapper(cudaFree)(ipiv);
 
   if (status2 != cudaSuccess)
     {
@@ -197,7 +197,7 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_
   const size_t max_rc = std::max(n_rows, n_cols);
   const kernel_dims dims = two_dimensional_grid_dims(n_rows, max_rc);
 
-  CUresult status3 = cuLaunchKernel(
+  CUresult status3 = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2], dims.d[3], dims.d[4], dims.d[5],
       0, NULL, (pivoting ? (void**) pivot_args : (void**) nopivot_args), 0);
@@ -220,7 +220,7 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_
 
     const kernel_dims dims2 = one_dimensional_grid_dims(n_rows);
 
-    status3 = cuLaunchKernel(
+    status3 = coot_wrapper(cuLaunchKernel)(
         kernel,
         dims2.d[0], dims2.d[1], dims2.d[2], dims2.d[3], dims2.d[4], dims2.d[5],
         0, NULL, (void**) args2, 0);

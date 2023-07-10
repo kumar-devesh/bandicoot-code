@@ -24,7 +24,7 @@ copy_from_dev_mem(eT* dest, const dev_mem_t<eT> src, const uword N)
   runtime_t::cq_guard guard;
 
   // use a blocking call
-  const cl_int status = clEnqueueReadBuffer(get_rt().cl_rt.get_cq(), src.cl_mem_ptr, CL_TRUE, 0, sizeof(eT) * N, dest, 0, NULL, NULL);
+  const cl_int status = coot_wrapper(clEnqueueReadBuffer)(get_rt().cl_rt.get_cq(), src.cl_mem_ptr, CL_TRUE, 0, sizeof(eT) * N, dest, 0, NULL, NULL);
 
   coot_check_runtime_error( (status != CL_SUCCESS), "Mat::copy_from_dev_mem(): couldn't access device memory" );
   }
@@ -41,7 +41,7 @@ copy_into_dev_mem(dev_mem_t<eT> dest, const eT* src, const uword N)
   runtime_t::cq_guard guard;
 
   // use a blocking call
-  cl_int status = clEnqueueWriteBuffer(get_rt().cl_rt.get_cq(), dest.cl_mem_ptr, CL_TRUE, 0, sizeof(eT)*N, src, 0, NULL, NULL);
+  cl_int status = coot_wrapper(clEnqueueWriteBuffer)(get_rt().cl_rt.get_cq(), dest.cl_mem_ptr, CL_TRUE, 0, sizeof(eT)*N, src, 0, NULL, NULL);
 
   coot_check_runtime_error( (status != CL_SUCCESS), "Mat::write_dev_mem(): couldn't access device memory" );
   }

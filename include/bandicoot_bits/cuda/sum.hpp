@@ -31,7 +31,7 @@ sum_colwise(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword n_rows, cons
 
   const kernel_dims dims = one_dimensional_grid_dims(n_cols);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],
@@ -61,7 +61,7 @@ sum_rowwise(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword n_rows, cons
 
   const kernel_dims dims = one_dimensional_grid_dims(n_rows);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],
@@ -94,7 +94,7 @@ sum_colwise_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword M_n_
 
   const kernel_dims dims = one_dimensional_grid_dims(n_cols);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],
@@ -127,7 +127,7 @@ sum_rowwise_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> A, const uword M_n_
 
   const kernel_dims dims = one_dimensional_grid_dims(n_rows);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],

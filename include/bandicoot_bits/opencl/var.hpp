@@ -37,12 +37,12 @@ var(dev_mem_t<eT> out, const dev_mem_t<eT> in, const dev_mem_t<eT> means, const 
   runtime_t::adapt_uword cl_n_cols(n_cols);
   runtime_t::adapt_uword cl_norm_correction(norm_correction);
 
-  status |= clSetKernelArg(k, 0, sizeof(cl_mem),          &(out.cl_mem_ptr));
-  status |= clSetKernelArg(k, 1, sizeof(cl_mem),          &(in.cl_mem_ptr));
-  status |= clSetKernelArg(k, 2, sizeof(cl_mem),          &(means.cl_mem_ptr));
-  status |= clSetKernelArg(k, 3, cl_n_rows.size,          cl_n_rows.addr);
-  status |= clSetKernelArg(k, 4, cl_n_cols.size,          cl_n_cols.addr);
-  status |= clSetKernelArg(k, 5, cl_norm_correction.size, cl_norm_correction.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 0, sizeof(cl_mem),          &(out.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(k, 1, sizeof(cl_mem),          &(in.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(k, 2, sizeof(cl_mem),          &(means.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(k, 3, cl_n_rows.size,          cl_n_rows.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 4, cl_n_cols.size,          cl_n_cols.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 5, cl_norm_correction.size, cl_norm_correction.addr);
 
   coot_check_cl_error(status, "coot::opencl::var(): failed to set kernel arguments");
 
@@ -50,7 +50,7 @@ var(dev_mem_t<eT> out, const dev_mem_t<eT> in, const dev_mem_t<eT> means, const 
   const size_t k1_work_offset[1] = { 0 };
   const size_t k1_work_size[1]   = { (dim == 0) ? n_cols : n_rows };
 
-  status = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+  status = coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
 
   coot_check_cl_error(status, "coot::opencl::var(): failed to run kernel");
   }
@@ -81,15 +81,15 @@ var_subview(dev_mem_t<eT> out, const dev_mem_t<eT> in, const dev_mem_t<eT> means
   runtime_t::adapt_uword cl_n_cols(n_cols);
   runtime_t::adapt_uword cl_norm_correction(norm_correction);
 
-  status |= clSetKernelArg(k, 0, sizeof(cl_mem),          &(out.cl_mem_ptr));
-  status |= clSetKernelArg(k, 1, sizeof(cl_mem),          &(in.cl_mem_ptr));
-  status |= clSetKernelArg(k, 2, sizeof(cl_mem),          &(means.cl_mem_ptr));
-  status |= clSetKernelArg(k, 3, cl_M_n_rows.size,        cl_M_n_rows.addr);
-  status |= clSetKernelArg(k, 4, cl_aux_row1.size,        cl_aux_row1.addr);
-  status |= clSetKernelArg(k, 5, cl_aux_col1.size,        cl_aux_col1.addr);
-  status |= clSetKernelArg(k, 6, cl_n_rows.size,          cl_n_rows.addr);
-  status |= clSetKernelArg(k, 7, cl_n_cols.size,          cl_n_cols.addr);
-  status |= clSetKernelArg(k, 8, cl_norm_correction.size, cl_norm_correction.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 0, sizeof(cl_mem),          &(out.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(k, 1, sizeof(cl_mem),          &(in.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(k, 2, sizeof(cl_mem),          &(means.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(k, 3, cl_M_n_rows.size,        cl_M_n_rows.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 4, cl_aux_row1.size,        cl_aux_row1.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 5, cl_aux_col1.size,        cl_aux_col1.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 6, cl_n_rows.size,          cl_n_rows.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 7, cl_n_cols.size,          cl_n_cols.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 8, cl_norm_correction.size, cl_norm_correction.addr);
 
   coot_check_cl_error(status, "coot::opencl::var_subview(): failed to set kernel arguments");
 
@@ -97,7 +97,7 @@ var_subview(dev_mem_t<eT> out, const dev_mem_t<eT> in, const dev_mem_t<eT> means
   const size_t k1_work_offset[1] = { 0 };
   const size_t k1_work_size[1]   = { (dim == 0) ? n_cols : n_rows };
 
-  status = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+  status = coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
 
   coot_check_cl_error(status, "coot::opencl::var_subview(): failed to run kernel");
   }

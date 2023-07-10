@@ -33,15 +33,15 @@ linspace(dev_mem_t<eT> mem, const eT start, const eT end, const uword num)
 
   const eT step = static_cast<eT>(end - start) / (num - 1);
 
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &mem.cl_mem_ptr);
-  status |= clSetKernelArg(kernel, 1, sizeof(eT),     &start);
-  status |= clSetKernelArg(kernel, 2, sizeof(eT),     &end);
-  status |= clSetKernelArg(kernel, 3, sizeof(eT),     &step);
-  status |= clSetKernelArg(kernel, 4, N.size,         N.addr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem), &mem.cl_mem_ptr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(eT),     &start);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 2, sizeof(eT),     &end);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 3, sizeof(eT),     &step);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 4, N.size,         N.addr);
 
   size_t work_size = size_t(num);
 
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &work_size, NULL, 0, NULL, NULL);
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &work_size, NULL, 0, NULL, NULL);
 
   coot_check_runtime_error( (status != CL_SUCCESS), "coot::opencl::linspace(): couldn't execute kernel");
   }

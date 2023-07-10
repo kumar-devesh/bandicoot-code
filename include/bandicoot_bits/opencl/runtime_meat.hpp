@@ -90,7 +90,7 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
 
   // setup clBLAS
   coot_extra_debug_warn("coot::cl_rt.init(): begin clBLAS setup");
-  cl_int clblas_status = clblasSetup();
+  cl_int clblas_status = coot_wrapper(clblasSetup)();
   coot_extra_debug_warn("coot::cl_rt.init(): finished clBLAS setup");
 
   if(clblas_status != CL_SUCCESS)  { coot_debug_warn("coot::cl_rt.init(): couldn't setup clBLAS"); return false; }
@@ -110,10 +110,10 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
   // where num_rng_threads is the maximum kernel work group size for the randu kernel.
   // This means that we will effectively have one RNG per thread.
   cl_kernel rng_kernel = get_kernel<float>(oneway_kernel_id::inplace_xorwow_randu);
-  status = clGetKernelWorkGroupInfo(rng_kernel, dev_id, CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &num_rng_threads, NULL);
+  status = coot_wrapper(clGetKernelWorkGroupInfo)(rng_kernel, dev_id, CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &num_rng_threads, NULL);
   coot_check_cl_error(status, "coot::cl_rt.init()");
   size_t preferred_work_group_size_multiple;
-  status = clGetKernelWorkGroupInfo(rng_kernel, dev_id, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, sizeof(size_t), &preferred_work_group_size_multiple, NULL);
+  status = coot_wrapper(clGetKernelWorkGroupInfo)(rng_kernel, dev_id, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, sizeof(size_t), &preferred_work_group_size_multiple, NULL);
   coot_check_cl_error(status, "coot::cl_rt.init()");
   num_rng_threads *= preferred_work_group_size_multiple;
 
@@ -165,9 +165,9 @@ runtime_t::internal_cleanup()
   {
   coot_extra_debug_sigprint();
 
-  if(cq != NULL)  { clFinish(cq); }
+  if(cq != NULL)  { coot_wrapper(clFinish)(cq); }
 
-  clblasTeardown();
+  coot_wrapper(clblasTeardown)();
 
   // TODO: clean up RNGs
 
@@ -177,8 +177,8 @@ runtime_t::internal_cleanup()
 
   //for(uword i=0; i<f_kernels_size; ++i)  { if(f_kernels.at(i) != NULL)  { clReleaseKernel(f_kernels.at(i)); } }
 
-  if(cq   != NULL)  { clReleaseCommandQueue(cq); cq   = NULL; }
-  if(ctxt != NULL)  { clReleaseContext(ctxt);    ctxt = NULL; }
+  if(cq   != NULL)  { coot_wrapper(clReleaseCommandQueue)(cq); cq   = NULL; }
+  if(ctxt != NULL)  { coot_wrapper(clReleaseContext)(ctxt);    ctxt = NULL; }
   }
 
 
@@ -194,7 +194,7 @@ runtime_t::search_devices(cl_platform_id& out_plt_id, cl_device_id& out_dev_id, 
   cl_int  status      = 0;
   cl_uint n_platforms = 0;
 
-  status = clGetPlatformIDs(0, NULL, &n_platforms);
+  status = coot_wrapper(clGetPlatformIDs)(0, NULL, &n_platforms);
 
   if((status != CL_SUCCESS) || (n_platforms == 0))
     {
@@ -204,7 +204,7 @@ runtime_t::search_devices(cl_platform_id& out_plt_id, cl_device_id& out_dev_id, 
 
   std::vector<cl_platform_id> platform_ids(n_platforms);
 
-  status = clGetPlatformIDs(n_platforms, &(platform_ids[0]), NULL);
+  status = coot_wrapper(clGetPlatformIDs)(n_platforms, &(platform_ids[0]), NULL);
 
   if(status != CL_SUCCESS)
     {
@@ -224,7 +224,7 @@ runtime_t::search_devices(cl_platform_id& out_plt_id, cl_device_id& out_dev_id, 
 
     cl_uint local_n_devices = 0;
 
-    status = clGetDeviceIDs(tmp_platform_id, CL_DEVICE_TYPE_ALL, 0, NULL, &local_n_devices);
+    status = coot_wrapper(clGetDeviceIDs)(tmp_platform_id, CL_DEVICE_TYPE_ALL, 0, NULL, &local_n_devices);
 
     if((status != CL_SUCCESS) || (local_n_devices == 0))
       {
@@ -237,7 +237,7 @@ runtime_t::search_devices(cl_platform_id& out_plt_id, cl_device_id& out_dev_id, 
     local_device_ids.resize(local_n_devices);
     local_device_pri.resize(local_n_devices);
 
-    status = clGetDeviceIDs(tmp_platform_id, CL_DEVICE_TYPE_ALL, local_n_devices, &(local_device_ids[0]), NULL);
+    status = coot_wrapper(clGetDeviceIDs)(tmp_platform_id, CL_DEVICE_TYPE_ALL, local_n_devices, &(local_device_ids[0]), NULL);
 
     // go through each device on this platform
     for(size_t local_device_count = 0; local_device_count < local_n_devices; ++local_device_count)
@@ -381,20 +381,20 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
   bool dev_has_subgroups = false;
   bool dev_must_synchronise_subgroups = true;
 
-  clGetDeviceInfo(in_dev_id, CL_DEVICE_VENDOR,              sizeof(dev_name1),           &dev_name1,   NULL);
-  clGetDeviceInfo(in_dev_id, CL_DEVICE_NAME,                sizeof(dev_name2),           &dev_name2,   NULL);
-  clGetDeviceInfo(in_dev_id, CL_DEVICE_VERSION,             sizeof(dev_name3),           &dev_name3,   NULL);
-  clGetDeviceInfo(in_dev_id, CL_DEVICE_TYPE,                sizeof(cl_device_type),      &dev_type,    NULL);
-  clGetDeviceInfo(in_dev_id, CL_DEVICE_DOUBLE_FP_CONFIG,    sizeof(cl_device_fp_config), &dev_fp64,    NULL);
-  clGetDeviceInfo(in_dev_id, CL_DEVICE_MAX_COMPUTE_UNITS,   sizeof(cl_uint),             &dev_n_units, NULL);
-  clGetDeviceInfo(in_dev_id, CL_DEVICE_MEM_BASE_ADDR_ALIGN, sizeof(cl_uint),             &dev_align,   NULL);
-  clGetDeviceInfo(in_dev_id, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(size_t),              &dev_max_wg,  NULL);
+  coot_wrapper(clGetDeviceInfo)(in_dev_id, CL_DEVICE_VENDOR,              sizeof(dev_name1),           &dev_name1,   NULL);
+  coot_wrapper(clGetDeviceInfo)(in_dev_id, CL_DEVICE_NAME,                sizeof(dev_name2),           &dev_name2,   NULL);
+  coot_wrapper(clGetDeviceInfo)(in_dev_id, CL_DEVICE_VERSION,             sizeof(dev_name3),           &dev_name3,   NULL);
+  coot_wrapper(clGetDeviceInfo)(in_dev_id, CL_DEVICE_TYPE,                sizeof(cl_device_type),      &dev_type,    NULL);
+  coot_wrapper(clGetDeviceInfo)(in_dev_id, CL_DEVICE_DOUBLE_FP_CONFIG,    sizeof(cl_device_fp_config), &dev_fp64,    NULL);
+  coot_wrapper(clGetDeviceInfo)(in_dev_id, CL_DEVICE_MAX_COMPUTE_UNITS,   sizeof(cl_uint),             &dev_n_units, NULL);
+  coot_wrapper(clGetDeviceInfo)(in_dev_id, CL_DEVICE_MEM_BASE_ADDR_ALIGN, sizeof(cl_uint),             &dev_align,   NULL);
+  coot_wrapper(clGetDeviceInfo)(in_dev_id, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(size_t),              &dev_max_wg,  NULL);
 
   // search for extensions we care about
   size_t dev_extension_size;
-  clGetDeviceInfo(in_dev_id, CL_DEVICE_EXTENSIONS, 0, NULL, &dev_extension_size);
+  coot_wrapper(clGetDeviceInfo)(in_dev_id, CL_DEVICE_EXTENSIONS, 0, NULL, &dev_extension_size);
   char* dev_extension_buffer = new char[dev_extension_size];
-  clGetDeviceInfo(in_dev_id, CL_DEVICE_EXTENSIONS, dev_extension_size, dev_extension_buffer, NULL);
+  coot_wrapper(clGetDeviceInfo)(in_dev_id, CL_DEVICE_EXTENSIONS, dev_extension_size, dev_extension_buffer, NULL);
   std::string dev_extension_str(dev_extension_buffer);
   delete[] dev_extension_buffer;
   size_t last_space = 0;
@@ -452,11 +452,11 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
 
   if(setup_queue(tmp_context, tmp_queue, in_plt_id, in_dev_id))
     {
-    tmp_program = clCreateProgramWithSource(tmp_context, 1, (const char **)&(tmp_program_src), NULL, &status);
+    tmp_program = coot_wrapper(clCreateProgramWithSource)(tmp_context, 1, (const char **)&(tmp_program_src), NULL, &status);
 
     if(status == CL_SUCCESS)
       {
-      status = clBuildProgram(tmp_program, 0, NULL, NULL, NULL, NULL);
+      status = coot_wrapper(clBuildProgram)(tmp_program, 0, NULL, NULL, NULL, NULL);
 
       // cout << "status: " << coot_cl_error::as_string(status) << endl;
 
@@ -469,24 +469,24 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
 
       if(status == CL_SUCCESS)
         {
-        tmp_kernel = clCreateKernel(tmp_program, "coot_interrogate", &status);
+        tmp_kernel = coot_wrapper(clCreateKernel)(tmp_program, "coot_interrogate", &status);
 
         if(status == CL_SUCCESS)
           {
-          tmp_dev_mem = clCreateBuffer(tmp_context, CL_MEM_READ_WRITE, sizeof(cl_uint)*4, NULL, &status);
+          tmp_dev_mem = coot_wrapper(clCreateBuffer)(tmp_context, CL_MEM_READ_WRITE, sizeof(cl_uint)*4, NULL, &status);
 
-          clSetKernelArg(tmp_kernel, 0, sizeof(cl_mem),  &tmp_dev_mem);
-          status = clEnqueueTask(tmp_queue, tmp_kernel, 0, NULL, NULL);  // TODO: replace with clEnqueueNDRangeKernel to avoid deprecation warnings
+          coot_wrapper(clSetKernelArg)(tmp_kernel, 0, sizeof(cl_mem),  &tmp_dev_mem);
+          status = coot_wrapper(clEnqueueTask)(tmp_queue, tmp_kernel, 0, NULL, NULL);  // TODO: replace with clEnqueueNDRangeKernel to avoid deprecation warnings
 
           if(status == CL_SUCCESS)
             {
-            clFinish(cq);
+            coot_wrapper(clFinish)(cq);
 
-            status = clEnqueueReadBuffer(tmp_queue, tmp_dev_mem, CL_TRUE, 0, sizeof(cl_uint)*4, tmp_cpu_mem, 0, NULL, NULL);
+            status = coot_wrapper(clEnqueueReadBuffer)(tmp_queue, tmp_dev_mem, CL_TRUE, 0, sizeof(cl_uint)*4, tmp_cpu_mem, 0, NULL, NULL);
 
             if(status == CL_SUCCESS)
               {
-              clFinish(cq);
+              coot_wrapper(clFinish)(cq);
 
               dev_sizet_width = tmp_cpu_mem[0];
               dev_ptr_width   = tmp_cpu_mem[1];
@@ -545,11 +545,11 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
     coot_debug_warn(coot_cl_error::as_string(status));
     }
 
-  if(tmp_dev_mem != NULL)  { clReleaseMemObject   (tmp_dev_mem); }
-  if(tmp_kernel  != NULL)  { clReleaseKernel      (tmp_kernel ); }
-  if(tmp_program != NULL)  { clReleaseProgram     (tmp_program); }
-  if(tmp_queue   != NULL)  { clReleaseCommandQueue(tmp_queue);   }
-  if(tmp_context != NULL)  { clReleaseContext     (tmp_context); }
+  if(tmp_dev_mem != NULL)  { coot_wrapper(clReleaseMemObject   )(tmp_dev_mem); }
+  if(tmp_kernel  != NULL)  { coot_wrapper(clReleaseKernel      )(tmp_kernel ); }
+  if(tmp_program != NULL)  { coot_wrapper(clReleaseProgram     )(tmp_program); }
+  if(tmp_queue   != NULL)  { coot_wrapper(clReleaseCommandQueue)(tmp_queue);   }
+  if(tmp_context != NULL)  { coot_wrapper(clReleaseContext     )(tmp_context); }
 
   if(print_info)
     {
@@ -597,7 +597,7 @@ runtime_t::unique_host_device_id() const
   // Use the reported name and vendor ID of the device.  (This preserves a little bit of human readability.)
   char buffer[1025]; // hopefully way larger than necessary
   memset(buffer, 0, 1025);
-  cl_int status = clGetDeviceInfo(dev_id, CL_DEVICE_NAME, 1024, buffer, NULL);
+  cl_int status = coot_wrapper(clGetDeviceInfo)(dev_id, CL_DEVICE_NAME, 1024, buffer, NULL);
   if (status != CL_SUCCESS)
     {
     get_cerr_stream() << "unable to get device name" << std::endl;
@@ -616,7 +616,7 @@ runtime_t::unique_host_device_id() const
   oss << buffer2 << "_";
 
   cl_uint vendor_id;
-  status = clGetDeviceInfo(dev_id, CL_DEVICE_VENDOR_ID, sizeof(cl_uint), &vendor_id, NULL);
+  status = coot_wrapper(clGetDeviceInfo)(dev_id, CL_DEVICE_VENDOR_ID, sizeof(cl_uint), &vendor_id, NULL);
   if (status != CL_SUCCESS)
     {
     get_cerr_stream() << "unable to get device vendor ID" << std::endl;
@@ -625,7 +625,7 @@ runtime_t::unique_host_device_id() const
   oss << vendor_id << "_";
 
   // Get the OpenCL driver version that the device supports.
-  status = clGetDeviceInfo(dev_id, CL_DEVICE_VERSION, 1024, buffer, NULL);
+  status = coot_wrapper(clGetDeviceInfo)(dev_id, CL_DEVICE_VERSION, 1024, buffer, NULL);
   if (status != CL_SUCCESS)
     {
     get_cerr_stream() << "unable to get OpenCL version of device" << std::endl;
@@ -655,7 +655,7 @@ runtime_t::setup_queue(cl_context& out_context, cl_command_queue& out_queue, cl_
 
   cl_int status = 0;
 
-  out_context = clCreateContext(prop, 1, &in_dev_id, NULL, NULL, &status);
+  out_context = coot_wrapper(clCreateContext)(prop, 1, &in_dev_id, NULL, NULL, &status);
 
   if((status != CL_SUCCESS) || (out_context == NULL))
     {
@@ -667,7 +667,7 @@ runtime_t::setup_queue(cl_context& out_context, cl_command_queue& out_queue, cl_
   // NOTE: clCreateCommandQueue is replaced with clCreateCommandQueueWithProperties in OpenCL 2.0
   // NOTE: http://stackoverflow.com/questions/28500496/opencl-function-found-deprecated-by-visual-studio
 
-  out_queue = clCreateCommandQueue(out_context, in_dev_id, 0, &status);
+  out_queue = coot_wrapper(clCreateCommandQueue)(out_context, in_dev_id, 0, &status);
 
   if((status != CL_SUCCESS) || (out_queue == NULL))
     {
@@ -698,7 +698,7 @@ runtime_t::load_cached_kernels(const std::string& unique_host_device_id, const s
 
   cl_int binary_status, errcode_ret;
   runtime_t::program_wrapper prog_holder;  // program_wrapper will automatically call clReleaseProgram() when it goes out of scope
-  prog_holder.prog = clCreateProgramWithBinary(ctxt, 1, &dev_id, &kernel_size, (const unsigned char**) &kernel_buffer, &binary_status, &errcode_ret);
+  prog_holder.prog = coot_wrapper(clCreateProgramWithBinary)(ctxt, 1, &dev_id, &kernel_size, (const unsigned char**) &kernel_buffer, &binary_status, &errcode_ret);
   if (errcode_ret != CL_SUCCESS)
     {
     coot_debug_warn(coot_cl_error::as_string(errcode_ret));
@@ -769,7 +769,7 @@ runtime_t::compile_kernels(const std::string& unique_host_id)
 
   const char* source_c_str = source.c_str();
 
-  prog_holder.prog = clCreateProgramWithSource(ctxt, 1, &source_c_str, NULL, &status);
+  prog_holder.prog = coot_wrapper(clCreateProgramWithSource)(ctxt, 1, &source_c_str, NULL, &status);
 
   if((status != CL_SUCCESS) || (prog_holder.prog == NULL))
     {
@@ -805,17 +805,17 @@ runtime_t::create_kernels(const std::vector<std::pair<std::string, cl_kernel*>>&
   {
 
   // We actually have to build the program first.  Ideally, if we are loading cached kernels, this step doesn't really do much.
-  cl_int status = clBuildProgram(prog_holder.prog, 0, NULL, build_options.c_str(), NULL, NULL);
+  cl_int status = coot_wrapper(clBuildProgram)(prog_holder.prog, 0, NULL, build_options.c_str(), NULL, NULL);
 
   if(status != CL_SUCCESS)
     {
     size_t len = 0;
 
     // Get the length of the error log and then allocate enough space for it.
-    clGetProgramBuildInfo(prog_holder.prog, dev_id, CL_PROGRAM_BUILD_LOG, 0, NULL, &len);
+    coot_wrapper(clGetProgramBuildInfo)(prog_holder.prog, dev_id, CL_PROGRAM_BUILD_LOG, 0, NULL, &len);
     char* buffer = new char[len];
 
-    clGetProgramBuildInfo(prog_holder.prog, dev_id, CL_PROGRAM_BUILD_LOG, len, buffer, NULL);
+    coot_wrapper(clGetProgramBuildInfo)(prog_holder.prog, dev_id, CL_PROGRAM_BUILD_LOG, len, buffer, NULL);
     coot_warn("coot::cl_rt.init(): couldn't build program; output from clGetProgramBuildInfo():");
     coot_warn(buffer);
     delete[] buffer;
@@ -825,7 +825,7 @@ runtime_t::create_kernels(const std::vector<std::pair<std::string, cl_kernel*>>&
 
   for (uword i = 0; i < name_map.size(); ++i)
     {
-    (*name_map.at(i).second) = clCreateKernel(prog_holder.prog, name_map.at(i).first.c_str(), &status);
+    (*name_map.at(i).second) = coot_wrapper(clCreateKernel)(prog_holder.prog, name_map.at(i).first.c_str(), &status);
 
     if((status != CL_SUCCESS) || (name_map.at(i).second == NULL))
       {
@@ -849,7 +849,7 @@ runtime_t::cache_kernels(const std::string& unique_host_device_id,
   // Get the actual binaries to serialize.
   cl_int status;
   size_t binary_size;
-  status = clGetProgramInfo(prog_holder.prog, CL_PROGRAM_BINARY_SIZES, sizeof(size_t), &binary_size, NULL);
+  status = coot_wrapper(clGetProgramInfo)(prog_holder.prog, CL_PROGRAM_BINARY_SIZES, sizeof(size_t), &binary_size, NULL);
   if (status != CL_SUCCESS)
     {
     coot_warn(std::string("coot::cl_rt.init(): clGetProgramInfo() call to get binary size failed with ") + coot_cl_error::as_string(status));
@@ -863,7 +863,7 @@ runtime_t::cache_kernels(const std::string& unique_host_device_id,
 
   // Now allocate something to hold the program.
   unsigned char* buffer = new unsigned char[binary_size];
-  status = clGetProgramInfo(prog_holder.prog, CL_PROGRAM_BINARIES, sizeof(size_t), &buffer, NULL);
+  status = coot_wrapper(clGetProgramInfo)(prog_holder.prog, CL_PROGRAM_BINARIES, sizeof(size_t), &buffer, NULL);
   if (status != CL_SUCCESS)
     {
     coot_warn(std::string("coot::cl_rt.init(): clGetProgramInfo() call to get binaries failed with ") + coot_cl_error::as_string(status));
@@ -967,7 +967,7 @@ runtime_t::acquire_memory(const uword n_elem)
    );
 
   cl_int status = 0;
-  cl_mem result = clCreateBuffer(ctxt, CL_MEM_READ_WRITE, sizeof(eT)*(std::max)(uword(1), n_elem), NULL, &status);
+  cl_mem result = coot_wrapper(clCreateBuffer)(ctxt, CL_MEM_READ_WRITE, sizeof(eT)*(std::max)(uword(1), n_elem), NULL, &status);
 
   coot_check_bad_alloc( ((status != CL_SUCCESS) || (result == NULL)), "coot::cl_rt.acquire_memory(): not enough memory on device" );
 
@@ -984,7 +984,7 @@ runtime_t::release_memory(cl_mem dev_mem)
 
   coot_debug_check( (valid == false), "coot::cl_rt not valid" );
 
-  if(dev_mem)  { clReleaseMemObject(dev_mem); }
+  if(dev_mem)  { coot_wrapper(clReleaseMemObject)(dev_mem); }
   }
 
 
@@ -993,7 +993,7 @@ inline
 void
 runtime_t::synchronise()
   {
-  clFinish(get_cq());
+  coot_wrapper(clFinish)(get_cq());
   }
 
 
@@ -1047,7 +1047,7 @@ runtime_t::create_extra_cq(cl_command_queue& out_queue)
 
   cl_int status = 0;
 
-  out_queue = clCreateCommandQueue((*this).ctxt, (*this).dev_id, 0, &status);
+  out_queue = coot_wrapper(clCreateCommandQueue)((*this).ctxt, (*this).dev_id, 0, &status);
 
   if((status != CL_SUCCESS) || (out_queue == NULL))
     {
@@ -1070,8 +1070,8 @@ runtime_t::delete_extra_cq(cl_command_queue& in_queue)
 
   if(in_queue != NULL)
     {
-    clFinish(in_queue); // force all queued operations to finish
-    clReleaseCommandQueue(in_queue);
+    coot_wrapper(clFinish)(in_queue); // force all queued operations to finish
+    coot_wrapper(clReleaseCommandQueue)(in_queue);
     in_queue = NULL;
     }
   }
@@ -1403,7 +1403,7 @@ runtime_t::program_wrapper::~program_wrapper()
   {
   coot_extra_debug_sigprint();
 
-  if(prog != NULL)  { clReleaseProgram(prog); }
+  if(prog != NULL)  { coot_wrapper(clReleaseProgram)(prog); }
   }
 
 
@@ -1424,7 +1424,7 @@ runtime_t::cq_guard::cq_guard()
   if(get_rt().cl_rt.is_valid())
     {
     coot_extra_debug_print("coot::cl_rt: calling clFinish()");
-    clFinish(get_rt().cl_rt.get_cq());  // force synchronisation
+    coot_wrapper(clFinish)(get_rt().cl_rt.get_cq());  // force synchronisation
 
     //coot_extra_debug_print("calling clFlush()");
     //clFlush(get_rt().cl_rt.get_cq());  // submit all enqueued commands
@@ -1441,7 +1441,7 @@ runtime_t::cq_guard::~cq_guard()
   if(get_rt().cl_rt.is_valid())
     {
     coot_extra_debug_print("coot::cl_rt: calling clFlush()");
-    clFlush(get_rt().cl_rt.get_cq());  // submit all enqueued commands
+    coot_wrapper(clFlush)(get_rt().cl_rt.get_cq());  // submit all enqueued commands
     }
 
   get_rt().cl_rt.unlock();

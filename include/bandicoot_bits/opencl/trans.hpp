@@ -32,14 +32,14 @@ htrans(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword n_rows, const uw
 
   cl_int status = 0;
 
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &(out.cl_mem_ptr));
-  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &(in.cl_mem_ptr));
-  status |= clSetKernelArg(kernel, 2, cl_n_rows.size, cl_n_rows.addr);
-  status |= clSetKernelArg(kernel, 3, cl_n_cols.size, cl_n_cols.addr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem), &(out.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(cl_mem), &(in.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(kernel, 2, cl_n_rows.size, cl_n_rows.addr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 3, cl_n_cols.size, cl_n_cols.addr);
 
   const size_t global_work_size[2] = { size_t(n_rows), size_t(n_cols) };
 
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 2, NULL, global_work_size, NULL, 0, NULL, NULL);
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 2, NULL, global_work_size, NULL, 0, NULL, NULL);
 
   coot_check_runtime_error( (status != 0), "coot::opencl::htrans(): couldn't execute kernel" );
   }
@@ -64,14 +64,14 @@ strans(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword n_rows, const uw
 
   cl_int status = 0;
 
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &(out.cl_mem_ptr));
-  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &(in.cl_mem_ptr));
-  status |= clSetKernelArg(kernel, 2, cl_n_rows.size, cl_n_rows.addr);
-  status |= clSetKernelArg(kernel, 3, cl_n_cols.size, cl_n_cols.addr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem), &(out.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(cl_mem), &(in.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(kernel, 2, cl_n_rows.size, cl_n_rows.addr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 3, cl_n_cols.size, cl_n_cols.addr);
 
   const size_t global_work_size[2] = { size_t(n_rows), size_t(n_cols) };
 
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 2, NULL, global_work_size, NULL, 0, NULL, NULL);
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 2, NULL, global_work_size, NULL, 0, NULL, NULL);
 
   coot_check_runtime_error( (status != 0), "coot::opencl::htrans(): couldn't execute kernel" );
   }

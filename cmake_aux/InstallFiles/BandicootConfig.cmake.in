@@ -1,0 +1,16 @@
+# - Config file for the Bandicoot package
+# It defines the following variables
+#  BANDICOOT_INCLUDE_DIRS - include directories for Bandicoot
+#  BANDICOOT_LIBRARY_DIRS - library directories for Bandicoot (normally not used!)
+#  BANDICOOT_LIBRARIES    - libraries to link against
+
+# Tell the user project where to find our headers and libraries
+set(BANDICOOT_INCLUDE_DIRS "@BANDICOOT_INCLUDE_DIRS@")
+set(BANDICOOT_LIBRARY_DIRS "@BANDICOOT_LIB_DIR@")
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+include("@BANDICOOT_CMAKE_DIR@/BandicootLibraryDepends.cmake")
+
+# These are IMPORTED targets created by BandicootLibraryDepends.cmake
+set(BANDICOOT_LIBRARIES bandicoot)
+

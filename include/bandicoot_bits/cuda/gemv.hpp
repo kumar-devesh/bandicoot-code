@@ -77,18 +77,18 @@ struct gemv
 
     cublasStatus_t result;
 
-    result = cublasSgemv(get_rt().cuda_rt.cublas_handle,
-                         trans_a,
-                         M,
-                         N,
-                         (float*) &alpha,
-                         A.cuda_mem_ptr + A_offset,
-                         cuda_lda,
-                         x.cuda_mem_ptr + x_offset,
-                         cuda_incx,
-                         (float*) &beta,
-                         y.cuda_mem_ptr + y_offset,
-                         cuda_incy);
+    result = coot_wrapper(cublasSgemv)(get_rt().cuda_rt.cublas_handle,
+                                       trans_a,
+                                       M,
+                                       N,
+                                       (float*) &alpha,
+                                       A.cuda_mem_ptr + A_offset,
+                                       cuda_lda,
+                                       x.cuda_mem_ptr + x_offset,
+                                       cuda_incx,
+                                       (float*) &beta,
+                                       y.cuda_mem_ptr + y_offset,
+                                       cuda_incy);
 
     coot_check_cublas_error( result, "coot::cuda::gemv(): call to cublasSgemv() failed" );
     }
@@ -129,18 +129,18 @@ struct gemv
 
     cublasStatus_t result;
 
-    result = cublasDgemv(get_rt().cuda_rt.cublas_handle,
-                         trans_a,
-                         M,
-                         N,
-                         (double*) &alpha,
-                         A.cuda_mem_ptr + A_offset,
-                         cuda_lda,
-                         x.cuda_mem_ptr + x_offset,
-                         cuda_incx,
-                         (double*) &beta,
-                         y.cuda_mem_ptr + y_offset,
-                         cuda_incy);
+    result = coot_wrapper(cublasDgemv)(get_rt().cuda_rt.cublas_handle,
+                                       trans_a,
+                                       M,
+                                       N,
+                                       (double*) &alpha,
+                                       A.cuda_mem_ptr + A_offset,
+                                       cuda_lda,
+                                       x.cuda_mem_ptr + x_offset,
+                                       cuda_incx,
+                                       (double*) &beta,
+                                       y.cuda_mem_ptr + y_offset,
+                                       cuda_incy);
 
     coot_check_cublas_error( result, "coot::cuda::gemv(): call to cublasSgemv() failed" );
     }

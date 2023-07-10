@@ -40,7 +40,7 @@ linspace(dev_mem_t<eT> mem, const eT start, const eT end, const uword num)
       (eT*) &step,
       (uword*) &num };
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2], // grid dims
       dims.d[3], dims.d[4], dims.d[5], // block dims

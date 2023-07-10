@@ -93,7 +93,7 @@ any(dev_mem_t<uword> out_mem, const dev_mem_t<eT1> in_mem, const uword n_rows, c
 
   const kernel_dims dims = one_dimensional_grid_dims(colwise ? n_cols : n_rows);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       k,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],

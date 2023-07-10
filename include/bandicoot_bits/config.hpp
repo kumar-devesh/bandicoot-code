@@ -24,6 +24,29 @@
 //// Bandicoot requires CUDA, CUDART, cuBLAS, cuRAND, cuSolver, and NVRTC.
 #endif
 
+#if !defined(COOT_DEFAULT_BACKEND)
+#define COOT_DEFAULT_BACKEND CL_BACKEND
+//// This defines the backend that Bandicoot will use by default.
+//// It takes values either CL_BACKEND or CUDA_BACKEND;
+//// if set to CL_BACKEND, then COOT_USE_OPENCL must be defined;
+//// if set to CUDA_BACKEND, then COOT_USE_CUDA must be defined.
+#endif
+
+#if !defined(COOT_USE_LAPACK)
+#define COOT_USE_LAPACK
+//// Comment out the above line if you don't have LAPACK or a high-speed replacement for LAPACK,
+//// such as Intel MKL, AMD ACML, or the Accelerate framework.
+//// LAPACK is required for matrix decompositions (eg. SVD) and matrix inverse.
+#endif
+
+#if !defined(COOT_USE_BLAS)
+#define COOT_USE_BLAS
+//// Comment out the above line if you don't have BLAS or a high-speed replacement for BLAS,
+//// such as OpenBLAS, GotoBLAS, Intel MKL, AMD ACML, or the Accelerate framework.
+//// BLAS is used for matrix multiplication.
+//// Without BLAS, matrix multiplication will still work, but might be slower.
+#endif
+
 // #define COOT_USE_WRAPPER
 //// Comment out the above line if you're getting linking errors when compiling your programs,
 //// or if you prefer to directly link with LAPACK, BLAS + etc instead of the Bandicoot runtime library.

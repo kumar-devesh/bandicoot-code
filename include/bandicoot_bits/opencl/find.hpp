@@ -36,7 +36,7 @@ find(dev_mem_t<uword>& out, uword& out_len, const dev_mem_t<eT> A, const uword n
   cl_kernel nnz_k = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::count_nonzeros);
 
   size_t kernel_wg_size;
-  cl_int status = clGetKernelWorkGroupInfo(nnz_k, get_rt().cl_rt.get_device(), CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &kernel_wg_size, NULL);
+  cl_int status = coot_wrapper(clGetKernelWorkGroupInfo)(nnz_k, get_rt().cl_rt.get_device(), CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &kernel_wg_size, NULL);
   coot_check_cl_error(status, "coot::opencl::find(): clGetKernelWorkGroupInfo() failed");
 
   // The kernel requires that all threads are in one block.
@@ -49,10 +49,10 @@ find(dev_mem_t<uword>& out, uword& out_len, const dev_mem_t<eT> A, const uword n
 
   runtime_t::adapt_uword cl_n_elem(n_elem);
 
-  status  = clSetKernelArg(nnz_k, 0, sizeof(cl_mem),                      &(A.cl_mem_ptr));
-  status |= clSetKernelArg(nnz_k, 1, sizeof(cl_mem),                      &(counts_mem.cl_mem_ptr));
-  status |= clSetKernelArg(nnz_k, 2, cl_n_elem.size,                      cl_n_elem.addr);
-  status |= clSetKernelArg(nnz_k, 3, sizeof(eT) * (pow2_num_threads + 1), NULL);
+  status  = coot_wrapper(clSetKernelArg)(nnz_k, 0, sizeof(cl_mem),                      &(A.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(nnz_k, 1, sizeof(cl_mem),                      &(counts_mem.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(nnz_k, 2, cl_n_elem.size,                      cl_n_elem.addr);
+  status |= coot_wrapper(clSetKernelArg)(nnz_k, 3, sizeof(eT) * (pow2_num_threads + 1), NULL);
 
   coot_check_cl_error(status, "coot::opencl::find(): could not set kernel arguments for count_nonzeros kernel");
 
@@ -60,7 +60,7 @@ find(dev_mem_t<uword>& out, uword& out_len, const dev_mem_t<eT> A, const uword n
   const size_t k1_work_offset[1] = { 0 };
   const size_t k1_work_size[1]   = { pow2_num_threads };
 
-  status = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), nnz_k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+  status = coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), nnz_k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
 
   coot_check_cl_error(status, "coot::opencl::find(): could not run find_nonzeros kernel");
 
@@ -81,14 +81,14 @@ find(dev_mem_t<uword>& out, uword& out_len, const dev_mem_t<eT> A, const uword n
     // Get all nonzero elements.
     cl_kernel find_k = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::find);
 
-    status  = clSetKernelArg(find_k, 0, sizeof(cl_mem), &(A.cl_mem_ptr));
-    status |= clSetKernelArg(find_k, 1, sizeof(cl_mem), &(counts_mem.cl_mem_ptr));
-    status |= clSetKernelArg(find_k, 2, sizeof(cl_mem), &(out.cl_mem_ptr));
-    status |= clSetKernelArg(find_k, 3, cl_n_elem.size, cl_n_elem.addr);
+    status  = coot_wrapper(clSetKernelArg)(find_k, 0, sizeof(cl_mem), &(A.cl_mem_ptr));
+    status |= coot_wrapper(clSetKernelArg)(find_k, 1, sizeof(cl_mem), &(counts_mem.cl_mem_ptr));
+    status |= coot_wrapper(clSetKernelArg)(find_k, 2, sizeof(cl_mem), &(out.cl_mem_ptr));
+    status |= coot_wrapper(clSetKernelArg)(find_k, 3, cl_n_elem.size, cl_n_elem.addr);
 
     coot_check_cl_error(status, "coot::opencl::find(): could not set kernel arguments for find kernel");
 
-    status = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), find_k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+    status = coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), find_k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
 
     coot_check_cl_error(status, "coot::opencl::find(): could not run find kernel");
     }
@@ -99,15 +99,15 @@ find(dev_mem_t<uword>& out, uword& out_len, const dev_mem_t<eT> A, const uword n
 
     runtime_t::adapt_uword cl_k(k);
 
-    status  = clSetKernelArg(find_k, 0, sizeof(cl_mem), &(A.cl_mem_ptr));
-    status |= clSetKernelArg(find_k, 1, sizeof(cl_mem), &(counts_mem.cl_mem_ptr));
-    status |= clSetKernelArg(find_k, 2, sizeof(cl_mem), &(out.cl_mem_ptr));
-    status |= clSetKernelArg(find_k, 3, cl_k.size,      cl_k.addr);
-    status |= clSetKernelArg(find_k, 4, cl_n_elem.size, cl_n_elem.addr);
+    status  = coot_wrapper(clSetKernelArg)(find_k, 0, sizeof(cl_mem), &(A.cl_mem_ptr));
+    status |= coot_wrapper(clSetKernelArg)(find_k, 1, sizeof(cl_mem), &(counts_mem.cl_mem_ptr));
+    status |= coot_wrapper(clSetKernelArg)(find_k, 2, sizeof(cl_mem), &(out.cl_mem_ptr));
+    status |= coot_wrapper(clSetKernelArg)(find_k, 3, cl_k.size,      cl_k.addr);
+    status |= coot_wrapper(clSetKernelArg)(find_k, 4, cl_n_elem.size, cl_n_elem.addr);
 
     coot_check_cl_error(status, "coot::opencl::find(): could not set kernel arguments for find_first kernel");
 
-    status = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), find_k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+    status = coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), find_k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
 
     coot_check_cl_error(status, "coot::opencl::find(): could not run find_first kernel");
     }
@@ -120,15 +120,15 @@ find(dev_mem_t<uword>& out, uword& out_len, const dev_mem_t<eT> A, const uword n
 
     runtime_t::adapt_uword cl_m(m);
 
-    status  = clSetKernelArg(find_k, 0, sizeof(cl_mem), &(A.cl_mem_ptr));
-    status |= clSetKernelArg(find_k, 1, sizeof(cl_mem), &(counts_mem.cl_mem_ptr));
-    status |= clSetKernelArg(find_k, 2, sizeof(cl_mem), &(out.cl_mem_ptr));
-    status |= clSetKernelArg(find_k, 3, cl_m.size,      cl_m.addr);
-    status |= clSetKernelArg(find_k, 4, cl_n_elem.size, cl_n_elem.addr);
+    status  = coot_wrapper(clSetKernelArg)(find_k, 0, sizeof(cl_mem), &(A.cl_mem_ptr));
+    status |= coot_wrapper(clSetKernelArg)(find_k, 1, sizeof(cl_mem), &(counts_mem.cl_mem_ptr));
+    status |= coot_wrapper(clSetKernelArg)(find_k, 2, sizeof(cl_mem), &(out.cl_mem_ptr));
+    status |= coot_wrapper(clSetKernelArg)(find_k, 3, cl_m.size,      cl_m.addr);
+    status |= coot_wrapper(clSetKernelArg)(find_k, 4, cl_n_elem.size, cl_n_elem.addr);
 
     coot_check_cl_error(status, "coot::opencl::find(): could not set kernel arguments for find_last kernel");
 
-    status = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), find_k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+    status = coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), find_k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
 
     coot_check_cl_error(status, "coot::opencl::find(): could not run find_last kernel");
     }

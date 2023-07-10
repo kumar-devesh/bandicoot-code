@@ -27,14 +27,14 @@ coot_sub_group_size(cl_kernel kernel, cl_device_id dev_id, const size_t input_si
   {
   // OpenCL 2.0 moved this into the base specification, so the KHR suffix is
   // deprecated.
-  return clGetKernelSubGroupInfo(kernel,
-                                 dev_id,
-                                 CL_KERNEL_MAX_SUB_GROUP_SIZE_FOR_NDRANGE,
-                                 sizeof(size_t),
-                                 (const void*) &input_size,
-                                 sizeof(size_t),
-                                 (void*) &subgroup_size,
-                                 NULL);
+  return coot_wrapper(clGetKernelSubGroupInfo)(kernel,
+                                               dev_id,
+                                               CL_KERNEL_MAX_SUB_GROUP_SIZE_FOR_NDRANGE,
+                                               sizeof(size_t),
+                                               (const void*) &input_size,
+                                               sizeof(size_t),
+                                               (void*) &subgroup_size,
+                                               NULL);
   }
 
 #elif defined(cl_khr_subgroups) || defined(cl_intel_subgroups)
@@ -45,14 +45,14 @@ coot_sub_group_size(cl_kernel kernel, cl_device_id dev_id, const size_t input_si
   {
   // This is a version of OpenCL where subgroups are available, but only as an
   // extension.
-  return clGetKernelSubGroupInfoKHR(kernel,
-                                    dev_id,
-                                    CL_KERNEL_MAX_SUB_GROUP_SIZE_FOR_NDRANGE,
-                                    sizeof(size_t),
-                                    (const void*) &input_size,
-                                    sizeof(size_t),
-                                    (void*) &subgroup_size,
-                                    NULL);
+  return coot_wrapper(clGetKernelSubGroupInfoKHR)(kernel,
+                                                  dev_id,
+                                                  CL_KERNEL_MAX_SUB_GROUP_SIZE_FOR_NDRANGE,
+                                                  sizeof(size_t),
+                                                  (const void*) &input_size,
+                                                  sizeof(size_t),
+                                                  (void*) &subgroup_size,
+                                                  NULL);
   }
 
 #else
@@ -85,7 +85,7 @@ coot_nv_warp_size(const cl_device_id dev_id, size_t& warp_size)
   {
 #if defined(CL_DEVICE_WARP_SIZE_NV)
   cl_uint warp_size_out;
-  cl_int status = clGetDeviceInfo(dev_id, CL_DEVICE_WARP_SIZE_NV, sizeof(cl_uint), (void*) &warp_size_out, NULL);
+  cl_int status = coot_wrapper(clGetDeviceInfo)(dev_id, CL_DEVICE_WARP_SIZE_NV, sizeof(cl_uint), (void*) &warp_size_out, NULL);
   warp_size = (size_t) warp_size_out;
   return status;
 #else
