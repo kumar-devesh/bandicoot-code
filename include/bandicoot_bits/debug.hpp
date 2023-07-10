@@ -14,57 +14,11 @@
 
 
 
-template<typename T>
-inline
-std::ostream&
-coot_cout_stream(std::ostream* user_stream)
-  {
-  static std::ostream* cout_stream = &(COOT_COUT_STREAM);
-
-  if(user_stream != NULL)  { cout_stream = user_stream; }
-
-  return (*cout_stream);
-  }
-
-
-
-template<typename T>
-inline
-std::ostream&
-coot_cerr_stream(std::ostream* user_stream)
-  {
-  static std::ostream* cerr_stream = &(COOT_CERR_STREAM);
-
-  if(user_stream != NULL)  { cerr_stream = user_stream; }
-
-  return (*cerr_stream);
-  }
-
-
-
-inline
-void
-set_cout_stream(std::ostream& user_stream)
-  {
-  coot_cout_stream<char>(&user_stream);
-  }
-
-
-
-inline
-void
-set_cerr_stream(std::ostream& user_stream)
-  {
-  coot_cerr_stream<char>(&user_stream);
-  }
-
-
-
 inline
 std::ostream&
 get_cout_stream()
   {
-  return coot_cout_stream<char>(NULL);
+  return (COOT_COUT_STREAM);
   }
 
 
@@ -73,7 +27,7 @@ inline
 std::ostream&
 get_cerr_stream()
   {
-  return coot_cerr_stream<char>(NULL);
+  return (COOT_CERR_STREAM);
   }
 
 
@@ -86,7 +40,7 @@ static
 void
 coot_stop_logic_error(const T1& x)
   {
-  #if defined(COOT_PRINT_ERRORS)
+  #if defined(COOT_PRINT_EXCEPTIONS)
     {
     get_cerr_stream() << "\nerror: " << x << std::endl;
     }
@@ -105,7 +59,7 @@ static
 void
 coot_stop_bounds_error(const T1& x)
   {
-  #if defined(COOT_PRINT_ERRORS)
+  #if defined(COOT_PRINT_EXCEPTIONS)
     {
     get_cerr_stream() << "\nerror: " << x << std::endl;
     }
@@ -124,7 +78,7 @@ static
 void
 coot_stop_bad_alloc(const T1& x)
   {
-  #if defined(COOT_PRINT_ERRORS)
+  #if defined(COOT_PRINT_EXCEPTIONS)
     {
     get_cerr_stream() << "\nerror: " << x << std::endl;
     }
@@ -147,7 +101,7 @@ static
 void
 coot_stop_runtime_error(const T1& x)
   {
-  #if defined(COOT_PRINT_ERRORS)
+  #if defined(COOT_PRINT_EXCEPTIONS)
     {
     get_cerr_stream() << "\nerror: " << x << std::endl;
     }
@@ -166,7 +120,7 @@ static
 void
 coot_stop_runtime_error(const T1& x, const T2& y)
   {
-  #if defined(COOT_PRINT_ERRORS)
+  #if defined(COOT_PRINT_EXCEPTIONS)
     {
     get_cerr_stream() << "\nerror: " << x << ": " << y << std::endl;
     }
@@ -304,15 +258,7 @@ static
 void
 coot_warn(const T1& x)
   {
-  #if defined(COOT_PRINT_ERRORS)
-    {
-    get_cerr_stream() << "\nwarning: " << x << '\n';
-    }
-  #else
-    {
-    coot_ignore(x);
-    }
-  #endif
+  get_cerr_stream() << "\nwarning: " << x << '\n';
   }
 
 
@@ -323,16 +269,7 @@ static
 void
 coot_warn(const T1& x, const T2& y)
   {
-  #if defined(COOT_PRINT_ERRORS)
-    {
-    get_cerr_stream() << "\nwarning: " << x << y << '\n';
-    }
-  #else
-    {
-    coot_ignore(x);
-    coot_ignore(y);
-    }
-  #endif
+  get_cerr_stream() << "\nwarning: " << x << y << '\n';
   }
 
 
@@ -343,17 +280,56 @@ static
 void
 coot_warn(const T1& x, const T2& y, const T3& z)
   {
-  #if defined(COOT_PRINT_ERRORS)
-    {
-    get_cerr_stream() << "\nwarning: " << x << y << z << '\n';
-    }
-  #else
-    {
-    coot_ignore(x);
-    coot_ignore(y);
-    coot_ignore(z);
-    }
-  #endif
+  get_cerr_stream() << "\nwarning: " << x << y << z << '\n';
+  }
+
+
+
+//
+// coot_warn_level
+
+
+template<typename T1>
+inline
+void
+coot_warn_level(const uword level, const T1& arg1)
+  {
+  constexpr uword config_level = (sword(COOT_WARN_LEVEL) > 0) ? uword(COOT_WARN_LEVEL) : uword(0);
+  
+  if((config_level > 0) && (level <= config_level))  { coot_warn(arg1); }
+  }
+
+
+template<typename T1, typename T2>
+inline
+void
+coot_warn_level(const uword level, const T1& arg1, const T2& arg2)
+  {
+  constexpr uword config_level = (sword(COOT_WARN_LEVEL) > 0) ? uword(COOT_WARN_LEVEL) : uword(0);
+  
+  if((config_level > 0) && (level <= config_level))  { coot_warn(arg1,arg2); }
+  }
+
+
+template<typename T1, typename T2, typename T3>
+inline
+void
+coot_warn_level(const uword level, const T1& arg1, const T2& arg2, const T3& arg3)
+  {
+  constexpr uword config_level = (sword(COOT_WARN_LEVEL) > 0) ? uword(COOT_WARN_LEVEL) : uword(0);
+  
+  if((config_level > 0) && (level <= config_level))  { coot_warn(arg1,arg2,arg3); }
+  }
+
+
+template<typename T1, typename T2, typename T3, typename T4>
+inline
+void
+coot_warn_level(const uword level, const T1& arg1, const T2& arg2, const T3& arg3, const T4& arg4)
+  {
+  constexpr uword config_level = (sword(COOT_WARN_LEVEL) > 0) ? uword(COOT_WARN_LEVEL) : uword(0);
+  
+  if((config_level > 0) && (level <= config_level))  { coot_warn(arg1,arg2,arg3,arg4); }
   }
 
 
@@ -435,7 +411,7 @@ static
 std::string
 coot_incompat_size_string(const uword A_n_rows, const uword A_n_cols, const uword B_n_rows, const uword B_n_cols, const char* x)
   {
-  std::stringstream tmp;
+  std::ostringstream tmp;
 
   tmp << x << ": incompatible matrix dimensions: " << A_n_rows << 'x' << A_n_cols << " and " << B_n_rows << 'x' << B_n_cols;
 
@@ -621,6 +597,7 @@ coot_assert_blas_size(const T1& A, const T2& B)
 
   #define coot_debug_print                   true ? (void)0 : coot_print
   #define coot_debug_warn                    true ? (void)0 : coot_warn
+  #define coot_debug_warn_level              true ? (void)0 : coot_warn_level
   #define coot_debug_check                   true ? (void)0 : coot_check
   #define coot_debug_check_bounds            true ? (void)0 : coot_check_bounds
   #define coot_debug_set_error               true ? (void)0 : coot_set_error
@@ -633,6 +610,7 @@ coot_assert_blas_size(const T1& A, const T2& B)
 
   #define coot_debug_print                 coot_print
   #define coot_debug_warn                  coot_warn
+  #define coot_debug_warn_level            coot_warn_level
   #define coot_debug_check                 coot_check
   #define coot_debug_check_bounds          coot_check_bounds
   #define coot_debug_set_error             coot_set_error
@@ -651,7 +629,6 @@ coot_assert_blas_size(const T1& A, const T2& B)
   #define coot_extra_debug_sigprint_this  coot_sigprint(COOT_FNSIG); coot_thisprint
   #define coot_extra_debug_print          coot_print
   #define coot_extra_debug_warn           coot_warn
-  #define coot_extra_debug_check          coot_check
 
 #else
 
@@ -659,7 +636,6 @@ coot_assert_blas_size(const T1& A, const T2& B)
   #define coot_extra_debug_sigprint_this   true ? (void)0 : coot_thisprint
   #define coot_extra_debug_print           true ? (void)0 : coot_print
   #define coot_extra_debug_warn            true ? (void)0 : coot_warn
-  #define coot_extra_debug_check           true ? (void)0 : coot_check
 
 #endif
 
