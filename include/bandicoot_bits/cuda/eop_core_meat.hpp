@@ -36,7 +36,7 @@ eop_scalar(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword n_elem, co
 
   const kernel_dims dims = one_dimensional_grid_dims(n_elem);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],

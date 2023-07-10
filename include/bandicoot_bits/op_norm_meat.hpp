@@ -181,7 +181,7 @@ op_norm::mat_norm_2(const Mat<eT>& X)
   // TODO: once is_finite() is implemented, handle this warning
 //  if (X.is_finite() == false)
 //    {
-//    coot_warn("norm(): given matrix has non-finite elements");
+//    coot_debug_warn_level(1, "norm(): given matrix has non-finite elements");
 //    }
 
   Col<eT> s;

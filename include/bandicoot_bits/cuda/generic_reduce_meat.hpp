@@ -175,7 +175,7 @@ generic_reduce_inner(const dev_mem_t<eT> mem,
     args[2] = &aux_mem.cuda_mem_ptr;
     unpack_args<sizeof...(A1), A1...>::apply(args, first_kernel_extra_args);
 
-    CUresult result = cuLaunchKernel(
+    CUresult result = coot_wrapper(cuLaunchKernel)(
         first_kernel,
         block_size, 1, 1, mtpb, 1, 1,
         2 * mtpb * sizeof(aux_eT), // shared mem should have size equal to number of threads times 2
@@ -225,7 +225,7 @@ generic_reduce_inner_small(const dev_mem_t<eT> mem,
   args[2] = &aux_mem.cuda_mem_ptr;
   unpack_args<sizeof...(Args), Args...>::apply(args, kernel_extra_args);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       pow2_num_threads <= 32 ? kernel_small : kernel, // if we have fewer threads than a single warp, we can use a more optimized version of the kernel
       1, 1, 1, pow2_num_threads, 1, 1,
       2 * pow2_num_threads * sizeof(aux_eT), // shared mem should have size equal to number of threads times 2

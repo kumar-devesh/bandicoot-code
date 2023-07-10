@@ -39,7 +39,7 @@ dot(dev_mem_t<eT1> mem1, dev_mem_t<eT2> mem2, const uword n_elem)
   // Compute workgroup sizes.  We use CL_KERNEL_WORK_GROUP_SIZE as an upper bound, which
   // depends on the compiled kernel.  I assume that the results for k will be identical to k_small.
   size_t kernel_wg_size;
-  status = clGetKernelWorkGroupInfo(k, get_rt().cl_rt.get_device(), CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &kernel_wg_size, NULL);
+  status = coot_wrapper(clGetKernelWorkGroupInfo)(k, get_rt().cl_rt.get_device(), CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &kernel_wg_size, NULL);
   coot_check_cl_error(status, "dot()");
 
   const size_t k1_work_dim       = 1;
@@ -67,13 +67,13 @@ dot(dev_mem_t<eT1> mem1, dev_mem_t<eT2> mem2, const uword n_elem)
   // If the number of threads is less than the subgroup size, we need to use the small kernel.
   cl_kernel* k_use = (pow2_group_size <= subgroup_size) ? &k_small : &k;
 
-  status |= clSetKernelArg(*k_use, 0, sizeof(cl_mem),                        &(aux_mem.cl_mem_ptr));
-  status |= clSetKernelArg(*k_use, 1, sizeof(cl_mem),                        &(mem1.cl_mem_ptr));
-  status |= clSetKernelArg(*k_use, 2, sizeof(cl_mem),                        &(mem2.cl_mem_ptr));
-  status |= clSetKernelArg(*k_use, 3, dev_n_elem.size,                       dev_n_elem.addr);
-  status |= clSetKernelArg(*k_use, 4, sizeof(promoted_eT) * pow2_group_size, NULL);
+  status |= coot_wrapper(clSetKernelArg)(*k_use, 0, sizeof(cl_mem),                        &(aux_mem.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(*k_use, 1, sizeof(cl_mem),                        &(mem1.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(*k_use, 2, sizeof(cl_mem),                        &(mem2.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(*k_use, 3, dev_n_elem.size,                       dev_n_elem.addr);
+  status |= coot_wrapper(clSetKernelArg)(*k_use, 4, sizeof(promoted_eT) * pow2_group_size, NULL);
 
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), *k_use, k1_work_dim, &k1_work_offset, &pow2_total_num_threads, &pow2_group_size, 0, NULL, NULL);
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), *k_use, k1_work_dim, &k1_work_offset, &pow2_total_num_threads, &pow2_group_size, 0, NULL, NULL);
 
   coot_check_cl_error(status, "dot()");
 

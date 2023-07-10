@@ -16,7 +16,7 @@
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 const Op<T1, op_sum>
 sum
   (
@@ -37,7 +37,7 @@ sum
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 const Op<T1, op_sum>
 sum
   (
@@ -90,7 +90,7 @@ sum(const Op<T1, op_sum>& in)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 const Op<Op<T1, op_sum>, op_sum>
 sum(const Op<T1, op_sum>& in, const uword dim)
   {
@@ -103,7 +103,7 @@ sum(const Op<T1, op_sum>& in, const uword dim)
 
 template<typename T>
 coot_warn_unused
-coot_inline
+inline
 const typename coot_scalar_only<T>::result &
 sum(const T& x)
   {

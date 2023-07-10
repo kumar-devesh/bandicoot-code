@@ -25,21 +25,21 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
   valid = false;
 
 
-  CUresult result = cuInit(0);
+  CUresult result = coot_wrapper(cuInit)(0);
   coot_check_cuda_error(result, "coot::cuda_rt.init(): cuInit() failed");
 
   int device_count = 0;
-  result = cuDeviceGetCount(&device_count);
+  result = coot_wrapper(cuDeviceGetCount)(&device_count);
   coot_check_cuda_error(result, "coot::cuda_rt.init(): cuDeviceGetCount() failed");
 
   // Ensure that the desired device is within the range of devices we have.
   // TODO: better error message?
   coot_debug_check( ((int) wanted_device >= device_count), "coot::cuda_rt.init(): invalid wanted_device" );
 
-  result = cuDeviceGet(&cuDevice, wanted_device);
+  result = coot_wrapper(cuDeviceGet)(&cuDevice, wanted_device);
   coot_check_cuda_error(result, "coot::cuda_rt.init(): cuDeviceGet() failed");
 
-  result = cuCtxCreate(&context, 0, cuDevice);
+  result = coot_wrapper(cuCtxCreate)(&context, 0, cuDevice);
   coot_check_cuda_error(result, "coot::cuda_rt.init(): cuCtxCreate() failed");
 
   // NOTE: it seems size_t will have the same size on the device and host;
@@ -47,7 +47,7 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
   // to size_t on the device.
   //
   // NOTE: float will also have the same size as the host (generally 32 bits)
-  cudaError_t result2 = cudaGetDeviceProperties(&dev_prop, wanted_device);
+  cudaError_t result2 = coot_wrapper(cudaGetDeviceProperties)(&dev_prop, wanted_device);
   coot_check_cuda_error(result2, "coot::cuda_rt.init(): couldn't get device properties");
 
   // Attempt to load cached kernels, if available.
@@ -76,15 +76,15 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
 
   // Initialize RNG struct.
   curandStatus_t result3;
-  result3 = curandCreateGenerator(&xorwow_rand, CURAND_RNG_PSEUDO_XORWOW);
+  result3 = coot_wrapper(curandCreateGenerator)(&xorwow_rand, CURAND_RNG_PSEUDO_XORWOW);
   coot_check_curand_error(result3, "coot::cuda_rt.init(): curandCreateGenerator() failed");
-  curandCreateGenerator(&philox_rand, CURAND_RNG_PSEUDO_PHILOX4_32_10);
+  result3 = coot_wrapper(curandCreateGenerator)(&philox_rand, CURAND_RNG_PSEUDO_PHILOX4_32_10);
   coot_check_curand_error(result3, "coot::cuda_rt.init(): curandCreateGenerator() failed");
 
   // Initialize cuBLAS.
-  cublasCreate(&cublas_handle);
+  coot_wrapper(cublasCreate)(&cublas_handle);
 
-  cusolverStatus_t status = cusolverDnCreate(&cusolver_handle);
+  cusolverStatus_t status = coot_wrapper(cusolverDnCreate)(&cusolver_handle);
   coot_check_cusolver_error(status, "coot::cuda::chol(): cusolverDnCreate() failed");
 
   valid = true;
@@ -104,7 +104,7 @@ runtime_t::unique_host_device_id() const
   // We'll use the UUID of the device, and the version of the runtime.
   std::ostringstream oss;
   int runtime_version;
-  cudaError_t result = cudaRuntimeGetVersion(&runtime_version);
+  cudaError_t result = coot_wrapper(cudaRuntimeGetVersion)(&runtime_version);
   coot_check_cuda_error(result, "coot::cuda_rt.unique_host_device_id(): cudaRuntimeGetVersion() failed");
   // Print each half-byte in hex.
   for (size_t i = 0; i < 16; i++)
@@ -167,7 +167,7 @@ runtime_t::compile_kernels(const std::string& unique_host_device_id)
 
   // We'll use NVRTC to compile each of the kernels we need on the fly.
   nvrtcProgram prog;
-  nvrtcResult result = nvrtcCreateProgram(
+  nvrtcResult result = coot_wrapper(nvrtcCreateProgram)(
       &prog,          // CUDA runtime compilation program
       source.c_str(), // CUDA program source
       "coot_kernels", // CUDA program name
@@ -184,9 +184,9 @@ runtime_t::compile_kernels(const std::string& unique_host_device_id)
 
   // Get compute capabilities.
   int major, minor = 0;
-  CUresult result2 = cuDeviceGetAttribute(&major, CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MAJOR, cuDevice);
+  CUresult result2 = coot_wrapper(cuDeviceGetAttribute)(&major, CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MAJOR, cuDevice);
   coot_check_cuda_error(result2, "coot::cuda_rt.init(): cuDeviceGetAttribute() failed");
-  result2 = cuDeviceGetAttribute(&minor, CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MINOR, cuDevice);
+  result2 = coot_wrapper(cuDeviceGetAttribute)(&minor, CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MINOR, cuDevice);
   coot_check_cuda_error(result2, "coot::cuda_rt.init(): cuDeviceGetAttribute() failed");
 
   std::stringstream gpu_arch_opt;
@@ -194,32 +194,32 @@ runtime_t::compile_kernels(const std::string& unique_host_device_id)
   const std::string& gpu_arch_opt_tmp = gpu_arch_opt.str();
   opts.push_back(gpu_arch_opt_tmp.c_str());
 
-  result = nvrtcCompileProgram(prog,         // CUDA runtime compilation program
-                               opts.size(),  // number of compile options
-                               opts.data()); // compile options
+  result = coot_wrapper(nvrtcCompileProgram)(prog,         // CUDA runtime compilation program
+                                             opts.size(),  // number of compile options
+                                             opts.data()); // compile options
 
   // If compilation failed, display what went wrong.  The NVRTC outputs aren't
   // always very helpful though...
   if (result != NVRTC_SUCCESS)
     {
     size_t logSize;
-    result = (nvrtcGetProgramLogSize(prog, &logSize));
+    result = coot_wrapper(nvrtcGetProgramLogSize)(prog, &logSize);
     coot_check_nvrtc_error(result, "coot::cuda_rt.init(): nvrtcGetProgramLogSize() failed");
 
     char *log = new char[logSize];
-    result = (nvrtcGetProgramLog(prog, log));
+    result = coot_wrapper(nvrtcGetProgramLog)(prog, log);
     coot_check_nvrtc_error(result, "coot::cuda_rt.init(): nvrtcGetProgramLog() failed");
 
     coot_stop_runtime_error("coot::cuda_rt.init(): compilation failed", std::string(log));
     }
 
-  // Obtain PTX from the program.
+  // Obtain CUBIN from the program.
   size_t cubin_size;
-  result = nvrtcGetCUBINSize(prog, &cubin_size);
+  result = coot_wrapper(nvrtcGetCUBINSize)(prog, &cubin_size);
   coot_check_nvrtc_error(result, "coot::cuda_rt.init(): nvrtcGetCUBINSize() failed");
 
   char *cubin = new char[cubin_size];
-  result = nvrtcGetCUBIN(prog, cubin);
+  result = coot_wrapper(nvrtcGetCUBIN)(prog, cubin);
   coot_check_nvrtc_error(result, "coot::cuda_rt.init(): nvrtcGetCUBIN() failed");
 
   bool create_kernel_result = create_kernels(name_map, cubin);
@@ -247,16 +247,16 @@ bool
 runtime_t::create_kernels(const std::vector<std::pair<std::string, CUfunction*>>& name_map,
                           char* cubin)
   {
-  CUresult result = cuInit(0);
+  CUresult result = coot_wrapper(cuInit)(0);
   CUmodule module;
-  result = cuModuleLoadDataEx(&module, cubin, 0, 0, 0);
+  result = coot_wrapper(cuModuleLoadDataEx)(&module, cubin, 0, 0, 0);
   coot_check_cuda_error(result, "coot::cuda_rt.init(): cuModuleLoadDataEx() failed");
 
   // Now that everything is compiled, unpack the results into individual kernels
   // that we can access.
   for (uword i = 0; i < name_map.size(); ++i)
     {
-    result = cuModuleGetFunction(name_map.at(i).second, module, name_map.at(i).first.c_str());
+    result = coot_wrapper(cuModuleGetFunction)(name_map.at(i).second, module, name_map.at(i).first.c_str());
     coot_check_cuda_error(result, "coot::cuda_rt.init(): cuModuleGetFunction() failed for function " + name_map.at(i).first);
     }
 
@@ -271,15 +271,15 @@ runtime_t::~runtime_t()
   if (valid)
     {
     // Clean up RNGs.
-    curandStatus_t status = curandDestroyGenerator(xorwow_rand);
+    curandStatus_t status = coot_wrapper(curandDestroyGenerator)(xorwow_rand);
     coot_check_curand_error(status, "coot::cuda_rt.cleanup(): curandDestroyGenerator() failed");
-    status = curandDestroyGenerator(philox_rand);
+    status = coot_wrapper(curandDestroyGenerator)(philox_rand);
     coot_check_curand_error(status, "coot::cuda_rt.cleanup(): curandDestroyGenerator() failed");
 
     // Clean up cuBLAS handle.
-    cublasDestroy(cublas_handle);
+    coot_wrapper(cublasDestroy)(cublas_handle);
     // Clean up cuSolver handle.
-    cusolverDnDestroy(cusolver_handle);
+    coot_wrapper(cusolverDnDestroy)(cusolver_handle);
     }
   }
 
@@ -460,7 +460,7 @@ eT*
 runtime_t::acquire_memory(const uword n_elem)
   {
   void* result;
-  cudaError_t error = cudaMalloc(&result, sizeof(eT) * n_elem);
+  cudaError_t error = coot_wrapper(cudaMalloc)(&result, sizeof(eT) * n_elem);
 
   coot_check_cuda_error(error, "coot::cuda_rt.acquire_memory(): couldn't allocate memory");
 
@@ -474,7 +474,7 @@ runtime_t::release_memory(eT* cuda_mem)
   {
   if(cuda_mem)
     {
-    cudaError_t error = cudaFree(cuda_mem);
+    cudaError_t error = coot_wrapper(cudaFree)(cuda_mem);
 
     coot_check_cuda_error(error, "coot::cuda_rt.release_memory(): couldn't free memory");
     }
@@ -486,7 +486,7 @@ inline
 void
 runtime_t::synchronise()
   {
-  cuCtxSynchronize();
+  coot_wrapper(cuCtxSynchronize)();
   }
 
 
@@ -497,9 +497,9 @@ runtime_t::set_rng_seed(const u64 seed)
   {
   coot_extra_debug_sigprint();
 
-  curandStatus_t status = curandSetPseudoRandomGeneratorSeed(xorwow_rand, seed);
+  curandStatus_t status = coot_wrapper(curandSetPseudoRandomGeneratorSeed)(xorwow_rand, seed);
   coot_check_curand_error(status, "cuda::set_rng_seed(): curandSetPseudoRandomGeneratorSeed() failed");
 
-  status = curandSetPseudoRandomGeneratorSeed(philox_rand, seed);
+  status = coot_wrapper(curandSetPseudoRandomGeneratorSeed)(philox_rand, seed);
   coot_check_curand_error(status, "cuda::set_rng_seed(): curandSetPseudoRandomGeneratorSeed() failed");
   }

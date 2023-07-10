@@ -46,6 +46,9 @@ class Mat : public Base< eT, Mat<eT> >
   inline explicit Mat(const uword in_rows, const uword in_cols);
   inline explicit Mat(const SizeMat& s);
 
+  template<typename fill_type> inline Mat(const uword in_n_rows, const uword in_n_cols, const fill::fill_class<fill_type>& f);
+  template<typename fill_type> inline Mat(const SizeMat& s,                             const fill::fill_class<fill_type>& f);
+
   inline Mat(dev_mem_t<eT> aux_dev_mem, const uword in_rows, const uword in_cols);
   inline Mat(cl_mem        aux_dev_mem, const uword in_rows, const uword in_cols); // OpenCL alias constructor
   inline Mat(eT*           aux_dev_mem, const uword in_rows, const uword in_cols); // CUDA alias constructor
@@ -150,6 +153,9 @@ class Mat : public Base< eT, Mat<eT> >
 
   inline const Mat& fill(const eT val);
 
+  template<typename fill_type>
+  inline const Mat& fill(const fill::fill_class<fill_type>& f);
+
   inline const Mat& zeros();
   inline const Mat& zeros(const uword new_n_elem);
   inline const Mat& zeros(const uword new_n_rows, const uword new_n_cols);
@@ -193,17 +199,17 @@ class Mat : public Base< eT, Mat<eT> >
   coot_inline uword get_n_cols() const;
   coot_inline uword get_n_elem() const;
 
-  inline coot_warn_unused MatValProxy<eT> operator[] (const uword ii);
-  inline coot_warn_unused eT              operator[] (const uword ii) const;
-  inline coot_warn_unused MatValProxy<eT> at         (const uword ii);
-  inline coot_warn_unused eT              at         (const uword ii) const;
-  inline coot_warn_unused MatValProxy<eT> operator() (const uword ii);
-  inline coot_warn_unused eT              operator() (const uword ii) const;
+  coot_warn_unused inline MatValProxy<eT> operator[] (const uword ii);
+  coot_warn_unused inline eT              operator[] (const uword ii) const;
+  coot_warn_unused inline MatValProxy<eT> at         (const uword ii);
+  coot_warn_unused inline eT              at         (const uword ii) const;
+  coot_warn_unused inline MatValProxy<eT> operator() (const uword ii);
+  coot_warn_unused inline eT              operator() (const uword ii) const;
 
-  inline coot_warn_unused MatValProxy<eT> at         (const uword in_row, const uword in_col);
-  inline coot_warn_unused eT              at         (const uword in_row, const uword in_col) const;
-  inline coot_warn_unused MatValProxy<eT> operator() (const uword in_row, const uword in_col);
-  inline coot_warn_unused eT              operator() (const uword in_row, const uword in_col) const;
+  coot_warn_unused inline MatValProxy<eT> at         (const uword in_row, const uword in_col);
+  coot_warn_unused inline eT              at         (const uword in_row, const uword in_col) const;
+  coot_warn_unused inline MatValProxy<eT> operator() (const uword in_row, const uword in_col);
+  coot_warn_unused inline eT              operator() (const uword in_row, const uword in_col) const;
 
   coot_inline       subview_row<eT> row(const uword row_num);
   coot_inline const subview_row<eT> row(const uword row_num) const;

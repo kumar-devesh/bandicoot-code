@@ -24,8 +24,8 @@
 
 
 template<typename T1>
-inline
 coot_warn_unused
+inline
 typename enable_if2< is_coot_type<T1>::value, typename T1::pod_type >::result
 norm
   (
@@ -73,8 +73,8 @@ norm
 
 
 template<typename T1>
-inline
 coot_warn_unused
+inline
 typename enable_if2< is_coot_type<T1>::value, typename T1::pod_type >::result
 norm
   (

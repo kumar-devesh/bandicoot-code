@@ -46,7 +46,10 @@ Row<eT>::Row(const uword in_rows, const uword in_cols)
   coot_extra_debug_sigprint();
 
   access::rw(Mat<eT>::vec_state) = 2;
+
   Mat<eT>::init(in_rows, in_cols);
+
+  Mat<eT>::zeros();  // fill with zeros by default
   }
 
 
@@ -59,7 +62,59 @@ Row<eT>::Row(const SizeMat& s)
   coot_extra_debug_sigprint();
 
   access::rw(Mat<eT>::vec_state) = 2;
+
   Mat<eT>::init(s.n_rows, s.n_cols);
+
+  Mat<eT>::zeros();  // fill with zeros by default
+  }
+
+
+
+template<typename eT>
+template<typename fill_type>
+inline
+Row<eT>::Row(const uword N, const fill::fill_class<fill_type>& f)
+  : Mat<eT>(1, N)
+  {
+  coot_extra_debug_sigprint();
+  
+  access::rw(Mat<eT>::vec_state) = 2;
+  
+  Mat<eT>::fill(f);
+  }
+
+
+
+template<typename eT>
+template<typename fill_type>
+inline
+Row<eT>::Row(const uword in_rows, const uword in_cols, const fill::fill_class<fill_type>& f)
+  : Mat<eT>()
+  {
+  coot_extra_debug_sigprint();
+  
+  access::rw(Mat<eT>::vec_state) = 2;
+  
+  Mat<eT>::init(in_rows, in_cols);
+  
+  Mat<eT>::fill(f);
+  }
+
+
+
+template<typename eT>
+template<typename fill_type>
+inline
+Row<eT>::Row(const SizeMat& s, const fill::fill_class<fill_type>& f)
+  : Mat<eT>()
+  {
+  coot_extra_debug_sigprint();
+  
+  access::rw(Mat<eT>::vec_state) = 2;
+  
+  Mat<eT>::init(s.n_rows, s.n_cols);
+  
+  Mat<eT>::fill(f);
   }
 
 
@@ -234,7 +289,7 @@ Row<eT>::operator arma::Row<eT>() const
 
 
 template<typename eT>
-coot_inline
+inline
 const Op<Row<eT>, op_htrans>
 Row<eT>::t() const
   {
@@ -244,7 +299,7 @@ Row<eT>::t() const
 
 
 template<typename eT>
-coot_inline
+inline
 const Op<Row<eT>, op_htrans>
 Row<eT>::ht() const
   {
@@ -254,7 +309,7 @@ Row<eT>::ht() const
 
 
 template<typename eT>
-coot_inline
+inline
 const Op<Row<eT>, op_strans>
 Row<eT>::st() const
   {

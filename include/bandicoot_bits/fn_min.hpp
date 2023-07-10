@@ -16,7 +16,7 @@
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 const Op<T1, op_min>
 min
   (
@@ -37,7 +37,7 @@ min
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 const Op<T1, op_min>
 min
   (

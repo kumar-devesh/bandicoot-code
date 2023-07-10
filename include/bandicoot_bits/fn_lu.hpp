@@ -72,7 +72,7 @@ lu
                                                              in_n_cols);
   if (!std::get<0>(result))
     {
-    coot_debug_warn("lu(): " + std::get<1>(result));
+    coot_debug_warn_level(3, "lu(): " + std::get<1>(result));
     }
 
   return std::get<0>(result);
@@ -141,7 +141,7 @@ lu
                                                              in_n_cols);
   if (!std::get<0>(result))
     {
-    coot_debug_warn("lu(): " + std::get<1>(result));
+    coot_debug_warn_level(3, "lu(): " + std::get<1>(result));
     }
 
   return std::get<0>(result);

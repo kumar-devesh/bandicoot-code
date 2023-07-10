@@ -69,7 +69,7 @@ set_extra_arg(cl_kernel& kernel,
   coot_ignore(adapt_uword_index);
   // The addition of 4 is to account for the first four arguments that every
   // generic reduce kernel must have.
-  return clSetKernelArg(kernel, 4 + index, sizeof(T), &arg);
+  return coot_wrapper(clSetKernelArg)(kernel, 4 + index, sizeof(T), &arg);
   }
 
 
@@ -86,7 +86,7 @@ set_extra_arg(cl_kernel& kernel,
   adapt_uwords[adapt_uword_index] = runtime_t::adapt_uword(arg);
   // The addition of 4 is to account for the first four arguments that every
   // generic reduce kernel must have.
-  cl_int status = clSetKernelArg(kernel, 4 + index, adapt_uwords[adapt_uword_index].size, adapt_uwords[adapt_uword_index].addr);
+  cl_int status = coot_wrapper(clSetKernelArg)(kernel, 4 + index, adapt_uwords[adapt_uword_index].size, adapt_uwords[adapt_uword_index].addr);
   adapt_uword_index++;
   return status;
   }
@@ -159,7 +159,7 @@ generic_reduce(const dev_mem_t<eT> mem,
   // Compute workgroup sizes.  We use CL_KERNEL_WORK_GROUP_SIZE as an upper bound, which
   // depends on the compiled kernel.  I assume that the results for k will be identical to k_small.
   size_t kernel_wg_size;
-  cl_int status = clGetKernelWorkGroupInfo(first_kernel, get_rt().cl_rt.get_device(), CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &kernel_wg_size, NULL);
+  cl_int status = coot_wrapper(clGetKernelWorkGroupInfo)(first_kernel, get_rt().cl_rt.get_device(), CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &kernel_wg_size, NULL);
   // TODO: should we multiply by CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE?
   coot_check_cl_error(status, std::string("coot::opencl::") + std::string(kernel_name) + std::string("()"));
 
@@ -267,10 +267,10 @@ generic_reduce_inner(const dev_mem_t<eT> mem,
     const uword pow2_total_num_threads = (total_num_threads % pow2_group_size == 0) ? total_num_threads : ((total_num_threads / pow2_group_size) + 1) * pow2_group_size;
 
     cl_int status;
-    status  = clSetKernelArg(first_kernel, 0, sizeof(cl_mem),                   &mem.cl_mem_ptr);
-    status |= clSetKernelArg(first_kernel, 1, dev_n_elem.size,                  dev_n_elem.addr);
-    status |= clSetKernelArg(first_kernel, 2, sizeof(cl_mem),                   &aux_mem.cl_mem_ptr);
-    status |= clSetKernelArg(first_kernel, 3, sizeof(aux_eT) * pow2_group_size, NULL);
+    status  = coot_wrapper(clSetKernelArg)(first_kernel, 0, sizeof(cl_mem),                   &mem.cl_mem_ptr);
+    status |= coot_wrapper(clSetKernelArg)(first_kernel, 1, dev_n_elem.size,                  dev_n_elem.addr);
+    status |= coot_wrapper(clSetKernelArg)(first_kernel, 2, sizeof(cl_mem),                   &aux_mem.cl_mem_ptr);
+    status |= coot_wrapper(clSetKernelArg)(first_kernel, 3, sizeof(aux_eT) * pow2_group_size, NULL);
 
     // If we have any uwords in extra_args, we need to allocate adapt_uwords for them, which will be filled in set_extra_args().
     constexpr const uword num_uwords = count_uwords<void, A1...>();
@@ -280,7 +280,7 @@ generic_reduce_inner(const dev_mem_t<eT> mem,
 
     coot_check_cl_error(status, std::string("coot::opencl::") + std::string(kernel_name) + std::string("()"));
 
-    status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), first_kernel, k1_work_dim, &k1_work_offset, &pow2_total_num_threads, &pow2_group_size, 0, NULL, NULL);
+    status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), first_kernel, k1_work_dim, &k1_work_offset, &pow2_total_num_threads, &pow2_group_size, 0, NULL, NULL);
 
     coot_check_cl_error(status, std::string("coot::opencl::") + std::string(kernel_name) + std::string("()"));
 
@@ -333,10 +333,10 @@ generic_reduce_inner_small(const dev_mem_t<eT> mem,
   cl_kernel* k_use = (pow2_group_size <= subgroup_size) ? &kernel_small : &kernel;
 
   cl_int status;
-  status  = clSetKernelArg(*k_use, 0, sizeof(cl_mem),                   &mem.cl_mem_ptr);
-  status |= clSetKernelArg(*k_use, 1, dev_n_elem.size,                  dev_n_elem.addr);
-  status |= clSetKernelArg(*k_use, 2, sizeof(cl_mem),                   &aux_mem.cl_mem_ptr);
-  status |= clSetKernelArg(*k_use, 3, sizeof(aux_eT) * pow2_group_size, NULL);
+  status  = coot_wrapper(clSetKernelArg)(*k_use, 0, sizeof(cl_mem),                   &mem.cl_mem_ptr);
+  status |= coot_wrapper(clSetKernelArg)(*k_use, 1, dev_n_elem.size,                  dev_n_elem.addr);
+  status |= coot_wrapper(clSetKernelArg)(*k_use, 2, sizeof(cl_mem),                   &aux_mem.cl_mem_ptr);
+  status |= coot_wrapper(clSetKernelArg)(*k_use, 3, sizeof(aux_eT) * pow2_group_size, NULL);
 
   // If we have any uwords in extra_args, we need to allocate adapt_uwords for them, which will be filled in set_extra_args().
   constexpr const uword num_uwords = count_uwords<void, Args...>();
@@ -346,7 +346,7 @@ generic_reduce_inner_small(const dev_mem_t<eT> mem,
 
   coot_check_cl_error(status, std::string("coot::opencl::") + std::string(kernel_name) + std::string("()"));
 
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), *k_use, k1_work_dim, &k1_work_offset, &pow2_total_num_threads, &pow2_group_size, 0, NULL, NULL);
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), *k_use, k1_work_dim, &k1_work_offset, &pow2_total_num_threads, &pow2_group_size, 0, NULL, NULL);
 
   coot_check_cl_error(status, std::string("coot::opencl::") + std::string(kernel_name) + std::string("()"));
   }

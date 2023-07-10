@@ -37,7 +37,7 @@ extract_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword mem_offset, 
 
   const kernel_dims dims = one_dimensional_grid_dims(len);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],
@@ -73,7 +73,7 @@ set_diag(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword mem_offset, co
 
   const kernel_dims dims = one_dimensional_grid_dims(len);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],
@@ -111,7 +111,7 @@ copy_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword out_mem_offset,
 
   const kernel_dims dims = one_dimensional_grid_dims(len);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],

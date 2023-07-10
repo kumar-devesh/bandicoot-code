@@ -74,7 +74,6 @@ Base<elem_type,derived>::raw_print(std::ostream& user_stream, const std::string 
 
 // template<typename elem_type, typename derived>
 // inline
-// coot_warn_unused
 // elem_type
 // Base<elem_type,derived>::min() const
 //   {
@@ -85,7 +84,6 @@ Base<elem_type,derived>::raw_print(std::ostream& user_stream, const std::string 
 //
 // template<typename elem_type, typename derived>
 // inline
-// coot_warn_unused
 // elem_type
 // Base<elem_type,derived>::max() const
 //   {
@@ -96,7 +94,6 @@ Base<elem_type,derived>::raw_print(std::ostream& user_stream, const std::string 
 //
 // template<typename elem_type, typename derived>
 // inline
-// coot_warn_unused
 // uword
 // Base<elem_type,derived>::index_min() const
 //   {
@@ -120,7 +117,6 @@ Base<elem_type,derived>::raw_print(std::ostream& user_stream, const std::string 
 
 // template<typename elem_type, typename derived>
 // inline
-// coot_warn_unused
 // uword
 // Base<elem_type,derived>::index_max() const
 //   {
@@ -146,7 +142,7 @@ Base<elem_type,derived>::raw_print(std::ostream& user_stream, const std::string 
 // extra functions defined in Base_inv_yes
 
 template<typename derived>
-coot_inline
+inline
 const Op<derived, op_inv>
 Base_inv_yes<derived>::i() const
   {
@@ -159,7 +155,7 @@ Base_inv_yes<derived>::i() const
 // extra functions defined in Base_eval_Mat
 
 template<typename elem_type, typename derived>
-coot_inline
+inline
 const derived&
 Base_eval_Mat<elem_type, derived>::eval() const
   {
@@ -174,7 +170,7 @@ Base_eval_Mat<elem_type, derived>::eval() const
 // extra functions defined in Base_eval_expr
 
 template<typename elem_type, typename derived>
-coot_inline
+inline
 Mat<elem_type>
 Base_eval_expr<elem_type, derived>::eval() const
   {
@@ -189,7 +185,7 @@ Base_eval_expr<elem_type, derived>::eval() const
 // extra functions defined in Base_trans_cx
 
 template<typename derived>
-coot_inline
+inline
 const Op<derived, op_htrans>
 Base_trans_cx<derived>::t() const
   {
@@ -199,7 +195,7 @@ Base_trans_cx<derived>::t() const
 
 
 template<typename derived>
-coot_inline
+inline
 const Op<derived, op_htrans>
 Base_trans_cx<derived>::ht() const
   {
@@ -209,7 +205,7 @@ Base_trans_cx<derived>::ht() const
 
 
 template<typename derived>
-coot_inline
+inline
 const Op<derived, op_strans>
 Base_trans_cx<derived>::st() const
   {
@@ -222,7 +218,7 @@ Base_trans_cx<derived>::st() const
 // extra functions defined in Base_trans_default
 
 template<typename derived>
-coot_inline
+inline
 const Op<derived, op_htrans>
 Base_trans_default<derived>::t() const
   {
@@ -232,7 +228,7 @@ Base_trans_default<derived>::t() const
 
 
 template<typename derived>
-coot_inline
+inline
 const Op<derived, op_htrans>
 Base_trans_default<derived>::ht() const
   {
@@ -242,7 +238,7 @@ Base_trans_default<derived>::ht() const
 
 
 template<typename derived>
-coot_inline
+inline
 const Op<derived, op_htrans>
 Base_trans_default<derived>::st() const
   {

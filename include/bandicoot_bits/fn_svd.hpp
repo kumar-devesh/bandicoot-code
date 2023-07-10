@@ -180,7 +180,7 @@ svd
 
   if (sig == 'd')
     {
-    coot_warn("svd(): \"dc\" method not supported by bandicoot; falling back to \"std\"");
+    coot_debug_warn_level(2, "svd(): \"dc\" method not supported by bandicoot; falling back to \"std\"");
     }
 
   SizeProxy<T1> P(X.get_ref());

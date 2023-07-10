@@ -72,20 +72,20 @@ class diagview : public Base< eT, diagview<eT> >
   template<typename T1> inline void operator/=(const Base<eT,T1>& x);
 
 
-  inline coot_warn_unused MatValProxy<eT>  operator[](const uword ii);
-  inline coot_warn_unused eT               operator[](const uword ii) const;
+  coot_warn_unused inline MatValProxy<eT>  operator[](const uword ii);
+  coot_warn_unused inline eT               operator[](const uword ii) const;
 
-  inline coot_warn_unused MatValProxy<eT>          at(const uword ii);
-  inline coot_warn_unused eT                       at(const uword ii) const;
+  coot_warn_unused inline MatValProxy<eT>          at(const uword ii);
+  coot_warn_unused inline eT                       at(const uword ii) const;
 
-  inline coot_warn_unused MatValProxy<eT>  operator()(const uword ii);
-  inline coot_warn_unused eT               operator()(const uword ii) const;
+  coot_warn_unused inline MatValProxy<eT>  operator()(const uword ii);
+  coot_warn_unused inline eT               operator()(const uword ii) const;
 
-  inline coot_warn_unused MatValProxy<eT>          at(const uword in_n_row, const uword);
-  inline coot_warn_unused eT                       at(const uword in_n_row, const uword) const;
+  coot_warn_unused inline MatValProxy<eT>          at(const uword in_n_row, const uword);
+  coot_warn_unused inline eT                       at(const uword in_n_row, const uword) const;
 
-  inline coot_warn_unused MatValProxy<eT>  operator()(const uword in_n_row, const uword in_n_col);
-  inline coot_warn_unused eT               operator()(const uword in_n_row, const uword in_n_col) const;
+  coot_warn_unused inline MatValProxy<eT>  operator()(const uword in_n_row, const uword in_n_col);
+  coot_warn_unused inline eT               operator()(const uword in_n_row, const uword in_n_col) const;
 
 
   /* inline void replace(const eT old_val, const eT new_val); */

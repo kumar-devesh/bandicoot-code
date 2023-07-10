@@ -48,7 +48,7 @@ find(dev_mem_t<uword>& out, uword& out_len, const dev_mem_t<eT> A, const uword n
       &(counts_mem.cuda_mem_ptr),
       (uword*) &n_elem };
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       nnz_k,
       1, 1, 1, pow2_num_threads, 1, 1,
       sizeof(uword) * pow2_num_threads,
@@ -81,7 +81,7 @@ find(dev_mem_t<uword>& out, uword& out_len, const dev_mem_t<eT> A, const uword n
         &(out.cuda_mem_ptr),
         (uword*) &n_elem };
 
-    result = cuLaunchKernel(
+    result = coot_wrapper(cuLaunchKernel)(
         find_k,
         1, 1, 1, pow2_num_threads, 1, 1,
         0, NULL, (void**) find_args, 0);
@@ -100,7 +100,7 @@ find(dev_mem_t<uword>& out, uword& out_len, const dev_mem_t<eT> A, const uword n
         (uword*) &k,
         (uword*) &n_elem };
 
-    result = cuLaunchKernel(
+    result = coot_wrapper(cuLaunchKernel)(
         find_k,
         1, 1, 1, pow2_num_threads, 1, 1,
         0, NULL, (void**) find_args, 0);
@@ -121,7 +121,7 @@ find(dev_mem_t<uword>& out, uword& out_len, const dev_mem_t<eT> A, const uword n
         (uword*) &m,
         (uword*) &n_elem };
 
-    result = cuLaunchKernel(
+    result = coot_wrapper(cuLaunchKernel)(
         find_k,
         1, 1, 1, pow2_num_threads, 1, 1,
         0, NULL, (void**) find_args, 0);

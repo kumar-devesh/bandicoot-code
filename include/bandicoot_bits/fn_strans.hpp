@@ -16,7 +16,7 @@
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 const Op<T1, op_strans>
 strans
   (
@@ -35,7 +35,7 @@ strans
 // NOTE: for non-complex objects, using op_htrans instead of op_strans to simplify implementation in glue_times
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 const Op<T1, op_htrans>
 strans
   (
@@ -55,7 +55,7 @@ strans
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename
 enable_if2
   <

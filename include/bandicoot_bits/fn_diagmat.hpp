@@ -17,7 +17,7 @@
 //! interpret a matrix or a vector as a diagonal matrix (ie. off-diagonal entries are zero)
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename
 enable_if2
   <
@@ -36,7 +36,7 @@ diagmat(const T1& X)
 //! create a matrix with the k-th diagonal set to the given vector
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename
 enable_if2
   <
@@ -58,7 +58,7 @@ diagmat(const T1& X, const sword k)
 // simplification: wrap transposes into diagmat
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename
 enable_if2
   <
@@ -76,7 +76,7 @@ diagmat(const Op<T1, op_htrans>& X)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename
 enable_if2
   <
@@ -97,7 +97,7 @@ diagmat(const Op<T1, op_htrans>& X, const sword k)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename
 enable_if2
   <

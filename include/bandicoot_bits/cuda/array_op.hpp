@@ -35,7 +35,7 @@ array_op(dev_mem_t<eT3> out, const uword n_elem, dev_mem_t<eT1> in_a, dev_mem_t<
 
   const kernel_dims dims = one_dimensional_grid_dims(n_elem);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],
@@ -58,7 +58,7 @@ copy_array(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword n_elem)
   {
   coot_extra_debug_sigprint();
 
-  cudaError_t result = cudaMemcpy(dest.cuda_mem_ptr, src.cuda_mem_ptr, sizeof(eT) * size_t(n_elem), cudaMemcpyDeviceToDevice);
+  cudaError_t result = coot_wrapper(cudaMemcpy)(dest.cuda_mem_ptr, src.cuda_mem_ptr, sizeof(eT) * size_t(n_elem), cudaMemcpyDeviceToDevice);
 
   coot_check_cuda_error(result, "coot::cuda::copy_array(): couldn't copy buffer" );
   }
@@ -85,7 +85,7 @@ copy_array(dev_mem_t<out_eT> dest, const dev_mem_t<in_eT> src, const uword n_ele
 
   const kernel_dims dims = one_dimensional_grid_dims(n_elem);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],
@@ -120,7 +120,7 @@ copy_subview(dev_mem_t<eT> dest, const uword dest_offset, const dev_mem_t<eT> sr
   // TODO: check that d_pitch or s_pitch isn't too big?
   // TODO: check that memory does not overlap?
 
-  cudaError_t result = cudaMemcpy2D(
+  cudaError_t result = coot_wrapper(cudaMemcpy2D)(
       dest.cuda_mem_ptr + dest_offset,
       d_pitch,
       src.cuda_mem_ptr + aux_col1 * M_n_rows + aux_row1, // offset to right place
@@ -160,7 +160,7 @@ copy_subview(dev_mem_t<out_eT> dest, const uword dest_offset, const dev_mem_t<in
 
   const kernel_dims dims = two_dimensional_grid_dims(n_rows, n_cols);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],
@@ -206,7 +206,7 @@ copy_subview_to_subview(dev_mem_t<eT> dest,
   // TODO: check that d_pitch or s_pitch isn't too big?
   // TODO: check that memory does not overlap?
 
-  cudaError_t result = cudaMemcpy2D(
+  cudaError_t result = coot_wrapper(cudaMemcpy2D)(
       dest.cuda_mem_ptr + dest_aux_col1 * dest_M_n_rows + dest_aux_row1,
       d_pitch,
       src.cuda_mem_ptr + src_aux_col1 * src_M_n_rows + src_aux_row1, // offset to right place

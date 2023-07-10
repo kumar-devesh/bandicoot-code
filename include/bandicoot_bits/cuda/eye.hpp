@@ -35,7 +35,7 @@ eye(dev_mem_t<eT> dest, const uword n_rows, const uword n_cols)
 
   const kernel_dims dims = two_dimensional_grid_dims(n_rows, n_cols);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],

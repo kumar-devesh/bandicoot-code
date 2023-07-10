@@ -70,7 +70,7 @@ stddev(const T1& X, const uword norm_type, const uword dim)
 
 template<typename T>
 coot_warn_unused
-coot_inline
+inline
 typename coot_scalar_only<T>::result
 stddev(const T& x)
   {

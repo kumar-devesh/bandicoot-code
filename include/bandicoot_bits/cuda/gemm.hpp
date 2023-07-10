@@ -44,37 +44,37 @@ struct gemm
 
     if (std::is_same<eT, float>::value)
       {
-      result = cublasSgemm(get_rt().cuda_rt.cublas_handle,
-                           trans_a,
-                           trans_b,
-                           M,
-                           N,
-                           K,
-                           (const float*) &alpha,
-                           (const float*) A_mem.cuda_mem_ptr,
-                           lda,
-                           (const float*) B_mem.cuda_mem_ptr,
-                           ldb,
-                           (const float*) &beta,
-                           (float*) C_mem.cuda_mem_ptr,
-                           ldc);
+      result = coot_wrapper(cublasSgemm)(get_rt().cuda_rt.cublas_handle,
+                                         trans_a,
+                                         trans_b,
+                                         M,
+                                         N,
+                                         K,
+                                         (const float*) &alpha,
+                                         (const float*) A_mem.cuda_mem_ptr,
+                                         lda,
+                                         (const float*) B_mem.cuda_mem_ptr,
+                                         ldb,
+                                         (const float*) &beta,
+                                         (float*) C_mem.cuda_mem_ptr,
+                                         ldc);
       }
     else if (std::is_same<eT, double>::value)
       {
-      result = cublasDgemm(get_rt().cuda_rt.cublas_handle,
-                           trans_a,
-                           trans_b,
-                           M,
-                           N,
-                           K,
-                           (const double*) &alpha,
-                           (const double*) A_mem.cuda_mem_ptr,
-                           lda,
-                           (const double*) B_mem.cuda_mem_ptr,
-                           ldb,
-                           (const double*) &beta,
-                           (double*) C_mem.cuda_mem_ptr,
-                           ldc);
+      result = coot_wrapper(cublasDgemm)(get_rt().cuda_rt.cublas_handle,
+                                         trans_a,
+                                         trans_b,
+                                         M,
+                                         N,
+                                         K,
+                                         (const double*) &alpha,
+                                         (const double*) A_mem.cuda_mem_ptr,
+                                         lda,
+                                         (const double*) B_mem.cuda_mem_ptr,
+                                         ldb,
+                                         (const double*) &beta,
+                                         (double*) C_mem.cuda_mem_ptr,
+                                         ldc);
       }
     else if (std::is_same<eT, std::complex<float>>::value)
       {
