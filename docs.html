@@ -173,7 +173,7 @@ font.comment
 <ul>
 <li>Bandicoot is a GPU-focused linear algebra library aiming for API compatibility with <a href="https://arma.sourceforge.net">Armadillo</a></li>
 <br>
-<li>Bandicoot can any OpenCL or CUDA device as a backend; see the <a href="#backend_configuration">backend configuration details</a></li>
+<li>Bandicoot can use any OpenCL or CUDA device as a backend; see the <a href="#backend_configuration">backend configuration details</a></li>
 <br>
 <li>
 For converting Matlab/Octave programs,
@@ -7482,6 +7482,28 @@ OpenCL headers and clBLAS headers must be available on the system.
   </tr>
   <tr>
     <td style="vertical-align: top;">
+<code>COOT_DONT_USE_OPENCL</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+Disable use of OpenCL; overrides <code><i>COOT_USE_OPENCL</i></code>
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
 <code>COOT_USE_CUDA</code>
     </td>
     <td style="vertical-align: top;">
@@ -7490,6 +7512,28 @@ OpenCL headers and clBLAS headers must be available on the system.
     <td style="vertical-align: top;">
 Enable use of CUDA as a GPU backend.  Note that either <code>COOT_USE_OPENCL</code> or <code>COOT_USE_CUDA</code> must be enabled.
 The CUDA toolkit must be available on the system.
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+<code>COOT_DONT_USE_CUDA</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+Disable use of CUDA; overrides <code><i>COOT_USE_CUDA</i></code>
     </td>
   </tr>
   <tr>
@@ -7859,7 +7903,7 @@ See also:
 <ul>
 <li>In order to perform GPU-based linear algebra, Bandicoot must first compile GPU kernel functions to a particular device</li>
 <br>
-<li>The first time Bandicoot is run on a system, all GPU kernel functions will be compiled; <b>this may take a considerable amount time</b>, depending on the underlying system (usually less than 5 minutes)</li>
+<li>The first time Bandicoot is run on a system, all GPU kernel functions will be compiled; <b>this may take a considerable amount of time</b>, depending on the underlying system (usually less than 5 minutes)</li>
 <br>
 <li>Compiled kernels are stored in disk in the <i>kernel cache</i> for later reuse</li>
 <br>
@@ -7867,7 +7911,7 @@ See also:
 <br>
 <li>The default location to store the kernel cache is
 <ul>
-<li><code>~/.bandicoot/cache/</code> on Linux, macOS and UNIX-like systems</li>
+<li><code>~/.bandicoot/cache/</code> on Linux, macOS, and UNIX-like systems</li>
 <li><code>%APPDATA%\bandicoot\cache</code> on Windows (e.g. <code>C:\Users\Username\AppData\bandicoot\cache</code>)</li>
 </ul>
 <br>
