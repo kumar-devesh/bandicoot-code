@@ -1248,22 +1248,22 @@ magma_dtrsv
   if (n <= 0)
     return;
 
-  cl_int err = clblasDtrsv(clblasColumnMajor,
-                           clblas_uplo_const( uplo ),
-                           clblas_trans_const( trans ),
-                           clblas_diag_const( diag ),
-                           n,
-                           dA,
-                           dA_offset,
-                           ldda,
-                           dx,
-                           dx_offset,
-                           incx,
-                           1,
-                           &queue,
-                           0,
-                           NULL,
-                           get_g_event());
+  cl_int err = coot_wrapper(clblasDtrsv)(clblasColumnMajor,
+                                         clblas_uplo_const( uplo ),
+                                         clblas_trans_const( trans ),
+                                         clblas_diag_const( diag ),
+                                         n,
+                                         dA,
+                                         dA_offset,
+                                         ldda,
+                                         dx,
+                                         dx_offset,
+                                         incx,
+                                         1,
+                                         &queue,
+                                         0,
+                                         NULL,
+                                         get_g_event());
   clFlush(queue);
   check_error(err);
   }
@@ -1290,21 +1290,21 @@ magma_strsv
   if (n <= 0)
     return;
 
-  cl_int err = clblasStrsv(clblasColumnMajor,
-                           clblas_uplo_const( uplo ),
-                           clblas_trans_const( trans ),
-                           clblas_diag_const( diag ),
-                           n,
-                           dA,
-                           dA_offset,
-                           ldda,
-                           dx,
-                           dx_offset,
-                           incx,
-                           1,
-                           &queue,
-                           NULL,
-                           get_g_event());
+  cl_int err = coot_wrapper(clblasStrsv)(clblasColumnMajor,
+                                         clblas_uplo_const( uplo ),
+                                         clblas_trans_const( trans ),
+                                         clblas_diag_const( diag ),
+                                         n,
+                                         dA,
+                                         dA_offset,
+                                         ldda,
+                                         dx,
+                                         dx_offset,
+                                         incx,
+                                         1,
+                                         &queue,
+                                         NULL,
+                                         get_g_event());
   clFlush(queue);
   check_error(err);
   }

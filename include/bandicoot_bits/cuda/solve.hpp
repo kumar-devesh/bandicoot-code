@@ -51,7 +51,7 @@ solve_square_fast(dev_mem_t<eT> A, const bool trans_A, dev_mem_t<eT> B, const uw
 
   // This is an additional error code for cusolverDn; but it is an error code on the device...
   int* dev_info = NULL;
-  status2 = cudaMalloc((void**) &dev_info, sizeof(int));
+  status2 = coot_wrapper(cudaMalloc)((void**) &dev_info, sizeof(int));
   if (status2 != cudaSuccess)
     {
     return std::make_tuple(false, "couldn't cudaMalloc() device info holder");
@@ -59,19 +59,19 @@ solve_square_fast(dev_mem_t<eT> A, const bool trans_A, dev_mem_t<eT> B, const uw
 
   size_t host_workspace_size = 0;
   size_t gpu_workspace_size = 0;
-  status = cusolverDnXgetrf_bufferSize(get_rt().cuda_rt.cusolver_handle,
-                                       NULL,
-                                       n_rows,
-                                       n_rows,
-                                       data_type,
-                                       A.cuda_mem_ptr,
-                                       n_rows,
-                                       data_type,
-                                       &gpu_workspace_size,
-                                       &host_workspace_size);
+  status = coot_wrapper(cusolverDnXgetrf_bufferSize)(get_rt().cuda_rt.cusolver_handle,
+                                                     NULL,
+                                                     n_rows,
+                                                     n_rows,
+                                                     data_type,
+                                                     A.cuda_mem_ptr,
+                                                     n_rows,
+                                                     data_type,
+                                                     &gpu_workspace_size,
+                                                     &host_workspace_size);
   if (status != CUSOLVER_STATUS_SUCCESS)
     {
-    cudaFree(dev_info);
+    coot_wrapper(cudaFree)(dev_info);
     return std::make_tuple(false, "couldn't compute workspace size with cusolverDnXgetrf_bufferSize()");
     }
 
@@ -79,55 +79,55 @@ solve_square_fast(dev_mem_t<eT> A, const bool trans_A, dev_mem_t<eT> B, const uw
   const uword ipiv_size = n_rows;
 
   // Allocate space for pivots.
-  status2 = cudaMalloc((void**) &ipiv, sizeof(s64) * ipiv_size);
+  status2 = coot_wrapper(cudaMalloc)((void**) &ipiv, sizeof(s64) * ipiv_size);
   if (status2 != cudaSuccess)
     {
-    cudaFree(dev_info);
+    coot_wrapper(cudaFree)(dev_info);
     return std::make_tuple(false, "couldn't cudaMalloc() pivot array");
     }
 
   void* gpu_workspace = NULL;
-  status2 = cudaMalloc((void**) &gpu_workspace, gpu_workspace_size);
+  status2 = coot_wrapper(cudaMalloc)((void**) &gpu_workspace, gpu_workspace_size);
   if (status2 != cudaSuccess)
     {
-    cudaFree(dev_info);
-    cudaFree(ipiv);
+    coot_wrapper(cudaFree)(dev_info);
+    coot_wrapper(cudaFree)(ipiv);
     return std::make_tuple(false, "couldn't cudaMalloc() GPU workspace memory");
     }
 
   char* host_workspace = cpu_memory::acquire<char>(host_workspace_size);
 
-  status = cusolverDnXgetrf(get_rt().cuda_rt.cusolver_handle,
-                            NULL,
-                            n_rows,
-                            n_rows,
-                            data_type,
-                            A.cuda_mem_ptr,
-                            n_rows,
-                            ipiv,
-                            data_type,
-                            gpu_workspace,
-                            gpu_workspace_size,
-                            (void*) host_workspace,
-                            host_workspace_size,
-                            dev_info);
+  status = coot_wrapper(cusolverDnXgetrf)(get_rt().cuda_rt.cusolver_handle,
+                                          NULL,
+                                          n_rows,
+                                          n_rows,
+                                          data_type,
+                                          A.cuda_mem_ptr,
+                                          n_rows,
+                                          ipiv,
+                                          data_type,
+                                          gpu_workspace,
+                                          gpu_workspace_size,
+                                          (void*) host_workspace,
+                                          host_workspace_size,
+                                          dev_info);
 
-  cudaFree(gpu_workspace);
+  coot_wrapper(cudaFree)(gpu_workspace);
   cpu_memory::release(host_workspace);
 
   if (status != CUSOLVER_STATUS_SUCCESS)
     {
-    cudaFree(dev_info);
-    cudaFree(ipiv);
+    coot_wrapper(cudaFree)(dev_info);
+    coot_wrapper(cudaFree)(ipiv);
     return std::make_tuple(false, "factorisation via cusolverDnXgetrf() failed");
     }
 
   // Check whether the factorisation was successful.
   int info_result;
-  status2 = cudaMemcpy(&info_result, dev_info, sizeof(int), cudaMemcpyDeviceToHost);
+  status2 = coot_wrapper(cudaMemcpy)(&info_result, dev_info, sizeof(int), cudaMemcpyDeviceToHost);
   if (status2 != cudaSuccess)
     {
-    cudaFree(ipiv);
+    coot_wrapper(cudaFree)(ipiv);
     return std::make_tuple(false, "couldn't copy device info holder to host");
     }
 
@@ -148,32 +148,32 @@ solve_square_fast(dev_mem_t<eT> A, const bool trans_A, dev_mem_t<eT> B, const uw
 
   // Now use the LU-factorised A as the input to getrs() to solve the system.
 
-  status = cusolverDnXgetrs(get_rt().cuda_rt.cusolver_handle,
-                            NULL,
-                            (trans_A ? CUBLAS_OP_T : CUBLAS_OP_N),
-                            n_rows,
-                            n_cols,
-                            data_type,
-                            A.cuda_mem_ptr,
-                            n_rows,
-                            ipiv,
-                            data_type,
-                            B.cuda_mem_ptr,
-                            n_rows,
-                            dev_info);
+  status = coot_wrapper(cusolverDnXgetrs)(get_rt().cuda_rt.cusolver_handle,
+                                          NULL,
+                                          (trans_A ? CUBLAS_OP_T : CUBLAS_OP_N),
+                                          n_rows,
+                                          n_cols,
+                                          data_type,
+                                          A.cuda_mem_ptr,
+                                          n_rows,
+                                          ipiv,
+                                          data_type,
+                                          B.cuda_mem_ptr,
+                                          n_rows,
+                                          dev_info);
 
   // no longer needed
-  cudaFree(ipiv);
+  coot_wrapper(cudaFree)(ipiv);
 
   if (status != CUSOLVER_STATUS_SUCCESS)
     {
-    cudaFree(dev_info);
+    coot_wrapper(cudaFree)(dev_info);
     return std::make_tuple(false, "solving via cusolverDnXgetrs() failed");
     }
 
   // Check whether the operation was successful.
-  status2 = cudaMemcpy(&info_result, dev_info, sizeof(int), cudaMemcpyDeviceToHost);
-  cudaFree(dev_info);
+  status2 = coot_wrapper(cudaMemcpy)(&info_result, dev_info, sizeof(int), cudaMemcpyDeviceToHost);
+  coot_wrapper(cudaFree)(dev_info);
   if (status2 != cudaSuccess)
     {
     return std::make_tuple(false, "couldn't copy device info holder to host");

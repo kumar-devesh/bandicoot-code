@@ -527,6 +527,86 @@ namespace coot
 
 
     //
+    // triangular matrix vector solve
+    //
+
+
+
+    clblasStatus wrapper_clblasDtrsv(clblasOrder order,
+                                     clblasUplo uplo,
+                                     clblasTranspose trans,
+                                     clblasDiag diag,
+                                     size_t N,
+                                     const cl_mem A,
+                                     size_t offa,
+                                     size_t lda,
+                                     cl_mem x,
+                                     size_t offx,
+                                     int incx,
+                                     cl_uint numCommandQueues,
+                                     cl_command_queue* commandQueues,
+                                     cl_uint numEventsInWaitList,
+                                     const cl_event* eventWaitList,
+                                     cl_event* events)
+      {
+      return clblasDtrsv(order,
+                         uplo,
+                         trans,
+                         diag,
+                         N,
+                         A,
+                         offa,
+                         lda,
+                         x,
+                         offx,
+                         incx,
+                         numCommandQueues,
+                         commandQueues,
+                         numEventsInWaitList,
+                         eventWaitList,
+                         events);
+      }
+
+
+
+    clblasStatus wrapper_clblasStrsv(clblasOrder order,
+                                     clblasUplo uplo,
+                                     clblasTranspose trans,
+                                     clblasDiag diag,
+                                     size_t N,
+                                     const cl_mem A,
+                                     size_t offa,
+                                     size_t lda,
+                                     cl_mem x,
+                                     size_t offx,
+                                     int incx,
+                                     cl_uint numCommandQueues,
+                                     cl_command_queue* commandQueues,
+                                     cl_uint numEventsInWaitList,
+                                     const cl_event* eventWaitList,
+                                     cl_event* events)
+      {
+      return clblasStrsv(order,
+                         uplo,
+                         trans,
+                         diag,
+                         N,
+                         A,
+                         offa,
+                         lda,
+                         x,
+                         offx,
+                         incx,
+                         numCommandQueues,
+                         commandQueues,
+                         numEventsInWaitList,
+                         eventWaitList,
+                         events);
+      }
+
+
+
+    //
     // symmetric matrix-vector multiplication
     //
 

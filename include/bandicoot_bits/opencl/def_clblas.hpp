@@ -282,6 +282,50 @@ extern "C"
 
 
   //
+  // triangular matrix vector solve
+  //
+
+
+
+  extern clblasStatus coot_wrapper(clblasDtrsv)(clblasOrder order,
+                                                clblasUplo uplo,
+                                                clblasTranspose trans,
+                                                clblasDiag diag,
+                                                size_t N,
+                                                const cl_mem A,
+                                                size_t offa,
+                                                size_t lda,
+                                                cl_mem x,
+                                                size_t offx,
+                                                int incx,
+                                                cl_uint numCommandQueues,
+                                                cl_command_queue* commandQueues,
+                                                cl_uint numEventsInWaitList,
+                                                const cl_event* eventWaitList,
+                                                cl_event* events);
+
+
+
+  extern clblasStatus coot_wrapper(clblasStrsv)(clblasOrder order,
+                                                clblasUplo uplo,
+                                                clblasTranspose trans,
+                                                clblasDiag diag,
+                                                size_t N,
+                                                const cl_mem A,
+                                                size_t offa,
+                                                size_t lda,
+                                                cl_mem x,
+                                                size_t offx,
+                                                int incx,
+                                                cl_uint numCommandQueues,
+                                                cl_command_queue* commandQueues,
+                                                cl_uint numEventsInWaitList,
+                                                const cl_event* eventWaitList,
+                                                cl_event* events);
+
+
+
+  //
   // symmetric matrix-vector multiplication
   //
 
