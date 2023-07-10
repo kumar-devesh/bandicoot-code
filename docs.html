@@ -626,7 +626,9 @@ Constructors:
 <tbody>
 <tr><td><code>fmat()</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
 <tr><td><code>fmat(<i>n_rows</i>, <i>n_cols</i>)</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>fmat(<i>n_rows</i>, <i>n_cols</i>, <i>fill_form</i>)</code></td><td>&nbsp;</td><td>(elements are initialised according to <i>fill_form</i>)</td></tr>
 <tr><td><code>fmat(size(<i>X</i>))</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>fmat(size(<i>X</i>), <i>fill_form</i>)</code></td><td>&nbsp;</td><td>(elements are initialised according to <i>fill_form</i>)</td></tr>
 <tr><td><code>fmat(fmat)</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
 <tr><td><code>fmat(arma::fmat)</code></td><td>&nbsp;</td><td>&nbsp;(convert from CPU-based Armadillo matrix)</td></tr>
 <tr><td><code>fmat(fvec)</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
@@ -637,11 +639,27 @@ Constructors:
 </li>
 <br>
 <li>
-<b>Caveat:</b>
+The elements can be explicitly initialised during construction by specifying <i>fill_form</i>,
+which is one of:
 <ul>
-<li>unlike Armadillo 10.5 and newer, the elements are <i>not</i> initialised;
-they may contain garbage values, including NaN
-<li>consider using <a href="#zeros_standalone">zeros()</a> or other functions to fill memory</li>
+<table>
+<tbody>
+<tr><td><code>fill::zeros</code></td><td>&nbsp;&mapsto;&nbsp;</td><td>set all elements to 0</td></tr>
+<tr><td><code>fill::ones</code></td><td>&nbsp;&mapsto;&nbsp;</td><td>set all elements to 1</td></tr>
+<tr><td><code>fill::eye</code></td><td>&nbsp;&mapsto;&nbsp;</td><td>set the elements on the main diagonal to 1 and off-diagonal elements to 0</td></tr>
+<tr><td><code>fill::randu</code></td><td>&nbsp;&mapsto;&nbsp;</td><td>set all elements to random values from a uniform distribution in the [0,1] interval</td></tr>
+<tr><td><code>fill::randn</code></td><td>&nbsp;&mapsto;&nbsp;</td><td>set all elements to random values from a normal/Gaussian distribution with zero mean and unit variance</td></tr>
+<!-- TODO: <tr><td><code>fill::value(scalar)</code></td><td>&nbsp;&mapsto;&nbsp;</td><td>set all elements to specified scalar</td></tr> -->
+<tr><td><code>fill::none</code></td><td>&nbsp;&mapsto;&nbsp;</td><td>do not initialise the elements</td></tr>
+</tbody>
+</table>
+</ul>
+</li>
+<br>
+<li>
+<b>Caveats:</b>
+<ul>
+<li>the elements are initialised to zero if <i>fill_form</i> is not specified; use <i>fill::none</i> to disable initialisation of elements</li>
 <li><a href="#element_access">setting the elements one by one is generally very inefficient</a> and should be avoided if possible</li>
 </ul>
 </li>
@@ -689,8 +707,8 @@ a CUDA memory pointer (e.g. a <i>float*</i> for an <i>fmat</i>), if using the <a
 Examples:
 <ul>
 <pre>
-fmat A(5, 5);
-A.randu();
+fmat A(5, 5, fill::randu);
+
 float x = A(1, 2); <font class="comment">// note: try to avoid repeated individual element accesses!</font>
 
 fmat B = A + A;
@@ -980,7 +998,9 @@ Constructors:
 <tbody>
 <tr><td><code>fvec()</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
 <tr><td><code>fvec(<i>n_elem</i>)</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>fvec(<i>n_elem</i>, <i>fill_form</i>)</code></td><td>&nbsp;</td><td>(elements are initialised according to <i>fill_form</i>)</td></tr>
 <tr><td><code>fvec(size(<i>X</i>))</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>fvec(size(<i>X</i>), <i>fill_form</i>)</code></td><td>&nbsp;</td><td>(elements are initialised according to <i>fill_form</i>)</td></tr>
 <tr><td><code>fvec(fvec)</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
 <tr><td><code>fvec(arma::fvec)</code></td><td>&nbsp;</td><td>(convert from CPU-based Armadillo vector)</td></tr>
 <tr><td><code>fvec(fmat)</code></td><td>&nbsp;</td><td>(<i>std::logic_error</i> exception is thrown if the given matrix has more than one column)</td></tr>
@@ -990,10 +1010,9 @@ Constructors:
 </li>
 <br>
 <li>
-<b>Caveat:</b>
+<b>Caveats:</b>
 <ul>
-<li>unlike Armadillo 10.5 and newer, the elements are <i>not</i> initialised; they may contain garbage values, including NaN
-<li>consider using <a href="#zeros_standalone">zeros()</a> or other functions to fill memory</li>
+<li>the elements are initialised to zero if <i>fill_form</i> is not specified; see the <a href="#Mat">Mat class</a> for details on <i>fill_form</i></li>
 <li><a href="#element_access">setting the elements one by one is generally very inefficient</a> and should be avoided if possible</li>
 </ul>
 </li>
@@ -1239,7 +1258,9 @@ Constructors:
 <tbody>
 <tr><td><code>frowvec()</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
 <tr><td><code>frowvec(<i>n_elem</i>)</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>frowvec(<i>n_elem</i>, <i>fill_form</i>)</code></td><td>&nbsp;</td><td>(elements are initialised according to <i>fill_form</i>)</td></tr>
 <tr><td><code>frowvec(size(<i>X</i>))</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>rowvec(size(<i>X</i>), <i>fill_form</i>)</code></td><td>&nbsp;</td><td>(elements are initialised according to <i>fill_form</i>)</td></tr>
 <tr><td><code>frowvec(frowvec)</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
 <tr><td><code>frowvec(arma::fmat)</code></td><td>&nbsp;</td><td>(convert from CPU-based Armadillo row vector)</td></tr>
 <tr><td><code>frowvec(fmat)</code></td><td>&nbsp;</td><td>(<i>std::logic_error</i> exception is thrown if the given matrix has more than one row)</td></tr>
@@ -1249,10 +1270,9 @@ Constructors:
 </li>
 <br>
 <li>
-<b>Caveat:</b>
+<b>Caveats:</b>
 <ul>
-<li>unlike Armadillo 10.5 and newer, the elements are <i>not</i> initialised; they may contain garbage values, including NaN
-<li>consider using <a href="#zeros_standalone">zeros()</a> or other functions to fill memory</li>
+<li>the elements are initialised to zero if <i>fill_form</i> is not specified; see the <a href="#Mat">Mat class</a> for details on <i>fill_form</i></li>
 <li><a href="#element_access">setting the elements one by one is generally very inefficient</a> and should be avoided if possible</li>
 </ul>
 </li>
@@ -1701,13 +1721,13 @@ Examples:
 <pre>
 <font class="comment">// remember that individual element accesses are slow and should be avoided;</font>
 <font class="comment">// when possible, operate in batch instead of on individual elements!</font>
-fmat M(10, 10);
-M.randu();
+fmat M(10, 10, fill::randu);
+
 M(9, 9) = 123.0;
 float x = M(1, 2);
 
-fvec v(10);
-v.randu();
+fvec v(10, fill::randu);
+
 v(9) = 123.0;
 float y = v(0);
 </pre>
@@ -1766,12 +1786,12 @@ Examples:
 <ul>
 <pre>
 fmat A;
-A.zeros(5, 10);
+A.zeros(5, 10);   // or:  fmat A(5, 10, fill::zeros);
 
 fvec B;
 B.zeros(100);
 
-fmat C(5, 10);
+fmat C(5, 10, fill::randu);
 C.zeros();
 </pre>
 </ul>
@@ -1833,12 +1853,12 @@ Examples:
 <ul>
 <pre>
 fmat A;
-A.ones(5, 10);
+A.ones(5, 10);   // or:  fmat A(5, 10, fill::ones);
 
 fvec B;
 B.ones(100);
 
-fmat C(5, 10);
+fmat C(5, 10, fill::randu);
 C.ones();
 </pre>
 </ul>
@@ -1882,9 +1902,9 @@ Examples:
 <ul>
 <pre>
 fmat A;
-A.eye(5, 5);
+A.eye(5, 5);  // or:  fmat A(5, 5, fill::eye);
 
-fmat B(5, 5);
+fmat B(5, 5, fill::randu);
 B.eye();
 </pre>
 </ul>
@@ -1983,12 +2003,12 @@ Examples:
 <ul>
 <pre>
 fmat A;
-A.randu(5, 10);
+A.randu(5, 10);   // or:  fmat A(5, 10, fill::randu);
 
 fvec B;
 B.randu(100);
 
-fmat C(5, 10);
+fmat C(5, 10, fill::zeros);
 C.randu();
 
 coot_rng::set_seed_random(); <font class="comment">// set the seed to a random value</font>
@@ -2406,8 +2426,7 @@ Instances of <i>span(start,end)</i> can be replaced by <i>span::all</i> to indic
 Examples:
 <ul>
 <pre>
-fmat A(5, 10);
-A.zeros();
+fmat A(5, 10, fill::zeros);
 
 A.submat( 0,1, 2,3 )      = randu&lt;fmat&gt;(3, 3);
 A( span(0,2), span(1,3) ) = randu&lt;fmat&gt;(3, 3);
