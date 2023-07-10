@@ -301,7 +301,6 @@ diagview<eT>::extract(Mat<eT>& out, const diagview<eT>& in)
 
 template<typename eT>
 inline
-coot_warn_unused
 MatValProxy<eT>
 diagview<eT>::operator[](const uword ii)
   {
@@ -313,7 +312,6 @@ diagview<eT>::operator[](const uword ii)
 
 template<typename eT>
 inline
-coot_warn_unused
 eT
 diagview<eT>::operator[](const uword ii) const
   {
@@ -325,7 +323,6 @@ diagview<eT>::operator[](const uword ii) const
 
 template<typename eT>
 inline
-coot_warn_unused
 MatValProxy<eT>
 diagview<eT>::at(const uword ii)
   {
@@ -337,7 +334,6 @@ diagview<eT>::at(const uword ii)
 
 template<typename eT>
 inline
-coot_warn_unused
 eT
 diagview<eT>::at(const uword ii) const
   {
@@ -349,7 +345,6 @@ diagview<eT>::at(const uword ii) const
 
 template<typename eT>
 inline
-coot_warn_unused
 MatValProxy<eT>
 diagview<eT>::operator()(const uword ii)
   {
@@ -363,7 +358,6 @@ diagview<eT>::operator()(const uword ii)
 
 template<typename eT>
 inline
-coot_warn_unused
 eT
 diagview<eT>::operator()(const uword ii) const
   {
@@ -377,7 +371,6 @@ diagview<eT>::operator()(const uword ii) const
 
 template<typename eT>
 inline
-coot_warn_unused
 MatValProxy<eT>
 diagview<eT>::at(const uword row, const uword)
   {
@@ -389,7 +382,6 @@ diagview<eT>::at(const uword row, const uword)
 
 template<typename eT>
 inline
-coot_warn_unused
 eT
 diagview<eT>::at(const uword row, const uword) const
   {
@@ -401,7 +393,6 @@ diagview<eT>::at(const uword row, const uword) const
 
 template<typename eT>
 inline
-coot_warn_unused
 MatValProxy<eT>
 diagview<eT>::operator()(const uword row, const uword col)
   {
@@ -415,7 +406,6 @@ diagview<eT>::operator()(const uword row, const uword col)
 
 template<typename eT>
 inline
-coot_warn_unused
 eT
 diagview<eT>::operator()(const uword row, const uword col) const
   {

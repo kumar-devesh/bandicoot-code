@@ -96,16 +96,16 @@ fill_randu(dev_mem_t<eT> dest, const uword n)
 
   cl_mem xorwow_state = get_rt().cl_rt.get_xorwow_state<eT>();
 
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &(dest.cl_mem_ptr) );
-  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &(xorwow_state) );
-  status |= clSetKernelArg(kernel, 2, n_cl.size,      n_cl.addr );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem), &(dest.cl_mem_ptr) );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(cl_mem), &(xorwow_state) );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 2, n_cl.size,      n_cl.addr );
 
   // Each thread will do as many elements as it can.
   // This avoids memory synchronization issues, since each RNG state will be local to only a single run of the kernel.
   const size_t num_rng_threads = get_rt().cl_rt.get_num_rng_threads();
   const size_t num_threads = std::min(num_rng_threads, n);
 
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &num_threads, NULL, 0, NULL, NULL);
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &num_threads, NULL, 0, NULL, NULL);
 
   coot_check_cl_error(status, "randu()");
   }
@@ -137,18 +137,18 @@ fill_randn(dev_mem_t<eT> dest, const uword n, const double mu, const double sd)
   fp_eT1 cl_mu(mu);
   fp_eT1 cl_sd(sd);
 
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &(dest.cl_mem_ptr) );
-  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &(philox_state) );
-  status |= clSetKernelArg(kernel, 2, n_cl.size,      n_cl.addr );
-  status |= clSetKernelArg(kernel, 3, sizeof(cl_mu),  &(cl_mu) );
-  status |= clSetKernelArg(kernel, 4, sizeof(cl_sd),  &(cl_sd) );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem), &(dest.cl_mem_ptr) );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(cl_mem), &(philox_state) );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 2, n_cl.size,      n_cl.addr );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 3, sizeof(cl_mu),  &(cl_mu) );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 4, sizeof(cl_sd),  &(cl_sd) );
 
   // Each thread will do as many elements as it can.
   // This avoids memory synchronization issues, since each RNG state will be local to only a single run of the kernel.
   const size_t num_rng_threads = get_rt().cl_rt.get_num_rng_threads();
   const size_t num_threads = std::min(num_rng_threads, n);
 
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &num_threads, NULL, 0, NULL, NULL);
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &num_threads, NULL, 0, NULL, NULL);
 
   coot_check_cl_error(status, "randn()");
   }
@@ -189,19 +189,19 @@ fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int hi)
   char needs_modulo = (range != std::numeric_limits<uint_eT>::max());
   eT cl_lo = eT(lo);
 
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem),  &(dest.cl_mem_ptr) );
-  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem),  &(xorwow_state) );
-  status |= clSetKernelArg(kernel, 2, n_cl.size,       n_cl.addr );
-  status |= clSetKernelArg(kernel, 3, sizeof(eT),      &cl_lo );
-  status |= clSetKernelArg(kernel, 4, sizeof(uint_eT), &range );
-  status |= clSetKernelArg(kernel, 5, sizeof(char),    &needs_modulo );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem),  &(dest.cl_mem_ptr) );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(cl_mem),  &(xorwow_state) );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 2, n_cl.size,       n_cl.addr );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 3, sizeof(eT),      &cl_lo );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 4, sizeof(uint_eT), &range );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 5, sizeof(char),    &needs_modulo );
 
   // Each thread will do as many elements as it can.
   // This avoids memory synchronization issues, since each RNG state will be local to only a single run of the kernel.
   const size_t num_rng_threads = get_rt().cl_rt.get_num_rng_threads();
   const size_t num_threads = std::min(num_rng_threads, n);
 
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &num_threads, NULL, 0, NULL, NULL);
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &num_threads, NULL, 0, NULL, NULL);
 
   coot_check_cl_error(status, "randi()");
   }

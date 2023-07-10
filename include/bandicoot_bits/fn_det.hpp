@@ -64,7 +64,7 @@ det
   if(status == false)
     {
     out_val = eT(0);
-    coot_debug_warn("det(): failed to find determinant");
+    coot_debug_warn_level(3, "det(): failed to find determinant");
     }
 
   return status;

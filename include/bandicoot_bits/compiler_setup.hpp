@@ -50,8 +50,6 @@
   #define coot_fortran2_prefix(function)   wrapper_##function
 #endif
 
-// TODO: do we still want to go through a wrapper library?
-
 #if defined(COOT_USE_WRAPPER)
   #define coot_fortran(function) coot_fortran2_prefix(function)
   #define coot_wrapper(function) wrapper_##function
@@ -254,6 +252,13 @@
   #pragma warning(disable: 4714)  // __forceinline can't be inlined
   #pragma warning(disable: 4800)  // value forced to bool
 
+  // NOTE: also possible to disable 4146 (unary minus operator applied to unsigned type, result still unsigned)
+
+  #if defined(COOT_HAVE_CXX17)
+  #pragma warning(disable: 26812)  // unscoped enum
+  #pragma warning(disable: 26819)  // unannotated fallthrough
+  #endif
+
   // #if (_MANAGED == 1) || (_M_CEE == 1)
   //
   //   // don't do any alignment when compiling in "managed code" mode
@@ -288,6 +293,21 @@
     #error "*** Need a newer compiler ***"
   #endif
 
+#endif
+
+
+#if defined(COOT_HAVE_CXX14)
+  #undef  coot_deprecated
+  #define coot_deprecated [[deprecated]]
+
+  #undef  coot_frown
+  #define coot_frown(msg) [[deprecated(msg)]]
+#endif
+
+
+#if defined(COOT_HAVE_CXX17)
+  #undef  coot_warn_unused
+  #define coot_warn_unused  [[nodiscard]]
 #endif
 
 
@@ -328,6 +348,11 @@
   #endif
 #endif
 
+
+#if ( (defined(_WIN32) || defined(_WIN64) || defined(_MSC_VER)) && (!defined(__MINGW32__) && !defined(__MINGW64__)) )
+  #undef  COOT_PRINT_EXCEPTIONS_INTERNAL
+  #define COOT_PRINT_EXCEPTIONS_INTERNAL
+#endif
 
 
 // cleanup

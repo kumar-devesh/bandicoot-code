@@ -62,7 +62,7 @@ accu_subview(dev_mem_t<eT> mem, const uword m_n_rows, const uword aux_row1, cons
 
   const kernel_dims dims = one_dimensional_grid_dims(n_cols);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       k1,
       dims.d[0], dims.d[1], dims.d[2], // grid dims
       dims.d[3], dims.d[4], dims.d[5], // block dims
@@ -81,7 +81,7 @@ accu_subview(dev_mem_t<eT> mem, const uword m_n_rows, const uword aux_row1, cons
       &(tmp_mem.cuda_mem_ptr),
       (uword*) &n_cols };
 
-  result = cuLaunchKernel(
+  result = coot_wrapper(cuLaunchKernel)(
       k2,
       1, 1, 1, // grid dims
       1, 1, 1, // block dims

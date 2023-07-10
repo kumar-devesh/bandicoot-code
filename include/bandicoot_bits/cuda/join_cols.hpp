@@ -33,49 +33,49 @@ join_cols(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword A_n_rows, const 
   cudaError_t result;
   if (A_n_elem > 0)
     {
-    result = cudaMemcpy2D((void*) out.cuda_mem_ptr,
-                          out_n_rows * sizeof(eT),
-                          (void*) A.cuda_mem_ptr,
-                          A_n_rows * sizeof(eT),
-                          A_n_rows * sizeof(eT),
-                          A_n_cols,
-                          cudaMemcpyDeviceToDevice);
+    result = coot_wrapper(cudaMemcpy2D)((void*) out.cuda_mem_ptr,
+                                        out_n_rows * sizeof(eT),
+                                        (void*) A.cuda_mem_ptr,
+                                        A_n_rows * sizeof(eT),
+                                        A_n_rows * sizeof(eT),
+                                        A_n_cols,
+                                        cudaMemcpyDeviceToDevice);
     coot_check_cuda_error(result, "coot::cuda::join_cols(): could not copy first argument");
     }
 
   if (B_n_elem > 0)
     {
-    result = cudaMemcpy2D((void*) (out.cuda_mem_ptr + A_n_rows),
-                          out_n_rows * sizeof(eT),
-                          (void*) B.cuda_mem_ptr,
-                          B_n_rows * sizeof(eT),
-                          B_n_rows * sizeof(eT),
-                          B_n_cols,
-                          cudaMemcpyDeviceToDevice);
+    result = coot_wrapper(cudaMemcpy2D)((void*) (out.cuda_mem_ptr + A_n_rows),
+                                        out_n_rows * sizeof(eT),
+                                        (void*) B.cuda_mem_ptr,
+                                        B_n_rows * sizeof(eT),
+                                        B_n_rows * sizeof(eT),
+                                        B_n_cols,
+                                        cudaMemcpyDeviceToDevice);
     coot_check_cuda_error(result, "coot::cuda::join_cols(): could not copy second argument");
     }
 
   if (C_n_elem > 0)
     {
-    result = cudaMemcpy2D((void*) (out.cuda_mem_ptr + A_n_rows + B_n_rows),
-                          out_n_rows * sizeof(eT),
-                          (void*) C.cuda_mem_ptr,
-                          C_n_rows * sizeof(eT),
-                          C_n_rows * sizeof(eT),
-                          C_n_cols,
-                          cudaMemcpyDeviceToDevice);
+    result = coot_wrapper(cudaMemcpy2D)((void*) (out.cuda_mem_ptr + A_n_rows + B_n_rows),
+                                        out_n_rows * sizeof(eT),
+                                        (void*) C.cuda_mem_ptr,
+                                        C_n_rows * sizeof(eT),
+                                        C_n_rows * sizeof(eT),
+                                        C_n_cols,
+                                        cudaMemcpyDeviceToDevice);
     coot_check_cuda_error(result, "coot::cuda::join_cols(): could not copy third argument");
     }
 
   if (D_n_elem > 0)
     {
-    result = cudaMemcpy2D((void*) (out.cuda_mem_ptr + A_n_rows + B_n_rows + C_n_rows),
-                          out_n_rows * sizeof(eT),
-                          (void*) D.cuda_mem_ptr,
-                          D_n_rows * sizeof(eT),
-                          D_n_rows * sizeof(eT),
-                          D_n_cols,
-                          cudaMemcpyDeviceToDevice);
+    result = coot_wrapper(cudaMemcpy2D)((void*) (out.cuda_mem_ptr + A_n_rows + B_n_rows + C_n_rows),
+                                        out_n_rows * sizeof(eT),
+                                        (void*) D.cuda_mem_ptr,
+                                        D_n_rows * sizeof(eT),
+                                        D_n_rows * sizeof(eT),
+                                        D_n_cols,
+                                        cudaMemcpyDeviceToDevice);
     coot_check_cuda_error(result, "coot::cuda::join_cols(): could not copy fourth argument");
     }
   }

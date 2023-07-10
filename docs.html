@@ -166,22 +166,21 @@ font.comment
 <b>Preamble</b>
 <br>
 <br>
-<ul>
-<li>Bandicoot is a GPU-based linear algebra library that meant to be API-compatible with <a href="https://arma.sourceforge.net">Armadillo</a></li>
-<br>
-<li>Bandicoot supports the use of any OpenCL or CUDA device as a backend; see the <a href="#backend_configuration">backend configuration details</a></li>
-<br>
-<li>For converting Armadillo programs to Bandicoot, see the <a href="#arma_comparison">Armadillo/Bandicoot conversion guide</a></li>
-</ul>
 <table border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr>
 <td style="text-align: left; vertical-align: top; width: 45%;">
 <ul>
+<li>Bandicoot is a GPU-focused linear algebra library aiming for API compatibility with <a href="https://arma.sourceforge.net">Armadillo</a></li>
+<br>
+<li>Bandicoot can any OpenCL or CUDA device as a backend; see the <a href="#backend_configuration">backend configuration details</a></li>
+<br>
 <li>
 For converting Matlab/Octave programs,
 see the <a href="#syntax">syntax conversion table</a>
 </li>
+<br>
+<li>For adapting Armadillo programs to Bandicoot, see the <a href="#arma_comparison">Armadillo/Bandicoot adaptation guide</a></li>
 <br>
 <li>
 First time users: please see the short <a href="#example_prog">example program</a>
@@ -365,6 +364,7 @@ Citations are useful for the continued development and maintenance of the librar
 <tr style="background-color: #F5F5F5;"><td><a href="#eig_sym">eig_sym</a></td><td>&nbsp;</td><td>eigen decomposition of dense symmetric/hermitian matrix</td></tr>
 <tr style="background-color: #F5F5F5;"><td><a href="#lu">lu&nbsp;&nbsp;</a></td><td>&nbsp;</td><td>lower-upper decomposition</td></tr>
 <tr><td><a href="#pinv">pinv</a></td><td>&nbsp;</td><td>pseudo-inverse / generalised inverse</td></tr>
+<tr><td><a href="#solve">solve</a></td><td>&nbsp;</td><td>solve systems of linear equations</td></tr>
 <tr><td><a href="#svd">svd</a></td><td>&nbsp;</td><td>singular value decomposition</td></tr>
 </tbody>
 </table>
@@ -626,7 +626,9 @@ Constructors:
 <tbody>
 <tr><td><code>fmat()</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
 <tr><td><code>fmat(<i>n_rows</i>, <i>n_cols</i>)</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>fmat(<i>n_rows</i>, <i>n_cols</i>, <i>fill_form</i>)</code></td><td>&nbsp;</td><td>(elements are initialised according to <i>fill_form</i>)</td></tr>
 <tr><td><code>fmat(size(<i>X</i>))</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>fmat(size(<i>X</i>), <i>fill_form</i>)</code></td><td>&nbsp;</td><td>(elements are initialised according to <i>fill_form</i>)</td></tr>
 <tr><td><code>fmat(fmat)</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
 <tr><td><code>fmat(arma::fmat)</code></td><td>&nbsp;</td><td>&nbsp;(convert from CPU-based Armadillo matrix)</td></tr>
 <tr><td><code>fmat(fvec)</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
@@ -637,11 +639,27 @@ Constructors:
 </li>
 <br>
 <li>
-<b>Caveat:</b>
+The elements can be explicitly initialised during construction by specifying <i>fill_form</i>,
+which is one of:
 <ul>
-<li>unlike Armadillo 10.5 and newer, the elements are <i>not</i> initialised;
-they may contain garbage values, including NaN
-<li>consider using <a href="#zeros_standalone">zeros()</a> or other functions to fill memory</li>
+<table>
+<tbody>
+<tr><td><code>fill::zeros</code></td><td>&nbsp;&mapsto;&nbsp;</td><td>set all elements to 0</td></tr>
+<tr><td><code>fill::ones</code></td><td>&nbsp;&mapsto;&nbsp;</td><td>set all elements to 1</td></tr>
+<tr><td><code>fill::eye</code></td><td>&nbsp;&mapsto;&nbsp;</td><td>set the elements on the main diagonal to 1 and off-diagonal elements to 0</td></tr>
+<tr><td><code>fill::randu</code></td><td>&nbsp;&mapsto;&nbsp;</td><td>set all elements to random values from a uniform distribution in the [0,1] interval</td></tr>
+<tr><td><code>fill::randn</code></td><td>&nbsp;&mapsto;&nbsp;</td><td>set all elements to random values from a normal/Gaussian distribution with zero mean and unit variance</td></tr>
+<!-- TODO: <tr><td><code>fill::value(scalar)</code></td><td>&nbsp;&mapsto;&nbsp;</td><td>set all elements to specified scalar</td></tr> -->
+<tr><td><code>fill::none</code></td><td>&nbsp;&mapsto;&nbsp;</td><td>do not initialise the elements</td></tr>
+</tbody>
+</table>
+</ul>
+</li>
+<br>
+<li>
+<b>Caveats:</b>
+<ul>
+<li>the elements are initialised to zero if <i>fill_form</i> is not specified; use <i>fill::none</i> to disable initialisation of elements</li>
 <li><a href="#element_access">setting the elements one by one is generally very inefficient</a> and should be avoided if possible</li>
 </ul>
 </li>
@@ -689,8 +707,8 @@ a CUDA memory pointer (e.g. a <i>float*</i> for an <i>fmat</i>), if using the <a
 Examples:
 <ul>
 <pre>
-fmat A(5, 5);
-A.randu();
+fmat A(5, 5, fill::randu);
+
 float x = A(1, 2); <font class="comment">// note: try to avoid repeated individual element accesses!</font>
 
 fmat B = A + A;
@@ -980,7 +998,9 @@ Constructors:
 <tbody>
 <tr><td><code>fvec()</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
 <tr><td><code>fvec(<i>n_elem</i>)</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>fvec(<i>n_elem</i>, <i>fill_form</i>)</code></td><td>&nbsp;</td><td>(elements are initialised according to <i>fill_form</i>)</td></tr>
 <tr><td><code>fvec(size(<i>X</i>))</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>fvec(size(<i>X</i>), <i>fill_form</i>)</code></td><td>&nbsp;</td><td>(elements are initialised according to <i>fill_form</i>)</td></tr>
 <tr><td><code>fvec(fvec)</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
 <tr><td><code>fvec(arma::fvec)</code></td><td>&nbsp;</td><td>(convert from CPU-based Armadillo vector)</td></tr>
 <tr><td><code>fvec(fmat)</code></td><td>&nbsp;</td><td>(<i>std::logic_error</i> exception is thrown if the given matrix has more than one column)</td></tr>
@@ -990,10 +1010,9 @@ Constructors:
 </li>
 <br>
 <li>
-<b>Caveat:</b>
+<b>Caveats:</b>
 <ul>
-<li>unlike Armadillo 10.5 and newer, the elements are <i>not</i> initialised; they may contain garbage values, including NaN
-<li>consider using <a href="#zeros_standalone">zeros()</a> or other functions to fill memory</li>
+<li>the elements are initialised to zero if <i>fill_form</i> is not specified; see the <a href="#Mat">Mat class</a> for details on <i>fill_form</i></li>
 <li><a href="#element_access">setting the elements one by one is generally very inefficient</a> and should be avoided if possible</li>
 </ul>
 </li>
@@ -1239,7 +1258,9 @@ Constructors:
 <tbody>
 <tr><td><code>frowvec()</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
 <tr><td><code>frowvec(<i>n_elem</i>)</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>frowvec(<i>n_elem</i>, <i>fill_form</i>)</code></td><td>&nbsp;</td><td>(elements are initialised according to <i>fill_form</i>)</td></tr>
 <tr><td><code>frowvec(size(<i>X</i>))</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td><code>rowvec(size(<i>X</i>), <i>fill_form</i>)</code></td><td>&nbsp;</td><td>(elements are initialised according to <i>fill_form</i>)</td></tr>
 <tr><td><code>frowvec(frowvec)</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
 <tr><td><code>frowvec(arma::fmat)</code></td><td>&nbsp;</td><td>(convert from CPU-based Armadillo row vector)</td></tr>
 <tr><td><code>frowvec(fmat)</code></td><td>&nbsp;</td><td>(<i>std::logic_error</i> exception is thrown if the given matrix has more than one row)</td></tr>
@@ -1249,10 +1270,9 @@ Constructors:
 </li>
 <br>
 <li>
-<b>Caveat:</b>
+<b>Caveats:</b>
 <ul>
-<li>unlike Armadillo 10.5 and newer, the elements are <i>not</i> initialised; they may contain garbage values, including NaN
-<li>consider using <a href="#zeros_standalone">zeros()</a> or other functions to fill memory</li>
+<li>the elements are initialised to zero if <i>fill_form</i> is not specified; see the <a href="#Mat">Mat class</a> for details on <i>fill_form</i></li>
 <li><a href="#element_access">setting the elements one by one is generally very inefficient</a> and should be avoided if possible</li>
 </ul>
 </li>
@@ -1673,7 +1693,7 @@ As for <code>(r,c)</code>, but without a bounds check; not recommended; see the 
 <b>Important:</b>
 every element access involves a transfer from GPU memory to CPU memory;
 therefore, for efficiency, avoid repeated element access when possible;
-see <a href="#arma_comparison">the Armadillo conversion guide</a> for more details and suggestions.
+see <a href="#arma_comparison">the Armadillo adaptation guide</a> for more details and suggestions.
 </li>
 <br>
 <li>
@@ -1701,13 +1721,13 @@ Examples:
 <pre>
 <font class="comment">// remember that individual element accesses are slow and should be avoided;</font>
 <font class="comment">// when possible, operate in batch instead of on individual elements!</font>
-fmat M(10, 10);
-M.randu();
+fmat M(10, 10, fill::randu);
+
 M(9, 9) = 123.0;
 float x = M(1, 2);
 
-fvec v(10);
-v.randu();
+fvec v(10, fill::randu);
+
 v(9) = 123.0;
 float y = v(0);
 </pre>
@@ -1716,7 +1736,7 @@ float y = v(0);
 <br>
 <li>See also:
 <ul>
-<li><a href="#arma_comparison">Armadillo conversion guide</a></li>
+<li><a href="#arma_comparison">Armadillo adaptation guide</a></li>
 <li><a href="#submat">submatrix views</a></li>
 <li><a href="#get_dev_mem">.get_dev_mem()</a></li>
 <li><a href="#config_hpp">config.hpp</a></li>
@@ -1766,12 +1786,12 @@ Examples:
 <ul>
 <pre>
 fmat A;
-A.zeros(5, 10);
+A.zeros(5, 10);   // or:  fmat A(5, 10, fill::zeros);
 
 fvec B;
 B.zeros(100);
 
-fmat C(5, 10);
+fmat C(5, 10, fill::randu);
 C.zeros();
 </pre>
 </ul>
@@ -1833,12 +1853,12 @@ Examples:
 <ul>
 <pre>
 fmat A;
-A.ones(5, 10);
+A.ones(5, 10);   // or:  fmat A(5, 10, fill::ones);
 
 fvec B;
 B.ones(100);
 
-fmat C(5, 10);
+fmat C(5, 10, fill::randu);
 C.ones();
 </pre>
 </ul>
@@ -1882,9 +1902,9 @@ Examples:
 <ul>
 <pre>
 fmat A;
-A.eye(5, 5);
+A.eye(5, 5);  // or:  fmat A(5, 5, fill::eye);
 
-fmat B(5, 5);
+fmat B(5, 5, fill::randu);
 B.eye();
 </pre>
 </ul>
@@ -1983,12 +2003,12 @@ Examples:
 <ul>
 <pre>
 fmat A;
-A.randu(5, 10);
+A.randu(5, 10);   // or:  fmat A(5, 10, fill::randu);
 
 fvec B;
 B.randu(100);
 
-fmat C(5, 10);
+fmat C(5, 10, fill::zeros);
 C.randu();
 
 coot_rng::set_seed_random(); <font class="comment">// set the seed to a random value</font>
@@ -2406,8 +2426,7 @@ Instances of <i>span(start,end)</i> can be replaced by <i>span::all</i> to indic
 Examples:
 <ul>
 <pre>
-fmat A(5, 10);
-A.zeros();
+fmat A(5, 10, fill::zeros);
 
 A.submat( 0,1, 2,3 )      = randu&lt;fmat&gt;(3, 3);
 A( span(0,2), span(1,3) ) = randu&lt;fmat&gt;(3, 3);
@@ -3587,7 +3606,7 @@ See also:
 <li><a href="#as_scalar">as_scalar()</a></li>
 <li><a href="#abs">abs()</a></li>
 <li><a href="#adv_constructors_mat">advanced constructors (matrices)</a></li>
-<li><a href="#arma_comparison">Armadillo/Bandicoot conversion guide</a></li>
+<li><a href="#arma_comparison">Armadillo/Bandicoot adaptation guide</a></li>
 </ul>
 </li>
 <br>
@@ -5367,6 +5386,27 @@ See also:
 </ul>
 
 <div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
+<a name="solve"></a>
+<b>X = solve( A, B )</b>
+<br><b>X = solve( A, B, settings )</b>
+<br>
+<br><b>solve( X, A, B )</b>
+<br><b>solve( X, A, B, settings )</b>
+<ul>
+<li>
+TODO: this is a placeholder! expand when implemented
+</li>
+<br>
+<!--
+<li>Solve a <b>dense</b> system of linear equations, <i>A*X = B</i>, where <i>X</i> is unknown;
+similar functionality to the \ operator in Matlab/Octave, ie. <i>X&thinsp;=&thinsp;A&thinsp;\&thinsp;B</i>
+</li>
+<br>
+-->
+<br>
+</ul>
+
+<div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
 <a name="svd"></a>
 <b>s = svd( X )</b>
 <br>
@@ -6646,13 +6686,14 @@ The default stream for printing warnings and errors is <code>std::cerr</code>
 </li>
 <br>
 <li>
-Whether warnings are printed is controlled by the <code>COOT_PRINT_ERRORS</code> and <code>COOT_DONT_PRINT_ERRORS</code> defines; see <a href="#config_hpp">config.hpp</a>
+The degree of printed warnings is controlled by the <code>COOT_WARN_LEVEL</code> define; see <a href="#config_hpp">config.hpp</a>
 </li>
 <br>
-<li>
-The <code>COOT_DONT_PRINT_ERRORS</code> define takes precedence over the <code>COOT_PRINT_ERRORS</code> define
-</li>
-<br>
+<li>Example of changing the warning level:
+<pre>
+#define COOT_WARN_LEVEL 1
+#include &lt;bandicoot&gt;
+</pre>
 <li>
 See also:
 <ul>
@@ -7279,10 +7320,23 @@ will require taking into account that indexing starts at 0
 
 <div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
 <a name="arma_comparison"></a>
-<b>Armadillo/Bandicoot conversion guide</b>
+<b>Armadillo/Bandicoot adaptation guide</b>
 <ul>
-<li>Bandicoot is meant to be a GPU-accelerated linear algebra library that is API-compatible with Armadillo and thus can function as a drop-in replacement; <i>however,</i> due to the different architecture of the GPU and other constraints, it is <b>not always</b> a benefit to use Bandicoot instead of Armadillo</li>
+<li>Bandicoot is a GPU-focused linear algebra library aiming for API compatibility with Armadillo;
+however, due to inherent architectural differences between GPUs and CPUs, the following caveats apply:
+<ul>
+<li>GPUs are best suited for operations on large matrices, so small matrices (e.g. with size &leq; 100x100) may not obtain speedups</li>
+<li>Individual element access such as <code>X(i,j)</code> has an overhead of transferring between the GPU and CPU; when adapting Armadillo code to Bandicoot, direct element access should be avoided
+<li>Where possible, use batch operations with Bandicoot; e.g., use <code>A += 1</code> instead of <code>for(uword i=0; i&lt;A.n_elem; ++i) { A[i] += 1; }</code></li>
+<li>If direct element access cannot be avoided, consider temporarily transferring the entire Bandicoot matrix to CPU-accessible memory by creating an Armadillo matrix via <a href="#conv_to">conv_to&lt;arma::fmat&gt;(X)</a></li>
+<li>Due to the overhead of direct element access, Bandicoot does not provide iterators <!-- as they are guaranteed to be inefficient --> </li>
+<li>Consumer-level GPUs typically obtain better performance with 32-bit floating point elements rather than 64-bit (e.g. <i>float</i> instead of <i>double</i>), so using <i>fmat</i> instead of <i>mat</i> is preferable</li>
+</ul>
 <br>
+<!--
+<li>Consumer-level GPUs are not designed for intensive linear algebra operations and thus may not show significant speedup; the best results will be obtained with high-end hardware</li>
+<br>
+-->
 <li>The first run of any Bandicoot program requires compiling all Bandicoot kernel functions for the given device, which can be a time-consuming process; kernels are cached and subsequent runs will use the cache</li>
 <ul>
 <li>Upgrading Bandicoot versions may incur recompilation of kernels</li>
@@ -7291,21 +7345,7 @@ will require taking into account that indexing starts at 0
 <li>For more information see the <a href="#kernel_cache">kernel cache</a> documentation</li>
 </ul>
 <br>
-<li>Where possible, use batch operations with Bandicoot; e.g., use <code>A += 1</code> instead of <code>for (uword i = 0; i &lt; A.n_elem; ++i) { A[i] += 1; }</code></li>
-<br>
-<li>GPUs are best suited for operations on large matrices, so small matrices (e.g. less than 100 elements) may not show significant speedup</li>
-<br>
-<li>Individual element access (such as <code>A.at(i, j)</code>) requires a transfer between the GPU and CPU; when adapting Armadillo code to Bandicoot, these should be avoided wherever possible
-<ul>
-<li>If such operations cannot be avoided, consider temporarily transferring the entire Bandicoot matrix back to memory by creating an Armadillo matrix with <a href="#conv_to">conv_to&lt;arma::fmat&gt;()</a> or similar</li>
-<li>For this reason, unlike Armadillo, Bandicoot does not provide iterators: they are guaranteed to be inefficient</li>
-</ul>
-<br>
-<li>Consumer-level GPUs are not designed for intensive linear algebra operations and thus may not show significant speedup; the best results will be obtained with high-end hardware</li>
-<br>
-<li>Most GPUs show better performance with 32-bit floating point elements (e.g. <i>float</i> instead of <i>double</i>), so using <i>fmat</i> instead of <i>mat</i> is recommended wherever possible</li>
-<br>
-<li>If support you need for a conversion is not available, please <a href="faq.html">file a bug report</a> so that the support can be prioritised</li>
+<li>If a specific Armadillo function is not implemented in Bandicoot for your use case, please <a href="faq.html">file a bug report</a> so that adding the function can be prioritised</li>
 </ul>
 <br>
 
@@ -7323,8 +7363,8 @@ using namespace coot;
 
 int main()
   {
-  fmat A = randu&lt;fmat&gt;(4, 5);
-  fmat B = randu&lt;fmat&gt;(4, 5);
+  fmat A(4, 5, fill::randu);
+  fmat B(4, 5, fill::randu);
 
   cout &lt;&lt; A * B.t() &lt;&lt; endl;
 
@@ -7339,14 +7379,14 @@ under Linux and macOS it can be compiled using:
 </li>
 <br>
 <li>
-Bandicoot extensively uses template meta-programming,
+Bandicoot uses template meta-programming,
 so it's recommended to enable optimisation when compiling programs (eg. use the -O2 or -O3 options for GCC or clang)
 </li>
 <br>
 <!-- TODO: coot.sourceforge.net link? -->
 <li>See the <a href="faq.html">Questions</a> page for more info on compiling and linking</li>
 <br>
-<li>If coming from <a href="https://arma.sourceforge.net/">Armadillo</a>, be sure to check the <a href="#arma_comparison">Armadillo/Bandicoot differences</a> for advice on writing efficient code</li>
+<li>If coming from <a href="https://arma.sourceforge.net/">Armadillo</a>, see the <a href="#arma_comparison">Armadillo/Bandicoot differences</a> for advice on writing efficient code</li>
 <br>
 <li>See also the example program that comes with the Bandicoot archive</li>
 </ul>
@@ -7729,6 +7769,41 @@ Must be always enabled.
 By default defined to <i>std::cerr</i>
     </td>
   </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+<code>COOT_WARN_LEVEL</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+The level of warning messages printed to <i>COOT_CERR_STREAM</i>.
+<br>Must be an integer &geq; 0. By default defined to 2.
+<table>
+<tr><td>0</td><td>&nbsp;=&nbsp;</td><td>no warnings; generally not recommended</td></tr>
+<tr><td>1</td><td>&nbsp;=&nbsp;</td><td>only critical warnings about arguments and/or data which are likely to lead to incorrect results</td></tr>
+<tr><td>2</td><td>&nbsp;=&nbsp;</td><td>as per level 1, and warnings about poorly conditioned systems (low rcond) detected by <a href="#solve">solve()</a></td></tr>
+<tr><td>3</td><td>&nbsp;=&nbsp;</td><td>as per level 2, and warnings about failed decompositions</td></tr>
+</table>
+<br>
+Example usage:
+<pre>
+#define COOT_WARN_LEVEL 1
+#include &lt;bandicoot&gt;
+</pre>
+    </td>
+  </tr>
 </tbody>
 </table>
 <br>
@@ -7783,7 +7858,7 @@ See also:
 <ul>
 <li>In order to perform GPU-based linear algebra, Bandicoot must first compile GPU kernel functions to a particular device</li>
 <br>
-<li>The first time Bandicoot is run on a system, all GPU kernel functions will be compiled; <b>this can take a long time!</b> (usually less than 5 minutes)</li>
+<li>The first time Bandicoot is run on a system, all GPU kernel functions will be compiled; <b>this may take a considerable amount time</b>, depending on the underlying system (usually less than 5 minutes)</li>
 <br>
 <li>Compiled kernels are stored in disk in the <i>kernel cache</i> for later reuse</li>
 <br>
@@ -7791,7 +7866,7 @@ See also:
 <br>
 <li>The default location to store the kernel cache is
 <ul>
-<li><code>~/.bandicoot/cache/</code> on Linux and OS X and UNIX-like systems</li>
+<li><code>~/.bandicoot/cache/</code> on Linux, macOS and UNIX-like systems</li>
 <li><code>%APPDATA%\bandicoot\cache</code> on Windows (e.g. <code>C:\Users\Username\AppData\bandicoot\cache</code>)</li>
 </ul>
 <br>

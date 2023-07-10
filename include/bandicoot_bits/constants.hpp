@@ -225,7 +225,6 @@ namespace priv
   template<typename eT>
   static
   coot_inline
-  coot_hot
   typename coot_real_only<eT>::result
   most_neg(typename coot_real_only<eT>::result* junk = 0)
     {
@@ -245,7 +244,6 @@ namespace priv
   template<typename eT>
   static
   coot_inline
-  coot_hot
   typename coot_integral_only<eT>::result
   most_neg(typename coot_integral_only<eT>::result* junk = 0)
     {
@@ -258,7 +256,6 @@ namespace priv
   template<typename eT>
   static
   coot_inline
-  coot_hot
   typename coot_real_only<eT>::result
   most_pos(typename coot_real_only<eT>::result* junk = 0)
     {
@@ -278,7 +275,6 @@ namespace priv
   template<typename eT>
   static
   coot_inline
-  coot_hot
   typename coot_integral_only<eT>::result
   most_pos(typename coot_integral_only<eT>::result* junk = 0)
     {

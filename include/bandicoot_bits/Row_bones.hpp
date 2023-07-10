@@ -33,6 +33,10 @@ class Row : public Mat<eT>
   inline explicit Row(const uword in_rows, const uword in_cols);
   inline explicit Row(const SizeMat& s);
 
+  template<typename fill_type> inline Row(const uword N,                            const fill::fill_class<fill_type>& f);
+  template<typename fill_type> inline Row(const uword in_rows, const uword in_cols, const fill::fill_class<fill_type>& f);
+  template<typename fill_type> inline Row(const SizeMat& s,                         const fill::fill_class<fill_type>& f);
+
   inline Row(dev_mem_t<eT> aux_dev_mem, const uword N);
   inline Row(cl_mem        aux_dev_mem, const uword N);
   inline Row(eT*           aux_dev_mem, const uword N);
@@ -43,6 +47,9 @@ class Row : public Mat<eT>
   inline                  Row(Row&& X);
   inline const Row& operator=(Row&& X);
 
+  // TODO: inline            Row(Mat<eT>&& m);
+  // TODO: inline Col& operator=(Mat<eT>&& m);
+
   template<typename T1> inline            Row(const Base<eT, T1>& X);
   template<typename T1> inline Row& operator=(const Base<eT, T1>& X);
 
@@ -51,9 +58,9 @@ class Row : public Mat<eT>
 
   inline explicit operator arma::Row<eT> () const;
 
-  coot_inline const Op<Row<eT>, op_htrans>  t() const;
-  coot_inline const Op<Row<eT>, op_htrans> ht() const;
-  coot_inline const Op<Row<eT>, op_strans> st() const;
+  coot_warn_unused inline const Op<Row<eT>, op_htrans>  t() const;
+  coot_warn_unused inline const Op<Row<eT>, op_htrans> ht() const;
+  coot_warn_unused inline const Op<Row<eT>, op_strans> st() const;
 
   using Mat<eT>::cols;
   using Mat<eT>::operator();

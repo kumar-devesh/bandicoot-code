@@ -19,9 +19,9 @@ inline
 void
 chol_cleanup(void* gpu_workspace, char* host_workspace, int* dev_info)
   {
-  cudaFree(gpu_workspace);
+  coot_wrapper(cudaFree)(gpu_workspace);
   cpu_memory::release(host_workspace);
-  cudaFree(dev_info);
+  coot_wrapper(cudaFree)(dev_info);
   }
 
 
@@ -61,23 +61,23 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
 
   size_t host_workspace_size = 0;
   size_t gpu_workspace_size = 0;
-  status = cusolverDnXpotrf_bufferSize(get_rt().cuda_rt.cusolver_handle,
-                                       NULL, // no special parameters
-                                       CUBLAS_FILL_MODE_UPPER,
-                                       (s64) n_rows,
-                                       data_type,
-                                       (void*) mem.cuda_mem_ptr,
-                                       (s64) n_rows,
-                                       data_type,
-                                       &gpu_workspace_size,
-                                       &host_workspace_size);
+  status = coot_wrapper(cusolverDnXpotrf_bufferSize)(get_rt().cuda_rt.cusolver_handle,
+                                                     NULL, // no special parameters
+                                                     CUBLAS_FILL_MODE_UPPER,
+                                                     (s64) n_rows,
+                                                     data_type,
+                                                     (void*) mem.cuda_mem_ptr,
+                                                     (s64) n_rows,
+                                                     data_type,
+                                                     &gpu_workspace_size,
+                                                     &host_workspace_size);
   if (status != CUSOLVER_STATUS_SUCCESS)
     {
     return std::make_tuple(false, "cusolverDnXpotrf_bufferSize() failed with error " + error_as_string(status));
     }
 
   void* gpu_workspace = NULL;
-  status2 = cudaMalloc((void**) &gpu_workspace, gpu_workspace_size);
+  status2 = coot_wrapper(cudaMalloc)((void**) &gpu_workspace, gpu_workspace_size);
   if (status2 != cudaSuccess)
     {
     return std::make_tuple(false, "couldn't cudaMalloc() device workspace: " + error_as_string(status2));
@@ -87,26 +87,26 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
 
   // This is an additional error code for cusolverDn; but it is an error code on the device.
   int* dev_info = NULL;
-  status2 = cudaMalloc(&dev_info, sizeof(int));
+  status2 = coot_wrapper(cudaMalloc)((void**) &dev_info, sizeof(int));
   if (status2 != cudaSuccess)
     {
     chol_cleanup(gpu_workspace, host_workspace, NULL);
     return std::make_tuple(false, "couldn't cudaMalloc() device info holder: " + error_as_string(status2));
     }
 
-  status = cusolverDnXpotrf(get_rt().cuda_rt.cusolver_handle,
-                            NULL,
-                            CUBLAS_FILL_MODE_UPPER,
-                            (s64) n_rows,
-                            data_type,
-                            (void*) mem.cuda_mem_ptr,
-                            (s64) n_rows,
-                            data_type,
-                            gpu_workspace,
-                            gpu_workspace_size,
-                            (void*) host_workspace,
-                            host_workspace_size,
-                            dev_info);
+  status = coot_wrapper(cusolverDnXpotrf)(get_rt().cuda_rt.cusolver_handle,
+                                          NULL,
+                                          CUBLAS_FILL_MODE_UPPER,
+                                          (s64) n_rows,
+                                          data_type,
+                                          (void*) mem.cuda_mem_ptr,
+                                          (s64) n_rows,
+                                          data_type,
+                                          gpu_workspace,
+                                          gpu_workspace_size,
+                                          (void*) host_workspace,
+                                          host_workspace_size,
+                                          dev_info);
   if (status != CUSOLVER_STATUS_SUCCESS)
     {
     chol_cleanup(gpu_workspace, host_workspace, NULL);
@@ -116,7 +116,7 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
   // It seems that CUSOLVER_STATUS_SUCCESS gets returned even when the Cholesky
   // decomposition fails!  So we have to process dev_info more carefully.
   int info;
-  status2 = cudaMemcpy(&info, dev_info, sizeof(int), cudaMemcpyDeviceToHost);
+  status2 = coot_wrapper(cudaMemcpy)(&info, dev_info, sizeof(int), cudaMemcpyDeviceToHost);
   chol_cleanup(gpu_workspace, host_workspace, dev_info);
 
   if (status2 != cudaSuccess)
@@ -147,7 +147,7 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
 
   const kernel_dims dims = two_dimensional_grid_dims(n_rows, n_rows);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],

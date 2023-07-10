@@ -48,7 +48,7 @@ op_det::apply_direct(typename T1::elem_type& out_val, const Base<typename T1::el
   std::tuple<bool, std::string> result = coot_rt_t::det(A.get_dev_mem(true), A.n_rows, out_val);
   if (std::get<0>(result) != true)
     {
-    coot_debug_warn("det(): " + std::get<1>(result));
+    coot_debug_warn_level(3, "det(): " + std::get<1>(result));
     }
 
   return std::get<0>(result);

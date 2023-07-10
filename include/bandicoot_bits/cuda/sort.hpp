@@ -44,7 +44,7 @@ sort_colwise(dev_mem_t<eT> A, const uword n_rows, const uword n_cols, const uwor
 
   const kernel_dims dims = one_dimensional_grid_dims(n_cols);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],
@@ -90,7 +90,7 @@ sort_rowwise(dev_mem_t<eT> A, const uword n_rows, const uword n_cols, const uwor
 
   const kernel_dims dims = one_dimensional_grid_dims(n_rows);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],
@@ -139,7 +139,7 @@ sort_vec(dev_mem_t<eT> A, const uword n_elem, const uword sort_type)
       &(tmp_mem.cuda_mem_ptr),
       (uword*) &n_elem };
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       1, 1, 1, pow2_num_threads, 1, 1,
       2 * pow2_num_threads * sizeof(eT), // shared memory should have size equal to the number of threads times 2

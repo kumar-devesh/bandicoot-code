@@ -43,10 +43,10 @@ sort_colwise(dev_mem_t<eT> A, const uword n_rows, const uword n_cols, const uwor
   runtime_t::adapt_uword cl_n_rows(n_rows);
   runtime_t::adapt_uword cl_n_cols(n_cols);
 
-  status |= clSetKernelArg(k, 0, sizeof(cl_mem), &(A.cl_mem_ptr));
-  status |= clSetKernelArg(k, 1, sizeof(cl_mem), &(tmp_mem.cl_mem_ptr));
-  status |= clSetKernelArg(k, 2, cl_n_rows.size, cl_n_rows.addr);
-  status |= clSetKernelArg(k, 3, cl_n_cols.size, cl_n_cols.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 0, sizeof(cl_mem), &(A.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(k, 1, sizeof(cl_mem), &(tmp_mem.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(k, 2, cl_n_rows.size, cl_n_rows.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 3, cl_n_cols.size, cl_n_cols.addr);
 
   coot_check_cl_error(status, "coot::opencl::sort_colwise(): failed to set kernel arguments");
 
@@ -54,7 +54,7 @@ sort_colwise(dev_mem_t<eT> A, const uword n_rows, const uword n_cols, const uwor
   const size_t k1_work_offset[1] = { 0 };
   const size_t k1_work_size[1]   = { n_cols };
 
-  status = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+  status = coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
 
   coot_check_cl_error(status, "coot::opencl::sort_colwise(): failed to run kernel");
 
@@ -93,10 +93,10 @@ sort_rowwise(dev_mem_t<eT> A, const uword n_rows, const uword n_cols, const uwor
   runtime_t::adapt_uword cl_n_rows(n_rows);
   runtime_t::adapt_uword cl_n_cols(n_cols);
 
-  status |= clSetKernelArg(k, 0, sizeof(cl_mem), &(A.cl_mem_ptr));
-  status |= clSetKernelArg(k, 1, sizeof(cl_mem), &(tmp_mem.cl_mem_ptr));
-  status |= clSetKernelArg(k, 2, cl_n_rows.size, cl_n_rows.addr);
-  status |= clSetKernelArg(k, 3, cl_n_cols.size, cl_n_cols.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 0, sizeof(cl_mem), &(A.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(k, 1, sizeof(cl_mem), &(tmp_mem.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(k, 2, cl_n_rows.size, cl_n_rows.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 3, cl_n_cols.size, cl_n_cols.addr);
 
   coot_check_cl_error(status, "coot::opencl::sort_rowwise(): failed to set kernel arguments");
 
@@ -104,7 +104,7 @@ sort_rowwise(dev_mem_t<eT> A, const uword n_rows, const uword n_cols, const uwor
   const size_t k1_work_offset[1] = { 0 };
   const size_t k1_work_size[1]   = { n_rows };
 
-  status = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+  status = coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
 
   coot_check_cl_error(status, "coot::opencl::sort_rowwise(): failed to run kernel");
 
@@ -132,7 +132,7 @@ sort_vec(dev_mem_t<eT> A, const uword n_elem, const uword sort_type)
   cl_kernel k = get_rt().cl_rt.get_kernel<eT>(sort_type == 0 ? oneway_kernel_id::radix_sort_ascending : oneway_kernel_id::radix_sort_descending);
 
   size_t kernel_wg_size;
-  cl_int status = clGetKernelWorkGroupInfo(k, get_rt().cl_rt.get_device(), CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &kernel_wg_size, NULL);
+  cl_int status = coot_wrapper(clGetKernelWorkGroupInfo)(k, get_rt().cl_rt.get_device(), CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &kernel_wg_size, NULL);
   coot_check_cl_error(status, "coot::opencl::sort(): clGetKernelWorkGroupInfo() failed");
 
   const size_t total_num_threads = std::ceil(n_elem / std::max(1.0, (2 * std::ceil(std::log2(n_elem)))));
@@ -146,10 +146,10 @@ sort_vec(dev_mem_t<eT> A, const uword n_elem, const uword sort_type)
 
   runtime_t::adapt_uword cl_n_elem(n_elem);
 
-  status |= clSetKernelArg(k, 0, sizeof(cl_mem),                    &(A.cl_mem_ptr));
-  status |= clSetKernelArg(k, 1, sizeof(cl_mem),                    &(tmp_mem.cl_mem_ptr));
-  status |= clSetKernelArg(k, 2, cl_n_elem.size,                    cl_n_elem.addr);
-  status |= clSetKernelArg(k, 3, 2 * sizeof(eT) * pow2_num_threads, NULL);
+  status |= coot_wrapper(clSetKernelArg)(k, 0, sizeof(cl_mem),                    &(A.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(k, 1, sizeof(cl_mem),                    &(tmp_mem.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(k, 2, cl_n_elem.size,                    cl_n_elem.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 3, 2 * sizeof(eT) * pow2_num_threads, NULL);
 
   coot_check_cl_error(status, "coot::opencl::sort(): failed to set kernel arguments");
 
@@ -157,7 +157,7 @@ sort_vec(dev_mem_t<eT> A, const uword n_elem, const uword sort_type)
   const size_t k1_work_offset[1] = { 0 };
   const size_t k1_work_size[1]   = { pow2_num_threads };
 
-  status = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+  status = coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
 
   coot_check_cl_error(status, "coot::opencl::sort(): failed to run kernel");
 

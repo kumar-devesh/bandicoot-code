@@ -211,14 +211,14 @@ magmablas_laswp
       err = 0;
       i   = 0;
       size_t k_offset = dAT_offset + k*ldda;
-      err |= clSetKernelArg( kernel, i++, sizeof(n       ), &n        );
-      err |= clSetKernelArg( kernel, i++, sizeof(dAT     ), &dAT      );
-      err |= clSetKernelArg( kernel, i++, sizeof(k_offset), &k_offset );
-      err |= clSetKernelArg( kernel, i++, sizeof(ldda    ), &ldda     );
-      err |= clSetKernelArg( kernel, i++, sizeof(params  ), &params   );
+      err |= coot_wrapper(clSetKernelArg)( kernel, i++, sizeof(n       ), &n        );
+      err |= coot_wrapper(clSetKernelArg)( kernel, i++, sizeof(dAT     ), &dAT      );
+      err |= coot_wrapper(clSetKernelArg)( kernel, i++, sizeof(k_offset), &k_offset );
+      err |= coot_wrapper(clSetKernelArg)( kernel, i++, sizeof(ldda    ), &ldda     );
+      err |= coot_wrapper(clSetKernelArg)( kernel, i++, sizeof(params  ), &params   );
       coot_check_runtime_error( err, "coot::opencl::magmablas_laswp(): couldn't set laswp kernel arguments" );
 
-      err = clEnqueueNDRangeKernel( queue, kernel, 1, NULL, grid, threads, 0, NULL, NULL );
+      err = coot_wrapper(clEnqueueNDRangeKernel)( queue, kernel, 1, NULL, grid, threads, 0, NULL, NULL );
       coot_check_runtime_error( err, "coot::opencl::magmablas_laswp(): couldn't run laswp kernel" );
       }
     }
@@ -307,13 +307,13 @@ magmablas_run_laset_kernel
 
   cl_kernel k = get_rt().cl_rt.get_kernel<eT>(num);
 
-  status  = clSetKernelArg(k, 0, local_m.size,         local_m.addr);
-  status |= clSetKernelArg(k, 1, local_n.size,         local_n.addr);
-  status |= clSetKernelArg(k, 2, sizeof(eT),           &offdiag);
-  status |= clSetKernelArg(k, 3, sizeof(eT),           &diag);
-  status |= clSetKernelArg(k, 4, sizeof(cl_mem),       &dA);
-  status |= clSetKernelArg(k, 5, local_dA_offset.size, local_dA_offset.addr);
-  status |= clSetKernelArg(k, 6, local_ldda.size,      local_ldda.addr);
+  status  = coot_wrapper(clSetKernelArg)(k, 0, local_m.size,         local_m.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 1, local_n.size,         local_n.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 2, sizeof(eT),           &offdiag);
+  status |= coot_wrapper(clSetKernelArg)(k, 3, sizeof(eT),           &diag);
+  status |= coot_wrapper(clSetKernelArg)(k, 4, sizeof(cl_mem),       &dA);
+  status |= coot_wrapper(clSetKernelArg)(k, 5, local_dA_offset.size, local_dA_offset.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 6, local_ldda.size,      local_ldda.addr);
   coot_check_runtime_error(status, "coot::opencl::magmablas_run_laset_kernel(): couldn't set kernel arguments");
 
   size_t threads[2] = { MAGMABLAS_BLK_X,                     1                                   };
@@ -321,7 +321,7 @@ magmablas_run_laset_kernel
   grid[0] *= threads[0];
   grid[1] *= threads[1];
 
-  status |= clEnqueueNDRangeKernel(queue, k, 2, NULL, grid, threads, 0, NULL, NULL);
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(queue, k, 2, NULL, grid, threads, 0, NULL, NULL);
   coot_check_runtime_error(status, "coot::opencl::magmablas_run_laset_kernel(): couldn't execute kernel");
   }
 
@@ -370,13 +370,13 @@ magmablas_laset_band(magma_uplo_t uplo, magma_int_t m, magma_int_t n, magma_int_
 
   cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(num);
 
-  status  = clSetKernelArg(kernel, 0, local_m.size,         local_m.addr);
-  status |= clSetKernelArg(kernel, 1, local_n.size,         local_n.addr);
-  status |= clSetKernelArg(kernel, 2, sizeof(eT),           &offdiag);
-  status |= clSetKernelArg(kernel, 3, sizeof(eT),           &diag);
-  status |= clSetKernelArg(kernel, 4, sizeof(cl_mem),       &dA);
-  status |= clSetKernelArg(kernel, 5, local_dA_offset.size, local_dA_offset.addr);
-  status |= clSetKernelArg(kernel, 6, local_ldda.size,      local_ldda.addr);
+  status  = coot_wrapper(clSetKernelArg)(kernel, 0, local_m.size,         local_m.addr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 1, local_n.size,         local_n.addr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 2, sizeof(eT),           &offdiag);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 3, sizeof(eT),           &diag);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 4, sizeof(cl_mem),       &dA);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 5, local_dA_offset.size, local_dA_offset.addr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 6, local_ldda.size,      local_ldda.addr);
   coot_check_runtime_error(status, "coot::opencl::magmablas_laset_band(): couldn't set kernel arguments");
 
   size_t threads;
@@ -393,7 +393,7 @@ magmablas_laset_band(magma_uplo_t uplo, magma_int_t m, magma_int_t n, magma_int_
     }
   grid *= threads;
 
-  status |= clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &grid, &threads, 0, NULL, NULL);
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(queue, kernel, 1, NULL, &grid, &threads, 0, NULL, NULL);
   coot_check_runtime_error(status, "coot::opencl::magmablas_laset_band(): couldn't execute kernel");
   }
 
@@ -490,17 +490,17 @@ magmablas_transpose
   opencl::runtime_t::adapt_uword local_lddat(lddat);
 
   cl_int status;
-  status  = clSetKernelArg(k, 0, local_m.size,          local_m.addr);
-  status |= clSetKernelArg(k, 1, local_n.size,          local_n.addr);
-  status |= clSetKernelArg(k, 2, sizeof(cl_mem),        &dA);
-  status |= clSetKernelArg(k, 3, local_dA_offset.size,  local_dA_offset.addr);
-  status |= clSetKernelArg(k, 4, local_ldda.size,       local_ldda.addr);
-  status |= clSetKernelArg(k, 5, sizeof(cl_mem),        &dAT);
-  status |= clSetKernelArg(k, 6, local_dAT_offset.size, local_dAT_offset.addr);
-  status |= clSetKernelArg(k, 7, local_lddat.size,      local_lddat.addr);
+  status  = coot_wrapper(clSetKernelArg)(k, 0, local_m.size,          local_m.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 1, local_n.size,          local_n.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 2, sizeof(cl_mem),        &dA);
+  status |= coot_wrapper(clSetKernelArg)(k, 3, local_dA_offset.size,  local_dA_offset.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 4, local_ldda.size,       local_ldda.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 5, sizeof(cl_mem),        &dAT);
+  status |= coot_wrapper(clSetKernelArg)(k, 6, local_dAT_offset.size, local_dAT_offset.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 7, local_lddat.size,      local_lddat.addr);
   coot_check_runtime_error(status, "coot::opencl::magmablas_transpose(): couldn't set kernel arguments");
 
-  status = clEnqueueNDRangeKernel(queue, k, 2, NULL, grid, threads, 0, NULL, NULL);
+  status = coot_wrapper(clEnqueueNDRangeKernel)(queue, k, 2, NULL, grid, threads, 0, NULL, NULL);
   coot_check_runtime_error(status, "coot::opencl::magmablas_transpose(): couldn't execute kernel");
   }
 
@@ -587,13 +587,13 @@ magmablas_transpose_inplace
   opencl::runtime_t::adapt_uword local_ldda(ldda);
 
   cl_int status;
-  status  = clSetKernelArg(k, 0, local_n.size,         local_n.addr);
-  status |= clSetKernelArg(k, 1, sizeof(cl_mem),       &dA);
-  status |= clSetKernelArg(k, 2, local_dA_offset.size, local_dA_offset.addr);
-  status |= clSetKernelArg(k, 3, local_ldda.size,      local_ldda.addr);
+  status  = coot_wrapper(clSetKernelArg)(k, 0, local_n.size,         local_n.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 1, sizeof(cl_mem),       &dA);
+  status |= coot_wrapper(clSetKernelArg)(k, 2, local_dA_offset.size, local_dA_offset.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 3, local_ldda.size,      local_ldda.addr);
   coot_check_runtime_error(status, "coot::opencl::magmablas_transpose_inplace(): couldn't set kernel arguments");
 
-  status = clEnqueueNDRangeKernel(queue, k, 2, NULL, grid, threads, 0, NULL, NULL);
+  status = coot_wrapper(clEnqueueNDRangeKernel)(queue, k, 2, NULL, grid, threads, 0, NULL, NULL);
   coot_check_runtime_error(status, "coot::opencl::magmablas_transpose_inplace(): couldn't execute kernel");
   }
 
@@ -766,15 +766,15 @@ magmablas_lascl
     opencl::runtime_t::adapt_uword local_ldda(ldda);
 
     cl_int status;
-    status  = clSetKernelArg(k, 0, local_m.size,          local_m.addr);
-    status |= clSetKernelArg(k, 1, local_n.size,          local_n.addr);
-    status |= clSetKernelArg(k, 2, sizeof(eT),            &mul);
-    status |= clSetKernelArg(k, 3, sizeof(cl_mem),        &dA);
-    status |= clSetKernelArg(k, 4, local_dA_offset.size,  local_dA_offset.addr);
-    status |= clSetKernelArg(k, 5, local_ldda.size,       local_ldda.addr);
+    status  = coot_wrapper(clSetKernelArg)(k, 0, local_m.size,          local_m.addr);
+    status |= coot_wrapper(clSetKernelArg)(k, 1, local_n.size,          local_n.addr);
+    status |= coot_wrapper(clSetKernelArg)(k, 2, sizeof(eT),            &mul);
+    status |= coot_wrapper(clSetKernelArg)(k, 3, sizeof(cl_mem),        &dA);
+    status |= coot_wrapper(clSetKernelArg)(k, 4, local_dA_offset.size,  local_dA_offset.addr);
+    status |= coot_wrapper(clSetKernelArg)(k, 5, local_ldda.size,       local_ldda.addr);
     coot_check_runtime_error(status, "coot::opencl::magmablas_lascl(): couldn't set kernel arguments");
 
-    status = clEnqueueNDRangeKernel( queue, k, 1, NULL, &grid, &threads, 0, NULL, NULL );
+    status = coot_wrapper(clEnqueueNDRangeKernel)( queue, k, 1, NULL, &grid, &threads, 0, NULL, NULL );
     coot_check_runtime_error(status, "coot::opencl::magmablas_lascl(): couldn't run kernel");
     }
   }
@@ -896,17 +896,17 @@ magmablas_lansy_inf
   opencl::runtime_t::adapt_uword local_n_full_block(n_full_block);
   opencl::runtime_t::adapt_uword local_n_mod_bs(n_mod_bs);
 
-  err  = clSetKernelArg(kernel, 0, local_n.size,            local_n.addr);
-  err |= clSetKernelArg(kernel, 1, sizeof(cl_mem),          &A);
-  err |= clSetKernelArg(kernel, 2, local_A_offset.size,     local_A_offset.addr);
-  err |= clSetKernelArg(kernel, 3, local_lda.size,          local_lda.addr);
-  err |= clSetKernelArg(kernel, 4, sizeof(cl_mem),          &dwork);
-  err |= clSetKernelArg(kernel, 5, local_dwork_offset.size, local_dwork_offset.addr);
-  err |= clSetKernelArg(kernel, 6, local_n_full_block.size, local_n_full_block.addr);
-  err |= clSetKernelArg(kernel, 7, local_n_mod_bs.size,     local_n_mod_bs.addr);
+  err  = coot_wrapper(clSetKernelArg)(kernel, 0, local_n.size,            local_n.addr);
+  err |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(cl_mem),          &A);
+  err |= coot_wrapper(clSetKernelArg)(kernel, 2, local_A_offset.size,     local_A_offset.addr);
+  err |= coot_wrapper(clSetKernelArg)(kernel, 3, local_lda.size,          local_lda.addr);
+  err |= coot_wrapper(clSetKernelArg)(kernel, 4, sizeof(cl_mem),          &dwork);
+  err |= coot_wrapper(clSetKernelArg)(kernel, 5, local_dwork_offset.size, local_dwork_offset.addr);
+  err |= coot_wrapper(clSetKernelArg)(kernel, 6, local_n_full_block.size, local_n_full_block.addr);
+  err |= coot_wrapper(clSetKernelArg)(kernel, 7, local_n_mod_bs.size,     local_n_mod_bs.addr);
   coot_check_runtime_error(err, "coot::opencl::magmablas_lansy_inf(): couldn't set kernel arguments");
 
-  err = clEnqueueNDRangeKernel( queue, kernel, 3, NULL, grid, threads, 0, NULL, NULL );
+  err = coot_wrapper(clEnqueueNDRangeKernel)( queue, kernel, 3, NULL, grid, threads, 0, NULL, NULL );
   coot_check_runtime_error(err, "coot::opencl::magmablas_lansy_inf(): couldn't run kernel");
   }
 
@@ -939,14 +939,14 @@ magmablas_lansy_max
   opencl::runtime_t::adapt_uword local_lda(lda);
   opencl::runtime_t::adapt_uword local_dwork_offset(dwork_offset);
 
-  err  = clSetKernelArg(kernel, 0, local_n.size,            local_n.addr);
-  err |= clSetKernelArg(kernel, 1, sizeof(cl_mem),          &A);
-  err |= clSetKernelArg(kernel, 2, local_A_offset.size,     local_A_offset.addr);
-  err |= clSetKernelArg(kernel, 3, local_lda.size,          local_lda.addr);
-  err |= clSetKernelArg(kernel, 4, sizeof(cl_mem),          &dwork);
-  err |= clSetKernelArg(kernel, 5, local_dwork_offset.size, local_dwork_offset.addr);
+  err  = coot_wrapper(clSetKernelArg)(kernel, 0, local_n.size,            local_n.addr);
+  err |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(cl_mem),          &A);
+  err |= coot_wrapper(clSetKernelArg)(kernel, 2, local_A_offset.size,     local_A_offset.addr);
+  err |= coot_wrapper(clSetKernelArg)(kernel, 3, local_lda.size,          local_lda.addr);
+  err |= coot_wrapper(clSetKernelArg)(kernel, 4, sizeof(cl_mem),          &dwork);
+  err |= coot_wrapper(clSetKernelArg)(kernel, 5, local_dwork_offset.size, local_dwork_offset.addr);
   coot_check_runtime_error(err, "coot::opencl::magmablas_lansy_max(): couldn't set kernel arguments");
 
-  err = clEnqueueNDRangeKernel( queue, kernel, 3, NULL, grid, threads, 0, NULL, NULL );
+  err = coot_wrapper(clEnqueueNDRangeKernel)( queue, kernel, 3, NULL, grid, threads, 0, NULL, NULL );
   coot_check_runtime_error(err, "coot::opencl::magmablas_lansy_max(): couldn't run kernel");
   }

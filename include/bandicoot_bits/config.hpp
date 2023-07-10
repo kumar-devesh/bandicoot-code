@@ -12,6 +12,20 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
+#if !defined(COOT_WARN_LEVEL)
+  #define COOT_WARN_LEVEL 2
+#endif
+//// The level of warning messages printed to COOT_CERR_STREAM.
+//// Must be an integer >= 0. The default value is 2.
+//// 0 = no warnings; generally not recommended
+//// 1 = only critical warnings about arguments and/or data which are likely to lead to incorrect results
+//// 2 = as per level 1, and warnings about poorly conditioned systems (low rcond) detected by solve() etc
+//// 3 = as per level 2, and warnings about failed decompositions, failed saving/loading, etc
+
+// #define COOT_USE_WRAPPER
+//// Comment out the above line if you prefer to directly link with CUDA, OpenCL, OpenBLAS, etc
+//// instead of the Bandicoot runtime library.
+
 #if !defined(COOT_USE_OPENCL)
 #define COOT_USE_OPENCL
 //// Uncomment the above line if you have OpenCL available on your system.
@@ -24,10 +38,25 @@
 //// Bandicoot requires CUDA, CUDART, cuBLAS, cuRAND, cuSolver, and NVRTC.
 #endif
 
-// #define COOT_USE_WRAPPER
-//// Comment out the above line if you're getting linking errors when compiling your programs,
-//// or if you prefer to directly link with LAPACK, BLAS + etc instead of the Bandicoot runtime library.
-//// You will then need to link your programs directly with -llapack -lblas instead of -lbandicoot
+#if !defined(COOT_DEFAULT_BACKEND)
+#define COOT_DEFAULT_BACKEND CL_BACKEND
+//// This defines the backend that Bandicoot will use by default.
+//// It takes values either CL_BACKEND or CUDA_BACKEND;
+//// if set to CL_BACKEND, then COOT_USE_OPENCL must be defined;
+//// if set to CUDA_BACKEND, then COOT_USE_CUDA must be defined.
+#endif
+
+#if !defined(COOT_USE_LAPACK)
+#define COOT_USE_LAPACK
+//// Comment out the above line if you don't have LAPACK or a high-speed replacement for LAPACK,
+//// such as OpenBLAS, Intel MKL, or the Accelerate framework.
+#endif
+
+#if !defined(COOT_USE_BLAS)
+#define COOT_USE_BLAS
+//// Comment out the above line if you don't have BLAS or a high-speed replacement for BLAS,
+//// such as OpenBLAS, Intel MKL, or the Accelerate framework.
+#endif
 
 // #define COOT_BLAS_CAPITALS
 //// Uncomment the above line if your BLAS and LAPACK libraries have capitalised function names
@@ -57,6 +86,56 @@
 //// Uncomment the above line if you want to see the function traces of how Bandicoot evaluates expressions.
 //// This is mainly useful for debugging of the library.
 
+#if defined(COOT_EXTRA_DEBUG)
+  #undef  COOT_NO_DEBUG
+  #undef  COOT_WARN_LEVEL
+  #define COOT_WARN_LEVEL 3
+#endif
+
+#if !defined(COOT_COUT_STREAM)
+  #define COOT_COUT_STREAM std::cout
+#endif
+
+#if !defined(COOT_CERR_STREAM)
+  #define COOT_CERR_STREAM std::cerr
+#endif
+
+#if !defined(COOT_PRINT_EXCEPTIONS)
+  // #define COOT_PRINT_EXCEPTIONS
+  #if defined(COOT_PRINT_EXCEPTIONS_INTERNAL)
+    #undef  COOT_PRINT_EXCEPTIONS
+    #define COOT_PRINT_EXCEPTIONS
+  #endif
+#endif
+
+#if defined(COOT_DONT_USE_LAPACK)
+  #undef COOT_USE_LAPACK
+#endif
+
+#if defined(COOT_DONT_USE_BLAS)
+  #undef COOT_USE_BLAS
+#endif
+
+#if defined(COOT_DONT_USE_OPENCL)
+  #undef COOT_USE_OPENCL
+#endif
+
+#if defined(COOT_DONT_USE_CUDA)
+  #undef COOT_USE_CUDA
+#endif
+
+#if defined(COOT_DONT_USE_WRAPPER)
+  #undef COOT_USE_WRAPPER
+#endif
+
+#if defined(COOT_DONT_USE_OPENMP)
+  #undef COOT_USE_OPENMP
+#endif
+
+#if defined(COOT_DONT_PRINT_EXCEPTIONS)
+  #undef COOT_PRINT_EXCEPTIONS
+#endif
+
 #if !defined(COOT_DEFAULT_BACKEND)
   #if defined(COOT_USE_OPENCL)
     #define COOT_DEFAULT_BACKEND CL_BACKEND
@@ -69,27 +148,6 @@
   // TODO: ensure that the backend is valid
 #endif
 
-
-#if !defined(COOT_COUT_STREAM)
-  #define COOT_COUT_STREAM std::cout
-#endif
-
-#if !defined(COOT_CERR_STREAM)
-  #define COOT_CERR_STREAM std::cerr
-#endif
-
-#if !defined(COOT_PRINT_ERRORS)
-#define COOT_PRINT_ERRORS
-//// Comment out the above line if you don't want errors and warnings printed (eg. failed decompositions)
-#endif
-
-#if defined(COOT_DONT_USE_WRAPPER)
-  #undef COOT_USE_WRAPPER
-#endif
-
-#if defined(COOT_DONT_PRINT_ERRORS)
-  #undef COOT_PRINT_ERRORS
-#endif
 
 // Uncomment and modify the lines below to specify a custom directory to store Bandicoot kernels to.
 // Alternately, define COOT_KERNEL_CACHE_DIR in your program.

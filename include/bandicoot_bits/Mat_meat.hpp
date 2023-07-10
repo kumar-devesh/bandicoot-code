@@ -58,6 +58,8 @@ Mat<eT>::Mat(const uword in_n_rows, const uword in_n_cols)
   coot_extra_debug_sigprint_this(this);
 
   init(in_n_rows, in_n_cols);
+
+  zeros();  // fill with zeros by default
   }
 
 
@@ -75,6 +77,48 @@ Mat<eT>::Mat(const SizeMat& s)
   coot_extra_debug_sigprint_this(this);
 
   init(s.n_rows, s.n_cols);
+
+  zeros();  // fill with zeros by default
+  }
+
+
+
+template<typename eT>
+template<typename fill_type>
+inline
+Mat<eT>::Mat(const uword in_n_rows, const uword in_n_cols, const fill::fill_class<fill_type>& f)
+  : n_rows    (0)
+  , n_cols    (0)
+  , n_elem    (0)
+  , vec_state (0)
+  , mem_state (0)
+  , dev_mem({ NULL })
+  {
+  coot_extra_debug_sigprint_this(this);
+  
+  init(in_n_rows, in_n_cols);
+  
+  (*this).fill(f);
+  }
+
+
+
+template<typename eT>
+template<typename fill_type>
+inline
+Mat<eT>::Mat(const SizeMat& s, const fill::fill_class<fill_type>& f)
+  : n_rows    (0)
+  , n_cols    (0)
+  , n_elem    (0)
+  , vec_state (0)
+  , mem_state (0)
+  , dev_mem({ NULL })
+  {
+  coot_extra_debug_sigprint_this(this);
+  
+  init(s.n_rows, s.n_cols);
+  
+  (*this).fill(f);
   }
 
 
@@ -1630,6 +1674,25 @@ Mat<eT>::fill(const eT val)
 
 
 template<typename eT>
+template<typename fill_type>
+inline
+const Mat<eT>&
+Mat<eT>::fill(const fill::fill_class<fill_type>&)
+  {
+  coot_extra_debug_sigprint();
+  
+  if(is_same_type<fill_type, fill::fill_zeros>::yes)  { (*this).zeros(); }
+  if(is_same_type<fill_type, fill::fill_ones >::yes)  { (*this).ones();  }
+  if(is_same_type<fill_type, fill::fill_eye  >::yes)  { (*this).eye();   }
+  if(is_same_type<fill_type, fill::fill_randu>::yes)  { (*this).randu(); }
+  if(is_same_type<fill_type, fill::fill_randn>::yes)  { (*this).randn(); }
+  
+  return *this;
+  }
+
+
+
+template<typename eT>
 inline
 const Mat<eT>&
 Mat<eT>::zeros()
@@ -2008,7 +2071,6 @@ Mat<eT>::impl_print(const std::string extra_text) const
 
 
 template<typename eT>
-coot_warn_unused
 inline
 bool
 Mat<eT>::is_vec() const
@@ -2019,7 +2081,6 @@ Mat<eT>::is_vec() const
 
 
 template<typename eT>
-coot_warn_unused
 inline
 bool
 Mat<eT>::is_colvec() const
@@ -2030,7 +2091,6 @@ Mat<eT>::is_colvec() const
 
 
 template<typename eT>
-coot_warn_unused
 inline
 bool
 Mat<eT>::is_rowvec() const
@@ -2041,7 +2101,6 @@ Mat<eT>::is_rowvec() const
 
 
 template<typename eT>
-coot_warn_unused
 inline
 bool
 Mat<eT>::is_square() const
@@ -2052,7 +2111,6 @@ Mat<eT>::is_square() const
 
 
 template<typename eT>
-coot_warn_unused
 inline
 bool
 Mat<eT>::is_empty() const
@@ -2094,8 +2152,7 @@ Mat<eT>::get_n_elem() const
 
 // linear element accessor without bounds check; this is very slow - do not use it unless absolutely necessary
 template<typename eT>
-coot_inline
-coot_warn_unused
+inline
 MatValProxy<eT>
 Mat<eT>::operator[] (const uword ii)
   {
@@ -2107,7 +2164,6 @@ Mat<eT>::operator[] (const uword ii)
 // linear element accessor without bounds check; this is very slow - do not use it unless absolutely necessary
 template<typename eT>
 inline
-coot_warn_unused
 eT
 Mat<eT>::operator[] (const uword ii) const
   {
@@ -2118,8 +2174,7 @@ Mat<eT>::operator[] (const uword ii) const
 
 // linear element accessor without bounds check; this is very slow - do not use it unless absolutely necessary
 template<typename eT>
-coot_inline
-coot_warn_unused
+inline
 MatValProxy<eT>
 Mat<eT>::at(const uword ii)
   {
@@ -2130,8 +2185,7 @@ Mat<eT>::at(const uword ii)
 
 // linear element accessor without bounds check; this is very slow - do not use it unless absolutely necessary
 template<typename eT>
-coot_inline
-coot_warn_unused
+inline
 eT
 Mat<eT>::at(const uword ii) const
   {
@@ -2142,8 +2196,7 @@ Mat<eT>::at(const uword ii) const
 
 // linear element accessor with bounds check; this is very slow - do not use it unless absolutely necessary
 template<typename eT>
-coot_inline
-coot_warn_unused
+inline
 MatValProxy<eT>
 Mat<eT>::operator() (const uword ii)
   {
@@ -2156,8 +2209,7 @@ Mat<eT>::operator() (const uword ii)
 
 // linear element accessor with bounds check; this is very slow - do not use it unless absolutely necessary
 template<typename eT>
-coot_inline
-coot_warn_unused
+inline
 eT
 Mat<eT>::operator() (const uword ii) const
   {
@@ -2169,8 +2221,7 @@ Mat<eT>::operator() (const uword ii) const
 
 
 template<typename eT>
-coot_inline
-coot_warn_unused
+inline
 MatValProxy<eT>
 Mat<eT>::at(const uword in_row, const uword in_col)
   {
@@ -2180,8 +2231,7 @@ Mat<eT>::at(const uword in_row, const uword in_col)
 
 
 template<typename eT>
-coot_inline
-coot_warn_unused
+inline
 eT
 Mat<eT>::at(const uword in_row, const uword in_col) const
   {
@@ -2191,8 +2241,7 @@ Mat<eT>::at(const uword in_row, const uword in_col) const
 
 
 template<typename eT>
-coot_inline
-coot_warn_unused
+inline
 MatValProxy<eT>
 Mat<eT>::operator() (const uword in_row, const uword in_col)
   {
@@ -2204,8 +2253,7 @@ Mat<eT>::operator() (const uword in_row, const uword in_col)
 
 
 template<typename eT>
-coot_inline
-coot_warn_unused
+inline
 eT
 Mat<eT>::operator() (const uword in_row, const uword in_col) const
   {

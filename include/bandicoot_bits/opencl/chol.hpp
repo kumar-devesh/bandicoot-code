@@ -79,9 +79,9 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
   // n_rows == n_cols because the Cholesky decomposition requires square matrices.
   runtime_t::adapt_uword dev_n_rows(n_rows);
 
-  status2 |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &(mem.cl_mem_ptr));
-  status2 |= clSetKernelArg(kernel, 1, dev_n_rows.size, dev_n_rows.addr);
-  status2 |= clSetKernelArg(kernel, 2, dev_n_rows.size, dev_n_rows.addr);
+  status2 |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem), &(mem.cl_mem_ptr));
+  status2 |= coot_wrapper(clSetKernelArg)(kernel, 1, dev_n_rows.size, dev_n_rows.addr);
+  status2 |= coot_wrapper(clSetKernelArg)(kernel, 2, dev_n_rows.size, dev_n_rows.addr);
   if (status2 != CL_SUCCESS)
     {
     return std::make_tuple(false, "failed to set arguments for kernel ltri_set_zero: " + coot_cl_error::as_string(status2));
@@ -90,7 +90,7 @@ chol(dev_mem_t<eT> mem, const uword n_rows)
   size_t global_work_offset[2] = { 0, 0 };
   size_t global_work_size[2] = { size_t(n_rows), size_t(n_rows) };
 
-  status2 |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 2, global_work_offset, global_work_size, NULL, 0, NULL, NULL);
+  status2 |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 2, global_work_offset, global_work_size, NULL, 0, NULL, NULL);
   if (status2 != CL_SUCCESS)
     {
     return std::make_tuple(false, "failed to run kernel ltri_set_zero: " + coot_cl_error::as_string(status2));

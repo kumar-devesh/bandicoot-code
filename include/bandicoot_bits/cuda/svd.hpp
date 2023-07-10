@@ -19,9 +19,9 @@ inline
 void
 svd_cleanup(char* device_buffer, char* host_buffer, int* dev_info)
   {
-  cudaFree(device_buffer);
+  coot_wrapper(cudaFree)(device_buffer);
   cpu_memory::release(host_buffer);
-  cudaFree(dev_info);
+  coot_wrapper(cudaFree)(dev_info);
   }
 
 
@@ -65,35 +65,35 @@ svd(dev_mem_t<eT> U,
   size_t device_buffer_size;
   size_t host_buffer_size;
 
-  status = cusolverDnXgesvd_bufferSize(get_rt().cuda_rt.cusolver_handle,
-                                       NULL, // it appears to be possible to pass NULL for the parameters
-                                       jobuvt,
-                                       jobuvt,
-                                       n_rows,
-                                       n_cols,
-                                       cuda_data_type<eT>::type,
-                                       (void*) A.cuda_mem_ptr,
-                                       n_rows,
-                                       cuda_data_type<eT>::type,
-                                       (void*) S.cuda_mem_ptr,
-                                       cuda_data_type<eT>::type,
-                                       (void*) U.cuda_mem_ptr,
-                                       // If compute_u_vt is false, we assume the user passed a 1x1 matrix for each,
-                                       // and we also assume those matrices won't be referenced.
-                                       (compute_u_vt) ? n_rows : 1,
-                                       cuda_data_type<eT>::type,
-                                       (void*) V.cuda_mem_ptr,
-                                       (compute_u_vt) ? n_cols : 1,
-                                       cuda_data_type<eT>::type,
-                                       &device_buffer_size,
-                                       &host_buffer_size);
+  status = coot_wrapper(cusolverDnXgesvd_bufferSize)(get_rt().cuda_rt.cusolver_handle,
+                                                     NULL, // it appears to be possible to pass NULL for the parameters
+                                                     jobuvt,
+                                                     jobuvt,
+                                                     n_rows,
+                                                     n_cols,
+                                                     cuda_data_type<eT>::type,
+                                                     (void*) A.cuda_mem_ptr,
+                                                     n_rows,
+                                                     cuda_data_type<eT>::type,
+                                                     (void*) S.cuda_mem_ptr,
+                                                     cuda_data_type<eT>::type,
+                                                     (void*) U.cuda_mem_ptr,
+                                                     // If compute_u_vt is false, we assume the user passed a 1x1 matrix for each,
+                                                     // and we also assume those matrices won't be referenced.
+                                                     (compute_u_vt) ? n_rows : 1,
+                                                     cuda_data_type<eT>::type,
+                                                     (void*) V.cuda_mem_ptr,
+                                                     (compute_u_vt) ? n_cols : 1,
+                                                     cuda_data_type<eT>::type,
+                                                     &device_buffer_size,
+                                                     &host_buffer_size);
   if (status != CUSOLVER_STATUS_SUCCESS)
     {
     return std::make_tuple(false, "couldn't calculate workspace sizes with cusolverDnXgesvd_bufferSize(): " + error_as_string(status));
     }
 
   char* device_buffer = NULL;
-  status2 = cudaMalloc(&device_buffer, device_buffer_size);
+  status2 = coot_wrapper(cudaMalloc)((void**) &device_buffer, device_buffer_size);
   if (status2 != cudaSuccess)
     {
     return std::make_tuple(false, "couldn't cudaMalloc() device workspace: " + error_as_string(status2));
@@ -102,36 +102,36 @@ svd(dev_mem_t<eT> U,
 
   // This is an additional error code for cusolverDn; but it is an error code on the device...
   int* dev_info = NULL;
-  status2 = cudaMalloc(&dev_info, sizeof(int));
+  status2 = coot_wrapper(cudaMalloc)((void**) &dev_info, sizeof(int));
   if (status2 != cudaSuccess)
     {
     svd_cleanup(device_buffer, host_buffer, NULL);
     return std::make_tuple(false, "couldn't cudaMalloc() status value: " + error_as_string(status2));
     }
 
-  status = cusolverDnXgesvd(get_rt().cuda_rt.cusolver_handle,
-                            NULL, // it appears to be possible to pass NULL for the parameters
-                            jobuvt,
-                            jobuvt,
-                            n_rows,
-                            n_cols,
-                            cuda_data_type<eT>::type,
-                            (void*) A.cuda_mem_ptr,
-                            n_rows,
-                            cuda_data_type<eT>::type,
-                            (void*) S.cuda_mem_ptr,
-                            cuda_data_type<eT>::type,
-                            (void*) U.cuda_mem_ptr,
-                            (compute_u_vt) ? n_rows : 1,
-                            cuda_data_type<eT>::type,
-                            (void*) V.cuda_mem_ptr,
-                            (compute_u_vt) ? n_cols : 1,
-                            cuda_data_type<eT>::type,
-                            (void*) device_buffer,
-                            device_buffer_size,
-                            (void*) host_buffer,
-                            host_buffer_size,
-                            dev_info);
+  status = coot_wrapper(cusolverDnXgesvd)(get_rt().cuda_rt.cusolver_handle,
+                                          NULL, // it appears to be possible to pass NULL for the parameters
+                                          jobuvt,
+                                          jobuvt,
+                                          n_rows,
+                                          n_cols,
+                                          cuda_data_type<eT>::type,
+                                          (void*) A.cuda_mem_ptr,
+                                          n_rows,
+                                          cuda_data_type<eT>::type,
+                                          (void*) S.cuda_mem_ptr,
+                                          cuda_data_type<eT>::type,
+                                          (void*) U.cuda_mem_ptr,
+                                          (compute_u_vt) ? n_rows : 1,
+                                          cuda_data_type<eT>::type,
+                                          (void*) V.cuda_mem_ptr,
+                                          (compute_u_vt) ? n_cols : 1,
+                                          cuda_data_type<eT>::type,
+                                          (void*) device_buffer,
+                                          device_buffer_size,
+                                          (void*) host_buffer,
+                                          host_buffer_size,
+                                          dev_info);
   if (status != CUSOLVER_STATUS_SUCCESS)
     {
     svd_cleanup(device_buffer, host_buffer, dev_info);
@@ -141,7 +141,7 @@ svd(dev_mem_t<eT> U,
   // It seems that CUSOLVER_STATUS_SUCCESS gets returned even when the SVD
   // failed!  So we have to process dev_info more carefully.
   int info;
-  status2 = cudaMemcpy(&info, dev_info, sizeof(int), cudaMemcpyDeviceToHost);
+  status2 = coot_wrapper(cudaMemcpy)(&info, dev_info, sizeof(int), cudaMemcpyDeviceToHost);
 
   // We don't need any of the allocated memory now.
   svd_cleanup(device_buffer, host_buffer, dev_info);

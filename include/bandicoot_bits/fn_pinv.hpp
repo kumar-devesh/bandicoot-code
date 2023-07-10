@@ -98,7 +98,7 @@ pinv
   if (std::get<0>(result) == false)
     {
     out.reset();
-    coot_debug_warn("pinv(): " + std::get<1>(result));
+    coot_debug_warn_level(3, "pinv(): " + std::get<1>(result));
     }
 
   return std::get<0>(result);

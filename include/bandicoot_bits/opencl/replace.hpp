@@ -32,14 +32,14 @@ replace(dev_mem_t<eT> mem, const uword n_elem, const eT val_find, const eT val_r
 
   cl_int status = 0;
 
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &mem.cl_mem_ptr);
-  status |= clSetKernelArg(kernel, 1, sizeof(eT),     &val_find      );
-  status |= clSetKernelArg(kernel, 2, sizeof(eT),     &val_replace   );
-  status |= clSetKernelArg(kernel, 3, N.size,         N.addr         );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem), &mem.cl_mem_ptr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(eT),     &val_find      );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 2, sizeof(eT),     &val_replace   );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 3, N.size,         N.addr         );
 
   size_t work_size = size_t(n_elem);
 
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &work_size, NULL, 0, NULL, NULL);
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &work_size, NULL, 0, NULL, NULL);
 
   coot_check_runtime_error( (status != CL_SUCCESS), "coot::opencl::replace(): couldn't execute kernel");
   }

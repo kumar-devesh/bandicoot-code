@@ -42,7 +42,7 @@ sort_index_vec(dev_mem_t<uword> out, dev_mem_t<eT> A, const uword n_elem, const 
     }
 
   size_t kernel_wg_size;
-  cl_int status = clGetKernelWorkGroupInfo(k, get_rt().cl_rt.get_device(), CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &kernel_wg_size, NULL);
+  cl_int status = coot_wrapper(clGetKernelWorkGroupInfo)(k, get_rt().cl_rt.get_device(), CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &kernel_wg_size, NULL);
   coot_check_cl_error(status, "coot::opencl::sort_index_vec(): clGetKernelWorkGroupInfo() failed");
 
   const size_t total_num_threads = std::ceil(n_elem / std::max(1.0, (2 * std::ceil(std::log2(n_elem)))));
@@ -60,12 +60,12 @@ sort_index_vec(dev_mem_t<uword> out, dev_mem_t<eT> A, const uword n_elem, const 
 
   runtime_t::adapt_uword cl_n_elem(n_elem);
 
-  status |= clSetKernelArg(k, 0, sizeof(cl_mem), &(A.cl_mem_ptr));
-  status |= clSetKernelArg(k, 1, sizeof(cl_mem), &(out.cl_mem_ptr));
-  status |= clSetKernelArg(k, 2, sizeof(cl_mem), &(tmp_mem.cl_mem_ptr));
-  status |= clSetKernelArg(k, 3, sizeof(cl_mem), &(tmp_mem_index.cl_mem_ptr));
-  status |= clSetKernelArg(k, 4, cl_n_elem.size, cl_n_elem.addr);
-  status |= clSetKernelArg(k, 5, aux_mem_size,   NULL);
+  status |= coot_wrapper(clSetKernelArg)(k, 0, sizeof(cl_mem), &(A.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(k, 1, sizeof(cl_mem), &(out.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(k, 2, sizeof(cl_mem), &(tmp_mem.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(k, 3, sizeof(cl_mem), &(tmp_mem_index.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(k, 4, cl_n_elem.size, cl_n_elem.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 5, aux_mem_size,   NULL);
 
   coot_check_cl_error(status, "coot::opencl::sort_index_vec(): failed to set kernel arguments");
 
@@ -73,7 +73,7 @@ sort_index_vec(dev_mem_t<uword> out, dev_mem_t<eT> A, const uword n_elem, const 
   const size_t k1_work_offset[1] = { 0 };
   const size_t k1_work_size[1]   = { pow2_num_threads };
 
-  status = clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+  status = coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
 
   coot_check_cl_error(status, "coot::opencl::sort_index_vec(): failed to run kernel");
 

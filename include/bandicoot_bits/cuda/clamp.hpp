@@ -37,7 +37,7 @@ clamp(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const eT1 min_val, const eT
       (eT1*) &max_val,
       (uword*) &n_elem };
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2], // grid dims
       dims.d[3], dims.d[4], dims.d[5], // block dims

@@ -25,21 +25,8 @@
 #include "bandicoot_bits/compiler_check.hpp"
 #include "bandicoot_bits/config.hpp"
 #include "bandicoot_bits/compiler_setup.hpp"
-
-
-#if defined(COOT_USE_OPENCL)
-  #if defined(__APPLE__)
-    #include <OpenCL/opencl.h>
-  #else
-    #include <CL/opencl.h>
-  #endif
-
-
-  // TODO: make this conditional on clBLAS being present
-  #include <clBLAS.h>
-#endif
-
-
+#include "bandicoot_bits/include_opencl.hpp"
+#include "bandicoot_bits/include_cuda.hpp"
 
 #if defined(COOT_USE_OPENMP)
   #if defined(__has_include)
@@ -58,16 +45,7 @@
 #include <mutex>
 
 
-// Import CUDA headers if needed.
-#if defined(COOT_USE_CUDA)
-  #include <cuda.h>
-  #include <cuda_runtime_api.h>
-  #include <cuda_runtime.h>
-  #include <cublas_v2.h>
-  #include <nvrtc.h>
-  #include <curand.h>
-  #include <cusolverDn.h>
-#endif
+// TODO: the following includes are probably not necessary as a lot of Armadillo functionality is being reused
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -118,7 +96,8 @@ namespace coot
   #include "bandicoot_bits/constants.hpp"
   #include "bandicoot_bits/dev_mem_t.hpp"
   #include "bandicoot_bits/distr_param.hpp"
-  
+  #include "bandicoot_bits/fill.hpp"
+
 
 
   //
@@ -146,6 +125,10 @@ namespace coot
     }
 
   #if defined(COOT_USE_OPENCL)
+
+  #include "bandicoot_bits/opencl/def_opencl.hpp"
+  #include "bandicoot_bits/opencl/def_clblas.hpp"
+
   namespace opencl
     {
     #include "bandicoot_bits/opencl/magma_kernel_id.hpp"
@@ -175,6 +158,13 @@ namespace coot
   #endif
 
   #if defined(COOT_USE_CUDA)
+
+  #include "bandicoot_bits/cuda/def_cuda.hpp"
+  #include "bandicoot_bits/cuda/def_nvrtc.hpp"
+  #include "bandicoot_bits/cuda/def_cublas.hpp"
+  #include "bandicoot_bits/cuda/def_curand.hpp"
+  #include "bandicoot_bits/cuda/def_cusolver.hpp"
+
   namespace cuda
     {
     #include "bandicoot_bits/cuda/runtime_bones.hpp"
@@ -486,7 +476,7 @@ namespace coot
   #include "bandicoot_bits/operator_schur.hpp"
   #include "bandicoot_bits/operator_div.hpp"
   #include "bandicoot_bits/operator_relational.hpp"
-  //#include "bandicoot_bits/operator_ostream.hpp"
+  #include "bandicoot_bits/operator_ostream.hpp"
 
 
 

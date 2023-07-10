@@ -31,57 +31,57 @@ join_rows(dev_mem_t<eT> out, const dev_mem_t<eT> A, const uword A_n_rows, const 
 
   if (A_n_elem > 0)
     {
-    status = clEnqueueCopyBuffer(get_rt().cl_rt.get_cq(),
-                                 A.cl_mem_ptr,
-                                 out.cl_mem_ptr,
-                                 0,
-                                 0,
-                                 sizeof(eT) * A_n_elem,
-                                 0,
-                                 NULL,
-                                 NULL);
+    status = coot_wrapper(clEnqueueCopyBuffer)(get_rt().cl_rt.get_cq(),
+                                               A.cl_mem_ptr,
+                                               out.cl_mem_ptr,
+                                               0,
+                                               0,
+                                               sizeof(eT) * A_n_elem,
+                                               0,
+                                               NULL,
+                                               NULL);
     coot_check_cl_error(status, "coot::opencl::join_rows(): clEnqueueCopyBuffer() failed for first argument");
     }
 
   if (B_n_elem > 0)
     {
-    status = clEnqueueCopyBuffer(get_rt().cl_rt.get_cq(),
-                                 B.cl_mem_ptr,
-                                 out.cl_mem_ptr,
-                                 0,
-                                 sizeof(eT) * A_n_elem,
-                                 sizeof(eT) * B_n_elem,
-                                 0,
-                                 NULL,
-                                 NULL);
+    status = coot_wrapper(clEnqueueCopyBuffer)(get_rt().cl_rt.get_cq(),
+                                               B.cl_mem_ptr,
+                                               out.cl_mem_ptr,
+                                               0,
+                                               sizeof(eT) * A_n_elem,
+                                               sizeof(eT) * B_n_elem,
+                                               0,
+                                               NULL,
+                                               NULL);
     coot_check_cl_error(status, "coot::opencl::join_rows(): clEnqueueCopyBuffer() failed for second argument");
     }
 
   if (C_n_elem > 0)
     {
-    status = clEnqueueCopyBuffer(get_rt().cl_rt.get_cq(),
-                                 C.cl_mem_ptr,
-                                 out.cl_mem_ptr,
-                                 0,
-                                 sizeof(eT) * (A_n_elem + B_n_elem),
-                                 sizeof(eT) * C_n_elem,
-                                 0,
-                                 NULL,
-                                 NULL);
+    status = coot_wrapper(clEnqueueCopyBuffer)(get_rt().cl_rt.get_cq(),
+                                               C.cl_mem_ptr,
+                                               out.cl_mem_ptr,
+                                               0,
+                                               sizeof(eT) * (A_n_elem + B_n_elem),
+                                               sizeof(eT) * C_n_elem,
+                                               0,
+                                               NULL,
+                                               NULL);
     coot_check_cl_error(status, "coot::opencl::join_rows(): clEnqueueCopyBuffer() failed for third argument");
     }
 
   if (D_n_elem > 0)
     {
-    status = clEnqueueCopyBuffer(get_rt().cl_rt.get_cq(),
-                                 D.cl_mem_ptr,
-                                 out.cl_mem_ptr,
-                                 0,
-                                 sizeof(eT) * (A_n_elem + B_n_elem + C_n_elem),
-                                 sizeof(eT) * D_n_elem,
-                                 0,
-                                 NULL,
-                                 NULL);
+    status = coot_wrapper(clEnqueueCopyBuffer)(get_rt().cl_rt.get_cq(),
+                                               D.cl_mem_ptr,
+                                               out.cl_mem_ptr,
+                                               0,
+                                               sizeof(eT) * (A_n_elem + B_n_elem + C_n_elem),
+                                               sizeof(eT) * D_n_elem,
+                                               0,
+                                               NULL,
+                                               NULL);
     coot_check_cl_error(status, "coot::opencl::join_rows(): clEnqueueCopyBuffer() failed for fourth argument");
 
     }

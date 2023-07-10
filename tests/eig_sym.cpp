@@ -550,7 +550,7 @@ TEMPLATE_TEST_CASE("alias_eigendecomposition_2", "[eig_sym]", float, double)
 
 
 
-// nonsquare matrices should throw an exception or return false
+// nonsquare matrices should throw an exception
 TEST_CASE("nonsquare_eigendecomposition", "[eig_sym]")
   {
   fmat x(5, 6);
@@ -563,13 +563,9 @@ TEST_CASE("nonsquare_eigendecomposition", "[eig_sym]")
   std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
   std::cerr.rdbuf(NULL);
 
-  status = eig_sym(y, x);
-  REQUIRE( status == false );
-
+  REQUIRE_THROWS( status = eig_sym(y, x) );
   REQUIRE_THROWS( y = eig_sym(x) );
-
-  status = eig_sym(y, z, x);
-  REQUIRE( status == false );
+  REQUIRE_THROWS( status = eig_sym(y, z, x) );
 
   // Restore cerr output.
   std::cerr.rdbuf(orig_cerr_buf);

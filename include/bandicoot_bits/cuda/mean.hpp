@@ -43,7 +43,7 @@ mean(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword n_rows, const uwor
 
   const kernel_dims dims = one_dimensional_grid_dims((dim == 0) ? n_cols : n_rows);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],
@@ -88,7 +88,7 @@ mean_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword M_n_rows, 
 
   const kernel_dims dims = one_dimensional_grid_dims((dim == 0) ? n_cols : n_rows);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],

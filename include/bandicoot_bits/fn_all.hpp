@@ -48,7 +48,7 @@ all(const T1& X)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename
 enable_if2<
   is_coot_type<T1>::value,
@@ -65,7 +65,7 @@ all(const T1& X, const uword dim)
 // for compatibility purposes: allows compiling user code designed for earlier versions of Armadillo
 template<typename T>
 coot_warn_unused
-coot_inline
+inline
 typename
 enable_if2
   <

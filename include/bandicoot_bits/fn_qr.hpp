@@ -41,7 +41,7 @@ qr
     {
     Q.reset();
     R.reset();
-    coot_debug_warn("qr(): decomposition failed");
+    coot_debug_warn_level(3, "qr(): decomposition failed");
     }
 
   return status;

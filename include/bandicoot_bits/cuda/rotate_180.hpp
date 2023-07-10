@@ -36,7 +36,7 @@ rotate_180(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword n_rows, const 
       (uword*) &n_rows,
       (uword*) &n_cols };
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       k,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],
