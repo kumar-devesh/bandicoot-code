@@ -1484,9 +1484,9 @@ If incompatible object sizes are used, a <i>std::logic_error</i> exception is th
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(5, 10);
-fmat B = randu&lt;fmat&gt;(5, 10);
-fmat C = randu&lt;fmat&gt;(10, 5);
+fmat A(5, 10, fill::randu);
+fmat B(5, 10, fill::randu);
+fmat C(10, 5, fill::randu);
 
 fmat P = A + B;
 fmat Q = A - B;
@@ -2492,11 +2492,11 @@ Examples:
 <ul>
 <pre>
 <font class="comment">// when using the OpenCL backend</font>
-fmat A = randu&lt;fmat&gt;(3, 4);
+fmat A(3, 4, fill::randu);
 cl_mem A_mem = A.get_dev_mem().cl_mem_ptr;
 
 <font class="comment">// when using the CUDA backend</font>
-fmat B = randu&lt;fmat&gt;(3, 4);
+fmat B(3, 4, fill::randu);
 float* B_mem = B.get_dev_mem().cuda_mem_ptr;
 </pre>
 </ul>
@@ -2628,7 +2628,7 @@ indiscriminate use can degrade performance
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(4,4);
+fmat A(4, 4, fill::randu);
 
 A.t().eval().print("A.t()");
 </pre>
@@ -2726,9 +2726,9 @@ Member functions of <i>Mat</i>
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(1, 5);
-fmat B = randu&lt;fmat&gt;(5, 1);
-fmat C = randu&lt;fmat&gt;(5, 5);
+fmat A(1, 5, fill::randu);
+fmat B(5, 1, fill::randu);
+fmat C(5, 5, fill::randu);
 
 cout &lt;&lt; A.is_vec() &lt;&lt; endl;
 cout &lt;&lt; B.is_vec() &lt;&lt; endl;
@@ -2765,8 +2765,8 @@ Member function of <i>Mat</i>
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(5, 5);
-fmat B = randu&lt;fmat&gt;(6, 7);
+fmat A(5, 5, fill::randu);
+fmat B(6, 7, fill::randu);
 
 cout &lt;&lt; A.is_square() &lt;&lt; endl;
 cout &lt;&lt; B.is_square() &lt;&lt; endl;
@@ -2809,8 +2809,8 @@ Objects can also be printed using the &lt;&lt; stream operator
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(5, 5);
-fmat B = randu&lt;fmat&gt;(6, 6);
+fmat A(5, 5, fill::randu);
+fmat B(6, 6, fill::randu);
 
 A.print();
 
@@ -2863,7 +2863,7 @@ If the cell width is set to zero, a space is printed between the elements
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(5, 5);
+fmat A(5, 5, fill::randu);
 
 cout.precision(11);
 cout.setf(ios::fixed);
@@ -3334,8 +3334,8 @@ Accumulate (sum) all elements of a vector or matrix
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(5, 6);
-fmat B = randu&lt;fmat&gt;(5, 6);
+fmat A(5, 6, fill::randu);
+fmat B(5, 6, fill::randu);
 
 float x = accu(A);
 
@@ -3389,8 +3389,8 @@ Relational operators can be used instead of <i>V</i> or <i>X</i>, eg. <i>A&thins
 Examples:
 <ul>
 <pre>
-fvec V = randu&lt;fvec&gt;(10);
-fmat X = randu&lt;fmat&gt;(5, 5);
+fvec V(10, fill::randu);
+fmat X(5, 5, fill::randu);
 
 <font class="comment">// status1 will be set to true if vector V has all non-zero elements</font>
 bool status1 = all(V);
@@ -3453,8 +3453,8 @@ Relational operators can be used instead of <i>V</i> or <i>X</i>, eg. <i>A&thins
 Examples:
 <ul>
 <pre>
-fvec V = randu&lt;fvec&gt;(10);
-fmat X = randu&lt;fmat&gt;(5, 5);
+fvec V(10, fill::randu);
+fmat X(5, 5, fill::randu);
 
 <font class="comment">// status1 will be set to true if vector V has any non-zero elements</font>
 bool status1 = any(V);
@@ -3502,8 +3502,8 @@ Optimised expression evaluations are automatically used when a binary or trinary
 Examples:
 <ul>
 <pre>
-frowvec r = randu&lt;frowvec&gt;(5);
-fcolvec q = randu&lt;fcolvec&gt;(5);
+frowvec r(5, fill::randu);
+fcolvec q(5, fill::randu);
 
 fmat X(5, 5, fill::randu);
 
@@ -3544,7 +3544,7 @@ Create a copy of <i>X</i> with each element clamped to the [<i>min_val</i>,&thin
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(5, 5);
+fmat A(5, 5, fill::randu);
 
 fmat B = clamp(A, 0.2,         0.8);
 fmat C = clamp(A, min(min(A)), 0.8);
@@ -3588,10 +3588,10 @@ When <i>conv_to</i> is applied to an expression, the conversion operation will b
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(5, 5);
+fmat A(5, 5, fill::randu);
  mat B = conv_to&lt;mat&gt;::from(A);
 
-fmat C = randu&lt;fmat&gt;(10, 1);
+fmat C(10, 1, fill::randu);
 fcolvec x = conv_to&lt; fcolvec &gt;::from(C);
 
 <font class="comment">// convert from Armadillo object</font>
@@ -3624,8 +3624,8 @@ Calculate the cross product between A and B, under the assumption that A and B a
 Examples:
 <ul>
 <pre>
-fvec a = randu&lt;fvec&gt;(3);
-fvec b = randu&lt;fvec&gt;(3);
+fvec a(3, fill::randu);
+fvec b(3, fill::randu);
 
 fvec c = cross(a, b);
 </pre>
@@ -3671,7 +3671,7 @@ See also:
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(5, 5);
+fmat A(5, 5, fill::randu);
 
 float val1 = det(A);         <font color = "#0000bb">// form 1</font>
 
@@ -3786,7 +3786,7 @@ The extracted diagonal is interpreted as a column vector
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(5, 5);
+fmat A(5, 5, fill::randu);
 
 fvec d = diagvec(A);
 </pre>
@@ -3820,8 +3820,8 @@ Dot product of <i>A</i> and <i>B</i>, treating <i>A</i> and <i>B</i> as vectors
 Examples:
 <ul>
 <pre>
-fvec a = randu&lt;fvec&gt;(10);
-fvec b = randu&lt;fvec&gt;(10);
+fvec a(10, fill::randu);
+fvec b(10, fill::randu);
 
 float x = dot(a,b);
 </pre>
@@ -3876,8 +3876,8 @@ float x = dot(a,b);
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(5, 5);
-fmat B = randu&lt;fmat&gt;(5, 5);
+fmat A(5, 5, fill::randu);
+fmat B(5, 5, fill::randu);
 
 uvec q1 = find(A &gt; B);
 uvec q2 = find(A &gt; 0.5);
@@ -3920,7 +3920,7 @@ See also:
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(5, 5);
+fmat A(5, 5, fill::randu);
 
 A(1, 1) = datum::inf;
 
@@ -3961,7 +3961,7 @@ See also:
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(5, 5);
+fmat A(5, 5, fill::randu);
 
 A(1, 1) = datum::inf;
 A(2, 2) = datum::nan;
@@ -4003,7 +4003,7 @@ See also:
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(5, 5);
+fmat A(5, 5, fill::randu);
 
 A(2, 3) = datum::nan;
 
@@ -4070,9 +4070,9 @@ the given matrices must have the same number of columns
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(4, 5);
-fmat B = randu&lt;fmat&gt;(4, 6);
-fmat C = randu&lt;fmat&gt;(6, 5);
+fmat A(4, 5, fill::randu);
+fmat B(4, 6, fill::randu);
+fmat C(6, 5, fill::randu);
 
 fmat AB = join_rows(A, B);
 fmat AC = join_cols(A, C);
@@ -4135,18 +4135,18 @@ For two matrices <i>A</i> and <i>B</i>, return a matrix containing element-wise 
 Examples:
 <ul>
 <pre>
-fcolvec v = randu&lt;fcolvec&gt;(10);
+fcolvec v(10, fill::randu);
 float x = max(v);
 
-fmat M = randu&lt;fmat&gt;(10, 10);
+fmat M(10, 10, fill::randu);
 
 frowvec a = max(M);
 frowvec b = max(M, 0);
 fcolvec c = max(M, 1);
 
 <font class="comment">// element-wise maximum</font>
-fmat X = randu&lt;fmat&gt;(5, 6);
-fmat Y = randu&lt;fmat&gt;(5, 6);
+fmat X(5, 6, fill::randu);
+fmat Y(5, 6, fill::randu);
 fmat Z = coot::max(X, Y); <font class="comment">// use coot:: prefix to distinguish from std::max()</font>
 </pre>
 </ul>
@@ -4203,7 +4203,7 @@ For vector norm with <i>p&thinsp;=&thinsp;2</i> and matrix norm with <i>p&thinsp
 Examples:
 <ul>
 <pre>
-fvec q = randu&lt;fvec&gt;(5);
+fvec q(5, fill::randu);
 
 float x = norm(q, 2);
 float y = norm(q, "inf");
@@ -4251,11 +4251,11 @@ The <i>dim</i> argument is optional; by default <i>dim&thinsp;=&thinsp;0</i> is 
 Examples:
 <ul>
 <pre>
-fvec A = randu&lt;fvec&gt;(10);
+fvec A(10, fill::randu);
 fvec B = normalise(A);
 fvec C = normalise(A, 1);
 
-fmat X = randu&lt;fmat&gt;(5, 6);
+fmat X(5, 6, fill::randu);
 fmat Y = normalise(X);
 fmat Z = normalise(X, 2, 1);
 </pre>
@@ -4293,10 +4293,10 @@ See also:
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(5, 6);
+fmat A(5, 6, fill::randu);
 fmat B = pow(A, 3.45);
 
-frowvec R = randu&lt;frowvec&gt;(6);
+frowvec R(6, fill::randu);
 frowvec S = pow(R, -1.0);
 </pre>
 </ul>
@@ -4333,7 +4333,7 @@ See also:
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(2, 3);
+fmat A(2, 3, fill::randu);
 
 fmat B = repmat(A, 4, 5);
 </pre>
@@ -4393,7 +4393,7 @@ to flatten a matrix into a vector, use <a href="#vectorise">vectorise()</a> inst
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(10, 5);
+fmat A(10, 5, fill::randu);
 
 fmat B = reshape(A, 5, 10);
 </pre>
@@ -4436,7 +4436,7 @@ to change the size without preserving data, use <a href="#set_size">.set_size()<
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(4, 5);
+fmat A(4, 5, fill::randu);
 
 fmat B = resize(A, 7, 6);
 </pre>
@@ -4549,7 +4549,7 @@ The <i>dim</i> argument is optional; by default <i>dim&thinsp;=&thinsp;0</i> is 
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(10, 10);
+fmat A(10, 10, fill::randu);
 fmat B = sort(A);
 </pre>
 </ul>
@@ -4594,7 +4594,7 @@ See also:
 Examples:
 <ul>
 <pre>
-fvec q = randu&lt;fvec&gt;(10);
+fvec q(10, fill::randu);
 
 uvec indices = sort_index(q);
 </pre>
@@ -4637,10 +4637,10 @@ The <i>dim</i> argument is optional; by default <i>dim&thinsp;=&thinsp;0</i> is 
 Examples:
 <ul>
 <pre>
-fcolvec v = randu&lt;fcolvec&gt;(10);
+fcolvec v(10, fill::randu);
 float x = sum(v);
 
-fmat M = randu&lt;fmat&gt;(10, 10);
+fmat M(10, 10, fill::randu);
 
 frowvec a = sum(M);
 frowvec b = sum(M, 0);
@@ -4684,7 +4684,7 @@ If <i>A</i> is non-square, a <i>std::logic_error</i> exception is thrown
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(5, 5);
+fmat A(5, 5, fill::randu);
 
 fmat B = symmatu(A);
 fmat C = symmatl(A);
@@ -4717,7 +4717,7 @@ If <i>X</i> is an expression, the evaluation of the expression aims to calculate
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(5, 5);
+fmat A(5, 5, fill::randu);
 
 float x = trace(A);
 </pre>
@@ -4749,7 +4749,7 @@ See also:
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(5, 10);
+fmat A(5, 10, fill::randu);
 
 fmat B = trans(A);
 fmat C = A.t();    <font class="comment">// equivalent to trans(A), but more compact</font>
@@ -4796,7 +4796,7 @@ For <i>dim&thinsp;=&thinsp;1</i>, the elements are copied from <i>X</i> row-wise
 Examples:
 <ul>
 <pre>
-fmat X = randu&lt;fmat&gt;(4, 5);
+fmat X(4, 5, fill::randu);
 
 fvec v = vectorise(X);
 </pre>
@@ -5064,7 +5064,7 @@ all of the above functions are applied element-wise, where each element is treat
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(5, 5);
+fmat A(5, 5, fill::randu);
 fmat B = exp(A);
 </pre>
 </ul>
@@ -5118,7 +5118,7 @@ For dual argument functions, apply the function to each tuple of two correspondi
 Examples:
 <ul>
 <pre>
-fmat X = randu&lt;fmat&gt;(5, 5);
+fmat X(5, 5, fill::randu);
 fmat Y = cos(X);
 </pre>
 </ul>
@@ -5187,7 +5187,7 @@ The decomposition has the form <i>X = R.t() * R</i>
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(5, 5);
+fmat A(5, 5, fill::randu);
 fmat X = A.t() * A;
 
 mat R1 = chol(X);
@@ -5248,7 +5248,7 @@ Examples:
 <pre>
 <font class="comment">// for matrices with real elements</font>
 
-fmat A = randu&lt;fmat&gt;(50, 50);
+fmat A(50, 50, fill::randu);
 fmat B = A.t()*A;  <font class="comment">// generate a symmetric matrix</font>
 
 fvec eigval;
@@ -5305,7 +5305,7 @@ If the decomposition fails:
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(5, 5);
+fmat A(5, 5, fill::randu);
 
 fmat L, U, P;
 
@@ -5364,7 +5364,7 @@ The computation is based on singular value decomposition
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(4, 5);
+fmat A(4, 5, fill::randu);
 
 fmat B = pinv(A);        <font class="comment">// use default tolerance</font>
 
@@ -5438,7 +5438,7 @@ If the decomposition fails, the output objects are reset and:
 Examples:
 <ul>
 <pre>
-fmat X = randu&lt;fmat&gt;(5, 5);
+fmat X(5, 5, fill::randu);
 
 fmat U;
 fvec s;
@@ -5508,9 +5508,9 @@ The convolution operation is also equivalent to FIR filtering
 Examples:
 <ul>
 <pre>
-fvec A = randu&lt;fvec&gt;(256);
+fvec A(256, fill::randu);
 
-fvec B = randu&lt;fvec&gt;(16);
+fvec B(16, fill::randu);
 
 fvec C = conv(A, B);
 
@@ -5559,9 +5559,9 @@ The <i>shape</i> argument is optional; it is one of:
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(256, 256);
+fmat A(256, 256, fill::randu);
 
-fmat B = randu&lt;fmat&gt;(16, 16);
+fmat B(16, 16, fill::randu);
 
 fmat C = conv2(A, B);
 
@@ -5732,13 +5732,13 @@ convert to a matrix/vector with floating point values (eg. <a href="#Mat">mat</a
 Examples:
 <ul>
 <pre>
-fmat A = randu&lt;fmat&gt;(5, 5);
+fmat A(5, 5, fill::randu);
 
 fmat B  = mean(A);
 fmat C  = var(A);
 float m = mean(mean(A));
 
-fvec v = randu&lt;fvec&gt;(5);
+fvec v(5, fill::randu);
 float x = var(v);
 </pre>
 </ul>
@@ -5807,8 +5807,8 @@ which provides the second moment matrix of the observations about their mean
 Examples:
 <ul>
 <pre>
-fmat X = randu&lt;fmat&gt;(4, 5);
-fmat Y = randu&lt;fmat&gt;(4, 5);
+fmat X(4, 5, fill::randu);
+fmat Y(4, 5, fill::randu);
 
 fmat C = cov(X, Y);
 fmat D = cov(X, Y, 1);
@@ -5873,8 +5873,8 @@ the <i>norm_type</i> argument controls the type of normalisation used, with <i>N
 Examples:
 <ul>
 <pre>
-fmat X = randu&lt;fmat&gt;(4, 5);
-fmat Y = randu&lt;fmat&gt;(4, 5);
+fmat X(4, 5, fill::randu);
+fmat Y(4, 5, fill::randu);
 
 fmat R = cor(X, Y);
 fmat S = cor(X, Y, 1);
