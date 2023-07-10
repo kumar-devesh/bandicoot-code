@@ -33,6 +33,10 @@ class Col : public Mat<eT>
   inline explicit Col(const uword in_rows, const uword in_cols);
   inline explicit Col(const SizeMat& s);
 
+  template<typename fill_type> inline Col(const uword N,                            const fill::fill_class<fill_type>& f);
+  template<typename fill_type> inline Col(const uword in_rows, const uword in_cols, const fill::fill_class<fill_type>& f);
+  template<typename fill_type> inline Col(const SizeMat& s,                         const fill::fill_class<fill_type>& f);
+
   inline Col(dev_mem_t<eT> aux_dev_mem, const uword N);
   inline Col(cl_mem        aux_dev_mem, const uword N);
   inline Col(eT*           aux_dev_mem, const uword N);
@@ -42,6 +46,9 @@ class Col : public Mat<eT>
 
   inline                  Col(Col&& X);
   inline const Col& operator=(Col&& X);
+
+  // TODO: inline            Col(Mat<eT>&& m);
+  // TODO: inline Col& operator=(Mat<eT>&& m);
 
   template<typename T1> inline            Col(const Base<eT, T1>& X);
   template<typename T1> inline Col& operator=(const Base<eT, T1>& X);

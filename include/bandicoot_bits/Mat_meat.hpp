@@ -58,6 +58,8 @@ Mat<eT>::Mat(const uword in_n_rows, const uword in_n_cols)
   coot_extra_debug_sigprint_this(this);
 
   init(in_n_rows, in_n_cols);
+
+  zeros();  // fill with zeros by default
   }
 
 
@@ -75,6 +77,48 @@ Mat<eT>::Mat(const SizeMat& s)
   coot_extra_debug_sigprint_this(this);
 
   init(s.n_rows, s.n_cols);
+
+  zeros();  // fill with zeros by default
+  }
+
+
+
+template<typename eT>
+template<typename fill_type>
+inline
+Mat<eT>::Mat(const uword in_n_rows, const uword in_n_cols, const fill::fill_class<fill_type>& f)
+  : n_rows    (0)
+  , n_cols    (0)
+  , n_elem    (0)
+  , vec_state (0)
+  , mem_state (0)
+  , dev_mem({ NULL })
+  {
+  coot_extra_debug_sigprint_this(this);
+  
+  init(in_n_rows, in_n_cols);
+  
+  (*this).fill(f);
+  }
+
+
+
+template<typename eT>
+template<typename fill_type>
+inline
+Mat<eT>::Mat(const SizeMat& s, const fill::fill_class<fill_type>& f)
+  : n_rows    (0)
+  , n_cols    (0)
+  , n_elem    (0)
+  , vec_state (0)
+  , mem_state (0)
+  , dev_mem({ NULL })
+  {
+  coot_extra_debug_sigprint_this(this);
+  
+  init(s.n_rows, s.n_cols);
+  
+  (*this).fill(f);
   }
 
 
@@ -1624,6 +1668,25 @@ Mat<eT>::fill(const eT val)
 
   arrayops::inplace_set_scalar(dev_mem, val, n_elem);
 
+  return *this;
+  }
+
+
+
+template<typename eT>
+template<typename fill_type>
+inline
+const Mat<eT>&
+Mat<eT>::fill(const fill::fill_class<fill_type>&)
+  {
+  coot_extra_debug_sigprint();
+  
+  if(is_same_type<fill_type, fill::fill_zeros>::yes)  { (*this).zeros(); }
+  if(is_same_type<fill_type, fill::fill_ones >::yes)  { (*this).ones();  }
+  if(is_same_type<fill_type, fill::fill_eye  >::yes)  { (*this).eye();   }
+  if(is_same_type<fill_type, fill::fill_randu>::yes)  { (*this).randu(); }
+  if(is_same_type<fill_type, fill::fill_randn>::yes)  { (*this).randn(); }
+  
   return *this;
   }
 
