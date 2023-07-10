@@ -46,6 +46,9 @@ class Mat : public Base< eT, Mat<eT> >
   inline explicit Mat(const uword in_rows, const uword in_cols);
   inline explicit Mat(const SizeMat& s);
 
+  template<typename fill_type> inline Mat(const uword in_n_rows, const uword in_n_cols, const fill::fill_class<fill_type>& f);
+  template<typename fill_type> inline Mat(const SizeMat& s,                             const fill::fill_class<fill_type>& f);
+
   inline Mat(dev_mem_t<eT> aux_dev_mem, const uword in_rows, const uword in_cols);
   inline Mat(cl_mem        aux_dev_mem, const uword in_rows, const uword in_cols); // OpenCL alias constructor
   inline Mat(eT*           aux_dev_mem, const uword in_rows, const uword in_cols); // CUDA alias constructor
@@ -149,6 +152,9 @@ class Mat : public Base< eT, Mat<eT> >
   inline const Mat& clamp(const eT min_val, const eT max_val);
 
   inline const Mat& fill(const eT val);
+
+  template<typename fill_type>
+  inline const Mat& fill(const fill::fill_class<fill_type>& f);
 
   inline const Mat& zeros();
   inline const Mat& zeros(const uword new_n_elem);

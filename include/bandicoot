@@ -91,6 +91,7 @@ namespace coot
   #include "bandicoot_bits/constants.hpp"
   #include "bandicoot_bits/dev_mem_t.hpp"
   #include "bandicoot_bits/distr_param.hpp"
+  #include "bandicoot_bits/fill.hpp"
 
 
 
