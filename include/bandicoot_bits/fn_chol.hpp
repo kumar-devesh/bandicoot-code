@@ -34,7 +34,7 @@ chol(Mat<typename T1::elem_type>& out, const Base<typename T1::elem_type, T1>& X
   if (std::get<0>(result) == false)
     {
     out.reset();
-    coot_debug_warn("coot::chol(): " + std::get<1>(result));
+    coot_debug_warn_level(3, "coot::chol(): " + std::get<1>(result));
     }
 
   return std::get<0>(result);
