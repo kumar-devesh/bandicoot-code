@@ -23,10 +23,21 @@ operator<< (std::ostream& o, const Base<eT, T1>& X)
 
   const unwrap<T1> tmp(X.get_ref());
 
-  // TODO: better output for subviews
-  const extract_subview<typename unwrap<T1>::stored_type> E(tmp.M);
+  coot_ostream::print(o, tmp.M, true);
 
-  E.M.impl_print("");
+  return o;
+  }
+
+
+
+template<typename eT, typename T1>
+inline
+std::ostream&
+operator<< (std::ostream& o, const SizeMat& S)
+  {
+  coot_extra_debug_sigprint();
+
+  coot_ostream::print(o, S);
 
   return o;
   }

@@ -468,6 +468,14 @@ namespace coot
 
 
   //
+  // ostream
+
+  #include "bandicoot_bits/coot_ostream_bones.hpp"
+  #include "bandicoot_bits/coot_ostream_meat.hpp"
+
+
+
+  //
   // operators
 
   #include "bandicoot_bits/operator_times.hpp"
