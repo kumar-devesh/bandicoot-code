@@ -51,6 +51,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <iomanip>
+#include <climits>
 #include <limits>
 #include <cfloat>
 #include <iostream>
@@ -58,6 +59,7 @@
 #include <complex>
 #include <vector>
 #include <random>
+#include <cstring>
 
 #ifndef WIN32
   #include <unistd.h>
