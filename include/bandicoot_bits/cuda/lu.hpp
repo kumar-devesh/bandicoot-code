@@ -15,7 +15,7 @@
 
 
 /**
- * Compute the LU factorisation using OpenCL.
+ * Compute the LU factorisation using CUDA.
  */
 template<typename eT>
 inline
