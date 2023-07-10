@@ -255,6 +255,7 @@ namespace coot
   #include "bandicoot_bits/glue_cross_bones.hpp"
   #include "bandicoot_bits/glue_conv_bones.hpp"
   #include "bandicoot_bits/glue_conv2_bones.hpp"
+  #include "bandicoot_bits/glue_solve_bones.hpp"
 
   #include "bandicoot_bits/mtglue_relational_bones.hpp"
 
@@ -541,6 +542,7 @@ namespace coot
   #include "bandicoot_bits/fn_pinv.hpp"
   #include "bandicoot_bits/fn_cross.hpp"
   #include "bandicoot_bits/fn_conv.hpp"
+  #include "bandicoot_bits/fn_solve.hpp"
 
 
   //
@@ -616,6 +618,7 @@ namespace coot
   #include "bandicoot_bits/glue_cross_meat.hpp"
   #include "bandicoot_bits/glue_conv_meat.hpp"
   #include "bandicoot_bits/glue_conv2_meat.hpp"
+  #include "bandicoot_bits/glue_solve_meat.hpp"
 
   #include "bandicoot_bits/mtglue_relational_meat.hpp"
 
