@@ -243,7 +243,7 @@ coot_ostream::print(std::ostream& o, const Mat<eT>& m, const bool modify)
     if(m_n_cols > 0)
       {
       // Transfer the matrix to temporary CPU memory for printing.
-      eT* tmp_mem = new eT[m.n_elem];
+      eT* tmp_mem = cpu_memory::acquire<eT>(m.n_elem);
       coot_rt_t::copy_from_dev_mem(tmp_mem, m.get_dev_mem(true), m.n_elem);
 
       const std::streamsize cell_width = modify ? coot_ostream::modify_stream(o, tmp_mem, m.n_elem) : o.width();
@@ -281,7 +281,7 @@ coot_ostream::print(std::ostream& o, const Mat<eT>& m, const bool modify)
           }
         }
 
-      delete[] tmp_mem;
+      cpu_memory::release(tmp_mem);
       }
     }
   else
