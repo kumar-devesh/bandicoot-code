@@ -235,8 +235,6 @@ coot_ostream::print(std::ostream& o, const Mat<eT>& m, const bool modify)
 
   const coot_ostream_state stream_state(o);
 
-  const std::streamsize cell_width = modify ? coot_ostream::modify_stream(o, m.memptr(), m.n_elem) : o.width();
-
   const uword m_n_rows = m.n_rows;
   const uword m_n_cols = m.n_cols;
 
@@ -247,6 +245,8 @@ coot_ostream::print(std::ostream& o, const Mat<eT>& m, const bool modify)
       // Transfer the matrix to temporary CPU memory for printing.
       eT* tmp_mem = new eT[m.n_elem];
       coot_rt_t::copy_from_dev_mem(tmp_mem, m.get_dev_mem(true), m.n_elem);
+
+      const std::streamsize cell_width = modify ? coot_ostream::modify_stream(o, tmp_mem, m.n_elem) : o.width();
 
       if(cell_width > 0)
         {
@@ -286,19 +286,28 @@ coot_ostream::print(std::ostream& o, const Mat<eT>& m, const bool modify)
     }
   else
     {
-    if(modify)
-      {
-      o.unsetf(ios::showbase);
-      o.unsetf(ios::uppercase);
-      o.unsetf(ios::showpos);
-      o.setf(ios::fixed);
-      }
-
     o << "[matrix size: " << m_n_rows << 'x' << m_n_cols << "]\n";
     }
 
   o.flush();
   stream_state.restore(o);
+  }
+
+
+
+template<typename eT>
+coot_cold
+inline
+void
+coot_ostream::print(std::ostream& o, const subview<eT>& m, const bool modify)
+  {
+  coot_extra_debug_sigprint();
+
+  // TODO: we can have a better implementation when we have a way to extract a subview directly to CPU memory;
+  // however, for now, we just extract the subview
+
+  Mat<eT> tmp(m);
+  print(o, tmp, modify);
   }
 
 
