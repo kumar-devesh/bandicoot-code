@@ -1,4 +1,4 @@
-// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2023 Ryan Curtin (http://www.ratml.org)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,59 +14,19 @@
 
 
 
-// // TODO
-// template<typename eT, typename T1>
-// inline
-// std::ostream&
-// operator<< (std::ostream& o, const Base<eT,T1>& X)
-//   {
-//   coot_extra_debug_sigprint();
-//
-//   const unwrap<T1> tmp(X.get_ref());
-//
-//   coot_ostream::print(o, tmp.M, true);
-//
-//   return o;
-//   }
+template<typename eT, typename T1>
+inline
+std::ostream&
+operator<< (std::ostream& o, const Base<eT, T1>& X)
+  {
+  coot_extra_debug_sigprint();
 
+  const unwrap<T1> tmp(X.get_ref());
 
+  // TODO: better output for subviews
+  const extract_subview<typename unwrap<T1>::stored_type> E(tmp.M);
 
-// // TODO
-// template<typename T1>
-// inline
-// std::ostream&
-// operator<< (std::ostream& o, const MatValProxy& X)
-//   {
-//   coot_extra_debug_sigprint();
-//
-//
-//   return o;
-//   }
+  E.M.impl_print("");
 
-
-
-// // TODO
-// inline
-// std::ostream&
-// operator<< (std::ostream& o, const SizeMat& S)
-//   {
-//   coot_extra_debug_sigprint();
-//
-//   coot_ostream::print(o, S);
-//
-//   return o;
-//   }
-
-
-
-// // TODO
-// inline
-// std::ostream&
-// operator<< (std::ostream& o, const SizeCube& S)
-//   {
-//   coot_extra_debug_sigprint();
-//
-//   coot_ostream::print(o, S);
-//
-//   return o;
-//   }
+  return o;
+  }

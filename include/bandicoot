@@ -470,7 +470,7 @@ namespace coot
   #include "bandicoot_bits/operator_schur.hpp"
   #include "bandicoot_bits/operator_div.hpp"
   #include "bandicoot_bits/operator_relational.hpp"
-  //#include "bandicoot_bits/operator_ostream.hpp"
+  #include "bandicoot_bits/operator_ostream.hpp"
 
 
 
