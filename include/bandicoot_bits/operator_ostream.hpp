@@ -30,7 +30,6 @@ operator<< (std::ostream& o, const Base<eT, T1>& X)
 
 
 
-template<typename eT, typename T1>
 inline
 std::ostream&
 operator<< (std::ostream& o, const SizeMat& S)
