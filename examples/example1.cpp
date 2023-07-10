@@ -12,7 +12,7 @@ using namespace coot;
 int
 main(int argc, char** argv)
   {
-  cout << "Bandicot version: " << coot_version::as_string() << endl;
+  cout << "Bandicoot version: " << coot_version::as_string() << endl;
 
   // construct a GPU matrix according to given size and set to zeros
   // GPU matrices tend to only show speedup for large matrices;
@@ -20,8 +20,7 @@ main(int argc, char** argv)
   //
   // NOTE: double-precision floating point matrices (`mat`) may not be supported by all GPUs,
   // and may not show as much speedup on GPUs as single-precision floating point, so this example uses `fmat`
-  fmat A(3,4);
-  A.zeros();
+  fmat A(3, 4, fill::zeros);
 
   // .n_rows and .n_cols are read only
   cout << "A.n_rows: " << A.n_rows << endl;
@@ -83,10 +82,10 @@ main(int argc, char** argv)
   cout << "trace(B): " << trace(B) << endl;
   
   // generate the identity matrix
-  fmat C = eye<fmat>(4,4);
+  fmat C(4, 4, fill::eye);
   
   // random matrix with values uniformly distributed in the [0,1] interval
-  fmat D = randu<fmat>(4,4);
+  fmat D(4, 4, fill::randu);
   D.print("D:");
   
   // row vectors are treated like a matrix with one row
