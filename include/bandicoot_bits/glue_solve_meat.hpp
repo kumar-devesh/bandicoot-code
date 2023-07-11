@@ -62,10 +62,19 @@ glue_solve::apply(Mat<eT>& out, const Base<eT, T1>& A_expr, const Base<eT, T2>& 
 
   // TODO: right now we only support LU-based decompositions, and so flags are ignored
 
-  out = B_expr.get_ref(); // form B into `out`; solve_square_fast() will overwrite with the result
   Mat<eT> A(A_expr.get_ref()); // A needs to be unwrapped into a new matrix, that will be destroyed during computation
+  out = B_expr.get_ref(); // form B into `out`; solve_square_fast() will overwrite with the result
 
-  return coot_rt_t::solve_square_fast(A.get_dev_mem(true), false, out.get_dev_mem(true), out.n_rows, out.n_cols);
+  if (A.is_empty() || out.is_empty())
+    {
+    out.set_size(A.n_rows, out.n_cols);
+    return std::make_tuple(true, "");
+    }
+
+  coot_debug_check( A.n_rows != A.n_cols, "solve(): given matrix must be square sized" );
+
+  copy_alias<eT> A2(A, out);
+  return coot_rt_t::solve_square_fast(A2.M.get_dev_mem(true), false, out.get_dev_mem(true), out.n_rows, out.n_cols);
   }
 
 
@@ -79,10 +88,19 @@ glue_solve::apply(Mat<eT>& out, const Base<eT, Op<T1, op_htrans>>& A_expr, const
 
   // TODO: right now we only support LU-based decompositions, and so flags are ignored
 
-  out = B_expr.get_ref(); // form B into `out`; solve_square_fast() will overwrite with the result
   Mat<eT> A(A_expr.get_ref().m); // A needs to be unwrapped into a new matrix, that will be destroyed during computation
+  out = B_expr.get_ref(); // form B into `out`; solve_square_fast() will overwrite with the result
 
-  return coot_rt_t::solve_square_fast(A.get_dev_mem(true), true, out.get_dev_mem(true), out.n_rows, out.n_cols);
+  if (A.is_empty() || out.is_empty())
+    {
+    out.set_size(A.n_rows, out.n_cols);
+    return std::make_tuple(true, "");
+    }
+
+  coot_debug_check( A.n_rows != A.n_cols, "solve(): given matrix must be square sized" );
+
+  copy_alias<eT> A2(A, out);
+  return coot_rt_t::solve_square_fast(A2.M.get_dev_mem(true), true, out.get_dev_mem(true), out.n_rows, out.n_cols);
   }
 
 
@@ -96,10 +114,19 @@ glue_solve::apply(Mat<eT>& out, const Base<eT, Op<T1, op_htrans2>>& A_expr, cons
 
   // TODO: right now we only support LU-based decompositions, and so flags are ignored
 
-  out = B_expr.get_ref(); // form B into `out`; solve_square_fast() will overwrite with the result
   Mat<eT> A(A_expr.get_ref().m); // A needs to be unwrapped into a new matrix, that will be destroyed during computation
+  out = B_expr.get_ref(); // form B into `out`; solve_square_fast() will overwrite with the result
 
-  const std::tuple<bool, std::string> result = coot_rt_t::solve_square_fast(A.get_dev_mem(true), true, out.get_dev_mem(true), out.n_rows, out.n_cols);
+  if (A.is_empty() || out.is_empty())
+    {
+    out.set_size(A.n_rows, out.n_cols);
+    return std::make_tuple(true, "");
+    }
+
+  coot_debug_check( A.n_rows != A.n_cols, "solve(): given matrix must be square sized" );
+
+  copy_alias<eT> A2(A, out);
+  const std::tuple<bool, std::string> result = coot_rt_t::solve_square_fast(A2.M.get_dev_mem(true), true, out.get_dev_mem(true), out.n_rows, out.n_cols);
   if (std::get<0>(result) == true)
     {
     // the result needs to be divided by the scalar

@@ -113,25 +113,25 @@ TEMPLATE_TEST_CASE("hardcoded_solve", "[solve]", float, double)
   REQUIRE( X2.n_cols == 3 );
 
   // Computed by GNU Octave: A \ B
-  REQUIRE( eT(X1(0, 0)) == eT(-0.17672413793) );
-  REQUIRE( eT(X1(1, 0)) == eT( 0.09482758621) );
-  REQUIRE( eT(X1(2, 0)) == eT( 0.36637931034) );
-  REQUIRE( eT(X1(0, 1)) == eT(-0.12068965517) );
-  REQUIRE( eT(X1(1, 1)) == eT( 0.13793103448) );
-  REQUIRE( eT(X1(2, 1)) == eT( 0.18103448276) );
-  REQUIRE( eT(X1(0, 2)) == eT( 0.36637931034) );
-  REQUIRE( eT(X1(1, 2)) == eT( 0.39655172414) );
-  REQUIRE( eT(X1(2, 2)) == eT( 0.42672413793) );
+  REQUIRE( eT(X1(0, 0)) == Approx(eT(-0.17672413793)) );
+  REQUIRE( eT(X1(1, 0)) == Approx(eT( 0.09482758621)) );
+  REQUIRE( eT(X1(2, 0)) == Approx(eT( 0.36637931034)) );
+  REQUIRE( eT(X1(0, 1)) == Approx(eT(-0.12068965517)) );
+  REQUIRE( eT(X1(1, 1)) == Approx(eT( 0.13793103448)) );
+  REQUIRE( eT(X1(2, 1)) == Approx(eT( 0.39655172414)) );
+  REQUIRE( eT(X1(0, 2)) == Approx(eT(-0.06465517241)) );
+  REQUIRE( eT(X1(1, 2)) == Approx(eT( 0.18103448276)) );
+  REQUIRE( eT(X1(2, 2)) == Approx(eT( 0.42672413793)) );
 
-  REQUIRE( eT(X2(0, 0)) == eT(-0.17672413793) );
-  REQUIRE( eT(X2(1, 0)) == eT( 0.09482758621) );
-  REQUIRE( eT(X2(2, 0)) == eT( 0.36637931034) );
-  REQUIRE( eT(X2(0, 1)) == eT(-0.12068965517) );
-  REQUIRE( eT(X2(1, 1)) == eT( 0.13793103448) );
-  REQUIRE( eT(X2(2, 1)) == eT( 0.18103448276) );
-  REQUIRE( eT(X2(0, 2)) == eT( 0.36637931034) );
-  REQUIRE( eT(X2(1, 2)) == eT( 0.39655172414) );
-  REQUIRE( eT(X2(2, 2)) == eT( 0.42672413793) );
+  REQUIRE( eT(X2(0, 0)) == Approx(eT(-0.17672413793)) );
+  REQUIRE( eT(X2(1, 0)) == Approx(eT( 0.09482758621)) );
+  REQUIRE( eT(X2(2, 0)) == Approx(eT( 0.36637931034)) );
+  REQUIRE( eT(X2(0, 1)) == Approx(eT(-0.12068965517)) );
+  REQUIRE( eT(X2(1, 1)) == Approx(eT( 0.13793103448)) );
+  REQUIRE( eT(X2(2, 1)) == Approx(eT( 0.39655172414)) );
+  REQUIRE( eT(X2(0, 2)) == Approx(eT(-0.06465517241)) );
+  REQUIRE( eT(X2(1, 2)) == Approx(eT( 0.18103448276)) );
+  REQUIRE( eT(X2(2, 2)) == Approx(eT( 0.42672413793)) );
   }
 
 
@@ -232,9 +232,9 @@ TEMPLATE_TEST_CASE("random_square_trans_solve", "[solve]", float, double)
   REQUIRE( status == true );
 
   REQUIRE( X1.n_rows == 456 );
-  REQUIRE( X1.n_cols == 500 );
+  REQUIRE( X1.n_cols == 100 );
   REQUIRE( X2.n_rows == 456 );
-  REQUIRE( X2.n_cols == 500 );
+  REQUIRE( X2.n_cols == 100 );
 
   Mat<eT> B1_rec = A.t() * X1;
   Mat<eT> B2_rec = A.t() * X2;
@@ -268,9 +268,9 @@ TEMPLATE_TEST_CASE("random_square_htrans2_solve", "[solve]", float, double)
   REQUIRE( status == true );
 
   REQUIRE( X1.n_rows == 456 );
-  REQUIRE( X1.n_cols == 500 );
+  REQUIRE( X1.n_cols == 100 );
   REQUIRE( X2.n_rows == 456 );
-  REQUIRE( X2.n_cols == 500 );
+  REQUIRE( X2.n_cols == 100 );
 
   Mat<eT> B1_rec = 3 * A.t() * X1;
   Mat<eT> B2_rec = 3 * A.t() * X2;
@@ -351,9 +351,9 @@ TEMPLATE_TEST_CASE("solve_expr", "[solve]", float, double)
   REQUIRE( status == true );
 
   REQUIRE( X1.n_rows == 256 );
-  REQUIRE( X1.n_cols == 256 );
+  REQUIRE( X1.n_cols == 50 );
   REQUIRE( X2.n_rows == 256 );
-  REQUIRE( X2.n_cols == 256 );
+  REQUIRE( X2.n_cols == 50 );
 
   Mat<eT> A_ref = (A + 1) - (3 * A.t()) + 10 * diagmat(ones<Col<eT>>(256));
   Mat<eT> B_ref = 2 * B + 1;
@@ -390,7 +390,7 @@ TEMPLATE_TEST_CASE
   Mat<eT2> X = conv_to<Mat<eT2>>::from(solve(A, B));
 
   REQUIRE( X.n_rows == 100 );
-  REQUIRE( X.n_cols == 100 );
+  REQUIRE( X.n_cols == 50 );
 
   Mat<eT1> X_pre_conv = solve(A, B);
   Mat<eT2> X_ref = conv_to<Mat<eT2>>::from(X_pre_conv);

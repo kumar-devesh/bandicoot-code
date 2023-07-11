@@ -1618,7 +1618,7 @@ coot_rt_t::solve_square_fast(dev_mem_t<eT> A, const bool trans_A, dev_mem_t<eT> 
   if (get_rt().backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
-    opencl::solve_square_fast(A, trans_A, B, n_rows, n_cols);
+    return opencl::solve_square_fast(A, trans_A, B, n_rows, n_cols);
     #else
     coot_stop_runtime_error("coot_rt::solve_square_fast(): OpenCL backend not enabled");
     #endif
@@ -1626,7 +1626,7 @@ coot_rt_t::solve_square_fast(dev_mem_t<eT> A, const bool trans_A, dev_mem_t<eT> 
   else if (get_rt().backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    cuda::solve_square_fast(A, trans_A, B, n_rows, n_cols);
+    return cuda::solve_square_fast(A, trans_A, B, n_rows, n_cols);
     #else
     coot_stop_runtime_error("coot_rt::solve_square_fast(): CUDA backend not enabled");
     #endif

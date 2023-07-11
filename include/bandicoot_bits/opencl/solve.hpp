@@ -121,6 +121,10 @@ solve_square_fast(dev_mem_t<eT> A, const bool trans_A, dev_mem_t<eT> B, const uw
       oss << "parameter " << -info << " was incorrect in call to MAGMA getrs_gpu()";
       return std::make_tuple(false, oss.str());
       }
+    else
+      {
+      return std::make_tuple(false, "call to getrs_gpu() failed");
+      }
     }
 
   return std::make_tuple(true, "");
