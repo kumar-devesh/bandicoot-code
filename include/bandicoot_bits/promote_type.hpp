@@ -17,14 +17,14 @@
 template<typename T1, typename T2>
 struct is_promotable
   {
-  static const bool value = false;
+  static constexpr bool value = false;
   typedef T1 result;
   };
 
 
 struct is_promotable_ok
   {
-  static const bool value = true;
+  static constexpr bool value = true;
   };
 
 

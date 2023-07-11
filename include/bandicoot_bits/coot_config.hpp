@@ -17,23 +17,23 @@
 struct coot_config
   {
   #if defined(COOT_NO_DEBUG)
-    static const bool debug = false;
+    static constexpr bool debug = false;
   #else
-    static const bool debug = true;
+    static constexpr bool debug = true;
   #endif
 
 
   #if defined(COOT_EXTRA_DEBUG)
-    static const bool extra_debug = true;
+    static constexpr bool extra_debug = true;
   #else
-    static const bool extra_debug = false;
+    static constexpr bool extra_debug = false;
   #endif
 
 
   #if defined(COOT_GOOD_COMPILER)
-    static const bool good_comp = true;
+    static constexpr bool good_comp = true;
   #else
-    static const bool good_comp = false;
+    static constexpr bool good_comp = false;
   #endif
 
 
@@ -42,16 +42,16 @@ struct coot_config
       || defined(COOT_EXTRA_COL_BONES)   || defined(COOT_EXTRA_COL_MEAT)   \
       || defined(COOT_EXTRA_ROW_BONES)   || defined(COOT_EXTRA_ROW_MEAT)   \
       )
-    static const bool extra_code = true;
+    static constexpr bool extra_code = true;
   #else
-    static const bool extra_code = false;
+    static constexpr bool extra_code = false;
   #endif
 
 
   // TODO: may need to link with -lbandicoot anyway, to provide the runtime library
   #if defined(COOT_USE_WRAPPER)
-    static const bool wrapper = true;
+    static constexpr bool wrapper = true;
   #else
-    static const bool wrapper = false;
+    static constexpr bool wrapper = false;
   #endif
   };

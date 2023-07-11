@@ -48,8 +48,8 @@ class SizeProxy< Mat<eT> >
   typedef typename get_pod_type<elem_type>::result pod_type;
   typedef Mat<eT>                                  stored_type;
 
-  static const bool is_row = false;
-  static const bool is_col = false;
+  static constexpr bool is_row = false;
+  static constexpr bool is_col = false;
 
   coot_aligned const Mat<eT>& Q;
 
@@ -59,9 +59,9 @@ class SizeProxy< Mat<eT> >
     coot_extra_debug_sigprint();
     }
 
-  coot_aligned uword get_n_rows() const { return Q.n_rows; }
-  coot_aligned uword get_n_cols() const { return Q.n_cols; }
-  coot_aligned uword get_n_elem() const { return Q.n_elem; }
+  coot_inline uword get_n_rows() const { return Q.n_rows; }
+  coot_inline uword get_n_cols() const { return Q.n_cols; }
+  coot_inline uword get_n_elem() const { return Q.n_elem; }
   };
 
 
@@ -75,8 +75,8 @@ class SizeProxy< Col<eT> >
   typedef typename get_pod_type<elem_type>::result pod_type;
   typedef Col<eT>                                  stored_type;
 
-  static const bool is_row = false;
-  static const bool is_col = true;
+  static constexpr bool is_row = false;
+  static constexpr bool is_col = true;
 
   coot_aligned const Col<eT>& Q;
 
@@ -86,9 +86,9 @@ class SizeProxy< Col<eT> >
     coot_extra_debug_sigprint();
     }
 
-  coot_aligned uword get_n_rows() const { return Q.n_rows; }
-  coot_aligned uword get_n_cols() const { return Q.n_cols; }
-  coot_aligned uword get_n_elem() const { return Q.n_elem; }
+  coot_inline uword get_n_rows() const { return Q.n_rows; }
+  constexpr   uword get_n_cols() const { return uword(1); }
+  coot_inline uword get_n_elem() const { return Q.n_elem; }
   };
 
 
@@ -102,8 +102,8 @@ class SizeProxy< Row<eT> >
   typedef typename get_pod_type<elem_type>::result pod_type;
   typedef Row<eT>                                  stored_type;
 
-  static const bool is_row = true;
-  static const bool is_col = false;
+  static constexpr bool is_row = true;
+  static constexpr bool is_col = false;
 
   coot_aligned const Row<eT>& Q;
 
@@ -113,9 +113,9 @@ class SizeProxy< Row<eT> >
     coot_extra_debug_sigprint();
     }
 
-  coot_aligned uword get_n_rows() const { return Q.n_rows; }
-  coot_aligned uword get_n_cols() const { return Q.n_cols; }
-  coot_aligned uword get_n_elem() const { return Q.n_elem; }
+  constexpr   uword get_n_rows() const { return uword(1); }
+  coot_inline uword get_n_cols() const { return Q.n_cols; }
+  coot_inline uword get_n_elem() const { return Q.n_elem; }
   };
 
 
@@ -129,8 +129,8 @@ class SizeProxy< subview<eT> >
   typedef typename get_pod_type<elem_type>::result pod_type;
   typedef subview<eT>                              stored_type;
 
-  static const bool is_row = false;
-  static const bool is_col = false;
+  static constexpr bool is_row = false;
+  static constexpr bool is_col = false;
 
   coot_aligned const subview<eT>& Q;
 
@@ -140,9 +140,9 @@ class SizeProxy< subview<eT> >
     coot_extra_debug_sigprint();
     }
 
-  coot_aligned uword get_n_rows() const { return Q.n_rows; }
-  coot_aligned uword get_n_cols() const { return Q.n_cols; }
-  coot_aligned uword get_n_elem() const { return Q.n_elem; }
+  coot_inline uword get_n_rows() const { return Q.n_rows; }
+  coot_inline uword get_n_cols() const { return Q.n_cols; }
+  coot_inline uword get_n_elem() const { return Q.n_elem; }
   };
 
 
@@ -156,8 +156,8 @@ class SizeProxy< subview_col<eT> >
   typedef typename get_pod_type<elem_type>::result pod_type;
   typedef subview_col<eT>                          stored_type;
 
-  static const bool is_row = false;
-  static const bool is_col = true;
+  static constexpr bool is_row = false;
+  static constexpr bool is_col = true;
 
   coot_aligned const subview_col<eT>& Q;
 
@@ -167,9 +167,9 @@ class SizeProxy< subview_col<eT> >
     coot_extra_debug_sigprint();
     }
 
-  coot_aligned uword get_n_rows() const { return Q.n_rows; }
-  coot_aligned uword get_n_cols() const { return Q.n_cols; }
-  coot_aligned uword get_n_elem() const { return Q.n_elem; }
+  coot_inline uword get_n_rows() const { return Q.n_rows; }
+  constexpr   uword get_n_cols() const { return uword(1); }
+  coot_inline uword get_n_elem() const { return Q.n_elem; }
   };
 
 
@@ -183,8 +183,8 @@ class SizeProxy< subview_row<eT> >
   typedef typename get_pod_type<elem_type>::result pod_type;
   typedef subview_row<eT>                          stored_type;
 
-  static const bool is_row = true;
-  static const bool is_col = false;
+  static constexpr bool is_row = true;
+  static constexpr bool is_col = false;
 
   coot_aligned const subview_row<eT>& Q;
 
@@ -194,9 +194,9 @@ class SizeProxy< subview_row<eT> >
     coot_extra_debug_sigprint();
     }
 
-  coot_aligned uword get_n_rows() const { return Q.n_rows; }
-  coot_aligned uword get_n_cols() const { return Q.n_cols; }
-  coot_aligned uword get_n_elem() const { return Q.n_elem; }
+  constexpr   uword get_n_rows() const { return uword(1); }
+  coot_inline uword get_n_cols() const { return Q.n_cols; }
+  coot_inline uword get_n_elem() const { return Q.n_elem; }
   };
 
 
@@ -210,8 +210,8 @@ class SizeProxy< diagview<eT> >
   typedef typename get_pod_type<elem_type>::result pod_type;
   typedef diagview<eT>                             stored_type;
 
-  static const bool is_row = false;
-  static const bool is_col = true;
+  static constexpr bool is_row = false;
+  static constexpr bool is_col = true;
 
   coot_aligned const diagview<eT>& Q;
 
@@ -221,9 +221,9 @@ class SizeProxy< diagview<eT> >
     coot_extra_debug_sigprint();
     }
 
-  coot_aligned uword get_n_rows() const { return Q.n_rows; }
-  coot_aligned uword get_n_cols() const { return 1; }
-  coot_aligned uword get_n_elem() const { return Q.n_elem; }
+  coot_inline uword get_n_rows() const { return Q.n_rows; }
+  constexpr   uword get_n_cols() const { return uword(1); }
+  coot_inline uword get_n_elem() const { return Q.n_elem; }
   };
 
 
@@ -238,8 +238,8 @@ class SizeProxy< eOp<T1, eop_type> >
   typedef typename get_pod_type<elem_type>::result pod_type;
   typedef eOp<T1, eop_type>                        stored_type;
 
-  static const bool is_row = eOp<T1, eop_type>::is_row;
-  static const bool is_col = eOp<T1, eop_type>::is_col;
+  static constexpr bool is_row = eOp<T1, eop_type>::is_row;
+  static constexpr bool is_col = eOp<T1, eop_type>::is_col;
 
   coot_aligned const eOp<T1, eop_type>& Q;
 
@@ -249,9 +249,9 @@ class SizeProxy< eOp<T1, eop_type> >
     coot_extra_debug_sigprint();
     }
 
-  coot_aligned uword get_n_rows() const { return Q.get_n_rows(); }
-  coot_aligned uword get_n_cols() const { return Q.get_n_cols(); }
-  coot_aligned uword get_n_elem() const { return Q.get_n_elem(); }
+  coot_inline uword get_n_rows() const { return Q.get_n_rows(); }
+  coot_inline uword get_n_cols() const { return Q.get_n_cols(); }
+  coot_inline uword get_n_elem() const { return Q.get_n_elem(); }
   };
 
 
@@ -266,8 +266,8 @@ class SizeProxy< eGlue<T1, T2, eglue_type> >
   typedef typename get_pod_type<elem_type>::result pod_type;
   typedef eGlue<T1, T2, eglue_type>                stored_type;
 
-  static const bool is_row = eGlue<T1, T2, eglue_type>::is_row;
-  static const bool is_col = eGlue<T1, T2, eglue_type>::is_col;
+  static constexpr bool is_row = eGlue<T1, T2, eglue_type>::is_row;
+  static constexpr bool is_col = eGlue<T1, T2, eglue_type>::is_col;
 
   coot_aligned const eGlue<T1, T2, eglue_type>& Q;
 
@@ -277,9 +277,9 @@ class SizeProxy< eGlue<T1, T2, eglue_type> >
     coot_extra_debug_sigprint();
     }
 
-  coot_aligned uword get_n_rows() const { return Q.get_n_rows(); }
-  coot_aligned uword get_n_cols() const { return Q.get_n_cols(); }
-  coot_aligned uword get_n_elem() const { return Q.get_n_elem(); }
+  coot_inline uword get_n_rows() const { return Q.get_n_rows(); }
+  coot_inline uword get_n_cols() const { return Q.get_n_cols(); }
+  coot_inline uword get_n_elem() const { return Q.get_n_elem(); }
   };
 
 
@@ -294,8 +294,8 @@ class SizeProxy< Op<T1, op_type> >
   typedef typename get_pod_type<elem_type>::result pod_type;
   typedef Op<T1, op_type>                          stored_type;
 
-  static const bool is_row = Op<T1, op_type>::is_row;
-  static const bool is_col = Op<T1, op_type>::is_col;
+  static constexpr bool is_row = Op<T1, op_type>::is_row;
+  static constexpr bool is_col = Op<T1, op_type>::is_col;
 
   coot_aligned const SizeProxy<T1> S;
   coot_aligned const Op<T1, op_type>& Q;
@@ -307,9 +307,9 @@ class SizeProxy< Op<T1, op_type> >
     coot_extra_debug_sigprint();
     }
 
-  coot_aligned uword get_n_rows() const { return op_type::compute_n_rows(Q, S.get_n_rows(), S.get_n_cols()); }
-  coot_aligned uword get_n_cols() const { return op_type::compute_n_cols(Q, S.get_n_rows(), S.get_n_cols()); }
-  coot_aligned uword get_n_elem() const { return get_n_rows() * get_n_cols(); }
+  coot_inline uword get_n_rows() const { return op_type::compute_n_rows(Q, S.get_n_rows(), S.get_n_cols()); }
+  coot_inline uword get_n_cols() const { return op_type::compute_n_cols(Q, S.get_n_rows(), S.get_n_cols()); }
+  coot_inline uword get_n_elem() const { return get_n_rows() * get_n_cols(); }
   };
 
 
@@ -323,8 +323,8 @@ class SizeProxy< mtOp<out_eT, T1, mtop_type> >
   typedef typename get_pod_type<elem_type>::result pod_type;
   typedef mtOp<out_eT, T1, mtop_type>              stored_type;
 
-  static const bool is_row = mtOp<out_eT, T1, mtop_type>::is_row;
-  static const bool is_col = mtOp<out_eT, T1, mtop_type>::is_col;
+  static constexpr bool is_row = mtOp<out_eT, T1, mtop_type>::is_row;
+  static constexpr bool is_col = mtOp<out_eT, T1, mtop_type>::is_col;
 
   coot_aligned const SizeProxy<T1> S;
   coot_aligned const mtOp<out_eT, T1, mtop_type>& Q;
@@ -336,9 +336,9 @@ class SizeProxy< mtOp<out_eT, T1, mtop_type> >
     coot_extra_debug_sigprint();
     }
 
-  coot_aligned uword get_n_rows() const { return mtop_type::compute_n_rows(Q, S.get_n_rows(), S.get_n_cols()); }
-  coot_aligned uword get_n_cols() const { return mtop_type::compute_n_cols(Q, S.get_n_rows(), S.get_n_cols()); }
-  coot_aligned uword get_n_elem() const { return get_n_rows() * get_n_cols(); }
+  coot_inline uword get_n_rows() const { return mtop_type::compute_n_rows(Q, S.get_n_rows(), S.get_n_cols()); }
+  coot_inline uword get_n_cols() const { return mtop_type::compute_n_cols(Q, S.get_n_rows(), S.get_n_cols()); }
+  coot_inline uword get_n_elem() const { return get_n_rows() * get_n_cols(); }
   };
 
 
@@ -352,8 +352,8 @@ class SizeProxy< Glue<T1, T2, glue_type> >
   typedef typename get_pod_type<elem_type>::result pod_type;
   typedef Glue<T1, T2, glue_type>                  stored_type;
 
-  static const bool is_row = Glue<T1, T2, glue_type>::is_row;
-  static const bool is_col = Glue<T1, T2, glue_type>::is_col;
+  static constexpr bool is_row = Glue<T1, T2, glue_type>::is_row;
+  static constexpr bool is_col = Glue<T1, T2, glue_type>::is_col;
 
   coot_aligned const SizeProxy<T1> S1;
   coot_aligned const SizeProxy<T2> S2;
@@ -368,9 +368,9 @@ class SizeProxy< Glue<T1, T2, glue_type> >
     }
 
   // Each glue_type must implement compute_n_rows() and compute_n_cols()
-  coot_aligned uword get_n_rows() const { return glue_type::compute_n_rows(Q, S1.get_n_rows(), S1.get_n_cols(), S2.get_n_rows(), S2.get_n_cols()); }
-  coot_aligned uword get_n_cols() const { return glue_type::compute_n_cols(Q, S1.get_n_rows(), S1.get_n_cols(), S2.get_n_rows(), S2.get_n_cols()); }
-  coot_aligned uword get_n_elem() const { return get_n_rows() * get_n_cols(); }
+  coot_inline uword get_n_rows() const { return glue_type::compute_n_rows(Q, S1.get_n_rows(), S1.get_n_cols(), S2.get_n_rows(), S2.get_n_cols()); }
+  coot_inline uword get_n_cols() const { return glue_type::compute_n_cols(Q, S1.get_n_rows(), S1.get_n_cols(), S2.get_n_rows(), S2.get_n_cols()); }
+  coot_inline uword get_n_elem() const { return get_n_rows() * get_n_cols(); }
   };
 
 
@@ -384,8 +384,8 @@ class SizeProxy< mtGlue<out_eT, T1, T2, mtglue_type> >
   typedef typename get_pod_type<elem_type>::result pod_type;
   typedef mtGlue<out_eT, T1, T2, mtglue_type>      stored_type;
 
-  static const bool is_row = mtGlue<out_eT, T1, T2, mtglue_type>::is_row;
-  static const bool is_col = mtGlue<out_eT, T1, T2, mtglue_type>::is_col;
+  static constexpr bool is_row = mtGlue<out_eT, T1, T2, mtglue_type>::is_row;
+  static constexpr bool is_col = mtGlue<out_eT, T1, T2, mtglue_type>::is_col;
 
   coot_aligned const SizeProxy<T1> S1;
   coot_aligned const SizeProxy<T2> S2;
@@ -400,7 +400,7 @@ class SizeProxy< mtGlue<out_eT, T1, T2, mtglue_type> >
     }
 
   // Each mtglue_type must implement compute_n_rows() and compute_n_cols()
-  coot_aligned uword get_n_rows() const { return mtglue_type::compute_n_rows(Q, S1.get_n_rows(), S1.get_n_cols(), S2.get_n_rows(), S2.get_n_cols()); }
-  coot_aligned uword get_n_cols() const { return mtglue_type::compute_n_cols(Q, S1.get_n_rows(), S1.get_n_cols(), S2.get_n_rows(), S2.get_n_cols()); }
-  coot_aligned uword get_n_elem() const { return get_n_rows() * get_n_cols(); }
+  coot_inline uword get_n_rows() const { return mtglue_type::compute_n_rows(Q, S1.get_n_rows(), S1.get_n_cols(), S2.get_n_rows(), S2.get_n_cols()); }
+  coot_inline uword get_n_cols() const { return mtglue_type::compute_n_cols(Q, S1.get_n_rows(), S1.get_n_cols(), S2.get_n_rows(), S2.get_n_cols()); }
+  coot_inline uword get_n_elem() const { return get_n_rows() * get_n_cols(); }
   };
