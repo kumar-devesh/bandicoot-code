@@ -12,9 +12,8 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-#include <bandicoot>
-// Armadillo is intentionally included after Bandicoot, to ensure that include order does not matter.
 #include <armadillo>
+#include <bandicoot>
 #include "catch.hpp"
 
 using namespace coot;

@@ -45,10 +45,10 @@
 #include <mutex>
 
 
-// TODO: the following includes are probably not necessary as a lot of Armadillo functionality is being reused
 
-#include <sys/types.h>
-#include <sys/stat.h>
+
+#include <sys/types.h>  // TODO: do we need this?  it's not part of the C++ standard
+#include <sys/stat.h>   // TODO: do we need this?  it's not part of the C++ standard
 #include <errno.h>
 #include <iomanip>
 #include <climits>
@@ -61,14 +61,14 @@
 #include <random>
 #include <cstring>
 
-#ifndef WIN32
+#if ( defined(__unix__) || defined(__unix) || defined(_POSIX_C_SOURCE) || (defined(__APPLE__) && defined(__MACH__)) ) && !defined(_WIN32)
   #include <unistd.h>
-  #include <pwd.h>
+  #include <pwd.h>     // TODO: do we need this?  doesn't seem relevant to Bandicoot
 #endif
 
 // For compatibility with Armadillo, if Bandicoot was included first.
 // Note that if Armadillo is never included, it's okay.
-#if !defined(ARMA_VERSION_MAJOR)
+#if !defined(COOT_HAVE_ARMA)
   #include "bandicoot_bits/arma_forward.hpp"
 #endif
 

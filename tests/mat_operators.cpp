@@ -12,8 +12,8 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-#include <bandicoot>
 #include <armadillo>
+#include <bandicoot>
 #include "catch.hpp"
 
 using namespace coot;
