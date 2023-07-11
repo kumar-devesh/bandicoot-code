@@ -43,12 +43,6 @@
 
 
 #include <mutex>
-
-
-
-
-#include <sys/types.h>  // TODO: do we need this?  it's not part of the C++ standard
-#include <sys/stat.h>   // TODO: do we need this?  it's not part of the C++ standard
 #include <errno.h>
 #include <iomanip>
 #include <climits>
@@ -62,8 +56,11 @@
 #include <cstring>
 
 #if ( defined(__unix__) || defined(__unix) || defined(_POSIX_C_SOURCE) || (defined(__APPLE__) && defined(__MACH__)) ) && !defined(_WIN32)
+  #define COOT_HAS_POSIX_FILE_FUNCTIONS
+
   #include <unistd.h>
-  #include <pwd.h>     // TODO: do we need this?  doesn't seem relevant to Bandicoot
+  #include <pwd.h>
+  #include <sys/stat.h>
 #endif
 
 // For compatibility with Armadillo, if Bandicoot was included first.
