@@ -264,9 +264,17 @@ Row<eT>::operator=(const arma::Row<eT>& X)
   {
   coot_extra_debug_sigprint();
 
-  (*this).set_size(X.n_rows, X.n_cols);
+  #if defined(COOT_HAVE_ARMA)
+    {
+    (*this).set_size(X.n_rows, X.n_cols);
 
-  (*this).copy_into_dev_mem(X.memptr(), (*this).n_elem);
+    (*this).copy_into_dev_mem(X.memptr(), (*this).n_elem);
+    }
+  #else
+    {
+    coot_stop_logic_error("#include <armadillo> must be before #include <bandicoot>");
+    }
+  #endif
 
   return *this;
   }
@@ -279,11 +287,21 @@ Row<eT>::operator arma::Row<eT>() const
   {
   coot_extra_debug_sigprint();
 
-  arma::Row<eT> out(1, Mat<eT>::n_cols);
+  #if defined(COOT_HAVE_ARMA)
+    {
+    arma::Row<eT> out(1, Mat<eT>::n_cols);
 
-  (*this).copy_from_dev_mem(out.memptr(), (*this).n_elem);
+    (*this).copy_from_dev_mem(out.memptr(), (*this).n_elem);
 
-  return out;
+    return out;
+    }
+  #else
+    {
+    coot_stop_logic_error("#include <armadillo> must be before #include <bandicoot>");
+
+    return arma::Row<eT>();
+    }
+  #endif
   }
 
 

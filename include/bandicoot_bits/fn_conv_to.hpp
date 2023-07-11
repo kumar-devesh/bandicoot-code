@@ -141,10 +141,20 @@ struct conv_to
     {
     coot_extra_debug_sigprint();
 
-    arma::Mat<out_eT> M = arma::conv_to<arma::Mat<out_eT>>::from(in);
-    T2 out(M); // must be Mat, Row, or Col (either Bandicoot or Armadillo)
+    #if defined(COOT_HAVE_ARMA)
+      {
+      arma::Mat<out_eT> M = arma::conv_to<arma::Mat<out_eT>>::from(in);
+      T2 out(M); // must be Mat, Row, or Col (either Bandicoot or Armadillo)
 
-    return out;
+      return out;
+      }
+    #else
+      {
+      coot_stop_logic_error("#include <armadillo> must be before #include <bandicoot>");
+
+      return T2();
+      }
+    #endif
     }
 
 
@@ -159,14 +169,26 @@ struct conv_to
   >::result
   from(const T1& in)
     {
-    typedef typename T1::elem_type eT;
+    coot_extra_debug_sigprint();
 
-    unwrap<T1> U(in);
-    extract_subview<typename unwrap<T1>::stored_type> E(U.M);
-    arma::Mat<eT> M(E.M);
+    #if defined(COOT_HAVE_ARMA)
+      {
+      typedef typename T1::elem_type eT;
 
-    T2 out = arma::conv_to<T2>::from(M);
+      unwrap<T1> U(in);
+      extract_subview<typename unwrap<T1>::stored_type> E(U.M);
+      arma::Mat<eT> M(E.M);
 
-    return out;
+      T2 out = arma::conv_to<T2>::from(M);
+
+      return out;
+      }
+    #else
+      {
+      coot_stop_logic_error("#include <armadillo> must be before #include <bandicoot>");
+
+      return T2();
+      }
+    #endif
     }
   };
