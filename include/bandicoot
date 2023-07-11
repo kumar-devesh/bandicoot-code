@@ -18,9 +18,6 @@
 
 #include <cassert>  // TODO: remove this after all of the code has been adapted
 
-#include <armadillo>  // TODO: make use of Armadillo optional?
-
-
 #undef  CL_USE_DEPRECATED_OPENCL_1_2_APIS
 #define CL_USE_DEPRECATED_OPENCL_1_2_APIS
 
@@ -54,16 +51,26 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <iomanip>
-#include <limits.h>
-#include <float.h>
+#include <climits>
+#include <limits>
+#include <cfloat>
+#include <iostream>
+#include <fstream>
+#include <complex>
+#include <vector>
+#include <random>
+#include <cstring>
 
 #ifndef WIN32
   #include <unistd.h>
   #include <pwd.h>
 #endif
 
-// TODO: include any stuff here that is not meant to be in the coot namespace
-
+// For compatibility with Armadillo, if Bandicoot was included first.
+// Note that if Armadillo is never included, it's okay.
+#if !defined(ARMA_VERSION_MAJOR)
+  #include "bandicoot_bits/arma_forward.hpp"
+#endif
 
 // namespace for bandicoot classes and functions
 namespace coot
@@ -459,6 +466,14 @@ namespace coot
   #include "bandicoot_bits/strip.hpp"
   #include "bandicoot_bits/extract_subview.hpp"
   #include "bandicoot_bits/copy_alias.hpp"
+
+
+
+  //
+  // ostream
+
+  #include "bandicoot_bits/coot_ostream_bones.hpp"
+  #include "bandicoot_bits/coot_ostream_meat.hpp"
 
 
 

@@ -419,7 +419,7 @@ if(FIND_CUDA)
       # That will cause CMake to link against the imported target, instead of just the library.
       # It's good to do that, because it's possible that each imported target may need to link against more than just the individual library.
       # (That is, it may have dependencies itself, and so linking against "CUDA::cudart" may link against more than one library.)
-      set(CUDA_LIBRARIES CUDA::cudart)
+      set(CUDA_LIBRARIES CUDA::cudart CUDA::cuda_driver)
       set(CUDA_CUBLAS_LIBRARIES CUDA::cublas)
       set(CUDA_curand_LIBRARY CUDA::curand)
       set(CUDA_cusolver_LIBRARY CUDA::cusolver)
@@ -428,14 +428,15 @@ if(FIND_CUDA)
 
       # However, we want to print to the user the specific things they are linking against, because they may read the output.
       # We have to therefore recover the path explicitly.
+      get_target_property(CUDADRIVER_LOC CUDA::cuda_driver IMPORTED_LOCATION)
       get_target_property(CUDART_LOC CUDA::cudart IMPORTED_LOCATION)
       get_target_property(CUBLAS_LOC CUDA::cublas IMPORTED_LOCATION)
       get_target_property(CURAND_LOC CUDA::curand IMPORTED_LOCATION)
       get_target_property(CUSOLVER_LOC CUDA::cusolver IMPORTED_LOCATION)
       get_target_property(NVRTC_LOC CUDA::nvrtc IMPORTED_LOCATION)
 
-      set(CUDA_LIBS_NOPRINT CUDA::cudart CUDA::cublas CUDA::curand CUDA::cusolver CUDA::nvrtc)
-      set(CUDA_LIBS_PRINT ${CUDART_LOC} ${CUBLAS_LOC} ${CURAND_LOC} ${CUSOLVER_LOC} ${NVRTC_LOC})
+      set(CUDA_LIBS_NOPRINT CUDA::cudart CUDA::cuda_driver CUDA::cublas CUDA::curand CUDA::cusolver CUDA::nvrtc)
+      set(CUDA_LIBS_PRINT ${CUDART_LOC} ${CUDADRIVER_LOC} ${CUBLAS_LOC} ${CURAND_LOC} ${CUSOLVER_LOC} ${NVRTC_LOC})
 
       # Set these so the next section succeeds.
       if(NOT CUDA_LIBRARIES)

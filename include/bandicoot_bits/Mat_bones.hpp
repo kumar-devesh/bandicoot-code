@@ -187,8 +187,6 @@ class Mat : public Base< eT, Mat<eT> >
   inline void  reshape(const uword new_n_rows, const uword new_n_cols);
   inline void  reshape(const SizeMat& s);
 
-  inline void impl_print(const std::string extra_text) const;
-
   coot_warn_unused inline bool is_vec()    const;
   coot_warn_unused inline bool is_colvec() const;
   coot_warn_unused inline bool is_rowvec() const;

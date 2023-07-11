@@ -2052,26 +2052,6 @@ Mat<eT>::resize(const SizeMat& s)
 
 template<typename eT>
 inline
-void
-Mat<eT>::impl_print(const std::string extra_text) const
-  {
-  coot_extra_debug_sigprint();
-
-  try
-    {
-    arma::Mat<eT> tmp(n_rows,n_cols);
-
-    (*this).copy_from_dev_mem( tmp.memptr(), n_elem);
-
-    tmp.print(extra_text);
-    }
-  catch(...) {}
-  }
-
-
-
-template<typename eT>
-inline
 bool
 Mat<eT>::is_vec() const
   {
