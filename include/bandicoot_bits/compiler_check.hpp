@@ -64,3 +64,16 @@
 #if !defined(COOT_HAVE_CXX11)
   #error "*** C++11 compiler required; enable C++11 mode in your compiler"
 #endif
+
+
+#undef COOT_HAVE_ARMA
+
+#if defined(ARMA_VERSION_MAJOR)
+  
+  #define COOT_HAVE_ARMA
+  
+  #if (ARMA_VERSION_MAJOR < 9)
+    #pragma message ("WARNING: detected unsupported version of Armadillo")
+  #endif
+  
+#endif

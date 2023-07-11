@@ -30,7 +30,7 @@ struct unwrap
   Mat<eT> M;
 
   template<typename eT2>
-  coot_inline bool is_alias(const Mat<eT2>&) const { return false; }
+  constexpr bool is_alias(const Mat<eT2>&) const { return false; }
   template<typename eT2>
   coot_inline bool is_alias(const subview<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X.m)); }
   };
@@ -189,12 +189,12 @@ struct partial_unwrap
     coot_extra_debug_sigprint();
     }
 
-  coot_inline eT get_val() const { return eT(1); }
+  constexpr eT get_val() const { return eT(1); }
 
-  coot_inline bool is_alias(const Mat<eT>&) const { return false; }
+  constexpr bool is_alias(const Mat<eT>&) const { return false; }
 
-  static const bool do_trans = false;
-  static const bool do_times = false;
+  static constexpr bool do_trans = false;
+  static constexpr bool do_times = false;
 
   const Mat<eT> M;
   };
@@ -213,12 +213,12 @@ struct partial_unwrap< Mat<eT> >
     coot_extra_debug_sigprint();
     }
 
-  coot_inline eT get_val() const { return eT(1); }
+  constexpr eT get_val() const { return eT(1); }
 
   coot_inline bool is_alias(const Mat<eT>& X) const { return ((&X) == (&M)); }
 
-  static const bool do_trans = false;
-  static const bool do_times = false;
+  static constexpr bool do_trans = false;
+  static constexpr bool do_times = false;
 
   const Mat<eT>& M;
   };
@@ -238,12 +238,12 @@ struct partial_unwrap< Op<T1, op_htrans> >
     coot_extra_debug_sigprint();
     }
 
-  coot_inline eT get_val() const { return eT(1); }
+  constexpr eT get_val() const { return eT(1); }
 
-  coot_inline bool is_alias(const Mat<eT>&) const { return false; }
+  constexpr bool is_alias(const Mat<eT>&) const { return false; }
 
-  static const bool do_trans = true;
-  static const bool do_times = false;
+  static constexpr bool do_trans = true;
+  static constexpr bool do_times = false;
 
   const Mat<eT> M;
   };
@@ -262,12 +262,12 @@ struct partial_unwrap< Op< Mat<eT>, op_htrans> >
     coot_extra_debug_sigprint();
     }
 
-  coot_inline eT get_val() const { return eT(1); }
+  constexpr eT get_val() const { return eT(1); }
 
   coot_inline bool is_alias(const Mat<eT>& X) const { return (void_ptr(&X) == void_ptr(&M)); }
 
-  static const bool do_trans = true;
-  static const bool do_times = false;
+  static constexpr bool do_trans = true;
+  static constexpr bool do_times = false;
 
   const Mat<eT>& M;
   };
@@ -290,10 +290,10 @@ struct partial_unwrap< Op<T1, op_htrans2> >
 
   coot_inline eT get_val() const { return val; }
 
-  coot_inline bool is_alias(const Mat<eT>&) const { return false; }
+  constexpr bool is_alias(const Mat<eT>&) const { return false; }
 
-  static const bool do_trans = true;
-  static const bool do_times = true;
+  static constexpr bool do_trans = true;
+  static constexpr bool do_times = true;
 
   const eT      val;
   const Mat<eT> M;
@@ -314,12 +314,12 @@ struct partial_unwrap< Op< Mat<eT>, op_htrans2> >
     coot_extra_debug_sigprint();
     }
 
-  inline eT get_val() const { return val; }
+  coot_inline eT get_val() const { return val; }
 
   coot_inline bool is_alias(const Mat<eT>& X) const { return (void_ptr(&X) == void_ptr(&M)); }
 
-  static const bool do_trans = true;
-  static const bool do_times = true;
+  static constexpr bool do_trans = true;
+  static constexpr bool do_times = true;
 
   const eT       val;
   const Mat<eT>& M;
@@ -340,12 +340,12 @@ struct partial_unwrap< eOp<Mat<eT>, eop_scalar_times> >
     coot_extra_debug_sigprint();
     }
 
-  inline eT get_val() const { return val; }
+  coot_inline eT get_val() const { return val; }
 
   coot_inline bool is_alias(const Mat<eT>& X) const { return (void_ptr(&X) == void_ptr(&M)); }
 
-  static const bool do_trans = false;
-  static const bool do_times = true;
+  static constexpr bool do_trans = false;
+  static constexpr bool do_times = true;
 
   const eT       val;
   const Mat<eT>& M;
@@ -365,12 +365,12 @@ struct partial_unwrap< eOp<Mat<eT>, eop_neg> >
     coot_extra_debug_sigprint();
     }
 
-  coot_inline eT get_val() const { return eT(-1); }
+  constexpr eT get_val() const { return eT(-1); }
 
   coot_inline bool is_alias(const Mat<eT>& X) const { return (void_ptr(&X) == void_ptr(&M)); }
 
-  static const bool do_trans = false;
-  static const bool do_times = true;
+  static constexpr bool do_trans = false;
+  static constexpr bool do_times = true;
 
   const Mat<eT>& M;
   };
@@ -393,12 +393,12 @@ struct partial_unwrap< mtOp<eT, T1, mtop_type> >
     coot_extra_debug_sigprint();
     }
 
-  inline eT get_val() const { return Q.get_val(); }
+  coot_inline eT get_val() const { return Q.get_val(); }
 
-  coot_inline bool is_alias(const Mat<eT>& X) const { return false; }
+  constexpr bool is_alias(const Mat<eT>&) const { return false; }
 
-  static const bool do_trans = partial_unwrap<T1>::do_trans;
-  static const bool do_times = partial_unwrap<T1>::do_times;
+  static constexpr bool do_trans = partial_unwrap<T1>::do_trans;
+  static constexpr bool do_times = partial_unwrap<T1>::do_times;
 
   const partial_unwrap<T1> Q;
   Mat<eT> M;

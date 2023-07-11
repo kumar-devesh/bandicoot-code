@@ -14,6 +14,7 @@
 
 // Tests for .diag(), diagmat(), diagvec(), and related functions.
 
+#include <armadillo>
 #include <bandicoot>
 #include "catch.hpp"
 

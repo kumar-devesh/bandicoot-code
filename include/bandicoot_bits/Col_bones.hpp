@@ -24,9 +24,9 @@ class Col : public Mat<eT>
   typedef eT                                elem_type;  // the type of elements stored in the matrix
   typedef typename get_pod_type<eT>::result  pod_type;  // if eT is std::complex<T>, pod_type is T; otherwise pod_type is eT
 
-  static const bool is_col = true;
-  static const bool is_row = false;
-  static const bool is_xvec = true;
+  static constexpr bool is_col = true;
+  static constexpr bool is_row = false;
+  static constexpr bool is_xvec = true;
 
   inline          Col();
   inline explicit Col(const uword N);

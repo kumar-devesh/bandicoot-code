@@ -23,9 +23,9 @@ class subview : public Base<eT, subview<eT> >
 
   coot_aligned const Mat<eT>& m;
 
-  static const bool is_row = false;
-  static const bool is_col = false;
-  static const bool is_xvec = false;
+  static constexpr bool is_row = false;
+  static constexpr bool is_col = false;
+  static constexpr bool is_xvec = false;
 
   const uword aux_row1;
   const uword aux_col1;
@@ -115,9 +115,9 @@ class subview_col : public subview<eT>
   typedef eT                                       elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
 
-  static const bool is_row = false;
-  static const bool is_col = true;
-  static const bool is_xvec = true;
+  static constexpr bool is_row = false;
+  static constexpr bool is_col = true;
+  static constexpr bool is_xvec = true;
 
   coot_inline uword get_n_cols() const;
 
@@ -154,9 +154,9 @@ class subview_row : public subview<eT>
   typedef eT                                       elem_type;
   typedef typename get_pod_type<elem_type>::result pod_type;
 
-  static const bool is_row = true;
-  static const bool is_col = false;
-  static const bool is_xvec = true;
+  static constexpr bool is_row = true;
+  static constexpr bool is_col = false;
+  static constexpr bool is_xvec = true;
 
   coot_inline uword get_n_rows() const;
 

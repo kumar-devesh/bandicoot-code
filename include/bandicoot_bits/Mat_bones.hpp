@@ -28,9 +28,9 @@ class Mat : public Base< eT, Mat<eT> >
   coot_aligned const uword vec_state; // 0: matrix layout; 1: column vector layout; 2: row vector layout
   coot_aligned const uword mem_state; // 0: normal; 1: external;  TODO: should this be expanded to allow re-allocation if size of aux mem is smaller than requested size?
 
-  static const bool is_col = false;
-  static const bool is_row = false;
-  static const bool is_xvec = false;
+  static constexpr bool is_col = false;
+  static constexpr bool is_row = false;
+  static constexpr bool is_xvec = false;
 
 
   private:
@@ -186,8 +186,6 @@ class Mat : public Base< eT, Mat<eT> >
 
   inline void  reshape(const uword new_n_rows, const uword new_n_cols);
   inline void  reshape(const SizeMat& s);
-
-  inline void impl_print(const std::string extra_text) const;
 
   coot_warn_unused inline bool is_vec()    const;
   coot_warn_unused inline bool is_colvec() const;

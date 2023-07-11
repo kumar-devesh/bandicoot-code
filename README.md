@@ -1,9 +1,9 @@
 ### Bandicoot: C++ Library for GPU Linear Algebra & Scientific Computing
 https://coot.sourceforge.net
 
-Copyright 2017-2023 Conrad Sanderson (http://conradsanderson.id.au)
-Copyright 2017-2023 Ryan Curtin (http://www.ratml.org)
-Copyright 2017-2023 Marcus Edel (http://kurg.org)
+Copyright 2017-2023 Ryan Curtin (https://www.ratml.org)  
+Copyright 2017-2023 Marcus Edel (https://kurg.org)  
+Copyright 2017-2023 Conrad Sanderson (https://conradsanderson.id.au)
 
 ---
 
@@ -45,22 +45,26 @@ It supports the use of CUDA and OpenCL devices.
 It's useful for GPU algorithm development directly in C++,
 and/or quick conversion of research code into GPU-enabled production environments.
 It has high-level syntax and functionality which is deliberately similar to Matlab,
-and mirrors the API of the CPU-based [Armadillo](https://arma.sourceforge.net/) C++ linear algebra library for seamless conversion from CPU linear algebra to GPU linear algebra.
+and mirrors the API of the CPU-based [Armadillo](https://arma.sourceforge.net/)
+C++ linear algebra library.
 
-The library provides efficient classes for vectors and matrices,
-as well as many associated functions covering essential and advanced functionality for data processing and manipulation of matrices.
+Bandicoot provides efficient classes for vectors and matrices,
+as well as many associated functions covering essential
+and advanced functionality for data processing and manipulation of matrices.
 
-Various matrix decompositions (eigen, SVD, QR, etc.) are provided through GPU implementations, either internal to Bandicoot or through external libraries such as cuSolver.
+Various matrix decompositions (eigen, SVD, QR, etc.) are provided through GPU implementations,
+either internal to Bandicoot or through external libraries such as cuSolver.
 
-A sophisticated expression evaluator (via C++ template meta-programming) automatically combines several operations (at compile time) to increase speed and efficiency.
+A sophisticated expression evaluator (via C++ template meta-programming)
+automatically combines several operations (at compile time) to increase speed and efficiency.
 
 The library can be used for machine learning, pattern recognition, computer vision,
 signal processing, bioinformatics, statistics, finance, etc.
 
 Authors:
-  * Conrad Sanderson - http://conradsanderson.id.au
-  * Ryan Curtin      - http://www.ratml.org
-  * Marcus Edel      - http://kurg.org
+  * Ryan Curtin      - https://www.ratml.org
+  * Marcus Edel      - https://kurg.org
+  * Conrad Sanderson - https://conradsanderson.id.au
 
 ---
 
@@ -80,7 +84,8 @@ Bandicoot can be used in both open-source and proprietary (closed-source) softwa
 Bandicoot is licensed under the Apache license, Version 2.0 (the "License").
 A copy of the License is included in the "LICENSE.txt" file.
 
-Any software that incorporates or distributes Bandicoot in source or binary form must include, in the documentation and/or other materials provided with teh software,
+Any software that incorporates or distributes Bandicoot in source or binary form must include,
+in the documentation and/or other materials provided with the software,
 a readable copy of the attribution notices present in the "NOTICE.txt" file.
 See the License for details. The contents of the "NOTICE.txt" file are for
 informational purposes only and do not modify the License.
@@ -177,7 +182,9 @@ cmake -DCMAKE_INSTALL_PREFIX:PATH=alternative_directory .
 If CMake needs to be re-run, it's a good idea to first delete the `CMakeCache.txt` file (not `CMakeLists.txt`).
 
 **Caveat:** if Bandicoot is installed in a non-system directory,
-make sure that the C++ compiler is configured to use the `lib` and `include` sub-directories present within this directory.
+make sure that the C++ compiler is configured to use the `lib` and `include`
+sub-directories present within this directory.
+
 Note that the `lib` directory might be named differently on your system.
 On recent 64-bit Debian and Ubuntu systems it is `lib/x86_64-linux-gnu`.
 On recent 64-bit Fedora and RHEL systems it is `lib64`.
@@ -199,7 +206,8 @@ make install
 #### 5b: Manual Installation
 
 Manual installation involves simply copying the `include/bandicoot` header
-**and** the associated `include/bandicoot_bits` directory to a location such as `/usr/include/` which is searched by your C++ compiler.
+**and** the associated `include/bandicoot_bits` directory
+to a location such as `/usr/include/` which is searched by your C++ compiler.
 If you don't have sudo access or don't have write access to `/usr/include/`,
 use a directory within your own home directory (e.g. `/home/user/include/`).
 
@@ -212,9 +220,10 @@ Comment or uncomment the following lines:
 #define COOT_USE_CUDA
 ```
 
-Note that the manual installation will not generate the Bandicoot runtime librari,
+Note that the manual installation will not generate the Bandicoot runtime library,
 and hence you will need to link your programs directly with OpenBLAS, LAPACK, CUDA, OpenCL, etc.;
-see the [direct linking](https://coot.sourceforge.net/docs.html#direct_linking) section of the documentation for more details.
+see the [direct linking](https://coot.sourceforge.net/docs.html#direct_linking)
+section of the documentation for more details.
 
 ---
 
@@ -230,7 +239,9 @@ g++ prog.cpp -o prog -O2 -std=c++11 -lbandicoot
 If you have installed Bandicoot manually, link with OpenBLAS and LAPACK
 and the required libraries for the backend you are using,
 instead of the Bandicoot runtime library.
-If only the OpenCL backend is enabled (i.e. only `COOT_USE_OPENCL` is defined in `config.hpp`), use this command:
+If only the OpenCL backend is enabled
+(i.e. only `COOT_USE_OPENCL` is defined in `config.hpp`),
+use this command:
 
 ```
 g++ prog.cpp -o prog -O2 -std=c++11 -lopenblas -llapack -lOpenCL -lclBLAS
@@ -273,7 +284,7 @@ on macOS change `-lopenblas -llapack` to `-framework Accelerate`.
 The `examples/` directory contains a short example program that uses Bandicoot.
 
 We recommend that compilation is done with optimisation enabled,
-in order to make the best use of the extensive template meta-programming
+in order to make the best use of the template meta-programming
 techniques employed in Bandicoot.
 For GCC and Clang compilers, use `-O2` or `-O3` to enable optimisation.
 
@@ -294,19 +305,30 @@ Contributions to improve Windows documentation and test on Windows are greatly a
 
 ### 8: Adapting Armadillo Code to Bandicoot
 
-Users of Armadillo can easily adapt their code that runs on CPUs to Bandicoot.
+Users of Armadillo can adapt their code that runs on CPUs to Bandicoot.
 Bandicoot aims to be API-compatible with Armadillo.
-Ideally, all that is necessary is to replace `#include <armadillo>` with `#include <bandicoot>`,
+As a first step, replace `#include <armadillo>` with `#include <bandicoot>`,
 and any uses of `arma::` (or `using namespace arma`) with `coot::` (or `using namespace coot`).
 
-However, due to the fundamental differences between GPUs and CPUs,
-not all linear algebra programs written with Armadillo will benefit from conversions to Bandicoot.
+Due to inherent architectural differences between GPUs and CPUs, the following caveats apply: 
 
-When converting Armadillo code to use Bandicoot,
-there are a couple important points to keep in mind:
-
- * Consumer-grade GPUs may not show speedup (and may not support) double-precision floating-point matrices; use `coot::fmat` instead of `coot::mat` when possible
- * Individual elements accesses (e.g. `A(3, 4)`) incur CPU/GPU memory transfers; prefer batch operations (e.g. `A.zeros()`) whenever possible
+  * GPUs are best suited for operations on large matrices,
+    so small matrices (e.g. with size ≤ 100x100) may not obtain speedups
+  
+  * Individual element access such as X(i,j) has an overhead of transferring between the GPU and CPU;
+    when adapting Armadillo code to Bandicoot, direct element access should be avoided
+    
+  * Where possible, use batch operations with Bandicoot; e.g., use `A += 1` instead of
+    `for(uword i=0; i<A.n_elem; ++i) { A[i] += 1; }`
+  
+  * If direct element access cannot be avoided, consider temporarily transferring
+    the entire Bandicoot matrix to CPU-accessible memory by creating an Armadillo matrix
+    via `conv_to<arma::fmat>(X)`
+    
+  * Due to the overhead of direct element access, Bandicoot does not provide iterators
+  
+  * Consumer-level GPUs typically obtain better performance with 32-bit floating point elements
+    rather than 64-bit (e.g. `float` instead of `double`), so using `fmat` instead of `mat` is preferable
 
 See also the Armadillo/Bandicoot conversion guide:
 https://coot.sourgeforge.net/docs.html#arma_comparison
@@ -377,7 +399,7 @@ similar to [Semantic Versioning](https://semver.org/), as follows:
 
 **CAVEAT:**
 the above policy applies only to the public API described in the documentation.
-Ayn functionality within Bandicoot which is _not explicitly_ described
+Any functionality within Bandicoot which is _not explicitly_ described
 in the public API documentation is considered to be internal implementation details,
 and may be changed or removed without notice.
 
@@ -392,11 +414,12 @@ If you find a bug in the library or the documentation,
 we are interested in hearing about it.
 Please make a _small_ and _self-contained_ program which exposes the bug,
 and then send the program source and the bug description to the developers.
-The small program must have a `main()` function and use only functions/classes from Bandicoot, the standard C++ library, and possibly Armadillo (no other libraries).
+The small program must have a `main()` function and use only functions/classes from Bandicoot,
+the standard C++ library, and possibly Armadillo (no other libraries).
 
 If you are adapting Armadillo code to Bandicoot
 and find that Bandicoot is missing functionality,
-we are also interested in hearing about that so that we can prioritize functionality.
+we are also interested in hearing about that so that we can prioritize development efforts.
 
 The contact details for bug reporting can be found at:
 https://coot.sourceforge.net/contact.html

@@ -13,30 +13,26 @@
 // ------------------------------------------------------------------------
 
 
+// Definitions of Armadillo public classes that may be used by Bandicoot.
+// Note that Armadillo is not a requirement for Bandicoot, but Bandicoot provides some convenience interoperability functions.
+// In order to provide those, we at least need forward definitions of the relevant classes.
 
-template<typename eT, typename T1>
-inline
-std::ostream&
-operator<< (std::ostream& o, const Base<eT, T1>& X)
+namespace arma
   {
-  coot_extra_debug_sigprint();
 
-  const unwrap<T1> tmp(X.get_ref());
+  template<typename base, typename derived>
+  class Base;
 
-  coot_ostream::print(o, tmp.M, true);
+  template<typename eT>
+  class Mat;
 
-  return o;
-  }
+  template<typename eT>
+  class Col;
 
+  template<typename eT>
+  class Row;
 
+  template<typename T1>
+  struct conv_to;
 
-inline
-std::ostream&
-operator<< (std::ostream& o, const SizeMat& S)
-  {
-  coot_extra_debug_sigprint();
-
-  coot_ostream::print(o, S);
-
-  return o;
   }

@@ -17,8 +17,7 @@
 template<typename T2>
 struct conv_to
   {
-  static_assert(       is_Mat<T2>::value ||       is_Row<T2>::value ||       is_Col<T2>::value ||
-                 arma::is_Mat<T2>::value || arma::is_Row<T2>::value || arma::is_Col<T2>::value,
+  static_assert( is_Mat<T2>::value || is_arma_Mat<T2>::value,
       "conv_to<T> can only be used with type T in the set { coot::Mat<eT>, coot::Row<eT>, coot::Col<eT>, arma::Mat<eT>, arma::Row<eT>, arma::Col<eT> }");
   typedef typename T2::elem_type out_eT;
 
@@ -29,7 +28,7 @@ struct conv_to
   inline
   static
   typename enable_if2<
-      !is_same_type<typename T1::elem_type, out_eT>::value && !arma::is_arma_type<T1>::value && !arma::is_arma_type<T2>::value,
+      !is_same_type<typename T1::elem_type, out_eT>::value && is_coot_type<T1>::value && is_coot_type<T2>::value,
       mtOp<out_eT, T1, mtop_conv_to>
   >::result
   from(const T1& in)
@@ -47,7 +46,7 @@ struct conv_to
   inline
   static
   typename enable_if2<
-      is_same_type<out_eT, typename T1::elem_type>::value && !arma::is_arma_type<T1>::value && !arma::is_arma_type<T2>::value,
+      is_same_type<out_eT, typename T1::elem_type>::value && is_coot_type<T1>::value && is_coot_type<T2>::value,
       T1
   >::result
   from(const T1& in)
@@ -66,7 +65,7 @@ struct conv_to
   inline
   static
   typename enable_if2<
-      is_same_type<typename T1::elem_type, out_eT>::no && !arma::is_arma_type<T2>::value,
+      is_same_type<typename T1::elem_type, out_eT>::no && is_coot_type<T2>::value,
       T2
   >::result
   from(const Op<T1, op_type>& in)
@@ -85,7 +84,7 @@ struct conv_to
   inline
   static
   typename enable_if2<
-      is_same_type<typename T1::elem_type, out_eT>::no && !arma::is_arma_type<T2>::value,
+      is_same_type<typename T1::elem_type, out_eT>::no && is_coot_type<T2>::value,
       T2
   >::result
   from(const Glue<T1, T3, glue_type>& in)
@@ -105,7 +104,7 @@ struct conv_to
   inline
   static
   typename enable_if2<
-      is_same_type<typename T1::elem_type, out_eT>::no && !arma::is_arma_type<T2>::value,
+      is_same_type<typename T1::elem_type, out_eT>::no && is_coot_type<T2>::value,
       mtOp<out_eT, Op<T1, op_htrans>, mtop_conv_to>
   >::result
   from(const Op<T1, op_htrans>& in)
@@ -121,7 +120,7 @@ struct conv_to
   inline
   static
   typename enable_if2<
-      is_same_type<typename T1::elem_type, out_eT>::no && !arma::is_arma_type<T2>::value,
+      is_same_type<typename T1::elem_type, out_eT>::no && is_coot_type<T2>::value,
       mtOp<out_eT, Op<T1, op_htrans2>, mtop_conv_to>
   >::result
   from(const Op<T1, op_htrans2>& in)
@@ -134,21 +133,28 @@ struct conv_to
 
 
   // Conversions from Armadillo (could include Armadillo-Armadillo conversions).
-  template<typename T1>
+  template<typename eT, typename T1>
   inline
   static
-  typename enable_if2<
-      arma::is_arma_type<T1>::value,
-      T2
-  >::result
-  from(const T1& in)
+  T2
+  from(const arma::Base<eT, T1>& in)
     {
     coot_extra_debug_sigprint();
 
-    arma::Mat<out_eT> M = arma::conv_to<arma::Mat<out_eT>>::from(in);
-    T2 out(M); // must be Mat, Row, or Col (either Bandicoot or Armadillo)
+    #if defined(COOT_HAVE_ARMA)
+      {
+      arma::Mat<out_eT> M = arma::conv_to<arma::Mat<out_eT>>::from(in);
+      T2 out(M); // must be Mat, Row, or Col (either Bandicoot or Armadillo)
 
-    return out;
+      return out;
+      }
+    #else
+      {
+      coot_stop_logic_error("#include <armadillo> must be before #include <bandicoot>");
+
+      return T2();
+      }
+    #endif
     }
 
 
@@ -158,19 +164,31 @@ struct conv_to
   inline
   static
   typename enable_if2<
-      !arma::is_arma_type<T1>::value && arma::is_arma_type<T2>::value,
+      is_coot_type<T1>::value && is_arma_Mat<T2>::value,
       T2
   >::result
   from(const T1& in)
     {
-    typedef typename T1::elem_type eT;
+    coot_extra_debug_sigprint();
 
-    unwrap<T1> U(in);
-    extract_subview<typename unwrap<T1>::stored_type> E(U.M);
-    arma::Mat<eT> M(E.M);
+    #if defined(COOT_HAVE_ARMA)
+      {
+      typedef typename T1::elem_type eT;
 
-    T2 out = arma::conv_to<T2>::from(M);
+      unwrap<T1> U(in);
+      extract_subview<typename unwrap<T1>::stored_type> E(U.M);
+      arma::Mat<eT> M(E.M);
 
-    return out;
+      T2 out = arma::conv_to<T2>::from(M);
+
+      return out;
+      }
+    #else
+      {
+      coot_stop_logic_error("#include <armadillo> must be before #include <bandicoot>");
+
+      return T2();
+      }
+    #endif
     }
   };
