@@ -1248,17 +1248,28 @@ magma_dtrsv
   if (n <= 0)
     return;
 
-  cl_int err = coot_wrapper(clblasDtrsv)(clblasColumnMajor,
+  if (incx != 1)
+    {
+    throw std::runtime_error("magma_dtrsv() cannot accept incx != 1");
+    }
+
+  // clBLAS's TRSV implementation generates invalid kernels that violate the OpenCL standard!
+  // See https://github.com/clMathLibraries/clBLAS/issues/341
+  // So, instead, we use TRSM...
+  cl_int err = coot_wrapper(clblasDtrsm)(clblasColumnMajor,
+                                         clblasLeft,
                                          clblas_uplo_const( uplo ),
                                          clblas_trans_const( transA ),
                                          clblas_diag_const( diag ),
                                          n,
+                                         1,
+                                         (double) 1.0,
                                          dA,
                                          dA_offset,
                                          ldda,
                                          dx,
                                          dx_offset,
-                                         incx,
+                                         n,
                                          1,
                                          &queue,
                                          0,
@@ -1290,17 +1301,28 @@ magma_strsv
   if (n <= 0)
     return;
 
-  cl_int err = coot_wrapper(clblasStrsv)(clblasColumnMajor,
+  if (incx != 1)
+    {
+    throw std::runtime_error("magma_strsv() cannot accept incx != 1");
+    }
+
+  // clBLAS's TRSV implementation generates invalid kernels that violate the OpenCL standard!
+  // See https://github.com/clMathLibraries/clBLAS/issues/341
+  // So, instead, we use TRSM...
+  cl_int err = coot_wrapper(clblasStrsm)(clblasColumnMajor,
+                                         clblasLeft,
                                          clblas_uplo_const( uplo ),
                                          clblas_trans_const( transA ),
                                          clblas_diag_const( diag ),
                                          n,
+                                         1,
+                                         (float) 1.0,
                                          dA,
                                          dA_offset,
                                          ldda,
                                          dx,
                                          dx_offset,
-                                         incx,
+                                         n,
                                          1,
                                          &queue,
                                          0,
