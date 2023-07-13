@@ -277,6 +277,9 @@
   #define coot_ssterf ssterf
   #define coot_dsterf dsterf
 
+  #define coot_slaswp slaswp
+  #define coot_dlaswp dlaswp
+
 #else
 
   #define coot_sgetrf SGETRF
@@ -537,6 +540,9 @@
 
   #define coot_ssterf SSTERF
   #define coot_dsterf DSTERF
+
+  #define coot_slaswp SLASWP
+  #define coot_dlaswp DLASWP
 
 #endif
 
@@ -878,4 +884,8 @@ extern "C"
   // compute all eigenvalues of symmetric tridiagonal matrix
   void coot_fortran(coot_ssterf)(const blas_int* n, float*  D, float*  E, blas_int* info);
   void coot_fortran(coot_dsterf)(const blas_int* n, double* D, double* E, blas_int* info);
+
+  // perform a series of row interchanges
+  void coot_fortran(coot_slaswp)(const blas_int* n, float*  A, const blas_int* lda, const blas_int* k1, const blas_int* k2, const blas_int* ipiv, const blas_int* incx);
+  void coot_fortran(coot_dlaswp)(const blas_int* n, double* A, const blas_int* lda, const blas_int* k1, const blas_int* k2, const blas_int* ipiv, const blas_int* incx);
   }

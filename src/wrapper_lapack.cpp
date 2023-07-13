@@ -1742,5 +1742,23 @@ namespace coot
 
 
 
+    //
+    // perform a series of row interchanges
+    //
+
+    void coot_fortran_prefix(coot_slaswp)(const blas_int* n, float*  A, const blas_int* lda, const blas_int* k1, const blas_int* k2, const blas_int* ipiv, const blas_int* incx)
+      {
+      coot_fortran_noprefix(coot_slaswp)(n, A, lda, k1, k2, ipiv, incx);
+      }
+
+
+
+    void coot_fortran_prefix(coot_dlaswp)(const blas_int* n, double* A, const blas_int* lda, const blas_int* k1, const blas_int* k2, const blas_int* ipiv, const blas_int* incx)
+      {
+      coot_fortran_noprefix(coot_dlaswp)(n, A, lda, k1, k2, ipiv, incx);
+      }
+
+
+
     } // extern "C"
   } // namespace coot

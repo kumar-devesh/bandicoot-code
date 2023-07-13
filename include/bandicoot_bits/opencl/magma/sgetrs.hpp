@@ -80,7 +80,7 @@ magma_sgetrs_gpu
   // Local variables
   float *work = NULL;
   bool notran = (trans == MagmaNoTrans);
-  magma_int_t i1, i2, inc;
+  magma_int_t i1, i2;
 
   *info = 0;
   if ( (! notran) &&
@@ -123,10 +123,9 @@ magma_sgetrs_gpu
   i2 = n;
   if (notran)
     {
-    inc = 1;
-
     /* Solve A * X = B. */
-    magmablas_slaswp( nrhs, dB, 0, lddb, i1, i2, ipiv, inc, queue );
+    magmablas_slaswp( nrhs, dB, 0, lddb, i1, i2, ipiv, 1, queue );
+    magma_queue_sync( queue );
 
     if (nrhs == 1)
       {
@@ -141,8 +140,6 @@ magma_sgetrs_gpu
     }
   else
     {
-    inc = -1;
-
     /* Solve A**T * X = B  or  A**H * X = B. */
     if (nrhs == 1)
       {
@@ -155,7 +152,23 @@ magma_sgetrs_gpu
       magma_strsm( MagmaLeft, MagmaLower, trans, MagmaUnit,    n, nrhs, c_one, dA, 0, ldda, dB, 0, lddb, queue );
       }
 
-    magmablas_slaswp( nrhs, dB, 0, lddb, i1, i2, ipiv, inc, queue );
+    magma_smalloc_cpu( &work, n * nrhs );
+    if ( work == NULL )
+      {
+      *info = MAGMA_ERR_HOST_ALLOC;
+      return *info;
+      }
+
+    // The MAGMABLAS laswp() implementation does not support applying pivots in reverse order from ipiv, so we use CPU LAPACK instead.
+    // TODO: fix MAGMABLAS laswp() implementation!
+
+    magma_int_t inc = -1;
+    magma_sgetmatrix( n, nrhs, dB, 0, lddb, work, n, queue );
+    coot_fortran(coot_slaswp)( &nrhs, work, &n, &i1, &i2, ipiv, &inc );
+    //magmablas_slaswp( nrhs, dB, 0, lddb, i1, i2, ipiv, inc, queue );
+    magma_ssetmatrix( n, nrhs, work, n, dB, 0, lddb, queue );
+
+    magma_free_cpu(work);
     }
 
   magma_queue_destroy( queue );
