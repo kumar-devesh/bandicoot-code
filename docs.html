@@ -187,7 +187,7 @@ First time users: please see the short <a href="#example_prog">example program</
 </li>
 <br>
 <li>
-If you discover any bugs or regressions, please <a href="http://arma.sourceforge.net/faq.html">report them</a>
+If you discover any bugs or regressions, please <a href="https://coot.sourceforge.io/faq.html">report them</a>
 </li>
 <br>
 <li>
@@ -603,14 +603,14 @@ For convenience the following typedefs have been defined:
 </li>
 <br>
 <li>
-In this documentation the <i>fmat</i> type is used for convenience, speed, and portability;
-it is possible to use other types instead, eg. <i>mat</i>
+Use of matrices with the <i>fmat</i> type is preferred over the <i>mat</i> type,
+as standard consumer-focused GPUs are considerably more performant with 32-bit floats (ie. <code>float</code> element type)
+rather than 64-bit floats (ie. <code>double</code> element type)
 </li>
 <br>
 <li>
-Note that standard consumer GPUs may not have support for 64-bit floats (<code>double</code>),
-and if they do, they may not show speedup over CPU-based <a href="https://arma.sourceforge.net">Armadillo</a> matrices
-unless they are high-end GPUs
+In this documentation, the type <i>fmat</i> is used for convenience, speed, and portability;
+it is possible to use other types instead, e.g. <i>mat</i>
 </li>
 <br>
 <li>
@@ -979,16 +979,20 @@ For convenience the following typedefs have been defined:
 </li>
 <br>
 <li>
-In this documentation, the types <i>fvec</i> or <i>fcolvec</i> are used for convenience, speed, and portability; it is possible to use other types instead, e.g. <i>vec</i>, <i>colvec</i>; note that the <i>fvec</i> and <i>fcolvec</i> have the <i>same meaning</i> and are used <i>interchangeably</i>
-</li>
-<br>
-<li>
-Note that standard consumer GPUs may not have support for 64-bit floats (<code>double</code>), and if they do, they may not show speedup over CPU-based <a href="https://arma.sourceforge.net/">Armadillo</a> matrices unless they are high-end GPUs
+Use of vectors with the <i>fvec</i> type is preferred over the <i>vec</i> type,
+as standard consumer-focused GPUs are considerably more performant with 32-bit floats (ie. <code>float</code> element type)
+rather than 64-bit floats (ie. <code>double</code> element type)
 </li>
 <br>
 <li>
 Functions which take <i>Mat</i> as input can generally also take <i>Col</i> as input;
 main exceptions are functions which require square matrices
+</li>
+<br>
+<li>
+In this documentation, the types <i>fvec</i> or <i>fcolvec</i> are used for convenience, speed, and portability;
+it is possible to use other types instead, e.g. <i>vec</i>, <i>colvec</i>;
+note that the <i>fvec</i> and <i>fcolvec</i> have the <i>same meaning</i> and are used <i>interchangeably</i>
 </li>
 <br>
 <li>
@@ -1238,17 +1242,19 @@ For convenience the following typedefs have been defined:
 </li>
 <br>
 <li>
-In this documentation, the <i>frowvec</i> type is used for convenience, speed, and portability;
-it is possible to use other types instead, eg. <i>rowvec</i>
+Use of vectors with the <i>frowvec</i> type is preferred over the <i>rowvec</i> type,
+as standard consumer-focused GPUs are considerably more performant with 32-bit floats (ie. <code>float</code> element type)
+rather than 64-bit floats (ie. <code>double</code> element type)
 </li>
 <br>
 <li>
-Note that standard consumer GPUs may not have support for 64-bit floats (<code>double</code>), and if they do, they may not show speedup over CPU-based <a href="https://arma.sourceforge.net/">Armadillo</a> matrices unless they are high-end GPUs
+Functions which take <i>Mat</i> as input can generally also take <i>Row</i> as input;
+main exceptions are functions which require square matrices
 </li>
 <br>
 <li>
-Functions which take <i>Mat</i> as input can generally also take <i>Row</i> as input.
-Main exceptions are functions which require square matrices
+In this documentation, the type <i>frowvec</i> is used for convenience, speed, and portability;
+it is possible to use other types instead, e.g. <i>rowvec</i>
 </li>
 <br>
 <li>
@@ -1260,9 +1266,9 @@ Constructors:
 <tr><td><code>frowvec(<i>n_elem</i>)</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
 <tr><td><code>frowvec(<i>n_elem</i>, <i>fill_form</i>)</code></td><td>&nbsp;</td><td>(elements are initialised according to <i>fill_form</i>)</td></tr>
 <tr><td><code>frowvec(size(<i>X</i>))</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
-<tr><td><code>rowvec(size(<i>X</i>), <i>fill_form</i>)</code></td><td>&nbsp;</td><td>(elements are initialised according to <i>fill_form</i>)</td></tr>
+<tr><td><code>frowvec(size(<i>X</i>), <i>fill_form</i>)</code></td><td>&nbsp;</td><td>(elements are initialised according to <i>fill_form</i>)</td></tr>
 <tr><td><code>frowvec(frowvec)</code></td><td>&nbsp;</td><td>&nbsp;</td></tr>
-<tr><td><code>frowvec(arma::fmat)</code></td><td>&nbsp;</td><td>(convert from CPU-based Armadillo row vector)</td></tr>
+<tr><td><code>frowvec(arma::frowvec)</code></td><td>&nbsp;</td><td>(convert from CPU-based Armadillo row vector)</td></tr>
 <tr><td><code>frowvec(fmat)</code></td><td>&nbsp;</td><td>(<i>std::logic_error</i> exception is thrown if the given matrix has more than one row)</td></tr>
 </tbody>
 </table>
@@ -6015,7 +6021,7 @@ See also:
 </ul>
 <br>
 <li>
-At any time, all asychronous operations can be forced to complete by calling <i>coot_synchronise()</i>
+At any time, all asynchronous operations can be forced to complete by calling <i>coot_synchronise()</i>
 </li>
 <br>
 <li>
@@ -6719,7 +6725,7 @@ See also:
 <ul>
 <li>the default width is 32 bits on 32-bit platforms</li>
 <li>the default width is 64 bits on 64-bit platforms</li>
-<li><i>uword</i> is a typedef for <i>size_t</i></li>
+<li><i>uword</i> is a typedef for <i>std::size_t</i></li>
 </ul>
 </li>
 <br>
@@ -7900,7 +7906,7 @@ See also:
 <a name="kernel_cache"></a>
 <b>kernel cache</b>
 <ul>
-<li>In order to perform GPU-based linear algebra, Bandicoot must first compile GPU kernel functions to a particular device</li>
+<li>In order to perform GPU-based linear algebra, Bandicoot must first compile kernel functions to a specific GPU</li>
 <br>
 <li>The first time Bandicoot is run on a system, all GPU kernel functions will be compiled; <b>this may take a considerable amount of time</b>, depending on the underlying system (usually less than 5 minutes)</li>
 <br>
@@ -7910,8 +7916,8 @@ See also:
 <br>
 <li>The default location to store the kernel cache is
 <ul>
-<li><code>~/.bandicoot/cache/</code> on Linux, macOS, and UNIX-like systems</li>
-<li><code>%APPDATA%\bandicoot\cache</code> on Windows (e.g. <code>C:\Users\Username\AppData\bandicoot\cache</code>)</li>
+<li>on Linux, macOS, and UNIX-like systems: <code>~/.bandicoot/cache/</code> (e.g. <code>/home/user/.bandicoot/cache/)</code></li>
+<li>on Windows: <code>%APPDATA%\bandicoot\cache</code> (e.g. <code>C:\Users\Username\AppData\bandicoot\cache</code>)</li>
 </ul>
 <br>
 <li>Custom locations can be specified with the <code>COOT_KERNEL_CACHE_DIR</code> <a href="#config_hpp">configuration variable</a></li>

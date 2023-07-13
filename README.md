@@ -1,5 +1,5 @@
 ### Bandicoot: C++ Library for GPU Linear Algebra & Scientific Computing
-https://coot.sourceforge.net
+https://coot.sourceforge.io
 
 Copyright 2017-2023 Ryan Curtin (https://www.ratml.org)  
 Copyright 2017-2023 Marcus Edel (https://kurg.org)  
@@ -9,9 +9,9 @@ Copyright 2017-2023 Conrad Sanderson (https://conradsanderson.id.au)
 
 ### Quick Links
 
-- [download latest stable release](https://coot.sourceforge.net/download.html)
-- [documentation for functions and classes](https://coot.sourceforge.net/docs.html)
-- [bug reports & questions](https://coot.sourceforge.net/faq.html)
+- [download latest stable release](https://coot.sourceforge.io/download.html)
+- [documentation for functions and classes](https://coot.sourceforge.io/docs.html)
+- [bug reports & questions](https://coot.sourceforge.io/faq.html)
 
 ### Contents
 
@@ -52,7 +52,7 @@ Bandicoot provides efficient classes for vectors and matrices,
 as well as many associated functions covering essential
 and advanced functionality for data processing and manipulation of matrices.
 
-Various matrix decompositions (eigen, SVD, QR, etc.) are provided through GPU implementations,
+Various matrix decompositions (eigen, SVD, etc.) are provided through GPU implementations,
 either internal to Bandicoot or through external libraries such as cuSolver.
 
 A sophisticated expression evaluator (via C++ template meta-programming)
@@ -222,7 +222,7 @@ Comment or uncomment the following lines:
 
 Note that the manual installation will not generate the Bandicoot runtime library,
 and hence you will need to link your programs directly with OpenBLAS, LAPACK, CUDA, OpenCL, etc.;
-see the [direct linking](https://coot.sourceforge.net/docs.html#direct_linking)
+see the [direct linking](https://coot.sourceforge.io/docs.html#direct_linking)
 section of the documentation for more details.
 
 ---
@@ -290,16 +290,15 @@ For GCC and Clang compilers, use `-O2` or `-O3` to enable optimisation.
 
 For more information on compiling and linking, see the following resources:
 
- * https://coot.sourceforge.net/faq.html
- * https://coot.sourceforge.net/docs.html#direct_linking
+ * https://coot.sourceforge.io/faq.html
+ * https://coot.sourceforge.io/docs.html#direct_linking
 
 ---
 
 ### 7. Windows Support
 
-At the current time, Bandicoot is not tested on Windows,
-although it should work.
-Contributions to improve Windows documentation and test on Windows are greatly appreciated.
+Bandicoot has so far not been thoroughly tested on Windows.
+Contributions to improve Windows support are appreciated.
 
 ---
 
@@ -361,7 +360,7 @@ as it will only parallelize a few CPU-specific parts of Bandicoot algorithms.
 ### 11: Documentation of Functions and Classes
 
 The documentation of Bandicoot functions and classes is available at:
-https://coot.sourceforge.net/docs.html
+https://coot.sourceforge.io/docs.html
 
 The documentation is also in the `docs.html` file distributed with Bandicoot.
 Use a web browser to view it.
@@ -419,10 +418,11 @@ the standard C++ library, and possibly Armadillo (no other libraries).
 
 If you are adapting Armadillo code to Bandicoot
 and find that Bandicoot is missing functionality,
-we are also interested in hearing about that so that we can prioritize development efforts.
+we are also interested in hearing about it,
+so that development efforts can be prioritized.
 
 The contact details for bug reporting can be found at:
-https://coot.sourceforge.net/contact.html
+https://coot.sourceforge.io/contact.html
 
 Further information about Bandicoot is on the Frequently Asked Questions page:
-https://coot.sourceforge.net/faq.html
+https://coot.sourceforge.io/faq.html
