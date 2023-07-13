@@ -41,7 +41,7 @@ solve_square_fast(dev_mem_t<eT> A, const bool trans_A, dev_mem_t<eT> B, const uw
   if (is_float<eT>::value)
     {
     status = magma_sgetrf_gpu(n_rows,
-                              n_cols,
+                              n_rows,
                               A.cl_mem_ptr,
                               0,
                               n_rows,
@@ -51,7 +51,7 @@ solve_square_fast(dev_mem_t<eT> A, const bool trans_A, dev_mem_t<eT> B, const uw
   else if (is_double<eT>::value)
     {
     status = magma_dgetrf_gpu(n_rows,
-                              n_cols,
+                              n_rows,
                               A.cl_mem_ptr,
                               0,
                               n_rows,
