@@ -1,4 +1,4 @@
-// Copyright 2019 Ryan Curtin (http://www.ratml.org)
+// Copyright 2023 Ryan Curtin (http://www.ratml.org)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,12 +15,15 @@
 
 
 /**
- * Compute the LU factorisation using CUDA.
+ * Solve the system A * X = B or A^T * X = B for square A using the LU factorisation using CUDA.
+ *
+ * A is of size n_rows x n_rows, and is destroyed.
+ * B is of size n_rows x n_cols, and is replaced with X.
  */
 template<typename eT>
 inline
 std::tuple<bool, std::string>
-lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_mem_t<eT> P, const uword n_rows, const uword n_cols)
+solve_square_fast(dev_mem_t<eT> A, const bool trans_A, dev_mem_t<eT> B, const uword n_rows, const uword n_cols)
   {
   coot_extra_debug_sigprint();
 
@@ -59,9 +62,9 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_
   status = coot_wrapper(cusolverDnXgetrf_bufferSize)(get_rt().cuda_rt.cusolver_handle,
                                                      NULL,
                                                      n_rows,
-                                                     n_cols,
+                                                     n_rows,
                                                      data_type,
-                                                     in.cuda_mem_ptr,
+                                                     A.cuda_mem_ptr,
                                                      n_rows,
                                                      data_type,
                                                      &gpu_workspace_size,
@@ -73,7 +76,7 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_
     }
 
   s64* ipiv = NULL;
-  const uword ipiv_size = std::min(n_rows, n_cols);
+  const uword ipiv_size = n_rows;
 
   // Allocate space for pivots.
   status2 = coot_wrapper(cudaMalloc)((void**) &ipiv, sizeof(s64) * ipiv_size);
@@ -97,9 +100,9 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_
   status = coot_wrapper(cusolverDnXgetrf)(get_rt().cuda_rt.cusolver_handle,
                                           NULL,
                                           n_rows,
-                                          n_cols,
+                                          n_rows,
                                           data_type,
-                                          in.cuda_mem_ptr,
+                                          A.cuda_mem_ptr,
                                           n_rows,
                                           ipiv,
                                           data_type,
@@ -122,7 +125,6 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_
   // Check whether the factorisation was successful.
   int info_result;
   status2 = coot_wrapper(cudaMemcpy)(&info_result, dev_info, sizeof(int), cudaMemcpyDeviceToHost);
-  coot_wrapper(cudaFree)(dev_info);
   if (status2 != cudaSuccess)
     {
     coot_wrapper(cudaFree)(ipiv);
@@ -144,96 +146,47 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_
     return std::make_tuple(false, oss.str());
     }
 
-  // First the pivoting needs to be "unwound" into a way where we can make P.
-  uword* ipiv2 = cpu_memory::acquire<uword>(n_rows);
-  for (uword i = 0; i < n_rows; ++i)
-    {
-    ipiv2[i] = i;
-    }
+  // Now use the LU-factorised A as the input to getrs() to solve the system.
 
-  s64* ipiv_cpu = cpu_memory::acquire<s64>(ipiv_size);
-  status2 = coot_wrapper(cudaMemcpy)(ipiv_cpu, ipiv, ipiv_size * sizeof(s64), cudaMemcpyDeviceToHost);
+  status = coot_wrapper(cusolverDnXgetrs)(get_rt().cuda_rt.cusolver_handle,
+                                          NULL,
+                                          (trans_A ? CUBLAS_OP_T : CUBLAS_OP_N),
+                                          n_rows,
+                                          n_cols,
+                                          data_type,
+                                          A.cuda_mem_ptr,
+                                          n_rows,
+                                          ipiv,
+                                          data_type,
+                                          B.cuda_mem_ptr,
+                                          n_rows,
+                                          dev_info);
+
+  // no longer needed
   coot_wrapper(cudaFree)(ipiv);
 
+  if (status != CUSOLVER_STATUS_SUCCESS)
+    {
+    coot_wrapper(cudaFree)(dev_info);
+    return std::make_tuple(false, "solving via cusolverDnXgetrs() failed");
+    }
+
+  // Check whether the operation was successful.
+  status2 = coot_wrapper(cudaMemcpy)(&info_result, dev_info, sizeof(int), cudaMemcpyDeviceToHost);
+  coot_wrapper(cudaFree)(dev_info);
   if (status2 != cudaSuccess)
     {
-    cpu_memory::release(ipiv2);
-    cpu_memory::release(ipiv_cpu);
-    return std::make_tuple(false, "couldn't copy pivot array from GPU");
+    return std::make_tuple(false, "couldn't copy device info holder to host");
     }
 
-  for (uword i = 0; i < ipiv_size; ++i)
+  if (info_result < 0)
     {
-    const int k = ipiv_cpu[i] - 1; // cusolverDnXgetrf() returns one-indexed results
-
-    if (ipiv2[i] != ipiv2[k])
-      {
-      std::swap( ipiv2[i], ipiv2[k] );
-      }
-    }
-
-  dev_mem_t<uword> ipiv_gpu;
-  ipiv_gpu.cuda_mem_ptr = get_rt().cuda_rt.acquire_memory<uword>(n_rows);
-  copy_into_dev_mem(ipiv_gpu, ipiv2, n_rows);
-  cpu_memory::release(ipiv_cpu);
-  cpu_memory::release(ipiv2);
-
-  // Now extract the lower triangular part (excluding diagonal).  This is done with a custom kernel.
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(pivoting ? oneway_real_kernel_id::lu_extract_l : oneway_real_kernel_id::lu_extract_pivoted_l);
-
-  const void* pivot_args[] = { &(L.cuda_mem_ptr),
-                               &(U.cuda_mem_ptr),
-                               &(in.cuda_mem_ptr),
-                               (uword*) &n_rows,
-                               (uword*) &n_cols };
-
-  const void* nopivot_args[] = { &(L.cuda_mem_ptr),
-                                 &(U.cuda_mem_ptr),
-                                 &(in.cuda_mem_ptr),
-                                 (uword*) &n_rows,
-                                 (uword*) &n_cols,
-                                 &(ipiv_gpu.cuda_mem_ptr) };
-
-  const size_t max_rc = std::max(n_rows, n_cols);
-  const kernel_dims dims = two_dimensional_grid_dims(n_rows, max_rc);
-
-  CUresult status3 = coot_wrapper(cuLaunchKernel)(
-      kernel,
-      dims.d[0], dims.d[1], dims.d[2], dims.d[3], dims.d[4], dims.d[5],
-      0, NULL, (pivoting ? (void**) pivot_args : (void**) nopivot_args), 0);
-
-  if (status3 != CUDA_SUCCESS)
-    {
-    get_rt().cuda_rt.release_memory(ipiv_gpu.cuda_mem_ptr);
-    return std::make_tuple(false, "cuLaunchKernel() failed for " + (pivoting ? std::string("lu_extract_l") : std::string("lu_extract_pivoted_l")) + " kernel");
-    }
-
-  // If pivoting was allowed, extract the permutation matrix.
-  if (pivoting)
-    {
-    kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_real_kernel_id::lu_extract_p);
-
-    const void* args2[] = {
-        &(P.cuda_mem_ptr),
-        &(ipiv_gpu.cuda_mem_ptr),
-        (uword*) &n_rows };
-
-    const kernel_dims dims2 = one_dimensional_grid_dims(n_rows);
-
-    status3 = coot_wrapper(cuLaunchKernel)(
-        kernel,
-        dims2.d[0], dims2.d[1], dims2.d[2], dims2.d[3], dims2.d[4], dims2.d[5],
-        0, NULL, (void**) args2, 0);
-
-    if (status3 != CUDA_SUCCESS)
-      {
-      get_rt().cuda_rt.release_memory(ipiv_gpu.cuda_mem_ptr);
-      return std::make_tuple(false, "cuLaunchKernel() failed for lu_extract_p kernel");
-      }
+    std::ostringstream oss;
+    oss << "parameter " << -info_result << " was incorrect in call to cusolverDnXgetrs()";
+    return std::make_tuple(false, oss.str());
     }
 
   get_rt().cuda_rt.synchronise();
-  get_rt().cuda_rt.release_memory(ipiv_gpu.cuda_mem_ptr);
 
   return std::make_tuple(true, "");
   }

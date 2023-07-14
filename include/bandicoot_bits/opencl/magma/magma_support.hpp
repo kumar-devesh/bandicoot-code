@@ -1223,6 +1223,117 @@ magma_strmm(
 
 
 
+// trsv
+// triangular matrix vector solve
+
+
+
+inline
+void
+magma_dtrsv
+  (
+  magma_uplo_t uplo,
+  magma_trans_t transA,
+  magma_diag_t diag,
+  magma_int_t n,
+  magmaDouble_const_ptr dA,
+  size_t dA_offset,
+  magma_int_t ldda,
+  magmaDouble_ptr dx,
+  size_t dx_offset,
+  magma_int_t incx,
+  magma_queue_t queue
+  )
+  {
+  if (n <= 0)
+    return;
+
+  if (incx != 1)
+    {
+    throw std::runtime_error("magma_dtrsv() cannot accept incx != 1");
+    }
+
+  // clBLAS's TRSV implementation generates invalid kernels that violate the OpenCL standard!
+  // See https://github.com/clMathLibraries/clBLAS/issues/341
+  // So, instead, we use TRSM...
+  cl_int err = coot_wrapper(clblasDtrsm)(clblasColumnMajor,
+                                         clblasLeft,
+                                         clblas_uplo_const( uplo ),
+                                         clblas_trans_const( transA ),
+                                         clblas_diag_const( diag ),
+                                         n,
+                                         1,
+                                         (double) 1.0,
+                                         dA,
+                                         dA_offset,
+                                         ldda,
+                                         dx,
+                                         dx_offset,
+                                         n,
+                                         1,
+                                         &queue,
+                                         0,
+                                         NULL,
+                                         get_g_event());
+  coot_wrapper(clFlush)(queue);
+  check_error(err);
+  }
+
+
+
+inline
+void
+magma_strsv
+  (
+  magma_uplo_t uplo,
+  magma_trans_t transA,
+  magma_diag_t diag,
+  magma_int_t n,
+  magmaFloat_const_ptr dA,
+  size_t dA_offset,
+  magma_int_t ldda,
+  magmaFloat_ptr dx,
+  size_t dx_offset,
+  magma_int_t incx,
+  magma_queue_t queue
+  )
+  {
+  if (n <= 0)
+    return;
+
+  if (incx != 1)
+    {
+    throw std::runtime_error("magma_strsv() cannot accept incx != 1");
+    }
+
+  // clBLAS's TRSV implementation generates invalid kernels that violate the OpenCL standard!
+  // See https://github.com/clMathLibraries/clBLAS/issues/341
+  // So, instead, we use TRSM...
+  cl_int err = coot_wrapper(clblasStrsm)(clblasColumnMajor,
+                                         clblasLeft,
+                                         clblas_uplo_const( uplo ),
+                                         clblas_trans_const( transA ),
+                                         clblas_diag_const( diag ),
+                                         n,
+                                         1,
+                                         (float) 1.0,
+                                         dA,
+                                         dA_offset,
+                                         ldda,
+                                         dx,
+                                         dx_offset,
+                                         n,
+                                         1,
+                                         &queue,
+                                         0,
+                                         NULL,
+                                         get_g_event());
+  coot_wrapper(clFlush)(queue);
+  check_error(err);
+  }
+
+
+
 // symv
 
 

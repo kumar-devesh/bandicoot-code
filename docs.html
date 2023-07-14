@@ -5394,22 +5394,64 @@ See also:
 <div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
 <a name="solve"></a>
 <b>X = solve( A, B )</b>
-<br><b>X = solve( A, B, settings )</b>
+<!-- <br><b>X = solve( A, B, settings )</b> -->
 <br>
 <br><b>solve( X, A, B )</b>
-<br><b>solve( X, A, B, settings )</b>
+<!-- <br><b>solve( X, A, B, settings )</b> -->
 <ul>
-<li>
-TODO: this is a placeholder! expand when implemented
-</li>
-<br>
-<!--
 <li>Solve a <b>dense</b> system of linear equations, <i>A*X = B</i>, where <i>X</i> is unknown;
 similar functionality to the \ operator in Matlab/Octave, ie. <i>X&thinsp;=&thinsp;A&thinsp;\&thinsp;B</i>
 </li>
 <br>
--->
+<li><i>A</i> must be square sized; <i>A</i> cannot be rank-deficient</li>
 <br>
+<li><i>B</i> can be a vector or matrix</li>
+<br>
+<li>The number of rows in <i>A</i> and <i>B</i> must be the same</li>
+<br>
+<li><b>NOTE:</b> support for <i>solve()</i> is <b>preliminary</b> and many options that are available in Armadillo are not yet available in Bandicoot; future releases will add additional support</li>
+<br>
+<li>The solution is computed using the LU decomposition</li>
+<br>
+<li>If no solution is found:
+<ul>
+<li><i>X = solve(A, B)</i> resets <i>X</i> and throws a <i>std::runtime_error</i> exception</li>
+<li><i>solve(X, A, B)</i> resets <i>X</i> and returns a bool set to <i>false</i> (exception is not thrown)</li>
+</ul>
+</li>
+<br>
+<li>Examples:
+<ul>
+<pre>
+fmat A(5, 5, fill::randu);
+A.diag() += 3; <font class="#comment">// ensure positive definite</font>
+fvec b(5,    fill::randu);
+fmat B(5, 5, fill::randu);
+
+fvec x1 = solve(A, b);
+
+fvec x2;
+bool status = solve(x2, A, b);
+
+fmat X1 = solve(A, B);
+</pre>
+</ul>
+</li>
+<br>
+<li>
+See also:
+<ul>
+<li><a href="#pinv">pinv()</a></li>
+<li><a href="#lu">lu()</a></li>
+<li><a href="https://mathworld.wolfram.com/LinearSystemofEquations.html">linear system of equations in MathWorld</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Linear_system_of_equations">system of linear equations in Wikipedia</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Definiteness_of_a_matrix">definiteness of a matrix in Wikipedia</a></li>
+<li><a href="https://mathworld.wolfram.com/PositiveDefiniteMatrix.html">positive definite matrix in MathWorld</a></li>
+<li><a href="https://ensmallen.org">ensmallen</a> - library for solving arbitrary optimisation problems</li>
+</ul>
+</li>
+<br>
+
 </ul>
 
 <div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>

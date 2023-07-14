@@ -48,6 +48,7 @@ lu(dev_mem_t<eT> L, dev_mem_t<eT> U, dev_mem_t<eT> in, const bool pivoting, dev_
     }
   else
     {
+    cpu_memory::release(ipiv);
     return std::make_tuple(false, "unknown data type, must be float or double");
     }
 

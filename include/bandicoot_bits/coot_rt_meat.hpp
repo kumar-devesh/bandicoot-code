@@ -1610,6 +1610,39 @@ coot_rt_t::eig_sym(dev_mem_t<eT> mem, const uword n_rows, const bool eigenvector
 
 template<typename eT>
 inline
+std::tuple<bool, std::string>
+coot_rt_t::solve_square_fast(dev_mem_t<eT> A, const bool trans_A, dev_mem_t<eT> B, const uword n_rows, const uword n_cols)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::solve_square_fast(A, trans_A, B, n_rows, n_cols);
+    #else
+    coot_stop_runtime_error("coot_rt::solve_square_fast(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::solve_square_fast(A, trans_A, B, n_rows, n_cols);
+    #else
+    coot_stop_runtime_error("coot_rt::solve_square_fast(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::solve_square_fast(): unknown backend");
+    }
+
+  return std::make_tuple(false, "");
+  }
+
+
+
+template<typename eT>
+inline
 void
 coot_rt_t::copy_from_dev_mem(eT* dest, const dev_mem_t<eT> src, const uword N)
   {
