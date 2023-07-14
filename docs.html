@@ -4284,7 +4284,7 @@ See also:
 <a name="pow"></a>
 <table>
 <tbody>
-<tr><td><b>pow( A, scalar )</b></td><td>&nbsp;&nbsp;&nbsp;</td><td>(form&nbsp;1)</td></tr>
+<tr><td><b>pow( A, scalar )</b></td><td>&nbsp;&nbsp;&nbsp;</td><td><!-- (form&nbsp;1) --></td></tr>
 </tbody>
 </table>
 <ul>
@@ -4747,7 +4747,7 @@ See also:
 <div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
 <a name="trans"></a>
 <b>trans( A )</b>
-<br><b>strans( A )</b>
+<!-- <br><b>strans( A )</b> -->  <!-- TODO: uncomment strans this when complex elements are explicitly supported -->
 <ul>
 <li>Compute a transposed copy of the matrix</li>
 <br>
@@ -5158,8 +5158,8 @@ See also:
 <div class="pagebreak"></div><div class="noprint"><hr class="greyline"><br></div>
 <a name="chol"></a>
 <table>
-<tr><td><b>R = chol(       X                   )</b></td><td>&nbsp;&nbsp;&nbsp;</td><td>(form&nbsp;1)</td></tr>
-<tr><td><b>    chol( R,    X                   )</b></td><td>&nbsp;&nbsp;&nbsp;</td><td>(form&nbsp;2)</td></tr>
+<tr><td><b>R = chol(   X)</b></td><td>&nbsp;&nbsp;&nbsp;</td><td><!-- (form&nbsp;1) --></td></tr>
+<tr><td><b>    chol(R, X)</b></td><td>&nbsp;&nbsp;&nbsp;</td><td><!-- (form&nbsp;2) --></td></tr>
 </table>
 <ul>
 <li>
@@ -5326,6 +5326,7 @@ fmat B = P.t() * L * U;
 See also:
 <ul>
 <li><a href="#chol">chol()</a></li>
+<li><a href="#solve">solve()</a></li>
 <li><a href="https://en.wikipedia.org/wiki/LU_decomposition">LU decomposition in Wikipedia</a></li>
 <li><a href="https://mathworld.wolfram.com/LUDecomposition.html">LU decomposition in MathWorld</a></li>
 </ul>
@@ -5382,6 +5383,7 @@ fmat C = pinv(A, 0.01);  <font class="comment">// set tolerance to 0.01</font>
 <li>
 See also:
 <ul>
+<li><a href="#solve">solve()</a></li>
 <li><a href="#constants">datum::eps</a></li>
 <li><a href="https://mathworld.wolfram.com/Pseudoinverse.html">Pseudoinverse in MathWorld</a></li>
 <li><a href="https://mathworld.wolfram.com/Moore-PenroseMatrixInverse.html">Moore-Penrose Matrix Inverse in MathWorld</a></li>
@@ -5425,14 +5427,14 @@ similar functionality to the \ operator in Matlab/Octave, ie. <i>X&thinsp;=&thin
 <pre>
 fmat A(5, 5, fill::randu);
 A.diag() += 3; <font class="#comment">// ensure positive definite</font>
-fvec b(5,    fill::randu);
-fmat B(5, 5, fill::randu);
 
+fvec b(5, fill::randu);
 fvec x1 = solve(A, b);
 
 fvec x2;
 bool status = solve(x2, A, b);
 
+fmat B(5, 5, fill::randu);
 fmat X1 = solve(A, B);
 </pre>
 </ul>
@@ -5441,8 +5443,8 @@ fmat X1 = solve(A, B);
 <li>
 See also:
 <ul>
-<li><a href="#pinv">pinv()</a></li>
 <li><a href="#lu">lu()</a></li>
+<li><a href="#pinv">pinv()</a></li>
 <li><a href="https://mathworld.wolfram.com/LinearSystemofEquations.html">linear system of equations in MathWorld</a></li>
 <li><a href="https://en.wikipedia.org/wiki/Linear_system_of_equations">system of linear equations in Wikipedia</a></li>
 <li><a href="https://en.wikipedia.org/wiki/Definiteness_of_a_matrix">definiteness of a matrix in Wikipedia</a></li>

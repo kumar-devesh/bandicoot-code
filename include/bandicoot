@@ -43,7 +43,7 @@
 
 
 #include <mutex>
-#include <errno.h>
+#include <cerrno>
 #include <iomanip>
 #include <climits>
 #include <limits>

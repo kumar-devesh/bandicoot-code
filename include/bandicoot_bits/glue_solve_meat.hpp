@@ -60,7 +60,7 @@ glue_solve::apply(Mat<eT>& out, const Base<eT, T1>& A_expr, const Base<eT, T2>& 
   {
   coot_extra_debug_sigprint();
 
-  // TODO: right now we only support LU-based decompositions, and so flags are ignored
+  coot_ignore(flags);  // TODO: right now we only support LU-based decompositions, and so flags are ignored
 
   Mat<eT> A(A_expr.get_ref()); // A needs to be unwrapped into a new matrix, that will be destroyed during computation
   out = B_expr.get_ref(); // form B into `out`; solve_square_fast() will overwrite with the result
@@ -86,7 +86,7 @@ glue_solve::apply(Mat<eT>& out, const Base<eT, Op<T1, op_htrans>>& A_expr, const
   {
   coot_extra_debug_sigprint();
 
-  // TODO: right now we only support LU-based decompositions, and so flags are ignored
+  coot_ignore(flags);  // TODO: right now we only support LU-based decompositions, and so flags are ignored
 
   Mat<eT> A(A_expr.get_ref().m); // A needs to be unwrapped into a new matrix, that will be destroyed during computation
   out = B_expr.get_ref(); // form B into `out`; solve_square_fast() will overwrite with the result
@@ -112,7 +112,7 @@ glue_solve::apply(Mat<eT>& out, const Base<eT, Op<T1, op_htrans2>>& A_expr, cons
   {
   coot_extra_debug_sigprint();
 
-  // TODO: right now we only support LU-based decompositions, and so flags are ignored
+  coot_ignore(flags);  // TODO: right now we only support LU-based decompositions, and so flags are ignored
 
   Mat<eT> A(A_expr.get_ref().m); // A needs to be unwrapped into a new matrix, that will be destroyed during computation
   out = B_expr.get_ref(); // form B into `out`; solve_square_fast() will overwrite with the result
