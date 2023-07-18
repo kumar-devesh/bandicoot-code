@@ -1,4 +1,7 @@
-// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
+// SPDX-License-Identifier: Apache-2.0
+// 
+// Copyright 2017-2023 Ryan Curtin (https://www.ratml.org)
+// Copyright 2017      Conrad Sanderson (https://conradsanderson.id.au)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.

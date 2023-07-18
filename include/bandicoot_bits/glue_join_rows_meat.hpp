@@ -1,5 +1,7 @@
-// Copyright 2022 Gopi Tatiraju
+// SPDX-License-Identifier: Apache-2.0
+// 
 // Copyright 2023 Ryan Curtin (http://www.ratml.org)
+// Copyright 2022 Gopi Tatiraju
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
