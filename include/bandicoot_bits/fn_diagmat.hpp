@@ -1,4 +1,8 @@
-// Copyright 2023 Ryan Curtin (http://www.ratml.org)
+// SPDX-License-Identifier: Apache-2.0
+// 
+// Copyright 2023      Ryan Curtin (http://www.ratml.org)
+// Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
+// Copyright 2008-2016 National ICT Australia (NICTA)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -111,6 +115,6 @@ diagmat(const Op<T1, op_htrans2>& X, const sword k)
   const uword a = (std::abs)(k);
   const uword b = (k < 0) ? 3 : 2;
 
-  eOp<T1, eop_scalar_times> inner(X.m, X.aux);
+  eOp<T1, eop_scalar_times> inner(X.m, X.aux);  // BUG: 'inner' is destroyed when the function finishes; Op then holds a dangling ref
   return Op<eOp<T1, eop_scalar_times>, op_diagmat2>(inner, a, b);
   }
