@@ -16,10 +16,10 @@
 // ------------------------------------------------------------------------
 
 
-#define COOT_VERSION_MAJOR 0
-#define COOT_VERSION_MINOR 100
-#define COOT_VERSION_PATCH 31
-#define COOT_VERSION_NOTE  "unstable development version"
+#define COOT_VERSION_MAJOR 1
+#define COOT_VERSION_MINOR 10
+#define COOT_VERSION_PATCH 0
+#define COOT_VERSION_NOTE  "oughta pack my bags"
 
 
 
