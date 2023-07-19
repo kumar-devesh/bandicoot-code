@@ -536,3 +536,12 @@ TEMPLATE_TEST_CASE("find_nan_integers", "[find_nan]", u32, s32, u64, s64)
   REQUIRE( y3.n_elem == 0 );
   REQUIRE( y4.n_elem == 0 );
   }
+
+
+
+TEST_CASE("find_nan_size_computation", "[find_nan]")
+  {
+  uvec x = randi<uvec>(1000, distr_param(1, 5));
+
+  REQUIRE( size(find_nan(x)).n_rows == 0 );
+  }

@@ -543,3 +543,13 @@ TEST_CASE("find_alias", "[find]")
   REQUIRE( x.n_elem == x2.n_elem );
   REQUIRE( all( x == x2 ) );
   }
+
+
+
+// test that computing the size works
+TEST_CASE("find_size_computation", "[find]")
+  {
+  uvec x = randi<uvec>(1000, distr_param(1, 5));
+
+  REQUIRE( size(find(x)).n_rows == 1000 );
+  }

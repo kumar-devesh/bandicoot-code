@@ -154,6 +154,43 @@ op_diagmat2::apply(Mat<out_eT>& out, const Op<T1, op_diagmat2>& in, const typena
 
 
 
+template<typename T1>
+inline
+void
+op_diagmat2::apply(Mat<typename T1::elem_type>& out, const Op<Op<T1, op_htrans2>, op_diagmat2>& in)
+  {
+  coot_extra_debug_sigprint();
+
+  const sword k = (in.aux_uword_b == 0) ? in.aux_uword_a : (-sword(in.aux_uword_a));
+
+  unwrap<T1> U(in.m.m);
+  op_diagmat2::apply_direct(out, U.M, k, true /* implicit transpose */);
+  // Now multiply by the scalar.
+  out *= in.m.aux;
+  }
+
+
+
+template<typename out_eT, typename T1>
+inline
+void
+op_diagmat2::apply(Mat<out_eT>& out, const Op<Op<T1, op_htrans2>, op_diagmat2>& in, const typename enable_if<is_same_type<out_eT, typename T1::elem_type>::no>::result* junk)
+  {
+  coot_extra_debug_sigprint();
+  coot_ignore(junk);
+
+  const sword k = (in.aux_uword_b == 0) ? in.aux_uword_a : (-sword(in.aux_uword_a));
+
+  // If the types are not the same, we have to force a conversion.
+  mtOp<out_eT, T1, mtop_conv_to> mtop(in.m.m);
+  unwrap<mtOp<out_eT, T1, mtop_conv_to>> U(mtop);
+  op_diagmat2::apply_direct(out, U.M, k, true /* implicit transpose */);
+  // Now multiply by the scalar.
+  out *= in.m.aux;
+  }
+
+
+
 template<typename eT>
 inline
 void

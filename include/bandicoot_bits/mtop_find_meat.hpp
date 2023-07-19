@@ -54,7 +54,7 @@ uword
 mtop_find::compute_n_rows(const mtOp<out_eT, T1, mtop_find>& op, const uword in_n_rows, const uword in_n_cols)
   {
   // We can't know the size of the result unless we actually compute it, unfortunately.
-  apply(op.computed_result, op);
+  apply(const_cast<Mat<uword>&>(op.computed_result), op);
   access::rw(op.is_computed) = true;
 
   return op.computed_result.n_elem;
