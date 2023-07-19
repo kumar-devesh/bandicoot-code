@@ -526,3 +526,12 @@ TEMPLATE_TEST_CASE("find_nonfinite_integers", "[find_nonfinite]", u32, s32, u64,
   REQUIRE( y3.n_elem == 0 );
   REQUIRE( y4.n_elem == 0 );
   }
+
+
+
+TEST_CASE("find_nonfinite_size_computation", "[find_nonfinite]")
+  {
+  uvec x = randi<uvec>(1000, distr_param(1, 5));
+
+  REQUIRE( size(find_nonfinite(x)).n_rows == 0 );
+  }

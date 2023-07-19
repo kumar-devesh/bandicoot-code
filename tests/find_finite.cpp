@@ -538,3 +538,12 @@ TEMPLATE_TEST_CASE("find_finite_integers", "[find_finite]", u32, s32, u64, s64)
   REQUIRE( all( y3 == lin ) );
   REQUIRE( all( y4 == lin ) );
   }
+
+
+
+TEST_CASE("find_finite_size_computation", "[find_finite]")
+  {
+  uvec x = randi<uvec>(1000, distr_param(1, 5));
+
+  REQUIRE( size(find_finite(x)).n_rows == 1000 );
+  }
