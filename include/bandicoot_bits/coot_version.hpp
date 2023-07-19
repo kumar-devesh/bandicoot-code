@@ -19,7 +19,7 @@
 #define COOT_VERSION_MAJOR 1
 #define COOT_VERSION_MINOR 10
 #define COOT_VERSION_PATCH 0
-#define COOT_VERSION_NOTE  "oughta pack my bags"
+#define COOT_VERSION_NOTE  "Oughta Pack My Bags"
 
 
 
