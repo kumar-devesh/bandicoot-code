@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 //
+// Copyright 2023      Ryan Curtin (http://ratml.org)
+// Copyright 2021      Marcus Edel (http://kurg.org)
 // Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
-// Copyright 2021 Marcus Edel (http://kurg.org)
-// Copyright 2023 Ryan Curtin (http://ratml.org)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
