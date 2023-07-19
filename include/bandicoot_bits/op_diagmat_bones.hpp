@@ -38,6 +38,9 @@ class op_diagmat2
   template<                 typename T1> inline static void apply(Mat<typename T1::elem_type>& out, const Op<T1, op_diagmat2>& in);
   template<typename out_eT, typename T1> inline static void apply(Mat<out_eT                >& out, const Op<T1, op_diagmat2>& in, const typename enable_if<is_same_type<out_eT, typename T1::elem_type>::no>::result* junk = 0);
 
+  template<                 typename T1> inline static void apply(Mat<typename T1::elem_type>& out, const Op<Op<T1, op_htrans2>, op_diagmat2>& in);
+  template<typename out_eT, typename T1> inline static void apply(Mat<out_eT                >& out, const Op<Op<T1, op_htrans2>, op_diagmat2>& in, const typename enable_if<is_same_type<out_eT, typename T1::elem_type>::no>::result* junk = 0);
+
   template<typename eT> inline static void apply_direct(Mat<eT>& out, const Mat<eT>& in, const sword k, const bool swap);
   template<typename eT> inline static void apply_direct(Mat<eT>& out, const subview<eT>& in, const sword k, const bool swap);
 
