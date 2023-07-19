@@ -73,7 +73,9 @@ Authors:
 Please cite the following papers if you use Bandicoot in your research and/or software.
 Citations are useful for the continued development and maintenance of the library.
 
-  * TODO!
+  * Ryan Curtin, Marcus Edel, and Conrad Sanderson.
+    [Bandicoot: C++ Library for GPU Linear Algebra and Scientific Computing](https://coot.sourceforge.io/tech-report.pdf).
+    Technical report, 2023.
 
 ---
 
