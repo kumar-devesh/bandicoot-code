@@ -16,12 +16,17 @@ __global__
 void
 COOT_FN(PREFIX,inplace_mod_scalar)(eT1* out,
                                    const eT1 val,
-                                   const UWORD N)
+                                   const UWORD n_rows,
+                                   const UWORD n_cols,
+                                   const UWORD M_n_rows)
   {
-  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x;
-  if (i < N)
+  const UWORD row = blockIdx.x * blockDim.x + threadIdx.x;
+  const UWORD col = blockIdx.y * blockDim.y + threadIdx.y;
+  const UWORD index = col * M_n_rows + row;
+
+  if(row < n_rows && col < n_cols)
     {
     // For an integer type, the casts end up doing nothing.
-    out[i] = (eT1) ((uint_eT1) out[i] % (uint_eT1) val);
+    out[index] = (eT1) ((uint_eT1) out[index] % (uint_eT1) val);
     }
   }
