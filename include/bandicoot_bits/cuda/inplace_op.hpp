@@ -14,6 +14,11 @@
 
 
 
+template<typename eT1, typename eT2>
+inline
+void
+eop_scalar(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword n_elem, const eT1 aux_val_pre, const eT2 aux_val_post, twoway_kernel_id::enum_id num);
+
 /**
  * Run a CUDA elementwise kernel that uses a scalar.
  */
@@ -26,6 +31,12 @@ inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_rows, const uw
 
   if (n_rows == 0 || n_cols == 0)
     return;
+
+  if (num == oneway_kernel_id::inplace_plus_scalar)
+    {
+    eop_scalar(dest, dest, n_rows * n_cols, val, (eT) 0, twoway_kernel_id::equ_array_plus_scalar);
+    return;
+    }
 
   // Get kernel.
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(num);
