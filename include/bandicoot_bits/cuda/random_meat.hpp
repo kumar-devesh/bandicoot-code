@@ -175,7 +175,7 @@ fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int hi, const 
   // [0, u32_MAX] --> [0, range] (only needed if range != u32_MAX)
   if (range != std::numeric_limits<u32>::max())
     {
-    inplace_op_scalar(u32_dest, (u32) range + 1, n, oneway_kernel_id::inplace_mod_scalar);
+    inplace_op_scalar(u32_dest, (u32) range + 1, n, 1, oneway_kernel_id::inplace_mod_scalar);
     }
 
   // Now cast it to the correct type, if needed.
@@ -188,7 +188,7 @@ fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int hi, const 
   // We do this after the casting, in case eT is a signed type and lo < 0.
   if (lo != 0)
     {
-    inplace_op_scalar(dest, (eT) lo, n, oneway_kernel_id::inplace_plus_scalar);
+    inplace_op_scalar(dest, (eT) lo, n, 1, oneway_kernel_id::inplace_plus_scalar);
     }
   }
 
@@ -218,7 +218,7 @@ fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int hi, const 
   // [0, u64_MAX] --> [0, range] (only needed if range != u64_MAX)
   if (range != std::numeric_limits<u64>::max())
     {
-    inplace_op_scalar(u64_dest, (u64) range + 1, n, oneway_kernel_id::inplace_mod_scalar);
+    inplace_op_scalar(u64_dest, (u64) range + 1, n, 1, oneway_kernel_id::inplace_mod_scalar);
     }
 
   // Now cast it to the correct type, if needed.
@@ -231,6 +231,6 @@ fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int hi, const 
   // We do this after the casting, in case eT is a signed type and lo < 0.
   if (lo != 0)
     {
-    inplace_op_scalar(dest, (eT) lo, n, oneway_kernel_id::inplace_plus_scalar);
+    inplace_op_scalar(dest, (eT) lo, n, 1, oneway_kernel_id::inplace_plus_scalar);
     }
   }

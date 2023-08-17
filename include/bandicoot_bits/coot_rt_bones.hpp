@@ -87,7 +87,7 @@ class coot_rt_t
   static inline void copy_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword out_mem_offset, const uword in_mem_offset, const uword out_n_rows, const uword in_n_rows, const uword len);
 
   template<typename eT>
-  static inline void inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, const oneway_kernel_id::enum_id num);
+  static inline void inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_rows, const uword n_cols, const oneway_kernel_id::enum_id num);
 
   template<typename eT1, typename eT2>
   static inline void inplace_op_array(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword n_elem, const twoway_kernel_id::enum_id num);

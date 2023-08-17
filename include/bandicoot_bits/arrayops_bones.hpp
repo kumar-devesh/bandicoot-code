@@ -31,30 +31,6 @@ class arrayops
 
 
   //
-  // array op= scalar
-
-  template<typename eT>
-  inline static void
-  inplace_set_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem);
-
-  template<typename eT>
-  inline static void
-  inplace_plus_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem);
-
-  template<typename eT>
-  inline static void
-  inplace_minus_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem);
-
-  template<typename eT>
-  inline static void
-  inplace_mul_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem);
-
-  template<typename eT>
-  inline static void
-  inplace_div_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem);
-
-
-  //
   // array op= array
 
   template<typename eT1, typename eT2>

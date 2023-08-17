@@ -20,9 +20,12 @@
 template<typename eT>
 inline
 void
-inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, oneway_kernel_id::enum_id num)
+inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_rows, const uword n_cols, oneway_kernel_id::enum_id num)
   {
   coot_extra_debug_sigprint();
+
+  // TODO: fix
+  const uword n_elem = n_rows * n_cols;
 
   if (n_elem == 0)
     return;

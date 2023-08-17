@@ -133,7 +133,7 @@ op_htrans2::apply_noalias(Mat<out_eT>& out,
   coot_extra_debug_sigprint();
 
   op_htrans::apply_noalias(out, A);
-  arrayops::inplace_mul_scalar(out.get_dev_mem(false), val, out.n_elem);
+  coot_rt_t::inplace_op_scalar(out.get_dev_mem(false), val, out.n_rows, out.n_cols, oneway_kernel_id::inplace_mul_scalar);
   }
 
 

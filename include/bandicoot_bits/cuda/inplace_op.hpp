@@ -20,22 +20,24 @@
 template<typename eT>
 inline
 void
-inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, oneway_kernel_id::enum_id num)
+inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_rows, const uword n_cols, oneway_kernel_id::enum_id num)
   {
   coot_extra_debug_sigprint();
 
-  if (n_elem == 0)
+  if (n_rows == 0 || n_cols == 0)
     return;
 
   // Get kernel.
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(num);
 
   const void* args[] = {
-      &(dest.cuda_mem_ptr),
+      &(dest.cuda_mem_ptr) + 0,
       &val,
-      (uword*) &n_elem };
+      (uword*) &n_rows,
+      (uword*) &n_cols,
+      (uword*) &n_rows };
 
-  const kernel_dims dims = one_dimensional_grid_dims(n_elem);
+  const kernel_dims dims = two_dimensional_grid_dims(n_rows, n_cols);
 
   CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,

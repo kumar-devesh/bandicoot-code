@@ -396,7 +396,7 @@ Mat<eT>::operator=(const eT val)
 
   set_size(1,1);
 
-  arrayops::inplace_set_scalar(dev_mem, val, n_elem);
+  coot_rt_t::inplace_op_scalar(dev_mem, val, n_rows, n_cols, oneway_kernel_id::inplace_set_scalar);
 
   return *this;
   }
@@ -410,7 +410,7 @@ Mat<eT>::operator+=(const eT val)
   {
   coot_extra_debug_sigprint();
 
-  arrayops::inplace_plus_scalar(dev_mem, val, n_elem);
+  coot_rt_t::inplace_op_scalar(dev_mem, val, n_rows, n_cols, oneway_kernel_id::inplace_plus_scalar);
 
   return *this;
   }
@@ -424,7 +424,7 @@ Mat<eT>::operator-=(const eT val)
   {
   coot_extra_debug_sigprint();
 
-  arrayops::inplace_minus_scalar(dev_mem, val, n_elem);
+  coot_rt_t::inplace_op_scalar(dev_mem, val, n_rows, n_cols, oneway_kernel_id::inplace_minus_scalar);
 
   return *this;
   }
@@ -438,7 +438,7 @@ Mat<eT>::operator*=(const eT val)
   {
   coot_extra_debug_sigprint();
 
-  arrayops::inplace_mul_scalar(dev_mem, val, n_elem);
+  coot_rt_t::inplace_op_scalar(dev_mem, val, n_rows, n_cols, oneway_kernel_id::inplace_mul_scalar);
 
   return *this;
   }
@@ -452,7 +452,7 @@ Mat<eT>::operator/=(const eT val)
   {
   coot_extra_debug_sigprint();
 
-  arrayops::inplace_div_scalar(dev_mem, val, n_elem);
+  coot_rt_t::inplace_op_scalar(dev_mem, val, n_rows, n_cols, oneway_kernel_id::inplace_div_scalar);
 
   return *this;
   }
@@ -1688,7 +1688,7 @@ Mat<eT>::fill(const eT val)
   {
   coot_extra_debug_sigprint();
 
-  arrayops::inplace_set_scalar(dev_mem, val, n_elem);
+  coot_rt_t::inplace_op_scalar(dev_mem, val, n_rows, n_cols, oneway_kernel_id::inplace_set_scalar);
 
   return *this;
   }

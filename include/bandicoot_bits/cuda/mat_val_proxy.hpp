@@ -69,7 +69,7 @@ val_add_inplace(dev_mem_t<eT> mem, const uword index, const eT val)
   // We'll run a kernel with only one worker to update the index.
   dev_mem_t<eT> tmp_mem;
   tmp_mem.cuda_mem_ptr = mem.cuda_mem_ptr + index;
-  inplace_op_scalar(tmp_mem, val, 1, oneway_kernel_id::inplace_plus_scalar);
+  inplace_op_scalar(tmp_mem, val, 1, 1, oneway_kernel_id::inplace_plus_scalar);
   }
 
 
@@ -84,7 +84,7 @@ val_minus_inplace(dev_mem_t<eT> mem, const uword index, const eT val)
   // We'll run a kernel with only one worker to update the index.
   dev_mem_t<eT> tmp_mem;
   tmp_mem.cuda_mem_ptr = mem.cuda_mem_ptr + index;
-  inplace_op_scalar(tmp_mem, val, 1, oneway_kernel_id::inplace_minus_scalar);
+  inplace_op_scalar(tmp_mem, val, 1, 1, oneway_kernel_id::inplace_minus_scalar);
   }
 
 
@@ -99,7 +99,7 @@ val_mul_inplace(dev_mem_t<eT> mem, const uword index, const eT val)
   // We'll run a kernel with only one worker to update the index.
   dev_mem_t<eT> tmp_mem;
   tmp_mem.cuda_mem_ptr = mem.cuda_mem_ptr + index;
-  inplace_op_scalar(tmp_mem, val, 1, oneway_kernel_id::inplace_mul_scalar);
+  inplace_op_scalar(tmp_mem, val, 1, 1, oneway_kernel_id::inplace_mul_scalar);
   }
 
 
@@ -114,5 +114,5 @@ val_div_inplace(dev_mem_t<eT> mem, const uword index, const eT val)
   // We'll run a kernel with only one worker to update the index.
   dev_mem_t<eT> tmp_mem;
   tmp_mem.cuda_mem_ptr = mem.cuda_mem_ptr + index;
-  inplace_op_scalar(tmp_mem, val, 1, oneway_kernel_id::inplace_div_scalar);
+  inplace_op_scalar(tmp_mem, val, 1, 1, oneway_kernel_id::inplace_div_scalar);
   }
