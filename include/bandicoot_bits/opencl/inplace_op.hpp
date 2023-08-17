@@ -24,10 +24,7 @@ inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_rows, const uw
   {
   coot_extra_debug_sigprint();
 
-  // TODO: fix
-  const uword n_elem = n_rows * n_cols;
-
-  if (n_elem == 0)
+  if (n_rows == 0 || n_cols == 0)
     return;
 
   // Get kernel.
@@ -35,18 +32,24 @@ inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_rows, const uw
 
   runtime_t::cq_guard guard;
 
-  runtime_t::adapt_uword N(n_elem);
+  runtime_t::adapt_uword out_offset(0);
+  runtime_t::adapt_uword cl_n_rows(n_rows);
+  runtime_t::adapt_uword cl_n_cols(n_cols);
+  runtime_t::adapt_uword cl_M_n_rows(n_rows);
 
   cl_int status = 0;
 
-  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem), &(dest.cl_mem_ptr) );
-  status |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(eT),     &val               );
-  status |= coot_wrapper(clSetKernelArg)(kernel, 2, N.size,         N.addr             );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem),   &(dest.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(kernel, 1, out_offset.size,  out_offset.addr   );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 2, sizeof(eT),       &val              );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 3, cl_n_rows.size,   cl_n_rows.addr    );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 4, cl_n_cols.size,   cl_n_cols.addr    );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 5, cl_M_n_rows.size, cl_M_n_rows.addr  );
   coot_check_cl_error(status, "coot::opencl::inplace_op_scalar(): couldn't set kernel arguments");
 
-  const size_t global_work_size[1] = { size_t(n_elem) };
+  const size_t global_work_size[2] = { size_t(n_rows), size_t(n_cols) };
 
-  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 1, NULL, global_work_size, NULL, 0, NULL, NULL);
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 2, NULL, global_work_size, NULL, 0, NULL, NULL);
 
   coot_check_cl_error(status, "coot::opencl::inplace_op_scalar(): couldn't execute kernel");
   }

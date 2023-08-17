@@ -15,12 +15,18 @@
 __kernel
 void
 COOT_FN(PREFIX,inplace_mod_scalar)(__global eT1* out,
+                                   const UWORD out_offset,
                                    const eT1 val,
-                                   const UWORD N)
+                                   const UWORD n_rows,
+                                   const UWORD n_cols,
+                                   const UWORD M_n_rows)
   {
-  const UWORD i = get_global_id(0);
-  if(i < N)
+  const UWORD row = get_global_id(0);
+  const UWORD col = get_global_id(1);
+  const UWORD index = col * M_n_rows + row;
+
+  if(row < n_rows && col < n_cols)
     {
-    out[i] = (eT1) ((uint_eT1) out[i] % (uint_eT1) val);
+    out[index + out_offset] = (eT1) ((uint_eT1) out[index + out_offset] % (uint_eT1) val);
     }
   }
