@@ -122,8 +122,27 @@ class coot_rt_t
   template<typename eT1, typename eT2, typename eT3>
   static inline void array_op(dev_mem_t<eT3> dest, const uword n_elem, const dev_mem_t<eT1> A_mem, const dev_mem_t<eT2> B_mem, const threeway_kernel_id::enum_id num);
 
+  /**
+   * Perform an elementwise scalar operation on a matrix of size `n_rows x n_cols`, storing the result in `dest`.
+   * The offsets and M_n_rows are meant to allow the source (and destination) to be subviews of a larger matrix.
+   */
   template<typename eT1, typename eT2>
-  static inline void eop_scalar(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword n_elem, const eT1 aux_val_pre, const eT2 aux_val_post, const twoway_kernel_id::enum_id num);
+  static inline void eop_scalar(const twoway_kernel_id::enum_id num,
+                                dev_mem_t<eT2> dest,
+                                const dev_mem_t<eT1> src,
+                                const eT1 aux_val_pre,
+                                const eT2 aux_val_post,
+                                // logical size of source and destination
+                                const uword n_rows,
+                                const uword n_cols,
+                                // submatrix destination offsets (set to 0, 0, and n_rows if not a subview)
+                                const uword dest_row_offset,
+                                const uword dest_col_offset,
+                                const uword dest_M_n_rows,
+                                // submatrix source offsets (set to 0, 0, and n_rows if not a subview)
+                                const uword src_row_offset,
+                                const uword src_col_offset,
+                                const uword src_M_n_rows);
 
   template<typename eT>
   static inline eT accu(const dev_mem_t<eT> mem, const uword n_elem);

@@ -98,7 +98,11 @@ eop_core<eop_type>::apply(Mat<eT>& out, const eOp<T1, eop_type>& x)
 
     dev_mem_t<in_eT> A_dev_mem = A.get_dev_mem(false);
 
-    coot_rt_t::eop_scalar(out_dev_mem, A_dev_mem, out.get_n_elem(), aux_in, aux_out, kernel_num);
+    coot_rt_t::eop_scalar(kernel_num, out_dev_mem, A_dev_mem,
+                          aux_in, aux_out,
+                          out.get_n_rows(), out.get_n_cols(),
+                          0, 0, out.get_n_rows(),
+                          0, 0, out.get_n_rows()); // TODO: cleaner subview support?
     }
   else
     {
@@ -109,7 +113,11 @@ eop_core<eop_type>::apply(Mat<eT>& out, const eOp<T1, eop_type>& x)
 
     dev_mem_t<typename T1::elem_type> A_dev_mem = A.get_dev_mem(false);
 
-    coot_rt_t::eop_scalar(out_dev_mem, A_dev_mem, out.get_n_elem(), (typename T1::elem_type) aux_in, aux_out, kernel_num);
+    coot_rt_t::eop_scalar(kernel_num, out_dev_mem, A_dev_mem,
+                          (typename T1::elem_type) aux_in, aux_out,
+                          out.get_n_rows(), out.get_n_cols(),
+                          0, 0, out.get_n_rows(),
+                          0, 0, out.get_n_rows());
     }
   }
 
@@ -144,14 +152,26 @@ eop_core<eop_type>::apply(Mat<eT>& out, const eOp<mtOp<eT, eOp<T2, eop_type>, mt
   if (!eop_type::is_chainable)
     {
     Mat<in_eT> tmp(A.n_rows, A.n_cols);
-    coot_rt_t::eop_scalar(tmp.get_dev_mem(), A_dev_mem, tmp.get_n_elem(), aux_in, in_eT(0), kernel_num);
-    coot_rt_t::eop_scalar(out_dev_mem, tmp.get_dev_mem(), out.get_n_elem(), in_eT(0), aux_out, kernel_num);
+    coot_rt_t::eop_scalar(kernel_num, tmp.get_dev_mem(), A_dev_mem,
+                          aux_in, in_eT(0),
+                          tmp.n_rows, tmp.n_cols,
+                          0, 0, tmp.n_rows,
+                          0, 0, A.n_rows);
+    coot_rt_t::eop_scalar(kernel_num, out_dev_mem, tmp.get_dev_mem(),
+                          in_eT(0), aux_out,
+                          out.n_rows, out.n_cols,
+                          0, 0, out.n_rows,
+                          0, 0, tmp.n_rows);
 
     return;
     }
   else
     {
-    coot_rt_t::eop_scalar(out_dev_mem, A_dev_mem, out.get_n_elem(), aux_in, aux_out, kernel_num);
+    coot_rt_t::eop_scalar(kernel_num, out_dev_mem, A_dev_mem,
+                          aux_in, aux_out,
+                          out.n_rows, out.n_cols,
+                          0, 0, out.n_rows,
+                          0, 0, A.n_rows);
     }
   }
 

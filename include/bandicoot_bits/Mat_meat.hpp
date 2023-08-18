@@ -396,7 +396,12 @@ Mat<eT>::operator=(const eT val)
 
   set_size(1,1);
 
-  coot_rt_t::inplace_op_scalar(dev_mem, val, n_rows, n_cols, oneway_kernel_id::inplace_set_scalar);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_plus_scalar, // TODO: rename array -> mat
+                        dev_mem, dev_mem,
+                        val, (eT) 1,
+                        n_rows, n_cols,
+                        0, 0, n_rows,
+                        0, 0, n_rows);
 
   return *this;
   }
@@ -410,7 +415,12 @@ Mat<eT>::operator+=(const eT val)
   {
   coot_extra_debug_sigprint();
 
-  coot_rt_t::inplace_op_scalar(dev_mem, val, n_rows, n_cols, oneway_kernel_id::inplace_plus_scalar);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_plus_scalar,
+                        dev_mem, dev_mem,
+                        (eT) 0, (eT) 0,
+                        n_rows, n_cols,
+                        0, 0, n_rows,
+                        0, 0, n_rows);
 
   return *this;
   }

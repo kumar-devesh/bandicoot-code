@@ -965,14 +965,33 @@ coot_rt_t::array_op(dev_mem_t<eT3> dest, const uword n_elem, const dev_mem_t<eT1
 template<typename eT1, typename eT2>
 inline
 void
-coot_rt_t::eop_scalar(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword n_elem, const eT1 aux_val_pre, const eT2 aux_val_post, const twoway_kernel_id::enum_id num)
+coot_rt_t::eop_scalar(const twoway_kernel_id::enum_id num,
+                      dev_mem_t<eT2> dest,
+                      const dev_mem_t<eT1> src,
+                      const eT1 aux_val_pre,
+                      const eT2 aux_val_post,
+                      // logical size of source and destination
+                      const uword n_rows,
+                      const uword n_cols,
+                      // submatrix destination offsets (set to 0, 0, and n_rows if not a subview)
+                      const uword dest_row_offset,
+                      const uword dest_col_offset,
+                      const uword dest_M_n_rows,
+                      // submatrix source offsets (set to 0, 0, and n_rows if not a subview)
+                      const uword src_row_offset,
+                      const uword src_col_offset,
+                      const uword src_M_n_rows)
   {
   coot_extra_debug_sigprint();
 
   if (get_rt().backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
-    opencl::eop_scalar(dest, src, n_elem, aux_val_pre, aux_val_post, num);
+    opencl::eop_scalar(num, dest, src,
+                       aux_val_pre, aux_val_post,
+                       n_rows, n_cols,
+                       dest_row_offset, dest_col_offset, dest_M_n_rows,
+                       src_row_offset, src_col_offset, src_M_n_rows);
     #else
     coot_stop_runtime_error("coot_rt::eop_scalar(): OpenCL backend not enabled");
     #endif
@@ -980,7 +999,11 @@ coot_rt_t::eop_scalar(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword
   else if (get_rt().backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    cuda::eop_scalar(dest, src, n_elem, aux_val_pre, aux_val_post, num);
+    cuda::eop_scalar(num, dest, src,
+                     aux_val_pre, aux_val_post,
+                     n_rows, n_cols,
+                     dest_row_offset, dest_col_offset, dest_M_n_rows,
+                     src_row_offset, src_col_offset, src_M_n_rows);
     #else
     coot_stop_runtime_error("coot_rt::eop_scalar(): CUDA backend not enabled");
     #endif
