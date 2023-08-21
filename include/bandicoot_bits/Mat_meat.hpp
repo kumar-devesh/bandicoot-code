@@ -417,7 +417,7 @@ Mat<eT>::operator+=(const eT val)
 
   coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_plus_scalar,
                         dev_mem, dev_mem,
-                        (eT) 0, (eT) 0,
+                        val, (eT) 0,
                         n_rows, n_cols,
                         0, 0, n_rows,
                         0, 0, n_rows);
