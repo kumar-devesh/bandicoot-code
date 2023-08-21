@@ -14,17 +14,25 @@
 
 __global__
 void
-COOT_FN(PREFIX,equ_array_log_pre)(eT2* out,
-                                  const eT1* A,
+COOT_FN(PREFIX,equ_array_log_pre)(eT2* dest,
+                                  const eT1* src,
                                   const eT1 val_pre,
                                   const eT2 val_post,
-                                  const UWORD N)
+                                  const UWORD n_rows,
+                                  const UWORD n_cols,
+                                  const UWORD dest_M_n_rows,
+                                  const UWORD src_M_n_rows)
   {
   (void)(val_pre);
   (void)(val_post);
-  const UWORD i = blockIdx.x * blockDim.x + threadIdx.x;
-  if(i < N)
+
+  const UWORD row = blockIdx.x * blockDim.x + threadIdx.x;
+  const UWORD col = blockIdx.y * blockDim.y + threadIdx.y;
+  const UWORD src_index = row + col * src_M_n_rows;
+  const UWORD dest_index = row + col * dest_M_n_rows;
+
+  if (row < n_rows && col < n_cols)
     {
-    out[i] = (eT2) log((fp_eT2) A[i]);
+    dest[dest_index] = (eT2) log((fp_eT2) src[src_index]);
     }
   }
