@@ -14,15 +14,24 @@
 
 __kernel
 void
-COOT_FN(PREFIX,equ_array_minus_scalar_post)(__global eT2* out,
-                                            __global const eT1* A,
+COOT_FN(PREFIX,equ_array_minus_scalar_post)(__global eT2* dest,
+                                            const UWORD dest_offset,
+                                            __global const eT1* src,
+                                            const UWORD src_offset,
                                             const eT1 val_pre,
                                             const eT2 val_post,
-                                            const UWORD N)
+                                            const UWORD n_rows,
+                                            const UWORD n_cols,
+                                            const UWORD dest_M_n_rows,
+                                            const UWORD src_M_n_rows)
   {
-  const UWORD i = get_global_id(0);
-  if(i < N)
+  const UWORD row = get_global_id(0);
+  const UWORD col = get_global_id(1);
+  const UWORD src_index = row + col * src_M_n_rows + src_offset;
+  const UWORD dest_index = row + col * dest_M_n_rows + dest_offset;
+
+  if (row < n_rows && col < n_cols)
     {
-    out[i] = ((eT2) (A[i] - val_pre)) - val_post;
+    dest[dest_index] = ((eT2) (src[src_index] - val_pre)) - val_post;
     }
   }

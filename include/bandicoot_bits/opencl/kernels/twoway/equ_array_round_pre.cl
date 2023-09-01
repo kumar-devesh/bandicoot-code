@@ -14,22 +14,35 @@
 
 __kernel
 void
-COOT_FN(PREFIX,equ_array_round_pre)(__global eT2* out,
-                                    __global const eT1* A,
+COOT_FN(PREFIX,equ_array_round_pre)(__global eT2* dest,
+                                    const UWORD dest_offset,
+                                    __global const eT1* src,
+                                    const UWORD src_offset,
                                     const eT1 val_pre,
                                     const eT2 val_post,
-                                    const UWORD N)
+                                    const UWORD n_rows,
+                                    const UWORD n_cols,
+                                    const UWORD dest_M_n_rows,
+                                    const UWORD src_M_n_rows)
   {
   (void)(val_pre);
   (void)(val_post);
-  const UWORD i = get_global_id(0);
-  if (COOT_FN(coot_is_fp_,eT2)())
+
+  const UWORD row = get_global_id(0);
+  const UWORD col = get_global_id(1);
+  const UWORD src_index = row + col * src_M_n_rows + src_offset;
+  const UWORD dest_index = row + col * dest_M_n_rows + dest_offset;
+
+  if (row < n_rows && col < n_cols)
     {
-    const fp_eT2 val = (fp_eT2) A[i];
-    out[i] = (eT2) round(val);
-    }
-  else
-    {
-    out[i] = (eT2) A[i];
+    if (COOT_FN(coot_is_fp_,eT2)())
+      {
+      const fp_eT2 val = (fp_eT2) src[src_index];
+      dest[dest_index] = (eT2) round(val);
+      }
+    else
+      {
+      dest[dest_index] = (eT2) src[src_index];
+      }
     }
   }

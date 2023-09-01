@@ -14,26 +14,39 @@
 
 __kernel
 void
-COOT_FN(PREFIX,equ_array_sign_pre)(__global eT2* out,
-                                   __global const eT1* A,
+COOT_FN(PREFIX,equ_array_sign_pre)(__global eT2* dest,
+                                   const UWORD dest_offset,
+                                   __global const eT1* src,
+                                   const UWORD src_offset,
                                    const eT1 val_pre,
                                    const eT2 val_post,
-                                   const UWORD N)
+                                   const UWORD n_rows,
+                                   const UWORD n_cols,
+                                   const UWORD dest_M_n_rows,
+                                   const UWORD src_M_n_rows)
   {
   (void)(val_pre);
   (void)(val_post);
-  const UWORD i = get_global_id(0);
-  const eT2 val = (eT2) A[i];
-  if (val > (eT2) 0)
+
+  const UWORD row = get_global_id(0);
+  const UWORD col = get_global_id(1);
+  const UWORD src_index = row + col * src_M_n_rows + src_offset;
+  const UWORD dest_index = row + col * dest_M_n_rows + dest_offset;
+
+  if (row < n_rows && col < n_cols)
     {
-    out[i] = (eT2) 1;
-    }
-  else if (val == (eT2) 0)
-    {
-    out[i] = (eT2) 0;
-    }
-  else
-    {
-    out[i] = (eT2) -1;
+    const eT2 val = (eT2) src[src_index];
+    if (val > (eT2) 0)
+      {
+      dest[dest_index] = (eT2) 1;
+      }
+    else if (val == (eT2) 0)
+      {
+      dest[dest_index] = (eT2) 0;
+      }
+    else
+      {
+      dest[dest_index] = (eT2) -1;
+      }
     }
   }

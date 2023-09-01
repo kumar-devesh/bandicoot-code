@@ -14,29 +14,39 @@
 
 __kernel
 void
-COOT_FN(PREFIX,equ_array_sinc_pre)(__global eT2* out,
-                                   __global const eT1* A,
+COOT_FN(PREFIX,equ_array_sinc_pre)(__global eT2* dest,
+                                   const UWORD dest_offset,
+                                   __global const eT1* src,
+                                   const UWORD src_offset,
                                    const eT1 val_pre,
                                    const eT2 val_post,
-                                   const UWORD N)
+                                   const UWORD n_rows,
+                                   const UWORD n_cols,
+                                   const UWORD dest_M_n_rows,
+                                   const UWORD src_M_n_rows)
   {
   (void)(val_pre);
   (void)(val_post);
-  const UWORD i = get_global_id(0);
-  if(i < N)
+
+  const UWORD row = get_global_id(0);
+  const UWORD col = get_global_id(1);
+  const UWORD src_index = row + col * src_M_n_rows + src_offset;
+  const UWORD dest_index = row + col * dest_M_n_rows + dest_offset;
+
+  if (row < n_rows && col < n_cols)
     {
-    const eT2 val = (eT2) A[i];
+    const eT2 val = (eT2) src[src_index];
     // To imitate Armadillo correctly, we use double if the type is not floating point.
     if (COOT_FN(coot_is_fp_,eT2)())
       {
       const fp_eT2 tmp = val * M_PI;
-      out[i] = (tmp == (eT2) 0.0) ? (eT2) 1.0 : (eT2) (sin(tmp) / tmp);
+      dest[dest_index] = (tmp == (eT2) 0.0) ? (eT2) 1.0 : (eT2) (sin(tmp) / tmp);
       }
     else
       {
       const ARMA_FP_TYPE fp_val = (ARMA_FP_TYPE) val;
       const ARMA_FP_TYPE tmp = fp_val * M_PI;
-      out[i] = (tmp == 0.0) ? (eT2) 1.0 : (eT2) (sin(tmp) / tmp);
+      dest[dest_index] = (tmp == 0.0) ? (eT2) 1.0 : (eT2) (sin(tmp) / tmp);
       }
     }
   }
