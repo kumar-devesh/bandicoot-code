@@ -145,7 +145,7 @@ eop_core<eop_type>::apply(Mat<eT>& out, const eOp<mtOp<eT, eOp<T2, eop_type>, mt
   // themselves can't support it).
   if (!eop_type::is_chainable)
     {
-    Mat<in_eT> tmp(A.n_rows, A.n_cols);
+    Mat<in_eT> tmp(U.M.n_rows, U.M.n_cols);
     coot_rt_t::eop_scalar(kernel_num, tmp.get_dev_mem(), A_dev_mem,
                           aux_in, in_eT(0),
                           tmp.n_rows, tmp.n_cols,

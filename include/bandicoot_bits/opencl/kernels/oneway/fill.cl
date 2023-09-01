@@ -13,16 +13,14 @@
 // ------------------------------------------------------------------------
 
 
-// TODO: inplace_set_scalar() could be replaced with explicit call to clEnqueueFillBuffer()
-// present in OpenCL 1.2: http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clEnqueueFillBuffer.html
 __kernel
 void
-COOT_FN(PREFIX,inplace_set_scalar)(__global eT1* out,
-                                   const UWORD out_offset,
-                                   const eT1 val,
-                                   const UWORD n_rows,
-                                   const UWORD n_cols,
-                                   const UWORD M_n_rows)
+COOT_FN(PREFIX,fill)(__global eT1* out,
+                     const UWORD out_offset,
+                     const eT1 val,
+                     const UWORD n_rows,
+                     const UWORD n_cols,
+                     const UWORD M_n_rows)
   {
   const UWORD row = get_global_id(0);
   const UWORD col = get_global_id(1);

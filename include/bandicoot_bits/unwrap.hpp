@@ -187,7 +187,7 @@ struct unwrap< mtOp<out_eT, T1, mtop_conv_to> >
   template<typename eT2>
   coot_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
   template<typename eT2>
-  coot_inline bool is_alias(const subview<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X.m));
+  coot_inline bool is_alias(const subview<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X.m)); }
 
   constexpr inline uword get_row_offset() const { return 0; }
   constexpr inline uword get_col_offset() const { return 0; }

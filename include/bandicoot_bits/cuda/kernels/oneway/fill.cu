@@ -14,11 +14,11 @@
 
 __global__
 void
-COOT_FN(PREFIX,inplace_set_scalar)(eT1* out,
-                                   const eT1 val,
-                                   const UWORD n_rows,
-                                   const UWORD n_cols,
-                                   const UWORD M_n_rows)
+COOT_FN(PREFIX,fill)(eT1* out,
+                     const eT1 val,
+                     const UWORD n_rows,
+                     const UWORD n_cols,
+                     const UWORD M_n_rows)
   {
   const UWORD row = blockIdx.x * blockDim.x + threadIdx.x;
   const UWORD col = blockIdx.y * blockDim.y + threadIdx.y;

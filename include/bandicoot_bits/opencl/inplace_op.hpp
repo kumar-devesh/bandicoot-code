@@ -20,7 +20,13 @@
 template<typename eT>
 inline
 void
-inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_rows, const uword n_cols, oneway_kernel_id::enum_id num)
+fill(dev_mem_t<eT> dest,
+     const eT val,
+     const uword n_rows,
+     const uword n_cols,
+     const uword row_offset,
+     const uword col_offset,
+     const uword M_n_rows)
   {
   coot_extra_debug_sigprint();
 
@@ -28,30 +34,31 @@ inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_rows, const uw
     return;
 
   // Get kernel.
-  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(num);
+  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::fill);
 
   runtime_t::cq_guard guard;
 
-  runtime_t::adapt_uword out_offset(0);
+  const uword out_offset = row_offset + col_offset * M_n_rows;
+  runtime_t::adapt_uword cl_out_offset(out_offset);
   runtime_t::adapt_uword cl_n_rows(n_rows);
   runtime_t::adapt_uword cl_n_cols(n_cols);
-  runtime_t::adapt_uword cl_M_n_rows(n_rows);
+  runtime_t::adapt_uword cl_M_n_rows(M_n_rows);
 
   cl_int status = 0;
 
-  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem),   &(dest.cl_mem_ptr));
-  status |= coot_wrapper(clSetKernelArg)(kernel, 1, out_offset.size,  out_offset.addr   );
-  status |= coot_wrapper(clSetKernelArg)(kernel, 2, sizeof(eT),       &val              );
-  status |= coot_wrapper(clSetKernelArg)(kernel, 3, cl_n_rows.size,   cl_n_rows.addr    );
-  status |= coot_wrapper(clSetKernelArg)(kernel, 4, cl_n_cols.size,   cl_n_cols.addr    );
-  status |= coot_wrapper(clSetKernelArg)(kernel, 5, cl_M_n_rows.size, cl_M_n_rows.addr  );
-  coot_check_cl_error(status, "coot::opencl::inplace_op_scalar(): couldn't set kernel arguments");
+  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem),     &(dest.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(kernel, 1, cl_out_offset.size, cl_out_offset.addr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 2, sizeof(eT),         &val              );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 3, cl_n_rows.size,     cl_n_rows.addr    );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 4, cl_n_cols.size,     cl_n_cols.addr    );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 5, cl_M_n_rows.size,   cl_M_n_rows.addr  );
+  coot_check_cl_error(status, "coot::opencl::fill(): couldn't set kernel arguments");
 
   const size_t global_work_size[2] = { size_t(n_rows), size_t(n_cols) };
 
   status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 2, NULL, global_work_size, NULL, 0, NULL, NULL);
 
-  coot_check_cl_error(status, "coot::opencl::inplace_op_scalar(): couldn't execute kernel");
+  coot_check_cl_error(status, "coot::opencl::fill(): couldn't execute kernel");
   }
 
 

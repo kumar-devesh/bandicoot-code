@@ -20,7 +20,13 @@
 template<typename eT>
 inline
 void
-inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_rows, const uword n_cols, oneway_kernel_id::enum_id num)
+fill(dev_mem_t<eT> dest,
+     const eT val,
+     const uword n_rows,
+     const uword n_cols,
+     const uword row_offset,
+     const uword col_offset,
+     const uword M_n_rows)
   {
   coot_extra_debug_sigprint();
 
@@ -28,14 +34,14 @@ inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_rows, const uw
     return;
 
   // Get kernel.
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(num);
+  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::fill);
 
   const void* args[] = {
-      &(dest.cuda_mem_ptr) + 0,
+      &(dest.cuda_mem_ptr) + row_offset + (col_offset * M_n_rows),
       &val,
       (uword*) &n_rows,
       (uword*) &n_cols,
-      (uword*) &n_rows };
+      (uword*) &M_n_rows };
 
   const kernel_dims dims = two_dimensional_grid_dims(n_rows, n_cols);
 
@@ -47,7 +53,7 @@ inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_rows, const uw
       (void**) args, // arguments
       0);
 
-  coot_check_cuda_error( result, "coot::cuda::inplace_op_scalar(): cuLaunchKernel() failed" );
+  coot_check_cuda_error( result, "coot::cuda::fill(): cuLaunchKernel() failed" );
   }
 
 

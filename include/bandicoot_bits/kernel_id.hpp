@@ -56,7 +56,7 @@ struct oneway_kernel_id
   {
   enum enum_id
     {
-    inplace_set_scalar = 0,
+    fill = 0,
     inplace_plus_scalar,
     inplace_minus_scalar,
     inplace_mul_scalar,
@@ -155,7 +155,7 @@ struct oneway_kernel_id
 
     std::vector<std::string> names;
 
-    names.push_back("inplace_set_scalar");
+    names.push_back("fill");
     names.push_back("inplace_plus_scalar");
     names.push_back("inplace_minus_scalar");
     names.push_back("inplace_mul_scalar");
@@ -422,6 +422,7 @@ struct twoway_kernel_id
     equ_array_mul_scalar,
     equ_array_div_scalar_pre,
     equ_array_div_scalar_post,
+    equ_array_mod_scalar,
     equ_array_square_pre,
     equ_array_square_post,
     equ_array_sqrt_pre,
@@ -596,6 +597,7 @@ struct twoway_kernel_id
     names.push_back("equ_array_mul_scalar");
     names.push_back("equ_array_div_scalar_pre");
     names.push_back("equ_array_div_scalar_post");
+    names.push_back("equ_array_mod_scalar");
     names.push_back("equ_array_square_pre");
     names.push_back("equ_array_square_post");
     names.push_back("equ_array_sqrt_pre");

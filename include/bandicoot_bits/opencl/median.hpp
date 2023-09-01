@@ -36,7 +36,12 @@ median(dev_mem_t<eT2> out, dev_mem_t<eT1> in, const uword n_rows, const uword n_
       {
       // Even number of elements: we have to do a little extra processing.
       sum_colwise_subview(out, in, n_rows, middle_element - 1, 0, 2, n_cols, true);
-      inplace_op_scalar(out, eT2(2), n_cols, 1, oneway_kernel_id::inplace_div_scalar);
+      eop_scalar(twoway_kernel_id::equ_array_div_scalar_post,
+                 out, out,
+                 eT2(2), eT2(1),
+                 1, n_cols,
+                 0, 0, 1,
+                 0, 0, 1);
       }
     else
       {
@@ -55,7 +60,12 @@ median(dev_mem_t<eT2> out, dev_mem_t<eT1> in, const uword n_rows, const uword n_
       {
       // Even number of elements: we have to do a little extra processing.
       sum_rowwise_subview(out, in, n_rows, 0, middle_element - 1, n_rows, 2, true);
-      inplace_op_scalar(out, eT2(2), n_rows, 1, oneway_kernel_id::inplace_div_scalar);
+      eop_scalar(twoway_kernel_id::equ_array_div_scalar_post,
+                 out, out,
+                 eT2(2), eT2(1),
+                 n_rows, 1,
+                 0, 0, n_rows,
+                 0, 0, n_rows);
       }
     else
       {
