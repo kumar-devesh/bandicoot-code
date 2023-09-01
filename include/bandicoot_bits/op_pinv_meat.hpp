@@ -75,6 +75,7 @@ op_pinv::apply_direct(Mat<eT2>& out, const T1& in, const typename T1::elem_type 
       // Note that aliases don't need to be handled since we are not operating on `in` now.
       const uword N = (std::min)(U.M.n_rows, U.M.n_cols);
       Col<typename T1::elem_type> diag(N);
+      // TODO: it's possible to see a diag as a subview
       coot_rt_t::extract_diag(diag.get_dev_mem(false), U.M.get_dev_mem(false), 0, U.M.n_rows, N);
 
       return apply_direct_diag(out, diag, tol);

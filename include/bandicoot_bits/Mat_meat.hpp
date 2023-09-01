@@ -396,6 +396,7 @@ Mat<eT>::operator=(const eT val)
 
   set_size(1,1);
 
+  // TODO: this is not correct!
   coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_plus_scalar, // TODO: rename array -> mat
                         dev_mem, dev_mem,
                         val, (eT) 1,

@@ -70,6 +70,7 @@ op_normalise_vec::apply(Mat<eT>& out, const Op<mtOp<eT, T1, mtop_conv_to>, op_no
   coot_debug_check( (p == 0), "normalise(): parameter 'p' must be greater than zero" );
 
   const unwrap<T1> U(in.m.q);
+  // TODO: allow copy_array to work on subviews and extract_subview is no longer needed
   const extract_subview<typename unwrap<T1>::stored_type> S(U.M);
 
   const eT norm_val_a = norm(in.m, p);
