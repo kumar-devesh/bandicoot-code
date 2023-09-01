@@ -131,7 +131,7 @@ TEMPLATE_TEST_CASE("diagonal_vec_pinv", "[pinv]", float, double)
 
   // Make sure the returned matrices are diagonal.
   arma::Mat<eT> out_cpu(out);
-  arma::Mat<eT> out2_cpu(out);
+  arma::Mat<eT> out2_cpu(out2);
 
   REQUIRE( out_cpu.is_diagmat() );
   REQUIRE( out2_cpu.is_diagmat() );
@@ -209,7 +209,7 @@ TEMPLATE_TEST_CASE("custom_tol_diagonal_vec_pinv", "[pinv]", float, double)
 
   // Make sure the returned matrices are diagonal.
   arma::Mat<eT> out_cpu(out);
-  arma::Mat<eT> out2_cpu(out);
+  arma::Mat<eT> out2_cpu(out2);
 
   REQUIRE( out_cpu.is_diagmat() );
   REQUIRE( out2_cpu.is_diagmat() );
@@ -314,9 +314,9 @@ TEMPLATE_TEST_CASE("trans_diagonal_vec_pinv", "[pinv]", float, double)
 
   // Make sure the returned matrices are diagonal.
   arma::Mat<eT> out_cpu(out);
-  arma::Mat<eT> out2_cpu(out);
-  arma::Mat<eT> out3_cpu(out);
-  arma::Mat<eT> out4_cpu(out);
+  arma::Mat<eT> out2_cpu(out2);
+  arma::Mat<eT> out3_cpu(out3);
+  arma::Mat<eT> out4_cpu(out4);
 
   REQUIRE( out_cpu.is_diagmat() );
   REQUIRE( out2_cpu.is_diagmat() );
@@ -373,9 +373,9 @@ TEMPLATE_TEST_CASE("scaled_diagonal_vec_pinv", "[pinv]", float, double)
 
   // Make sure the returned matrices are diagonal.
   arma::Mat<eT> out_cpu(out);
-  arma::Mat<eT> out2_cpu(out);
-  arma::Mat<eT> out3_cpu(out);
-  arma::Mat<eT> out4_cpu(out);
+  arma::Mat<eT> out2_cpu(out2);
+  arma::Mat<eT> out3_cpu(out3);
+  arma::Mat<eT> out4_cpu(out4);
 
   REQUIRE( out_cpu.is_diagmat() );
   REQUIRE( out2_cpu.is_diagmat() );
@@ -456,13 +456,13 @@ TEMPLATE_TEST_CASE("scaled_trans_diagonal_vec_pinv", "[pinv]", float, double)
 
   // Make sure the returned matrices are diagonal.
   arma::Mat<eT> out_cpu(out);
-  arma::Mat<eT> out2_cpu(out);
-  arma::Mat<eT> out3_cpu(out);
-  arma::Mat<eT> out4_cpu(out);
-  arma::Mat<eT> out5_cpu(out);
-  arma::Mat<eT> out6_cpu(out);
-  arma::Mat<eT> out7_cpu(out);
-  arma::Mat<eT> out8_cpu(out);
+  arma::Mat<eT> out2_cpu(out2);
+  arma::Mat<eT> out3_cpu(out3);
+  arma::Mat<eT> out4_cpu(out4);
+  arma::Mat<eT> out5_cpu(out5);
+  arma::Mat<eT> out6_cpu(out6);
+  arma::Mat<eT> out7_cpu(out7);
+  arma::Mat<eT> out8_cpu(out8);
 
   REQUIRE( out_cpu.is_diagmat() );
   REQUIRE( out2_cpu.is_diagmat() );
@@ -574,7 +574,7 @@ TEMPLATE_TEST_CASE("diagonal_mat_pinv", "[pinv]", float, double)
 
   // Make sure the returned matrices are diagonal.
   arma::Mat<eT> out_cpu(out);
-  arma::Mat<eT> out2_cpu(out);
+  arma::Mat<eT> out2_cpu(out2);
 
   REQUIRE( out_cpu.is_diagmat() );
   REQUIRE( out2_cpu.is_diagmat() );
@@ -650,7 +650,7 @@ TEMPLATE_TEST_CASE("diagonal_mat_pinv_offdiag_nans", "[pinv]", float, double)
 
   // Make sure the returned matrices are diagonal.
   arma::Mat<eT> out_cpu(out);
-  arma::Mat<eT> out2_cpu(out);
+  arma::Mat<eT> out2_cpu(out2);
 
   REQUIRE( out_cpu.is_diagmat() );
   REQUIRE( out2_cpu.is_diagmat() );
@@ -701,7 +701,7 @@ TEMPLATE_TEST_CASE("custom_tol_diagonal_mat_pinv", "[pinv]", float, double)
 
   // Make sure the returned matrices are diagonal.
   arma::Mat<eT> out_cpu(out);
-  arma::Mat<eT> out2_cpu(out);
+  arma::Mat<eT> out2_cpu(out2);
 
   REQUIRE( out_cpu.is_diagmat() );
   REQUIRE( out2_cpu.is_diagmat() );
@@ -805,9 +805,9 @@ TEMPLATE_TEST_CASE("trans_diagonal_mat_pinv", "[pinv]", float, double)
 
   // Make sure the returned matrices are diagonal.
   arma::Mat<eT> out_cpu(out);
-  arma::Mat<eT> out2_cpu(out);
-  arma::Mat<eT> out3_cpu(out);
-  arma::Mat<eT> out4_cpu(out);
+  arma::Mat<eT> out2_cpu(out2);
+  arma::Mat<eT> out3_cpu(out3);
+  arma::Mat<eT> out4_cpu(out4);
 
   REQUIRE( out_cpu.is_diagmat() );
   REQUIRE( out2_cpu.is_diagmat() );
@@ -864,9 +864,9 @@ TEMPLATE_TEST_CASE("scaled_diagonal_mat_pinv", "[pinv]", float, double)
 
   // Make sure the returned matrices are diagonal.
   arma::Mat<eT> out_cpu(out);
-  arma::Mat<eT> out2_cpu(out);
-  arma::Mat<eT> out3_cpu(out);
-  arma::Mat<eT> out4_cpu(out);
+  arma::Mat<eT> out2_cpu(out2);
+  arma::Mat<eT> out3_cpu(out3);
+  arma::Mat<eT> out4_cpu(out4);
 
   REQUIRE( out_cpu.is_diagmat() );
   REQUIRE( out2_cpu.is_diagmat() );
@@ -947,13 +947,13 @@ TEMPLATE_TEST_CASE("scaled_trans_diagonal_mat_pinv", "[pinv]", float, double)
 
   // Make sure the returned matrices are diagonal.
   arma::Mat<eT> out_cpu(out);
-  arma::Mat<eT> out2_cpu(out);
-  arma::Mat<eT> out3_cpu(out);
-  arma::Mat<eT> out4_cpu(out);
-  arma::Mat<eT> out5_cpu(out);
-  arma::Mat<eT> out6_cpu(out);
-  arma::Mat<eT> out7_cpu(out);
-  arma::Mat<eT> out8_cpu(out);
+  arma::Mat<eT> out2_cpu(out2);
+  arma::Mat<eT> out3_cpu(out3);
+  arma::Mat<eT> out4_cpu(out4);
+  arma::Mat<eT> out5_cpu(out5);
+  arma::Mat<eT> out6_cpu(out6);
+  arma::Mat<eT> out7_cpu(out7);
+  arma::Mat<eT> out8_cpu(out8);
 
   REQUIRE( out_cpu.is_diagmat() );
   REQUIRE( out2_cpu.is_diagmat() );
