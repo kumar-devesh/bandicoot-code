@@ -155,7 +155,7 @@ op_pinv::apply_direct_diag(Mat<eT>& out, const Mat<eT>& in, const eT tol)
                         (eT) 0, (eT) 0,
                         abs_in.n_rows, abs_in.n_cols,
                         0, 0, abs_in.n_rows,
-                        0, 0, abs_in.n_cols);
+                        0, 0, abs_in.n_rows);
 
   // Compute tolerance if not given.
   eT tol_use = tol;
