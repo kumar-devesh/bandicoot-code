@@ -36,8 +36,9 @@ fill(dev_mem_t<eT> dest,
   // Get kernel.
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::fill);
 
+  const eT* dest_ptr = dest.cuda_mem_ptr + row_offset + (col_offset * M_n_rows);
   const void* args[] = {
-      &(dest.cuda_mem_ptr) + row_offset + (col_offset * M_n_rows),
+      &dest_ptr,
       &val,
       (uword*) &n_rows,
       (uword*) &n_cols,

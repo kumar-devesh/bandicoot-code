@@ -45,9 +45,11 @@ eop_scalar(const twoway_kernel_id::enum_id num,
   const uword dest_offset = dest_row_offset + dest_col_offset * dest_M_n_rows;
   const uword src_offset = src_row_offset + src_col_offset * src_M_n_rows;
 
+  const eT1* src_ptr  =  src.cuda_mem_ptr + src_offset;
+  const eT2* dest_ptr = dest.cuda_mem_ptr + dest_offset;
   const void* args[] = {
-      &(dest.cuda_mem_ptr) + dest_offset,
-      &(src.cuda_mem_ptr) + src_offset,
+      &dest_ptr,
+      &src_ptr,
       &aux_val_pre,
       &aux_val_post,
       (uword*) &n_rows,
