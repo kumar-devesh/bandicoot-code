@@ -94,7 +94,7 @@ eop_core<eop_type>::apply(Mat<eT>& out, const eOp<T1, eop_type>& x)
     {
     const no_conv_unwrap<typename SizeProxy<T1>::stored_type> U(x.m.Q);
 
-    dev_mem_t<in_eT> A_dev_mem = U.M.get_dev_mem(false);
+    dev_mem_t<in_eT> A_dev_mem = U.get_dev_mem(false);
 
     coot_rt_t::eop_scalar(kernel_num, out_dev_mem, A_dev_mem,
                           aux_in, aux_out,
@@ -107,7 +107,7 @@ eop_core<eop_type>::apply(Mat<eT>& out, const eOp<T1, eop_type>& x)
     // We have to perform any conversion before this level.
     const unwrap<typename SizeProxy<T1>::stored_type> U(x.m.Q);
 
-    dev_mem_t<typename T1::elem_type> A_dev_mem = U.M.get_dev_mem(false);
+    dev_mem_t<typename T1::elem_type> A_dev_mem = U.get_dev_mem(false);
 
     coot_rt_t::eop_scalar(kernel_num, out_dev_mem, A_dev_mem,
                           (typename T1::elem_type) aux_in, aux_out,
@@ -139,7 +139,7 @@ eop_core<eop_type>::apply(Mat<eT>& out, const eOp<mtOp<eT, eOp<T2, eop_type>, mt
   const unwrap<T2> U(X.m.Q.q.m.Q);
 
   dev_mem_t<eT>    out_dev_mem = out.get_dev_mem(false);
-  dev_mem_t<in_eT>   A_dev_mem = U.M.get_dev_mem(false);
+  dev_mem_t<in_eT>   A_dev_mem = U.get_dev_mem(false);
 
   // There are a couple exceptions of operations where we actually *can't* chain them together (because the kernels
   // themselves can't support it).

@@ -270,28 +270,24 @@ glue_conv2::fill_gemv_buffer_top_bottom(Mat<eT>& buffer, const uword buffer_top_
   //    buffer.rows(buffer.n_rows - kernel_rows * buffer_bottom_padding, buffer.n_rows - 1) = 0
   if (buffer_top_padding > 0)
     {
-    coot_rt_t::inplace_op_subview(buffer.get_dev_mem(false),
-                                  0,
-                                  (eT) 0,
-                                  0,
-                                  0,
-                                  kernel_rows * buffer_top_padding,
-                                  buffer.n_cols,
-                                  buffer.n_rows,
-                                  oneway_kernel_id::submat_inplace_set_scalar);
+    coot_rt_t::fill(buffer.get_dev_mem(false),
+                    (eT) 0,
+                    kernel_rows * buffer_top_padding,
+                    buffer.n_cols,
+                    0,
+                    0,
+                    buffer.n_rows);
     }
 
   if (buffer_bottom_padding > 0)
     {
-    coot_rt_t::inplace_op_subview(buffer.get_dev_mem(false),
-                                  0,
-                                  (eT) 0,
-                                  buffer.n_rows - (kernel_rows * buffer_bottom_padding),
-                                  0,
-                                  kernel_rows * buffer_bottom_padding,
-                                  buffer.n_cols,
-                                  buffer.n_rows,
-                                  oneway_kernel_id::submat_inplace_set_scalar);
+    coot_rt_t::fill(buffer.get_dev_mem(false),
+                    (eT) 0,
+                    kernel_rows * buffer_bottom_padding,
+                    buffer.n_cols,
+                    buffer.n_rows - (kernel_rows * buffer_bottom_padding),
+                    0,
+                    buffer.n_rows);
     }
   }
 
@@ -316,15 +312,13 @@ glue_conv2::fill_gemv_buffer_col(Mat<eT>& buffer, const uword i, const uword j, 
     // Then, we can say:
     //    bufmat_j.submat(0, 0, K.n_rows - i - 2, A.n_cols - 1) = 0
     //    bufmat_j.submat(K.n_rows - i - 1, 0, K.n_rows, A.n_cols - 1) = A.submat(0, 0, i, A.n_cols - 1)
-    coot_rt_t::inplace_op_subview(buffer.get_dev_mem(false),
-                                  j * buffer.n_rows + K.n_rows * buffer_top_padding,
-                                  (eT) 0,
-                                  0,
-                                  0,
-                                  K.n_rows - i - 1,
-                                  cols_to_copy,
-                                  K.n_rows,
-                                  oneway_kernel_id::submat_inplace_set_scalar);
+    coot_rt_t::fill(buffer.get_dev_mem(false),
+                    (eT) 0,
+                    K.n_rows - i - 1,
+                    cols_to_copy,
+                    j * buffer.n_rows + K.n_rows * buffer_top_padding, // manual offset
+                    0,
+                    K.n_rows);
 
     coot_rt_t::copy_subview_to_subview(buffer.get_dev_mem(false),
                                        K.n_rows - i - 1 + ((j * buffer.n_rows) + K.n_rows * buffer_top_padding),
@@ -381,15 +375,13 @@ glue_conv2::fill_gemv_buffer_col(Mat<eT>& buffer, const uword i, const uword j, 
                                        A.n_cols,
                                        K.n_rows - num_zero_rows,
                                        cols_to_copy);
-    coot_rt_t::inplace_op_subview(buffer.get_dev_mem(false),
-                                  j * buffer.n_rows + K.n_rows * buffer_top_padding,
-                                  (eT) 0,
-                                  K.n_rows - num_zero_rows,
-                                  0,
-                                  num_zero_rows,
-                                  cols_to_copy,
-                                  K.n_rows,
-                                  oneway_kernel_id::submat_inplace_set_scalar);
+    coot_rt_t::fill(buffer.get_dev_mem(false),
+                    (eT) 0,
+                    num_zero_rows,
+                    cols_to_copy,
+                    /* manual offset */ (j * buffer.n_rows + K.n_rows * buffer_top_padding) + /* row offset */ (K.n_rows - num_zero_rows),
+                    0,
+                    K.n_rows);
     }
   }
 

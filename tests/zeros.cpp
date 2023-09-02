@@ -113,7 +113,7 @@ TEMPLATE_TEST_CASE("zeros_standalone_sizemat", "[zeros]", float, double, u32, s3
 
 
 
-TEMPLATE_TEST_CASE("zeres_standalone_row_col", "[zeros]", float, double, u32, s32, u64, s64)
+TEMPLATE_TEST_CASE("zeros_standalone_row_col", "[zeros]", float, double, u32, s32, u64, s64)
   {
   typedef TestType eT;
 

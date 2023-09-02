@@ -54,8 +54,6 @@ class subview : public Base<eT, subview<eT> >
 
   inline void operator= (const subview<eT>& x);
 
-  inline void inplace_op(const eT val, oneway_kernel_id::enum_id kernel);
-
   inline void operator=  (const eT val);
   inline void operator+= (const eT val);
   inline void operator-= (const eT val);
