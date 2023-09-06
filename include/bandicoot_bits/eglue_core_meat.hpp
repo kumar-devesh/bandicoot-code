@@ -42,30 +42,52 @@ eglue_core<eglue_type>::apply(Mat<eT3>& out, const eGlue<T1, T2, eglue_type>& x)
 
   // TODO: there is no size checking here!
 
+  threeway_kernel_id::enum_id kernel;
+
   if(is_same_type<eglue_type, eglue_plus >::yes)
     {
-    coot_rt_t::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), threeway_kernel_id::equ_array_plus_array);
+    kernel = threeway_kernel_id::equ_array_plus_array;
     }
   else if(is_same_type<eglue_type, eglue_minus>::yes)
     {
-    coot_rt_t::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), threeway_kernel_id::equ_array_minus_array);
+    kernel = threeway_kernel_id::equ_array_minus_array;
     }
   else if(is_same_type<eglue_type, eglue_div  >::yes)
     {
-    coot_rt_t::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), threeway_kernel_id::equ_array_div_array);
+    kernel = threeway_kernel_id::equ_array_div_array;
     }
   else if(is_same_type<eglue_type, eglue_schur>::yes)
     {
-    coot_rt_t::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), threeway_kernel_id::equ_array_mul_array);
+    kernel = threeway_kernel_id::equ_array_mul_array;
     }
   else if(is_same_type<eglue_type, eglue_atan2>::yes)
     {
-    coot_rt_t::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), threeway_kernel_id::equ_array_atan2);
+    kernel = threeway_kernel_id::equ_array_atan2;
     }
   else if(is_same_type<eglue_type, eglue_hypot>::yes)
     {
-    coot_rt_t::array_op(out.get_dev_mem(false), out.n_elem, A.get_dev_mem(false), B.get_dev_mem(false), threeway_kernel_id::equ_array_hypot);
+    kernel = threeway_kernel_id::equ_array_hypot;
     }
+  else
+    {
+    coot_stop_runtime_error("eglue_core::apply(): unknown eglue_type");
+    }
+
+  coot_rt_t::eop_array(kernel,
+                       out.get_dev_mem(false),
+                       UA.get_dev_mem(false),
+                       UB.get_dev_mem(false),
+                       out.n_rows,
+                       out.n_cols,
+                       0,
+                       0,
+                       out.n_rows,
+                       UA.get_row_offset(),
+                       UA.get_col_offset(),
+                       UA.get_M_n_rows(),
+                       UB.get_row_offset(),
+                       UB.get_col_offset(),
+                       UB.get_M_n_rows());
   }
 
 
