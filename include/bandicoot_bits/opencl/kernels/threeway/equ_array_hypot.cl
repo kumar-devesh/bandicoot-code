@@ -14,16 +14,29 @@
 
 __kernel
 void
-COOT_FN(PREFIX,equ_array_hypot)(__global eT3* out,
-                                __global const eT1* A,
-                                __global const eT2* B,
-                                const UWORD N)
+COOT_FN(PREFIX,equ_array_hypot)(__global eT3* dest,
+                                const UWORD dest_offset,
+                                __global const eT1* src_A,
+                                const UWORD src_A_offset,
+                                __global const eT2* src_B,
+                                const UWORD src_B_offset,
+                                const UWORD n_rows,
+                                const UWORD n_cols,
+                                const UWORD dest_M_n_rows,
+                                const UWORD src_A_M_n_rows,
+                                const UWORD src_B_M_n_rows)
   {
-  const UWORD i = get_global_id(0);
-  if(i < N)
+  const UWORD row = get_global_id(0);
+  const UWORD col = get_global_id(1);
+
+  if (row < n_rows && col < n_cols)
     {
-    const fp_eT3 a_val = (fp_eT3) A[i];
-    const fp_eT3 b_val = (fp_eT3) B[i];
-    out[i] = (eT3) hypot(a_val, b_val);
+    const UWORD src_A_index = row + col * src_A_M_n_rows + src_A_offset;
+    const UWORD src_B_index = row + col * src_B_M_n_rows + src_B_offset;
+    const UWORD  dest_index = row + col *  dest_M_n_rows +  dest_offset;
+
+    const fp_eT3 a_val = (fp_eT3) src_A[src_A_index];
+    const fp_eT3 b_val = (fp_eT3) src_B[src_B_index];
+    dest[dest_index] = (eT3) hypot(a_val, b_val);
     }
   }

@@ -20,20 +20,49 @@
 template<typename eT1, typename eT2, typename eT3>
 inline
 void
-array_op(dev_mem_t<eT3> out, const uword n_elem, dev_mem_t<eT1> in_a, dev_mem_t<eT2> in_b, threeway_kernel_id::enum_id num)
+eop_array(const threeway_kernel_id::enum_id num,
+          dev_mem_t<eT3> dest,
+          const dev_mem_t<eT1> src_A,
+          const dev_mem_t<eT2> src_B,
+          // logical size of source and destination
+          const uword n_rows,
+          const uword n_cols,
+          // submatrix destination offsets (set to 0, 0, and n_rows if not a subview)
+          const uword dest_row_offset,
+          const uword dest_col_offset,
+          const uword dest_M_n_rows,
+          // submatrix source offsets (set to 0, 0, and n_rows if not a subview)
+          const uword src_A_row_offset,
+          const uword src_A_col_offset,
+          const uword src_A_M_n_rows,
+          const uword src_B_row_offset,
+          const uword src_B_col_offset,
+          const uword src_B_M_n_rows)
   {
   coot_extra_debug_sigprint();
 
   // Get kernel.
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT3, eT2, eT1>(num);
 
-  const void* args[] = {
-      &(out.cuda_mem_ptr),
-      &(in_a.cuda_mem_ptr),
-      &(in_b.cuda_mem_ptr),
-      (uword*) &n_elem };
+  const uword src_A_offset = src_A_row_offset + src_A_col_offset * src_A_M_n_rows;
+  const uword src_B_offset = src_B_row_offset + src_B_col_offset * src_B_M_n_rows;
+  const uword dest_offset  =  dest_row_offset +  dest_col_offset * dest_M_n_rows;
 
-  const kernel_dims dims = one_dimensional_grid_dims(n_elem);
+  const eT1* src_A_ptr = src_A.cuda_mem_ptr + src_A_offset;
+  const eT2* src_B_ptr = src_B.cuda_mem_ptr + src_B_offset;
+  const eT3* dest_ptr  =  dest.cuda_mem_ptr + dest_offset;
+
+  const void* args[] = {
+      &dest_ptr,
+      &src_A_ptr,
+      &src_B_ptr,
+      (uword*) &n_rows,
+      (uword*) &n_cols,
+      (uword*) &dest_M_n_rows,
+      (uword*) &src_A_M_n_rows,
+      (uword*) &src_B_M_n_rows };
+
+  const kernel_dims dims = two_dimensional_grid_dims(n_rows, n_cols);
 
   CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
@@ -43,7 +72,7 @@ array_op(dev_mem_t<eT3> out, const uword n_elem, dev_mem_t<eT1> in_a, dev_mem_t<
       (void**) args, // arguments
       0);
 
-  coot_check_cuda_error( result, "coot::cuda::array_op(): cuLaunchKernel() failed" );
+  coot_check_cuda_error( result, "coot::cuda::eop_array(): cuLaunchKernel() failed" );
   }
 
 

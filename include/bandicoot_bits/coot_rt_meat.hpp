@@ -627,37 +627,6 @@ coot_rt_t::fill(dev_mem_t<eT> dest,
 
 
 
-template<typename eT1, typename eT2>
-inline
-void
-coot_rt_t::inplace_op_array(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword n_elem, const twoway_kernel_id::enum_id num)
-  {
-  coot_extra_debug_sigprint();
-
-  if (get_rt().backend == CL_BACKEND)
-    {
-    #if defined(COOT_USE_OPENCL)
-    opencl::inplace_op_array(dest, src, n_elem, num);
-    #else
-    coot_stop_runtime_error("coot_rt::inplace_op_array(): OpenCL backend not enabled");
-    #endif
-    }
-  else if (get_rt().backend == CUDA_BACKEND)
-    {
-    #if defined(COOT_USE_CUDA)
-    cuda::inplace_op_array(dest, src, n_elem, num);
-    #else
-    coot_stop_runtime_error("coot_rt::inplace_op_array(): CUDA backend not enabled");
-    #endif
-    }
-  else
-    {
-    coot_stop_runtime_error("coot_rt::inplace_op_array(): unknown backend");
-    }
-  }
-
-
-
 template<typename eT>
 inline
 void
@@ -906,37 +875,6 @@ coot_rt_t::fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int
 
 
 
-template<typename eT1, typename eT2, typename eT3>
-inline
-void
-coot_rt_t::array_op(dev_mem_t<eT3> dest, const uword n_elem, const dev_mem_t<eT1> A_mem, const dev_mem_t<eT2> B_mem, const threeway_kernel_id::enum_id num)
-  {
-  coot_extra_debug_sigprint();
-
-  if (get_rt().backend == CL_BACKEND)
-    {
-    #if defined(COOT_USE_OPENCL)
-    opencl::array_op(dest, n_elem, A_mem, B_mem, num);
-    #else
-    coot_stop_runtime_error("coot_rt::array_op(): OpenCL backend not enabled");
-    #endif
-    }
-  else if (get_rt().backend == CUDA_BACKEND)
-    {
-    #if defined(COOT_USE_CUDA)
-    cuda::array_op(dest, n_elem, A_mem, B_mem, num);
-    #else
-    coot_stop_runtime_error("coot_rt::array_op(): CUDA backend not enabled");
-    #endif
-    }
-  else
-    {
-    coot_stop_runtime_error("coot_rt::array_op(): unknown backend");
-    }
-  }
-
-
-
 template<typename eT1, typename eT2>
 inline
 void
@@ -986,6 +924,62 @@ coot_rt_t::eop_scalar(const twoway_kernel_id::enum_id num,
   else
     {
     coot_stop_runtime_error("coot_rt::eop_scalar(): unknown backend");
+    }
+  }
+
+
+
+template<typename eT1, typename eT2, typename eT3>
+inline
+void
+coot_rt_t::eop_array(const threeway_kernel_id::enum_id num,
+                     dev_mem_t<eT3> dest,
+                     const dev_mem_t<eT1> src_A,
+                     const dev_mem_t<eT2> src_B,
+                     // logical size of source and destination
+                     const uword n_rows,
+                     const uword n_cols,
+                     // submatrix destination offsets (set to 0, 0, and n_rows if not a subview)
+                     const uword dest_row_offset,
+                     const uword dest_col_offset,
+                     const uword dest_M_n_rows,
+                     // submatrix source offsets (set to 0, 0, and n_rows if not a subview)
+                     const uword src_A_row_offset,
+                     const uword src_A_col_offset,
+                     const uword src_A_M_n_rows,
+                     const uword src_B_row_offset,
+                     const uword src_B_col_offset,
+                     const uword src_B_M_n_rows)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    opencl::eop_array(num, dest, src_A, src_B,
+                      n_rows, n_cols,
+                      dest_row_offset, dest_col_offset, dest_M_n_rows,
+                      src_A_row_offset, src_A_col_offset, src_A_M_n_rows,
+                      src_B_row_offset, src_B_col_offset, src_B_M_n_rows);
+    #else
+    coot_stop_runtime_error("coot_rt::eop_array(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    cuda::eop_array(num, dest, src_A, src_B,
+                    n_rows, n_cols,
+                    dest_row_offset, dest_col_offset, dest_M_n_rows,
+                    src_A_row_offset, src_A_col_offset, src_A_M_n_rows,
+                    src_B_row_offset, src_B_col_offset, src_B_M_n_rows);
+    #else
+    coot_stop_runtime_error("coot_rt::eop_array(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::eop_array(): unknown backend");
     }
   }
 
