@@ -14,7 +14,7 @@
 
 __kernel
 void
-COOT_FN(PREFIX,equ_array_mul_array)(__global eT3* out,
+COOT_FN(PREFIX,equ_array_mul_array)(__global eT3* dest,
                                     const UWORD dest_offset,
                                     __global const eT1* src_A,
                                     const UWORD src_A_offset,
