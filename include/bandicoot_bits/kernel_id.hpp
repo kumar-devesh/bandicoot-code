@@ -379,12 +379,7 @@ struct twoway_kernel_id
   enum enum_id
     {
     //
-    inplace_plus_array = 0
-    inplace_minus_array,
-    inplace_mul_array,
-    inplace_div_array,
-    //
-    equ_array_plus_scalar,
+    equ_array_plus_scalar = 0,
     equ_array_neg_pre,
     equ_array_neg_post,
     equ_array_minus_scalar_pre_pre,
@@ -546,11 +541,6 @@ struct twoway_kernel_id
   init_names()
     {
     std::vector<std::string> names;
-
-    names.push_back("inplace_plus_array");
-    names.push_back("inplace_minus_array");
-    names.push_back("inplace_mul_array");
-    names.push_back("inplace_div_array");
 
     names.push_back("equ_array_plus_scalar");
     names.push_back("equ_array_neg_pre");
