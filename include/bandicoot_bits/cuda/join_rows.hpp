@@ -80,7 +80,7 @@ join_rows(dev_mem_t<eT5> out, const dev_mem_t<eT1> A, const uword A_n_rows, cons
   const uword C_n_elem = C_n_rows * C_n_cols;
   const uword D_n_elem = D_n_rows * D_n_cols;
 
-  // If the types are different, we need to perform a cast during the copy.  We can use the submat_inplace_set_mat kernel for this.
+  // If the types are different, we need to perform a cast during the copy.
   if (A_n_elem > 0)
     {
     copy_array(out, A, A_n_elem);

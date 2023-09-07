@@ -103,24 +103,44 @@ join_rows(dev_mem_t<eT5> out, const dev_mem_t<eT1> A, const uword A_n_rows, cons
   const uword C_n_elem = C_n_rows * C_n_cols;
   const uword D_n_elem = D_n_rows * D_n_cols;
 
-  // If the types are different, we need to perform a cast during the copy.  We can use the submat_inplace_set_mat kernel for this.
+  // If the types are different, we need to perform a cast during the copy.
   if (A_n_elem > 0)
     {
-    inplace_op_subview(out, A, out_n_rows, 0, 0, A_n_rows, A_n_cols, twoway_kernel_id::submat_inplace_set_mat, "coot::opencl::join_rows()");
+    eop_scalar(twoway_kernel_id::equ_array_plus_scalar,
+               out, A,
+               (eT1) 0, (eT5) 0,
+               A_n_rows, A_n_cols,
+               0, 0, out_n_rows,
+               0, 0, A_n_rows);
     }
 
   if (B_n_elem > 0)
     {
-    inplace_op_subview(out, B, out_n_rows, 0, A_n_cols, B_n_rows, B_n_cols, twoway_kernel_id::submat_inplace_set_mat, "coot::opencl::join_rows()");
+    eop_scalar(twoway_kernel_id::equ_array_plus_scalar,
+               out, B,
+               (eT2) 0, (eT5) 0,
+               B_n_rows, B_n_cols,
+               0, A_n_cols, out_n_rows,
+               0, 0, B_n_rows);
     }
 
   if (C_n_elem > 0)
     {
-    inplace_op_subview(out, C, out_n_rows, 0, (A_n_cols + B_n_cols), C_n_rows, C_n_cols, twoway_kernel_id::submat_inplace_set_mat, "coot::opencl::join_rows()");
+    eop_scalar(twoway_kernel_id::equ_array_plus_scalar,
+               out, C,
+               (eT3) 0, (eT5) 0,
+               C_n_rows, C_n_cols,
+               0, A_n_cols + B_n_cols, out_n_rows,
+               0, 0, C_n_rows);
     }
 
   if (D_n_elem > 0)
     {
-    inplace_op_subview(out, D, out_n_rows, 0, (A_n_cols + B_n_cols + C_n_cols), C_n_rows, C_n_cols, twoway_kernel_id::submat_inplace_set_mat, "coot::opencl::join_rows()");
+    eop_scalar(twoway_kernel_id::equ_array_plus_scalar,
+               out, D,
+               (eT4) 0, (eT5) 0,
+               D_n_rows, D_n_cols,
+               0, A_n_cols + B_n_cols + C_n_cols, out_n_rows,
+               0, 0, D_n_rows);
     }
   }
