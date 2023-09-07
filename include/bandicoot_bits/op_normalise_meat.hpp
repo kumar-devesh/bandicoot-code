@@ -91,7 +91,7 @@ op_normalise_vec::apply(Mat<eT>& out, const Op<mtOp<eT, T1, mtop_conv_to>, op_no
                           eT2(1), eT(norm_val_b),
                           out.n_rows, out.n_cols,
                           0, 0, out.n_rows,
-                          0, 0, out.n_cols);
+                          0, 0, out.n_rows);
     }
   }
 

@@ -33,7 +33,7 @@ TEMPLATE_TEST_CASE("trivial_diagonal_solve", "[solve]", float, double)
   Col<eT> B(10, fill::ones);
 
   Col<eT> X1 = solve(A, B);
-  Col<eT> X2;
+  Col<eT> X2(10);
   const bool status = solve(X2, A, B);
 
   REQUIRE( status == true );

@@ -233,7 +233,7 @@ op_pinv::apply_direct_diag(Mat<eT2>& out, const Mat<eT1>& in, const eT1 tol, con
                         (eT1) 0, (eT1) 0,
                         abs_in.n_rows, abs_in.n_cols,
                         0, 0, abs_in.n_rows,
-                        0, 0, abs_in.n_cols);
+                        0, 0, abs_in.n_rows);
 
   // Compute tolerance if not given.
   eT1 tol_use = tol;
@@ -342,7 +342,7 @@ op_pinv::apply_direct_sym(Mat<eT>& out, Mat<eT>& in, const eT tol)
                         (eT) 0, (eT) 1,
                         filtered_eigvals.n_rows, filtered_eigvals.n_cols,
                         0, 0, filtered_eigvals.n_rows,
-                        0, 0, filtered_eigvals.n_cols);
+                        0, 0, filtered_eigvals.n_rows);
 
   //
   // 4. Construct output.

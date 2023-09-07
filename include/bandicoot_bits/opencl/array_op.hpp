@@ -77,7 +77,10 @@ eop_array(const threeway_kernel_id::enum_id num,
 
   status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 2, NULL, global_work_size, NULL, 0, NULL, NULL);
 
-  coot_check_runtime_error( (status != 0), "coot::opencl::eop_array(): couldn't execute kernel" );
+  coot_check_cl_error(status, "coot::opencl::eop_array(): couldn't execute kernel" );
+
+  status = coot_wrapper(clFinish)(get_rt().cl_rt.get_cq());
+  coot_check_cl_error(status, "coot::opencl::eop_scalar(): clFinish() failed");
   }
 
 
@@ -98,7 +101,7 @@ copy_array(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword n_elem)
 
   cl_int status = coot_wrapper(clEnqueueCopyBuffer)(get_rt().cl_rt.get_cq(), src.cl_mem_ptr, dest.cl_mem_ptr, size_t(0), size_t(0), sizeof(eT) * size_t(n_elem), cl_uint(0), NULL, NULL);
 
-  coot_check_runtime_error( (status != 0), "coot::opencl::copy_array(): couldn't copy buffer" );
+  coot_check_cl_error(status, "coot::opencl::copy_array(): couldn't copy buffer" );
   }
 
 
@@ -132,7 +135,7 @@ copy_array(dev_mem_t<out_eT> dest, const dev_mem_t<in_eT> src, const uword n_ele
 
   status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
 
-  coot_check_runtime_error( (status != 0), "coot::opencl::copy_array(): couldn't copy buffer");
+  coot_check_cl_error(status, "coot::opencl::copy_array(): couldn't copy buffer");
   }
 
 
