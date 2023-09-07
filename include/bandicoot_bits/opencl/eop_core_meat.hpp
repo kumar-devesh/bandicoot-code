@@ -28,14 +28,14 @@ eop_scalar(const twoway_kernel_id::enum_id num,
            // logical size of source and destination
            const uword n_rows,
            const uword n_cols,
-           // submatrix source offsets (set to 0, 0, and n_rows if not a subview)
-           const uword src_row_offset,
-           const uword src_col_offset,
-           const uword src_M_n_rows,
            // submatrix destination offsets (set to 0, 0, and n_rows if not a subview)
            const uword dest_row_offset,
            const uword dest_col_offset,
-           const uword dest_M_n_rows)
+           const uword dest_M_n_rows,
+           // submatrix source offsets (set to 0, 0, and n_rows if not a subview)
+           const uword src_row_offset,
+           const uword src_col_offset,
+           const uword src_M_n_rows)
   {
   coot_extra_debug_sigprint();
 
