@@ -607,37 +607,6 @@ coot_rt_t::inplace_op_diag(dev_mem_t<eT> dest, const uword mem_offset, const eT 
 
 
 
-template<typename eT1, typename eT2>
-inline
-void
-coot_rt_t::inplace_op_subview(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword M_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const twoway_kernel_id::enum_id num, const char* identifier)
-  {
-  coot_extra_debug_sigprint();
-
-  if (get_rt().backend == CL_BACKEND)
-    {
-    #if defined(COOT_USE_OPENCL)
-    opencl::inplace_op_subview(dest, src, M_n_rows, aux_row1, aux_col1, n_rows, n_cols, num, identifier);
-    #else
-    coot_stop_runtime_error("coot_rt::inplace_op_subview(): OpenCL backend not enabled");
-    #endif
-    }
-  else if (get_rt().backend == CUDA_BACKEND)
-    {
-    #if defined(COOT_USE_CUDA)
-    cuda::inplace_op_subview(dest, src, M_n_rows, aux_row1, aux_col1, n_rows, n_cols, num, identifier);
-    #else
-    coot_stop_runtime_error("coot_rt::inplace_op_subview(): CUDA backend not enabled");
-    #endif
-    }
-  else
-    {
-    coot_stop_runtime_error("coot_rt::inplace_op_subview(): unknown backend");
-    }
-  }
-
-
-
 template<typename eT>
 inline
 void
