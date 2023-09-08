@@ -30,7 +30,6 @@ op_reshape::apply(Mat<out_eT>& out, const Op<T1, op_reshape>& in)
     return;
     }
 
-  unwrap<T1> U(in.m);
   op_reshape::apply_direct(out, U.M, in.aux_uword_a, in.aux_uword_b);
   }
 
@@ -86,7 +85,12 @@ op_reshape::apply_direct(Mat<eT>& out, const Mat<eT>& in, const uword new_n_rows
 
     if (in.n_elem > 0)
       {
-      coot_rt_t::copy_array(out.get_dev_mem(false), in.get_dev_mem(false), (std::min)(new_n_elem, in.n_elem));
+      // We treat both out and in as column vectors here.
+      const uword elems_to_copy = (std::min)(new_n_elem, in.n_elem);
+      coot_rt_t::copy_array(out.get_dev_mem(false), in.get_dev_mem(false),
+                            elems_to_copy, 1,
+                            0, 0, elems_to_copy,
+                            0, 0, elems_to_copy);
       }
     }
   }
@@ -112,7 +116,12 @@ op_reshape::apply_direct(Mat<out_eT>& out, const Mat<eT>& in, const uword new_n_
 
   if (in.n_elem > 0)
     {
-    coot_rt_t::copy_array(out.get_dev_mem(false), in.get_dev_mem(false), (std::min)(new_n_elem, in.n_elem));
+    // We treat both out and in as column vectors here.
+    const uword elems_to_copy = (std::min)(new_n_elem, in.n_elem);
+    coot_rt_t::copy_array(out.get_dev_mem(false), in.get_dev_mem(false),
+                          elems_to_copy, 1,
+                          0, 0, elems_to_copy,
+                          0, 0, elems_to_copy);
     }
   }
 
@@ -145,12 +154,18 @@ op_reshape::apply_direct(Mat<eT>& out, const subview<eT>& in, const uword new_n_
 
     if (in.n_elem > 0)
       {
-      coot_rt_t::copy_subview(out.get_dev_mem(false), 0, in.m.get_dev_mem(false), in.aux_row1, in.aux_col1, in.m.n_rows, in.m.n_cols, in.n_rows, in.n_cols);
+      coot_rt_t::copy_array(out.get_dev_mem(false), in.m.get_dev_mem(false),
+                            in.n_rows, in.n_cols,
+                            0, 0, out.n_rows,
+                            in.aux_row1, in.aux_col1, in.m.n_rows);
       }
     }
   else if (new_n_elem == in.n_elem && in.n_elem > 0)
     {
-    coot_rt_t::copy_subview(out.get_dev_mem(false), 0, in.m.get_dev_mem(false), in.aux_row1, in.aux_col1, in.m.n_rows, in.m.n_cols, in.n_rows, in.n_cols);
+    coot_rt_t::copy_array(out.get_dev_mem(false), in.m.get_dev_mem(false),
+                          in.n_rows, in.n_cols,
+                          0, 0, out.n_rows,
+                          in.aux_row1, in.aux_col1, in.m.n_rows);
     }
   else
     {
@@ -181,12 +196,19 @@ op_reshape::apply_direct(Mat<out_eT>& out, const subview<eT>& in, const uword ne
     coot_rt_t::fill(out.get_dev_mem(false), out_eT(0), new_n_rows, new_n_cols, 0, 0, new_n_rows);
     if (in.n_elem > 0)
       {
-      coot_rt_t::copy_subview(out.get_dev_mem(false), 0, in.m.get_dev_mem(false), in.aux_row1, in.aux_col1, in.m.n_rows, in.m.n_cols, in.n_rows, in.n_cols);
+      coot_rt_t::copy_array(out.get_dev_mem(false), in.m.get_dev_mem(false),
+                            in.n_rows, in.n_cols,
+                            0, 0, out.n_rows,
+                            in.aux_row1, in.aux_col1, in.m.n_rows);
       }
     }
   else if (new_n_elem == in.n_elem && in.n_elem > 0)
     {
-    coot_rt_t::copy_subview(out.get_dev_mem(false), 0, in.m.get_dev_mem(false), in.aux_row1, in.aux_col1, in.m.n_rows, in.m.n_cols, in.n_rows, in.n_cols);
+    // TODO: are these correct?
+    coot_rt_t::copy_array(out.get_dev_mem(false), in.m.get_dev_mem(false),
+                          in.n_rows, in.n_cols,
+                          0, 0, out.n_rows,
+                          in.aux_row1, in.aux_col1, in.m.n_rows);
     }
   else
     {

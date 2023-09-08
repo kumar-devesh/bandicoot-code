@@ -47,7 +47,10 @@ glue_conv2::apply_direct(Mat<out_eT>& out, const Mat<eT>& A_in, const Mat<eT>& B
   Mat<eT> tmp;
   apply_direct(tmp, A_in, B_in, mode);
   out.set_size(tmp.n_rows, tmp.n_cols);
-  coot_rt_t::copy_array(out.get_dev_mem(false), tmp.get_dev_mem(false), tmp.n_elem);
+  coot_rt_t::copy_array(out.get_dev_mem(false), tmp.get_dev_mem(false),
+                        tmp.n_rows, tmp.n_cols,
+                        0, 0, out.n_rows,
+                        0, 0, tmp.n_rows);
   }
 
 
@@ -320,18 +323,10 @@ glue_conv2::fill_gemv_buffer_col(Mat<eT>& buffer, const uword i, const uword j, 
                     0,
                     K.n_rows);
 
-    coot_rt_t::copy_subview_to_subview(buffer.get_dev_mem(false),
-                                       K.n_rows - i - 1 + ((j * buffer.n_rows) + K.n_rows * buffer_top_padding),
-                                       0,
-                                       K.n_rows,
-                                       A.n_cols,
-                                       A.get_dev_mem(false),
-                                       0,
-                                       A_col_offset,
-                                       A.n_rows,
-                                       A.n_cols,
-                                       i + 1,
-                                       cols_to_copy);
+    coot_rt_t::copy_array(buffer.get_dev_mem(false), A.get_dev_mem(false),
+                          i + 1, cols_to_copy,
+                          K.n_rows - i - 1 + ((j * buffer.n_rows) + K.n_rows * buffer_top_padding), 0, K.n_rows,
+                          0, A_col_offset, A.n_rows);
     }
   else if (i < A.n_rows)
     {
@@ -342,15 +337,10 @@ glue_conv2::fill_gemv_buffer_col(Mat<eT>& buffer, const uword i, const uword j, 
     // Equivalent to:
     //    buffer.col(j) = vectorise(A.submat(A_row, 0, A_row + K.n_rows - 1, A.n_cols - 1))
     // Note that for buffer.col(j) we ignore the top and bottom row zero padding.
-    coot_rt_t::copy_subview(buffer.get_dev_mem(false),
-                            j * buffer.n_rows + K.n_rows * buffer_top_padding,
-                            A.get_dev_mem(false),
-                            A_row,
-                            A_col_offset,
-                            A.n_rows,
-                            A.n_cols,
-                            K.n_rows,
-                            cols_to_copy);
+    coot_rt_t::copy_array(buffer.get_dev_mem(false), A.get_dev_mem(false),
+                          K.n_rows, cols_to_copy,
+                          j * buffer.n_rows + K.n_rows * buffer_top_padding, 0, K.n_rows,
+                          A_row, A_col_offset, A.n_rows);
     }
   else if (i < A.n_rows + 2 * (K.n_rows - 1))
     {
@@ -363,18 +353,10 @@ glue_conv2::fill_gemv_buffer_col(Mat<eT>& buffer, const uword i, const uword j, 
     //    bufmat_j.submat(0, 0, K.n_rows - num_zero_rows - 1, A.n_cols - 1) = A.submat(i - K.n_rows - 1, 0, A.n_rows - 1, A.n_cols - 1)
     //    bufmat_j.submat(K.n_rows - num_zero_rows, 0, K.n_rows - 1, A.n_cols - 1) = 0
     // Note that for buffer.col(j) (or bufmat_j) we ignore the top and bottom zero padding.
-    coot_rt_t::copy_subview_to_subview(buffer.get_dev_mem(false),
-                                       j * buffer.n_rows + K.n_rows * buffer_top_padding,
-                                       0,
-                                       K.n_rows,
-                                       A.n_cols,
-                                       A.get_dev_mem(false),
-                                       i - (K.n_rows - 1),
-                                       A_col_offset,
-                                       A.n_rows,
-                                       A.n_cols,
-                                       K.n_rows - num_zero_rows,
-                                       cols_to_copy);
+    coot_rt_t::copy_array(buffer.get_dev_mem(false), A.get_dev_mem(false),
+                          K.n_rows - num_zero_rows, cols_to_copy,
+                          j * buffer.n_rows + K.n_rows * buffer_top_padding, 0, K.n_rows,
+                          i - (K.n_rows - 1), A_col_offset, A.n_rows);
     coot_rt_t::fill(buffer.get_dev_mem(false),
                     (eT) 0,
                     num_zero_rows,

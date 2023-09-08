@@ -28,25 +28,11 @@ mtop_conv_to::apply(Mat<out_eT>& out, const mtOp<out_eT, T1, mtop_conv_to>& X)
 
   out.set_size(U.M.n_rows, U.M.n_cols);
 
-  arrayops::copy(out.get_dev_mem(false), U.M.get_dev_mem(false), U.M.n_elem);
+  coot_rt_t::copy_array(out.get_dev_mem(false), U.get_dev_mem(false),
+                        out.n_rows, out.n_cols,
+                        0, 0, out.n_rows,
+                        U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
   }
-
-
-
-template<typename out_eT, typename in_eT>
-inline
-void
-mtop_conv_to::apply(Mat<out_eT>& out, const mtOp<out_eT, subview<in_eT>, mtop_conv_to>& X)
-  {
-  coot_extra_debug_sigprint();
-
-  const subview<in_eT>& U(X.q);
-
-  out.set_size(U.n_rows, U.n_cols);
-
-  arrayops::copy_subview(out.get_dev_mem(false), 0, U.m.get_dev_mem(false), U.aux_row1, U.aux_col1, U.m.n_rows, U.m.n_cols, U.n_rows, U.n_cols);
-  }
-
 
 
 

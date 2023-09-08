@@ -373,17 +373,28 @@ coot_rt_t::synchronise()
 
 
 
-template<typename out_eT, typename in_eT>
+template<typename eT2, typename eT1>
 inline
 void
-coot_rt_t::copy_array(dev_mem_t<out_eT> dest, dev_mem_t<in_eT> src, const uword n_elem)
+coot_rt_t::copy_array(dev_mem_t<eT2> dest,
+                      dev_mem_t<eT1> src,
+                      // logical size of matrix
+                      const uword n_rows,
+                      const uword n_cols,
+                      // offsets for subviews
+                      const uword dest_row_offset,
+                      const uword dest_col_offset,
+                      const uword dest_M_n_rows,
+                      const uword src_row_offset,
+                      const uword src_col_offset,
+                      const uword src_M_n_rows);
   {
   coot_extra_debug_sigprint();
 
   if (get_rt().backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
-    opencl::copy_array(dest, src, n_elem);
+    opencl::copy_array(dest, src, n_rows, n_cols, dest_row_offset, dest_col_offset, dest_M_n_rows, src_row_offset, src_col_offset, src_M_n_rows);
     #else
     coot_stop_runtime_error("coot_rt::copy_array(): OpenCL backend not enabled");
     #endif
@@ -391,7 +402,7 @@ coot_rt_t::copy_array(dev_mem_t<out_eT> dest, dev_mem_t<in_eT> src, const uword 
   else if (get_rt().backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    cuda::copy_array(dest, src, n_elem);
+    cuda::copy_array(dest, src, n_rows, n_cols, dest_row_offset, dest_col_offset, dest_M_n_rows, src_row_offset, src_col_offset, src_M_n_rows);
     #else
     coot_stop_runtime_error("coot_rt::copy_array(): CUDA backend not enabled");
     #endif
@@ -399,68 +410,6 @@ coot_rt_t::copy_array(dev_mem_t<out_eT> dest, dev_mem_t<in_eT> src, const uword 
   else
     {
     coot_stop_runtime_error("coot_rt::copy_array(): unknown backend");
-    }
-  }
-
-
-
-template<typename out_eT, typename in_eT>
-inline
-void
-coot_rt_t::copy_subview(dev_mem_t<out_eT> dest, const uword dest_offset, dev_mem_t<in_eT> src, const uword aux_row1, const uword aux_col1, const uword M_n_rows, const uword M_n_cols, const uword n_rows, const uword n_cols)
-  {
-  coot_extra_debug_sigprint();
-
-  if (get_rt().backend == CL_BACKEND)
-    {
-    #if defined(COOT_USE_OPENCL)
-    opencl::copy_subview(dest, dest_offset, src, aux_row1, aux_col1, M_n_rows, M_n_cols, n_rows, n_cols);
-    #else
-    coot_stop_runtime_error("coot_rt::copy_subview(): OpenCL backend not enabled");
-    #endif
-    }
-  else if (get_rt().backend == CUDA_BACKEND)
-    {
-    #if defined(COOT_USE_CUDA)
-    cuda::copy_subview(dest, dest_offset, src, aux_row1, aux_col1, M_n_rows, M_n_cols, n_rows, n_cols);
-    #else
-    coot_stop_runtime_error("coot_rt::copy_subview(): CUDA backend not enabled");
-    #endif
-    }
-  else
-    {
-    coot_stop_runtime_error("coot_rt::copy_subview(): unknown backend");
-    }
-  }
-
-
-
-template<typename eT>
-inline
-void
-coot_rt_t::copy_subview_to_subview(dev_mem_t<eT> dest, const uword dest_aux_row1, const uword dest_aux_col1, const uword dest_M_n_rows, const uword dest_M_n_cols, const dev_mem_t<eT> src, const uword src_aux_row1, const uword src_aux_col1, const uword src_M_n_rows, const uword src_M_n_cols, const uword n_rows, const uword n_cols)
-  {
-  coot_extra_debug_sigprint();
-
-  if (get_rt().backend == CL_BACKEND)
-    {
-    #if defined(COOT_USE_OPENCL)
-    opencl::copy_subview_to_subview(dest, dest_aux_row1, dest_aux_col1, dest_M_n_rows, dest_M_n_cols, src, src_aux_row1, src_aux_col1, src_M_n_rows, src_M_n_cols, n_rows, n_cols);
-    #else
-    coot_stop_runtime_error("coot_rt::copy_subview_to_subview(): OpenCL backend not enabled");
-    #endif
-    }
-  else if (get_rt().backend == CUDA_BACKEND)
-    {
-    #if defined(COOT_USE_CUDA)
-    cuda::copy_subview_to_subview(dest, dest_aux_row1, dest_aux_col1, dest_M_n_rows, dest_M_n_cols, src, src_aux_row1, src_aux_col1, src_M_n_rows, src_M_n_cols, n_rows, n_cols);
-    #else
-    coot_stop_runtime_error("coot_rt::copy_subview_to_subview(): CUDA backend not enabled");
-    #endif
-    }
-  else
-    {
-    coot_stop_runtime_error("coot_rt::copy_subview_to_subview(): unknown backend");
     }
   }
 

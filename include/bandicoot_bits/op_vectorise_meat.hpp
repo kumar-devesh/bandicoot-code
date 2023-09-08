@@ -76,32 +76,11 @@ op_vectorise_col::apply_direct(Mat<out_eT>& out, const T1& expr, const bool outp
       {
       out.set_size(1, U.M.n_elem);
       }
-    arrayops::copy(out.get_dev_mem(false), U.M.get_dev_mem(false), U.M.n_elem);
-    }
-  }
 
-
-
-template<typename out_eT, typename eT>
-inline
-void
-op_vectorise_col::apply_direct(Mat<out_eT>& out, const subview<eT>& sv, const bool output_is_row)
-  {
-  coot_extra_debug_sigprint();
-
-  const uword new_n_rows = (output_is_row ? 1 : sv.n_elem);
-  const uword new_n_cols = (output_is_row ? sv.n_elem : 1);
-
-  if(&out == &(sv.m))
-    {
-    Mat<out_eT> tmp(new_n_rows, new_n_cols);
-    arrayops::copy_subview(tmp.get_dev_mem(false), 0, sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
-    out.steal_mem(tmp);
-    }
-  else
-    {
-    out.set_size(new_n_rows, new_n_cols);
-    arrayops::copy_subview(out.get_dev_mem(false), 0, sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
+    coot_rt_t::copy_array(out.get_dev_mem(false), U.get_dev_mem(false),
+                          out.n_rows, out.n_cols,
+                          0, 0, out.n_rows,
+                          U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
     }
   }
 
@@ -214,12 +193,16 @@ op_vectorise_row::apply_direct(Mat<typename T1::elem_type>& out, const T1& expr)
 
   // If U.M is an object we created during unwrapping, steal the memory and set the size.
   // Otherwise, copy U.M.
-  if (is_Mat<T1>::value)
+  // TODO: this is not correct!
+  if (is_Mat<T1>::value || is_subview<T1>::value)
     {
     // If `expr` is some type of matrix, then unwrap<T1> just stores the matrix itself.
     // That's not a temporary, and we can't steal its memory---we have to copy it.
     out.set_size(1, U.M.n_elem);
-    arrayops::copy(out.get_dev_mem(false), U.M.get_dev_mem(false), U.M.n_elem);
+    coot_rt_t::copy_array(out.get_dev_mem(false), U.get_dev_mem(false),
+                          out.n_rows, out.n_cols,
+                          0, 0, out.n_rows,
+                          U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
     }
   else
     {
@@ -227,29 +210,6 @@ op_vectorise_row::apply_direct(Mat<typename T1::elem_type>& out, const T1& expr)
     const uword new_n_rows = U.M.n_elem;
     out.steal_mem(U.M);
     out.set_size(1, new_n_rows);
-    }
-  }
-
-
-
-template<typename eT>
-inline
-void
-op_vectorise_row::apply_direct(Mat<eT>& out, const subview<eT>& sv)
-  {
-  coot_extra_debug_sigprint();
-
-  // If `expr` is a subview, we have to extract the subview.
-  if(&out == &(sv.m))
-    {
-    Mat<eT> tmp(1, sv.n_elem);
-    arrayops::copy_subview(tmp.get_dev_mem(false), 0, sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
-    out.steal_mem(tmp);
-    }
-  else
-    {
-    out.set_size(1, sv.n_elem);
-    arrayops::copy_subview(out.get_dev_mem(false), 0, sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
     }
   }
 
@@ -271,21 +231,10 @@ op_vectorise_row::apply_direct(Mat<out_eT>& out, const T1& expr, const typename 
 
   // A conversion operation is always necessary when the type is different.
   out.set_size(1, U.M.n_elem);
-  arrayops::copy(out.get_dev_mem(false), U.M.get_dev_mem(false), U.M.n_elem);
-  }
-
-
-
-template<typename out_eT, typename eT>
-inline
-void
-op_vectorise_row::apply_direct(Mat<out_eT>& out, const subview<eT>& sv, const typename enable_if<!std::is_same<out_eT, eT>::value>::result* junk)
-  {
-  coot_extra_debug_sigprint();
-  coot_ignore(junk);
-
-  out.set_size(1, sv.n_elem);
-  arrayops::copy_subview(out.get_dev_mem(false), 0, sv.m.get_dev_mem(false), sv.aux_row1, sv.aux_col1, sv.m.n_rows, sv.m.n_cols, sv.n_rows, sv.n_cols);
+  coot_rt_t::copy_array(out.get_dev_mem(false), U.get_dev_mem(false),
+                        out.n_rows, out.n_cols,
+                        0, 0, out.n_rows,
+                        U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
   }
 
 

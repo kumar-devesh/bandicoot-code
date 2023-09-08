@@ -47,7 +47,10 @@ glue_solve::apply(Mat<out_eT>& out, const Base<eT, T1>& A_expr, const Base<eT, T
     {
     // convert to output type
     out.set_size(tmp_out.n_rows, tmp_out.n_cols);
-    coot_rt_t::copy_array(out.get_dev_mem(false), tmp_out.get_dev_mem(false), tmp_out.n_elem);
+    coot_rt_t::copy_array(out.get_dev_mem(false), tmp_out.get_dev_mem(false),
+                          tmp_out.n_rows, tmp_out.n_cols,
+                          0, 0, out.n_rows,
+                          0, 0, tmp_out.n_rows);
     }
 
   return result;

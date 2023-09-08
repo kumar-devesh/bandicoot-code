@@ -531,22 +531,10 @@ subview<eT>::extract(Mat<eT1>& out, const subview<eT>& in)
     return;
     }
 
-  coot_rt_t::copy_subview(out.get_dev_mem(false), 0, in.m.get_dev_mem(false), in.aux_row1, in.aux_col1, in.m.n_rows, in.m.n_cols, in.n_rows, in.n_cols);
-
-//  size_t src_origin[3] = { in.aux_row1*sizeof(eT), in.aux_col1, 0 };
-//  size_t dst_origin[3] = { 0, 0, 0 };
-
-//  size_t region[3] = { in.n_rows*sizeof(eT), in.n_cols, 1 };
-
-//  size_t src_row_pitch   = sizeof(eT) * in.m.n_rows;
-//  size_t src_slice_pitch = sizeof(eT) * in.m.n_cols * in.m.n_rows;
-
-//  size_t dst_row_pitch   = 0;
-//  size_t dst_slice_pitch = 0;
-
-//  cl_int status = clEnqueueCopyBufferRect(get_rt().cl_rt.get_cq(), in.m.dev_mem, out.dev_mem, src_origin, dst_origin, region, src_row_pitch, src_slice_pitch, dst_row_pitch, dst_slice_pitch, 0, NULL, NULL);
-
-//  coot_check_runtime_error( (status != 0), "subview::extract: couldn't copy buffer" );
+  coot_rt_t::copy_array(out.get_dev_mem(false), in.get_dev_mem(false),
+                        in.n_rows, in.n_cols,
+                        0, 0, out.n_rows,
+                        in.aux_row1, in.aux_col1, in.m.n_rows);
   }
 
 

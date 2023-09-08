@@ -65,14 +65,19 @@ class coot_rt_t
 
   static inline void set_rng_seed(const u64 seed);
 
-  template<typename out_eT, typename in_eT>
-  static inline void copy_array(dev_mem_t<out_eT> dest, dev_mem_t<in_eT> src, const uword n_elem);
-
-  template<typename out_eT, typename in_eT>
-  static inline void copy_subview(dev_mem_t<out_eT> dest, const uword dest_offset, dev_mem_t<in_eT> src, const uword aux_row1, const uword aux_col1, const uword M_n_rows, const uword M_n_cols, const uword n_rows, const uword n_cols);
-
-  template<typename eT>
-  static inline void copy_subview_to_subview(dev_mem_t<eT> dest, const uword dest_aux_row1, const uword dest_aux_col1, const uword dest_M_n_rows, const uword dest_M_n_cols, const dev_mem_t<eT> src, const uword src_aux_row1, const uword src_aux_col1, const uword src_M_n_rows, const uword src_M_n_cols, const uword n_rows, const uword n_cols);
+  template<typename eT2, typename eT1>
+  static inline void copy_array(dev_mem_t<eT2> dest,
+                                dev_mem_t<eT1> src,
+                                // logical size of matrix
+                                const uword n_rows,
+                                const uword n_cols,
+                                // offsets for subviews
+                                const uword dest_row_offset,
+                                const uword dest_col_offset,
+                                const uword dest_M_n_rows,
+                                const uword src_row_offset,
+                                const uword src_col_offset,
+                                const uword src_M_n_rows);
 
   template<typename eT>
   static inline void reorder_cols(dev_mem_t<eT> out, const dev_mem_t<eT> mem, const uword n_rows, const dev_mem_t<uword> order, const uword out_n_cols);

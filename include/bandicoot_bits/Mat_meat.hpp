@@ -506,7 +506,10 @@ Mat<eT>::operator=(const Mat<eT>& X)
     {
     (*this).set_size(X.n_rows, X.n_cols);
 
-    arrayops::copy<eT>(dev_mem, X.dev_mem, n_elem);
+    coot_rt_t::copy_array(dev_mem, X.dev_mem,
+                          n_rows, n_cols,
+                          0, 0, n_rows,
+                          0, 0, X.n_rows);
     }
 
   return *this;

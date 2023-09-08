@@ -57,8 +57,14 @@ glue_cor::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_cor>& in)
 
   Mat<eT> tmp_AA(AA.n_rows, AA.n_cols);
   Mat<eT> tmp_BB(BB.n_rows, BB.n_cols);
-  coot_rt_t::copy_array(tmp_AA.get_dev_mem(false), AA.get_dev_mem(false), tmp_AA.n_elem);
-  coot_rt_t::copy_array(tmp_BB.get_dev_mem(false), BB.get_dev_mem(false), tmp_BB.n_elem);
+  coot_rt_t::copy_array(tmp_AA.get_dev_mem(false), AA.get_dev_mem(false),
+                        tmp_AA.n_rows, tmp_AA.n_cols,
+                        0, 0, tmp_AA.n_rows,
+                        0, 0, AA.n_rows);
+  coot_rt_t::copy_array(tmp_BB.get_dev_mem(false), BB.get_dev_mem(false),
+                        tmp_BB.n_rows, tmp_BB.n_cols,
+                        0, 0, tmp_BB.n_rows,
+                        0, 0, BB.n_rows);
   for (uword i = 0; i < tmp_AA.n_rows; ++i)
     {
     tmp_AA.row(i) -= mean_vals_AA;

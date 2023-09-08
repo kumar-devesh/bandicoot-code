@@ -44,7 +44,10 @@ op_var::apply_direct(Mat<out_eT>& out, const Mat<in_eT>& in, const uword dim, co
   Mat<in_eT> tmp;
   apply_direct(tmp, in, dim, norm_type);
   out.set_size(tmp.n_rows, tmp.n_cols);
-  coot_rt_t::copy_array(out.get_dev_mem(false), tmp.get_dev_mem(false), tmp.n_elem);
+  coot_rt_t::copy_array(out.get_dev_mem(false), tmp.get_dev_mem(false),
+                        out.n_rows, out.n_cols,
+                        0, 0, out.n_rows,
+                        0, 0, tmp.n_rows);
   }
 
 

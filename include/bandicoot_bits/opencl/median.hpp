@@ -47,7 +47,10 @@ median(dev_mem_t<eT2> out, dev_mem_t<eT1> in, const uword n_rows, const uword n_
       {
       // Odd number of elements: the middle element is the result.
       // Now extract that row into the output.
-      copy_subview(out, 0, in, middle_element, 0, n_rows, n_cols, 1, n_cols);
+      copy_array(out, in,
+                 1, n_cols,
+                 0, 0, out.n_rows,
+                 middle_element, 0, n_rows);
       }
     }
   else
@@ -71,7 +74,10 @@ median(dev_mem_t<eT2> out, dev_mem_t<eT1> in, const uword n_rows, const uword n_
       {
       // Odd number of elements: the middle element is the result.
       // Now extract the column into the output.
-      copy_subview(out, 0, in, 0, middle_element, n_rows, n_cols, n_rows, 1);
+      copy_array(out, in,
+                 n_rows, 1,
+                 0, 0, out.n_rows,
+                 0, middle_element, n_rows);
       }
     }
   }

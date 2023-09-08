@@ -70,28 +70,29 @@ op_normalise_vec::apply(Mat<eT>& out, const Op<mtOp<eT, T1, mtop_conv_to>, op_no
   coot_debug_check( (p == 0), "normalise(): parameter 'p' must be greater than zero" );
 
   const unwrap<T1> U(in.m.q);
-  // TODO: allow copy_array to work on subviews and extract_subview is no longer needed
-  const extract_subview<typename unwrap<T1>::stored_type> S(U.M);
 
   const eT norm_val_a = norm(in.m, p);
   const eT norm_val_b = (norm_val_a != eT(0)) ? norm_val_a : eT(1);
 
-  out.set_size(S.M.n_rows, S.M.n_cols);
+  out.set_size(U.M.n_rows, U.M.n_cols);
 
   if (norm_val_b == eT2(1))
     {
     // Shortcut: if the norm is 1, it's already normalized.
-    coot_rt_t::copy_array(out.get_dev_mem(false), S.M.get_dev_mem(false), S.M.n_elem);
+    coot_rt_t::copy_array(out.get_dev_mem(false), U.get_dev_mem(false),
+                          out.n_rows, out.n_cols,
+                          0, 0, out.n_rows,
+                          U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
     }
   else
     {
     // Note that normalisation happens *after* conversion.
     coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_div_scalar_post,
-                          out.get_dev_mem(false), S.M.get_dev_mem(false),
+                          out.get_dev_mem(false), U.get_dev_mem(false),
                           eT2(1), eT(norm_val_b),
                           out.n_rows, out.n_cols,
                           0, 0, out.n_rows,
-                          0, 0, out.n_cols);
+                          U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
     }
   }
 
