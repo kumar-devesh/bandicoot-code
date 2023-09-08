@@ -387,7 +387,7 @@ coot_rt_t::copy_array(dev_mem_t<eT2> dest,
                       const uword dest_M_n_rows,
                       const uword src_row_offset,
                       const uword src_col_offset,
-                      const uword src_M_n_rows);
+                      const uword src_M_n_rows)
   {
   coot_extra_debug_sigprint();
 

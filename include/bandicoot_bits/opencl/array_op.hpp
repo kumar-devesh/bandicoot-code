@@ -149,7 +149,7 @@ copy_array(dev_mem_t<eT2> dest,
   cl_kernel kernel = get_rt().cl_rt.get_kernel<eT2, eT1>(twoway_kernel_id::convert_type);
 
   const uword dest_offset = dest_row_offset + dest_col_offset * dest_M_n_rows;
-  const uword  src_offset =  src_row_offset +  src_col_offset * src_M_n_cols;
+  const uword  src_offset =  src_row_offset +  src_col_offset * src_M_n_rows;
 
   runtime_t::cq_guard guard;
 
@@ -167,7 +167,7 @@ copy_array(dev_mem_t<eT2> dest,
   status |= coot_wrapper(clSetKernelArg)(kernel, 2, sizeof(cl_mem),        &( src.cl_mem_ptr)   );
   status |= coot_wrapper(clSetKernelArg)(kernel, 3, cl_src_offset.size,    cl_src_offset.addr   );
   status |= coot_wrapper(clSetKernelArg)(kernel, 4, cl_n_rows.size,        cl_n_rows.addr       );
-  status |= coot_wrapper(clSetKernelArg)(kernel, 5, cl_n_cols.size,        cl_n_col.addr        );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 5, cl_n_cols.size,        cl_n_cols.addr       );
   status |= coot_wrapper(clSetKernelArg)(kernel, 6, cl_dest_M_n_rows.size, cl_dest_M_n_rows.addr);
   status |= coot_wrapper(clSetKernelArg)(kernel, 7, cl_src_M_n_rows.size,  cl_src_M_n_rows.addr );
 

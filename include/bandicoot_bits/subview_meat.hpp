@@ -531,7 +531,7 @@ subview<eT>::extract(Mat<eT1>& out, const subview<eT>& in)
     return;
     }
 
-  coot_rt_t::copy_array(out.get_dev_mem(false), in.get_dev_mem(false),
+  coot_rt_t::copy_array(out.get_dev_mem(false), in.m.get_dev_mem(false),
                         in.n_rows, in.n_cols,
                         0, 0, out.n_rows,
                         in.aux_row1, in.aux_col1, in.m.n_rows);

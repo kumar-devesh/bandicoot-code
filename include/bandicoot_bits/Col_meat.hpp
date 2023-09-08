@@ -168,8 +168,8 @@ Col<eT>::Col(const Col<eT>& X)
 
   access::rw(Mat<eT>::vec_state) = 1;
   coot_rt_t::copy_array(this->get_dev_mem(), X.get_dev_mem(),
-                        n_rows, 1,
-                        0, 0, n_rows,
+                        Mat<eT>::n_rows, 1,
+                        0, 0, Mat<eT>::n_rows,
                         0, 0, X.n_rows);
   }
 
@@ -184,8 +184,8 @@ Col<eT>::operator=(const Col<eT>& X)
 
   Mat<eT>::init(X.n_rows, 1);
   coot_rt_t::copy_array(this->get_dev_mem(), X.get_dev_mem(),
-                        n_rows, 1,
-                        0, 0, n_rows,
+                        Mat<eT>::n_rows, 1,
+                        0, 0, Mat<eT>::n_rows,
                         0, 0, X.n_rows);
 
   return *this;

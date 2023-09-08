@@ -49,7 +49,7 @@ median(dev_mem_t<eT2> out, dev_mem_t<eT1> in, const uword n_rows, const uword n_
       // Now extract that row into the output.
       copy_array(out, in,
                  1, n_cols,
-                 0, 0, out.n_rows,
+                 0, 0, n_rows,
                  middle_element, 0, n_rows);
       }
     }
@@ -76,7 +76,7 @@ median(dev_mem_t<eT2> out, dev_mem_t<eT1> in, const uword n_rows, const uword n_
       // Now extract that column into the output.
       copy_array(out, in,
                  n_rows, 1,
-                 0, 0, out.n_rows,
+                 0, 0, n_rows,
                  0, middle_element, n_rows);
       }
     }
