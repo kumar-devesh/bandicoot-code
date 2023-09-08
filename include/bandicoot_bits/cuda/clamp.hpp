@@ -20,22 +20,42 @@
 template<typename eT1, typename eT2>
 inline
 void
-clamp(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const eT1 min_val, const eT1 max_val, const uword n_elem)
+clamp(dev_mem_t<eT2> dest,
+      const dev_mem_t<eT1> src,
+      const eT1 min_val,
+      const eT1 max_val,
+      const uword n_rows,
+      const uword n_cols,
+      const uword dest_row_offset,
+      const uword dest_col_offset,
+      const uword dest_M_n_rows,
+      const uword src_row_offset,
+      const uword src_col_offset,
+      const uword src_M_n_rows)
   {
   coot_extra_debug_sigprint();
 
   coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "cuda::clamp(): cuda runtime not valid");
 
-  const kernel_dims dims = one_dimensional_grid_dims(n_elem);
+  const kernel_dims dims = two_dimensional_grid_dims(n_rows, n_cols);
 
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT2, eT1>(twoway_kernel_id::clamp);
 
+  const uword dest_offset = dest_row_offset + dest_col_offset * dest_M_n_rows;
+  const uword  src_offset =  src_row_offset +  src_col_offset * src_M_n_rows;
+
+  const eT2* dest_ptr = dest.cuda_mem_ptr + dest_offset;
+  const eT1*  src_ptr =  src.cuda_mem_ptr + src_offset;
+
   const void* args[] = {
-      &(dest.cuda_mem_ptr),
-      &(src.cuda_mem_ptr),
+      &dest_ptr,
+      &src_ptr,
       (eT1*) &min_val,
       (eT1*) &max_val,
-      (uword*) &n_elem };
+      (uword*) &n_rows,
+      (uword*) &n_cols,
+      (uword*) &dest_M_n_rows,
+      (uword*) &src_M_n_rows };
 
   CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,

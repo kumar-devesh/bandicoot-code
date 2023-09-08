@@ -355,7 +355,7 @@ subview<eT>::clamp(const eT min_val, const eT max_val)
 
   // TODO: this implementation could be improved!
   Mat<eT> tmp;
-  op_clamp::apply_direct(tmp, *this, min_val, max_val);
+  op_clamp::apply(tmp, *this, min_val, max_val);
   *this = tmp;
   }
 

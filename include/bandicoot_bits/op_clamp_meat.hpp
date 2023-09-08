@@ -34,75 +34,25 @@ op_clamp::apply(Mat<out_eT>& out, const Op<T1, op_clamp>& in)
   coot_debug_check( (min_val > max_val), "clamp(): min_val must be less than max_val" );
 
   const unwrap<T1> U(in.m);
-
-  op_clamp::apply_direct(out, U.M, min_val, max_val);
-  }
-
-
-
-template<typename eT>
-inline
-void
-op_clamp::apply_direct(Mat<eT>& out, const Mat<eT>& X, const eT min_val, const eT max_val)
-  {
-  coot_extra_debug_sigprint();
-
-  if (X.n_elem == 0)
-    {
-    out.set_size(X.n_rows, X.n_cols);
-    return;
-    }
-
-  if (&out == &X)
+  if (U.is_alias(out))
     {
     Mat<eT> tmp;
-    tmp.set_size(X.n_rows, X.n_cols);
-    coot_rt_t::clamp(tmp.get_dev_mem(false), X.get_dev_mem(false), min_val, max_val, X.n_elem);
+    tmp.set_size(U.M.n_rows, U.M.n_cols);
+    coot_rt_t::clamp(tmp.get_dev_mem(false), U.get_dev_mem(false),
+                     min_val, max_val,
+                     n_rows, n_cols,
+                     0, 0, tmp.n_rows,
+                     U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
     out.steal_mem(tmp);
     }
   else
     {
-    out.set_size(X.n_rows, X.n_cols);
-    coot_rt_t::clamp(out.get_dev_mem(false), X.get_dev_mem(false), min_val, max_val, X.n_elem);
+    coot_rt_t::clamp(out.get_dev_mem(false), U.get_dev_mem(false),
+                     min_val, max_val,
+                     n_rows, n_cols,
+                     0, 0, tmp.n_rows,
+                     U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
     }
-  }
-
-
-
-template<typename out_eT, typename in_eT>
-inline
-void
-op_clamp::apply_direct(Mat<out_eT>& out, const Mat<in_eT>& X, const in_eT min_val, const in_eT max_val)
-  {
-  coot_extra_debug_sigprint();
-
-  out.set_size(X.n_rows, X.n_cols);
-  if (X.n_elem == 0)
-    {
-    return;
-    }
-
-  coot_rt_t::clamp(out.get_dev_mem(false), X.get_dev_mem(false), min_val, max_val, X.n_elem);
-  }
-
-
-
-template<typename out_eT, typename in_eT>
-inline
-void
-op_clamp::apply_direct(Mat<out_eT>& out, const subview<in_eT>& sv, const in_eT min_val, const in_eT max_val)
-  {
-  coot_extra_debug_sigprint();
-
-  out.set_size(sv.n_rows, sv.n_cols);
-  if (sv.n_elem == 0)
-    {
-    return;
-    }
-
-  // TODO: this could be improved: we don't do specialized subview clamping, so instead we extract the subview.
-  Mat<in_eT> extracted_sv(sv);
-  op_clamp::apply_direct(out, extracted_sv, min_val, max_val);
   }
 
 

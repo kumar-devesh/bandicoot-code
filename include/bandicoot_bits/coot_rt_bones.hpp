@@ -327,7 +327,18 @@ class coot_rt_t
   static inline void linspace(const dev_mem_t<eT> mem, const eT start, const eT end, const uword num);
 
   template<typename eT1, typename eT2>
-  static inline void clamp(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const eT1 min_val, const eT1 max_val, const uword n_elem);
+  static inline void clamp(dev_mem_t<eT2> dest,
+                           const dev_mem_t<eT1> src,
+                           const eT1 min_val,
+                           const eT1 max_val,
+                           const uword n_rows,
+                           const uword n_cols,
+                           const uword dest_row_offset,
+                           const uword dest_col_offset,
+                           const uword dest_M_n_rows,
+                           const uword src_row_offset,
+                           const uword src_col_offset,
+                           const uowrd src_M_n_rows);
 
   template<typename eT>
   static inline eT vec_norm_1(dev_mem_t<eT> mem, const uword n_elem);
