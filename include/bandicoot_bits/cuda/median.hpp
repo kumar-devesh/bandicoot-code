@@ -29,7 +29,7 @@ median(dev_mem_t<eT2> out, dev_mem_t<eT1> in, const uword n_rows, const uword n_
   if (dim == 0)
     {
     // Sort the data in each column.
-    sort_colwise(in, n_rows, n_cols, 0);
+    sort(in, n_rows, n_cols, 0, 0, 0, 0, n_rows);
     const uword middle_element = (n_rows / 2);
 
     if (n_rows % 2 == 0)
@@ -56,7 +56,7 @@ median(dev_mem_t<eT2> out, dev_mem_t<eT1> in, const uword n_rows, const uword n_
   else
     {
     // Sort the data in each row.
-    sort_rowwise(in, n_rows, n_cols, 0);
+    sort(in, n_rows, n_cols, 0, 0, 0, n_rows);
     const uword middle_element = (n_cols / 2);
 
     if (n_cols % 2 == 0)

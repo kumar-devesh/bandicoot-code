@@ -32,14 +32,7 @@ op_sort::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_sort>& in)
   // TODO: implement has_nan() and use it here
   //coot_debug_check( (X.has_nan()),   "sort(): detected NaN"                         );
 
-  if (dim == 0)
-    {
-    coot_rt_t::sort_colwise(out.get_dev_mem(false), out.n_rows, out.n_cols, sort_type);
-    }
-  else
-    {
-    coot_rt_t::sort_rowwise(out.get_dev_mem(false), out.n_rows, out.n_cols, sort_type);
-    }
+  coot_rt_t::sort(out.get_dev_mem(false), out.n_rows, out.n_cols, sort_type, dim, 0, 0, out.n_rows);
   }
 
 

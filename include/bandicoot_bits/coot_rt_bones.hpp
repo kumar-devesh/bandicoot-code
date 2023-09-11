@@ -402,10 +402,15 @@ class coot_rt_t
   static inline void join_rows(dev_mem_t<eT5> out, const dev_mem_t<eT1> A, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<eT2> B, const uword B_n_rows, const uword B_n_cols, const dev_mem_t<eT3> C, const uword C_n_rows, const uword C_n_cols, const dev_mem_t<eT4> D, const uword D_n_rows, const uword D_n_cols);
 
   template<typename eT>
-  static inline void sort_colwise(dev_mem_t<eT> mem, const uword n_rows, const uword n_cols, const uword sort_type);
-
-  template<typename eT>
-  static inline void sort_rowwise(dev_mem_t<eT> mem, const uword n_rows, const uword n_cols, const uword sort_type);
+  static inline void sort(dev_mem_t<eT> mem,
+                          const uword n_rows,
+                          const uword n_cols,
+                          const uword sort_type,
+                          const uword dim,
+                          // subview arguments
+                          const uword row_offset,
+                          const uword col_offset,
+                          const uword M_n_rows);
 
   template<typename eT>
   static inline void sort_vec(dev_mem_t<eT> mem, const uword n_elem, const uword sort_type);

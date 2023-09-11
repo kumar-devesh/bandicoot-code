@@ -2758,7 +2758,7 @@ coot_rt_t::var(dev_mem_t<eT> dest,
   if (get_rt().backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
-    opencl::var(out, in, means,
+    opencl::var(dest, src, src_means,
                 n_rows, n_cols,
                 dim, norm_type,
                 dest_offset, dest_mem_incr,
@@ -2771,7 +2771,7 @@ coot_rt_t::var(dev_mem_t<eT> dest,
   else if (get_rt().backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    cuda::var(out, in, means,
+    cuda::var(dest, src, src_means,
               n_rows, n_cols,
               dim, norm_type,
               dest_offset, dest_mem_incr,
@@ -2920,60 +2920,37 @@ coot_rt_t::join_rows(dev_mem_t<eT5> out, const dev_mem_t<eT1> A, const uword A_n
 template<typename eT>
 inline
 void
-coot_rt_t::sort_colwise(dev_mem_t<eT> mem, const uword n_rows, const uword n_cols, const uword sort_type)
+coot_rt_t::sort(dev_mem_t<eT> mem,
+                const uword n_rows,
+                const uword n_cols,
+                const uword sort_type,
+                const uword dim,
+                // subview arguments
+                const uword row_offset,
+                const uword col_offset,
+                const uword M_n_rows)
   {
   coot_extra_debug_sigprint();
 
   if (get_rt().backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
-    opencl::sort_colwise(mem, n_rows, n_cols, sort_type);
+    opencl::sort(mem, n_rows, n_cols, sort_type, dim, row_offset, col_offset, M_n_rows);
     #else
-    coot_stop_runtime_error("coot_rt::sort_colwise(): OpenCL backend not enabled");
+    coot_stop_runtime_error("coot_rt::sort(): OpenCL backend not enabled");
     #endif
     }
   else if (get_rt().backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    cuda::sort_colwise(mem, n_rows, n_cols, sort_type);
+    cuda::sort(mem, n_rows, n_cols, sort_type, dim, row_offset, col_offset, M_n_rows);
     #else
-    coot_stop_runtime_error("coot_rt::sort_colwise(): CUDA backend not enabled");
+    coot_stop_runtime_error("coot_rt::sort(): CUDA backend not enabled");
     #endif
     }
   else
     {
-    coot_stop_runtime_error("coot_rt::sort_colwise(): unknown backend");
-    }
-  }
-
-
-
-template<typename eT>
-inline
-void
-coot_rt_t::sort_rowwise(dev_mem_t<eT> mem, const uword n_rows, const uword n_cols, const uword sort_type)
-  {
-  coot_extra_debug_sigprint();
-
-  if (get_rt().backend == CL_BACKEND)
-    {
-    #if defined(COOT_USE_OPENCL)
-    opencl::sort_rowwise(mem, n_rows, n_cols, sort_type);
-    #else
-    coot_stop_runtime_error("coot_rt::sort_rowwise(): OpenCL backend not enabled");
-    #endif
-    }
-  else if (get_rt().backend == CUDA_BACKEND)
-    {
-    #if defined(COOT_USE_CUDA)
-    cuda::sort_rowwise(mem, n_rows, n_cols, sort_type);
-    #else
-    coot_stop_runtime_error("coot_rt::sort_rowwise(): CUDA backend not enabled");
-    #endif
-    }
-  else
-    {
-    coot_stop_runtime_error("coot_rt::sort_rowwise(): unknown backend");
+    coot_stop_runtime_error("coot_rt::sort(): unknown backend");
     }
   }
 
