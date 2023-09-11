@@ -14,25 +14,30 @@
 
 __kernel
 void
-COOT_FN(PREFIX,var_rowwise)(__global eT1* out,
-                            __global const eT1* A,
-                            __global const eT1* means,
-                            const UWORD A_n_rows,
-                            const UWORD A_n_cols,
-                            const UWORD norm_correction)
+COOT_FN(PREFIX,var_rowwise)(__global eT1* dest,
+                            const UWORD dest_offset,
+                            __global const eT1* src,
+                            const UWORD src_offset,
+                            __global const eT1* src_means,
+                            const UWORD src_means_offset,
+                            const UWORD n_rows,
+                            const UWORD n_cols,
+                            const UWORD norm_correction,
+                            const UWORD dest_mem_incr,
+                            const UWORD src_M_n_rows,
+                            const UWORD src_means_mem_incr)
   {
   const UWORD row = get_global_id(0);
-  if(row < A_n_rows)
+  if(row < n_rows)
     {
     eT1 acc = (eT1)(0);
-    const eT1 mean_val = means[row];
-    for (UWORD i = 0; i < A_n_cols; ++i)
+    const eT1 mean_val = src_means[src_means_offset + row * src_means_mem_incr];
+    for (UWORD i = 0; i < n_cols; ++i)
       {
-      const eT1 val = (A[i * A_n_rows + row] - mean_val);
+      const eT1 val = (src[src_offset + (i * src_M_n_rows) + row] - mean_val);
       acc += (val * val);
       }
 
-    out[row] = (acc / (eT1) (A_n_cols - norm_correction));
+    dest[dest_offset + row * dest_mem_incr] = (acc / (eT1) (n_cols - norm_correction));
     }
   }
-

@@ -20,20 +20,43 @@
 template<typename eT>
 inline
 void
-var(dev_mem_t<eT> out, const dev_mem_t<eT> in, const dev_mem_t<eT> means, const uword n_rows, const uword n_cols, const uword dim, const uword norm_type)
+var(dev_mem_t<eT> dest,
+    const dev_mem_t<eT> src,
+    const dev_mem_t<eT> src_means,
+    const uword n_rows,
+    const uword n_cols,
+    const uword dim,
+    const uword norm_type,
+    // subview arguments
+    const uword dest_offset,
+    const uword dest_mem_incr,
+    const uword src_row_offset,
+    const uword src_col_offset,
+    const uword src_M_n_rows,
+    const uword src_means_offset,
+    const uword src_means_mem_incr)
   {
   coot_extra_debug_sigprint();
 
   CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>((dim == 0) ? oneway_kernel_id::var_colwise : oneway_kernel_id::var_rowwise);
   const uword norm_correction = (norm_type == 0) ? 1 : 0;
 
+  const uword src_offset = src_row_offset + src_col_offset * src_M_n_rows;
+
+  const eT* dest_ptr      =      dest.cuda_mem_ptr + dest_offset;
+  const eT* src_ptr       =       src.cuda_mem_ptr + src_offset;
+  const eT* src_means_ptr = src_means.cuda_mem_ptr + src_means_offset;
+
   const void* args[] = {
-      &(out.cuda_mem_ptr),
-      &(in.cuda_mem_ptr),
-      &(means.cuda_mem_ptr),
+      &dest_ptr,
+      &src_ptr,
+      &src_means_ptr,
       (uword*) &n_rows,
       (uword*) &n_cols,
-      (uword*) &norm_correction };
+      (uword*) &norm_correction,
+      (uword*) &dest_mem_incr,
+      (uword*) &src_M_n_rows,
+      (uword*) &src_means_mem_incr };
 
   const kernel_dims dims = one_dimensional_grid_dims((dim == 0) ? n_cols : n_rows);
 
@@ -46,42 +69,6 @@ var(dev_mem_t<eT> out, const dev_mem_t<eT> in, const dev_mem_t<eT> means, const 
       0);
 
   coot_check_cuda_error(result, "coot::cuda::var(): cuLaunchKernel() failed");
-  }
-
-
-
-template<typename eT>
-inline
-void
-var_subview(dev_mem_t<eT> out, const dev_mem_t<eT> in, const dev_mem_t<eT> means, const uword M_n_rows, const uword M_n_cols, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const uword dim, const uword norm_type)
-  {
-  coot_extra_debug_sigprint();
-
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(dim == 0 ? oneway_kernel_id::submat_var_colwise : oneway_kernel_id::submat_var_rowwise);
-  const uword norm_correction = (norm_type == 0) ? 1 : 0;
-
-  const void* args[] = {
-      &(out.cuda_mem_ptr),
-      &(in.cuda_mem_ptr),
-      &(means.cuda_mem_ptr),
-      (uword*) &M_n_rows,
-      (uword*) &aux_row1,
-      (uword*) &aux_col1,
-      (uword*) &n_rows,
-      (uword*) &n_cols,
-      (uword*) &norm_correction };
-
-  const kernel_dims dims = one_dimensional_grid_dims((dim == 0) ? n_cols : n_rows);
-
-  CUresult result = coot_wrapper(cuLaunchKernel)(
-      kernel,
-      dims.d[0], dims.d[1], dims.d[2],
-      dims.d[3], dims.d[4], dims.d[5],
-      0, NULL,
-      (void**) args,
-      0);
-
-  coot_check_cuda_error(result, "coot::cuda::var_subview(): cuLaunchKernel() failed");
   }
 
 

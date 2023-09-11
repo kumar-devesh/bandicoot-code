@@ -373,10 +373,21 @@ class coot_rt_t
   static inline eT median_vec(dev_mem_t<eT> mem, const uword n_elem);
 
   template<typename eT>
-  static inline void var(dev_mem_t<eT> out, const dev_mem_t<eT> in, const dev_mem_t<eT> means, const uword n_rows, const uword n_cols, const uword dim, const uword norm_type);
-
-  template<typename eT>
-  static inline void var_subview(dev_mem_t<eT> out, const dev_mem_t<eT> in, const dev_mem_t<eT> means, const uword M_n_rows, const uword M_n_cols, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const uword dim, const uword norm_type);
+  static inline void var(dev_mem_t<eT> dest,
+                         const dev_mem_t<eT> src,
+                         const dev_mem_t<eT> src_means,
+                         const uword n_rows,
+                         const uword n_cols,
+                         const uword dim,
+                         const uword norm_type,
+                         // subview arguments
+                         const uword dest_offset,
+                         const uword dest_mem_incr,
+                         const uword src_row_offset,
+                         const uword src_col_offset,
+                         const uword src_M_n_rows,
+                         const uword src_means_offset,
+                         const uword src_means_mem_incr);
 
   template<typename eT>
   static inline eT var_vec(const dev_mem_t<eT> mem, const eT mean, const uword n_elem, const uword norm_type);

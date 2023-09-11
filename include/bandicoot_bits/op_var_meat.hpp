@@ -81,7 +81,12 @@ op_var::apply_direct(Mat<eT>& out, const Mat<eT>& in, const uword dim, const uwo
   Mat<eT> mean;
   op_mean::apply_direct(mean, C.M, dim, false);
 
-  coot_rt_t::var(out.get_dev_mem(false), C.M.get_dev_mem(false), mean.get_dev_mem(false), in.n_rows, in.n_cols, dim, norm_type);
+  coot_rt_t::var(out.get_dev_mem(false), C.M.get_dev_mem(false), mean.get_dev_mem(false),
+                 in.n_rows, in.n_cols,
+                 dim, norm_type,
+                 0, 1,
+                 0, 0, C.M.n_rows,
+                 0, 1);
   }
 
 
@@ -134,7 +139,12 @@ op_var::apply_direct(Mat<eT>& out, const subview<eT>& in, const uword dim, const
   Mat<eT> mean;
   op_mean::apply_direct(mean, in, dim, false);
 
-  coot_rt_t::var_subview(out.get_dev_mem(false), in.m.get_dev_mem(false), mean.get_dev_mem(false), in.m.n_rows, in.m.n_cols, in.aux_row1, in.aux_col1, in.n_rows, in.n_cols, dim, norm_type);
+  coot_rt_t::var(out.get_dev_mem(false), in.m.get_dev_mem(false), mean.get_dev_mem(false),
+                 in.n_rows, in.n_cols,
+                 dim, norm_type,
+                 0, 1,
+                 in.aux_row1, in.aux_col1, in.m.n_rows,
+                 0, 1);
   }
 
 
