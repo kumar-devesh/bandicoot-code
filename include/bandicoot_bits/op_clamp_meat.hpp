@@ -40,17 +40,18 @@ op_clamp::apply(Mat<out_eT>& out, const Op<T1, op_clamp>& in)
     tmp.set_size(U.M.n_rows, U.M.n_cols);
     coot_rt_t::clamp(tmp.get_dev_mem(false), U.get_dev_mem(false),
                      min_val, max_val,
-                     n_rows, n_cols,
+                     tmp.n_rows, tmp.n_cols,
                      0, 0, tmp.n_rows,
                      U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
-    out.steal_mem(tmp);
+    steal_or_copy_mem(out, tmp);
     }
   else
     {
+    out.set_size(U.M.n_rows, U.M.n_cols);
     coot_rt_t::clamp(out.get_dev_mem(false), U.get_dev_mem(false),
                      min_val, max_val,
-                     n_rows, n_cols,
-                     0, 0, tmp.n_rows,
+                     out.n_rows, out.n_cols,
+                     0, 0, out.n_rows,
                      U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
     }
   }

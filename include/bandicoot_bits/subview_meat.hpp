@@ -353,10 +353,11 @@ subview<eT>::clamp(const eT min_val, const eT max_val)
 
   coot_debug_check( (min_val > max_val), "clamp(): min_val must be less than max_val" );
 
-  // TODO: this implementation could be improved!
-  Mat<eT> tmp;
-  op_clamp::apply(tmp, *this, min_val, max_val);
-  *this = tmp;
+  coot_rt_t::clamp(m.get_dev_mem(false), m.get_dev_mem(false),
+                   min_val, max_val,
+                   n_rows, n_cols,
+                   aux_row1, aux_col1, m.n_rows,
+                   aux_row1, aux_col1, m.n_rows);
   }
 
 

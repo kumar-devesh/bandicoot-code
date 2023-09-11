@@ -1717,7 +1717,11 @@ Mat<eT>::clamp(const eT min_val, const eT max_val)
 
   coot_debug_check( (min_val > max_val), "clamp(): min_val must be less than max_val" );
 
-  coot_rt_t::clamp(get_dev_mem(false), get_dev_mem(false), min_val, max_val, n_elem);
+  coot_rt_t::clamp(get_dev_mem(false), get_dev_mem(false),
+                   min_val, max_val,
+                   n_rows, n_cols,
+                   0, 0, n_rows,
+                   0, 0, n_rows);
 
   return *this;
   }
