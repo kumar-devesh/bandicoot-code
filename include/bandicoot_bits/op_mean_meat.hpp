@@ -71,7 +71,11 @@ op_mean::apply_direct(Mat<out_eT>& out, const Mat<in_eT>& in, const uword dim, c
     return;
     }
 
-  coot_rt_t::mean(out.get_dev_mem(false), C.M.get_dev_mem(false), in.n_rows, in.n_cols, dim, post_conv_apply);
+  coot_rt_t::mean(out.get_dev_mem(false), C.M.get_dev_mem(false),
+                  in.n_rows, in.n_cols,
+                  dim, post_conv_apply,
+                  0, 1,
+                  0, 0, C.M.n_rows);
   }
 
 
@@ -106,7 +110,11 @@ op_mean::apply_direct(Mat<out_eT>& out, const subview<in_eT>& in, const uword di
     return;
     }
 
-  coot_rt_t::mean_subview(out.get_dev_mem(false), in.m.get_dev_mem(false), in.m.n_rows, in.aux_row1, in.aux_col1, in.n_rows, in.n_cols, dim, post_conv_apply);
+  coot_rt_t::mean(out.get_dev_mem(false), in.m.get_dev_mem(false),
+                  in.n_rows, in.n_cols,
+                  dim, post_conv_apply,
+                  0, 1,
+                  0, 0, in.m.n_rows);
   }
 
 

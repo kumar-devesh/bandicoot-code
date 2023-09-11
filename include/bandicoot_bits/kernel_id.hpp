@@ -488,10 +488,6 @@ struct twoway_kernel_id
     mean_rowwise_conv_pre,
     mean_colwise_conv_post,
     mean_rowwise_conv_post,
-    submat_mean_colwise_conv_pre,
-    submat_mean_rowwise_conv_pre,
-    submat_mean_colwise_conv_post,
-    submat_mean_rowwise_conv_post,
     //
     dot,
     dot_small,
@@ -653,10 +649,6 @@ struct twoway_kernel_id
     names.push_back("mean_rowwise_conv_pre");
     names.push_back("mean_colwise_conv_post");
     names.push_back("mean_rowwise_conv_post");
-    names.push_back("submat_mean_colwise_conv_pre");
-    names.push_back("submat_mean_rowwise_conv_pre");
-    names.push_back("submat_mean_colwise_conv_post");
-    names.push_back("submat_mean_rowwise_conv_post");
 
     names.push_back("dot");
     names.push_back("dot_small");

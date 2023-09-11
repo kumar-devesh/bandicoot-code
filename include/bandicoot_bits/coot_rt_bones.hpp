@@ -338,7 +338,7 @@ class coot_rt_t
                            const uword dest_M_n_rows,
                            const uword src_row_offset,
                            const uword src_col_offset,
-                           const uowrd src_M_n_rows);
+                           const uword src_M_n_rows);
 
   template<typename eT>
   static inline eT vec_norm_1(dev_mem_t<eT> mem, const uword n_elem);
@@ -353,10 +353,18 @@ class coot_rt_t
   static inline eT vec_norm_min(dev_mem_t<eT> mem, const uword n_elem);
 
   template<typename eT1, typename eT2>
-  static inline void mean(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword n_rows, const uword n_cols, const uword dim, const bool post_conv_apply);
-
-  template<typename eT1, typename eT2>
-  static inline void mean_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword M_n_rows, const uword start_row, const uword start_col, const uword n_rows, const uword n_cols, const uword dim, const bool post_conv_apply);
+  static inline void mean(dev_mem_t<eT2> dest,
+                          const dev_mem_t<eT1> src,
+                          const uword n_rows,
+                          const uword n_cols,
+                          const uword dim,
+                          const bool post_conv_apply,
+                          // subview arguments
+                          const uword dest_offset,
+                          const uword dest_mem_incr,
+                          const uword src_row_offset,
+                          const uword src_col_offset,
+                          const uword src_M_n_rows);
 
   template<typename eT1, typename eT2>
   static inline void median(dev_mem_t<eT2> out, dev_mem_t<eT1> in, const uword n_rows, const uword n_cols, const uword dim);

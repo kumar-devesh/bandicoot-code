@@ -2625,14 +2625,28 @@ coot_rt_t::vec_norm_min(const dev_mem_t<eT> mem, const uword n_elem)
 template<typename eT1, typename eT2>
 inline
 void
-coot_rt_t::mean(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword n_rows, const uword n_cols, const uword dim, const bool post_conv_apply)
+coot_rt_t::mean(dev_mem_t<eT2> dest,
+                const dev_mem_t<eT1> src,
+                const uword n_rows,
+                const uword n_cols,
+                const uword dim,
+                const bool post_conv_apply,
+                // subview arguments
+                const uword dest_offset,
+                const uword dest_mem_incr,
+                const uword src_row_offset,
+                const uword src_col_offset,
+                const uword src_M_n_rows)
   {
   coot_extra_debug_sigprint();
 
   if (get_rt().backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
-    opencl::mean(out, in, n_rows, n_cols, dim, post_conv_apply);
+    opencl::mean(dest, src,
+                 n_rows, n_cols, dim, post_conv_apply,
+                 dest_offset, dest_mem_incr,
+                 src_row_offset, src_col_offset, src_M_n_rows);
     #else
     coot_stop_runtime_error("coot_rt::mean(): OpenCL backend not enabled");
     #endif
@@ -2640,7 +2654,10 @@ coot_rt_t::mean(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword n_rows,
   else if (get_rt().backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    cuda::mean(out, in, n_rows, n_cols, dim, post_conv_apply);
+    cuda::mean(dest, src,
+               n_rows, n_cols, dim, post_conv_apply,
+               dest_offset, dest_mem_incr,
+               src_row_offset, src_col_offset, src_M_n_rows);
     #else
     coot_stop_runtime_error("coot_rt::mean(): CUDA backend not enabled");
     #endif
@@ -2648,37 +2665,6 @@ coot_rt_t::mean(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword n_rows,
   else
     {
     coot_stop_runtime_error("coot_rt::mean(): unknown backend");
-    }
-  }
-
-
-
-template<typename eT1, typename eT2>
-inline
-void
-coot_rt_t::mean_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword M_n_rows, const uword start_row, const uword start_col, const uword n_rows, const uword n_cols, const uword dim, const bool post_conv_apply)
-  {
-  coot_extra_debug_sigprint();
-
-  if (get_rt().backend == CL_BACKEND)
-    {
-    #if defined(COOT_USE_OPENCL)
-    opencl::mean_subview(out, in, M_n_rows, start_row, start_col, n_rows, n_cols, dim, post_conv_apply);
-    #else
-    coot_stop_runtime_error("coot_rt::mean_subview(): OpenCL backend not enabled");
-    #endif
-    }
-  else if (get_rt().backend == CUDA_BACKEND)
-    {
-    #if defined(COOT_USE_CUDA)
-    cuda::mean_subview(out, in, M_n_rows, start_row, start_col, n_rows, n_cols, dim, post_conv_apply);
-    #else
-    coot_stop_runtime_error("coot_rt::mean_subview(): CUDA backend not enabled");
-    #endif
-    }
-  else
-    {
-    coot_stop_runtime_error("coot_rt::mean_subview(): unknown backend");
     }
   }
 
