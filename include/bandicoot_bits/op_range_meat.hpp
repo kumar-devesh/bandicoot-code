@@ -79,17 +79,19 @@ op_range::apply_direct(Mat<out_eT>& out, const Mat<in_eT>& in, const uword dim, 
   mins.set_size(out.n_rows, out.n_cols);
   maxs.set_size(out.n_rows, out.n_cols);
 
+  // mins = min(in, dim)
+  coot_rt_t::min(mins.get_dev_mem(false), in.get_dev_mem(false),
+                 in.n_rows, in.n_cols,
+                 dim, post_conv_apply,
+                 0, 1,
+                 0, 0, in.n_rows);
   if (dim == 0)
     {
-    // mins = min(in, dim)
-    coot_rt_t::min_colwise(mins.get_dev_mem(false), in.get_dev_mem(false), in.n_rows, in.n_cols, post_conv_apply);
     // maxs = max(in, dim)
     coot_rt_t::max_colwise(maxs.get_dev_mem(false), in.get_dev_mem(false), in.n_rows, in.n_cols, post_conv_apply);
     }
   else
     {
-    // mins = min(in, dim)
-    coot_rt_t::min_rowwise(mins.get_dev_mem(false), in.get_dev_mem(false), in.n_rows, in.n_cols, post_conv_apply);
     // maxs = max(in, dim)
     coot_rt_t::max_rowwise(maxs.get_dev_mem(false), in.get_dev_mem(false), in.n_rows, in.n_cols, post_conv_apply);
     }

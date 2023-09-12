@@ -14,20 +14,22 @@
 
 __global__
 void
-COOT_FN(PREFIX,min_rowwise_conv_post)(eT2* out,
-                                      const eT1* A,
-                                      const UWORD A_n_rows,
-                                      const UWORD A_n_cols)
+COOT_FN(PREFIX,min_rowwise_conv_post)(eT2* dest,
+                                      const eT1* src,
+                                      const UWORD n_rows,
+                                      const UWORD n_cols,
+                                      const UWORD dest_mem_incr,
+                                      const UWORD src_M_n_rows)
   {
   const UWORD row = blockIdx.x * blockDim.x + threadIdx.x;
-  if(row < A_n_rows)
+  if(row < n_rows)
     {
-    eT1 acc = (eT1) A[row];
-    for (UWORD i = 1; i < A_n_cols; ++i)
+    eT1 acc = (eT1) src[row];
+    for (UWORD i = 1; i < n_cols; ++i)
       {
-      acc = min(acc, A[i*A_n_rows + row]);
+      acc = min(acc, src[(i * src_M_n_rows) + row]);
       }
 
-    out[row] = (eT2) (acc);
+    dest[row * dest_mem_incr] = (eT2) (acc);
     }
   }

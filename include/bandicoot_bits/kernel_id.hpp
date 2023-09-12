@@ -468,10 +468,6 @@ struct twoway_kernel_id
     min_rowwise_conv_pre,
     min_colwise_conv_post,
     min_rowwise_conv_post,
-    submat_min_colwise_conv_pre,
-    submat_min_rowwise_conv_pre,
-    submat_min_colwise_conv_post,
-    submat_min_rowwise_conv_post,
     max_colwise_conv_pre,
     max_rowwise_conv_pre,
     max_colwise_conv_post,
@@ -625,10 +621,6 @@ struct twoway_kernel_id
     names.push_back("min_rowwise_conv_pre");
     names.push_back("min_colwise_conv_post");
     names.push_back("min_rowwise_conv_post");
-    names.push_back("submat_min_colwise_conv_pre");
-    names.push_back("submat_min_rowwise_conv_pre");
-    names.push_back("submat_min_colwise_conv_post");
-    names.push_back("submat_min_rowwise_conv_post");
     names.push_back("max_colwise_conv_pre");
     names.push_back("max_rowwise_conv_pre");
     names.push_back("max_colwise_conv_post");

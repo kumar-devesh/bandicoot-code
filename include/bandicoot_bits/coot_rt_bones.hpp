@@ -175,12 +175,6 @@ class coot_rt_t
                                const uword src_B_M_n_rows);
 
   template<typename eT>
-  static inline eT accu(const dev_mem_t<eT> mem, const uword n_elem);
-
-  template<typename eT>
-  static inline eT accu_subview(const dev_mem_t<eT> mem, const uword M_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols);
-
-  template<typename eT>
   static inline eT prod(const dev_mem_t<eT> mem, const uword n_elem);
 
   template<typename eT>
@@ -292,17 +286,25 @@ class coot_rt_t
                          const uword src_col_offset,
                          const uword src_M_n_rows);
 
-  template<typename eT1, typename eT2>
-  static inline void min_colwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply);
+  template<typename eT>
+  static inline eT accu(const dev_mem_t<eT> mem, const uword n_elem);
+
+  template<typename eT>
+  static inline eT accu_subview(const dev_mem_t<eT> mem, const uword M_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols);
 
   template<typename eT1, typename eT2>
-  static inline void min_rowwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply);
-
-  template<typename eT1, typename eT2>
-  static inline void min_colwise_subview(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword A_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const bool post_conv_apply);
-
-  template<typename eT1, typename eT2>
-  static inline void min_rowwise_subview(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword A_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const bool post_conv_apply);
+  static inline void min(dev_mem_t<eT2> dest,
+                         const dev_mem_t<eT1> src,
+                         const uword n_rows,
+                         const uword n_cols,
+                         const uword dim,
+                         const bool post_conv_apply,
+                         // subview arguments
+                         const uword dest_offset,
+                         const uword dest_mem_incr,
+                         const uword src_row_offset,
+                         const uword src_col_offset,
+                         const uword src_M_n_rows);
 
   template<typename eT1, typename eT2>
   static inline void max_colwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply);
