@@ -96,15 +96,11 @@ op_sum::apply_noalias(Mat<out_eT>& out, const Mat<in_eT>& A, const uword dim, co
     }
 
 
-  if(dim == 0)
-    {
-    coot_rt_t::sum_colwise(out.get_dev_mem(false), A.get_dev_mem(false), A.n_rows, A.n_cols, post_conv_apply);
-    }
-  else
-  if(dim == 1)
-    {
-    coot_rt_t::sum_rowwise(out.get_dev_mem(false), A.get_dev_mem(false), A.n_rows, A.n_cols, post_conv_apply);
-    }
+  coot_rt_t::sum(out.get_dev_mem(false), A.get_dev_mem(false),
+                 A.n_rows, A.n_cols,
+                 dim, post_conv_apply,
+                 0, 1,
+                 0, 0, A.n_rows);
   }
 
 
@@ -132,16 +128,12 @@ op_sum::apply_noalias(Mat<out_eT>& out, const subview<in_eT>& sv, const uword di
     return;
     }
 
-
-  if(dim == 0)
-    {
-    coot_rt_t::sum_colwise_subview(out.get_dev_mem(false), sv.m.get_dev_mem(false), sv.m.n_rows, sv.aux_row1, sv.aux_col1, sv.n_rows, sv.n_cols, post_conv_apply);
-    }
-  else
-  if(dim == 1)
-    {
-    coot_rt_t::sum_rowwise_subview(out.get_dev_mem(false), sv.m.get_dev_mem(false), sv.m.n_rows, sv.aux_row1, sv.aux_col1, sv.n_rows, sv.n_cols, post_conv_apply);
-    }
+  coot_rt_t::sum(out.get_dev_mem(false),
+                 sv.m.get_dev_mem(false),
+                 sv.m.n_rows, sv.m.n_cols,
+                 dim, post_conv_apply,
+                 0, 1,
+                 sv.aux_row1, sv.aux_col1, sv.m.n_rows);
   }
 
 

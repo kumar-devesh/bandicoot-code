@@ -14,21 +14,25 @@
 
 __kernel
 void
-COOT_FN(PREFIX,sum_colwise_conv_pre)(__global eT2* out,
-                                     __global const eT1* A,
-                                     const UWORD A_n_rows,
-                                     const UWORD A_n_cols)
+COOT_FN(PREFIX,sum_colwise_conv_pre)(__global eT2* dest,
+                                     const UWORD dest_offset,
+                                     __global const eT1* src,
+                                     const UWORD src_offset,
+                                     const UWORD n_rows,
+                                     const UWORD n_cols,
+                                     const UWORD dest_mem_incr,
+                                     const UWORD src_M_n_rows)
   {
   const UWORD col = get_global_id(0);
-  if(col < A_n_cols)
+  if(col < n_cols)
     {
-    __global const eT1* colptr = &(A[ col*A_n_rows ]);
+    __global const eT1* colptr = &(src[src_offset + col * src_M_n_rows]);
     eT2 acc = (eT2) (0);
     #pragma unroll
-    for(UWORD i = 0; i < A_n_rows; ++i)
+    for(UWORD i = 0; i < n_rows; ++i)
       {
       acc += (eT2) (colptr[i]);
       }
-    out[col] = acc;
+    dest[dest_offset + col * dest_mem_incr] = acc;
     }
   }

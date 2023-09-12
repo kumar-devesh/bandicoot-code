@@ -1943,122 +1943,48 @@ coot_rt_t::mul_diag(dev_mem_t<eT> C_mem, const uword C_n_rows, const uword C_n_c
 template<typename eT1, typename eT2>
 inline
 void
-coot_rt_t::sum_colwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply)
+coot_rt_t::sum(dev_mem_t<eT2> dest,
+               const dev_mem_t<eT1> src,
+               const uword n_rows,
+               const uword n_cols,
+               const uword dim,
+               const bool post_conv_apply,
+               // subview arguments
+               const uword dest_offset,
+               const uword dest_mem_incr,
+               const uword src_row_offset,
+               const uword src_col_offset,
+               const uword src_M_n_rows)
   {
   coot_extra_debug_sigprint();
 
   if (get_rt().backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
-    opencl::sum_colwise(out_mem, A_mem, n_rows, n_cols, post_conv_apply);
+    opencl::sum(dest, src,
+                n_rows, n_cols,
+                dim, post_conv_apply,
+                dest_offset, dest_mem_incr,
+                src_row_offset, src_col_offset, src_M_n_rows);
     #else
-    coot_stop_runtime_error("coot_rt::sum_colwise(): OpenCL backend not enabled");
+    coot_stop_runtime_error("coot_rt::sum(): OpenCL backend not enabled");
     #endif
     }
   else if (get_rt().backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    cuda::sum_colwise(out_mem, A_mem, n_rows, n_cols, post_conv_apply);
+    cuda::sum(dest, src,
+              n_rows, n_cols,
+              dim, post_conv_apply,
+              dest_offset, dest_mem_incr,
+              src_row_offset, src_col_offset, src_M_n_rows);
     #else
-    coot_stop_runtime_error("coot_rt::sum_colwise(): CUDA backend not enabled");
+    coot_stop_runtime_error("coot_rt::sum(): CUDA backend not enabled");
     #endif
     }
   else
     {
-    coot_stop_runtime_error("coot_rt::sum_colwise(): unknown backend");
-    }
-  }
-
-
-
-template<typename eT1, typename eT2>
-inline
-void
-coot_rt_t::sum_rowwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply)
-  {
-  coot_extra_debug_sigprint();
-
-  if (get_rt().backend == CL_BACKEND)
-    {
-    #if defined(COOT_USE_OPENCL)
-    opencl::sum_rowwise(out_mem, A_mem, n_rows, n_cols, post_conv_apply);
-    #else
-    coot_stop_runtime_error("coot_rt::sum_rowwise(): OpenCL backend not enabled");
-    #endif
-    }
-  else if (get_rt().backend == CUDA_BACKEND)
-    {
-    #if defined(COOT_USE_CUDA)
-    cuda::sum_rowwise(out_mem, A_mem, n_rows, n_cols, post_conv_apply);
-    #else
-    coot_stop_runtime_error("coot_rt::sum_rowwise(): CUDA backend not enabled");
-    #endif
-    }
-  else
-    {
-    coot_stop_runtime_error("coot_rt::sum_rowwise(): unknown backend");
-    }
-  }
-
-
-
-template<typename eT1, typename eT2>
-inline
-void
-coot_rt_t::sum_colwise_subview(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> a_mem, const uword a_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const bool post_conv_apply)
-  {
-  coot_extra_debug_sigprint();
-
-  if (get_rt().backend == CL_BACKEND)
-    {
-    #if defined(COOT_USE_OPENCL)
-    opencl::sum_colwise_subview(out_mem, a_mem, a_n_rows, aux_row1, aux_col1, n_rows, n_cols, post_conv_apply);
-    #else
-    coot_stop_runtime_error("coot_rt::sum_colwise_subview(): OpenCL backend not enabled");
-    #endif
-    }
-  else if (get_rt().backend == CUDA_BACKEND)
-    {
-    #if defined(COOT_USE_CUDA)
-    cuda::sum_colwise_subview(out_mem, a_mem, a_n_rows, aux_row1, aux_col1, n_rows, n_cols, post_conv_apply);
-    #else
-    coot_stop_runtime_error("coot_rt::sum_colwise_subview(): CUDA backend not enabled");
-    #endif
-    }
-  else
-    {
-    coot_stop_runtime_error("coot_rt::sum_colwise_subview(): unknown backend");
-    }
-  }
-
-
-
-template<typename eT1, typename eT2>
-inline
-void
-coot_rt_t::sum_rowwise_subview(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> a_mem, const uword a_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const bool post_conv_apply)
-  {
-  coot_extra_debug_sigprint();
-
-  if (get_rt().backend == CL_BACKEND)
-    {
-    #if defined(COOT_USE_OPENCL)
-    opencl::sum_rowwise_subview(out_mem, a_mem, a_n_rows, aux_row1, aux_col1, n_rows, n_cols, post_conv_apply);
-    #else
-    coot_stop_runtime_error("coot_rt::sum_rowwise_subview(): OpenCL backend not enabled");
-    #endif
-    }
-  else if (get_rt().backend == CUDA_BACKEND)
-    {
-    #if defined(COOT_USE_CUDA)
-    cuda::sum_rowwise_subview(out_mem, a_mem, a_n_rows, aux_row1, aux_col1, n_rows, n_cols, post_conv_apply);
-    #else
-    coot_stop_runtime_error("coot_rt::sum_rowwise_subview(): CUDA backend not enabled");
-    #endif
-    }
-  else
-    {
-    coot_stop_runtime_error("coot_rt::sum_rowwise_subview(): unknown backend");
+    coot_stop_runtime_error("coot_rt::sum(): unknown backend");
     }
   }
 

@@ -279,16 +279,18 @@ class coot_rt_t
   static inline void mul_diag(dev_mem_t<eT> C_mem, const uword C_n_rows, const uword C_n_cols, const eT alpha, const dev_mem_t<eT> A_mem, const bool A_is_diag, const bool A_trans, const dev_mem_t<eT> B_mem, const bool B_is_diag, const bool B_trans);
 
   template<typename eT1, typename eT2>
-  static inline void sum_colwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply);
-
-  template<typename eT1, typename eT2>
-  static inline void sum_rowwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply);
-
-  template<typename eT1, typename eT2>
-  static inline void sum_colwise_subview(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword A_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const bool post_conv_apply);
-
-  template<typename eT1, typename eT2>
-  static inline void sum_rowwise_subview(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword A_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const bool post_conv_apply);
+  static inline void sum(dev_mem_t<eT2> dest,
+                         const dev_mem_t<eT1> src,
+                         const uword n_rows,
+                         const uword n_cols,
+                         const uword dim,
+                         const bool post_conv_apply,
+                         // subview arguments
+                         const uword dest_offset,
+                         const uword dest_mem_incr,
+                         const uword src_row_offset,
+                         const uword src_col_offset,
+                         const uword src_M_n_rows);
 
   template<typename eT1, typename eT2>
   static inline void min_colwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply);

@@ -464,10 +464,6 @@ struct twoway_kernel_id
     sum_rowwise_conv_pre,
     sum_colwise_conv_post,
     sum_rowwise_conv_post,
-    submat_sum_colwise_conv_pre,
-    submat_sum_rowwise_conv_pre,
-    submat_sum_colwise_conv_post,
-    submat_sum_rowwise_conv_post,
     min_colwise_conv_pre,
     min_rowwise_conv_pre,
     min_colwise_conv_post,
@@ -625,10 +621,6 @@ struct twoway_kernel_id
     names.push_back("sum_rowwise_conv_pre");
     names.push_back("sum_colwise_conv_post");
     names.push_back("sum_rowwise_conv_post");
-    names.push_back("submat_sum_colwise_conv_pre");
-    names.push_back("submat_sum_rowwise_conv_pre");
-    names.push_back("submat_sum_colwise_conv_post");
-    names.push_back("submat_sum_rowwise_conv_post");
     names.push_back("min_colwise_conv_pre");
     names.push_back("min_rowwise_conv_pre");
     names.push_back("min_colwise_conv_post");
