@@ -2043,122 +2043,48 @@ coot_rt_t::min_vec(const dev_mem_t<eT> mem, const uword n_elem)
 template<typename eT1, typename eT2>
 inline
 void
-coot_rt_t::max_colwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply)
+coot_rt_t::max(dev_mem_t<eT2> dest,
+               const dev_mem_t<eT1> src,
+               const uword n_rows,
+               const uword n_cols,
+               const uword dim,
+               const bool post_conv_apply,
+               // subview arguments
+               const uword dest_offset,
+               const uword dest_mem_incr,
+               const uword src_row_offset,
+               const uword src_col_offset,
+               const uword src_M_n_rows);
   {
   coot_extra_debug_sigprint();
 
   if (get_rt().backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
-    opencl::max_colwise(out_mem, A_mem, n_rows, n_cols, post_conv_apply);
+    opencl::max(dest, src,
+                n_rows, n_cols,
+                dim, post_conv_apply,
+                dest_offset, dest_mem_incr,
+                src_row_offset, src_col_offset, src_M_n_rows);
     #else
-    coot_stop_runtime_error("coot_rt::max_colwise(): OpenCL backend not enabled");
+    coot_stop_runtime_error("coot_rt::max(): OpenCL backend not enabled");
     #endif
     }
   else if (get_rt().backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    cuda::max_colwise(out_mem, A_mem, n_rows, n_cols, post_conv_apply);
+    cuda::max(dest, src,
+              n_rows, n_cols,
+              dim, post_conv_apply,
+              dest_offset, dest_mem_incr,
+              src_row_offset, src_col_offset, src_M_n_rows);
     #else
-    coot_stop_runtime_error("coot_rt::max_colwise(): CUDA backend not enabled");
+    coot_stop_runtime_error("coot_rt::max(): CUDA backend not enabled");
     #endif
     }
   else
     {
-    coot_stop_runtime_error("coot_rt::max_colwise(): unknown backend");
-    }
-  }
-
-
-
-template<typename eT1, typename eT2>
-inline
-void
-coot_rt_t::max_rowwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply)
-  {
-  coot_extra_debug_sigprint();
-
-  if (get_rt().backend == CL_BACKEND)
-    {
-    #if defined(COOT_USE_OPENCL)
-    opencl::max_rowwise(out_mem, A_mem, n_rows, n_cols, post_conv_apply);
-    #else
-    coot_stop_runtime_error("coot_rt::max_rowwise(): OpenCL backend not enabled");
-    #endif
-    }
-  else if (get_rt().backend == CUDA_BACKEND)
-    {
-    #if defined(COOT_USE_CUDA)
-    cuda::max_rowwise(out_mem, A_mem, n_rows, n_cols, post_conv_apply);
-    #else
-    coot_stop_runtime_error("coot_rt::max_rowwise(): CUDA backend not enabled");
-    #endif
-    }
-  else
-    {
-    coot_stop_runtime_error("coot_rt::max_rowwise(): unknown backend");
-    }
-  }
-
-
-
-template<typename eT1, typename eT2>
-inline
-void
-coot_rt_t::max_colwise_subview(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> a_mem, const uword a_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const bool post_conv_apply)
-  {
-  coot_extra_debug_sigprint();
-
-  if (get_rt().backend == CL_BACKEND)
-    {
-    #if defined(COOT_USE_OPENCL)
-    opencl::max_colwise_subview(out_mem, a_mem, a_n_rows, aux_row1, aux_col1, n_rows, n_cols, post_conv_apply);
-    #else
-    coot_stop_runtime_error("coot_rt::max_colwise_subview(): OpenCL backend not enabled");
-    #endif
-    }
-  else if (get_rt().backend == CUDA_BACKEND)
-    {
-    #if defined(COOT_USE_CUDA)
-    cuda::max_colwise_subview(out_mem, a_mem, a_n_rows, aux_row1, aux_col1, n_rows, n_cols, post_conv_apply);
-    #else
-    coot_stop_runtime_error("coot_rt::max_colwise_subview(): CUDA backend not enabled");
-    #endif
-    }
-  else
-    {
-    coot_stop_runtime_error("coot_rt::max_colwise_subview(): unknown backend");
-    }
-  }
-
-
-
-template<typename eT1, typename eT2>
-inline
-void
-coot_rt_t::max_rowwise_subview(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> a_mem, const uword a_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const bool post_conv_apply)
-  {
-  coot_extra_debug_sigprint();
-
-  if (get_rt().backend == CL_BACKEND)
-    {
-    #if defined(COOT_USE_OPENCL)
-    opencl::max_rowwise_subview(out_mem, a_mem, a_n_rows, aux_row1, aux_col1, n_rows, n_cols, post_conv_apply);
-    #else
-    coot_stop_runtime_error("coot_rt::max_rowwise_subview(): OpenCL backend not enabled");
-    #endif
-    }
-  else if (get_rt().backend == CUDA_BACKEND)
-    {
-    #if defined(COOT_USE_CUDA)
-    cuda::max_rowwise_subview(out_mem, a_mem, a_n_rows, aux_row1, aux_col1, n_rows, n_cols, post_conv_apply);
-    #else
-    coot_stop_runtime_error("coot_rt::max_rowwise_subview(): CUDA backend not enabled");
-    #endif
-    }
-  else
-    {
-    coot_stop_runtime_error("coot_rt::max_rowwise_subview(): unknown backend");
+    coot_stop_runtime_error("coot_rt::max(): unknown backend");
     }
   }
 

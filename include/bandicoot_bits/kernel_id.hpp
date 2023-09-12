@@ -472,10 +472,6 @@ struct twoway_kernel_id
     max_rowwise_conv_pre,
     max_colwise_conv_post,
     max_rowwise_conv_post,
-    submat_max_colwise_conv_pre,
-    submat_max_rowwise_conv_pre,
-    submat_max_colwise_conv_post,
-    submat_max_rowwise_conv_post,
     mean_colwise_conv_pre,
     mean_rowwise_conv_pre,
     mean_colwise_conv_post,
@@ -625,10 +621,6 @@ struct twoway_kernel_id
     names.push_back("max_rowwise_conv_pre");
     names.push_back("max_colwise_conv_post");
     names.push_back("max_rowwise_conv_post");
-    names.push_back("submat_max_colwise_conv_pre");
-    names.push_back("submat_max_rowwise_conv_pre");
-    names.push_back("submat_max_colwise_conv_post");
-    names.push_back("submat_max_rowwise_conv_post");
     names.push_back("mean_colwise_conv_pre");
     names.push_back("mean_rowwise_conv_pre");
     names.push_back("mean_colwise_conv_post");
