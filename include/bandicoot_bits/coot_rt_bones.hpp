@@ -178,9 +178,6 @@ class coot_rt_t
   static inline eT prod(const dev_mem_t<eT> mem, const uword n_elem);
 
   template<typename eT>
-  static inline eT max(const dev_mem_t<eT> mem, const uword n_elem);
-
-  template<typename eT>
   static inline eT max_abs(const dev_mem_t<eT> mem, const uword n_elem);
 
   template<typename eT1, typename eT2>
@@ -319,6 +316,9 @@ class coot_rt_t
                          const uword src_row_offset,
                          const uword src_col_offset,
                          const uword src_M_n_rows);
+
+  template<typename eT>
+  static inline eT max_vec(const dev_mem_t<eT> mem, const uword n_elem);
 
   template<typename eT>
   static inline eT trace(const dev_mem_t<eT> mem, const uword n_rows, const uword n_cols);

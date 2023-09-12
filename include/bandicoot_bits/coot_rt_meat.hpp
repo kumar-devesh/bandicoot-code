@@ -939,39 +939,6 @@ coot_rt_t::prod(const dev_mem_t<eT> mem, const uword n_elem)
 template<typename eT>
 inline
 eT
-coot_rt_t::max(const dev_mem_t<eT> mem, const uword n_elem)
-  {
-  coot_extra_debug_sigprint();
-
-  if (get_rt().backend == CL_BACKEND)
-    {
-    #if defined(COOT_USE_OPENCL)
-    return opencl::max(mem, n_elem);
-    #else
-    coot_stop_runtime_error("coot_rt::max(): OpenCL backend not enabled");
-    #endif
-    }
-  else if (get_rt().backend == CUDA_BACKEND)
-    {
-    #if defined(COOT_USE_CUDA)
-    return cuda::max(mem, n_elem);
-    #else
-    coot_stop_runtime_error("coot_rt::max(): CUDA backend not enabled");
-    #endif
-    }
-  else
-    {
-    coot_stop_runtime_error("coot_rt::max(): unknown backend");
-    }
-
-  return eT(0); // fix warnings
-  }
-
-
-
-template<typename eT>
-inline
-eT
 coot_rt_t::max_abs(const dev_mem_t<eT> mem, const uword n_elem)
   {
   coot_extra_debug_sigprint();
@@ -2086,6 +2053,39 @@ coot_rt_t::max(dev_mem_t<eT2> dest,
     {
     coot_stop_runtime_error("coot_rt::max(): unknown backend");
     }
+  }
+
+
+
+template<typename eT>
+inline
+eT
+coot_rt_t::max_vec(const dev_mem_t<eT> mem, const uword n_elem)
+  {
+  coot_extra_debug_sigprint();
+
+  if (get_rt().backend == CL_BACKEND)
+    {
+    #if defined(COOT_USE_OPENCL)
+    return opencl::max_vec(mem, n_elem);
+    #else
+    coot_stop_runtime_error("coot_rt::max_vec(): OpenCL backend not enabled");
+    #endif
+    }
+  else if (get_rt().backend == CUDA_BACKEND)
+    {
+    #if defined(COOT_USE_CUDA)
+    return cuda::max_vec(mem, n_elem);
+    #else
+    coot_stop_runtime_error("coot_rt::max_vec(): CUDA backend not enabled");
+    #endif
+    }
+  else
+    {
+    coot_stop_runtime_error("coot_rt::max_vec(): unknown backend");
+    }
+
+  return eT(0); // fix warnings
   }
 
 

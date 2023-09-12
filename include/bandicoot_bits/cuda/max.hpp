@@ -14,27 +14,6 @@
 
 
 
-/**
- * Compute the maximum of all elements in `mem`.
- * This is basically identical to `accu()`.
- */
-template<typename eT>
-inline
-eT
-max(dev_mem_t<eT> mem, const uword n_elem)
-  {
-  coot_extra_debug_sigprint();
-
-  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "coot::cuda::max(): cuda runtime not valid" );
-
-  CUfunction k = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::max);
-  CUfunction k_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::max_small);
-
-  return generic_reduce<eT, eT>(mem, n_elem, "max", k, k_small, std::make_tuple(/* no extra args */));
-  }
-
-
-
 template<typename eT1, typename eT2>
 inline
 void
@@ -89,4 +68,25 @@ max(dev_mem_t<eT2> dest,
       0);
 
   coot_check_cuda_error(result, "coot::cuda::max(): cuLaunchKernel() failed");
+  }
+
+
+
+/**
+ * Compute the maximum of all elements in `mem`.
+ * This is basically identical to `accu()`.
+ */
+template<typename eT>
+inline
+eT
+max_vec(dev_mem_t<eT> mem, const uword n_elem)
+  {
+  coot_extra_debug_sigprint();
+
+  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "coot::cuda::max_vec(): cuda runtime not valid" );
+
+  CUfunction k = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::max);
+  CUfunction k_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::max_small);
+
+  return generic_reduce<eT, eT>(mem, n_elem, "max_vec", k, k_small, std::make_tuple(/* no extra args */));
   }
