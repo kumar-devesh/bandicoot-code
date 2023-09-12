@@ -373,7 +373,17 @@ class coot_rt_t
                           const uword src_M_n_rows);
 
   template<typename eT1, typename eT2>
-  static inline void median(dev_mem_t<eT2> out, dev_mem_t<eT1> in, const uword n_rows, const uword n_cols, const uword dim);
+  static inline void median(dev_mem_t<eT2> dest,
+                            dev_mem_t<eT1> src,
+                            const uword n_rows,
+                            const uword n_cols,
+                            const uword dim,
+                            // subview arguments
+                            const uword dest_offset,
+                            const uword dest_mem_incr,
+                            const uword src_row_offset,
+                            const uword src_col_offset,
+                            const uword src_M_n_rows);
 
   template<typename eT>
   static inline eT median_vec(dev_mem_t<eT> mem, const uword n_elem);

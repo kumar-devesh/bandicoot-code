@@ -2451,14 +2451,28 @@ coot_rt_t::mean(dev_mem_t<eT2> dest,
 template<typename eT1, typename eT2>
 inline
 void
-coot_rt_t::median(dev_mem_t<eT2> out, dev_mem_t<eT1> in, const uword n_rows, const uword n_cols, const uword dim)
+coot_rt_t::median(dev_mem_t<eT2> dest,
+                  dev_mem_t<eT1> src,
+                  const uword n_rows,
+                  const uword n_cols,
+                  const uword dim,
+                  // subview arguments
+                  const uword dest_offset,
+                  const uword dest_mem_incr,
+                  const uword src_row_offset,
+                  const uword src_col_offset,
+                  const uword src_M_n_rows)
   {
   coot_extra_debug_sigprint();
 
   if (get_rt().backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
-    opencl::median(out, in, n_rows, n_cols, dim);
+    opencl::median(dest, src,
+                   n_rows, n_cols,
+                   dim,
+                   dest_offset, dest_mem_incr,
+                   src_row_offset, src_col_offset, src_M_n_rows);
     #else
     coot_stop_runtime_error("coot_rt::median(): OpenCL backend not enabled");
     #endif
@@ -2466,7 +2480,11 @@ coot_rt_t::median(dev_mem_t<eT2> out, dev_mem_t<eT1> in, const uword n_rows, con
   else if (get_rt().backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    cuda::median(out, in, n_rows, n_cols, dim);
+    cuda::median(dest, src,
+                 n_rows, n_cols,
+                 dim,
+                 dest_offset, dest_mem_incr,
+                 src_row_offset, src_col_offset, src_M_n_rows);
     #else
     coot_stop_runtime_error("coot_rt::median(): CUDA backend not enabled");
     #endif
