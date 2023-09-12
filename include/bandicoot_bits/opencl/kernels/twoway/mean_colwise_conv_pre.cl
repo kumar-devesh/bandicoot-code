@@ -14,7 +14,7 @@
 
 __kernel
 void
-COOT_FN(PREFIX,mean_colwise_conv_pre)(__global eT2* out,
+COOT_FN(PREFIX,mean_colwise_conv_pre)(__global eT2* dest,
                                       const UWORD dest_offset,
                                       __global const eT1* src,
                                       const UWORD src_offset,
