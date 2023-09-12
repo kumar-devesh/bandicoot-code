@@ -14,27 +14,6 @@
 
 
 
-/**
- * Compute the minimum of all elements in `mem`.
- * This is basically the same as accu(), which is also a reduction.
- */
-template<typename eT>
-inline
-eT
-min(dev_mem_t<eT> mem, const uword n_elem)
-  {
-  coot_extra_debug_sigprint();
-
-  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::min(): OpenCL runtime not valid" );
-
-  cl_kernel k = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::min);
-  cl_kernel k_small = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::min_small);
-
-  return generic_reduce<eT, eT>(mem, n_elem, "min", k, k_small, std::make_tuple(/* no extra args */));
-  }
-
-
-
 template<typename eT1, typename eT2>
 inline
 void
@@ -94,4 +73,25 @@ min(dev_mem_t<eT2> dest,
   status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
 
   coot_check_cl_error(status, "coot::opencl::min(): failed to run kernel");
+  }
+
+
+
+/**
+ * Compute the minimum of all elements in `mem`.
+ * This is basically the same as accu(), which is also a reduction.
+ */
+template<typename eT>
+inline
+eT
+min_vec(dev_mem_t<eT> mem, const uword n_elem)
+  {
+  coot_extra_debug_sigprint();
+
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::min_vec(): OpenCL runtime not valid" );
+
+  cl_kernel k = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::min);
+  cl_kernel k_small = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::min_small);
+
+  return generic_reduce<eT, eT>(mem, n_elem, "min_vec", k, k_small, std::make_tuple(/* no extra args */));
   }

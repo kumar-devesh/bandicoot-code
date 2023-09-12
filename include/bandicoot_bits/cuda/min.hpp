@@ -14,27 +14,6 @@
 
 
 
-/**
- * Compute the minimum of all elements in `mem`.
- * This is basically identical to `accu()`.
- */
-template<typename eT>
-inline
-eT
-min(dev_mem_t<eT> mem, const uword n_elem)
-  {
-  coot_extra_debug_sigprint();
-
-  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "coot::cuda::min(): cuda runtime not valid" );
-
-  CUfunction k = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::min);
-  CUfunction k_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::min_small);
-
-  return generic_reduce<eT, eT>(mem, n_elem, "min", k, k_small, std::make_tuple(/* no extra args */));
-  }
-
-
-
 template<typename eT1, typename eT2>
 inline
 void
@@ -52,6 +31,8 @@ min(dev_mem_t<eT2> dest,
     const uword src_M_n_rows)
   {
   coot_extra_debug_sigprint();
+
+  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "coot::cuda::min(): cuda runtime not valid" );
 
   CUfunction kernel;
   if (dim == 0)
@@ -87,4 +68,25 @@ min(dev_mem_t<eT2> dest,
       0);
 
   coot_check_cuda_error(result, "coot::cuda::min(): cuLaunchKernel() failed");
+  }
+
+
+
+/**
+ * Compute the minimum of all elements in `mem`.
+ * This is basically identical to `accu()`.
+ */
+template<typename eT>
+inline
+eT
+min_vec(dev_mem_t<eT> mem, const uword n_elem)
+  {
+  coot_extra_debug_sigprint();
+
+  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "coot::cuda::min_vec(): cuda runtime not valid" );
+
+  CUfunction k = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::min);
+  CUfunction k_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::min_small);
+
+  return generic_reduce<eT, eT>(mem, n_elem, "min_vec", k, k_small, std::make_tuple(/* no extra args */));
   }
