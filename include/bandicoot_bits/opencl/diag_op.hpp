@@ -15,44 +15,6 @@
 
 
 /**
- * Extract the diagonal of a matrix into a column vector.
- */
-template<typename eT>
-inline
-void
-extract_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword mem_offset, const uword n_rows, const uword len)
-  {
-  coot_extra_debug_sigprint();
-
-  if (len == 0) { return; }
-
-  runtime_t::cq_guard guard;
-
-  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::extract_diag);
-
-  cl_int status = 0;
-
-  runtime_t::adapt_uword cl_in_offset(mem_offset);
-  runtime_t::adapt_uword cl_n_rows(n_rows);
-  runtime_t::adapt_uword cl_len(len);
-
-  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem),      &(out.cl_mem_ptr));
-  status |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(cl_mem),      &(in.cl_mem_ptr));
-  status |= coot_wrapper(clSetKernelArg)(kernel, 2, cl_in_offset.size,   cl_in_offset.addr);
-  status |= coot_wrapper(clSetKernelArg)(kernel, 3, cl_n_rows.size,      cl_n_rows.addr);
-  status |= coot_wrapper(clSetKernelArg)(kernel, 4, cl_len.size,         cl_len.addr);
-  coot_check_cl_error(status, "coot::opencl::extract_diag(): couldn't set kernel arguments");
-
-  const size_t global_work_size[1] = { size_t(len) };
-
-  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 1, NULL, global_work_size, NULL, 0, NULL, NULL);
-
-  coot_check_cl_error(status, "coot::opencl::extract_diag(): failed to run kernel");
-  }
-
-
-
-/**
  * Set the diagonal of a matrix to the given column vector.
  */
 template<typename eT2, typename eT1>

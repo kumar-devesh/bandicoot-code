@@ -294,7 +294,13 @@ diagview<eT>::extract(Mat<eT>& out, const diagview<eT>& in)
 
   const Mat<eT>& in_m = in.m;
 
-  coot_rt_t::extract_diag(out.get_dev_mem(false), in_m.get_dev_mem(false), in.mem_offset, in_m.n_rows, in.n_elem);
+  out.set_size(in.n_rows, in.n_cols); // should be a vector
+
+  // A diagonal can be seen as a subvector of the matrix with m_n_rows = n_rows + 1.
+  coot_rt_t::copy_array(out.get_dev_mem(false), in.m.get_dev_mem(false),
+                        1, in.n_elem,
+                        0, 0, 1,
+                        mem_offset, 0, in.m.n_rows + 1);
   }
 
 
