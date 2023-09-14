@@ -99,9 +99,7 @@ join_cols(dev_mem_t<eT5> out, const dev_mem_t<eT1> A, const uword A_n_rows, cons
   // If the types are different, we need to perform a cast during the copy.
   if (A_n_elem > 0)
     {
-    eop_scalar(twoway_kernel_id::equ_array_plus_scalar,
-               out, A,
-               (eT1) 0, (eT5) 0,
+    copy_array(out, A,
                A_n_rows, A_n_cols,
                0, 0, out_n_rows,
                0, 0, A_n_rows);
@@ -109,9 +107,7 @@ join_cols(dev_mem_t<eT5> out, const dev_mem_t<eT1> A, const uword A_n_rows, cons
 
   if (B_n_elem > 0)
     {
-    eop_scalar(twoway_kernel_id::equ_array_plus_scalar,
-               out, B,
-               (eT2) 0, (eT5) 0,
+    copy_array(out, B,
                B_n_rows, B_n_cols,
                A_n_rows, 0, out_n_rows,
                0, 0, B_n_rows);
@@ -119,9 +115,7 @@ join_cols(dev_mem_t<eT5> out, const dev_mem_t<eT1> A, const uword A_n_rows, cons
 
   if (C_n_elem > 0)
     {
-    eop_scalar(twoway_kernel_id::equ_array_plus_scalar,
-               out, C,
-               (eT3) 0, (eT5) 0,
+    copy_array(out, C,
                C_n_rows, C_n_cols,
                A_n_rows + B_n_rows, 0, out_n_rows,
                0, 0, C_n_rows);
@@ -129,9 +123,7 @@ join_cols(dev_mem_t<eT5> out, const dev_mem_t<eT1> A, const uword A_n_rows, cons
 
   if (D_n_elem > 0)
     {
-    eop_scalar(twoway_kernel_id::equ_array_plus_scalar,
-               out, D,
-               (eT4) 0, (eT5) 0,
+    copy_array(out, D,
                D_n_rows, D_n_cols,
                A_n_rows + B_n_rows + C_n_rows, 0, out_n_rows,
                0, 0, D_n_rows);

@@ -200,9 +200,7 @@ subview<eT>::operator= (const Base<eT, T1>& in)
 
   coot_assert_same_size(n_rows, n_cols, U.M.n_rows, U.M.n_cols, "subview::operator=");
 
-  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_plus_scalar,
-                        m.dev_mem, U.get_dev_mem(false),
-                        typename no_conv_unwrap<T1>::stored_type::elem_type(0), eT(0),
+  coot_rt_t::copy_array(m.dev_mem, U.get_dev_mem(false),
                         n_rows, n_cols,
                         U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows(),
                         aux_row1, aux_col1, m.n_rows);
