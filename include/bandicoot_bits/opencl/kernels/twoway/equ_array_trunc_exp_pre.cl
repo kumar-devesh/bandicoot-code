@@ -14,29 +14,39 @@
 
 __kernel
 void
-COOT_FN(PREFIX,equ_array_trunc_exp_pre)(__global eT2* out,
-                                        __global const eT1* A,
+COOT_FN(PREFIX,equ_array_trunc_exp_pre)(__global eT2* dest,
+                                        const UWORD dest_offset,
+                                        __global const eT1* src,
+                                        const UWORD src_offset,
                                         const eT1 val_pre,
                                         const eT2 val_post,
-                                        const UWORD N)
+                                        const UWORD n_rows,
+                                        const UWORD n_cols,
+                                        const UWORD dest_M_n_rows,
+                                        const UWORD src_M_n_rows)
   {
   (void)(val_pre);
   (void)(val_post);
-  const UWORD i = get_global_id(0);
-  if(i < N)
+
+  const UWORD row = get_global_id(0);
+  const UWORD col = get_global_id(1);
+  const UWORD src_index = row + col * src_M_n_rows + src_offset;
+  const UWORD dest_index = row + col * dest_M_n_rows + dest_offset;
+
+  if (row < n_rows && col < n_cols)
     {
     // To imitate Armadillo's behavior exactly, if the type is not floating-point, we convert to double.
-    const eT2 val = (eT2) A[i];
+    const eT2 val = (eT2) src[src_index];
     if (COOT_FN(coot_is_fp_,eT2)())
       {
       const fp_eT2 fp_val = (fp_eT2) val;
       if (fp_val >= log(COOT_FN(coot_type_max_,fp_eT2)()))
         {
-        out[i] = (eT2) COOT_FN(coot_type_max_,fp_eT2)();
+        dest[dest_index] = (eT2) COOT_FN(coot_type_max_,fp_eT2)();
         }
       else
         {
-        out[i] = (eT2) exp(fp_val);
+        dest[dest_index] = (eT2) exp(fp_val);
         }
       }
     else
@@ -44,11 +54,11 @@ COOT_FN(PREFIX,equ_array_trunc_exp_pre)(__global eT2* out,
       const ARMA_FP_TYPE fp_val = (ARMA_FP_TYPE) val;
       if (fp_val >= log(COOT_FN(coot_type_max_,ARMA_FP_TYPE)()))
         {
-        out[i] = (eT2) COOT_FN(coot_type_max_,ARMA_FP_TYPE)();
+        dest[dest_index] = (eT2) COOT_FN(coot_type_max_,ARMA_FP_TYPE)();
         }
       else
         {
-        out[i] = (eT2) exp(fp_val);
+        dest[dest_index] = (eT2) exp(fp_val);
         }
       }
     }

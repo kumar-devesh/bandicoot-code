@@ -102,20 +102,6 @@ subview<eT>::operator= (const subview<eT>& x)
 template<typename eT>
 inline
 void
-subview<eT>::inplace_op(const eT val, oneway_kernel_id::enum_id kernel)
-  {
-  coot_extra_debug_sigprint();
-
-  if(n_elem == 0)  { return; }
-
-  coot_rt_t::inplace_op_subview(m.dev_mem, 0, val, aux_row1, aux_col1, n_rows, n_cols, m.n_rows, kernel);
-  }
-
-
-
-template<typename eT>
-inline
-void
 subview<eT>::operator= (const eT val)
   {
   coot_extra_debug_sigprint();
@@ -141,7 +127,12 @@ subview<eT>::operator+= (const eT val)
   {
   coot_extra_debug_sigprint();
 
-  inplace_op(val, oneway_kernel_id::submat_inplace_plus_scalar);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_plus_scalar,
+                        m.dev_mem, m.dev_mem,
+                        (eT) val, (eT) 0,
+                        n_rows, n_cols,
+                        aux_row1, aux_col1, m.n_rows,
+                        aux_row1, aux_col1, m.n_rows);
   }
 
 
@@ -153,7 +144,12 @@ subview<eT>::operator-= (const eT val)
   {
   coot_extra_debug_sigprint();
 
-  inplace_op(val, oneway_kernel_id::submat_inplace_minus_scalar);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_minus_scalar_post,
+                        m.dev_mem, m.dev_mem,
+                        (eT) val, (eT) 0,
+                        n_rows, n_cols,
+                        aux_row1, aux_col1, m.n_rows,
+                        aux_row1, aux_col1, m.n_rows);
   }
 
 
@@ -165,7 +161,12 @@ subview<eT>::operator*= (const eT val)
   {
   coot_extra_debug_sigprint();
 
-  inplace_op(val, oneway_kernel_id::submat_inplace_mul_scalar);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_mul_scalar,
+                        m.dev_mem, m.dev_mem,
+                        (eT) val, (eT) 1,
+                        n_rows, n_cols,
+                        aux_row1, aux_col1, m.n_rows,
+                        aux_row1, aux_col1, m.n_rows);
   }
 
 
@@ -177,7 +178,12 @@ subview<eT>::operator/= (const eT val)
   {
   coot_extra_debug_sigprint();
 
-  inplace_op(val, oneway_kernel_id::submat_inplace_div_scalar);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_div_scalar_post,
+                        m.dev_mem, m.dev_mem,
+                        (eT) val, (eT) 1,
+                        n_rows, n_cols,
+                        aux_row1, aux_col1, m.n_rows,
+                        aux_row1, aux_col1, m.n_rows);
   }
 
 
@@ -456,7 +462,7 @@ subview<eT>::fill(const eT val)
   {
   coot_extra_debug_sigprint();
 
-  (*this).inplace_op(val, oneway_kernel_id::submat_inplace_set_scalar);
+  coot_rt_t::fill(m.dev_mem, val, n_rows, n_cols, aux_row1, aux_col1, m.n_rows);
   }
 
 

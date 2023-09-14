@@ -43,7 +43,11 @@ op_stddev::apply(Mat<typename T1::elem_type>& out, const Op<T1, op_stddev>& in)
     }
 
   // Now take the square root.
-  coot_rt_t::eop_scalar(out.get_dev_mem(false), out.get_dev_mem(false), out.n_elem, eT(0), eT(0), twoway_kernel_id::equ_array_sqrt_pre);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_sqrt_pre, out.get_dev_mem(false), out.get_dev_mem(false),
+                        eT(0), eT(0),
+                        out.n_rows, out.n_cols,
+                        0, 0, out.n_rows,
+                        0, 0, out.n_rows);
   }
 
 
@@ -75,7 +79,11 @@ op_stddev::apply(Mat<out_eT>& out, const Op<T1, op_stddev>& in, const typename e
     }
 
   // Now take the square root.
-  coot_rt_t::eop_scalar(out.get_dev_mem(false), tmp.get_dev_mem(false), out.n_elem, eT(0), out_eT(0), twoway_kernel_id::equ_array_sqrt_post);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_sqrt_post, out.get_dev_mem(false), tmp.get_dev_mem(false),
+                        eT(0), out_eT(0),
+                        out.n_rows, out.n_cols,
+                        0, 0, out.n_rows,
+                        0, 0, tmp.n_rows);
   }
 
 

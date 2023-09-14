@@ -67,9 +67,12 @@ val_add_inplace(dev_mem_t<eT> mem, const uword index, const eT val)
   coot_extra_debug_sigprint();
 
   // We'll run a kernel with only one worker to update the index.
-  dev_mem_t<eT> tmp_mem;
-  tmp_mem.cuda_mem_ptr = mem.cuda_mem_ptr + index;
-  inplace_op_scalar(tmp_mem, val, 1, oneway_kernel_id::inplace_plus_scalar);
+  eop_scalar(twoway_kernel_id::equ_array_plus_scalar,
+             mem, mem,
+             val, (eT) 0,
+             1, 1,
+             index, 0, index + 1,
+             index, 0, index + 1);
   }
 
 
@@ -82,9 +85,12 @@ val_minus_inplace(dev_mem_t<eT> mem, const uword index, const eT val)
   coot_extra_debug_sigprint();
 
   // We'll run a kernel with only one worker to update the index.
-  dev_mem_t<eT> tmp_mem;
-  tmp_mem.cuda_mem_ptr = mem.cuda_mem_ptr + index;
-  inplace_op_scalar(tmp_mem, val, 1, oneway_kernel_id::inplace_minus_scalar);
+  eop_scalar(twoway_kernel_id::equ_array_minus_scalar_post,
+             mem, mem,
+             val, (eT) 0,
+             1, 1,
+             index, 0, index + 1,
+             index, 0, index + 1);
   }
 
 
@@ -97,9 +103,12 @@ val_mul_inplace(dev_mem_t<eT> mem, const uword index, const eT val)
   coot_extra_debug_sigprint();
 
   // We'll run a kernel with only one worker to update the index.
-  dev_mem_t<eT> tmp_mem;
-  tmp_mem.cuda_mem_ptr = mem.cuda_mem_ptr + index;
-  inplace_op_scalar(tmp_mem, val, 1, oneway_kernel_id::inplace_mul_scalar);
+  eop_scalar(twoway_kernel_id::equ_array_mul_scalar,
+             mem, mem,
+             val, (eT) 1,
+             1, 1,
+             index, 0, index + 1,
+             index, 0, index + 1);
   }
 
 
@@ -112,7 +121,10 @@ val_div_inplace(dev_mem_t<eT> mem, const uword index, const eT val)
   coot_extra_debug_sigprint();
 
   // We'll run a kernel with only one worker to update the index.
-  dev_mem_t<eT> tmp_mem;
-  tmp_mem.cuda_mem_ptr = mem.cuda_mem_ptr + index;
-  inplace_op_scalar(tmp_mem, val, 1, oneway_kernel_id::inplace_div_scalar);
+  eop_scalar(twoway_kernel_id::equ_array_div_scalar_post,
+             mem, mem,
+             val, (eT) 1,
+             1, 1,
+             index, 0, index + 1,
+             index, 0, index + 1);
   }

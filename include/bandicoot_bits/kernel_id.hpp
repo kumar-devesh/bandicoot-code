@@ -56,18 +56,7 @@ struct oneway_kernel_id
   {
   enum enum_id
     {
-    inplace_set_scalar = 0,
-    inplace_plus_scalar,
-    inplace_minus_scalar,
-    inplace_mul_scalar,
-    inplace_div_scalar,
-    inplace_mod_scalar,
-    //
-    submat_inplace_set_scalar,
-    submat_inplace_plus_scalar,
-    submat_inplace_minus_scalar,
-    submat_inplace_mul_scalar,
-    submat_inplace_div_scalar,
+    fill = 0,
     //
     diag_inplace_set_scalar,
     diag_inplace_plus_scalar,
@@ -155,18 +144,7 @@ struct oneway_kernel_id
 
     std::vector<std::string> names;
 
-    names.push_back("inplace_set_scalar");
-    names.push_back("inplace_plus_scalar");
-    names.push_back("inplace_minus_scalar");
-    names.push_back("inplace_mul_scalar");
-    names.push_back("inplace_div_scalar");
-    names.push_back("inplace_mod_scalar");
-
-    names.push_back("submat_inplace_set_scalar");
-    names.push_back("submat_inplace_plus_scalar");
-    names.push_back("submat_inplace_minus_scalar");
-    names.push_back("submat_inplace_mul_scalar");
-    names.push_back("submat_inplace_div_scalar");
+    names.push_back("fill");
 
     names.push_back("diag_inplace_set_scalar");
     names.push_back("diag_inplace_plus_scalar");
@@ -422,6 +400,7 @@ struct twoway_kernel_id
     equ_array_mul_scalar,
     equ_array_div_scalar_pre,
     equ_array_div_scalar_post,
+    equ_array_mod_scalar,
     equ_array_square_pre,
     equ_array_square_post,
     equ_array_sqrt_pre,
@@ -596,6 +575,7 @@ struct twoway_kernel_id
     names.push_back("equ_array_mul_scalar");
     names.push_back("equ_array_div_scalar_pre");
     names.push_back("equ_array_div_scalar_post");
+    names.push_back("equ_array_mod_scalar");
     names.push_back("equ_array_square_pre");
     names.push_back("equ_array_square_post");
     names.push_back("equ_array_sqrt_pre");

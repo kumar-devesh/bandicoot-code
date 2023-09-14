@@ -14,7 +14,7 @@
 
 __kernel
 void
-COOT_FN(PREFIX,equ_array_square_pre)(__global eT2* dest,
+COOT_FN(PREFIX,equ_array_mod_scalar)(__global eT2* dest,
                                      const UWORD dest_offset,
                                      __global const eT1* src,
                                      const UWORD src_offset,
@@ -25,9 +25,6 @@ COOT_FN(PREFIX,equ_array_square_pre)(__global eT2* dest,
                                      const UWORD dest_M_n_rows,
                                      const UWORD src_M_n_rows)
   {
-  (void)(val_pre);
-  (void)(val_post);
-
   const UWORD row = get_global_id(0);
   const UWORD col = get_global_id(1);
   const UWORD src_index = row + col * src_M_n_rows + src_offset;
@@ -35,7 +32,8 @@ COOT_FN(PREFIX,equ_array_square_pre)(__global eT2* dest,
 
   if (row < n_rows && col < n_cols)
     {
-    const eT2 val = (eT2) src[src_index];
-    dest[dest_index] = val * val;
+    // For an integer type, the casts end up doing nothing.
+    uint_eT1 val = ((uint_eT1) src[src_index]) % ((uint_eT1) val_pre);
+    dest[dest_index] = (eT2) (((uint_eT2) val) % ((uint_eT2) val_post));
     }
   }

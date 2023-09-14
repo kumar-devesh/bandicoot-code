@@ -548,7 +548,12 @@ glue_times_diag::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_times_diag>& X)
     coot_rt_t::array_op(tmp.get_dev_mem(false), A_n_elem, p1.M.get_dev_mem(false), p2.M.get_dev_mem(false), threeway_kernel_id::equ_array_mul_array);
     if (alpha != out_eT(1))
       {
-      coot_rt_t::inplace_op_scalar(tmp.get_dev_mem(false), alpha, A_n_elem, oneway_kernel_id::inplace_mul_scalar);
+      coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_mul_scalar,
+                            tmp.get_dev_mem(false), tmp.get_dev_mem(false),
+                            alpha, (out_eT) 1,
+                            tmp.n_rows, tmp.n_cols,
+                            0, 0, tmp.n_rows,
+                            0, 0, tmp.n_rows);
       }
 
     coot_rt_t::set_diag(out.get_dev_mem(false), tmp.get_dev_mem(false), 0, A_n_rows, A_n_elem);

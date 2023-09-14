@@ -396,7 +396,7 @@ Mat<eT>::operator=(const eT val)
 
   set_size(1,1);
 
-  arrayops::inplace_set_scalar(dev_mem, val, n_elem);
+  coot_rt_t::fill(dev_mem, val, n_rows, n_cols, 0, 0, n_rows);
 
   return *this;
   }
@@ -410,7 +410,12 @@ Mat<eT>::operator+=(const eT val)
   {
   coot_extra_debug_sigprint();
 
-  arrayops::inplace_plus_scalar(dev_mem, val, n_elem);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_plus_scalar,
+                        dev_mem, dev_mem,
+                        val, (eT) 0,
+                        n_rows, n_cols,
+                        0, 0, n_rows,
+                        0, 0, n_rows);
 
   return *this;
   }
@@ -424,7 +429,12 @@ Mat<eT>::operator-=(const eT val)
   {
   coot_extra_debug_sigprint();
 
-  arrayops::inplace_minus_scalar(dev_mem, val, n_elem);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_minus_scalar_post,
+                        dev_mem, dev_mem,
+                        val, (eT) 0,
+                        n_rows, n_cols,
+                        0, 0, n_rows,
+                        0, 0, n_rows);
 
   return *this;
   }
@@ -438,7 +448,12 @@ Mat<eT>::operator*=(const eT val)
   {
   coot_extra_debug_sigprint();
 
-  arrayops::inplace_mul_scalar(dev_mem, val, n_elem);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_mul_scalar,
+                        dev_mem, dev_mem,
+                        val, (eT) 1,
+                        n_rows, n_cols,
+                        0, 0, n_rows,
+                        0, 0, n_rows);
 
   return *this;
   }
@@ -452,7 +467,12 @@ Mat<eT>::operator/=(const eT val)
   {
   coot_extra_debug_sigprint();
 
-  arrayops::inplace_div_scalar(dev_mem, val, n_elem);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_div_scalar_post,
+                        dev_mem, dev_mem,
+                        val, (eT) 1,
+                        n_rows, n_cols,
+                        0, 0, n_rows,
+                        0, 0, n_rows);
 
   return *this;
   }
@@ -1688,7 +1708,7 @@ Mat<eT>::fill(const eT val)
   {
   coot_extra_debug_sigprint();
 
-  arrayops::inplace_set_scalar(dev_mem, val, n_elem);
+  coot_rt_t::fill(dev_mem, val, n_rows, n_cols, 0, 0, n_rows);
 
   return *this;
   }

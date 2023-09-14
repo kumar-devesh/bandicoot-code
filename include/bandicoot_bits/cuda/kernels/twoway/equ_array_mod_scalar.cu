@@ -1,4 +1,4 @@
-// Copyright 2022 Ryan Curtin (http://www.ratml.org/)
+// Copyright 2019 Ryan Curtin (http://www.ratml.org/)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,18 +14,15 @@
 
 __global__
 void
-COOT_FN(PREFIX,equ_array_exp2_pre)(eT2* dest,
-                                   const eT1* src,
-                                   const eT1 val_pre,
-                                   const eT2 val_post,
-                                   const UWORD n_rows,
-                                   const UWORD n_cols,
-                                   const UWORD dest_M_n_rows,
-                                   const UWORD src_M_n_rows)
+COOT_FN(PREFIX,equ_array_mod_scalar)(eT2* dest,
+                                     const eT1* src,
+                                     const eT1 val_pre,
+                                     const eT2 val_post,
+                                     const UWORD n_rows,
+                                     const UWORD n_cols,
+                                     const UWORD dest_M_n_rows,
+                                     const UWORD src_M_n_rows)
   {
-  (void)(val_pre);
-  (void)(val_post);
-
   const UWORD row = blockIdx.x * blockDim.x + threadIdx.x;
   const UWORD col = blockIdx.y * blockDim.y + threadIdx.y;
   const UWORD src_index = row + col * src_M_n_rows;
@@ -33,6 +30,8 @@ COOT_FN(PREFIX,equ_array_exp2_pre)(eT2* dest,
 
   if (row < n_rows && col < n_cols)
     {
-    dest[dest_index] = (eT2) exp2((fp_eT2) src[src_index]);
+    // For an integer type, the casts end up doing nothing.
+    uint_eT1 val = ((uint_eT1) src[src_index]) % ((uint_eT1) val_pre);
+    dest[dest_index] = (eT2) (((uint_eT2) val) % ((uint_eT2) val_post));
     }
   }

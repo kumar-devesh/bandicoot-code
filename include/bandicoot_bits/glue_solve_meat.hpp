@@ -132,7 +132,12 @@ glue_solve::apply(Mat<eT>& out, const Base<eT, Op<T1, op_htrans2>>& A_expr, cons
   if (std::get<0>(result) == true)
     {
     // the result needs to be divided by the scalar
-    coot_rt_t::inplace_op_scalar(out.get_dev_mem(false), A_expr.get_ref().aux, out.n_elem, oneway_kernel_id::inplace_div_scalar);
+    coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_div_scalar_post,
+                          out.get_dev_mem(false), out.get_dev_mem(false),
+                          (eT) A_expr.get_ref().aux, (eT) 1,
+                          out.n_rows, out.n_cols,
+                          0, 0, out.n_rows,
+                          0, 0, out.n_rows);
     }
 
   return result;

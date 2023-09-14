@@ -593,29 +593,35 @@ coot_rt_t::copy_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword out_
 template<typename eT>
 inline
 void
-coot_rt_t::inplace_op_scalar(dev_mem_t<eT> dest, const eT val, const uword n_elem, const oneway_kernel_id::enum_id num)
+coot_rt_t::fill(dev_mem_t<eT> dest,
+                const eT val,
+                const uword n_rows,
+                const uword n_cols,
+                const uword row_offset,
+                const uword col_offset,
+                const uword M_n_rows)
   {
   coot_extra_debug_sigprint();
 
   if (get_rt().backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
-    opencl::inplace_op_scalar(dest, val, n_elem, num);
+    opencl::fill(dest, val, n_rows, n_cols, row_offset, col_offset, M_n_rows);
     #else
-    coot_stop_runtime_error("coot_rt::inplace_op_scalar(): OpenCL backend not enabled");
+    coot_stop_runtime_error("coot_rt::fill(): OpenCL backend not enabled");
     #endif
     }
   else if (get_rt().backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    cuda::inplace_op_scalar(dest, val, n_elem, num);
+    cuda::fill(dest, val, n_rows, n_cols, row_offset, col_offset, M_n_rows);
     #else
-    coot_stop_runtime_error("coot_rt::inplace_op_scalar(): CUDA backend not enabled");
+    coot_stop_runtime_error("coot_rt::fill(): CUDA backend not enabled");
     #endif
     }
   else
     {
-    coot_stop_runtime_error("coot_rt::inplace_op_scalar(): unknown backend");
+    coot_stop_runtime_error("coot_rt::fill(): unknown backend");
     }
   }
 
@@ -647,37 +653,6 @@ coot_rt_t::inplace_op_array(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const
   else
     {
     coot_stop_runtime_error("coot_rt::inplace_op_array(): unknown backend");
-    }
-  }
-
-
-
-template<typename eT>
-inline
-void
-coot_rt_t::inplace_op_subview(dev_mem_t<eT> dest, const uword dest_offset, const eT val, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const uword M_n_rows, const oneway_kernel_id::enum_id num)
-  {
-  coot_extra_debug_sigprint();
-
-  if (get_rt().backend == CL_BACKEND)
-    {
-    #if defined(COOT_USE_OPENCL)
-    opencl::inplace_op_subview(dest, dest_offset, val, aux_row1, aux_col1, n_rows, n_cols, M_n_rows, num);
-    #else
-    coot_stop_runtime_error("coot_rt::inplace_op_subview(): OpenCL backend not enabled");
-    #endif
-    }
-  else if (get_rt().backend == CUDA_BACKEND)
-    {
-    #if defined(COOT_USE_CUDA)
-    cuda::inplace_op_subview(dest, dest_offset, val, aux_row1, aux_col1, n_rows, n_cols, M_n_rows, num);
-    #else
-    coot_stop_runtime_error("coot_rt::inplace_op_subview(): CUDA backend not enabled");
-    #endif
-    }
-  else
-    {
-    coot_stop_runtime_error("coot_rt::inplace_op_subview(): unknown backend");
     }
   }
 
@@ -965,14 +940,33 @@ coot_rt_t::array_op(dev_mem_t<eT3> dest, const uword n_elem, const dev_mem_t<eT1
 template<typename eT1, typename eT2>
 inline
 void
-coot_rt_t::eop_scalar(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword n_elem, const eT1 aux_val_pre, const eT2 aux_val_post, const twoway_kernel_id::enum_id num)
+coot_rt_t::eop_scalar(const twoway_kernel_id::enum_id num,
+                      dev_mem_t<eT2> dest,
+                      const dev_mem_t<eT1> src,
+                      const eT1 aux_val_pre,
+                      const eT2 aux_val_post,
+                      // logical size of source and destination
+                      const uword n_rows,
+                      const uword n_cols,
+                      // submatrix destination offsets (set to 0, 0, and n_rows if not a subview)
+                      const uword dest_row_offset,
+                      const uword dest_col_offset,
+                      const uword dest_M_n_rows,
+                      // submatrix source offsets (set to 0, 0, and n_rows if not a subview)
+                      const uword src_row_offset,
+                      const uword src_col_offset,
+                      const uword src_M_n_rows)
   {
   coot_extra_debug_sigprint();
 
   if (get_rt().backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
-    opencl::eop_scalar(dest, src, n_elem, aux_val_pre, aux_val_post, num);
+    opencl::eop_scalar(num, dest, src,
+                       aux_val_pre, aux_val_post,
+                       n_rows, n_cols,
+                       dest_row_offset, dest_col_offset, dest_M_n_rows,
+                       src_row_offset, src_col_offset, src_M_n_rows);
     #else
     coot_stop_runtime_error("coot_rt::eop_scalar(): OpenCL backend not enabled");
     #endif
@@ -980,7 +974,11 @@ coot_rt_t::eop_scalar(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword
   else if (get_rt().backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    cuda::eop_scalar(dest, src, n_elem, aux_val_pre, aux_val_post, num);
+    cuda::eop_scalar(num, dest, src,
+                     aux_val_pre, aux_val_post,
+                     n_rows, n_cols,
+                     dest_row_offset, dest_col_offset, dest_M_n_rows,
+                     src_row_offset, src_col_offset, src_M_n_rows);
     #else
     coot_stop_runtime_error("coot_rt::eop_scalar(): CUDA backend not enabled");
     #endif

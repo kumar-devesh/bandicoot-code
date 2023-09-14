@@ -18,6 +18,27 @@
 
 
 
+//
+// The unwrap<> struct is a tool to actually evaluate expressions.
+// Construction of an unwrap<T1> object called `U` for some expression T1
+// will cause `U.M` to hold the result of the expression being evaluated:
+//
+// unwrap<T1> U(expr); // expr has type T1
+//
+// Importantly, `U.M` may have type `Mat` or `subview`!  That is, `unwrap`
+// does *not* extract subviews.  Make sure your code can handle that,
+// and also that you test both situations.  Extracting subviews can be done
+// with the `extract_subview` struct (see extract_subview.hpp).
+//
+// If you are going to call a backend function that accepts subviews (such
+// as eop_scalar()), you can use the convenience functions below to compute
+// offsets agnostic to whether `U.M` is a `Mat` or `subview`:
+//
+//  - get_row_offset()  (0 for `Mat`, `U.M.aux_row1` for `subview`s)
+//  - get_col_offset()  (0 for `Mat`, `U.M.aux_col1` for `subview`s)
+//  - get_M_n_rows()    (`U.M.n_rows` for `Mat`, `U.M.m.n_rows` for `subview`s)
+//  - get_dev_mem(sync) (`U.M.get_dev_mem(sync)` for `Mat`, `U.M.m.get_dev_mem(sync)` for `subview`s)
+//
 template<typename T1>
 struct unwrap
   {
@@ -37,6 +58,11 @@ struct unwrap
   constexpr bool is_alias(const Mat<eT2>&) const { return false; }
   template<typename eT2>
   coot_inline bool is_alias(const subview<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X.m)); }
+
+  constexpr inline uword         get_row_offset()                    const { return 0; }
+  constexpr inline uword         get_col_offset()                    const { return 0; }
+            inline uword         get_M_n_rows()                      const { return M.n_rows; }
+            inline dev_mem_t<eT> get_dev_mem(const bool synchronise) const { return M.get_dev_mem(synchronise); }
   };
 
 
@@ -59,6 +85,11 @@ struct unwrap< Mat<eT> >
   coot_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
   template<typename eT2>
   coot_inline bool is_alias(const subview<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X.m)); }
+
+  constexpr inline uword         get_row_offset()                    const { return 0; }
+  constexpr inline uword         get_col_offset()                    const { return 0; }
+            inline uword         get_M_n_rows()                      const { return M.n_rows; }
+            inline dev_mem_t<eT> get_dev_mem(const bool synchronise) const { return M.get_dev_mem(synchronise); }
   };
 
 
@@ -81,6 +112,11 @@ struct unwrap< Row<eT> >
   coot_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
   template<typename eT2>
   coot_inline bool is_alias(const subview<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X.m)); }
+
+  constexpr inline uword         get_row_offset()                    const { return 0; }
+  constexpr inline uword         get_col_offset()                    const { return 0; }
+            inline uword         get_M_n_rows()                      const { return M.n_rows; }
+            inline dev_mem_t<eT> get_dev_mem(const bool synchronise) const { return M.get_dev_mem(synchronise); }
   };
 
 
@@ -103,6 +139,11 @@ struct unwrap< Col<eT> >
   coot_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
   template<typename eT2>
   coot_inline bool is_alias(const subview<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X.m)); }
+
+  constexpr inline uword         get_row_offset()                    const { return 0; }
+  constexpr inline uword         get_col_offset()                    const { return 0; }
+            inline uword         get_M_n_rows()                      const { return M.n_rows; }
+            inline dev_mem_t<eT> get_dev_mem(const bool synchronise) const { return M.get_dev_mem(synchronise); }
   };
 
 
@@ -125,6 +166,11 @@ struct unwrap< subview<eT> >
   coot_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M.m) == void_ptr(&X)); }
   template<typename eT2>
   coot_inline bool is_alias(const subview<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
+
+  inline uword get_row_offset() const { return M.aux_row1; }
+  inline uword get_col_offset() const { return M.aux_col1; }
+  inline uword get_M_n_rows()   const { return M.m.n_rows; }
+  inline dev_mem_t<eT> get_dev_mem(const bool synchronise) const { return M.m.get_dev_mem(synchronise); }
   };
 
 
@@ -148,6 +194,11 @@ struct unwrap< mtOp<out_eT, T1, mtop_conv_to> >
   coot_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
   template<typename eT2>
   coot_inline bool is_alias(const subview<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X.m)); }
+
+  constexpr inline uword             get_row_offset()                    const { return 0; }
+  constexpr inline uword             get_col_offset()                    const { return 0; }
+            inline uword             get_M_n_rows()                      const { return M.n_rows; }
+            inline dev_mem_t<out_eT> get_dev_mem(const bool synchronise) const { return M.get_dev_mem(synchronise); }
   };
 
 
@@ -170,6 +221,11 @@ struct unwrap< mtGlue<out_eT, T1, T2, mtglue_type> >
   coot_inline bool is_alias(const Mat<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X)); }
   template<typename eT2>
   coot_inline bool is_alias(const subview<eT2>& X) const { return (void_ptr(&M) == void_ptr(&X.m)); }
+
+  constexpr inline uword             get_row_offset()                    const { return 0; }
+  constexpr inline uword             get_col_offset()                    const { return 0; }
+            inline uword             get_M_n_rows()                      const { return M.n_rows; }
+            inline dev_mem_t<out_eT> get_dev_mem(const bool synchronise) const { return M.get_dev_mem(synchronise); }
   };
 
 

@@ -106,5 +106,5 @@ mul_diag
       (void**) args, // arguments
       0);
 
-  coot_check_cuda_error( result, "coot::cuda::inplace_op_scalar(): cuLaunchKernel() failed" );
+  coot_check_cuda_error( result, "coot::cuda::mul_diag(): cuLaunchKernel() failed" );
   }

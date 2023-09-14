@@ -75,6 +75,7 @@ op_pinv::apply_direct(Mat<eT2>& out, const T1& in, const typename T1::elem_type 
       // Note that aliases don't need to be handled since we are not operating on `in` now.
       const uword N = (std::min)(U.M.n_rows, U.M.n_cols);
       Col<typename T1::elem_type> diag(N);
+      // TODO: it's possible to see a diag as a subview
       coot_rt_t::extract_diag(diag.get_dev_mem(false), U.M.get_dev_mem(false), 0, U.M.n_rows, N);
 
       return apply_direct_diag(out, diag, tol);
@@ -150,7 +151,12 @@ op_pinv::apply_direct_diag(Mat<eT>& out, const Mat<eT>& in, const eT tol)
 
   // Find the values that are below tolerance.
   Mat<eT> abs_in(in.n_rows, in.n_cols);
-  coot_rt_t::eop_scalar(abs_in.get_dev_mem(false), in.get_dev_mem(false), in.n_elem, (eT) 0, (eT) 0, twoway_kernel_id::equ_array_abs);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_abs,
+                        abs_in.get_dev_mem(false), in.get_dev_mem(false),
+                        (eT) 0, (eT) 0,
+                        abs_in.n_rows, abs_in.n_cols,
+                        0, 0, abs_in.n_rows,
+                        0, 0, abs_in.n_rows);
 
   // Compute tolerance if not given.
   eT tol_use = tol;
@@ -167,7 +173,12 @@ op_pinv::apply_direct_diag(Mat<eT>& out, const Mat<eT>& in, const eT tol)
   Mat<eT> out_vec(abs_in.n_rows, abs_in.n_cols);
   coot_rt_t::copy_array(out_vec.get_dev_mem(false), in.get_dev_mem(false), in.n_elem);
   coot_rt_t::replace(out_vec.get_dev_mem(false), out_vec.n_elem, (eT) 0.0, (eT) 1.0);
-  coot_rt_t::eop_scalar(out_vec.get_dev_mem(false), out_vec.get_dev_mem(false), in.n_elem, (eT) 0, (eT) 1, twoway_kernel_id::equ_array_div_scalar_pre);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_div_scalar_pre,
+                        out_vec.get_dev_mem(false), out_vec.get_dev_mem(false),
+                        (eT) 0, (eT) 1,
+                        out_vec.n_rows, out_vec.n_cols,
+                        0, 0, out_vec.n_rows,
+                        0, 0, out_vec.n_rows);
 
   // Zero out any values that are below the tolerance.
   coot_rt_t::inplace_op_array(out_vec.get_dev_mem(false), tol_indicator.get_dev_mem(false), out_vec.n_elem, twoway_kernel_id::inplace_mul_array);
@@ -212,7 +223,12 @@ op_pinv::apply_direct_diag(Mat<eT2>& out, const Mat<eT1>& in, const eT1 tol, con
 
   // Find the values that are below tolerance.
   Mat<eT1> abs_in(in.n_rows, in.n_cols);
-  coot_rt_t::eop_scalar(abs_in.get_dev_mem(false), in.get_dev_mem(false), in.n_elem, (eT1) 0, (eT1) 0, twoway_kernel_id::equ_array_abs);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_abs,
+                        abs_in.get_dev_mem(false), in.get_dev_mem(false),
+                        (eT1) 0, (eT1) 0,
+                        abs_in.n_rows, abs_in.n_cols,
+                        0, 0, abs_in.n_rows,
+                        0, 0, abs_in.n_rows);
 
   // Compute tolerance if not given.
   eT1 tol_use = tol;
@@ -229,7 +245,12 @@ op_pinv::apply_direct_diag(Mat<eT2>& out, const Mat<eT1>& in, const eT1 tol, con
   Mat<eT1> out_vec(abs_in.n_rows, abs_in.n_cols);
   coot_rt_t::copy_array(out_vec.get_dev_mem(false), in.get_dev_mem(false), in.n_elem);
   coot_rt_t::replace(out_vec.get_dev_mem(false), out_vec.n_elem, (eT1) 0.0, (eT1) 1.0);
-  coot_rt_t::eop_scalar(out_vec.get_dev_mem(false), out_vec.get_dev_mem(false), in.n_elem, (eT1) 0, (eT1) 1, twoway_kernel_id::equ_array_div_scalar_pre);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_div_scalar_pre,
+                        out_vec.get_dev_mem(false), out_vec.get_dev_mem(false),
+                        (eT1) 0, (eT1) 1,
+                        out_vec.n_rows, out_vec.n_cols,
+                        0, 0, out_vec.n_rows,
+                        0, 0, out_vec.n_rows);
 
   // Zero out any values that are below the tolerance.
   coot_rt_t::inplace_op_array(out_vec.get_dev_mem(false), tol_indicator.get_dev_mem(false), out_vec.n_elem, twoway_kernel_id::inplace_mul_array);
@@ -271,7 +292,12 @@ op_pinv::apply_direct_sym(Mat<eT>& out, Mat<eT>& in, const eT tol)
     }
 
   Col<eT> abs_eigvals(in.n_rows);
-  coot_rt_t::eop_scalar(abs_eigvals.get_dev_mem(false), eigvals.get_dev_mem(false), eigvals.n_elem, (eT) 0, (eT) 0, twoway_kernel_id::equ_array_abs);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_abs,
+                        abs_eigvals.get_dev_mem(false), eigvals.get_dev_mem(false),
+                        (eT) 0, (eT) 0,
+                        abs_eigvals.n_rows, abs_eigvals.n_cols,
+                        0, 0, abs_eigvals.n_rows,
+                        0, 0, eigvals.n_rows);
 
   Col<uword> eigval_order(in.n_rows);
   // This also sorts `abs_eigvals`.
@@ -301,7 +327,12 @@ op_pinv::apply_direct_sym(Mat<eT>& out, Mat<eT>& in, const eT tol)
   // 3. Invert the eigenvalues we kept.
   //
   coot_rt_t::replace(filtered_eigvals.get_dev_mem(false), num_eigvals, (eT) 0, (eT) 1); // avoid divergence
-  coot_rt_t::eop_scalar(filtered_eigvals.get_dev_mem(false), filtered_eigvals.get_dev_mem(false), num_eigvals, (eT) 0, (eT) 1, twoway_kernel_id::equ_array_div_scalar_pre);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_div_scalar_pre,
+                        filtered_eigvals.get_dev_mem(false), filtered_eigvals.get_dev_mem(false),
+                        (eT) 0, (eT) 1,
+                        filtered_eigvals.n_rows, filtered_eigvals.n_cols,
+                        0, 0, filtered_eigvals.n_rows,
+                        0, 0, filtered_eigvals.n_rows);
 
   //
   // 4. Construct output.
@@ -428,7 +459,12 @@ op_pinv::apply_direct_gen(Mat<eT>& out, Mat<eT>& in, const eT tol)
   // 4. Invert singular values.
   //
   coot_rt_t::replace(filtered_S.get_dev_mem(false), num_svs, (eT) 0, (eT) 1); // avoid divergence
-  coot_rt_t::eop_scalar(filtered_S.get_dev_mem(false), filtered_S.get_dev_mem(false), num_svs, (eT) 0, (eT) 1, twoway_kernel_id::equ_array_div_scalar_pre);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_div_scalar_pre,
+                        filtered_S.get_dev_mem(false), filtered_S.get_dev_mem(false),
+                        (eT) 0, (eT) 1,
+                        num_svs, 1,
+                        0, 0, num_svs,
+                        0, 0, num_svs);
 
   //
   // 5. Reconstruct as subset of V * diagmat(inv_s) * subset of U
