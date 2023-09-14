@@ -128,9 +128,8 @@ op_sum::apply_noalias(Mat<out_eT>& out, const subview<in_eT>& sv, const uword di
     return;
     }
 
-  coot_rt_t::sum(out.get_dev_mem(false),
-                 sv.m.get_dev_mem(false),
-                 sv.m.n_rows, sv.m.n_cols,
+  coot_rt_t::sum(out.get_dev_mem(false), sv.m.get_dev_mem(false),
+                 sv.n_rows, sv.n_cols,
                  dim, post_conv_apply,
                  0, 1,
                  sv.aux_row1, sv.aux_col1, sv.m.n_rows);

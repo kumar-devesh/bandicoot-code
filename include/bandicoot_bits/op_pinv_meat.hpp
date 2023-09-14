@@ -162,7 +162,7 @@ op_pinv::apply_direct_diag(Mat<eT>& out, const Mat<eT>& in, const eT tol)
   eT tol_use = tol;
   if (tol == (eT) 0)
     {
-    const eT max_val = coot_rt_t::max(abs_in.get_dev_mem(false), abs_in.n_elem);
+    const eT max_val = coot_rt_t::max_vec(abs_in.get_dev_mem(false), abs_in.n_elem);
     tol_use = abs_in.n_elem * max_val * std::numeric_limits<eT>::epsilon();
     }
 
@@ -242,7 +242,7 @@ op_pinv::apply_direct_diag(Mat<eT2>& out, const Mat<eT1>& in, const eT1 tol, con
   eT1 tol_use = tol;
   if (tol == (eT1) 0)
     {
-    const eT1 max_val = coot_rt_t::max(abs_in.get_dev_mem(false), abs_in.n_elem);
+    const eT1 max_val = coot_rt_t::max_vec(abs_in.get_dev_mem(false), abs_in.n_elem);
     tol_use = abs_in.n_elem * max_val * std::numeric_limits<eT1>::epsilon();
     }
 

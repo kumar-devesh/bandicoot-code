@@ -48,7 +48,7 @@ max(dev_mem_t<eT2> dest,
 
   cl_int status = 0;
 
-  const uword src_offset = src_row_offset + src_dest_offset * src_M_n_rows;
+  const uword src_offset = src_row_offset + src_col_offset * src_M_n_rows;
 
   runtime_t::adapt_uword cl_dest_offset(dest_offset);
   runtime_t::adapt_uword cl_src_offset(src_offset);

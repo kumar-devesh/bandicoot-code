@@ -114,7 +114,7 @@ op_mean::apply_direct(Mat<out_eT>& out, const subview<in_eT>& in, const uword di
                   in.n_rows, in.n_cols,
                   dim, post_conv_apply,
                   0, 1,
-                  0, 0, in.m.n_rows);
+                  in.aux_row1, in.aux_col1, in.m.n_rows);
   }
 
 

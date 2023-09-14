@@ -85,16 +85,12 @@ op_range::apply_direct(Mat<out_eT>& out, const Mat<in_eT>& in, const uword dim, 
                  dim, post_conv_apply,
                  0, 1,
                  0, 0, in.n_rows);
-  if (dim == 0)
-    {
-    // maxs = max(in, dim)
-    coot_rt_t::max_colwise(maxs.get_dev_mem(false), in.get_dev_mem(false), in.n_rows, in.n_cols, post_conv_apply);
-    }
-  else
-    {
-    // maxs = max(in, dim)
-    coot_rt_t::max_rowwise(maxs.get_dev_mem(false), in.get_dev_mem(false), in.n_rows, in.n_cols, post_conv_apply);
-    }
+  // maxs = max(in, dim)
+  coot_rt_t::max(maxs.get_dev_mem(false), in.get_dev_mem(false),
+                 in.n_rows, in.n_cols,
+                 dim, post_conv_apply,
+                 0, 1,
+                 0, 0, in.n_rows);
   // out = maxs - mins
   coot_rt_t::eop_array(threeway_kernel_id::equ_array_minus_array,
                        out.get_dev_mem(false),
@@ -124,8 +120,8 @@ op_range::range_vec(const T1& X)
     return eT(0);
     }
 
-  const eT max = coot_rt_t::max(M.get_dev_mem(false), M.n_elem);
-  const eT min = coot_rt_t::min(M.get_dev_mem(false), M.n_elem);
+  const eT max = coot_rt_t::max_vec(M.get_dev_mem(false), M.n_elem);
+  const eT min = coot_rt_t::min_vec(M.get_dev_mem(false), M.n_elem);
 
   return max - min;
   }

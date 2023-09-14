@@ -524,14 +524,6 @@ subview<eT>::extract(Mat<eT1>& out, const subview<eT>& in)
 
   if(in.n_elem == 0)  { return; }
 
-  // if the entire range is selected, use simple copy
-  // (beignet 1.3 crashes if clEnqueueCopyBufferRect() is used on entire range)
-  if( (in.n_rows == in.m.n_rows) && (in.n_cols == in.m.n_cols) )
-    {
-    out = in.m;
-    return;
-    }
-
   coot_rt_t::copy_array(out.get_dev_mem(false), in.m.get_dev_mem(false),
                         in.n_rows, in.n_cols,
                         0, 0, out.n_rows,

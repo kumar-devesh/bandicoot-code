@@ -35,6 +35,11 @@ clamp(dev_mem_t<eT2> dest,
   {
   coot_extra_debug_sigprint();
 
+  if (n_rows == 0 || n_cols == 0)
+    {
+    return;
+    }
+
   coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "cuda::clamp(): cuda runtime not valid");
 
   const kernel_dims dims = two_dimensional_grid_dims(n_rows, n_cols);

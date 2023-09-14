@@ -27,7 +27,7 @@ COOT_FN(PREFIX,max_rowwise_conv_post)(eT2* dest,
     eT1 acc = (eT1) src[row];
     for (UWORD i = 1; i < n_cols; ++i)
       {
-      acc = max(acc, A[(i * src_M_n_rows) + row]);
+      acc = max(acc, src[(i * src_M_n_rows) + row]);
       }
 
     dest[row * dest_mem_incr] = (eT2) (acc);

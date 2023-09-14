@@ -61,9 +61,10 @@ op_htrans::apply_noalias(Mat<out_eT>& out,
     {
     // Simply copying the data is sufficient.
     coot_rt_t::copy_array(out.get_dev_mem(false), A.get_dev_mem(false),
-                          out.n_rows, out.n_cols,
-                          0, 0, out.n_rows,
-                          0, 0, A.n_rows);
+                          // logically treat both as vectors
+                          out.n_elem, 1,
+                          0, 0, out.n_elem,
+                          0, 0, A.n_elem);
     }
   else
     {

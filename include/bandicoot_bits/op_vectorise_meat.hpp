@@ -78,8 +78,9 @@ op_vectorise_col::apply_direct(Mat<out_eT>& out, const T1& expr, const bool outp
       }
 
     coot_rt_t::copy_array(out.get_dev_mem(false), U.get_dev_mem(false),
-                          out.n_rows, out.n_cols,
-                          0, 0, out.n_rows,
+                          // logically, we treat `out` as the same size as the input
+                          U.M.n_rows, U.M.n_cols,
+                          0, 0, U.M.n_rows,
                           U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
     }
   }
@@ -171,9 +172,7 @@ op_vectorise_row::apply(Mat<out_eT>& out, const Op<T1,op_vectorise_row>& in)
   {
   coot_extra_debug_sigprint();
 
-  const unwrap<T1> U(in.m);
-
-  op_vectorise_row::apply_direct(out, U.M);
+  op_vectorise_row::apply_direct(out, in.m);
   }
 
 
@@ -200,8 +199,9 @@ op_vectorise_row::apply_direct(Mat<typename T1::elem_type>& out, const T1& expr)
     // That's not a temporary, and we can't steal its memory---we have to copy it.
     out.set_size(1, U.M.n_elem);
     coot_rt_t::copy_array(out.get_dev_mem(false), U.get_dev_mem(false),
-                          out.n_rows, out.n_cols,
-                          0, 0, out.n_rows,
+                          // logically, we treat `out` as the same size as the input
+                          U.M.n_rows, U.M.n_cols,
+                          0, 0, U.M.n_rows,
                           U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
     }
   else
@@ -232,8 +232,9 @@ op_vectorise_row::apply_direct(Mat<out_eT>& out, const T1& expr, const typename 
   // A conversion operation is always necessary when the type is different.
   out.set_size(1, U.M.n_elem);
   coot_rt_t::copy_array(out.get_dev_mem(false), U.get_dev_mem(false),
-                        out.n_rows, out.n_cols,
-                        0, 0, out.n_rows,
+                        // logically, we treat `out` as the same size as the input
+                        U.M.n_rows, U.M.n_cols,
+                        0, 0, U.M.n_rows,
                         U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
   }
 

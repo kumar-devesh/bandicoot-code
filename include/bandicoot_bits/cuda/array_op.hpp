@@ -96,9 +96,12 @@ copy_array(dev_mem_t<eT> dest,
   {
   coot_extra_debug_sigprint();
 
-  cudaError_t result = coot_wrapper(cudaMemcpy2D)(dest.cuda_mem_ptr,
+  const uword dest_offset = dest_row_offset + dest_col_offset * dest_M_n_rows;
+  const uword  src_offset =  src_row_offset +  src_col_offset * src_M_n_rows;
+
+  cudaError_t result = coot_wrapper(cudaMemcpy2D)(dest.cuda_mem_ptr + dest_offset,
                                                   sizeof(eT) * dest_M_n_rows,
-                                                  src.cuda_mem_ptr,
+                                                  src.cuda_mem_ptr + src_offset,
                                                   sizeof(eT) * src_M_n_rows,
                                                   sizeof(eT) * n_rows,
                                                   n_cols,

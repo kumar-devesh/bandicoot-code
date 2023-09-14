@@ -100,8 +100,6 @@ struct oneway_kernel_id
     //
     var_colwise,
     var_rowwise,
-    submat_var_colwise,
-    submat_var_rowwise,
     var,
     var_small,
     submat_var,
@@ -188,8 +186,6 @@ struct oneway_kernel_id
 
     names.push_back("var_colwise");
     names.push_back("var_rowwise");
-    names.push_back("submat_var_colwise");
-    names.push_back("submat_var_rowwise");
     names.push_back("var");
     names.push_back("var_small");
     names.push_back("submat_var");
@@ -378,9 +374,7 @@ struct twoway_kernel_id
   {
   enum enum_id
     {
-    submat_extract = 0,
-    //
-    equ_array_plus_scalar,
+    equ_array_plus_scalar = 0,
     equ_array_neg_pre,
     equ_array_neg_post,
     equ_array_minus_scalar_pre_pre,
@@ -526,8 +520,6 @@ struct twoway_kernel_id
   init_names()
     {
     std::vector<std::string> names;
-
-    names.push_back("submat_extract");
 
     names.push_back("equ_array_plus_scalar");
     names.push_back("equ_array_neg_pre");

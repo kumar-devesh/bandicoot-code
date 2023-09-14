@@ -130,7 +130,7 @@ op_min::apply_noalias(Mat<out_eT>& out, const subview<in_eT>& sv, const uword di
                  sv.n_rows, sv.n_cols,
                  dim, post_conv_apply,
                  0, 1,
-                 0, 0, sv.m.n_rows);
+                 sv.aux_row1, sv.aux_col1, sv.m.n_rows);
   }
 
 
@@ -167,5 +167,5 @@ op_min::apply_direct(const T1& in)
   const unwrap<T1> U(in);
   const Mat<typename T1::elem_type>& A = U.M;
 
-  return coot_rt_t::min(A.get_dev_mem(false), A.n_elem);
+  return coot_rt_t::min_vec(A.get_dev_mem(false), A.n_elem);
   }

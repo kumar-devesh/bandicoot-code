@@ -41,6 +41,11 @@ eop_array(const threeway_kernel_id::enum_id num,
   {
   coot_extra_debug_sigprint();
 
+  if (n_rows == 0 || n_cols == 0)
+    {
+    return;
+    }
+
   // Get kernel.
   cl_kernel kernel = get_rt().cl_rt.get_kernel<eT3, eT2, eT1>(num);
 
@@ -101,11 +106,16 @@ copy_array(dev_mem_t<eT> dest,
   {
   coot_extra_debug_sigprint();
 
+  if (n_rows == 0 || n_cols == 0)
+    {
+    return;
+    }
+
   runtime_t::cq_guard guard;
 
-  const size_t  src_origin[3] = { size_t(src_row_offset),      size_t(src_col_offset),  0  };
-  const size_t dest_origin[3] = { size_t(dest_row_offset),     size_t(dest_col_offset), 0 };
-  const size_t      region[3] = { size_t(n_rows) * sizeof(eT), size_t(n_cols),          1 };
+  const size_t  src_origin[3] = { size_t(src_row_offset) * sizeof(eT),  size_t(src_col_offset),  0 };
+  const size_t dest_origin[3] = { size_t(dest_row_offset) * sizeof(eT), size_t(dest_col_offset), 0 };
+  const size_t      region[3] = { size_t(n_rows) * sizeof(eT),          size_t(n_cols),          1 };
 
   cl_int status = coot_wrapper(clEnqueueCopyBufferRect)(get_rt().cl_rt.get_cq(),
                                                         src.cl_mem_ptr,
@@ -144,6 +154,11 @@ copy_array(dev_mem_t<eT2> dest,
            const uword src_M_n_rows)
   {
   coot_extra_debug_sigprint();
+
+  if (n_rows == 0 || n_cols == 0)
+    {
+    return;
+    }
 
   // Get kernel.
   cl_kernel kernel = get_rt().cl_rt.get_kernel<eT2, eT1>(twoway_kernel_id::convert_type);

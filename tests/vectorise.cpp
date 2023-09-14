@@ -456,7 +456,7 @@ TEST_CASE("vectorise_row_inplace_subview", "[vectorise]")
   {
   fmat x = randu<fmat>(20, 20);
   fmat x_old(x);
-  fmat x_sub = x.submat(0, 0, 3, 3);
+  fmat x_sub = x.submat(0, 0, 3, 3).t();
 
   x.submat(0, 0, 0, 15) = vectorise(x.submat(0, 0, 3, 3), 1);
 
@@ -500,7 +500,7 @@ TEST_CASE("vectorise_row_non_inplace_subview", "[vectorise]")
   fmat x = randu<fmat>(20, 20);
 
   frowvec y = vectorise(x.submat(0, 0, 9, 9), 1);
-  fmat x_sub = x.submat(0, 0, 9, 9);
+  fmat x_sub = x.submat(0, 0, 9, 9).t();
 
   REQUIRE( y.n_elem == x_sub.n_elem );
 

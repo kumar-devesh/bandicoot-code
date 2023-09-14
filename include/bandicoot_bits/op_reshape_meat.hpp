@@ -151,13 +151,15 @@ op_reshape::apply_direct(Mat<eT>& out, const subview<eT>& in, const uword new_n_
   if (new_n_elem > in.n_elem)
     {
     // Set all the memory to zeros, since some zero elements will be needed.
-    coot_rt_t::fill(out.get_dev_mem(false), eT(0), new_n_rows, new_n_cols, 0, 0, new_n_rows);
+    coot_rt_t::fill(out.get_dev_mem(false), eT(0),
+                    new_n_elem - in.n_elem, 1,
+                    in.n_elem, 0, new_n_elem - in.n_elem);
 
     if (in.n_elem > 0)
       {
       coot_rt_t::copy_array(out.get_dev_mem(false), in.m.get_dev_mem(false),
                             in.n_rows, in.n_cols,
-                            0, 0, out.n_rows,
+                            0, 0, in.n_rows /* intentionally not out.n_rows */,
                             in.aux_row1, in.aux_col1, in.m.n_rows);
       }
     }
@@ -165,7 +167,7 @@ op_reshape::apply_direct(Mat<eT>& out, const subview<eT>& in, const uword new_n_
     {
     coot_rt_t::copy_array(out.get_dev_mem(false), in.m.get_dev_mem(false),
                           in.n_rows, in.n_cols,
-                          0, 0, out.n_rows,
+                          0, 0, in.n_rows /* intentionally not out.n_rows */,
                           in.aux_row1, in.aux_col1, in.m.n_rows);
     }
   else
@@ -194,21 +196,22 @@ op_reshape::apply_direct(Mat<out_eT>& out, const subview<eT>& in, const uword ne
   if (new_n_elem > in.n_elem)
     {
     // Set all the memory to zeros, since some zero elements will be needed.
-    coot_rt_t::fill(out.get_dev_mem(false), out_eT(0), new_n_rows, new_n_cols, 0, 0, new_n_rows);
+    coot_rt_t::fill(out.get_dev_mem(false), out_eT(0),
+                    new_n_elem - in.n_elem, 1,
+                    in.n_elem, 0, new_n_rows - in.n_elem);
     if (in.n_elem > 0)
       {
       coot_rt_t::copy_array(out.get_dev_mem(false), in.m.get_dev_mem(false),
                             in.n_rows, in.n_cols,
-                            0, 0, out.n_rows,
+                            0, 0, in.n_rows /* intentionally not out.n_rows */,
                             in.aux_row1, in.aux_col1, in.m.n_rows);
       }
     }
   else if (new_n_elem == in.n_elem && in.n_elem > 0)
     {
-    // TODO: are these correct?
     coot_rt_t::copy_array(out.get_dev_mem(false), in.m.get_dev_mem(false),
                           in.n_rows, in.n_cols,
-                          0, 0, out.n_rows,
+                          0, 0, in.n_rows /* intentionally not out.n_rows */,
                           in.aux_row1, in.aux_col1, in.m.n_rows);
     }
   else

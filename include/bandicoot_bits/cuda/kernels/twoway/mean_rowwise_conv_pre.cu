@@ -27,7 +27,7 @@ COOT_FN(PREFIX,mean_rowwise_conv_pre)(eT2* dest,
     eT2 acc = (eT2)(0);
     for (UWORD i = 0; i < n_cols; ++i)
       {
-      acc += (eT2) (A[i * src_M_n_rows + row]);
+      acc += (eT2) (src[i * src_M_n_rows + row]);
       }
 
     dest[row * dest_mem_incr] = (acc / (eT2) n_cols);

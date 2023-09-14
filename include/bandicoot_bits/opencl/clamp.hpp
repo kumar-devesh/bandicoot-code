@@ -59,7 +59,7 @@ clamp(dev_mem_t<eT2> dest,
   status |= coot_wrapper(clSetKernelArg)(kernel, 4, sizeof(eT1),           &min_val);
   status |= coot_wrapper(clSetKernelArg)(kernel, 5, sizeof(eT1),           &max_val);
   status |= coot_wrapper(clSetKernelArg)(kernel, 6, cl_n_rows.size,        cl_n_rows.addr);
-  status |= coot_wrapper(clSetKernelArg)(kernel, 7, cl_n_cols.size,        cl_n_rows.addr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 7, cl_n_cols.size,        cl_n_cols.addr);
   status |= coot_wrapper(clSetKernelArg)(kernel, 8, cl_dest_M_n_rows.size, cl_dest_M_n_rows.addr);
   status |= coot_wrapper(clSetKernelArg)(kernel, 9, cl_src_M_n_rows.size,  cl_src_M_n_rows.addr);
   coot_check_runtime_error( (status != 0), "coot::opencl::clamp(): couldn't set input arguments");
