@@ -55,7 +55,7 @@ get_val(const dev_mem_t<eT> mem, const uword index)
         NULL);
     }
 
-  coot_check_runtime_error( (status != CL_SUCCESS), "opencl::get_val(): couldn't access device memory");
+  coot_check_cl_error(status, "opencl::get_val(): couldn't access device memory");
 
   return val;
 
@@ -101,7 +101,7 @@ set_val(dev_mem_t<eT> mem, const uword index, const eT in_val)
     status = coot_wrapper(clEnqueueUnmapMemObject)(get_rt().cl_rt.get_cq(), mem.cl_mem_ptr, mapped_ptr, 0, NULL, NULL);
     }
 
-  coot_check_runtime_error( (status != CL_SUCCESS), "opencl::set_val(): couldn't access device memory" );
+  coot_check_cl_error(status, "opencl::set_val(): couldn't access device memory" );
   }
 
 
@@ -126,7 +126,7 @@ val_add_inplace(dev_mem_t<eT> mem, const uword index, const eT val)
     status = coot_wrapper(clEnqueueUnmapMemObject)(get_rt().cl_rt.get_cq(), mem.cl_mem_ptr, mapped_ptr, 0, NULL, NULL);
     }
 
-  coot_check_runtime_error( (status != CL_SUCCESS), "opencl::val_add_inplace(): couldn't access device memory" );
+  coot_check_cl_error(status, "opencl::val_add_inplace(): couldn't access device memory" );
   }
 
 
@@ -151,7 +151,7 @@ val_minus_inplace(dev_mem_t<eT> mem, const uword index, const eT val)
     status = coot_wrapper(clEnqueueUnmapMemObject)(get_rt().cl_rt.get_cq(), mem.cl_mem_ptr, mapped_ptr, 0, NULL, NULL);
     }
 
-  coot_check_runtime_error( (status != CL_SUCCESS), "opencl::val_add_inplace(): couldn't access device memory" );
+  coot_check_cl_error(status, "opencl::val_add_inplace(): couldn't access device memory" );
   }
 
 
@@ -176,7 +176,7 @@ val_mul_inplace(dev_mem_t<eT> mem, const uword index, const eT val)
     status = coot_wrapper(clEnqueueUnmapMemObject)(get_rt().cl_rt.get_cq(), mem.cl_mem_ptr, mapped_ptr, 0, NULL, NULL);
     }
 
-  coot_check_runtime_error( (status != CL_SUCCESS), "opencl::val_add_inplace(): couldn't access device memory" );
+  coot_check_cl_error(status, "opencl::val_add_inplace(): couldn't access device memory" );
   }
 
 
@@ -201,5 +201,5 @@ val_div_inplace(dev_mem_t<eT> mem, const uword index, const eT val)
     status = coot_wrapper(clEnqueueUnmapMemObject)(get_rt().cl_rt.get_cq(), mem.cl_mem_ptr, mapped_ptr, 0, NULL, NULL);
     }
 
-  coot_check_runtime_error( (status != CL_SUCCESS), "opencl::val_add_inplace(): couldn't access device memory" );
+  coot_check_cl_error(status, "opencl::val_add_inplace(): couldn't access device memory" );
   }

@@ -202,8 +202,8 @@ subview<eT>::operator= (const Base<eT, T1>& in)
 
   coot_rt_t::copy_mat(m.dev_mem, U.get_dev_mem(false),
                       n_rows, n_cols,
-                      U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows(),
-                      aux_row1, aux_col1, m.n_rows);
+                      aux_row1, aux_col1, m.n_rows,
+                      U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
   }
 
 
