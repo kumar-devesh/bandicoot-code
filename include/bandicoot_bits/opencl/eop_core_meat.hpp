@@ -70,5 +70,5 @@ eop_scalar(const twoway_kernel_id::enum_id num,
 
   status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 2, NULL, work_size, NULL, 0, NULL, NULL);
 
-  coot_check_runtime_error( (status != CL_SUCCESS), "coot::opencl::eop_scalar(): couldn't execute kernel");
+  coot_check_cl_error(status, "coot::opencl::eop_scalar(): couldn't execute kernel");
   }

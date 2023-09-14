@@ -28,38 +28,4 @@ class arrayops
   template<typename out_eT, typename in_eT>
   inline static void
   copy_subview(dev_mem_t<out_eT> dest, const uword dest_offset, const dev_mem_t<in_eT> src, const uword aux_row1, const uword aux_col1, const uword M_n_rows, const uword M_n_cols, const uword n_rows, const uword n_cols);
-
-
-  //
-  // array op= array
-
-  template<typename eT1, typename eT2>
-  inline static void
-  inplace_plus_array(dev_mem_t<eT2> dest, dev_mem_t<eT1> src, const uword n_elem);
-
-  template<typename eT1, typename eT2>
-  inline static void
-  inplace_minus_array(dev_mem_t<eT2> dest, dev_mem_t<eT1> src, const uword n_elem);
-
-  template<typename eT1, typename eT2>
-  inline static void
-  inplace_mul_array(dev_mem_t<eT2> dest, dev_mem_t<eT1> src, const uword n_elem);
-
-  template<typename eT1, typename eT2>
-  inline static void
-  inplace_div_array(dev_mem_t<eT2> dest, dev_mem_t<eT1> src, const uword n_elem);
-
-
-  //
-  // scalar = op(array)
-
-  template<typename eT>
-  inline static
-  eT
-  accumulate(cl_mem src, const uword n_elem);
-
-  template<typename eT>
-  inline static
-  eT
-  product(cl_mem src, const uword n_elem);
   };

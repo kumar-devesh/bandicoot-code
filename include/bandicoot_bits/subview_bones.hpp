@@ -60,22 +60,11 @@ class subview : public Base<eT, subview<eT> >
   inline void operator*= (const eT val);
   inline void operator/= (const eT val);
 
-
-  template<typename T1> inline void inplace_op(const Base<eT, T1>& x, twoway_kernel_id::enum_id kernel, const char* identifier);
-
   template<typename T1> inline void operator= (const Base<eT, T1>& x);
   template<typename T1> inline void operator+=(const Base<eT, T1>& x);
   template<typename T1> inline void operator-=(const Base<eT, T1>& x);
   template<typename T1> inline void operator%=(const Base<eT, T1>& x);
   template<typename T1> inline void operator/=(const Base<eT, T1>& x);
-
-  template<typename T1> inline void inplace_op(const mtOp<eT, T1, mtop_conv_to>& x, twoway_kernel_id::enum_id kernel, const char* identifier);
-
-  template<typename T1> inline void operator= (const mtOp<eT, T1, mtop_conv_to>& x);
-  template<typename T1> inline void operator+=(const mtOp<eT, T1, mtop_conv_to>& x);
-  template<typename T1> inline void operator-=(const mtOp<eT, T1, mtop_conv_to>& x);
-  template<typename T1> inline void operator%=(const mtOp<eT, T1, mtop_conv_to>& x);
-  template<typename T1> inline void operator/=(const mtOp<eT, T1, mtop_conv_to>& x);
 
   template<typename eT1> inline static void       extract(Mat<eT1>& out, const subview& in);
   template<typename eT1> inline static void  plus_inplace(Mat<eT1>& out, const subview& in);

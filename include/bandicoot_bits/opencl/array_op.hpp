@@ -20,31 +20,64 @@
 template<typename eT1, typename eT2, typename eT3>
 inline
 void
-array_op(dev_mem_t<eT3> out, const uword n_elem, dev_mem_t<eT1> in_a, dev_mem_t<eT2> in_b, threeway_kernel_id::enum_id num)
+eop_array(const threeway_kernel_id::enum_id num,
+          dev_mem_t<eT3> dest,
+          const dev_mem_t<eT1> src_A,
+          const dev_mem_t<eT2> src_B,
+          // logical size of source and destination
+          const uword n_rows,
+          const uword n_cols,
+          // submatrix destination offsets (set to 0, 0, and n_rows if not a subview)
+          const uword dest_row_offset,
+          const uword dest_col_offset,
+          const uword dest_M_n_rows,
+          // submatrix source offsets (set to 0, 0, and n_rows if not a subview)
+          const uword src_A_row_offset,
+          const uword src_A_col_offset,
+          const uword src_A_M_n_rows,
+          const uword src_B_row_offset,
+          const uword src_B_col_offset,
+          const uword src_B_M_n_rows)
   {
   coot_extra_debug_sigprint();
 
   // Get kernel.
   cl_kernel kernel = get_rt().cl_rt.get_kernel<eT3, eT2, eT1>(num);
 
+  const uword src_A_offset = src_A_row_offset + src_A_col_offset * src_A_M_n_rows;
+  const uword src_B_offset = src_B_row_offset + src_B_col_offset * src_B_M_n_rows;
+  const uword dest_offset  =  dest_row_offset +  dest_col_offset * dest_M_n_rows;
+
   runtime_t::cq_guard guard;
 
-  runtime_t::adapt_uword N(n_elem);
+  runtime_t::adapt_uword cl_dest_offset(dest_offset);
+  runtime_t::adapt_uword cl_src_A_offset(src_A_offset);
+  runtime_t::adapt_uword cl_src_B_offset(src_B_offset);
+  runtime_t::adapt_uword cl_n_rows(n_rows);
+  runtime_t::adapt_uword cl_n_cols(n_cols);
+  runtime_t::adapt_uword cl_dest_M_n_rows(dest_M_n_rows);
+  runtime_t::adapt_uword cl_src_A_M_n_rows(src_A_M_n_rows);
+  runtime_t::adapt_uword cl_src_B_M_n_rows(src_B_M_n_rows);
 
   cl_int status = 0;
 
-  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem), &( out.cl_mem_ptr) );
-  status |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(cl_mem), &(in_a.cl_mem_ptr) );
-  status |= coot_wrapper(clSetKernelArg)(kernel, 2, sizeof(cl_mem), &(in_b.cl_mem_ptr) );
-  status |= coot_wrapper(clSetKernelArg)(kernel, 3, N.size,         N.addr             );
+  status |= coot_wrapper(clSetKernelArg)(kernel,  0,         sizeof(cl_mem), &( dest.cl_mem_ptr)   );
+  status |= coot_wrapper(clSetKernelArg)(kernel,  1,    cl_dest_offset.size, cl_dest_offset.addr   );
+  status |= coot_wrapper(clSetKernelArg)(kernel,  2,         sizeof(cl_mem), &(src_A.cl_mem_ptr)   );
+  status |= coot_wrapper(clSetKernelArg)(kernel,  3,   cl_src_A_offset.size, cl_src_A_offset.addr  );
+  status |= coot_wrapper(clSetKernelArg)(kernel,  4,         sizeof(cl_mem), &(src_B.cl_mem_ptr)   );
+  status |= coot_wrapper(clSetKernelArg)(kernel,  5,   cl_src_B_offset.size, cl_src_B_offset.addr  );
+  status |= coot_wrapper(clSetKernelArg)(kernel,  6,         cl_n_rows.size, cl_n_rows.addr        );
+  status |= coot_wrapper(clSetKernelArg)(kernel,  7,         cl_n_cols.size, cl_n_cols.addr        );
+  status |= coot_wrapper(clSetKernelArg)(kernel,  8,  cl_dest_M_n_rows.size, cl_dest_M_n_rows.addr );
+  status |= coot_wrapper(clSetKernelArg)(kernel,  9, cl_src_A_M_n_rows.size, cl_src_A_M_n_rows.addr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 10, cl_src_B_M_n_rows.size, cl_src_B_M_n_rows.addr);
 
-  const size_t global_work_size = size_t(n_elem);
+  const size_t global_work_size[2] = { size_t(n_rows), size_t(n_cols) };
 
-  coot_extra_debug_print("clEnqueueNDRangeKernel()");
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 2, NULL, global_work_size, NULL, 0, NULL, NULL);
 
-  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
-
-  coot_check_runtime_error( (status != 0), "coot::opencl::array_op(): couldn't execute kernel" );
+  coot_check_cl_error(status, "coot::opencl::eop_array(): couldn't execute kernel" );
   }
 
 
@@ -65,7 +98,7 @@ copy_array(dev_mem_t<eT> dest, const dev_mem_t<eT> src, const uword n_elem)
 
   cl_int status = coot_wrapper(clEnqueueCopyBuffer)(get_rt().cl_rt.get_cq(), src.cl_mem_ptr, dest.cl_mem_ptr, size_t(0), size_t(0), sizeof(eT) * size_t(n_elem), cl_uint(0), NULL, NULL);
 
-  coot_check_runtime_error( (status != 0), "coot::opencl::copy_array(): couldn't copy buffer" );
+  coot_check_cl_error(status, "coot::opencl::copy_array(): couldn't copy buffer" );
   }
 
 
@@ -99,7 +132,7 @@ copy_array(dev_mem_t<out_eT> dest, const dev_mem_t<in_eT> src, const uword n_ele
 
   status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
 
-  coot_check_runtime_error( (status != 0), "coot::opencl::copy_array(): couldn't copy buffer");
+  coot_check_cl_error(status, "coot::opencl::copy_array(): couldn't copy buffer");
   }
 
 

@@ -99,9 +99,6 @@ class coot_rt_t
                           const uword col_offset,
                           const uword M_n_rows);
 
-  template<typename eT1, typename eT2>
-  static inline void inplace_op_array(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword n_elem, const twoway_kernel_id::enum_id num);
-
   template<typename eT>
   static inline void inplace_op_diag(dev_mem_t<eT> dest, const uword mem_offset, const eT val, const uword n_rows, const uword len, const oneway_kernel_id::enum_id num);
 
@@ -126,9 +123,6 @@ class coot_rt_t
   template<typename eT>
   static inline void fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int hi);
 
-  template<typename eT1, typename eT2, typename eT3>
-  static inline void array_op(dev_mem_t<eT3> dest, const uword n_elem, const dev_mem_t<eT1> A_mem, const dev_mem_t<eT2> B_mem, const threeway_kernel_id::enum_id num);
-
   /**
    * Perform an elementwise scalar operation on a matrix of size `n_rows x n_cols`, storing the result in `dest`.
    * The offsets and M_n_rows are meant to allow the source (and destination) to be subviews of a larger matrix.
@@ -150,6 +144,29 @@ class coot_rt_t
                                 const uword src_row_offset,
                                 const uword src_col_offset,
                                 const uword src_M_n_rows);
+
+  /**
+   * Perform an elementwise matrix operation on two matrices of size `n_rows` x `n_cols`.
+   */
+  template<typename eT1, typename eT2, typename eT3>
+  static inline void eop_array(const threeway_kernel_id::enum_id num,
+                               dev_mem_t<eT3> dest,
+                               const dev_mem_t<eT1> src_A,
+                               const dev_mem_t<eT2> src_B,
+                               // logical size of source and destination
+                               const uword n_rows,
+                               const uword n_cols,
+                               // submatrix destination offsets (set to 0, 0, and n_rows if not a subview)
+                               const uword dest_row_offset,
+                               const uword dest_col_offset,
+                               const uword dest_M_n_rows,
+                               // submatrix source offsets (set to 0, 0, and n_rows if not a subview)
+                               const uword src_A_row_offset,
+                               const uword src_A_col_offset,
+                               const uword src_A_M_n_rows,
+                               const uword src_B_row_offset,
+                               const uword src_B_col_offset,
+                               const uword src_B_M_n_rows);
 
   template<typename eT>
   static inline eT accu(const dev_mem_t<eT> mem, const uword n_elem);

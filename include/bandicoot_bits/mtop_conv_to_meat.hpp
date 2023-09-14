@@ -103,7 +103,12 @@ mtop_conv_to::apply_inplace_plus(Mat<out_eT>& out, const mtOp<out_eT, T1, mtop_c
 
   const unwrap<T1> U(X.q);
 
-  arrayops::inplace_plus_array(out.get_dev_mem(false), U.M.get_dev_mem(false), U.M.n_elem);
+  coot_rt_t::eop_array(threeway_kernel_id::equ_array_plus_array,
+                       out.get_dev_mem(false), out.get_dev_mem(false), U.get_dev_mem(false),
+                       out.n_rows, out.n_cols,
+                       0, 0, out.n_rows,
+                       0, 0, out.n_rows,
+                       U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
   }
 
 
@@ -117,7 +122,12 @@ mtop_conv_to::apply_inplace_minus(Mat<out_eT>& out, const mtOp<out_eT, T1, mtop_
 
   const unwrap<T1> U(X.q);
 
-  arrayops::inplace_minus_array(out.get_dev_mem(false), U.M.get_dev_mem(false), U.M.n_elem);
+  coot_rt_t::eop_array(threeway_kernel_id::equ_array_minus_array,
+                       out.get_dev_mem(false), out.get_dev_mem(false), U.get_dev_mem(false),
+                       out.n_rows, out.n_cols,
+                       0, 0, out.n_rows,
+                       0, 0, out.n_rows,
+                       U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
   }
 
 
@@ -148,7 +158,12 @@ mtop_conv_to::apply_inplace_schur(Mat<out_eT>& out, const mtOp<out_eT, T1, mtop_
 
   const unwrap<T1> U(X.q);
 
-  arrayops::inplace_mul_array(out.get_dev_mem(false), U.M.get_dev_mem(false), U.M.n_elem);
+  coot_rt_t::eop_array(threeway_kernel_id::equ_array_mul_array,
+                       out.get_dev_mem(false), out.get_dev_mem(false), U.get_dev_mem(false),
+                       out.n_rows, out.n_cols,
+                       0, 0, out.n_rows,
+                       0, 0, out.n_rows,
+                       U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
   }
 
 
@@ -162,7 +177,12 @@ mtop_conv_to::apply_inplace_div(Mat<out_eT>& out, const mtOp<out_eT, T1, mtop_co
 
   const unwrap<T1> U(X.q);
 
-  arrayops::inplace_div_array(out.get_dev_mem(false), U.M.get_dev_mem(false), U.M.n_elem);
+  coot_rt_t::eop_array(threeway_kernel_id::equ_array_div_array,
+                       out.get_dev_mem(false), out.get_dev_mem(false), U.get_dev_mem(false),
+                       out.n_rows, out.n_cols,
+                       0, 0, out.n_rows,
+                       0, 0, out.n_rows,
+                       U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
   }
 
 

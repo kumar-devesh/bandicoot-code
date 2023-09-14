@@ -181,7 +181,12 @@ op_pinv::apply_direct_diag(Mat<eT>& out, const Mat<eT>& in, const eT tol)
                         0, 0, out_vec.n_rows);
 
   // Zero out any values that are below the tolerance.
-  coot_rt_t::inplace_op_array(out_vec.get_dev_mem(false), tol_indicator.get_dev_mem(false), out_vec.n_elem, twoway_kernel_id::inplace_mul_array);
+  coot_rt_t::eop_array(threeway_kernel_id::equ_array_mul_array,
+                       out_vec.get_dev_mem(false), out_vec.get_dev_mem(false), tol_indicator.get_dev_mem(false),
+                       out_vec.n_rows, out_vec.n_cols,
+                       0, 0, out_vec.n_rows,
+                       0, 0, out_vec.n_rows,
+                       0, 0, tol_indicator.n_rows);
 
   // Now set the diagonal of the other matrix.
   coot_rt_t::set_diag(out.get_dev_mem(false), out_vec.get_dev_mem(false), 0, N, N);
@@ -253,7 +258,12 @@ op_pinv::apply_direct_diag(Mat<eT2>& out, const Mat<eT1>& in, const eT1 tol, con
                         0, 0, out_vec.n_rows);
 
   // Zero out any values that are below the tolerance.
-  coot_rt_t::inplace_op_array(out_vec.get_dev_mem(false), tol_indicator.get_dev_mem(false), out_vec.n_elem, twoway_kernel_id::inplace_mul_array);
+  coot_rt_t::eop_array(threeway_kernel_id::equ_array_mul_array,
+                       out_vec.get_dev_mem(false), out_vec.get_dev_mem(false), tol_indicator.get_dev_mem(false),
+                       out_vec.n_rows, out_vec.n_cols,
+                       0, 0, out_vec.n_rows,
+                       0, 0, out_vec.n_rows,
+                       0, 0, tol_indicator.n_rows);
 
   // Now set the diagonal of the other matrix.  This also performs the conversion.
   coot_rt_t::set_diag(out.get_dev_mem(false), out_vec.get_dev_mem(false), 0, N, N);

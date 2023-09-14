@@ -192,64 +192,20 @@ template<typename eT>
 template<typename T1>
 inline
 void
-subview<eT>::inplace_op(const Base<eT, T1>& in, twoway_kernel_id::enum_id num, const char* identifier)
-  {
-  coot_extra_debug_sigprint();
-
-  const no_conv_unwrap<T1>                                        U(in.get_ref());
-  const extract_subview<typename no_conv_unwrap<T1>::stored_type> E(U.M);
-
-  coot_assert_same_size(n_rows, n_cols, E.M.n_rows, E.M.n_cols, identifier);
-
-  if(n_elem == 0)  { return; }
-
-  coot_rt_t::inplace_op_subview(m.get_dev_mem(false), E.M.get_dev_mem(false), m.n_rows, aux_row1, aux_col1, E.M.n_rows, E.M.n_cols, num, identifier);
-  }
-
-
-
-template<typename eT>
-template<typename T1>
-inline
-void
 subview<eT>::operator= (const Base<eT, T1>& in)
   {
   coot_extra_debug_sigprint();
 
-  // TODO: the code below uses the submat_inplace_set_mat kernel, but it may be faster to use the commented-out code with clEnqueueCopyBufferRect() with the OpenCL backend
+  no_conv_unwrap<T1> U(in.get_ref());
 
-  inplace_op(in, twoway_kernel_id::submat_inplace_set_mat, "subview::operator=()");
+  coot_assert_same_size(n_rows, n_cols, U.M.n_rows, U.M.n_cols, "subview::operator=");
 
-  /*
-  const unwrap<T1>   U(in.get_ref());
-  const Mat<eT>& X = U.M;
-
-  coot_assert_same_size(n_rows, n_cols, X.n_rows, X.n_cols, "subview::operator=");
-
-  // if the entire range is selected, use simple copy
-  // (beignet 1.3 crashes if clEnqueueCopyBufferRect() is used on entire range)
-  if( (n_rows == m.n_rows) && (n_cols == m.n_cols) )
-    {
-    Mat<eT>& mm = const_cast< Mat<eT>& >(m);
-    m = in.get_ref();
-    return;
-    }
-
-  size_t src_origin[3] = { 0, 0, 0 };
-  size_t dst_origin[3] = { aux_row1*sizeof(eT), aux_col1, 0 };
-
-  size_t region[3] = { n_rows*sizeof(eT), n_cols, 1 };
-
-  size_t src_row_pitch   = 0;
-  size_t src_slice_pitch = 0;
-
-  size_t dst_row_pitch   = sizeof(eT) * m.n_rows;
-  size_t dst_slice_pitch = sizeof(eT) * m.n_cols * m.n_rows;
-
-  cl_int status = clEnqueueCopyBufferRect(get_rt().cl_rt.get_cq(), X.dev_mem, m.dev_mem, src_origin, dst_origin, region, src_row_pitch, src_slice_pitch, dst_row_pitch, dst_slice_pitch, 0, NULL, NULL);
-
-  coot_check_runtime_error( (status != 0), "subview::extract: couldn't copy buffer" );
-  */
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_plus_scalar,
+                        m.dev_mem, U.get_dev_mem(false),
+                        typename no_conv_unwrap<T1>::stored_type::elem_type(0), eT(0),
+                        n_rows, n_cols,
+                        aux_row1, aux_col1, m.n_rows,
+                        U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
   }
 
 
@@ -262,7 +218,16 @@ subview<eT>::operator+= (const Base<eT, T1>& in)
   {
   coot_extra_debug_sigprint();
 
-  inplace_op(in, twoway_kernel_id::submat_inplace_plus_mat, "subview::operator+=()");
+  const no_conv_unwrap<T1> U(in.get_ref());
+
+  coot_assert_same_size(n_rows, n_cols, U.M.n_rows, U.M.n_cols, "subview::operator+=");
+
+  coot_rt_t::eop_array(threeway_kernel_id::equ_array_plus_array,
+                       m.dev_mem, m.dev_mem, U.get_dev_mem(false),
+                       n_rows, n_cols,
+                       aux_row1, aux_col1, m.n_rows,
+                       aux_row1, aux_col1, m.n_rows,
+                       U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
   }
 
 
@@ -275,7 +240,16 @@ subview<eT>::operator-= (const Base<eT, T1>& in)
   {
   coot_extra_debug_sigprint();
 
-  inplace_op(in, twoway_kernel_id::submat_inplace_minus_mat, "subview::operator-=()");
+  const no_conv_unwrap<T1> U(in.get_ref());
+
+  coot_assert_same_size(n_rows, n_cols, U.M.n_rows, U.M.n_cols, "subview::operator-=");
+
+  coot_rt_t::eop_array(threeway_kernel_id::equ_array_minus_array,
+                       m.dev_mem, m.dev_mem, U.get_dev_mem(false),
+                       n_rows, n_cols,
+                       aux_row1, aux_col1, m.n_rows,
+                       aux_row1, aux_col1, m.n_rows,
+                       U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
   }
 
 
@@ -288,7 +262,16 @@ subview<eT>::operator%= (const Base<eT, T1>& in)
   {
   coot_extra_debug_sigprint();
 
-  inplace_op(in, twoway_kernel_id::submat_inplace_schur_mat, "subview::operator%=()");
+  const no_conv_unwrap<T1> U(in.get_ref());
+
+  coot_assert_same_size(n_rows, n_cols, U.M.n_rows, U.M.n_cols, "subview::operator%=");
+
+  coot_rt_t::eop_array(threeway_kernel_id::equ_array_mul_array,
+                       m.dev_mem, m.dev_mem, U.get_dev_mem(false),
+                       n_rows, n_cols,
+                       aux_row1, aux_col1, m.n_rows,
+                       aux_row1, aux_col1, m.n_rows,
+                       U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
   }
 
 
@@ -301,93 +284,16 @@ subview<eT>::operator/= (const Base<eT, T1>& in)
   {
   coot_extra_debug_sigprint();
 
-  inplace_op(in, twoway_kernel_id::submat_inplace_div_mat, "subview::operator/=()");
-  }
+  const no_conv_unwrap<T1> U(in.get_ref());
 
+  coot_assert_same_size(n_rows, n_cols, U.M.n_rows, U.M.n_cols, "subview::operator/=");
 
-
-template<typename eT>
-template<typename T1>
-inline
-void
-subview<eT>::inplace_op(const mtOp<eT, T1, mtop_conv_to>& x, twoway_kernel_id::enum_id num, const char* identifier)
-  {
-  coot_extra_debug_sigprint();
-
-  // Avoid explicitly performing the conv_to so we can incorporate it into our operation here.
-  const no_conv_unwrap<T1>                                        U(x.q);
-  const extract_subview<typename no_conv_unwrap<T1>::stored_type> E(U.M);
-
-  coot_assert_same_size(n_rows, n_cols, E.M.n_rows, E.M.n_cols, identifier);
-
-  if(n_elem == 0)  { return; }
-
-  coot_rt_t::inplace_op_subview(m.get_dev_mem(false), E.M.get_dev_mem(false), m.n_rows, aux_row1, aux_col1, E.M.n_rows, E.M.n_cols, num, identifier);
-  }
-
-
-
-template<typename eT>
-template<typename T1>
-inline
-void
-subview<eT>::operator= (const mtOp<eT, T1, mtop_conv_to>& x)
-  {
-  coot_extra_debug_sigprint();
-
-  inplace_op(x, twoway_kernel_id::submat_inplace_set_mat, "subview::operator=()");
-  }
-
-
-
-template<typename eT>
-template<typename T1>
-inline
-void
-subview<eT>::operator+=(const mtOp<eT, T1, mtop_conv_to>& x)
-  {
-  coot_extra_debug_sigprint();
-
-  inplace_op(x, twoway_kernel_id::submat_inplace_plus_mat, "subview::operator+=()");
-  }
-
-
-
-template<typename eT>
-template<typename T1>
-inline
-void
-subview<eT>::operator-=(const mtOp<eT, T1, mtop_conv_to>& x)
-  {
-  coot_extra_debug_sigprint();
-
-  inplace_op(x, twoway_kernel_id::submat_inplace_minus_mat, "subview::operator-=()");
-  }
-
-
-
-template<typename eT>
-template<typename T1>
-inline
-void
-subview<eT>::operator%=(const mtOp<eT, T1, mtop_conv_to>& x)
-  {
-  coot_extra_debug_sigprint();
-
-  inplace_op(x, twoway_kernel_id::submat_inplace_schur_mat, "subview::operator%=()");
-  }
-
-
-
-template<typename eT>
-template<typename T1>
-inline
-void
-subview<eT>::operator/=(const mtOp<eT, T1, mtop_conv_to>& x)
-  {
-  coot_extra_debug_sigprint();
-
-  inplace_op(x, twoway_kernel_id::submat_inplace_div_mat, "subview::operator/=()");
+  coot_rt_t::eop_array(threeway_kernel_id::equ_array_div_array,
+                       m.dev_mem, m.dev_mem, U.get_dev_mem(false),
+                       n_rows, n_cols,
+                       aux_row1, aux_col1, m.n_rows,
+                       aux_row1, aux_col1, m.n_rows,
+                       U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
   }
 
 
