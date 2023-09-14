@@ -82,7 +82,7 @@ eop_array(const threeway_kernel_id::enum_id num,
 
   status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 2, NULL, global_work_size, NULL, 0, NULL, NULL);
 
-  coot_check_runtime_error( (status != 0), "coot::opencl::eop_array(): couldn't execute kernel" );
+  coot_check_cl_error(status, "coot::opencl::eop_array(): couldn't execute kernel" );
   }
 
 
