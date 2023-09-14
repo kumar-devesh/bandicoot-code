@@ -63,8 +63,8 @@ eop_scalar(const twoway_kernel_id::enum_id num,
   status |= coot_wrapper(clSetKernelArg)(kernel, 5, sizeof(eT2),           &aux_val_post        );
   status |= coot_wrapper(clSetKernelArg)(kernel, 6, cl_n_rows.size,        cl_n_rows.addr       );
   status |= coot_wrapper(clSetKernelArg)(kernel, 7, cl_n_cols.size,        cl_n_cols.addr       );
-  status |= coot_wrapper(clSetKernelArg)(kernel, 8, cl_src_M_n_rows.size,  cl_src_M_n_rows.addr );
-  status |= coot_wrapper(clSetKernelArg)(kernel, 9, cl_dest_M_n_rows.size, cl_dest_M_n_rows.addr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 8, cl_dest_M_n_rows.size, cl_dest_M_n_rows.addr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 9, cl_src_M_n_rows.size,  cl_src_M_n_rows.addr );
 
   size_t work_size[2] = { size_t(n_rows), size_t(n_cols) };
 
