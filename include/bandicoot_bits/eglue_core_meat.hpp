@@ -73,21 +73,12 @@ eglue_core<eglue_type>::apply(Mat<eT3>& out, const eGlue<T1, T2, eglue_type>& x)
     coot_stop_runtime_error("eglue_core::apply(): unknown eglue_type");
     }
 
-  coot_rt_t::eop_array(kernel,
-                       out.get_dev_mem(false),
-                       UA.get_dev_mem(false),
-                       UB.get_dev_mem(false),
-                       out.n_rows,
-                       out.n_cols,
-                       0,
-                       0,
-                       out.n_rows,
-                       UA.get_row_offset(),
-                       UA.get_col_offset(),
-                       UA.get_M_n_rows(),
-                       UB.get_row_offset(),
-                       UB.get_col_offset(),
-                       UB.get_M_n_rows());
+  coot_rt_t::eop_mat(kernel,
+                     out.get_dev_mem(false), UA.get_dev_mem(false), UB.get_dev_mem(false),
+                     out.n_rows, out.n_cols,
+                     0, 0, out.n_rows,
+                     UA.get_row_offset(), UA.get_col_offset(), UA.get_M_n_rows(),
+                     UB.get_row_offset(), UB.get_col_offset(), UB.get_M_n_rows());
   }
 
 

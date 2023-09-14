@@ -167,10 +167,10 @@ Row<eT>::Row(const Row<eT>& X)
   coot_extra_debug_sigprint();
 
   access::rw(Mat<eT>::vec_state) = 2;
-  coot_rt_t::copy_array(this->get_dev_mem(), X.get_dev_mem(),
-                        1, Mat<eT>::n_cols,
-                        0, 0, Mat<eT>::n_rows,
-                        0, 0, X.n_rows);
+  coot_rt_t::copy_mat(this->get_dev_mem(), X.get_dev_mem(),
+                      1, Mat<eT>::n_cols,
+                      0, 0, Mat<eT>::n_rows,
+                      0, 0, X.n_rows);
   }
 
 
@@ -183,10 +183,10 @@ Row<eT>::operator=(const Row<eT>& X)
   coot_extra_debug_sigprint();
 
   Mat<eT>::init(1, X.n_cols);
-  coot_rt_t::copy_array(this->get_dev_mem(), X.get_dev_mem(),
-                        1, Mat<eT>::n_cols,
-                        0, 0, Mat<eT>::n_rows,
-                        0, 0, X.n_rows);
+  coot_rt_t::copy_mat(this->get_dev_mem(), X.get_dev_mem(),
+                      1, Mat<eT>::n_cols,
+                      0, 0, Mat<eT>::n_rows,
+                      0, 0, X.n_rows);
 
   return *this;
   }

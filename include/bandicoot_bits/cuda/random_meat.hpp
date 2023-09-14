@@ -33,14 +33,14 @@ fill_randu(dev_mem_t<eT> dest, const uword n)
     dev_mem_t<float> reinterpreted_mem;
     reinterpreted_mem.cuda_mem_ptr = (float*) dest.cuda_mem_ptr;
     fill_randu(reinterpreted_mem, n);
-    copy_array(dest, reinterpreted_mem, n, 1, 0, 0, n, 0, 0, n);
+    copy_mat(dest, reinterpreted_mem, n, 1, 0, 0, n, 0, 0, n);
     }
   else if (std::is_same<eT, u64>::value || std::is_same<eT, s64>::value)
     {
     dev_mem_t<double> reinterpreted_mem;
     reinterpreted_mem.cuda_mem_ptr = (double*) dest.cuda_mem_ptr;
     fill_randu(reinterpreted_mem, n);
-    copy_array(dest, reinterpreted_mem, n, 1, 0, 0, n, 0, 0, n);
+    copy_mat(dest, reinterpreted_mem, n, 1, 0, 0, n, 0, 0, n);
     }
   else
     {
@@ -98,14 +98,14 @@ fill_randn(dev_mem_t<eT> dest, const uword n, const double mu, const double sd)
     dev_mem_t<float> reinterpreted_mem;
     reinterpreted_mem.cuda_mem_ptr = (float*) dest.cuda_mem_ptr;
     fill_randn(reinterpreted_mem, n, mu, sd);
-    copy_array(dest, reinterpreted_mem, n, 1, 0, 0, n, 0, 0, n);
+    copy_mat(dest, reinterpreted_mem, n, 1, 0, 0, n, 0, 0, n);
     }
   else if (std::is_same<eT, u64>::value || std::is_same<eT, s64>::value)
     {
     dev_mem_t<double> reinterpreted_mem;
     reinterpreted_mem.cuda_mem_ptr = (double*) dest.cuda_mem_ptr;
     fill_randn(reinterpreted_mem, n, mu, sd);
-    copy_array(dest, reinterpreted_mem, n, 1, 0, 0, n, 0, 0, n);
+    copy_mat(dest, reinterpreted_mem, n, 1, 0, 0, n, 0, 0, n);
     }
   else
     {
@@ -186,7 +186,7 @@ fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int hi, const 
   // Now cast it to the correct type, if needed.
   if (!std::is_same<eT, u32>::value)
     {
-    copy_array(dest, u32_dest, n, 1, 0, 0, n, 0, 0, n);
+    copy_mat(dest, u32_dest, n, 1, 0, 0, n, 0, 0, n);
     }
 
   // [0, range] --> [lo, hi]
@@ -239,7 +239,7 @@ fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int hi, const 
   // Now cast it to the correct type, if needed.
   if (!std::is_same<eT, u64>::value)
     {
-    copy_array(dest, u64_dest, n, 1, 0, 0, n, 0, 0, n);
+    copy_mat(dest, u64_dest, n, 1, 0, 0, n, 0, 0, n);
     }
 
   // [0, range] --> [lo, hi]

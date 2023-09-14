@@ -79,10 +79,10 @@ op_normalise_vec::apply(Mat<eT>& out, const Op<mtOp<eT, T1, mtop_conv_to>, op_no
   if (norm_val_b == eT2(1))
     {
     // Shortcut: if the norm is 1, it's already normalized.
-    coot_rt_t::copy_array(out.get_dev_mem(false), U.get_dev_mem(false),
-                          out.n_rows, out.n_cols,
-                          0, 0, out.n_rows,
-                          U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
+    coot_rt_t::copy_mat(out.get_dev_mem(false), U.get_dev_mem(false),
+                        out.n_rows, out.n_cols,
+                        0, 0, out.n_rows,
+                        U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
     }
   else
     {

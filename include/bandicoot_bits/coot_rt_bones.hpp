@@ -70,18 +70,18 @@ class coot_rt_t
    * The offsets and M_n_rows are meant to allow the destination to be a subview of a larger matrix.
    */
   template<typename eT2, typename eT1>
-  static inline void copy_array(dev_mem_t<eT2> dest,
-                                dev_mem_t<eT1> src,
-                                // logical size of matrix
-                                const uword n_rows,
-                                const uword n_cols,
-                                // offsets for subviews
-                                const uword dest_row_offset,
-                                const uword dest_col_offset,
-                                const uword dest_M_n_rows,
-                                const uword src_row_offset,
-                                const uword src_col_offset,
-                                const uword src_M_n_rows);
+  static inline void copy_mat(dev_mem_t<eT2> dest,
+                              dev_mem_t<eT1> src,
+                              // logical size of matrix
+                              const uword n_rows,
+                              const uword n_cols,
+                              // offsets for subviews
+                              const uword dest_row_offset,
+                              const uword dest_col_offset,
+                              const uword dest_M_n_rows,
+                              const uword src_row_offset,
+                              const uword src_col_offset,
+                              const uword src_M_n_rows);
 
   template<typename eT>
   static inline void reorder_cols(dev_mem_t<eT> out, const dev_mem_t<eT> mem, const uword n_rows, const dev_mem_t<uword> order, const uword out_n_cols);
@@ -155,24 +155,24 @@ class coot_rt_t
    * Perform an elementwise matrix operation on two matrices of size `n_rows` x `n_cols`.
    */
   template<typename eT1, typename eT2, typename eT3>
-  static inline void eop_array(const threeway_kernel_id::enum_id num,
-                               dev_mem_t<eT3> dest,
-                               const dev_mem_t<eT1> src_A,
-                               const dev_mem_t<eT2> src_B,
-                               // logical size of source and destination
-                               const uword n_rows,
-                               const uword n_cols,
-                               // submatrix destination offsets (set to 0, 0, and n_rows if not a subview)
-                               const uword dest_row_offset,
-                               const uword dest_col_offset,
-                               const uword dest_M_n_rows,
-                               // submatrix source offsets (set to 0, 0, and n_rows if not a subview)
-                               const uword src_A_row_offset,
-                               const uword src_A_col_offset,
-                               const uword src_A_M_n_rows,
-                               const uword src_B_row_offset,
-                               const uword src_B_col_offset,
-                               const uword src_B_M_n_rows);
+  static inline void eop_mat(const threeway_kernel_id::enum_id num,
+                             dev_mem_t<eT3> dest,
+                             const dev_mem_t<eT1> src_A,
+                             const dev_mem_t<eT2> src_B,
+                             // logical size of source and destination
+                             const uword n_rows,
+                             const uword n_cols,
+                             // submatrix destination offsets (set to 0, 0, and n_rows if not a subview)
+                             const uword dest_row_offset,
+                             const uword dest_col_offset,
+                             const uword dest_M_n_rows,
+                             // submatrix source offsets (set to 0, 0, and n_rows if not a subview)
+                             const uword src_A_row_offset,
+                             const uword src_A_col_offset,
+                             const uword src_A_M_n_rows,
+                             const uword src_B_row_offset,
+                             const uword src_B_col_offset,
+                             const uword src_B_M_n_rows);
 
   template<typename eT>
   static inline eT prod(const dev_mem_t<eT> mem, const uword n_elem);

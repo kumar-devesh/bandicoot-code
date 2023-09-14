@@ -25,3 +25,35 @@ template<typename eT>
 inline
 void
 copy_into_dev_mem(dev_mem_t<eT> dest, const eT* src, const uword N);
+
+
+
+template<typename eT>
+inline
+void
+copy_mat(dev_mem_t<eT> dest,
+         const dev_mem_t<eT> src,
+         const uword n_rows,
+         const uword n_cols,
+         const uword dest_row_offset,
+         const uword dest_col_offset,
+         const uword dest_M_n_rows,
+         const uword src_row_offset,
+         const uword src_col_offset,
+         const uword src_M_n_rows);
+
+
+
+template<typename eT2, typename eT1>
+inline
+void
+copy_mat(dev_mem_t<eT2> dest,
+         const dev_mem_t<eT1> src,
+         const uword n_rows,
+         const uword n_cols,
+         const uword dest_row_offset,
+         const uword dest_col_offset,
+         const uword dest_M_n_rows,
+         const uword src_row_offset,
+         const uword src_col_offset,
+         const uword src_M_n_rows)

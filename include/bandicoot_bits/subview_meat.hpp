@@ -200,10 +200,10 @@ subview<eT>::operator= (const Base<eT, T1>& in)
 
   coot_assert_same_size(n_rows, n_cols, U.M.n_rows, U.M.n_cols, "subview::operator=");
 
-  coot_rt_t::copy_array(m.dev_mem, U.get_dev_mem(false),
-                        n_rows, n_cols,
-                        U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows(),
-                        aux_row1, aux_col1, m.n_rows);
+  coot_rt_t::copy_mat(m.dev_mem, U.get_dev_mem(false),
+                      n_rows, n_cols,
+                      U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows(),
+                      aux_row1, aux_col1, m.n_rows);
   }
 
 
@@ -220,12 +220,12 @@ subview<eT>::operator+= (const Base<eT, T1>& in)
 
   coot_assert_same_size(n_rows, n_cols, U.M.n_rows, U.M.n_cols, "subview::operator+=");
 
-  coot_rt_t::eop_array(threeway_kernel_id::equ_array_plus_array,
-                       m.dev_mem, m.dev_mem, U.get_dev_mem(false),
-                       n_rows, n_cols,
-                       aux_row1, aux_col1, m.n_rows,
-                       aux_row1, aux_col1, m.n_rows,
-                       U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
+  coot_rt_t::eop_mat(threeway_kernel_id::equ_array_plus_array,
+                     m.dev_mem, m.dev_mem, U.get_dev_mem(false),
+                     n_rows, n_cols,
+                     aux_row1, aux_col1, m.n_rows,
+                     aux_row1, aux_col1, m.n_rows,
+                     U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
   }
 
 
@@ -242,12 +242,12 @@ subview<eT>::operator-= (const Base<eT, T1>& in)
 
   coot_assert_same_size(n_rows, n_cols, U.M.n_rows, U.M.n_cols, "subview::operator-=");
 
-  coot_rt_t::eop_array(threeway_kernel_id::equ_array_minus_array,
-                       m.dev_mem, m.dev_mem, U.get_dev_mem(false),
-                       n_rows, n_cols,
-                       aux_row1, aux_col1, m.n_rows,
-                       aux_row1, aux_col1, m.n_rows,
-                       U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
+  coot_rt_t::eop_mat(threeway_kernel_id::equ_array_minus_array,
+                     m.dev_mem, m.dev_mem, U.get_dev_mem(false),
+                     n_rows, n_cols,
+                     aux_row1, aux_col1, m.n_rows,
+                     aux_row1, aux_col1, m.n_rows,
+                     U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
   }
 
 
@@ -264,12 +264,12 @@ subview<eT>::operator%= (const Base<eT, T1>& in)
 
   coot_assert_same_size(n_rows, n_cols, U.M.n_rows, U.M.n_cols, "subview::operator%=");
 
-  coot_rt_t::eop_array(threeway_kernel_id::equ_array_mul_array,
-                       m.dev_mem, m.dev_mem, U.get_dev_mem(false),
-                       n_rows, n_cols,
-                       aux_row1, aux_col1, m.n_rows,
-                       aux_row1, aux_col1, m.n_rows,
-                       U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
+  coot_rt_t::eop_mat(threeway_kernel_id::equ_array_mul_array,
+                     m.dev_mem, m.dev_mem, U.get_dev_mem(false),
+                     n_rows, n_cols,
+                     aux_row1, aux_col1, m.n_rows,
+                     aux_row1, aux_col1, m.n_rows,
+                     U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
   }
 
 
@@ -286,12 +286,12 @@ subview<eT>::operator/= (const Base<eT, T1>& in)
 
   coot_assert_same_size(n_rows, n_cols, U.M.n_rows, U.M.n_cols, "subview::operator/=");
 
-  coot_rt_t::eop_array(threeway_kernel_id::equ_array_div_array,
-                       m.dev_mem, m.dev_mem, U.get_dev_mem(false),
-                       n_rows, n_cols,
-                       aux_row1, aux_col1, m.n_rows,
-                       aux_row1, aux_col1, m.n_rows,
-                       U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
+  coot_rt_t::eop_mat(threeway_kernel_id::equ_array_div_array,
+                     m.dev_mem, m.dev_mem, U.get_dev_mem(false),
+                     n_rows, n_cols,
+                     aux_row1, aux_col1, m.n_rows,
+                     aux_row1, aux_col1, m.n_rows,
+                     U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
   }
 
 
@@ -522,10 +522,10 @@ subview<eT>::extract(Mat<eT1>& out, const subview<eT>& in)
 
   if(in.n_elem == 0)  { return; }
 
-  coot_rt_t::copy_array(out.get_dev_mem(false), in.m.get_dev_mem(false),
-                        in.n_rows, in.n_cols,
-                        0, 0, out.n_rows,
-                        in.aux_row1, in.aux_col1, in.m.n_rows);
+  coot_rt_t::copy_mat(out.get_dev_mem(false), in.m.get_dev_mem(false),
+                      in.n_rows, in.n_cols,
+                      0, 0, out.n_rows,
+                      in.aux_row1, in.aux_col1, in.m.n_rows);
   }
 
 
