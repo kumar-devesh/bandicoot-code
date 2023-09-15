@@ -452,37 +452,6 @@ coot_rt_t::reorder_cols(dev_mem_t<eT> out, const dev_mem_t<eT> mem, const uword 
 
 
 
-template<typename eT2, typename eT1>
-inline
-void
-coot_rt_t::set_diag(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword in_mem_offset, const uword n_rows, const uword len)
-  {
-  coot_extra_debug_sigprint();
-
-  if (get_rt().backend == CL_BACKEND)
-    {
-    #if defined(COOT_USE_OPENCL)
-    opencl::set_diag(out, in, in_mem_offset, n_rows, len);
-    #else
-    coot_stop_runtime_error("coot_rt::set_diag(): OpenCL backend not enabled");
-    #endif
-    }
-  else if (get_rt().backend == CUDA_BACKEND)
-    {
-    #if defined(COOT_USE_CUDA)
-    cuda::set_diag(out, in, in_mem_offset, n_rows, len);
-    #else
-    coot_stop_runtime_error("coot_rt::set_diag(): CUDA backend not enabled");
-    #endif
-    }
-  else
-    {
-    coot_stop_runtime_error("coot_rt::set_diag(): unknown backend");
-    }
-  }
-
-
-
 template<typename eT>
 inline
 void

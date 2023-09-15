@@ -163,17 +163,22 @@ diagview<eT>::operator= (const Mat<eT>& o)
     );
 
   const bool is_alias = (&o == &t_m);
+  const bool is_vector = (o.n_rows == 1 || o.n_cols == 1);
 
   if (is_alias)
     {
-    coot_extra_debug_print("aliasing detected");
-
     Mat<eT> tmp(o);
-    coot_rt_t::set_diag(t_m.get_dev_mem(false), tmp.get_dev_mem(false), mem_offset, m.n_rows, n_elem);
+    coot_rt_t::copy_mat(t_m.get_dev_mem(false), tmp.get_dev_mem(false),
+                        1, n_elem,
+                        mem_offset, 0, t_m.n_rows + 1,
+                        0, 0, is_vector ? 1 : (tmp.n_rows + 1));
     }
   else
     {
-    coot_rt_t::set_diag(t_m.get_dev_mem(false), o.get_dev_mem(false), mem_offset, m.n_rows, n_elem);
+    coot_rt_t::copy_mat(t_m.get_dev_mem(false), o.get_dev_mem(false),
+                        1, n_elem,
+                        mem_offset, 0, t_m.n_rows + 1,
+                        0, 0, is_vector ? 1 : (o.n_rows + 1));
     }
   }
 
@@ -194,9 +199,25 @@ diagview<eT>::operator= (const subview<eT>& o)
     "diagview: given object has incompatible size"
     );
 
-  // All subviews must be extracted.
-  Mat<eT> tmp(o);
-  coot_rt_t::set_diag(t_m.get_dev_mem(false), tmp.get_dev_mem(false), mem_offset, m.n_rows, n_elem);
+  const bool is_alias = (&o.m == &t_m);
+
+  if (is_alias)
+    {
+    const bool is_vector = (o.n_rows == 1 || o.n_cols == 1);
+
+    Mat<eT> tmp(o);
+    coot_rt_t::copy_mat(t_m.get_dev_mem(false), tmp.get_dev_mem(false),
+                        1, n_elem,
+                        mem_offset, 0, t_m.n_rows + 1,
+                        0, 0, is_vector ? 1 : (tmp.n_rows + 1));
+    }
+  else
+    {
+    coot_rt_t::copy_mat(t_m.get_dev_mem(false), o.m.get_dev_mem(false),
+                        1, n_elem,
+                        mem_offset, 0, t_m.n_rows + 1,
+                        o.aux_row1, o.aux_col1, o.m.n_rows + 1);
+    }
   }
 
 

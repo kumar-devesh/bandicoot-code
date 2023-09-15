@@ -449,9 +449,6 @@ struct twoway_kernel_id
     equ_array_lgamma_post,
     clamp,
     //
-    get_diag,
-    set_diag,
-    //
     sum_colwise_conv_pre,
     sum_rowwise_conv_pre,
     sum_colwise_conv_post,
@@ -595,9 +592,6 @@ struct twoway_kernel_id
     names.push_back("equ_array_lgamma_pre");
     names.push_back("equ_array_lgamma_post");
     names.push_back("clamp");
-
-    names.push_back("get_diag");
-    names.push_back("set_diag");
 
     names.push_back("sum_colwise_conv_pre");
     names.push_back("sum_rowwise_conv_pre");

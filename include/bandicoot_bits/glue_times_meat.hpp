@@ -564,7 +564,11 @@ glue_times_diag::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_times_diag>& X)
                             0, 0, tmp.n_rows);
       }
 
-    coot_rt_t::set_diag(out.get_dev_mem(false), tmp.get_dev_mem(false), 0, A_n_rows, A_n_elem);
+    // Set the diagonal of `out` to the vector in `tmp`.
+    coot_rt_t::copy_mat(out.get_dev_mem(false), tmp.get_dev_mem(false),
+                        1, A_n_elem,
+                        0, 0, C_n_rows + 1,
+                        0, 0, 1);
     }
   else if (!A_diag && !B_diag)
     {
