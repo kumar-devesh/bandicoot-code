@@ -86,9 +86,6 @@ class coot_rt_t
   template<typename eT>
   static inline void reorder_cols(dev_mem_t<eT> out, const dev_mem_t<eT> mem, const uword n_rows, const dev_mem_t<uword> order, const uword out_n_cols);
 
-  template<typename eT>
-  static inline void copy_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword out_mem_offset, const uword in_mem_offset, const uword out_n_rows, const uword in_n_rows, const uword len);
-
   /**
    * Fill a matrix or subview with a scalar value.
    * The offsets and M_n_rows are meant to allow the destination to be a subview of a larger matrix.

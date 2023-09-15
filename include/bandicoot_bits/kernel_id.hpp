@@ -65,8 +65,6 @@ struct oneway_kernel_id
     diag_inplace_div_scalar,
     diag_inplace_mod_scalar,
     //
-    copy_diag,
-    //
     mul_colwise,
     mul_rowwise,
     mul_colwise_trans,
@@ -149,8 +147,6 @@ struct oneway_kernel_id
     names.push_back("diag_inplace_mul_scalar");
     names.push_back("diag_inplace_div_scalar");
     names.push_back("diag_inplace_mod_scalar");
-
-    names.push_back("copy_diag");
 
     names.push_back("mul_colwise");
     names.push_back("mul_rowwise");

@@ -85,7 +85,11 @@ diagview<eT>::operator= (const diagview<eT>& x)
         Mat<eT>& d_m = const_cast< Mat<eT>& >(m);
   const Mat<eT>& x_m = x.m;
 
-  coot_rt_t::copy_diag(d_m.get_dev_mem(false), x_m.get_dev_mem(false), mem_offset, x.mem_offset, d_m.n_rows, x_m.n_rows, n_elem);
+  // We can view the diagonal as a subview.
+  coot_rt_t::copy_mat(d_m.get_dev_mem(false), x_m.get_dev_mem(false),
+                      1, n_elem,
+                      mem_offset, 0, d_m.n_rows + 1,
+                      x.mem_offset, 0, x_m.n_rows + 1);
   }
 
 
