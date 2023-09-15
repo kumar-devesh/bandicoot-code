@@ -75,10 +75,10 @@ op_diagvec::apply_direct(Mat<eT>& out, const Mat<eT>& in, const sword k)
 
   const uword mem_offset = row_offset + col_offset * in.n_rows;
 
-  coot_rt_t::copy_array(out.get_dev_mem(false), in.get_dev_mem(false),
-                        1, len,
-                        0, 0, 1,
-                        mem_offset, 0, in.m.n_rows + 1);
+  coot_rt_t::copy_mat(out.get_dev_mem(false), in.get_dev_mem(false),
+                      1, len,
+                      0, 0, 1,
+                      mem_offset, 0, in.n_rows + 1);
   }
 
 
