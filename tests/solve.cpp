@@ -29,11 +29,11 @@ TEMPLATE_TEST_CASE("trivial_diagonal_solve", "[solve]", float, double)
     return;
     }
 
-  Mat<eT> A(10, 10, fill::eye);
-  Col<eT> B(10, fill::ones);
+  Mat<eT> A(50, 50, fill::eye);
+  Col<eT> B(50, fill::ones);
 
   Col<eT> X1 = solve(A, B);
-  Col<eT> X2(10);
+  Col<eT> X2;
   const bool status = solve(X2, A, B);
 
   REQUIRE( status == true );

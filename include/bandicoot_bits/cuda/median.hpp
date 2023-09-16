@@ -71,7 +71,7 @@ median(dev_mem_t<eT2> dest,
   else
     {
     // Sort the data in each row.
-    sort(src, n_rows, n_cols, 0, 0, src_row_offset, src_col_offset, src_M_n_rows);
+    sort(src, n_rows, n_cols, 0, 1, src_row_offset, src_col_offset, src_M_n_rows);
     const uword middle_element = (n_cols / 2);
 
     if (n_cols % 2 == 0)
@@ -99,7 +99,7 @@ median(dev_mem_t<eT2> dest,
                // logically treat as column vector so dest_mem_incr can be used
                1, n_rows,
                dest_offset, 0, dest_mem_incr,
-               src_row_offset + (src_col_offset + middle_element) * n_rows, 0, 1);
+               src_row_offset + (src_col_offset + middle_element) * src_M_n_rows, 0, 1);
       }
     }
   }

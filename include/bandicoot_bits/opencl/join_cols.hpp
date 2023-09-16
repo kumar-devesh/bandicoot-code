@@ -122,7 +122,6 @@ join_cols(dev_mem_t<eT5> out, const dev_mem_t<eT1> A, const uword A_n_rows, cons
   {
   coot_extra_debug_sigprint();
 
-  std::cout << "join_cols specific to other types\n";
   const uword A_n_elem = A_n_rows * A_n_cols;
   const uword B_n_elem = B_n_rows * B_n_cols;
   const uword C_n_elem = C_n_rows * C_n_cols;
