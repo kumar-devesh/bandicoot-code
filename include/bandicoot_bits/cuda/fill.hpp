@@ -56,36 +56,3 @@ fill(dev_mem_t<eT> dest,
 
   coot_check_cuda_error( result, "coot::cuda::fill(): cuLaunchKernel() failed" );
   }
-
-
-
-/**
- * Run a CUDA array-wise kernel.
- */
-template<typename eT1, typename eT2>
-inline
-void
-inplace_op_array(dev_mem_t<eT2> dest, dev_mem_t<eT1> src, const uword n_elem, twoway_kernel_id::enum_id num)
-  {
-  coot_extra_debug_sigprint();
-
-  // Get kernel.
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT2, eT1>(num);
-
-  const void* args[] = {
-      &(dest.cuda_mem_ptr),
-      &(src.cuda_mem_ptr),
-      (uword*) &n_elem };
-
-  const kernel_dims dims = one_dimensional_grid_dims(n_elem);
-
-  CUresult result = coot_wrapper(cuLaunchKernel)(
-      kernel,
-      dims.d[0], dims.d[1], dims.d[2],
-      dims.d[3], dims.d[4], dims.d[5],
-      0, NULL, // shared mem and stream
-      (void**) args, // arguments
-      0);
-
-  coot_check_cuda_error( result, "coot::cuda::inplace_op_array(): cuLaunchKernel() failed" );
-  }

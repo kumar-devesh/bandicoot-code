@@ -60,36 +60,3 @@ fill(dev_mem_t<eT> dest,
 
   coot_check_cl_error(status, "coot::opencl::fill(): couldn't execute kernel");
   }
-
-
-
-/**
- * Run an OpenCL array-wise kernel.
- */
-template<typename eT1, typename eT2>
-inline
-void
-inplace_op_array(dev_mem_t<eT2> dest, dev_mem_t<eT1> src, const uword n_elem, twoway_kernel_id::enum_id num)
-  {
-  coot_extra_debug_sigprint();
-
-  // Get kernel.
-  cl_kernel kernel = get_rt().cl_rt.get_kernel<eT2, eT1>(num);
-
-  opencl::runtime_t::cq_guard guard;
-
-  opencl::runtime_t::adapt_uword N(n_elem);
-
-  cl_int status = 0;
-
-  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem), &(dest.cl_mem_ptr)  );
-  status |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(cl_mem), &(src.cl_mem_ptr)   );
-  status |= coot_wrapper(clSetKernelArg)(kernel, 2, N.size,         N.addr              );
-  coot_check_cl_error(status, "coot::opencl::inplace_op_array(): couldn't set kernel arguments");
-
-  const size_t global_work_size[1] = { size_t(n_elem) };
-
-  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 1, NULL, global_work_size, NULL, 0, NULL, NULL);
-
-  coot_check_cl_error(status, "coot::opencl::inplace_op_array(): couldn't execute kernel");
-  }
