@@ -58,13 +58,6 @@ struct oneway_kernel_id
     {
     fill = 0,
     //
-    diag_inplace_set_scalar,
-    diag_inplace_plus_scalar,
-    diag_inplace_minus_scalar,
-    diag_inplace_mul_scalar,
-    diag_inplace_div_scalar,
-    diag_inplace_mod_scalar,
-    //
     mul_colwise,
     mul_rowwise,
     mul_colwise_trans,
@@ -140,13 +133,6 @@ struct oneway_kernel_id
     std::vector<std::string> names;
 
     names.push_back("fill");
-
-    names.push_back("diag_inplace_set_scalar");
-    names.push_back("diag_inplace_plus_scalar");
-    names.push_back("diag_inplace_minus_scalar");
-    names.push_back("diag_inplace_mul_scalar");
-    names.push_back("diag_inplace_div_scalar");
-    names.push_back("diag_inplace_mod_scalar");
 
     names.push_back("mul_colwise");
     names.push_back("mul_rowwise");

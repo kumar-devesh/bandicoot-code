@@ -100,9 +100,6 @@ class coot_rt_t
                           const uword M_n_rows);
 
   template<typename eT>
-  static inline void inplace_op_diag(dev_mem_t<eT> dest, const uword mem_offset, const eT val, const uword n_rows, const uword len, const oneway_kernel_id::enum_id num);
-
-  template<typename eT>
   static inline void replace(dev_mem_t<eT> mem, const uword n_elem, const eT val_find, const eT val_replace);
 
   template<typename eT1, typename eT2>

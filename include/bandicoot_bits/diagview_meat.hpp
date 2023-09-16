@@ -103,7 +103,12 @@ diagview<eT>::operator+=(const eT val)
 
   Mat<eT>& t_m = const_cast< Mat<eT>& >(m);
 
-  coot_rt_t::inplace_op_diag(m.get_dev_mem(false), mem_offset, val, t_m.n_rows, n_elem, oneway_kernel_id::diag_inplace_plus_scalar);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_plus_scalar,
+                        m.get_dev_mem(false), m.get_dev_mem(false),
+                        (eT) val, (eT) 0,
+                        1, n_elem,
+                        mem_offset, 0, m.n_rows + 1,
+                        mem_offset, 0, m.n_rows + 1);
   }
 
 
@@ -117,7 +122,12 @@ diagview<eT>::operator-=(const eT val)
 
   Mat<eT>& t_m = const_cast< Mat<eT>& >(m);
 
-  coot_rt_t::inplace_op_diag(m.get_dev_mem(false), mem_offset, val, t_m.n_rows, n_elem, oneway_kernel_id::diag_inplace_minus_scalar);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_minus_scalar_post,
+                        m.get_dev_mem(false), m.get_dev_mem(false),
+                        (eT) val, (eT) 0,
+                        1, n_elem,
+                        mem_offset, 0, m.n_rows + 1,
+                        mem_offset, 0, m.n_rows + 1);
   }
 
 
@@ -131,7 +141,12 @@ diagview<eT>::operator*=(const eT val)
 
   Mat<eT>& t_m = const_cast< Mat<eT>& >(m);
 
-  coot_rt_t::inplace_op_diag(m.get_dev_mem(false), mem_offset, val, t_m.n_rows, n_elem, oneway_kernel_id::diag_inplace_mul_scalar);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_mul_scalar,
+                        m.get_dev_mem(false), m.get_dev_mem(false),
+                        (eT) val, (eT) 1,
+                        1, n_elem,
+                        mem_offset, 0, m.n_rows + 1,
+                        mem_offset, 0, m.n_rows + 1);
   }
 
 
@@ -145,7 +160,12 @@ diagview<eT>::operator/=(const eT val)
 
   Mat<eT>& t_m = const_cast< Mat<eT>& >(m);
 
-  coot_rt_t::inplace_op_diag(m.get_dev_mem(false), mem_offset, val, t_m.n_rows, n_elem, oneway_kernel_id::diag_inplace_div_scalar);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_div_scalar_post,
+                        m.get_dev_mem(false), m.get_dev_mem(false),
+                        (eT) val, (eT) 1,
+                        1, n_elem,
+                        mem_offset, 0, m.n_rows + 1,
+                        mem_offset, 0, m.n_rows + 1);
   }
 
 
@@ -523,7 +543,9 @@ diagview<eT>::fill(const eT val)
 
   Mat<eT>& t_m = const_cast< Mat<eT>& >(m);
 
-  coot_rt_t::inplace_op_diag(t_m.get_dev_mem(false), mem_offset, val, t_m.n_rows, n_elem, oneway_kernel_id::diag_inplace_set_scalar);
+  coot_rt_t::fill(m.get_dev_mem(false), val,
+                  1, n_elem,
+                  mem_offset, 0, m.n_rows + 1);
   }
 
 
