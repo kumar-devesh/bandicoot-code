@@ -17,15 +17,20 @@
 __kernel
 void
 COOT_FN(PREFIX,radix_sort_rowwise_ascending)(__global eT1* A,
+                                             const UWORD A_offset,
                                              __global eT1* tmp_mem,
                                              const UWORD A_n_rows,
-                                             const UWORD A_n_cols)
+                                             const UWORD A_n_cols,
+                                             const UWORD A_M_n_rows)
   {
   const UWORD row = get_global_id(0);
   if(row < A_n_rows)
     {
-    __global eT1* unsorted_rowptr =       &A[row];
-    __global eT1* sorted_rowptr =   &tmp_mem[row];
+    __global eT1* unsorted_rowptr =       &A[A_offset + row];
+    __global eT1* sorted_rowptr =   &tmp_mem[           row];
+
+    UWORD unsorted_n_rows = A_M_n_rows;
+    UWORD sorted_n_rows   = A_n_rows;
 
     UWORD counts[2];
 
@@ -44,7 +49,7 @@ COOT_FN(PREFIX,radix_sort_rowwise_ascending)(__global eT1* A,
 
       for (UWORD i = 0; i < A_n_cols; ++i)
         {
-        ++counts[(rowptr[i * A_n_rows] & mask) >> b];
+        ++counts[(rowptr[i * unsorted_n_rows] & mask) >> b];
         }
 
       counts[1] = counts[0]; // now holds the offset to put the next value at
@@ -52,9 +57,9 @@ COOT_FN(PREFIX,radix_sort_rowwise_ascending)(__global eT1* A,
 
       for (UWORD i = 0; i < A_n_cols; ++i)
         {
-        const UWORD in_index = i * A_n_rows;
+        const UWORD in_index = i * unsorted_n_rows;
         const eT1 val = unsorted_rowptr[in_index];
-        const UWORD out_index = (counts[((rowptr[in_index] & mask) >> b)]++) * A_n_rows;
+        const UWORD out_index = (counts[((rowptr[in_index] & mask) >> b)]++) * sorted_n_rows;
         sorted_rowptr[out_index] = val;
         }
 
@@ -62,6 +67,10 @@ COOT_FN(PREFIX,radix_sort_rowwise_ascending)(__global eT1* A,
       __global eT1* tmp = unsorted_rowptr;
       unsorted_rowptr = sorted_rowptr;
       sorted_rowptr = tmp;
+
+      UWORD tmp2 = unsorted_n_rows;
+      unsorted_n_rows = sorted_n_rows;
+      sorted_n_rows = tmp2;
       }
 
     // If the type is unsigned, we're now done---we don't have to handle a sign bit differently.
@@ -83,7 +92,7 @@ COOT_FN(PREFIX,radix_sort_rowwise_ascending)(__global eT1* A,
 
     for (UWORD i = 0; i < A_n_cols; ++i)
       {
-      ++counts[(rowptr[i * A_n_rows] & mask) >> last_bit];
+      ++counts[(rowptr[i * unsorted_n_rows] & mask) >> last_bit];
       }
     // counts[0] now holds the number of positive points; counts[1] holds the number of negative points
 
@@ -94,10 +103,10 @@ COOT_FN(PREFIX,radix_sort_rowwise_ascending)(__global eT1* A,
 
       for (UWORD i = 0; i < A_n_cols; ++i)
         {
-        const UWORD in_index = i * A_n_rows;
+        const UWORD in_index = i * unsorted_n_rows;
         const eT1 val = unsorted_rowptr[in_index];
         const UWORD bit_val = ((rowptr[in_index] & mask) >> last_bit);
-        const UWORD out_index = counts[bit_val] * A_n_rows;
+        const UWORD out_index = counts[bit_val] * sorted_n_rows;
         const int offset = (bit_val == 1) ? -1 : 1;
         counts[bit_val] += offset; // decrements for negative values, increments for positive values
         sorted_rowptr[out_index] = val;
@@ -110,14 +119,14 @@ COOT_FN(PREFIX,radix_sort_rowwise_ascending)(__global eT1* A,
 
       for (UWORD i = 0; i < A_n_cols; ++i)
         {
-        const UWORD in_index = i * A_n_rows;
+        const UWORD in_index = i * unsorted_n_rows;
         const eT1 val = unsorted_rowptr[in_index];
         const UWORD bit_val = ((rowptr[in_index] & mask) >> last_bit);
-        const UWORD out_index = (counts[bit_val]++) * A_n_rows;
+        const UWORD out_index = (counts[bit_val]++) * sorted_n_rows;
         sorted_rowptr[out_index] = val;
         }
       }
     }
 
-    // Since there are an even number of bits in every data type (or... well... I am going to assume that!), the sorted result is now in A.
+  // Since there are an even number of bits in every data type (or... well... I am going to assume that!), the sorted result is now in A.
   }

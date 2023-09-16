@@ -167,7 +167,10 @@ Col<eT>::Col(const Col<eT>& X)
   coot_extra_debug_sigprint();
 
   access::rw(Mat<eT>::vec_state) = 1;
-  arrayops::copy(this->get_dev_mem(), X.get_dev_mem(), X.n_elem);
+  coot_rt_t::copy_array(this->get_dev_mem(), X.get_dev_mem(),
+                        Mat<eT>::n_rows, 1,
+                        0, 0, Mat<eT>::n_rows,
+                        0, 0, X.n_rows);
   }
 
 
@@ -180,7 +183,10 @@ Col<eT>::operator=(const Col<eT>& X)
   coot_extra_debug_sigprint();
 
   Mat<eT>::init(X.n_rows, 1);
-  arrayops::copy(this->get_dev_mem(), X.get_dev_mem(), X.n_elem);
+  coot_rt_t::copy_array(this->get_dev_mem(), X.get_dev_mem(),
+                        Mat<eT>::n_rows, 1,
+                        0, 0, Mat<eT>::n_rows,
+                        0, 0, X.n_rows);
 
   return *this;
   }

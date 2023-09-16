@@ -65,14 +65,23 @@ class coot_rt_t
 
   static inline void set_rng_seed(const u64 seed);
 
-  template<typename out_eT, typename in_eT>
-  static inline void copy_array(dev_mem_t<out_eT> dest, dev_mem_t<in_eT> src, const uword n_elem);
-
-  template<typename out_eT, typename in_eT>
-  static inline void copy_subview(dev_mem_t<out_eT> dest, const uword dest_offset, dev_mem_t<in_eT> src, const uword aux_row1, const uword aux_col1, const uword M_n_rows, const uword M_n_cols, const uword n_rows, const uword n_cols);
-
-  template<typename eT>
-  static inline void copy_subview_to_subview(dev_mem_t<eT> dest, const uword dest_aux_row1, const uword dest_aux_col1, const uword dest_M_n_rows, const uword dest_M_n_cols, const dev_mem_t<eT> src, const uword src_aux_row1, const uword src_aux_col1, const uword src_M_n_rows, const uword src_M_n_cols, const uword n_rows, const uword n_cols);
+  /**
+   * Copy one matrix to another matrix.
+   * The offsets and M_n_rows are meant to allow the destination to be a subview of a larger matrix.
+   */
+  template<typename eT2, typename eT1>
+  static inline void copy_array(dev_mem_t<eT2> dest,
+                                dev_mem_t<eT1> src,
+                                // logical size of matrix
+                                const uword n_rows,
+                                const uword n_cols,
+                                // offsets for subviews
+                                const uword dest_row_offset,
+                                const uword dest_col_offset,
+                                const uword dest_M_n_rows,
+                                const uword src_row_offset,
+                                const uword src_col_offset,
+                                const uword src_M_n_rows);
 
   template<typename eT>
   static inline void reorder_cols(dev_mem_t<eT> out, const dev_mem_t<eT> mem, const uword n_rows, const dev_mem_t<uword> order, const uword out_n_cols);
@@ -101,9 +110,6 @@ class coot_rt_t
 
   template<typename eT>
   static inline void inplace_op_diag(dev_mem_t<eT> dest, const uword mem_offset, const eT val, const uword n_rows, const uword len, const oneway_kernel_id::enum_id num);
-
-  template<typename eT1, typename eT2>
-  static inline void inplace_op_subview(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const uword M_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const twoway_kernel_id::enum_id num, const char* identifier);
 
   template<typename eT>
   static inline void replace(dev_mem_t<eT> mem, const uword n_elem, const eT val_find, const eT val_replace);
@@ -169,19 +175,7 @@ class coot_rt_t
                                const uword src_B_M_n_rows);
 
   template<typename eT>
-  static inline eT accu(const dev_mem_t<eT> mem, const uword n_elem);
-
-  template<typename eT>
-  static inline eT accu_subview(const dev_mem_t<eT> mem, const uword M_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols);
-
-  template<typename eT>
   static inline eT prod(const dev_mem_t<eT> mem, const uword n_elem);
-
-  template<typename eT>
-  static inline eT min(const dev_mem_t<eT> mem, const uword n_elem);
-
-  template<typename eT>
-  static inline eT max(const dev_mem_t<eT> mem, const uword n_elem);
 
   template<typename eT>
   static inline eT max_abs(const dev_mem_t<eT> mem, const uword n_elem);
@@ -273,40 +267,58 @@ class coot_rt_t
   static inline void mul_diag(dev_mem_t<eT> C_mem, const uword C_n_rows, const uword C_n_cols, const eT alpha, const dev_mem_t<eT> A_mem, const bool A_is_diag, const bool A_trans, const dev_mem_t<eT> B_mem, const bool B_is_diag, const bool B_trans);
 
   template<typename eT1, typename eT2>
-  static inline void sum_colwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply);
+  static inline void sum(dev_mem_t<eT2> dest,
+                         const dev_mem_t<eT1> src,
+                         const uword n_rows,
+                         const uword n_cols,
+                         const uword dim,
+                         const bool post_conv_apply,
+                         // subview arguments
+                         const uword dest_offset,
+                         const uword dest_mem_incr,
+                         const uword src_row_offset,
+                         const uword src_col_offset,
+                         const uword src_M_n_rows);
+
+  template<typename eT>
+  static inline eT accu(const dev_mem_t<eT> mem, const uword n_elem);
+
+  template<typename eT>
+  static inline eT accu_subview(const dev_mem_t<eT> mem, const uword M_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols);
 
   template<typename eT1, typename eT2>
-  static inline void sum_rowwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply);
+  static inline void min(dev_mem_t<eT2> dest,
+                         const dev_mem_t<eT1> src,
+                         const uword n_rows,
+                         const uword n_cols,
+                         const uword dim,
+                         const bool post_conv_apply,
+                         // subview arguments
+                         const uword dest_offset,
+                         const uword dest_mem_incr,
+                         const uword src_row_offset,
+                         const uword src_col_offset,
+                         const uword src_M_n_rows);
+
+  template<typename eT>
+  static inline eT min_vec(const dev_mem_t<eT> mem, const uword n_elem);
 
   template<typename eT1, typename eT2>
-  static inline void sum_colwise_subview(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword A_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const bool post_conv_apply);
+  static inline void max(dev_mem_t<eT2> dest,
+                         const dev_mem_t<eT1> src,
+                         const uword n_rows,
+                         const uword n_cols,
+                         const uword dim,
+                         const bool post_conv_apply,
+                         // subview arguments
+                         const uword dest_offset,
+                         const uword dest_mem_incr,
+                         const uword src_row_offset,
+                         const uword src_col_offset,
+                         const uword src_M_n_rows);
 
-  template<typename eT1, typename eT2>
-  static inline void sum_rowwise_subview(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword A_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const bool post_conv_apply);
-
-  template<typename eT1, typename eT2>
-  static inline void min_colwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply);
-
-  template<typename eT1, typename eT2>
-  static inline void min_rowwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply);
-
-  template<typename eT1, typename eT2>
-  static inline void min_colwise_subview(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword A_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const bool post_conv_apply);
-
-  template<typename eT1, typename eT2>
-  static inline void min_rowwise_subview(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword A_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const bool post_conv_apply);
-
-  template<typename eT1, typename eT2>
-  static inline void max_colwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply);
-
-  template<typename eT1, typename eT2>
-  static inline void max_rowwise(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword n_rows, const uword n_cols, const bool post_conv_apply);
-
-  template<typename eT1, typename eT2>
-  static inline void max_colwise_subview(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword A_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const bool post_conv_apply);
-
-  template<typename eT1, typename eT2>
-  static inline void max_rowwise_subview(dev_mem_t<eT2> out_mem, const dev_mem_t<eT1> A_mem, const uword A_n_rows, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const bool post_conv_apply);
+  template<typename eT>
+  static inline eT max_vec(const dev_mem_t<eT> mem, const uword n_elem);
 
   template<typename eT>
   static inline eT trace(const dev_mem_t<eT> mem, const uword n_rows, const uword n_cols);
@@ -321,7 +333,18 @@ class coot_rt_t
   static inline void linspace(const dev_mem_t<eT> mem, const eT start, const eT end, const uword num);
 
   template<typename eT1, typename eT2>
-  static inline void clamp(dev_mem_t<eT2> dest, const dev_mem_t<eT1> src, const eT1 min_val, const eT1 max_val, const uword n_elem);
+  static inline void clamp(dev_mem_t<eT2> dest,
+                           const dev_mem_t<eT1> src,
+                           const eT1 min_val,
+                           const eT1 max_val,
+                           const uword n_rows,
+                           const uword n_cols,
+                           const uword dest_row_offset,
+                           const uword dest_col_offset,
+                           const uword dest_M_n_rows,
+                           const uword src_row_offset,
+                           const uword src_col_offset,
+                           const uword src_M_n_rows);
 
   template<typename eT>
   static inline eT vec_norm_1(dev_mem_t<eT> mem, const uword n_elem);
@@ -336,22 +359,51 @@ class coot_rt_t
   static inline eT vec_norm_min(dev_mem_t<eT> mem, const uword n_elem);
 
   template<typename eT1, typename eT2>
-  static inline void mean(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword n_rows, const uword n_cols, const uword dim, const bool post_conv_apply);
+  static inline void mean(dev_mem_t<eT2> dest,
+                          const dev_mem_t<eT1> src,
+                          const uword n_rows,
+                          const uword n_cols,
+                          const uword dim,
+                          const bool post_conv_apply,
+                          // subview arguments
+                          const uword dest_offset,
+                          const uword dest_mem_incr,
+                          const uword src_row_offset,
+                          const uword src_col_offset,
+                          const uword src_M_n_rows);
 
   template<typename eT1, typename eT2>
-  static inline void mean_subview(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword M_n_rows, const uword start_row, const uword start_col, const uword n_rows, const uword n_cols, const uword dim, const bool post_conv_apply);
-
-  template<typename eT1, typename eT2>
-  static inline void median(dev_mem_t<eT2> out, dev_mem_t<eT1> in, const uword n_rows, const uword n_cols, const uword dim);
+  static inline void median(dev_mem_t<eT2> dest,
+                            dev_mem_t<eT1> src,
+                            const uword n_rows,
+                            const uword n_cols,
+                            const uword dim,
+                            // subview arguments
+                            const uword dest_offset,
+                            const uword dest_mem_incr,
+                            const uword src_row_offset,
+                            const uword src_col_offset,
+                            const uword src_M_n_rows);
 
   template<typename eT>
   static inline eT median_vec(dev_mem_t<eT> mem, const uword n_elem);
 
   template<typename eT>
-  static inline void var(dev_mem_t<eT> out, const dev_mem_t<eT> in, const dev_mem_t<eT> means, const uword n_rows, const uword n_cols, const uword dim, const uword norm_type);
-
-  template<typename eT>
-  static inline void var_subview(dev_mem_t<eT> out, const dev_mem_t<eT> in, const dev_mem_t<eT> means, const uword M_n_rows, const uword M_n_cols, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const uword dim, const uword norm_type);
+  static inline void var(dev_mem_t<eT> dest,
+                         const dev_mem_t<eT> src,
+                         const dev_mem_t<eT> src_means,
+                         const uword n_rows,
+                         const uword n_cols,
+                         const uword dim,
+                         const uword norm_type,
+                         // subview arguments
+                         const uword dest_offset,
+                         const uword dest_mem_incr,
+                         const uword src_row_offset,
+                         const uword src_col_offset,
+                         const uword src_M_n_rows,
+                         const uword src_means_offset,
+                         const uword src_means_mem_incr);
 
   template<typename eT>
   static inline eT var_vec(const dev_mem_t<eT> mem, const eT mean, const uword n_elem, const uword norm_type);
@@ -366,10 +418,15 @@ class coot_rt_t
   static inline void join_rows(dev_mem_t<eT5> out, const dev_mem_t<eT1> A, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<eT2> B, const uword B_n_rows, const uword B_n_cols, const dev_mem_t<eT3> C, const uword C_n_rows, const uword C_n_cols, const dev_mem_t<eT4> D, const uword D_n_rows, const uword D_n_cols);
 
   template<typename eT>
-  static inline void sort_colwise(dev_mem_t<eT> mem, const uword n_rows, const uword n_cols, const uword sort_type);
-
-  template<typename eT>
-  static inline void sort_rowwise(dev_mem_t<eT> mem, const uword n_rows, const uword n_cols, const uword sort_type);
+  static inline void sort(dev_mem_t<eT> mem,
+                          const uword n_rows,
+                          const uword n_cols,
+                          const uword sort_type,
+                          const uword dim,
+                          // subview arguments
+                          const uword row_offset,
+                          const uword col_offset,
+                          const uword M_n_rows);
 
   template<typename eT>
   static inline void sort_vec(dev_mem_t<eT> mem, const uword n_elem, const uword sort_type);

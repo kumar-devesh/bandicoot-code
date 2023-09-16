@@ -20,7 +20,21 @@
 template<typename eT>
 inline
 void
-var(dev_mem_t<eT> out, const dev_mem_t<eT> in, const dev_mem_t<eT> means, const uword n_rows, const uword n_cols, const uword dim, const uword norm_type)
+var(dev_mem_t<eT> dest,
+    const dev_mem_t<eT> src,
+    const dev_mem_t<eT> src_means,
+    const uword n_rows,
+    const uword n_cols,
+    const uword dim,
+    const uword norm_type,
+    // subview arguments
+    const uword dest_offset,
+    const uword dest_mem_incr,
+    const uword src_row_offset,
+    const uword src_col_offset,
+    const uword src_M_n_rows,
+    const uword src_means_offset,
+    const uword src_means_mem_incr)
   {
   coot_extra_debug_sigprint();
 
@@ -31,18 +45,32 @@ var(dev_mem_t<eT> out, const dev_mem_t<eT> in, const dev_mem_t<eT> means, const 
   cl_kernel k = get_rt().cl_rt.get_kernel<eT>((dim == 0) ? oneway_kernel_id::var_colwise : oneway_kernel_id::var_rowwise);
   const uword norm_correction = (norm_type == 0) ? 1 : 0;
 
+  const uword src_offset = src_row_offset + src_col_offset * src_M_n_rows;
+
   cl_int status = 0;
 
   runtime_t::adapt_uword cl_n_rows(n_rows);
   runtime_t::adapt_uword cl_n_cols(n_cols);
   runtime_t::adapt_uword cl_norm_correction(norm_correction);
+  runtime_t::adapt_uword cl_dest_offset(dest_offset);
+  runtime_t::adapt_uword cl_src_offset(src_offset);
+  runtime_t::adapt_uword cl_src_means_offset(src_means_offset);
+  runtime_t::adapt_uword cl_dest_mem_incr(dest_mem_incr);
+  runtime_t::adapt_uword cl_src_M_n_rows(src_M_n_rows);
+  runtime_t::adapt_uword cl_src_means_mem_incr(src_means_mem_incr);
 
-  status |= coot_wrapper(clSetKernelArg)(k, 0, sizeof(cl_mem),          &(out.cl_mem_ptr));
-  status |= coot_wrapper(clSetKernelArg)(k, 1, sizeof(cl_mem),          &(in.cl_mem_ptr));
-  status |= coot_wrapper(clSetKernelArg)(k, 2, sizeof(cl_mem),          &(means.cl_mem_ptr));
-  status |= coot_wrapper(clSetKernelArg)(k, 3, cl_n_rows.size,          cl_n_rows.addr);
-  status |= coot_wrapper(clSetKernelArg)(k, 4, cl_n_cols.size,          cl_n_cols.addr);
-  status |= coot_wrapper(clSetKernelArg)(k, 5, cl_norm_correction.size, cl_norm_correction.addr);
+  status |= coot_wrapper(clSetKernelArg)(k,  0, sizeof(cl_mem),             &(dest.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(k,  1, cl_dest_offset.size,        cl_dest_offset.addr);
+  status |= coot_wrapper(clSetKernelArg)(k,  2, sizeof(cl_mem),             &(src.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(k,  3, cl_src_offset.size,         cl_src_offset.addr);
+  status |= coot_wrapper(clSetKernelArg)(k,  4, sizeof(cl_mem),             &(src_means.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(k,  5, cl_src_means_offset.size,   cl_src_means_offset.addr);
+  status |= coot_wrapper(clSetKernelArg)(k,  6, cl_n_rows.size,             cl_n_rows.addr);
+  status |= coot_wrapper(clSetKernelArg)(k,  7, cl_n_cols.size,             cl_n_cols.addr);
+  status |= coot_wrapper(clSetKernelArg)(k,  8, cl_norm_correction.size,    cl_norm_correction.addr);
+  status |= coot_wrapper(clSetKernelArg)(k,  9, cl_dest_mem_incr.size,      cl_dest_mem_incr.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 10, cl_src_M_n_rows.size,       cl_src_M_n_rows.addr);
+  status |= coot_wrapper(clSetKernelArg)(k, 11, cl_src_means_mem_incr.size, cl_src_means_mem_incr.addr);
 
   coot_check_cl_error(status, "coot::opencl::var(): failed to set kernel arguments");
 
@@ -53,53 +81,6 @@ var(dev_mem_t<eT> out, const dev_mem_t<eT> in, const dev_mem_t<eT> means, const 
   status = coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
 
   coot_check_cl_error(status, "coot::opencl::var(): failed to run kernel");
-  }
-
-
-
-template<typename eT>
-inline
-void
-var_subview(dev_mem_t<eT> out, const dev_mem_t<eT> in, const dev_mem_t<eT> means, const uword M_n_rows, const uword M_n_cols, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const uword dim, const uword norm_type)
-  {
-  coot_extra_debug_sigprint();
-  coot_ignore(M_n_cols);
-
-  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::var_subview(): OpenCL runtime not valid" );
-
-  runtime_t::cq_guard guard;
-
-  cl_kernel k = get_rt().cl_rt.get_kernel<eT>((dim == 0) ? oneway_kernel_id::submat_var_colwise : oneway_kernel_id::submat_var_rowwise);
-  const uword norm_correction = (norm_type == 0) ? 1 : 0;
-
-  cl_int status = 0;
-
-  runtime_t::adapt_uword cl_M_n_rows(M_n_rows);
-  runtime_t::adapt_uword cl_aux_row1(aux_row1);
-  runtime_t::adapt_uword cl_aux_col1(aux_col1);
-  runtime_t::adapt_uword cl_n_rows(n_rows);
-  runtime_t::adapt_uword cl_n_cols(n_cols);
-  runtime_t::adapt_uword cl_norm_correction(norm_correction);
-
-  status |= coot_wrapper(clSetKernelArg)(k, 0, sizeof(cl_mem),          &(out.cl_mem_ptr));
-  status |= coot_wrapper(clSetKernelArg)(k, 1, sizeof(cl_mem),          &(in.cl_mem_ptr));
-  status |= coot_wrapper(clSetKernelArg)(k, 2, sizeof(cl_mem),          &(means.cl_mem_ptr));
-  status |= coot_wrapper(clSetKernelArg)(k, 3, cl_M_n_rows.size,        cl_M_n_rows.addr);
-  status |= coot_wrapper(clSetKernelArg)(k, 4, cl_aux_row1.size,        cl_aux_row1.addr);
-  status |= coot_wrapper(clSetKernelArg)(k, 5, cl_aux_col1.size,        cl_aux_col1.addr);
-  status |= coot_wrapper(clSetKernelArg)(k, 6, cl_n_rows.size,          cl_n_rows.addr);
-  status |= coot_wrapper(clSetKernelArg)(k, 7, cl_n_cols.size,          cl_n_cols.addr);
-  status |= coot_wrapper(clSetKernelArg)(k, 8, cl_norm_correction.size, cl_norm_correction.addr);
-
-  coot_check_cl_error(status, "coot::opencl::var_subview(): failed to set kernel arguments");
-
-  const size_t k1_work_dim       = 1;
-  const size_t k1_work_offset[1] = { 0 };
-  const size_t k1_work_size[1]   = { (dim == 0) ? n_cols : n_rows };
-
-  status = coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), k, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
-
-  coot_check_cl_error(status, "coot::opencl::var_subview(): failed to run kernel");
   }
 
 

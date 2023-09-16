@@ -100,8 +100,6 @@ struct oneway_kernel_id
     //
     var_colwise,
     var_rowwise,
-    submat_var_colwise,
-    submat_var_rowwise,
     var,
     var_small,
     submat_var,
@@ -188,8 +186,6 @@ struct oneway_kernel_id
 
     names.push_back("var_colwise");
     names.push_back("var_rowwise");
-    names.push_back("submat_var_colwise");
-    names.push_back("submat_var_rowwise");
     names.push_back("var");
     names.push_back("var_small");
     names.push_back("submat_var");
@@ -378,9 +374,7 @@ struct twoway_kernel_id
   {
   enum enum_id
     {
-    submat_extract = 0,
-    //
-    equ_array_plus_scalar,
+    equ_array_plus_scalar = 0,
     equ_array_neg_pre,
     equ_array_neg_post,
     equ_array_minus_scalar_pre_pre,
@@ -464,34 +458,18 @@ struct twoway_kernel_id
     sum_rowwise_conv_pre,
     sum_colwise_conv_post,
     sum_rowwise_conv_post,
-    submat_sum_colwise_conv_pre,
-    submat_sum_rowwise_conv_pre,
-    submat_sum_colwise_conv_post,
-    submat_sum_rowwise_conv_post,
     min_colwise_conv_pre,
     min_rowwise_conv_pre,
     min_colwise_conv_post,
     min_rowwise_conv_post,
-    submat_min_colwise_conv_pre,
-    submat_min_rowwise_conv_pre,
-    submat_min_colwise_conv_post,
-    submat_min_rowwise_conv_post,
     max_colwise_conv_pre,
     max_rowwise_conv_pre,
     max_colwise_conv_post,
     max_rowwise_conv_post,
-    submat_max_colwise_conv_pre,
-    submat_max_rowwise_conv_pre,
-    submat_max_colwise_conv_post,
-    submat_max_rowwise_conv_post,
     mean_colwise_conv_pre,
     mean_rowwise_conv_pre,
     mean_colwise_conv_post,
     mean_rowwise_conv_post,
-    submat_mean_colwise_conv_pre,
-    submat_mean_rowwise_conv_pre,
-    submat_mean_colwise_conv_post,
-    submat_mean_rowwise_conv_post,
     //
     dot,
     dot_small,
@@ -542,8 +520,6 @@ struct twoway_kernel_id
   init_names()
     {
     std::vector<std::string> names;
-
-    names.push_back("submat_extract");
 
     names.push_back("equ_array_plus_scalar");
     names.push_back("equ_array_neg_pre");
@@ -629,34 +605,18 @@ struct twoway_kernel_id
     names.push_back("sum_rowwise_conv_pre");
     names.push_back("sum_colwise_conv_post");
     names.push_back("sum_rowwise_conv_post");
-    names.push_back("submat_sum_colwise_conv_pre");
-    names.push_back("submat_sum_rowwise_conv_pre");
-    names.push_back("submat_sum_colwise_conv_post");
-    names.push_back("submat_sum_rowwise_conv_post");
     names.push_back("min_colwise_conv_pre");
     names.push_back("min_rowwise_conv_pre");
     names.push_back("min_colwise_conv_post");
     names.push_back("min_rowwise_conv_post");
-    names.push_back("submat_min_colwise_conv_pre");
-    names.push_back("submat_min_rowwise_conv_pre");
-    names.push_back("submat_min_colwise_conv_post");
-    names.push_back("submat_min_rowwise_conv_post");
     names.push_back("max_colwise_conv_pre");
     names.push_back("max_rowwise_conv_pre");
     names.push_back("max_colwise_conv_post");
     names.push_back("max_rowwise_conv_post");
-    names.push_back("submat_max_colwise_conv_pre");
-    names.push_back("submat_max_rowwise_conv_pre");
-    names.push_back("submat_max_colwise_conv_post");
-    names.push_back("submat_max_rowwise_conv_post");
     names.push_back("mean_colwise_conv_pre");
     names.push_back("mean_rowwise_conv_pre");
     names.push_back("mean_colwise_conv_post");
     names.push_back("mean_rowwise_conv_post");
-    names.push_back("submat_mean_colwise_conv_pre");
-    names.push_back("submat_mean_rowwise_conv_pre");
-    names.push_back("submat_mean_colwise_conv_post");
-    names.push_back("submat_mean_rowwise_conv_post");
 
     names.push_back("dot");
     names.push_back("dot_small");

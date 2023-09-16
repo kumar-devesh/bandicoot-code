@@ -75,7 +75,11 @@ op_median::apply_direct(Mat<out_eT>& out, Mat<in_eT>& in, const uword dim)
     return;
     }
 
-  coot_rt_t::median(out.get_dev_mem(false), in.get_dev_mem(false), in.n_rows, in.n_cols, dim);
+  coot_rt_t::median(out.get_dev_mem(false), in.get_dev_mem(false),
+                    in.n_rows, in.n_cols,
+                    dim,
+                    0, 1,
+                    0, 0, in.n_rows);
   }
 
 

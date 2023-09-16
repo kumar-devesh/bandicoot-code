@@ -54,7 +54,11 @@ op_strans::apply_noalias(Mat<out_eT>& out, const Mat<in_eT>& A)
   if (A.n_cols == 1 || A.n_rows == 1)
     {
     // Simply copying the data is sufficient.
-    arrayops::copy(out.get_dev_mem(false), A.get_dev_mem(false), A.n_elem);
+    coot_rt_t::copy_array(out.get_dev_mem(false), A.get_dev_mem(false),
+                          // logically treat both as vectors
+                          out.n_elem, 1,
+                          0, 0, out.n_elem,
+                          0, 0, A.n_elem);
     }
   else
     {

@@ -162,7 +162,7 @@ op_pinv::apply_direct_diag(Mat<eT>& out, const Mat<eT>& in, const eT tol)
   eT tol_use = tol;
   if (tol == (eT) 0)
     {
-    const eT max_val = coot_rt_t::max(abs_in.get_dev_mem(false), abs_in.n_elem);
+    const eT max_val = coot_rt_t::max_vec(abs_in.get_dev_mem(false), abs_in.n_elem);
     tol_use = abs_in.n_elem * max_val * std::numeric_limits<eT>::epsilon();
     }
 
@@ -171,7 +171,10 @@ op_pinv::apply_direct_diag(Mat<eT>& out, const Mat<eT>& in, const eT tol)
 
   // Now invert the diagonal.  Any zero values need to changed to 1, so as to not produce infs or nans.
   Mat<eT> out_vec(abs_in.n_rows, abs_in.n_cols);
-  coot_rt_t::copy_array(out_vec.get_dev_mem(false), in.get_dev_mem(false), in.n_elem);
+  coot_rt_t::copy_array(out_vec.get_dev_mem(false), in.get_dev_mem(false),
+                        out_vec.n_rows, out_vec.n_cols,
+                        0, 0, out_vec.n_rows,
+                        0, 0, in.n_rows);
   coot_rt_t::replace(out_vec.get_dev_mem(false), out_vec.n_elem, (eT) 0.0, (eT) 1.0);
   coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_div_scalar_pre,
                         out_vec.get_dev_mem(false), out_vec.get_dev_mem(false),
@@ -239,7 +242,7 @@ op_pinv::apply_direct_diag(Mat<eT2>& out, const Mat<eT1>& in, const eT1 tol, con
   eT1 tol_use = tol;
   if (tol == (eT1) 0)
     {
-    const eT1 max_val = coot_rt_t::max(abs_in.get_dev_mem(false), abs_in.n_elem);
+    const eT1 max_val = coot_rt_t::max_vec(abs_in.get_dev_mem(false), abs_in.n_elem);
     tol_use = abs_in.n_elem * max_val * std::numeric_limits<eT1>::epsilon();
     }
 
@@ -248,7 +251,10 @@ op_pinv::apply_direct_diag(Mat<eT2>& out, const Mat<eT1>& in, const eT1 tol, con
 
   // Now invert the diagonal.  Any zero values need to changed to 1, so as to not produce infs or nans.
   Mat<eT1> out_vec(abs_in.n_rows, abs_in.n_cols);
-  coot_rt_t::copy_array(out_vec.get_dev_mem(false), in.get_dev_mem(false), in.n_elem);
+  coot_rt_t::copy_array(out_vec.get_dev_mem(false), in.get_dev_mem(false),
+                        out_vec.n_rows, out_vec.n_cols,
+                        0, 0, out_vec.n_rows,
+                        0, 0, in.n_rows);
   coot_rt_t::replace(out_vec.get_dev_mem(false), out_vec.n_elem, (eT1) 0.0, (eT1) 1.0);
   coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_div_scalar_pre,
                         out_vec.get_dev_mem(false), out_vec.get_dev_mem(false),
@@ -380,7 +386,10 @@ op_pinv::apply_direct_sym(Mat<eT2>& out, Mat<eT1>& in, const eT1 tol, const type
     }
 
   out.set_size(tmp.n_rows, tmp.n_cols);
-  coot_rt_t::copy_array(out.get_dev_mem(false), tmp.get_dev_mem(false), tmp.n_elem);
+  coot_rt_t::copy_array(out.get_dev_mem(false), tmp.get_dev_mem(false),
+                        out.n_rows, out.n_cols,
+                        0, 0, out.n_rows,
+                        0, 0, tmp.n_rows);
   return status; // (true, "")
   }
 
@@ -458,7 +467,10 @@ op_pinv::apply_direct_gen(Mat<eT>& out, Mat<eT>& in, const eT tol)
   if (num_svs != V.n_rows)
     {
     filtered_V.set_size(num_svs, V.n_cols);
-    coot_rt_t::copy_subview(filtered_V.get_dev_mem(false), 0, V.get_dev_mem(false), 0, 0, V.n_rows, V.n_cols, num_svs, V.n_cols);
+    coot_rt_t::copy_array(filtered_V.get_dev_mem(false), V.get_dev_mem(false),
+                          num_svs, V.n_cols,
+                          0, 0, filtered_V.n_rows,
+                          0, 0, V.n_rows);
     }
   else
     {
@@ -530,7 +542,10 @@ op_pinv::apply_direct_gen(Mat<eT2>& out, Mat<eT1>& in, const eT1 tol, const type
     }
 
   out.set_size(tmp.n_rows, tmp.n_cols);
-  coot_rt_t::copy_array(out.get_dev_mem(false), tmp.get_dev_mem(false), tmp.n_elem);
+  coot_rt_t::copy_array(out.get_dev_mem(false), tmp.get_dev_mem(false),
+                        out.n_rows, out.n_cols,
+                        0, 0, out.n_rows,
+                        0, 0, tmp.n_rows);
   return status; // (true, "")
   }
 

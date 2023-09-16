@@ -19,12 +19,13 @@ void
 COOT_FN(PREFIX,radix_sort_colwise_ascending)(eT1* A,
                                              eT1* tmp_mem,
                                              const UWORD A_n_rows,
-                                             const UWORD A_n_cols)
+                                             const UWORD A_n_cols,
+                                             const UWORD A_M_n_rows)
   {
   const UWORD col = blockIdx.x * blockDim.x + threadIdx.x;
   if(col < A_n_cols)
     {
-    eT1* unsorted_colptr =       &A[col * A_n_rows];
+    eT1* unsorted_colptr =       &A[col * A_M_n_rows];
     eT1* sorted_colptr =   &tmp_mem[col * A_n_rows];
 
     UWORD counts[2];

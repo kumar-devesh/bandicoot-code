@@ -20,7 +20,17 @@
 template<typename eT2, typename eT1>
 inline
 void
-median(dev_mem_t<eT2> out, dev_mem_t<eT1> in, const uword n_rows, const uword n_cols, const uword dim)
+median(dev_mem_t<eT2> dest,
+       dev_mem_t<eT1> src,
+       const uword n_rows,
+       const uword n_cols,
+       const uword dim,
+       // subview arguments
+       const uword dest_offset,
+       const uword dest_mem_incr,
+       const uword src_row_offset,
+       const uword src_col_offset,
+       const uword src_M_n_rows)
   {
   coot_extra_debug_sigprint();
 
@@ -29,49 +39,67 @@ median(dev_mem_t<eT2> out, dev_mem_t<eT1> in, const uword n_rows, const uword n_
   if (dim == 0)
     {
     // Sort the data in each column.
-    sort_colwise(in, n_rows, n_cols, 0);
+    sort(src, n_rows, n_cols, 0, 0, src_row_offset, src_col_offset, src_M_n_rows);
     const uword middle_element = (n_rows / 2);
 
     if (n_rows % 2 == 0)
       {
       // Even number of elements; we have to do a little extra processing.
-      sum_colwise_subview(out, in, n_rows, middle_element - 1, 0, 2, n_cols, true);
+      sum(dest, src,
+          2, n_cols,
+          0, true,
+          dest_offset, dest_mem_incr,
+          src_row_offset + (middle_element - 1), src_col_offset, src_M_n_rows);
+
       eop_scalar(twoway_kernel_id::equ_array_div_scalar_post,
-                 out, out,
+                 dest, dest,
                  eT2(2), eT2(1),
                  1, n_cols,
-                 0, 0, 1,
-                 0, 0, 1);
+                 dest_offset, 0, dest_mem_incr,
+                 dest_offset, 0, dest_mem_incr);
       }
     else
       {
       // Odd number of elements: the middle element is the result.
       // Now extract that row into the output.
-      copy_subview(out, 0, in, middle_element, 0, n_rows, n_cols, 1, n_cols);
+      copy_array(dest, src,
+                 1, n_cols,
+                 dest_offset, 0, dest_mem_incr,
+                 src_row_offset + middle_element, src_col_offset, src_M_n_rows);
       }
     }
   else
     {
     // Sort the data in each row.
-    sort_rowwise(in, n_rows, n_cols, 0);
+    sort(src, n_rows, n_cols, 0, 1, src_row_offset, src_col_offset, src_M_n_rows);
     const uword middle_element = (n_cols / 2);
 
     if (n_cols % 2 == 0)
       {
       // Even number of elements; we have to do a little extra processing.
-      sum_rowwise_subview(out, in, n_rows, 0, middle_element - 1, n_rows, 2, true);
+      sum(dest, src,
+          n_rows, 2,
+          1, true,
+          dest_offset, dest_mem_incr,
+          src_row_offset, src_col_offset + (middle_element - 1), src_M_n_rows);
+
       eop_scalar(twoway_kernel_id::equ_array_div_scalar_post,
-                 out, out,
+                 dest, dest,
                  eT2(2), eT2(1),
-                 n_rows, 1,
-                 0, 0, n_rows,
-                 0, 0, n_rows);
+                 // logically treat as column vector so dest_mem_incr can be used
+                 1, n_rows,
+                 dest_offset, 0, dest_mem_incr,
+                 dest_offset, 0, dest_mem_incr);
       }
     else
       {
       // Odd number of elements: the middle element is the result.
       // Now extract that column into the output.
-      copy_subview(out, 0, in, 0, middle_element, n_rows, n_cols, n_rows, 1);
+      copy_array(dest, src,
+                 // logically treat as column vector so dest_mem_incr can be used
+                 1, n_rows,
+                 dest_offset, 0, dest_mem_incr,
+                 src_row_offset + (src_col_offset + middle_element) * src_M_n_rows, 0, 1);
       }
     }
   }

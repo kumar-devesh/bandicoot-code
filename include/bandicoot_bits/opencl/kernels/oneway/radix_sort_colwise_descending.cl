@@ -17,15 +17,17 @@
 __kernel
 void
 COOT_FN(PREFIX,radix_sort_colwise_descending)(__global eT1* A,
+                                              const UWORD A_offset,
                                               __global eT1* tmp_mem,
                                               const UWORD A_n_rows,
-                                              const UWORD A_n_cols)
+                                              const UWORD A_n_cols,
+                                              const UWORD A_M_n_rows)
   {
   const UWORD col = get_global_id(0);
   if(col < A_n_cols)
     {
-    __global eT1* unsorted_colptr =       &A[col * A_n_rows];
-    __global eT1* sorted_colptr =   &tmp_mem[col * A_n_rows];
+    __global eT1* unsorted_colptr =       &A[A_offset + col * A_M_n_rows];
+    __global eT1* sorted_colptr =   &tmp_mem[           col * A_n_rows  ];
 
     UWORD counts[2];
 
@@ -123,5 +125,5 @@ COOT_FN(PREFIX,radix_sort_colwise_descending)(__global eT1* A,
       }
     }
 
-    // Since there are an even number of bits in every data type (or... well... I am going to assume that!), the sorted result is now in A.
+  // Since there are an even number of bits in every data type (or... well... I am going to assume that!), the sorted result is now in A.
   }

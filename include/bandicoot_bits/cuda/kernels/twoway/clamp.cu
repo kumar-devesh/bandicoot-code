@@ -13,16 +13,24 @@
 // ------------------------------------------------------------------------
 __global__
 void
-COOT_FN(PREFIX,clamp)(eT2* out_mem,
-                      const eT1* A_mem,
+COOT_FN(PREFIX,clamp)(eT2* dest,
+                      const eT1* src,
                       const eT1 min_val,
                       const eT1 max_val,
-                      const UWORD num)
+                      const UWORD n_rows,
+                      const UWORD n_cols,
+                      const UWORD dest_M_n_rows,
+                      const UWORD src_M_n_rows)
   {
-  const UWORD idx = blockIdx.x * blockDim.x + threadIdx.x;
-  if (idx < num)
+  const UWORD row = blockIdx.x * blockDim.x + threadIdx.x;
+  const UWORD col = blockIdx.y * blockDim.y + threadIdx.y;
+
+  if (row < n_rows && col < n_cols)
     {
-    const eT1 clamped_val = max(min_val, min(max_val, A_mem[idx]));
-    out_mem[idx] = (eT2) clamped_val;
+    const UWORD  src_index = row + col * src_M_n_rows;
+    const UWORD dest_index = row + col * dest_M_n_rows;
+
+    const eT1 clamped_val = max(min_val, min(max_val, src[src_index]));
+    dest[dest_index] = (eT2) clamped_val;
     }
   }

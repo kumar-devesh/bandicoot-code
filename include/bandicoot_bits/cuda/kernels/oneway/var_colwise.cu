@@ -14,25 +14,28 @@
 
 __global__
 void
-COOT_FN(PREFIX,var_colwise)(eT1* out,
-                            const eT1* A,
-                            const eT1* means,
-                            const UWORD A_n_rows,
-                            const UWORD A_n_cols,
-                            const UWORD norm_correction)
+COOT_FN(PREFIX,var_colwise)(eT1* dest,
+                            const eT1* src,
+                            const eT1* src_means,
+                            const UWORD n_rows,
+                            const UWORD n_cols,
+                            const UWORD norm_correction,
+                            const UWORD dest_mem_incr,
+                            const UWORD src_M_n_rows,
+                            const UWORD src_means_mem_incr)
   {
   const UWORD col = blockIdx.x * blockDim.x + threadIdx.x;
-  if(col < A_n_cols)
+  if(col < n_cols)
     {
-    const eT1* colptr = &(A[ col*A_n_rows ]);
-    const eT1 mean_val = means[col];
+    const eT1* colptr = &(src[col * src_M_n_rows]);
+    const eT1 mean_val = src_means[col * src_means_mem_incr];
     eT1 acc = (eT1) (0);
-    for (UWORD i = 0; i < A_n_rows; ++i)
+    for (UWORD i = 0; i < n_rows; ++i)
       {
       eT1 val = (colptr[i] - mean_val);
       acc += (val * val);
       }
 
-    out[col] = (acc / (eT1) (A_n_rows - norm_correction));
+    dest[col * dest_mem_incr] = (acc / (eT1) (n_rows - norm_correction));
     }
   }

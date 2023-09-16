@@ -15,12 +15,20 @@
 
 
 /**
- * Sort the data in each column.
+ * Sort the data in each row or column.
  */
 template<typename eT>
 inline
 void
-sort_colwise(dev_mem_t<eT> A, const uword n_rows, const uword n_cols, const uword sort_type)
+sort(dev_mem_t<eT> mem,
+     const uword n_rows,
+     const uword n_cols,
+     const uword sort_type,
+     const uword dim,
+     // subview arguments
+     const uword row_offset,
+     const uword col_offset,
+     const uword M_n_rows)
   {
   coot_extra_debug_sigprint();
 
@@ -34,61 +42,27 @@ sort_colwise(dev_mem_t<eT> A, const uword n_rows, const uword n_cols, const uwor
   dev_mem_t<eT> tmp_mem;
   tmp_mem.cuda_mem_ptr = get_rt().cuda_rt.acquire_memory<eT>(n_rows * n_cols);
 
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(sort_type == 0 ? oneway_kernel_id::radix_sort_colwise_ascending : oneway_kernel_id::radix_sort_colwise_descending);
-
-  const void* args[] = {
-      &(A.cuda_mem_ptr),
-      &(tmp_mem.cuda_mem_ptr),
-      (uword*) &n_rows,
-      (uword*) &n_cols };
-
-  const kernel_dims dims = one_dimensional_grid_dims(n_cols);
-
-  CUresult result = coot_wrapper(cuLaunchKernel)(
-      kernel,
-      dims.d[0], dims.d[1], dims.d[2],
-      dims.d[3], dims.d[4], dims.d[5],
-      0, NULL,
-      (void**) args,
-      0);
-
-  coot_check_cuda_error(result, "coot::cuda::sort_colwise(): cuLaunchKernel() failed");
-
-  get_rt().cuda_rt.synchronise();
-  get_rt().cuda_rt.release_memory(tmp_mem.cuda_mem_ptr);
-  }
-
-
-
-/**
- * Sort the data in each row.
- */
-template<typename eT>
-inline
-void
-sort_rowwise(dev_mem_t<eT> A, const uword n_rows, const uword n_cols, const uword sort_type)
-  {
-  coot_extra_debug_sigprint();
-
-  // If the matrix is empty, don't do anything.
-  if (n_rows == 0 || n_cols == 0)
+  CUfunction kernel;
+  if (dim == 0)
     {
-    return;
+    kernel = get_rt().cuda_rt.get_kernel<eT>(sort_type == 0 ? oneway_kernel_id::radix_sort_colwise_ascending : oneway_kernel_id::radix_sort_colwise_descending);
+    }
+  else
+    {
+    kernel = get_rt().cuda_rt.get_kernel<eT>(sort_type == 0 ? oneway_kernel_id::radix_sort_rowwise_ascending : oneway_kernel_id::radix_sort_rowwise_descending);
     }
 
-  // First, allocate a temporary matrix we will use during computation.
-  dev_mem_t<eT> tmp_mem;
-  tmp_mem.cuda_mem_ptr = get_rt().cuda_rt.acquire_memory<eT>(n_rows * n_cols);
-
-  CUfunction kernel = get_rt().cuda_rt.get_kernel<eT>(sort_type == 0 ? oneway_kernel_id::radix_sort_rowwise_ascending : oneway_kernel_id::radix_sort_rowwise_descending);
+  const uword mem_offset = row_offset + col_offset * M_n_rows;
+  const eT* mem_ptr = mem.cuda_mem_ptr + mem_offset;
 
   const void* args[] = {
-      &(A.cuda_mem_ptr),
+      &mem_ptr,
       &(tmp_mem.cuda_mem_ptr),
       (uword*) &n_rows,
-      (uword*) &n_cols };
+      (uword*) &n_cols,
+      (uword*) &M_n_rows };
 
-  const kernel_dims dims = one_dimensional_grid_dims(n_rows);
+  const kernel_dims dims = one_dimensional_grid_dims(dim == 0 ? n_cols : n_rows);
 
   CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
@@ -98,7 +72,7 @@ sort_rowwise(dev_mem_t<eT> A, const uword n_rows, const uword n_cols, const uwor
       (void**) args,
       0);
 
-  coot_check_cuda_error(result, "coot::cuda::sort_rowwise(): cuLaunchKernel() failed");
+  coot_check_cuda_error(result, "coot::cuda::sort(): cuLaunchKernel() failed");
 
   get_rt().cuda_rt.synchronise();
   get_rt().cuda_rt.release_memory(tmp_mem.cuda_mem_ptr);

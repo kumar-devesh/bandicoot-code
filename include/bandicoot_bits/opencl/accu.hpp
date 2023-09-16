@@ -49,30 +49,34 @@ accu_subview(dev_mem_t<eT> mem, const uword m_n_rows, const uword aux_row1, cons
 
   runtime_t::cq_guard guard;
 
-  cl_kernel k1 = get_rt().cl_rt.get_kernel<eT, eT>(twoway_kernel_id::submat_sum_colwise_conv_pre);
+  cl_kernel k1 = get_rt().cl_rt.get_kernel<eT, eT>(twoway_kernel_id::sum_colwise_conv_pre);
 
   cl_int status = 0;
 
+  const uword dest_offset = 0;
+  const uword  src_offset = aux_row1 + aux_col1 * m_n_rows;
+  const uword dest_mem_incr = 1;
+
   dev_mem_t<eT> tmp_mem = tmp.get_dev_mem(false);
 
-  runtime_t::adapt_uword S_m_n_rows(m_n_rows);
+  runtime_t::adapt_uword cl_dest_offset(dest_offset);
+  runtime_t::adapt_uword cl_src_offset(src_offset);
+  runtime_t::adapt_uword cl_n_rows(n_rows);
+  runtime_t::adapt_uword cl_n_cols(n_cols);
+  runtime_t::adapt_uword cl_dest_mem_incr(dest_mem_incr);
+  runtime_t::adapt_uword cl_src_m_n_rows(m_n_rows);
 
-  runtime_t::adapt_uword start_row(aux_row1);
-  runtime_t::adapt_uword start_col(aux_col1);
-
-  runtime_t::adapt_uword S_n_rows(n_rows);
-  runtime_t::adapt_uword S_n_cols(n_cols);
-
-  status |= coot_wrapper(clSetKernelArg)(k1, 0,  sizeof(cl_mem), &(tmp_mem.cl_mem_ptr));
-  status |= coot_wrapper(clSetKernelArg)(k1, 1,  sizeof(cl_mem), &(mem.cl_mem_ptr)    );
-  status |= coot_wrapper(clSetKernelArg)(k1, 2, S_m_n_rows.size, S_m_n_rows.addr      );
-  status |= coot_wrapper(clSetKernelArg)(k1, 3,  start_row.size,  start_row.addr      );
-  status |= coot_wrapper(clSetKernelArg)(k1, 4,  start_col.size,  start_col.addr      );
-  status |= coot_wrapper(clSetKernelArg)(k1, 5,   S_n_rows.size,   S_n_rows.addr      );
-  status |= coot_wrapper(clSetKernelArg)(k1, 6,   S_n_cols.size,   S_n_cols.addr      );
+  status |= coot_wrapper(clSetKernelArg)(k1, 0, sizeof(cl_mem),        &(tmp_mem.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(k1, 1, cl_dest_offset.size,   cl_dest_offset.addr  );
+  status |= coot_wrapper(clSetKernelArg)(k1, 2, sizeof(cl_mem),        &(mem.cl_mem_ptr)    );
+  status |= coot_wrapper(clSetKernelArg)(k1, 3, cl_src_offset.size,    cl_src_offset.addr   );
+  status |= coot_wrapper(clSetKernelArg)(k1, 4, cl_n_rows.size,        cl_n_rows.addr       );
+  status |= coot_wrapper(clSetKernelArg)(k1, 5, cl_n_cols.size,        cl_n_cols.addr       );
+  status |= coot_wrapper(clSetKernelArg)(k1, 6, cl_dest_mem_incr.size, cl_dest_mem_incr.addr);
+  status |= coot_wrapper(clSetKernelArg)(k1, 7, cl_src_m_n_rows.size,  cl_src_m_n_rows.addr );
 
   const size_t k1_work_dim       = 1;
-  const size_t k1_work_offset[1] = { 0                };
+  const size_t k1_work_offset[1] = { 0              };
   const size_t k1_work_size[1]   = { size_t(n_cols) };
 
   status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), k1, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
@@ -85,7 +89,7 @@ accu_subview(dev_mem_t<eT> mem, const uword m_n_rows, const uword aux_row1, cons
 
   status |= coot_wrapper(clSetKernelArg)(k2, 0, sizeof(cl_mem), &(tmp_mem.cl_mem_ptr));
   status |= coot_wrapper(clSetKernelArg)(k2, 1, sizeof(cl_mem), &(tmp_mem.cl_mem_ptr));
-  status |= coot_wrapper(clSetKernelArg)(k2, 2,  S_n_cols.size, S_n_cols.addr        );
+  status |= coot_wrapper(clSetKernelArg)(k2, 2, cl_n_cols.size, cl_n_cols.addr       );
 
   const size_t k2_work_dim       = 1;
   const size_t k2_work_offset[1] = { 0 };

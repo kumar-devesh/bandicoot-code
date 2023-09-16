@@ -47,18 +47,22 @@ accu_subview(dev_mem_t<eT> mem, const uword m_n_rows, const uword aux_row1, cons
 
   Mat<eT> tmp(1, n_cols);
 
-  CUfunction k1 = get_rt().cuda_rt.get_kernel<eT, eT>(twoway_kernel_id::submat_sum_colwise_conv_pre);
+  const uword src_offset = aux_row1 + aux_col1 * m_n_rows;
+
+  CUfunction k1 = get_rt().cuda_rt.get_kernel<eT, eT>(twoway_kernel_id::sum_colwise_conv_pre);
 
   dev_mem_t<eT> tmp_mem = tmp.get_dev_mem(false);
 
+  const eT* src_ptr = mem.cuda_mem_ptr + src_offset;
+  const uword dest_mem_incr = 1;
+
   const void* args[] = {
       &(tmp_mem.cuda_mem_ptr),
-      &(mem.cuda_mem_ptr),
-      (uword*) &m_n_rows,
-      (uword*) &aux_row1,
-      (uword*) &aux_col1,
+      &src_ptr,
       (uword*) &n_rows,
-      (uword*) &n_cols };
+      (uword*) &n_cols,
+      (uword*) &dest_mem_incr,
+      (uword*) &m_n_rows };
 
   const kernel_dims dims = one_dimensional_grid_dims(n_cols);
 
