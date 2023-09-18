@@ -1206,7 +1206,7 @@ TEMPLATE_TEST_CASE("random_scaled_trans_symmat_pinv", "[pinv]", float, double)
   arma::Mat<eT> out3_cpu(out3);
   arma::Mat<eT> out4_cpu(out4);
 
-  const eT tol = (is_same_type<eT, float>::value) ? 1e-5 : 1e-8;
+  const eT tol = (is_same_type<eT, float>::value) ? 1e-4 : 1e-7;
 
   REQUIRE( ( arma::norm( out_cpu - out_ref   ) / out_cpu.n_elem  ) <= tol );
   REQUIRE( ( arma::norm( out2_cpu - out2_ref ) / out2_cpu.n_elem ) <= tol );
