@@ -147,3 +147,9 @@ copy_mat(dev_mem_t<eT2> dest,
   status |= coot_wrapper(clSetKernelArg)(kernel, 6, cl_dest_M_n_rows.size, cl_dest_M_n_rows.addr);
   status |= coot_wrapper(clSetKernelArg)(kernel, 7, cl_src_M_n_rows.size,  cl_src_M_n_rows.addr );
 
+  const size_t global_work_size[2] = { size_t(n_rows), size_t(n_cols) };
+
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 2, NULL, global_work_size, NULL, 0, NULL, NULL);
+
+  coot_check_cl_error(status, "coot::opencl::copy_mat(): couldn't copy buffer");
+  }

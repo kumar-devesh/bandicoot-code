@@ -175,6 +175,7 @@ namespace coot
     #include "bandicoot_bits/cuda/error.hpp"
     #include "bandicoot_bits/cuda/type_to_dev_string.hpp"
     #include "bandicoot_bits/cuda/cuda_data_type.hpp"
+    #include "bandicoot_bits/cuda/copy_bones.hpp"
     #include "bandicoot_bits/cuda/generic_reduce_bones.hpp"
     }
   #endif
@@ -417,7 +418,7 @@ namespace coot
     #include "bandicoot_bits/cuda/random_meat.hpp"
     #include "bandicoot_bits/cuda/accu.hpp"
     #include "bandicoot_bits/cuda/chol.hpp"
-    #include "bandicoot_bits/cuda/copy.hpp"
+    #include "bandicoot_bits/cuda/copy_meat.hpp"
     #include "bandicoot_bits/cuda/trace.hpp"
     #include "bandicoot_bits/cuda/eye.hpp"
     #include "bandicoot_bits/cuda/gemm.hpp"
