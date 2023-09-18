@@ -187,7 +187,6 @@ diagview<eT>::operator= (const Mat<eT>& o)
     );
 
   const bool is_alias = (&o == &t_m);
-  const bool is_vector = (o.n_rows == 1 || o.n_cols == 1);
 
   if (is_alias)
     {
@@ -195,14 +194,14 @@ diagview<eT>::operator= (const Mat<eT>& o)
     coot_rt_t::copy_mat(t_m.get_dev_mem(false), tmp.get_dev_mem(false),
                         1, n_elem,
                         mem_offset, 0, t_m.n_rows + 1,
-                        0, 0, is_vector ? 1 : (tmp.n_rows + 1));
+                        0, 0, 1);
     }
   else
     {
     coot_rt_t::copy_mat(t_m.get_dev_mem(false), o.get_dev_mem(false),
                         1, n_elem,
                         mem_offset, 0, t_m.n_rows + 1,
-                        0, 0, is_vector ? 1 : (o.n_rows + 1));
+                        0, 0, 1);
     }
   }
 
