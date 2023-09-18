@@ -83,27 +83,27 @@ join_rows(dev_mem_t<eT5> out, const dev_mem_t<eT1> A, const uword A_n_rows, cons
   // If the types are different, we need to perform a cast during the copy.
   if (A_n_elem > 0)
     {
-    copy_array(out, A, A_n_elem, 1, 0, 0, A_n_elem, 0, 0, A_n_elem);
+    copy_mat(out, A, A_n_elem, 1, 0, 0, A_n_elem, 0, 0, A_n_elem);
     }
 
   if (B_n_elem > 0)
     {
     dev_mem_t<eT5> out_offset;
     out_offset.cuda_mem_ptr = out.cuda_mem_ptr + A_n_elem;
-    copy_array(out_offset, B, B_n_elem, 1, 0, 0, B_n_elem, 0, 0, B_n_elem);
+    copy_mat(out_offset, B, B_n_elem, 1, 0, 0, B_n_elem, 0, 0, B_n_elem);
     }
 
   if (C_n_elem > 0)
     {
     dev_mem_t<eT5> out_offset;
     out_offset.cuda_mem_ptr = out.cuda_mem_ptr + A_n_elem + B_n_elem;
-    copy_array(out_offset, C, C_n_elem, 1, 0, 0, C_n_elem, 0, 0, C_n_elem);
+    copy_mat(out_offset, C, C_n_elem, 1, 0, 0, C_n_elem, 0, 0, C_n_elem);
     }
 
   if (D_n_elem > 0)
     {
     dev_mem_t<eT5> out_offset;
     out_offset.cuda_mem_ptr = out.cuda_mem_ptr + A_n_elem + B_n_elem + C_n_elem;
-    copy_array(out_offset, D, D_n_elem, 1, 0, 0, D_n_elem, 0, 0, D_n_elem);
+    copy_mat(out_offset, D, D_n_elem, 1, 0, 0, D_n_elem, 0, 0, D_n_elem);
     }
   }

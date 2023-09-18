@@ -506,10 +506,10 @@ Mat<eT>::operator=(const Mat<eT>& X)
     {
     (*this).set_size(X.n_rows, X.n_cols);
 
-    coot_rt_t::copy_array(dev_mem, X.dev_mem,
-                          n_rows, n_cols,
-                          0, 0, n_rows,
-                          0, 0, X.n_rows);
+    coot_rt_t::copy_mat(dev_mem, X.dev_mem,
+                        n_rows, n_cols,
+                        0, 0, n_rows,
+                        0, 0, X.n_rows);
     }
 
   return *this;
@@ -526,12 +526,12 @@ Mat<eT>::operator+=(const Mat<eT>& X)
 
   coot_assert_same_size((*this), X, "Mat::operator+=" );
 
-  coot_rt_t::eop_array(threeway_kernel_id::equ_array_plus_array,
-                       dev_mem, dev_mem, X.dev_mem,
-                       n_rows, n_cols,
-                       0, 0, n_rows,
-                       0, 0, n_rows,
-                       0, 0, X.n_rows);
+  coot_rt_t::eop_mat(threeway_kernel_id::equ_array_plus_array,
+                     dev_mem, dev_mem, X.dev_mem,
+                     n_rows, n_cols,
+                     0, 0, n_rows,
+                     0, 0, n_rows,
+                     0, 0, X.n_rows);
 
   return *this;
   }
@@ -547,12 +547,12 @@ Mat<eT>::operator-=(const Mat<eT>& X)
 
   coot_assert_same_size((*this), X, "Mat::operator-=" );
 
-  coot_rt_t::eop_array(threeway_kernel_id::equ_array_minus_array,
-                       dev_mem, dev_mem, X.dev_mem,
-                       n_rows, n_cols,
-                       0, 0, n_rows,
-                       0, 0, n_rows,
-                       0, 0, X.n_rows);
+  coot_rt_t::eop_mat(threeway_kernel_id::equ_array_minus_array,
+                     dev_mem, dev_mem, X.dev_mem,
+                     n_rows, n_cols,
+                     0, 0, n_rows,
+                     0, 0, n_rows,
+                     0, 0, X.n_rows);
 
   return *this;
   }
@@ -584,12 +584,12 @@ Mat<eT>::operator%=(const Mat<eT>& X)
 
   coot_assert_same_size((*this), X, "Mat::operator%=" );
 
-  coot_rt_t::eop_array(threeway_kernel_id::equ_array_mul_array,
-                       dev_mem, dev_mem, X.dev_mem,
-                       n_rows, n_cols,
-                       0, 0, n_rows,
-                       0, 0, n_rows,
-                       0, 0, X.n_rows);
+  coot_rt_t::eop_mat(threeway_kernel_id::equ_array_mul_array,
+                     dev_mem, dev_mem, X.dev_mem,
+                     n_rows, n_cols,
+                     0, 0, n_rows,
+                     0, 0, n_rows,
+                     0, 0, X.n_rows);
 
   return *this;
   }
@@ -605,12 +605,12 @@ Mat<eT>::operator/=(const Mat<eT>& X)
 
   coot_assert_same_size((*this), X, "Mat::operator/=" );
 
-  coot_rt_t::eop_array(threeway_kernel_id::equ_array_div_array,
-                       dev_mem, dev_mem, X.dev_mem,
-                       n_rows, n_cols,
-                       0, 0, n_rows,
-                       0, 0, n_rows,
-                       0, 0, X.n_rows);
+  coot_rt_t::eop_mat(threeway_kernel_id::equ_array_div_array,
+                     dev_mem, dev_mem, X.dev_mem,
+                     n_rows, n_cols,
+                     0, 0, n_rows,
+                     0, 0, n_rows,
+                     0, 0, X.n_rows);
 
   return *this;
   }

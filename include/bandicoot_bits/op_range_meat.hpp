@@ -92,14 +92,14 @@ op_range::apply_direct(Mat<out_eT>& out, const Mat<in_eT>& in, const uword dim, 
                  0, 1,
                  0, 0, in.n_rows);
   // out = maxs - mins
-  coot_rt_t::eop_array(threeway_kernel_id::equ_array_minus_array,
-                       out.get_dev_mem(false),
-                       maxs.get_dev_mem(false),
-                       mins.get_dev_mem(false),
-                       out.n_rows, out.n_cols,
-                       0, 0, out.n_rows,
-                       0, 0, mins.n_rows,
-                       0, 0, maxs.n_rows);
+  coot_rt_t::eop_mat(threeway_kernel_id::equ_array_minus_array,
+                     out.get_dev_mem(false),
+                     maxs.get_dev_mem(false),
+                     mins.get_dev_mem(false),
+                     out.n_rows, out.n_cols,
+                     0, 0, out.n_rows,
+                     0, 0, mins.n_rows,
+                     0, 0, maxs.n_rows);
   }
 
 

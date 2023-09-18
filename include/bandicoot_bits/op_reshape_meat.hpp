@@ -88,10 +88,10 @@ op_reshape::apply_direct(Mat<eT>& out, const Mat<eT>& in, const uword new_n_rows
       {
       // We treat both out and in as column vectors here.
       const uword elems_to_copy = (std::min)(new_n_elem, in.n_elem);
-      coot_rt_t::copy_array(out.get_dev_mem(false), in.get_dev_mem(false),
-                            elems_to_copy, 1,
-                            0, 0, elems_to_copy,
-                            0, 0, elems_to_copy);
+      coot_rt_t::copy_mat(out.get_dev_mem(false), in.get_dev_mem(false),
+                          elems_to_copy, 1,
+                          0, 0, elems_to_copy,
+                          0, 0, elems_to_copy);
       }
     }
   }
@@ -119,10 +119,10 @@ op_reshape::apply_direct(Mat<out_eT>& out, const Mat<eT>& in, const uword new_n_
     {
     // We treat both out and in as column vectors here.
     const uword elems_to_copy = (std::min)(new_n_elem, in.n_elem);
-    coot_rt_t::copy_array(out.get_dev_mem(false), in.get_dev_mem(false),
-                          elems_to_copy, 1,
-                          0, 0, elems_to_copy,
-                          0, 0, elems_to_copy);
+    coot_rt_t::copy_mat(out.get_dev_mem(false), in.get_dev_mem(false),
+                        elems_to_copy, 1,
+                        0, 0, elems_to_copy,
+                        0, 0, elems_to_copy);
     }
   }
 
@@ -157,18 +157,18 @@ op_reshape::apply_direct(Mat<eT>& out, const subview<eT>& in, const uword new_n_
 
     if (in.n_elem > 0)
       {
-      coot_rt_t::copy_array(out.get_dev_mem(false), in.m.get_dev_mem(false),
-                            in.n_rows, in.n_cols,
-                            0, 0, in.n_rows /* intentionally not out.n_rows */,
-                            in.aux_row1, in.aux_col1, in.m.n_rows);
+      coot_rt_t::copy_mat(out.get_dev_mem(false), in.m.get_dev_mem(false),
+                          in.n_rows, in.n_cols,
+                          0, 0, in.n_rows /* intentionally not out.n_rows */,
+                          in.aux_row1, in.aux_col1, in.m.n_rows);
       }
     }
   else if (new_n_elem == in.n_elem && in.n_elem > 0)
     {
-    coot_rt_t::copy_array(out.get_dev_mem(false), in.m.get_dev_mem(false),
-                          in.n_rows, in.n_cols,
-                          0, 0, in.n_rows /* intentionally not out.n_rows */,
-                          in.aux_row1, in.aux_col1, in.m.n_rows);
+    coot_rt_t::copy_mat(out.get_dev_mem(false), in.m.get_dev_mem(false),
+                        in.n_rows, in.n_cols,
+                        0, 0, in.n_rows /* intentionally not out.n_rows */,
+                        in.aux_row1, in.aux_col1, in.m.n_rows);
     }
   else
     {
@@ -201,18 +201,18 @@ op_reshape::apply_direct(Mat<out_eT>& out, const subview<eT>& in, const uword ne
                     in.n_elem, 0, new_n_rows - in.n_elem);
     if (in.n_elem > 0)
       {
-      coot_rt_t::copy_array(out.get_dev_mem(false), in.m.get_dev_mem(false),
-                            in.n_rows, in.n_cols,
-                            0, 0, in.n_rows /* intentionally not out.n_rows */,
-                            in.aux_row1, in.aux_col1, in.m.n_rows);
+      coot_rt_t::copy_mat(out.get_dev_mem(false), in.m.get_dev_mem(false),
+                          in.n_rows, in.n_cols,
+                          0, 0, in.n_rows /* intentionally not out.n_rows */,
+                          in.aux_row1, in.aux_col1, in.m.n_rows);
       }
     }
   else if (new_n_elem == in.n_elem && in.n_elem > 0)
     {
-    coot_rt_t::copy_array(out.get_dev_mem(false), in.m.get_dev_mem(false),
-                          in.n_rows, in.n_cols,
-                          0, 0, in.n_rows /* intentionally not out.n_rows */,
-                          in.aux_row1, in.aux_col1, in.m.n_rows);
+    coot_rt_t::copy_mat(out.get_dev_mem(false), in.m.get_dev_mem(false),
+                        in.n_rows, in.n_cols,
+                        0, 0, in.n_rows /* intentionally not out.n_rows */,
+                        in.aux_row1, in.aux_col1, in.m.n_rows);
     }
   else
     {

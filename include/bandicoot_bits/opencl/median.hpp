@@ -62,10 +62,10 @@ median(dev_mem_t<eT2> dest,
       {
       // Odd number of elements: the middle element is the result.
       // Now extract that row into the output.
-      copy_array(dest, src,
-                 1, n_cols,
-                 dest_offset, 0, dest_mem_incr,
-                 src_row_offset + middle_element, src_col_offset, src_M_n_rows);
+      copy_mat(dest, src,
+               1, n_cols,
+               dest_offset, 0, dest_mem_incr,
+               src_row_offset + middle_element, src_col_offset, src_M_n_rows);
       }
     }
   else
@@ -95,11 +95,11 @@ median(dev_mem_t<eT2> dest,
       {
       // Odd number of elements: the middle element is the result.
       // Now extract the column into the output.
-      copy_array(dest, src,
-                 // logically treat as column vector so dest_mem_incr can be used
-                 1, n_rows,
-                 dest_offset, 0, dest_mem_incr,
-                 src_row_offset + (src_col_offset + middle_element) * n_rows, 0, 1);
+      copy_mat(dest, src,
+               // logically treat as column vector so dest_mem_incr can be used
+               1, n_rows,
+               dest_offset, 0, dest_mem_incr,
+               src_row_offset + (src_col_offset + middle_element) * n_rows, 0, 1);
       }
     }
   }

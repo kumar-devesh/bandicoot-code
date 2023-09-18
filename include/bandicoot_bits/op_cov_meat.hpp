@@ -89,10 +89,10 @@ op_cov::apply(Mat<out_eT>& out, const Op<mtOp<out_eT, T1, mtop_conv_to>, op_cov>
   op_mean::apply_direct(mean_vals, AA, 0, true); // convert then compute mean
 
   Mat<out_eT> tmp = conv_to<Mat<out_eT>>::from(AA);
-  coot_rt_t::copy_array(tmp.get_dev_mem(false), AA.get_dev_mem(false),
-                        tmp.n_rows, tmp.n_cols,
-                        0, 0, tmp.n_rows,
-                        0, 0, AA.n_rows);
+  coot_rt_t::copy_mat(tmp.get_dev_mem(false), AA.get_dev_mem(false),
+                      tmp.n_rows, tmp.n_cols,
+                      0, 0, tmp.n_rows,
+                      0, 0, AA.n_rows);
   for (uword i = 0; i < tmp.n_rows; ++i)
     {
     // tmp.row(i) = AA.row(i) - mean_vals, plus conversion to out_eT
