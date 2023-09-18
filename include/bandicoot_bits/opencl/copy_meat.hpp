@@ -102,5 +102,5 @@ copy_mat(dev_mem_t<eT2> dest,
 
   status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 2, NULL, global_work_size, NULL, 0, NULL, NULL);
 
-  coot_check_cl_error(status, "coot::opencl::copy_array(): couldn't copy buffer");
+  coot_check_cl_error(status, "coot::opencl::copy_mat(): couldn't copy buffer");
   }

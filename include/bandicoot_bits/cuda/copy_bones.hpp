@@ -28,6 +28,9 @@ copy_into_dev_mem(dev_mem_t<eT> dest, const eT* src, const uword N);
 
 
 
+/**
+ * Use CUDA to copy the source memory to the destination.
+ */
 template<typename eT>
 inline
 void
@@ -44,6 +47,9 @@ copy_mat(dev_mem_t<eT> dest,
 
 
 
+/*
+ * Copy source memory to the destination, changing types.
+ */
 template<typename eT2, typename eT1>
 inline
 void
