@@ -2536,14 +2536,51 @@ coot_rt_t::var_vec_subview(const dev_mem_t<eT> mem, const eT mean, const uword M
 template<typename eT1, typename eT2, typename eT3, typename eT4, typename eT5>
 inline
 void
-coot_rt_t::join_cols(dev_mem_t<eT5> out, const dev_mem_t<eT1> A, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<eT2> B, const uword B_n_rows, const uword B_n_cols, const dev_mem_t<eT3> C, const uword C_n_rows, const uword C_n_cols, const dev_mem_t<eT4> D, const uword D_n_rows, const uword D_n_cols)
+coot_rt_t::join_cols(dev_mem_t<eT5> out,
+                     const dev_mem_t<eT1> A,
+                     const uword A_n_rows,
+                     const uword A_n_cols,
+                     const dev_mem_t<eT2> B,
+                     const uword B_n_rows,
+                     const uword B_n_cols,
+                     const dev_mem_t<eT3> C,
+                     const uword C_n_rows,
+                     const uword C_n_cols,
+                     const dev_mem_t<eT4> D,
+                     const uword D_n_rows,
+                     const uword D_n_cols,
+                     // subview arguments
+                     const uword out_row_offset,
+                     const uword out_col_offset,
+                     const uword out_M_n_rows,
+                     const uword A_row_offset,
+                     const uword A_col_offset,
+                     const uword A_M_n_rows,
+                     const uword B_row_offset,
+                     const uword B_col_offset,
+                     const uword B_M_n_rows,
+                     const uword C_row_offset,
+                     const uword C_col_offset,
+                     const uword C_M_n_rows,
+                     const uword D_row_offset,
+                     const uword D_col_offset,
+                     const uword D_M_n_rows)
   {
   coot_extra_debug_sigprint();
 
   if (get_rt().backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
-    opencl::join_cols(out, A, A_n_rows, A_n_cols, B, B_n_rows, B_n_cols, C, C_n_rows, C_n_cols, D, D_n_rows, D_n_cols);
+    opencl::join_cols(out,
+                      A, A_n_rows, A_n_cols,
+                      B, B_n_rows, B_n_cols,
+                      C, C_n_rows, C_n_cols,
+                      D, D_n_rows, D_n_cols,
+                      out_row_offset, out_col_offset, out_M_n_rows,
+                      A_row_offset, A_col_offset, A_M_n_rows,
+                      B_row_offset, B_col_offset, B_M_n_rows,
+                      C_row_offset, C_col_offset, C_M_n_rows,
+                      D_row_offset, D_col_offset, D_M_n_rows);
     #else
     coot_stop_runtime_error("coot_rt::join_cols(): OpenCL backend not enabled");
     #endif
@@ -2551,7 +2588,16 @@ coot_rt_t::join_cols(dev_mem_t<eT5> out, const dev_mem_t<eT1> A, const uword A_n
   else if (get_rt().backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    cuda::join_cols(out, A, A_n_rows, A_n_cols, B, B_n_rows, B_n_cols, C, C_n_rows, C_n_cols, D, D_n_rows, D_n_cols);
+    cuda::join_cols(out,
+                    A, A_n_rows, A_n_cols,
+                    B, B_n_rows, B_n_cols,
+                    C, C_n_rows, C_n_cols,
+                    D, D_n_rows, D_n_cols,
+                    out_row_offset, out_col_offset, out_M_n_rows,
+                    A_row_offset, A_col_offset, A_M_n_rows,
+                    B_row_offset, B_col_offset, B_M_n_rows,
+                    C_row_offset, C_col_offset, C_M_n_rows,
+                    D_row_offset, D_col_offset, D_M_n_rows);
     #else
     coot_stop_runtime_error("coot_rt::join_cols(): CUDA backend not enabled");
     #endif
@@ -2567,14 +2613,51 @@ coot_rt_t::join_cols(dev_mem_t<eT5> out, const dev_mem_t<eT1> A, const uword A_n
 template<typename eT1, typename eT2, typename eT3, typename eT4, typename eT5>
 inline
 void
-coot_rt_t::join_rows(dev_mem_t<eT5> out, const dev_mem_t<eT1> A, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<eT2> B, const uword B_n_rows, const uword B_n_cols, const dev_mem_t<eT3> C, const uword C_n_rows, const uword C_n_cols, const dev_mem_t<eT4> D, const uword D_n_rows, const uword D_n_cols)
+coot_rt_t::join_rows(dev_mem_t<eT5> out,
+                     const dev_mem_t<eT1> A,
+                     const uword A_n_rows,
+                     const uword A_n_cols,
+                     const dev_mem_t<eT2> B,
+                     const uword B_n_rows,
+                     const uword B_n_cols,
+                     const dev_mem_t<eT3> C,
+                     const uword C_n_rows,
+                     const uword C_n_cols,
+                     const dev_mem_t<eT4> D,
+                     const uword D_n_rows,
+                     const uword D_n_cols,
+                     // subview arguments
+                     const uword out_row_offset,
+                     const uword out_col_offset,
+                     const uword out_M_n_rows,
+                     const uword A_row_offset,
+                     const uword A_col_offset,
+                     const uword A_M_n_rows,
+                     const uword B_row_offset,
+                     const uword B_col_offset,
+                     const uword B_M_n_rows,
+                     const uword C_row_offset,
+                     const uword C_col_offset,
+                     const uword C_M_n_rows,
+                     const uword D_row_offset,
+                     const uword D_col_offset,
+                     const uword D_M_n_rows)
   {
   coot_extra_debug_sigprint();
 
   if (get_rt().backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
-    opencl::join_rows(out, A, A_n_rows, A_n_cols, B, B_n_rows, B_n_cols, C, C_n_rows, C_n_cols, D, D_n_rows, D_n_cols);
+    opencl::join_rows(out,
+                      A, A_n_rows, A_n_cols,
+                      B, B_n_rows, B_n_cols,
+                      C, C_n_rows, C_n_cols,
+                      D, D_n_rows, D_n_cols,
+                      out_row_offset, out_col_offset, out_M_n_rows,
+                      A_row_offset, A_col_offset, A_M_n_rows,
+                      B_row_offset, B_col_offset, B_M_n_rows,
+                      C_row_offset, C_col_offset, C_M_n_rows,
+                      D_row_offset, D_col_offset, D_M_n_rows);
     #else
     coot_stop_runtime_error("coot_rt::join_rows(): OpenCL backend not enabled");
     #endif
@@ -2582,7 +2665,16 @@ coot_rt_t::join_rows(dev_mem_t<eT5> out, const dev_mem_t<eT1> A, const uword A_n
   else if (get_rt().backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    cuda::join_rows(out, A, A_n_rows, A_n_cols, B, B_n_rows, B_n_cols, C, C_n_rows, C_n_cols, D, D_n_rows, D_n_cols);
+    cuda::join_rows(out,
+                    A, A_n_rows, A_n_cols,
+                    B, B_n_rows, B_n_cols,
+                    C, C_n_rows, C_n_cols,
+                    D, D_n_rows, D_n_cols,
+                    out_row_offset, out_col_offset, out_M_n_rows,
+                    A_row_offset, A_col_offset, A_M_n_rows,
+                    B_row_offset, B_col_offset, B_M_n_rows,
+                    C_row_offset, C_col_offset, C_M_n_rows,
+                    D_row_offset, D_col_offset, D_M_n_rows);
     #else
     coot_stop_runtime_error("coot_rt::join_rows(): CUDA backend not enabled");
     #endif

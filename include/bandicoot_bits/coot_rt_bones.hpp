@@ -400,10 +400,66 @@ class coot_rt_t
   static inline eT var_vec_subview(const dev_mem_t<eT> mem, const eT mean, const uword M_n_rows, const uword M_n_cols, const uword aux_row1, const uword aux_col1, const uword n_rows, const uword n_cols, const uword norm_type);
 
   template<typename eT1, typename eT2, typename eT3, typename eT4, typename eT5>
-  static inline void join_cols(dev_mem_t<eT5> out, const dev_mem_t<eT1> A, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<eT2> B, const uword B_n_rows, const uword B_n_cols, const dev_mem_t<eT3> C, const uword C_n_rows, const uword C_n_cols, const dev_mem_t<eT4> D, const uword D_n_rows, const uword D_n_cols);
+  static inline void join_cols(dev_mem_t<eT5> out,
+                               const dev_mem_t<eT1> A,
+                               const uword A_n_rows,
+                               const uword A_n_cols,
+                               const dev_mem_t<eT2> B,
+                               const uword B_n_rows,
+                               const uword B_n_cols,
+                               const dev_mem_t<eT3> C,
+                               const uword C_n_rows,
+                               const uword C_n_cols,
+                               const dev_mem_t<eT4> D,
+                               const uword D_n_rows,
+                               const uword D_n_cols,
+                               // subview arguments
+                               const uword out_row_offset,
+                               const uword out_col_offset,
+                               const uword out_M_n_rows,
+                               const uword A_row_offset,
+                               const uword A_col_offset,
+                               const uword A_M_n_rows,
+                               const uword B_row_offset,
+                               const uword B_col_offset,
+                               const uword B_M_n_rows,
+                               const uword C_row_offset,
+                               const uword C_col_offset,
+                               const uword C_M_n_rows,
+                               const uword D_row_offset,
+                               const uword D_col_offset,
+                               const uword D_M_n_rows);
 
   template<typename eT1, typename eT2, typename eT3, typename eT4, typename eT5>
-  static inline void join_rows(dev_mem_t<eT5> out, const dev_mem_t<eT1> A, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<eT2> B, const uword B_n_rows, const uword B_n_cols, const dev_mem_t<eT3> C, const uword C_n_rows, const uword C_n_cols, const dev_mem_t<eT4> D, const uword D_n_rows, const uword D_n_cols);
+  static inline void join_rows(dev_mem_t<eT5> out,
+                               const dev_mem_t<eT1> A,
+                               const uword A_n_rows,
+                               const uword A_n_cols,
+                               const dev_mem_t<eT2> B,
+                               const uword B_n_rows,
+                               const uword B_n_cols,
+                               const dev_mem_t<eT3> C,
+                               const uword C_n_rows,
+                               const uword C_n_cols,
+                               const dev_mem_t<eT4> D,
+                               const uword D_n_rows,
+                               const uword D_n_cols,
+                               // subview arguments
+                               const uword out_row_offset,
+                               const uword out_col_offset,
+                               const uword out_M_n_rows,
+                               const uword A_row_offset,
+                               const uword A_col_offset,
+                               const uword A_M_n_rows,
+                               const uword B_row_offset,
+                               const uword B_col_offset,
+                               const uword B_M_n_rows,
+                               const uword C_row_offset,
+                               const uword C_col_offset,
+                               const uword C_M_n_rows,
+                               const uword D_row_offset,
+                               const uword D_col_offset,
+                               const uword D_M_n_rows);
 
   template<typename eT>
   static inline void sort(dev_mem_t<eT> mem,

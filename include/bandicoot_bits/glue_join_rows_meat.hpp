@@ -29,15 +29,12 @@ glue_join_rows::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_join_rows>& glue
   const no_conv_unwrap<T1> U1(glue.A);
   const no_conv_unwrap<T2> U2(glue.B);
 
-  const extract_subview<typename no_conv_unwrap<T1>::stored_type> E1(U1.M);
-  const extract_subview<typename no_conv_unwrap<T2>::stored_type> E2(U2.M);
-
   // check for same number of columns
-  const uword A_n_rows = E1.M.n_rows;
-  const uword A_n_cols = E1.M.n_cols;
+  const uword A_n_rows = U1.M.n_rows;
+  const uword A_n_cols = U1.M.n_cols;
 
-  const uword B_n_rows = E2.M.n_rows;
-  const uword B_n_cols = E2.M.n_cols;
+  const uword B_n_rows = U2.M.n_rows;
+  const uword B_n_cols = U2.M.n_cols;
 
   coot_debug_check
     (
@@ -55,24 +52,36 @@ glue_join_rows::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_join_rows>& glue
     return;
     }
 
-  if ((void_ptr(&out) == void_ptr(&E1.M)) || (void_ptr(&out) == void_ptr(&E2.M)))
+  if ((void_ptr(&out) == void_ptr(&U1.M)) || (void_ptr(&out) == void_ptr(&U2.M)))
     {
     Mat<out_eT> tmp(new_n_rows, new_n_cols);
     coot_rt_t::join_rows(tmp.get_dev_mem(false),
-                         E1.M.get_dev_mem(false), A_n_rows, A_n_cols,
-                         E2.M.get_dev_mem(false), B_n_rows, B_n_cols,
-                         E1.M.get_dev_mem(false), 0, 0, /* ignored */
-                         E1.M.get_dev_mem(false), 0, 0 /* ignored */);
+                         U1.get_dev_mem(false), A_n_rows, A_n_cols,
+                         U2.get_dev_mem(false), B_n_rows, B_n_cols,
+                         U1.get_dev_mem(false), 0, 0, /* ignored */
+                         U1.get_dev_mem(false), 0, 0, /* ignored */
+                         // subview arguments
+                         0, 0, new_n_rows,
+                         U1.get_row_offset(), U1.get_col_offset(), U1.get_M_n_rows(),
+                         U2.get_row_offset(), U2.get_col_offset(), U2.get_M_n_rows(),
+                         0, 0, 1, /* ignored */
+                         0, 0, 1 /* ignored */);
     out.steal_mem(tmp);
     }
   else
     {
     out.set_size(new_n_rows, new_n_cols);
     coot_rt_t::join_rows(out.get_dev_mem(false),
-                         E1.M.get_dev_mem(false), A_n_rows, A_n_cols,
-                         E2.M.get_dev_mem(false), B_n_rows, B_n_cols,
-                         E1.M.get_dev_mem(false), 0, 0, /* ignored */
-                         E1.M.get_dev_mem(false), 0, 0 /* ignored */);
+                         U1.get_dev_mem(false), A_n_rows, A_n_cols,
+                         U2.get_dev_mem(false), B_n_rows, B_n_cols,
+                         U1.get_dev_mem(false), 0, 0, /* ignored */
+                         U1.get_dev_mem(false), 0, 0, /* ignored */
+                         // subview arguments
+                         0, 0, new_n_rows,
+                         U1.get_row_offset(), U1.get_col_offset(), U1.get_M_n_rows(),
+                         U2.get_row_offset(), U2.get_col_offset(), U2.get_M_n_rows(),
+                         0, 0, 1, /* ignored */
+                         0, 0, 1 /* ignored */);
     }
   }
 
@@ -89,17 +98,13 @@ glue_join_rows::apply(Mat<eT>& out, const T1& A, const T2& B, const T3& C, const
   const no_conv_unwrap<T2> U2(B);
   const no_conv_unwrap<T3> U3(C);
 
-  const extract_subview<typename no_conv_unwrap<T1>::stored_type> E1(U1.M);
-  const extract_subview<typename no_conv_unwrap<T2>::stored_type> E2(U2.M);
-  const extract_subview<typename no_conv_unwrap<T3>::stored_type> E3(U3.M);
-
   // check for same number of columns
-  const uword A_n_rows = E1.M.n_rows;
-  const uword A_n_cols = E1.M.n_cols;
-  const uword B_n_rows = E2.M.n_rows;
-  const uword B_n_cols = E2.M.n_cols;
-  const uword C_n_rows = E3.M.n_rows;
-  const uword C_n_cols = E3.M.n_cols;
+  const uword A_n_rows = U1.M.n_rows;
+  const uword A_n_cols = U1.M.n_cols;
+  const uword B_n_rows = U2.M.n_rows;
+  const uword B_n_cols = U2.M.n_cols;
+  const uword C_n_rows = U3.M.n_rows;
+  const uword C_n_cols = U3.M.n_cols;
 
   const uword out_n_cols = A_n_cols + B_n_cols + C_n_cols;
   const uword out_n_rows = ((std::max)((std::max)(A_n_rows, B_n_rows), C_n_rows));
@@ -116,24 +121,36 @@ glue_join_rows::apply(Mat<eT>& out, const T1& A, const T2& B, const T3& C, const
     }
 
   // Ensure that the output is not an alias.
-  if ((void_ptr(&out) == void_ptr(&E1.M)) || (void_ptr(&out) == void_ptr(&E2.M)) || (void_ptr(&out) == void_ptr(&E3.M)))
+  if ((void_ptr(&out) == void_ptr(&U1.M)) || (void_ptr(&out) == void_ptr(&U2.M)) || (void_ptr(&out) == void_ptr(&U3.M)))
     {
     Mat<eT> tmp(out_n_rows, out_n_cols);
     coot_rt_t::join_rows(tmp.get_dev_mem(false),
-                         E1.M.get_dev_mem(false), A_n_rows, A_n_cols,
-                         E2.M.get_dev_mem(false), B_n_rows, B_n_cols,
-                         E3.M.get_dev_mem(false), C_n_rows, C_n_cols,
-                         E1.M.get_dev_mem(false), 0, 0 /* ignored */);
+                         U1.get_dev_mem(false), A_n_rows, A_n_cols,
+                         U2.get_dev_mem(false), B_n_rows, B_n_cols,
+                         U3.get_dev_mem(false), C_n_rows, C_n_cols,
+                         U1.get_dev_mem(false), 0, 0, /* ignored */
+                         // subview arguments
+                         0, 0, out_n_rows,
+                         U1.get_row_offset(), U1.get_col_offset(), U1.get_M_n_rows(),
+                         U2.get_row_offset(), U2.get_col_offset(), U2.get_M_n_rows(),
+                         U3.get_row_offset(), U3.get_col_offset(), U3.get_M_n_rows(),
+                         0, 0, 1 /* ignored */);
     out.steal_mem(tmp);
     }
   else
     {
     out.set_size(out_n_rows, out_n_cols);
     coot_rt_t::join_rows(out.get_dev_mem(false),
-                         E1.M.get_dev_mem(false), A_n_rows, A_n_cols,
-                         E2.M.get_dev_mem(false), B_n_rows, B_n_cols,
-                         E3.M.get_dev_mem(false), C_n_rows, C_n_cols,
-                         E1.M.get_dev_mem(false), 0, 0 /* ignored */);
+                         U1.get_dev_mem(false), A_n_rows, A_n_cols,
+                         U2.get_dev_mem(false), B_n_rows, B_n_cols,
+                         U3.get_dev_mem(false), C_n_rows, C_n_cols,
+                         U1.get_dev_mem(false), 0, 0, /* ignored */
+                         // subview arguments
+                         0, 0, out_n_rows,
+                         U1.get_row_offset(), U1.get_col_offset(), U1.get_M_n_rows(),
+                         U2.get_row_offset(), U2.get_col_offset(), U2.get_M_n_rows(),
+                         U3.get_row_offset(), U3.get_col_offset(), U3.get_M_n_rows(),
+                         0, 0, 1 /* ignored */);
     }
   }
 
@@ -151,20 +168,15 @@ glue_join_rows::apply(Mat<eT>& out, const T1& A, const T2& B, const T3& C, const
   const no_conv_unwrap<T3> U3(C);
   const no_conv_unwrap<T4> U4(D);
 
-  const extract_subview<typename no_conv_unwrap<T1>::stored_type> E1(U1.M);
-  const extract_subview<typename no_conv_unwrap<T2>::stored_type> E2(U2.M);
-  const extract_subview<typename no_conv_unwrap<T3>::stored_type> E3(U3.M);
-  const extract_subview<typename no_conv_unwrap<T3>::stored_type> E4(U4.M);
-
   // check for same number of columns
-  const uword A_n_rows = E1.M.n_rows;
-  const uword A_n_cols = E1.M.n_cols;
-  const uword B_n_rows = E2.M.n_rows;
-  const uword B_n_cols = E2.M.n_cols;
-  const uword C_n_rows = E3.M.n_rows;
-  const uword C_n_cols = E3.M.n_cols;
-  const uword D_n_rows = E4.M.n_rows;
-  const uword D_n_cols = E4.M.n_cols;
+  const uword A_n_rows = U1.M.n_rows;
+  const uword A_n_cols = U1.M.n_cols;
+  const uword B_n_rows = U2.M.n_rows;
+  const uword B_n_cols = U2.M.n_cols;
+  const uword C_n_rows = U3.M.n_rows;
+  const uword C_n_cols = U3.M.n_cols;
+  const uword D_n_rows = U4.M.n_rows;
+  const uword D_n_cols = U4.M.n_cols;
 
   const uword out_n_cols = A_n_cols + B_n_cols + C_n_cols + D_n_cols;
   const uword out_n_rows = (std::max)((std::max)((std::max)(A_n_rows, B_n_rows), C_n_rows), D_n_rows);
@@ -182,24 +194,36 @@ glue_join_rows::apply(Mat<eT>& out, const T1& A, const T2& B, const T3& C, const
     }
 
   // Ensure that the output is not an alias.
-  if ((void_ptr(&out) == void_ptr(&E1.M)) || (void_ptr(&out) == void_ptr(&E2.M)) || (void_ptr(&out) == void_ptr(&E3.M)))
+  if ((void_ptr(&out) == void_ptr(&U1.M)) || (void_ptr(&out) == void_ptr(&U2.M)) || (void_ptr(&out) == void_ptr(&U3.M)) || (void_ptr(&out) == void_ptr(&U4.M)))
     {
     Mat<eT> tmp(out_n_rows, out_n_cols);
     coot_rt_t::join_rows(tmp.get_dev_mem(false),
-                         E1.M.get_dev_mem(false), A_n_rows, A_n_cols,
-                         E2.M.get_dev_mem(false), B_n_rows, B_n_cols,
-                         E3.M.get_dev_mem(false), C_n_rows, C_n_cols,
-                         E4.M.get_dev_mem(false), D_n_rows, D_n_cols);
+                         U1.get_dev_mem(false), A_n_rows, A_n_cols,
+                         U2.get_dev_mem(false), B_n_rows, B_n_cols,
+                         U3.get_dev_mem(false), C_n_rows, C_n_cols,
+                         U4.get_dev_mem(false), D_n_rows, D_n_cols,
+                         // subview arguments
+                         0, 0, out_n_rows,
+                         U1.get_row_offset(), U1.get_col_offset(), U1.get_M_n_rows(),
+                         U2.get_row_offset(), U2.get_col_offset(), U2.get_M_n_rows(),
+                         U3.get_row_offset(), U3.get_col_offset(), U3.get_M_n_rows(),
+                         U4.get_row_offset(), U4.get_col_offset(), U4.get_M_n_rows());
     out.steal_mem(tmp);
     }
   else
     {
     out.set_size(out_n_rows, out_n_cols);
     coot_rt_t::join_rows(out.get_dev_mem(false),
-                         E1.M.get_dev_mem(false), A_n_rows, A_n_cols,
-                         E2.M.get_dev_mem(false), B_n_rows, B_n_cols,
-                         E3.M.get_dev_mem(false), C_n_rows, C_n_cols,
-                         E4.M.get_dev_mem(false), D_n_rows, D_n_cols);
+                         U1.get_dev_mem(false), A_n_rows, A_n_cols,
+                         U2.get_dev_mem(false), B_n_rows, B_n_cols,
+                         U3.get_dev_mem(false), C_n_rows, C_n_cols,
+                         U4.get_dev_mem(false), D_n_rows, D_n_cols,
+                         // subview arguments
+                         0, 0, out_n_rows,
+                         U1.get_row_offset(), U1.get_col_offset(), U1.get_M_n_rows(),
+                         U2.get_row_offset(), U2.get_col_offset(), U2.get_M_n_rows(),
+                         U3.get_row_offset(), U3.get_col_offset(), U3.get_M_n_rows(),
+                         U4.get_row_offset(), U4.get_col_offset(), U4.get_M_n_rows());
     }
   }
 
