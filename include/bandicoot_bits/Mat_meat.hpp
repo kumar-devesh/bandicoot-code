@@ -804,8 +804,6 @@ Mat<eT>::Mat(const diagview<eT>& X)
   {
   coot_extra_debug_sigprint_this(this);
 
-  init(X.n_rows, X.n_cols);
-
   diagview<eT>::extract(*this, X);
   }
 
@@ -822,7 +820,6 @@ Mat<eT>::operator=(const diagview<eT>& X)
 
   if (alias == false)
     {
-    init(X.n_rows, X.n_cols);
     diagview<eT>::extract(*this, X);
     }
   else

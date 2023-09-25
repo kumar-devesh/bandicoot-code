@@ -49,55 +49,6 @@ copy_into_dev_mem(dev_mem_t<eT> dest, const eT* src, const uword N)
 
 
 /**
- * Use OpenCL to copy the source memory to the destination.
- */
-template<typename eT>
-inline
-void
-copy_mat(dev_mem_t<eT> dest,
-         const dev_mem_t<eT> src,
-         const uword n_rows,
-         const uword n_cols,
-         const uword dest_row_offset,
-         const uword dest_col_offset,
-         const uword dest_M_n_rows,
-         const uword src_row_offset,
-         const uword src_col_offset,
-         const uword src_M_n_rows)
-  {
-  coot_extra_debug_sigprint();
-
-  if (n_rows == 0 || n_cols == 0)
-    {
-    return;
-    }
-
-  runtime_t::cq_guard guard;
-
-  const size_t  src_origin[3] = { size_t(src_row_offset) * sizeof(eT),  size_t(src_col_offset),  0 };
-  const size_t dest_origin[3] = { size_t(dest_row_offset) * sizeof(eT), size_t(dest_col_offset), 0 };
-  const size_t      region[3] = { size_t(n_rows) * sizeof(eT),          size_t(n_cols),          1 };
-
-  cl_int status = coot_wrapper(clEnqueueCopyBufferRect)(get_rt().cl_rt.get_cq(),
-                                                        src.cl_mem_ptr,
-                                                        dest.cl_mem_ptr,
-                                                        src_origin,
-                                                        dest_origin,
-                                                        region,
-                                                        sizeof(eT) * src_M_n_rows,
-                                                        0,
-                                                        sizeof(eT) * dest_M_n_rows,
-                                                        0,
-                                                        0,
-                                                        NULL,
-                                                        NULL);
-
-  coot_check_cl_error(status, "coot::opencl::copy_mat(): couldn't copy buffer" );
-  }
-
-
-
-/**
  * Copy an array via OpenCL and cast the type of its elements.
  */
 template<typename eT2, typename eT1>

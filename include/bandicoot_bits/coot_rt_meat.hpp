@@ -455,99 +455,6 @@ coot_rt_t::reorder_cols(dev_mem_t<eT> out, const dev_mem_t<eT> mem, const uword 
 template<typename eT>
 inline
 void
-coot_rt_t::extract_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword in_mem_offset, const uword n_rows, const uword len)
-  {
-  coot_extra_debug_sigprint();
-
-  if (get_rt().backend == CL_BACKEND)
-    {
-    #if defined(COOT_USE_OPENCL)
-    opencl::extract_diag(out, in, in_mem_offset, n_rows, len);
-    #else
-    coot_stop_runtime_error("coot_rt::extract_diag(): OpenCL backend not enabled");
-    #endif
-    }
-  else if (get_rt().backend == CUDA_BACKEND)
-    {
-    #if defined(COOT_USE_CUDA)
-    cuda::extract_diag(out, in, in_mem_offset, n_rows, len);
-    #else
-    coot_stop_runtime_error("coot_rt::extract_diag(): CUDA backend not enabled");
-    #endif
-    }
-  else
-    {
-    coot_stop_runtime_error("coot_rt::extract_diag(): unknown backend");
-    }
-  }
-
-
-
-template<typename eT2, typename eT1>
-inline
-void
-coot_rt_t::set_diag(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword in_mem_offset, const uword n_rows, const uword len)
-  {
-  coot_extra_debug_sigprint();
-
-  if (get_rt().backend == CL_BACKEND)
-    {
-    #if defined(COOT_USE_OPENCL)
-    opencl::set_diag(out, in, in_mem_offset, n_rows, len);
-    #else
-    coot_stop_runtime_error("coot_rt::set_diag(): OpenCL backend not enabled");
-    #endif
-    }
-  else if (get_rt().backend == CUDA_BACKEND)
-    {
-    #if defined(COOT_USE_CUDA)
-    cuda::set_diag(out, in, in_mem_offset, n_rows, len);
-    #else
-    coot_stop_runtime_error("coot_rt::set_diag(): CUDA backend not enabled");
-    #endif
-    }
-  else
-    {
-    coot_stop_runtime_error("coot_rt::set_diag(): unknown backend");
-    }
-  }
-
-
-
-template<typename eT>
-inline
-void
-coot_rt_t::copy_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword out_mem_offset, const uword in_mem_offset, const uword out_n_rows, const uword in_n_rows, const uword len)
-  {
-  coot_extra_debug_sigprint();
-
-  if (get_rt().backend == CL_BACKEND)
-    {
-    #if defined(COOT_USE_OPENCL)
-    opencl::copy_diag(out, in, out_mem_offset, in_mem_offset, out_n_rows, in_n_rows, len);
-    #else
-    coot_stop_runtime_error("coot_rt::copy_diag(): OpenCL backend not enabled");
-    #endif
-    }
-  else if (get_rt().backend == CUDA_BACKEND)
-    {
-    #if defined(COOT_USE_CUDA)
-    cuda::copy_diag(out, in, out_mem_offset, in_mem_offset, out_n_rows, in_n_rows, len);
-    #else
-    coot_stop_runtime_error("coot_rt::copy_diag(): CUDA backend not enabled");
-    #endif
-    }
-  else
-    {
-    coot_stop_runtime_error("coot_rt::copy_diag(): unknown backend");
-    }
-  }
-
-
-
-template<typename eT>
-inline
-void
 coot_rt_t::fill(dev_mem_t<eT> dest,
                 const eT val,
                 const uword n_rows,
@@ -577,37 +484,6 @@ coot_rt_t::fill(dev_mem_t<eT> dest,
   else
     {
     coot_stop_runtime_error("coot_rt::fill(): unknown backend");
-    }
-  }
-
-
-
-template<typename eT>
-inline
-void
-coot_rt_t::inplace_op_diag(dev_mem_t<eT> dest, const uword mem_offset, const eT val, const uword n_rows, const uword len, const oneway_kernel_id::enum_id num)
-  {
-  coot_extra_debug_sigprint();
-
-  if (get_rt().backend == CL_BACKEND)
-    {
-    #if defined(COOT_USE_OPENCL)
-    opencl::inplace_op_diag(dest, mem_offset, val, n_rows, len, num);
-    #else
-    coot_stop_runtime_error("coot_rt::inplace_op_diag(): OpenCL backend not enabled");
-    #endif
-    }
-  else if (get_rt().backend == CUDA_BACKEND)
-    {
-    #if defined(COOT_USE_CUDA)
-    cuda::inplace_op_diag(dest, mem_offset, val, n_rows, len, num);
-    #else
-    coot_stop_runtime_error("coot_rt::inplace_op_diag(): CUDA backend not enabled");
-    #endif
-    }
-  else
-    {
-    coot_stop_runtime_error("coot_rt::inplace_op_diag(): unknown backend");
     }
   }
 

@@ -86,15 +86,6 @@ class coot_rt_t
   template<typename eT>
   static inline void reorder_cols(dev_mem_t<eT> out, const dev_mem_t<eT> mem, const uword n_rows, const dev_mem_t<uword> order, const uword out_n_cols);
 
-  template<typename eT>
-  static inline void extract_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword in_mem_offset, const uword n_rows, const uword len);
-
-  template<typename eT2, typename eT1>
-  static inline void set_diag(dev_mem_t<eT2> out, const dev_mem_t<eT1> in, const uword in_mem_offset, const uword n_rows, const uword len);
-
-  template<typename eT>
-  static inline void copy_diag(dev_mem_t<eT> out, const dev_mem_t<eT> in, const uword out_mem_offset, const uword in_mem_offset, const uword out_n_rows, const uword in_n_rows, const uword len);
-
   /**
    * Fill a matrix or subview with a scalar value.
    * The offsets and M_n_rows are meant to allow the destination to be a subview of a larger matrix.
@@ -107,9 +98,6 @@ class coot_rt_t
                           const uword row_offset,
                           const uword col_offset,
                           const uword M_n_rows);
-
-  template<typename eT>
-  static inline void inplace_op_diag(dev_mem_t<eT> dest, const uword mem_offset, const eT val, const uword n_rows, const uword len, const oneway_kernel_id::enum_id num);
 
   template<typename eT>
   static inline void replace(dev_mem_t<eT> mem, const uword n_elem, const eT val_find, const eT val_replace);

@@ -75,8 +75,11 @@ op_pinv::apply_direct(Mat<eT2>& out, const T1& in, const typename T1::elem_type 
       // Note that aliases don't need to be handled since we are not operating on `in` now.
       const uword N = (std::min)(U.M.n_rows, U.M.n_cols);
       Col<typename T1::elem_type> diag(N);
-      // TODO: it's possible to see a diag as a subview
-      coot_rt_t::extract_diag(diag.get_dev_mem(false), U.M.get_dev_mem(false), 0, U.M.n_rows, N);
+      // Extract the diagonal.
+      coot_rt_t::copy_mat(diag.get_dev_mem(false), U.get_dev_mem(false),
+                          1, N,
+                          0, 0, 1,
+                          U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows() + 1);
 
       return apply_direct_diag(out, diag, tol);
       }
@@ -192,7 +195,10 @@ op_pinv::apply_direct_diag(Mat<eT>& out, const Mat<eT>& in, const eT tol)
                      0, 0, tol_indicator.n_rows);
 
   // Now set the diagonal of the other matrix.
-  coot_rt_t::set_diag(out.get_dev_mem(false), out_vec.get_dev_mem(false), 0, N, N);
+  coot_rt_t::copy_mat(out.get_dev_mem(false), out_vec.get_dev_mem(false),
+                      1, N,
+                      0, 0, out.n_rows + 1,
+                      0, 0, 1);
 
   return std::make_tuple(true, "");
   }
@@ -272,7 +278,10 @@ op_pinv::apply_direct_diag(Mat<eT2>& out, const Mat<eT1>& in, const eT1 tol, con
                      0, 0, tol_indicator.n_rows);
 
   // Now set the diagonal of the other matrix.  This also performs the conversion.
-  coot_rt_t::set_diag(out.get_dev_mem(false), out_vec.get_dev_mem(false), 0, N, N);
+  coot_rt_t::copy_mat(out.get_dev_mem(false), out_vec.get_dev_mem(false),
+                      1, N,
+                      0, 0, out.n_rows + 1,
+                      0, 0, 1);
 
   return std::make_tuple(true, "");
   }

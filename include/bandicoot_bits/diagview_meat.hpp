@@ -85,7 +85,11 @@ diagview<eT>::operator= (const diagview<eT>& x)
         Mat<eT>& d_m = const_cast< Mat<eT>& >(m);
   const Mat<eT>& x_m = x.m;
 
-  coot_rt_t::copy_diag(d_m.get_dev_mem(false), x_m.get_dev_mem(false), mem_offset, x.mem_offset, d_m.n_rows, x_m.n_rows, n_elem);
+  // We can view the diagonal as a subview.
+  coot_rt_t::copy_mat(d_m.get_dev_mem(false), x_m.get_dev_mem(false),
+                      1, n_elem,
+                      mem_offset, 0, d_m.n_rows + 1,
+                      x.mem_offset, 0, x_m.n_rows + 1);
   }
 
 
@@ -99,7 +103,12 @@ diagview<eT>::operator+=(const eT val)
 
   Mat<eT>& t_m = const_cast< Mat<eT>& >(m);
 
-  coot_rt_t::inplace_op_diag(m.get_dev_mem(false), mem_offset, val, t_m.n_rows, n_elem, oneway_kernel_id::diag_inplace_plus_scalar);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_plus_scalar,
+                        m.get_dev_mem(false), m.get_dev_mem(false),
+                        (eT) val, (eT) 0,
+                        1, n_elem,
+                        mem_offset, 0, m.n_rows + 1,
+                        mem_offset, 0, m.n_rows + 1);
   }
 
 
@@ -113,7 +122,12 @@ diagview<eT>::operator-=(const eT val)
 
   Mat<eT>& t_m = const_cast< Mat<eT>& >(m);
 
-  coot_rt_t::inplace_op_diag(m.get_dev_mem(false), mem_offset, val, t_m.n_rows, n_elem, oneway_kernel_id::diag_inplace_minus_scalar);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_minus_scalar_post,
+                        m.get_dev_mem(false), m.get_dev_mem(false),
+                        (eT) val, (eT) 0,
+                        1, n_elem,
+                        mem_offset, 0, m.n_rows + 1,
+                        mem_offset, 0, m.n_rows + 1);
   }
 
 
@@ -127,7 +141,12 @@ diagview<eT>::operator*=(const eT val)
 
   Mat<eT>& t_m = const_cast< Mat<eT>& >(m);
 
-  coot_rt_t::inplace_op_diag(m.get_dev_mem(false), mem_offset, val, t_m.n_rows, n_elem, oneway_kernel_id::diag_inplace_mul_scalar);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_mul_scalar,
+                        m.get_dev_mem(false), m.get_dev_mem(false),
+                        (eT) val, (eT) 1,
+                        1, n_elem,
+                        mem_offset, 0, m.n_rows + 1,
+                        mem_offset, 0, m.n_rows + 1);
   }
 
 
@@ -141,7 +160,12 @@ diagview<eT>::operator/=(const eT val)
 
   Mat<eT>& t_m = const_cast< Mat<eT>& >(m);
 
-  coot_rt_t::inplace_op_diag(m.get_dev_mem(false), mem_offset, val, t_m.n_rows, n_elem, oneway_kernel_id::diag_inplace_div_scalar);
+  coot_rt_t::eop_scalar(twoway_kernel_id::equ_array_div_scalar_post,
+                        m.get_dev_mem(false), m.get_dev_mem(false),
+                        (eT) val, (eT) 1,
+                        1, n_elem,
+                        mem_offset, 0, m.n_rows + 1,
+                        mem_offset, 0, m.n_rows + 1);
   }
 
 
@@ -166,14 +190,18 @@ diagview<eT>::operator= (const Mat<eT>& o)
 
   if (is_alias)
     {
-    coot_extra_debug_print("aliasing detected");
-
     Mat<eT> tmp(o);
-    coot_rt_t::set_diag(t_m.get_dev_mem(false), tmp.get_dev_mem(false), mem_offset, m.n_rows, n_elem);
+    coot_rt_t::copy_mat(t_m.get_dev_mem(false), tmp.get_dev_mem(false),
+                        1, n_elem,
+                        mem_offset, 0, t_m.n_rows + 1,
+                        0, 0, 1);
     }
   else
     {
-    coot_rt_t::set_diag(t_m.get_dev_mem(false), o.get_dev_mem(false), mem_offset, m.n_rows, n_elem);
+    coot_rt_t::copy_mat(t_m.get_dev_mem(false), o.get_dev_mem(false),
+                        1, n_elem,
+                        mem_offset, 0, t_m.n_rows + 1,
+                        0, 0, 1);
     }
   }
 
@@ -194,9 +222,25 @@ diagview<eT>::operator= (const subview<eT>& o)
     "diagview: given object has incompatible size"
     );
 
-  // All subviews must be extracted.
-  Mat<eT> tmp(o);
-  coot_rt_t::set_diag(t_m.get_dev_mem(false), tmp.get_dev_mem(false), mem_offset, m.n_rows, n_elem);
+  const bool is_alias = (&o.m == &t_m);
+
+  if (is_alias)
+    {
+    const bool is_vector = (o.n_rows == 1 || o.n_cols == 1);
+
+    Mat<eT> tmp(o);
+    coot_rt_t::copy_mat(t_m.get_dev_mem(false), tmp.get_dev_mem(false),
+                        1, n_elem,
+                        mem_offset, 0, t_m.n_rows + 1,
+                        0, 0, is_vector ? 1 : (tmp.n_rows + 1));
+    }
+  else
+    {
+    coot_rt_t::copy_mat(t_m.get_dev_mem(false), o.m.get_dev_mem(false),
+                        1, n_elem,
+                        mem_offset, 0, t_m.n_rows + 1,
+                        o.aux_row1, o.aux_col1, o.m.n_rows + 1);
+    }
   }
 
 
@@ -294,7 +338,13 @@ diagview<eT>::extract(Mat<eT>& out, const diagview<eT>& in)
 
   const Mat<eT>& in_m = in.m;
 
-  coot_rt_t::extract_diag(out.get_dev_mem(false), in_m.get_dev_mem(false), in.mem_offset, in_m.n_rows, in.n_elem);
+  out.set_size(in.n_rows, in.n_cols); // should be a vector
+
+  // A diagonal can be seen as a subvector of the matrix with m_n_rows = n_rows + 1.
+  coot_rt_t::copy_mat(out.get_dev_mem(false), in.m.get_dev_mem(false),
+                      1, in.n_elem,
+                      0, 0, 1,
+                      in.mem_offset, 0, in.m.n_rows + 1);
   }
 
 
@@ -492,7 +542,9 @@ diagview<eT>::fill(const eT val)
 
   Mat<eT>& t_m = const_cast< Mat<eT>& >(m);
 
-  coot_rt_t::inplace_op_diag(t_m.get_dev_mem(false), mem_offset, val, t_m.n_rows, n_elem, oneway_kernel_id::diag_inplace_set_scalar);
+  coot_rt_t::fill(m.get_dev_mem(false), val,
+                  1, n_elem,
+                  mem_offset, 0, m.n_rows + 1);
   }
 
 
