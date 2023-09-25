@@ -552,3 +552,29 @@ TEMPLATE_TEST_CASE(
   REQUIRE( out.n_cols == out_ref.n_cols );
   REQUIRE( all( all( out == out_ref ) ) );
   }
+
+
+
+TEMPLATE_TEST_CASE("two_subview_min", "[min]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x(100, 100, fill::randu);
+  Mat<eT> y(100, 100, fill::randn);
+
+  Mat<eT> z = min(x.submat(50, 50, 74, 74), y.submat(25, 25, 49, 49));
+
+  Mat<eT> x_extracted = x.submat(50, 50, 74, 74);
+  Mat<eT> y_extracted = y.submat(25, 25, 49, 49);
+
+  Mat<eT> z_ref = min(x_extracted, y_extracted);
+
+  REQUIRE( z.n_rows == 25 );
+  REQUIRE( z.n_cols == 25 );
+  REQUIRE( all( all( z == z_ref ) ) );
+  }
