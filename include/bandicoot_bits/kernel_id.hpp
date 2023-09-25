@@ -58,16 +58,6 @@ struct oneway_kernel_id
     {
     fill = 0,
     //
-    diag_inplace_set_scalar,
-    diag_inplace_plus_scalar,
-    diag_inplace_minus_scalar,
-    diag_inplace_mul_scalar,
-    diag_inplace_div_scalar,
-    diag_inplace_mod_scalar,
-    //
-    extract_diag,
-    copy_diag,
-    //
     mul_colwise,
     mul_rowwise,
     mul_colwise_trans,
@@ -143,16 +133,6 @@ struct oneway_kernel_id
     std::vector<std::string> names;
 
     names.push_back("fill");
-
-    names.push_back("diag_inplace_set_scalar");
-    names.push_back("diag_inplace_plus_scalar");
-    names.push_back("diag_inplace_minus_scalar");
-    names.push_back("diag_inplace_mul_scalar");
-    names.push_back("diag_inplace_div_scalar");
-    names.push_back("diag_inplace_mod_scalar");
-
-    names.push_back("extract_diag");
-    names.push_back("copy_diag");
 
     names.push_back("mul_colwise");
     names.push_back("mul_rowwise");
@@ -451,9 +431,6 @@ struct twoway_kernel_id
     equ_array_lgamma_post,
     clamp,
     //
-    get_diag,
-    set_diag,
-    //
     sum_colwise_conv_pre,
     sum_rowwise_conv_pre,
     sum_colwise_conv_post,
@@ -597,9 +574,6 @@ struct twoway_kernel_id
     names.push_back("equ_array_lgamma_pre");
     names.push_back("equ_array_lgamma_post");
     names.push_back("clamp");
-
-    names.push_back("get_diag");
-    names.push_back("set_diag");
 
     names.push_back("sum_colwise_conv_pre");
     names.push_back("sum_rowwise_conv_pre");
