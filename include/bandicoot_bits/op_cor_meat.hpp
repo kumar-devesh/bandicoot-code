@@ -64,67 +64,12 @@ op_cor::apply(Mat<out_eT>& out, const Op<T1, op_cor>& in)
     {
     tmp.row(i) -= mean_vals;
     }
+
   // Since `tmp` is a manually created alias, glue_times's alias detection doesn't work, so we use a separate object.
   Mat<eT> tmp2 = (tmp.t() * tmp / norm_val);
   const Col<eT> s = sqrt(tmp2.diag());
 
   out = conv_to<Mat<out_eT>>::from(tmp2 / (s * s.t()));
-  }
-
-
-
-template<typename out_eT, typename T1>
-inline
-void
-op_cor::apply(Mat<out_eT>& out, const Op<mtOp<out_eT, T1, mtop_conv_to>, op_cor>& in)
-  {
-  coot_extra_debug_sigprint();
-
-  typedef typename T1::elem_type eT;
-
-  // If the input is a row vector, we treat it as a column vector instead.
-  const special_cor_cov_unwrap<T1> U(in.m.q);
-
-  if (U.M.n_elem == 0)
-    {
-    out.reset();
-    return;
-    }
-  else if (U.M.n_elem == 1)
-    {
-    out.set_size(1, 1);
-    out[0] = eT(1);
-    return;
-    }
-
-  const uword AA_n_rows = U.get_n_rows();
-  const uword AA_n_cols = U.get_n_cols();
-
-  const uword N         = AA_n_rows;
-  const uword norm_type = in.aux_uword_a;
-  const eT norm_val     = (norm_type == 0) ? ( (N > 1) ? eT(N - 1) : eT(1) ) : eT(N);
-
-  // TODO: a dedicated kernel for this particular operation would be widely useful
-  Row<out_eT> mean_vals(AA_n_cols);
-  coot_rt_t::mean(mean_vals.get_dev_mem(false), U.get_dev_mem(false),
-                  AA_n_rows, AA_n_cols,
-                  0, true,
-                  0, 1,
-                  U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
-
-  Mat<out_eT> tmp(AA_n_rows, AA_n_cols);
-  coot_rt_t::copy_mat(tmp.get_dev_mem(false), U.get_dev_mem(false),
-                      tmp.n_rows, tmp.n_cols,
-                      0, 0, tmp.n_rows,
-                      U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
-  for (uword i = 0; i < tmp.n_rows; ++i)
-    {
-    tmp.row(i) -= mean_vals;
-    }
-  Mat<out_eT> tmp2 = (tmp.t() * tmp / norm_val);
-  const Col<out_eT> s = sqrt(tmp2.diag());
-
-  out = (tmp2 / (s * s.t()));
   }
 
 
