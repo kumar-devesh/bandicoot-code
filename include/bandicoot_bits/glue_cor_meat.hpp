@@ -25,46 +25,51 @@ glue_cor::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_cor>& in)
 
   typedef typename T1::elem_type eT;
 
-  const unwrap<T1> U1(in.A);
-  const extract_subview<typename unwrap<T1>::stored_type> E1(U1.M);
-  const unwrap<T2> U2(in.B);
-  const extract_subview<typename unwrap<T2>::stored_type> E2(U2.M);
+  const special_cor_cov_unwrap<T1> U1(in.A);
+  const special_cor_cov_unwrap<T2> U2(in.B);
 
-  // If the input is a row vector, we treat it as a column vector instead.
-  const Mat<eT>& AA = (E1.M.n_rows == 1)
-      ? Mat<eT>(E1.M.get_dev_mem(false), E1.M.n_cols, E1.M.n_rows)
-      : Mat<eT>(E1.M.get_dev_mem(false), E1.M.n_rows, E1.M.n_cols);
-  const Mat<eT>& BB = (E2.M.n_rows == 1)
-      ? Mat<eT>(E2.M.get_dev_mem(false), E2.M.n_cols, E2.M.n_rows)
-      : Mat<eT>(E2.M.get_dev_mem(false), E2.M.n_rows, E2.M.n_cols);
+  const uword AA_n_rows = U1.get_n_rows();
+  const uword AA_n_cols = U1.get_n_cols();
+  const uword BB_n_rows = U2.get_n_rows();
+  const uword BB_n_cols = U2.get_n_cols();
 
-  coot_debug_assert_mul_size(AA, BB, true, false, "cov()");
+  coot_debug_assert_mul_size(AA_n_cols, AA_n_rows, BB_n_rows, BB_n_cols, "cov()");
 
-  if (E1.M.n_elem == 0 || E2.M.n_elem == 0)
+  if (U1.M.n_elem == 0 || U2.M.n_elem == 0)
     {
     out.reset();
     return;
     }
 
-  const uword N         = AA.n_rows;
+  const uword N         = AA_n_rows;
   const uword norm_type = in.aux_uword;
   const eT norm_val     = (norm_type == 0) ? ( (N > 1) ? eT(N - 1) : eT(1) ) : eT(N);
 
   // TODO: a dedicated kernel for this particular operation would be widely useful
-  Row<eT> mean_vals_AA, mean_vals_BB;
-  op_mean::apply_direct(mean_vals_AA, AA, 0, true); // no conversion
-  op_mean::apply_direct(mean_vals_BB, BB, 0, true); // no conversion
+  Row<eT> mean_vals_AA(AA_n_cols);
+  coot_rt_t::mean(mean_vals_AA.get_dev_mem(false), U1.get_dev_mem(false),
+                  AA_n_rows, AA_n_cols,
+                  0, true,
+                  0, 1,
+                  U1.get_row_offset(), U1.get_col_offset(), U1.get_M_n_rows());
 
-  Mat<eT> tmp_AA(AA.n_rows, AA.n_cols);
-  Mat<eT> tmp_BB(BB.n_rows, BB.n_cols);
-  coot_rt_t::copy_mat(tmp_AA.get_dev_mem(false), AA.get_dev_mem(false),
+  Row<eT> mean_vals_BB(BB_n_cols);
+  coot_rt_t::mean(mean_vals_BB.get_dev_mem(false), U2.get_dev_mem(false),
+                  BB_n_rows, BB_n_cols,
+                  0, true,
+                  0, 1,
+                  U2.get_row_offset(), U2.get_col_offset(), U2.get_M_n_rows());
+
+  Mat<eT> tmp_AA(AA_n_rows, AA_n_cols);
+  Mat<eT> tmp_BB(BB_n_rows, BB_n_cols);
+  coot_rt_t::copy_mat(tmp_AA.get_dev_mem(false), U1.get_dev_mem(false),
                       tmp_AA.n_rows, tmp_AA.n_cols,
                       0, 0, tmp_AA.n_rows,
-                      0, 0, AA.n_rows);
-  coot_rt_t::copy_mat(tmp_BB.get_dev_mem(false), BB.get_dev_mem(false),
+                      U1.get_row_offset(), U1.get_col_offset(), U1.get_M_n_rows());
+  coot_rt_t::copy_mat(tmp_BB.get_dev_mem(false), U2.get_dev_mem(false),
                       tmp_BB.n_rows, tmp_BB.n_cols,
                       0, 0, tmp_BB.n_rows,
-                      0, 0, BB.n_rows);
+                      U2.get_row_offset(), U2.get_col_offset(), U2.get_M_n_rows());
   for (uword i = 0; i < tmp_AA.n_rows; ++i)
     {
     tmp_AA.row(i) -= mean_vals_AA;
@@ -76,7 +81,22 @@ glue_cor::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_cor>& in)
 
   Mat<eT> tmp = (tmp_AA.t() * tmp_BB / norm_val);
 
-  out = conv_to<Mat<out_eT>>::from(tmp / ( stddev(AA).t() * stddev(BB) ));
+  if (U1.use_local_mat && U2.use_local_mat)
+    {
+    out = conv_to<Mat<out_eT>>::from(tmp / ( stddev(U1.local_mat).t() * stddev(U2.local_mat) ));
+    }
+  else if (U1.use_local_mat)
+    {
+    out = conv_to<Mat<out_eT>>::from(tmp / ( stddev(U1.local_mat).t() * stddev(U2.M) ));
+    }
+  else if (U2.use_local_mat)
+    {
+    out = conv_to<Mat<out_eT>>::from(tmp / ( stddev(U1.M).t() * stddev(U2.local_mat) ));
+    }
+  else
+    {
+    out = conv_to<Mat<out_eT>>::from(tmp / ( stddev(U1.M).t() * stddev(U2.M) ));
+    }
   }
 
 
