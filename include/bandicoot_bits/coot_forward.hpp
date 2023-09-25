@@ -148,6 +148,8 @@ class glue_cross;
 class glue_conv;
 class glue_conv2;
 class glue_solve;
+class glue_min;
+class glue_max;
 
 class glue_mixed_plus;
 class glue_mixed_minus;

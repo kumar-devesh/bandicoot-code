@@ -102,3 +102,25 @@ max(const SizeMat& s)
   {
   return (std::max)(s.n_rows, s.n_cols);
   }
+
+
+
+template<typename T1, typename T2>
+coot_warn_unused
+inline
+typename
+enable_if2
+  <
+  ( is_coot_type<T1>::value && is_coot_type<T2>::value && is_same_type<typename T1::elem_type, typename T2::elem_type>::value ),
+  Glue<T1, T2, glue_max>
+  >::result
+max
+  (
+  const T1& X,
+  const T2& Y
+  )
+  {
+  coot_extra_debug_sigprint();
+
+  return Glue<T1, T2, glue_max>(X, Y);
+  }
