@@ -657,6 +657,9 @@ struct threeway_kernel_id
     equ_array_mul_array,
     equ_array_div_array,
     //
+    equ_array_min_array,
+    equ_array_max_array,
+    //
     equ_array_atan2,
     equ_array_hypot,
     //
@@ -676,6 +679,9 @@ struct threeway_kernel_id
     names.push_back("equ_array_minus_array");
     names.push_back("equ_array_mul_array");
     names.push_back("equ_array_div_array");
+
+    names.push_back("equ_array_min_array");
+    names.push_back("equ_array_max_array");
 
     names.push_back("equ_array_atan2");
     names.push_back("equ_array_hypot");
