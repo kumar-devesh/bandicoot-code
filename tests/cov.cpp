@@ -172,6 +172,44 @@ TEMPLATE_TEST_CASE("random_vec_cov", "[cov]", double, float)
 
 
 
+// Test cov() on subvectors and compare with Armadillo.
+TEMPLATE_TEST_CASE("random_subvec_cov", "[cov]", double, float)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Col<eT> c = randi<Col<eT>>(200, distr_param(1, 10));
+  Row<eT> r = randi<Row<eT>>(200, distr_param(1, 10));
+
+  Mat<eT> cov_c = cov(c.subvec(10, 109));
+  Mat<eT> cov_r = cov(r.subvec(10, 109));
+
+  Col<eT> c_sub = c.subvec(10, 109);
+  arma::Col<eT> c_cpu(c_sub);
+  Row<eT> r_sub = r.subvec(10, 109);
+  arma::Row<eT> r_cpu(r_sub);
+
+  arma::Mat<eT> cov_c_ref_cpu = arma::cov(c_cpu);
+  arma::Mat<eT> cov_r_ref_cpu = arma::cov(r_cpu);
+
+  REQUIRE( cov_c.n_rows == cov_c_ref_cpu.n_rows );
+  REQUIRE( cov_c.n_cols == cov_c_ref_cpu.n_cols );
+  REQUIRE( cov_r.n_rows == cov_r_ref_cpu.n_rows );
+  REQUIRE( cov_r.n_cols == cov_r_ref_cpu.n_cols );
+
+  arma::Mat<eT> cov_c_cpu(cov_c);
+  arma::Mat<eT> cov_r_cpu(cov_r);
+
+  REQUIRE( arma::approx_equal( cov_c_cpu, cov_c_ref_cpu, "reldiff", tolerance<eT>::value ) );
+  REQUIRE( arma::approx_equal( cov_r_cpu, cov_r_ref_cpu, "reldiff", tolerance<eT>::value ) );
+  }
+
+
+
 // Same as the test above, but with negative floating-point values.
 TEMPLATE_TEST_CASE("random_neg_vec_cov", "[cov]", double, float)
   {
@@ -390,6 +428,84 @@ TEMPLATE_TEST_CASE("vec_x_matrix_cov", "[cov]", float, double)
   arma::Col<eT> x1_cpu(x1);
   arma::Row<eT> x2_cpu(x2);
   arma::Mat<eT> x3_cpu(x3);
+
+  arma::Mat<eT> c1_ref_cpu = arma::cov(x1_cpu, x3_cpu);
+  arma::Mat<eT> c2_ref_cpu = arma::cov(x2_cpu, x3_cpu);
+  arma::Mat<eT> c3_ref_cpu = arma::cov(x3_cpu, x1_cpu);
+  arma::Mat<eT> c4_ref_cpu = arma::cov(x3_cpu, x2_cpu);
+  arma::Mat<eT> c5_ref_cpu = arma::cov(x1_cpu, x3_cpu, 1);
+  arma::Mat<eT> c6_ref_cpu = arma::cov(x2_cpu, x3_cpu, 1);
+  arma::Mat<eT> c7_ref_cpu = arma::cov(x3_cpu, x1_cpu, 1);
+  arma::Mat<eT> c8_ref_cpu = arma::cov(x3_cpu, x2_cpu, 1);
+
+  REQUIRE( c1.n_rows == c1_ref_cpu.n_rows );
+  REQUIRE( c1.n_cols == c1_ref_cpu.n_cols );
+  REQUIRE( c2.n_rows == c2_ref_cpu.n_rows );
+  REQUIRE( c2.n_cols == c2_ref_cpu.n_cols );
+  REQUIRE( c3.n_rows == c3_ref_cpu.n_rows );
+  REQUIRE( c3.n_cols == c3_ref_cpu.n_cols );
+  REQUIRE( c4.n_rows == c4_ref_cpu.n_rows );
+  REQUIRE( c4.n_cols == c4_ref_cpu.n_cols );
+  REQUIRE( c5.n_rows == c5_ref_cpu.n_rows );
+  REQUIRE( c5.n_cols == c5_ref_cpu.n_cols );
+  REQUIRE( c6.n_rows == c6_ref_cpu.n_rows );
+  REQUIRE( c6.n_cols == c6_ref_cpu.n_cols );
+  REQUIRE( c7.n_rows == c7_ref_cpu.n_rows );
+  REQUIRE( c7.n_cols == c7_ref_cpu.n_cols );
+  REQUIRE( c8.n_rows == c8_ref_cpu.n_rows );
+  REQUIRE( c8.n_cols == c8_ref_cpu.n_cols );
+
+  arma::Mat<eT> c1_cpu(c1);
+  arma::Mat<eT> c2_cpu(c2);
+  arma::Mat<eT> c3_cpu(c3);
+  arma::Mat<eT> c4_cpu(c4);
+  arma::Mat<eT> c5_cpu(c5);
+  arma::Mat<eT> c6_cpu(c6);
+  arma::Mat<eT> c7_cpu(c7);
+  arma::Mat<eT> c8_cpu(c8);
+
+  REQUIRE( arma::norm( c1_cpu - c1_ref_cpu, 2 ) <= (eT) tolerance<eT>::value );
+  REQUIRE( arma::norm( c2_cpu - c2_ref_cpu, 2 ) <= (eT) tolerance<eT>::value );
+  REQUIRE( arma::norm( c3_cpu - c3_ref_cpu, 2 ) <= (eT) tolerance<eT>::value );
+  REQUIRE( arma::norm( c4_cpu - c4_ref_cpu, 2 ) <= (eT) tolerance<eT>::value );
+  REQUIRE( arma::norm( c5_cpu - c5_ref_cpu, 2 ) <= (eT) tolerance<eT>::value );
+  REQUIRE( arma::norm( c6_cpu - c6_ref_cpu, 2 ) <= (eT) tolerance<eT>::value );
+  REQUIRE( arma::norm( c7_cpu - c7_ref_cpu, 2 ) <= (eT) tolerance<eT>::value );
+  REQUIRE( arma::norm( c8_cpu - c8_ref_cpu, 2 ) <= (eT) tolerance<eT>::value );
+  }
+
+
+
+// Compute covariances of subvectors x submatrices and vice versa; compare with Armadillo.
+TEMPLATE_TEST_CASE("subvec_x_submatrix_cov", "[cov]", float, double)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Col<eT> x1 = randi<Col<eT>>(200, distr_param(1, 10));
+  Row<eT> x2 = randi<Row<eT>>(200, distr_param(1, 10));
+  Mat<eT> x3 = randi<Mat<eT>>(200, 200, distr_param(1, 10));
+
+  Mat<eT> c1 = cov(x1.subvec(10, 109), x3.submat(10, 10, 109, 109));
+  Mat<eT> c2 = cov(x2.subvec(10, 109), x3.submat(10, 10, 109, 109));
+  Mat<eT> c3 = cov(x3.submat(10, 10, 109, 109), x1.subvec(10, 109));
+  Mat<eT> c4 = cov(x3.submat(10, 10, 109, 109), x2.subvec(10, 109));
+  Mat<eT> c5 = cov(x1.subvec(10, 109), x3.submat(10, 10, 109, 109), 1);
+  Mat<eT> c6 = cov(x2.subvec(10, 109), x3.submat(10, 10, 109, 109), 1);
+  Mat<eT> c7 = cov(x3.submat(10, 10, 109, 109), x1.subvec(10, 109), 1);
+  Mat<eT> c8 = cov(x3.submat(10, 10, 109, 109), x2.subvec(10, 109), 1);
+
+  // Now do the same computation with Armadillo.
+  Col<eT> x1_sub = x1.subvec(10, 109);
+  arma::Col<eT> x1_cpu(x1_sub);
+  Row<eT> x2_sub = x2.subvec(10, 109);
+  arma::Row<eT> x2_cpu(x2_sub);
+  Mat<eT> x3_sub = x3.submat(10, 10, 109, 109);
+  arma::Mat<eT> x3_cpu(x3_sub);
 
   arma::Mat<eT> c1_ref_cpu = arma::cov(x1_cpu, x3_cpu);
   arma::Mat<eT> c2_ref_cpu = arma::cov(x2_cpu, x3_cpu);
