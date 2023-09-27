@@ -248,7 +248,7 @@ coot_ostream::print(std::ostream& o, const Mat<eT>& m, const bool modify)
       {
       // Transfer the matrix to temporary CPU memory for printing.
       eT* tmp_mem = cpu_memory::acquire<eT>(m.n_elem);
-      coot_rt_t::copy_from_dev_mem(tmp_mem, m.get_dev_mem(true), m.n_elem);
+      coot_rt_t::copy_from_dev_mem(tmp_mem, m.get_dev_mem(true), m.n_elem, 1, 0, 0, m.n_elem);
 
       const std::streamsize cell_width = modify ? coot_ostream::modify_stream(o, tmp_mem, m.n_elem) : o.width();
 
@@ -307,11 +307,64 @@ coot_ostream::print(std::ostream& o, const subview<eT>& m, const bool modify)
   {
   coot_extra_debug_sigprint();
 
-  // TODO: we can have a better implementation when we have a way to extract a subview directly to CPU memory;
-  // however, for now, we just extract the subview
+  const coot_ostream_state stream_state(o);
 
-  Mat<eT> tmp(m);
-  print(o, tmp, modify);
+  const uword m_n_rows = m.n_rows;
+  const uword m_n_cols = m.n_cols;
+
+  if(m.is_empty() == false)
+    {
+    if(m_n_cols > 0)
+      {
+      // Transfer the matrix to temporary CPU memory for printing.
+      eT* tmp_mem = cpu_memory::acquire<eT>(m.n_elem);
+      coot_rt_t::copy_from_dev_mem(tmp_mem, m.m.get_dev_mem(true), m.n_rows, m.n_cols, m.aux_row1, m.aux_col1, m.m.n_rows);
+
+      const std::streamsize cell_width = modify ? coot_ostream::modify_stream(o, tmp_mem, m.n_elem) : o.width();
+
+      if(cell_width > 0)
+        {
+        for(uword row=0; row < m_n_rows; ++row)
+          {
+          for(uword col=0; col < m_n_cols; ++col)
+            {
+            // the cell width appears to be reset after each element is printed,
+            // hence we need to restore it
+            o.width(cell_width);
+            const uword index = col * m_n_rows + row;
+            coot_ostream::print_elem(o, m[index], modify);
+            }
+
+          o << '\n';
+          }
+        }
+      else
+        {
+        for(uword row=0; row < m_n_rows; ++row)
+          {
+          for(uword col=0; col < m_n_cols-1; ++col)
+            {
+            const uword index = col * m_n_rows + row;
+            coot_ostream::print_elem(o, m[index], modify);
+            o << ' ';
+            }
+
+          const uword last_index = (m_n_cols - 1) * m_n_rows + row;
+          coot_ostream::print_elem(o, m[last_index], modify);
+          o << '\n';
+          }
+        }
+
+      cpu_memory::release(tmp_mem);
+      }
+    }
+  else
+    {
+    o << "[matrix size: " << m_n_rows << 'x' << m_n_cols << "]\n";
+    }
+
+  o.flush();
+  stream_state.restore(o);
   }
 
 
