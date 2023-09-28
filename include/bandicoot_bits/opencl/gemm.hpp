@@ -22,7 +22,25 @@ struct gemm
   static
   inline
   void
-  apply(dev_mem_t<eT> C, const uword C_n_rows, const uword C_n_cols, const dev_mem_t<eT> A, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<eT> B, eT alpha, eT beta)
+  apply(dev_mem_t<eT> C_mem,
+        const uword C_n_rows,
+        const uword C_n_cols,
+        const dev_mem_t<eT> A_mem,
+        const uword A_n_rows,
+        const uword A_n_cols,
+        const dev_mem_t<eT> B_mem,
+        const eT alpha,
+        const eT beta,
+        // subview arguments
+        const uword C_row_offset,
+        const uword C_col_offset,
+        const uword C_M_n_rows,
+        const uword A_row_offset,
+        const uword A_col_offset,
+        const uword A_M_n_rows,
+        const uword B_row_offset,
+        const uword B_col_offset,
+        const uword B_M_n_rows)
     {
     coot_extra_debug_sigprint();
 
@@ -34,7 +52,25 @@ struct gemm
   static
   inline
   void
-  apply(dev_mem_t<float> C, const uword C_n_rows, const uword C_n_cols, const dev_mem_t<float> A, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<float> B, float alpha, float beta)
+  apply(dev_mem_t<float> C_mem,
+        const uword C_n_rows,
+        const uword C_n_cols,
+        const dev_mem_t<float> A_mem,
+        const uword A_n_rows,
+        const uword A_n_cols,
+        const dev_mem_t<float> B_mem,
+        const float alpha,
+        const float beta,
+        // subview arguments
+        const uword C_row_offset,
+        const uword C_col_offset,
+        const uword C_M_n_rows,
+        const uword A_row_offset,
+        const uword A_col_offset,
+        const uword A_M_n_rows,
+        const uword B_row_offset,
+        const uword B_col_offset,
+        const uword B_M_n_rows)
     {
     coot_extra_debug_sigprint();
 
@@ -47,15 +83,40 @@ struct gemm
     const size_t N = size_t(C_n_cols);
     const size_t K = (do_trans_A) ? size_t(A_n_rows) : size_t(A_n_cols);
 
-    const size_t lda = (do_trans_A) ? K : M;
-    const size_t ldb = (do_trans_B) ? N : K;
-    const size_t ldc = size_t(C_n_rows);
+    const size_t lda = size_t(A_M_n_rows);
+    const size_t ldb = size_t(B_M_n_rows);
+    const size_t ldc = size_t(C_M_n_rows);
+
+    const size_t A_mem_offset = A_row_offset + A_col_offset * A_M_n_rows;
+    const size_t B_mem_offset = B_row_offset + B_col_offset * B_M_n_rows;
+    const size_t C_mem_offset = C_row_offset + C_col_offset * C_M_n_rows;
 
     cl_command_queue queue = get_rt().cl_rt.get_cq();
 
     cl_int status = 0;
 
-    status |= coot_wrapper(clblasSgemm)(clblasColumnMajor, transA, transB, M, N, K, alpha, A.cl_mem_ptr, 0, lda, B.cl_mem_ptr, 0, ldb, beta, C.cl_mem_ptr, 0, ldc, 1, &queue, 0, NULL, NULL);
+    status |= coot_wrapper(clblasSgemm)(clblasColumnMajor,
+                                        transA,
+                                        transB,
+                                        M,
+                                        N,
+                                        K,
+                                        alpha,
+                                        A_mem.cl_mem_ptr,
+                                        A_mem_offset,
+                                        lda,
+                                        B_mem.cl_mem_ptr,
+                                        B_mem_offset,
+                                        ldb,
+                                        beta,
+                                        C_mem.cl_mem_ptr,
+                                        C_mem_offset,
+                                        ldc,
+                                        1,
+                                        &queue,
+                                        0,
+                                        NULL,
+                                        NULL);
     status |= coot_wrapper(clFlush)(queue);
 
     coot_check_cl_error(status, "coot::opencl::gemm(): eT = float");
@@ -66,7 +127,25 @@ struct gemm
   static
   inline
   void
-  apply(dev_mem_t<double> C, const uword C_n_rows, const uword C_n_cols, const dev_mem_t<double> A, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<double> B, double alpha, double beta)
+  apply(dev_mem_t<double> C_mem,
+        const uword C_n_rows,
+        const uword C_n_cols,
+        const dev_mem_t<double> A_mem,
+        const uword A_n_rows,
+        const uword A_n_cols,
+        const dev_mem_t<double> B_mem,
+        const double alpha,
+        const double beta,
+        // subview arguments
+        const uword C_row_offset,
+        const uword C_col_offset,
+        const uword C_M_n_rows,
+        const uword A_row_offset,
+        const uword A_col_offset,
+        const uword A_M_n_rows,
+        const uword B_row_offset,
+        const uword B_col_offset,
+        const uword B_M_n_rows)
     {
     coot_extra_debug_sigprint();
 
@@ -79,15 +158,40 @@ struct gemm
     const size_t N = size_t(C_n_cols);
     const size_t K = (do_trans_A) ? size_t(A_n_rows) : size_t(A_n_cols);
 
-    const size_t lda = (do_trans_A) ? K : M;
-    const size_t ldb = (do_trans_B) ? N : K;
-    const size_t ldc = size_t(C_n_rows);
+    const size_t lda = size_t(A_M_n_rows);
+    const size_t ldb = size_t(B_M_n_rows);
+    const size_t ldc = size_t(C_M_n_rows);
+
+    const size_t A_mem_offset = A_row_offset + A_col_offset * A_M_n_rows;
+    const size_t B_mem_offset = B_row_offset + B_col_offset * B_M_n_rows;
+    const size_t C_mem_offset = C_row_offset + C_col_offset * C_M_n_rows;
 
     cl_command_queue queue = get_rt().cl_rt.get_cq();
 
     cl_int status = 0;
 
-    status |= coot_wrapper(clblasDgemm)(clblasColumnMajor, transA, transB, M, N, K, alpha, A.cl_mem_ptr, 0, lda, B.cl_mem_ptr, 0, ldb, beta, C.cl_mem_ptr, 0, ldc, 1, &queue, 0, NULL, NULL);
+    status |= coot_wrapper(clblasDgemm)(clblasColumnMajor,
+                                        transA,
+                                        transB,
+                                        M,
+                                        N,
+                                        K,
+                                        alpha,
+                                        A_mem.cl_mem_ptr,
+                                        A_mem_offset,
+                                        lda,
+                                        B_mem.cl_mem_ptr,
+                                        B_mem_offset,
+                                        ldb,
+                                        beta,
+                                        C_mem.cl_mem_ptr,
+                                        C_mem_offset,
+                                        ldc,
+                                        1,
+                                        &queue,
+                                        0,
+                                        NULL,
+                                        NULL);
     status |= coot_wrapper(clFlush)(queue);
 
     coot_check_cl_error(status, "coot::opencl::gemm(): eT = double");

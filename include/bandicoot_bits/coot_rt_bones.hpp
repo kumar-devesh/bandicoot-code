@@ -234,7 +234,25 @@ class coot_rt_t
   template<typename eT> static inline void   val_div_inplace(dev_mem_t<eT> mem, const uword index, const eT val);
 
   template<typename eT, const bool do_trans_A, const bool do_trans_B>
-  static inline void gemm(dev_mem_t<eT> C_mem, const uword C_n_rows, const uword C_n_cols, const dev_mem_t<eT> A_mem, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<eT> B_mem, const eT alpha, const eT beta);
+  static inline void gemm(dev_mem_t<eT> C_mem,
+                          const uword C_n_rows,
+                          const uword C_n_cols,
+                          const dev_mem_t<eT> A_mem,
+                          const uword A_n_rows,
+                          const uword A_n_cols,
+                          const dev_mem_t<eT> B_mem,
+                          const eT alpha,
+                          const eT beta,
+                          // subview arguments
+                          const uword C_row_offset,
+                          const uword C_col_offset,
+                          const uword C_M_n_rows,
+                          const uword A_row_offset,
+                          const uword A_col_offset,
+                          const uword A_M_n_rows,
+                          const uword B_row_offset,
+                          const uword B_col_offset,
+                          const uword B_M_n_rows);
 
   template<typename eT, const bool do_trans_A>
   static inline void gemv(dev_mem_t<eT> y_mem,
