@@ -238,18 +238,20 @@ class coot_rt_t
 
   template<typename eT, const bool do_trans_A>
   static inline void gemv(dev_mem_t<eT> y_mem,
-                          const uword y_offset,
-                          const uword incy,
                           const dev_mem_t<eT> A_mem,
-                          const uword A_offset,
                           const uword A_n_rows,
-                          const uword lda,
                           const uword A_n_cols,
                           const dev_mem_t<eT> x_mem,
-                          const uword x_offset,
-                          const uword incx,
                           const eT alpha,
-                          const eT beta);
+                          const eT beta,
+                          // subview arguments
+                          const uword y_offset,
+                          const uword y_mem_incr,
+                          const uword A_row_offset,
+                          const uword A_col_offset,
+                          const uword A_M_n_rows,
+                          const uword x_offset,
+                          const uword x_mem_incr);
 
   template<typename eT>
   static inline void mul_diag(dev_mem_t<eT> C_mem, const uword C_n_rows, const uword C_n_cols, const eT alpha, const dev_mem_t<eT> A_mem, const bool A_is_diag, const bool A_trans, const dev_mem_t<eT> B_mem, const bool B_is_diag, const bool B_trans);

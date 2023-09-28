@@ -1620,25 +1620,34 @@ template<typename eT, const bool do_trans_A>
 inline
 void
 coot_rt_t::gemv(dev_mem_t<eT> y_mem,
-                const uword y_offset,
-                const uword incy,
                 const dev_mem_t<eT> A_mem,
-                const uword A_offset,
                 const uword A_n_rows,
-                const uword lda,
                 const uword A_n_cols,
                 const dev_mem_t<eT> x_mem,
-                const uword x_offset,
-                const uword incx,
                 const eT alpha,
-                const eT beta)
+                const eT beta,
+                // subview arguments
+                const uword y_offset,
+                const uword y_mem_incr,
+                const uword A_row_offset,
+                const uword A_col_offset,
+                const uword A_M_n_rows,
+                const uword x_offset,
+                const uword x_mem_incr)
   {
   coot_extra_debug_sigprint();
 
   if (get_rt().backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
-    opencl::gemv<do_trans_A>::apply(y_mem, y_offset, incy, A_mem, A_offset, A_n_rows, lda, A_n_cols, x_mem, x_offset, incx, alpha, beta);
+    opencl::gemv<do_trans_A>::apply(y_mem,
+                                    A_mem,
+                                    A_n_rows, A_n_cols,
+                                    x_mem,
+                                    alpha, beta,
+                                    y_offset, y_mem_incr,
+                                    A_row_offset, A_col_offset, A_M_n_rows,
+                                    x_offset, x_mem_incr);
     #else
     coot_stop_runtime_error("coot_rt::gemv(): OpenCL backend not enabled");
     #endif
@@ -1646,7 +1655,14 @@ coot_rt_t::gemv(dev_mem_t<eT> y_mem,
   else if (get_rt().backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    cuda::gemv<do_trans_A>::apply(y_mem, y_offset, incy, A_mem, A_offset, A_n_rows, lda, A_n_cols, x_mem, x_offset, incx, alpha, beta);
+    cuda::gemv<do_trans_A>::apply(y_mem,
+                                  A_mem,
+                                  A_n_rows, A_n_cols,
+                                  x_mem,
+                                  alpha, beta,
+                                  y_offset, y_mem_incr,
+                                  A_row_offset, A_col_offset, A_M_n_rows,
+                                  x_offset, x_mem_incr);
     #else
     coot_stop_runtime_error("coot_rt::gemv(): CUDA backend not enabled");
     #endif

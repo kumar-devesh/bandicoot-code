@@ -34,7 +34,86 @@ class gemv
     const float local_alpha = (use_alpha) ? alpha : float(1);
     const float local_beta  = (use_beta)  ? beta  : float(0);
 
-    // TODO: versions that use subviews and offsets instead of using the default values
-    coot_rt_t::gemv<eT, do_trans_A>(y.get_dev_mem(true), 0, 1, A.get_dev_mem(true), 0, A.n_rows, A.n_rows, A.n_cols, x.get_dev_mem(true), 0, 1, local_alpha, local_beta);
+    coot_rt_t::gemv<eT, do_trans_A>(y.get_dev_mem(true),
+                                    A.get_dev_mem(true),
+                                    A.n_rows, A.n_rows,
+                                    x.get_dev_mem(true),
+                                    local_alpha, local_beta,
+                                    0, 1,
+                                    0, 0, A.n_rows,
+                                    0, 1);
+    }
+
+
+
+  template<typename eT>
+  inline
+  static
+  void
+  apply( Mat<eT>& y, const subview<eT>& A, const Mat<eT>& x, const eT alpha = eT(1), const eT beta = eT(0) )
+    {
+    coot_extra_debug_sigprint();
+
+    const float local_alpha = (use_alpha) ? alpha : float(1);
+    const float local_beta  = (use_beta)  ? beta  : float(0);
+
+    coot_rt_t::gemv<eT, do_trans_A>(y.get_dev_mem(true),
+                                    A.m.get_dev_mem(true),
+                                    A.n_rows, A.n_rows,
+                                    x.get_dev_mem(true),
+                                    local_alpha, local_beta,
+                                    0, 1,
+                                    A.aux_row1, A.aux_col1, A.m.n_rows,
+                                    0, 1);
+    }
+
+
+
+  template<typename eT>
+  inline
+  static
+  void
+  apply( Mat<eT>& y, const Mat<eT>& A, const subview<eT>& x, const eT alpha = eT(1), const eT beta = eT(0) )
+    {
+    coot_extra_debug_sigprint();
+
+    const float local_alpha = (use_alpha) ? alpha : float(1);
+    const float local_beta  = (use_beta)  ? beta  : float(0);
+
+    const uword x_mem_incr = (x.n_rows == 1) ? x.m.n_rows : 1;
+
+    coot_rt_t::gemv<eT, do_trans_A>(y.get_dev_mem(true),
+                                    A.get_dev_mem(true),
+                                    A.n_rows, A.n_rows,
+                                    x.m.get_dev_mem(true),
+                                    local_alpha, local_beta,
+                                    0, 1,
+                                    0, 0, A.n_rows,
+                                    x.aux_row1 + x.aux_col1 * x.m.n_rows, x_mem_incr);
+    }
+
+
+
+  template<typename eT>
+  inline
+  static
+  void
+  apply( Mat<eT>& y, const subview<eT>& A, const subview<eT>& x, const eT alpha = eT(1), const eT beta = eT(0) )
+    {
+    coot_extra_debug_sigprint();
+
+    const float local_alpha = (use_alpha) ? alpha : float(1);
+    const float local_beta  = (use_beta)  ? beta  : float(0);
+
+    const uword x_mem_incr = (x.n_rows == 1) ? x.m.n_rows : 1;
+
+    coot_rt_t::gemv<eT, do_trans_A>(y.get_dev_mem(true),
+                                    A.m.get_dev_mem(true),
+                                    A.n_rows, A.n_rows,
+                                    x.m.get_dev_mem(true),
+                                    local_alpha, local_beta,
+                                    0, 1,
+                                    A.aux_row1, A.aux_col1, A.m.n_rows,
+                                    x.aux_row1 + x.aux_col1 * x.m.n_rows, x_mem_incr);
     }
   };
