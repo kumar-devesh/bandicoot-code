@@ -36,7 +36,7 @@ class gemv
 
     coot_rt_t::gemv<eT, do_trans_A>(y.get_dev_mem(true),
                                     A.get_dev_mem(true),
-                                    A.n_rows, A.n_rows,
+                                    A.n_rows, A.n_cols,
                                     x.get_dev_mem(true),
                                     local_alpha, local_beta,
                                     0, 1,
@@ -59,7 +59,7 @@ class gemv
 
     coot_rt_t::gemv<eT, do_trans_A>(y.get_dev_mem(true),
                                     A.m.get_dev_mem(true),
-                                    A.n_rows, A.n_rows,
+                                    A.n_rows, A.n_cols,
                                     x.get_dev_mem(true),
                                     local_alpha, local_beta,
                                     0, 1,
@@ -84,7 +84,7 @@ class gemv
 
     coot_rt_t::gemv<eT, do_trans_A>(y.get_dev_mem(true),
                                     A.get_dev_mem(true),
-                                    A.n_rows, A.n_rows,
+                                    A.n_rows, A.n_cols,
                                     x.m.get_dev_mem(true),
                                     local_alpha, local_beta,
                                     0, 1,
@@ -109,7 +109,7 @@ class gemv
 
     coot_rt_t::gemv<eT, do_trans_A>(y.get_dev_mem(true),
                                     A.m.get_dev_mem(true),
-                                    A.n_rows, A.n_rows,
+                                    A.n_rows, A.n_cols,
                                     x.m.get_dev_mem(true),
                                     local_alpha, local_beta,
                                     0, 1,
