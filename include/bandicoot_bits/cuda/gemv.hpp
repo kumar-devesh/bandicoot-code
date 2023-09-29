@@ -130,8 +130,8 @@ struct gemv
     const int N = int(A_n_cols);
 
     const int cuda_lda = int(A_M_n_rows);
-    const int cuda_incx = int(x_offset);
-    const int cuda_incy = int(y_offset);
+    const int cuda_incx = int(x_mem_incr);
+    const int cuda_incy = int(y_mem_incr);
 
     cublasStatus_t result;
 
