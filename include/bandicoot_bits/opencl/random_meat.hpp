@@ -1,10 +1,10 @@
 // Copyright 2019 Ryan Curtin (http://www.ratml.org/)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,17 +22,16 @@ template<> struct preferred_rng<u64> { typedef std::mt19937_64 result; };
 template<typename eT>
 inline
 void
-init_xorwow_state(cl_mem xorwow_state, const size_t num_rng_threads)
+init_xorwow_state(cl_mem xorwow_state, const size_t num_rng_threads, const u64 seed)
   {
   coot_extra_debug_sigprint();
 
-  // TODO: allow modification of seed
-
   // Since the states are relatively small, and we only do the seeding once, we'll initialize the values on the CPU, then copy them over.
   // We ensure that all values are odd.
-  arma::Row<eT> cpu_state(6 * num_rng_threads, arma::fill::none);
-  typename preferred_rng<eT>::result rng;
-  for (size_t i = 0; i < cpu_state.n_elem; ++i)
+  eT* cpu_state = new eT[6 * num_rng_threads];
+  const eT trunc_seed = eT(seed);
+  typename preferred_rng<eT>::result rng(trunc_seed);
+  for (size_t i = 0; i < 6 * num_rng_threads; ++i)
     {
     eT val = rng();
     if (val % 2 == 0)
@@ -43,23 +42,24 @@ init_xorwow_state(cl_mem xorwow_state, const size_t num_rng_threads)
   // Copy the state to the GPU memory.
   dev_mem_t<eT> m;
   m.cl_mem_ptr = xorwow_state;
-  copy_into_dev_mem(m, cpu_state.memptr(), 6 * num_rng_threads);
+  copy_into_dev_mem(m, cpu_state, 6 * num_rng_threads);
+  delete[] cpu_state;
   }
 
 
 
 inline
 void
-init_philox_state(cl_mem philox_state, const size_t num_rng_threads)
+init_philox_state(cl_mem philox_state, const size_t num_rng_threads, const u64 seed)
   {
   coot_extra_debug_sigprint();
 
-  // TODO: allow modification of seed
-
   // Since the states are small, we seed on the CPU, and then transfer the memory.
   // For now we always initialize the counters to 0.  (TODO: should this be an option?)
-  arma::Row<u32> cpu_state(6 * num_rng_threads, arma::fill::zeros);
-  preferred_rng<u32>::result rng;
+  u32* cpu_state = new u32[6 * num_rng_threads];
+  memset(cpu_state, 0, sizeof(u32) * 6 * num_rng_threads);
+  const u32 trunc_seed = u32(seed);
+  preferred_rng<u32>::result rng(trunc_seed);
   for (size_t i = 0; i < num_rng_threads; ++i)
     {
     cpu_state[6 * i + 4] = rng();
@@ -69,8 +69,10 @@ init_philox_state(cl_mem philox_state, const size_t num_rng_threads)
   // Copy the state to the GPU.
   dev_mem_t<u32> m;
   m.cl_mem_ptr = philox_state;
-  copy_into_dev_mem(m, cpu_state.memptr(), 6 * num_rng_threads);
+  copy_into_dev_mem(m, cpu_state, 6 * num_rng_threads);
+  delete[] cpu_state;
   }
+
 
 
 template<typename eT>
@@ -94,16 +96,16 @@ fill_randu(dev_mem_t<eT> dest, const uword n)
 
   cl_mem xorwow_state = get_rt().cl_rt.get_xorwow_state<eT>();
 
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &(dest.cl_mem_ptr) );
-  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &(xorwow_state) );
-  status |= clSetKernelArg(kernel, 2, n_cl.size,      n_cl.addr );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem), &(dest.cl_mem_ptr) );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(cl_mem), &(xorwow_state) );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 2, n_cl.size,      n_cl.addr );
 
   // Each thread will do as many elements as it can.
   // This avoids memory synchronization issues, since each RNG state will be local to only a single run of the kernel.
   const size_t num_rng_threads = get_rt().cl_rt.get_num_rng_threads();
   const size_t num_threads = std::min(num_rng_threads, n);
 
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &num_threads, NULL, 0, NULL, NULL);
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &num_threads, NULL, 0, NULL, NULL);
 
   coot_check_cl_error(status, "randu()");
   }
@@ -135,18 +137,18 @@ fill_randn(dev_mem_t<eT> dest, const uword n, const double mu, const double sd)
   fp_eT1 cl_mu(mu);
   fp_eT1 cl_sd(sd);
 
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem), &(dest.cl_mem_ptr) );
-  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &(philox_state) );
-  status |= clSetKernelArg(kernel, 2, n_cl.size,      n_cl.addr );
-  status |= clSetKernelArg(kernel, 3, sizeof(cl_mu),  &(cl_mu) );
-  status |= clSetKernelArg(kernel, 4, sizeof(cl_sd),  &(cl_sd) );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem), &(dest.cl_mem_ptr) );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(cl_mem), &(philox_state) );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 2, n_cl.size,      n_cl.addr );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 3, sizeof(cl_mu),  &(cl_mu) );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 4, sizeof(cl_sd),  &(cl_sd) );
 
   // Each thread will do as many elements as it can.
   // This avoids memory synchronization issues, since each RNG state will be local to only a single run of the kernel.
   const size_t num_rng_threads = get_rt().cl_rt.get_num_rng_threads();
   const size_t num_threads = std::min(num_rng_threads, n);
 
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &num_threads, NULL, 0, NULL, NULL);
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &num_threads, NULL, 0, NULL, NULL);
 
   coot_check_cl_error(status, "randn()");
   }
@@ -187,19 +189,19 @@ fill_randi(dev_mem_t<eT> dest, const uword n, const int lo, const int hi)
   char needs_modulo = (range != std::numeric_limits<uint_eT>::max());
   eT cl_lo = eT(lo);
 
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem),  &(dest.cl_mem_ptr) );
-  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem),  &(xorwow_state) );
-  status |= clSetKernelArg(kernel, 2, n_cl.size,       n_cl.addr );
-  status |= clSetKernelArg(kernel, 3, sizeof(eT),      &cl_lo );
-  status |= clSetKernelArg(kernel, 4, sizeof(uint_eT), &range );
-  status |= clSetKernelArg(kernel, 5, sizeof(char),    &needs_modulo );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem),  &(dest.cl_mem_ptr) );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(cl_mem),  &(xorwow_state) );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 2, n_cl.size,       n_cl.addr );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 3, sizeof(eT),      &cl_lo );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 4, sizeof(uint_eT), &range );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 5, sizeof(char),    &needs_modulo );
 
   // Each thread will do as many elements as it can.
   // This avoids memory synchronization issues, since each RNG state will be local to only a single run of the kernel.
   const size_t num_rng_threads = get_rt().cl_rt.get_num_rng_threads();
   const size_t num_threads = std::min(num_rng_threads, n);
 
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &num_threads, NULL, 0, NULL, NULL);
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 1, NULL, &num_threads, NULL, 0, NULL, NULL);
 
   coot_check_cl_error(status, "randi()");
   }

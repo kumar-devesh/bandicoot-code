@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 //
+// Copyright 2022      Marcus Edel (http://kurg.org)
 // Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
-// Copyright 2022 Marcus Edel (http://kurg.org)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,10 +15,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ------------------------------------------------------------------------
-
-
-//! \addtogroup fn_randu
-//! @{
 
 
 
@@ -66,4 +62,14 @@ randu(const uword n_elem, const typename coot_Mat_Col_Row_only<T>::result* junk 
 
 
 
-//! @}
+template<typename T>
+coot_warn_unused
+inline
+T
+randu(const SizeMat& s, const typename coot_Mat_Col_Row_only<T>::result* junk = nullptr)
+  {
+  coot_extra_debug_sigprint();
+  coot_ignore(junk);
+
+  return randu<T>(s.n_rows, s.n_cols);
+  }

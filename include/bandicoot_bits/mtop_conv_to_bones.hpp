@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// 
 // Copyright 2020 Ryan Curtin (http://www.ratml.org
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,16 +17,17 @@
 
 
 class mtop_conv_to
+  : public traits_op_passthru
   {
   public:
 
   template<typename out_eT, typename T1>
   static inline void apply(Mat<out_eT>& out, const mtOp<out_eT, T1, mtop_conv_to>& X);
 
-  template<typename out_eT, typename in_eT>
-  static inline void apply(Mat<out_eT>& out, const mtOp<out_eT, subview<in_eT>, mtop_conv_to>& X);
-
   // Specializations to merge type conversions with other operations.
+  template<typename out_eT, typename T1, typename op_type>
+  static inline void apply(Mat<out_eT>& out, const mtOp<out_eT, Op<T1, op_type>, mtop_conv_to>& X);
+
   template<typename out_eT, typename T1, typename eop_type>
   static inline void apply(Mat<out_eT>& out, const mtOp<out_eT, eOp<T1, eop_type>, mtop_conv_to>& X);
 
@@ -37,4 +40,8 @@ class mtop_conv_to
   template<typename out_eT, typename T1> static inline void apply_inplace_times(Mat<out_eT>& out, const mtOp<out_eT, T1, mtop_conv_to>& X);
   template<typename out_eT, typename T1> static inline void apply_inplace_schur(Mat<out_eT>& out, const mtOp<out_eT, T1, mtop_conv_to>& X);
   template<typename out_eT, typename T1> static inline void apply_inplace_div  (Mat<out_eT>& out, const mtOp<out_eT, T1, mtop_conv_to>& X);
+
+  // Compute the sizes of the output.
+  template<typename out_eT, typename T1> static inline uword compute_n_rows(const mtOp<out_eT, T1, mtop_conv_to>& X, const uword in_n_rows, const uword in_n_cols);
+  template<typename out_eT, typename T1> static inline uword compute_n_cols(const mtOp<out_eT, T1, mtop_conv_to>& X, const uword in_n_rows, const uword in_n_cols);
   };

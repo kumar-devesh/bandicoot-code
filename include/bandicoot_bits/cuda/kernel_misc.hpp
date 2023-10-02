@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup cuda
-//! @{
-
-
 
 // stores: grid_size[0], grid_size[1], grid_size[2], block_size[0], block_size[1], block_size[2]
 struct kernel_dims
@@ -91,7 +87,3 @@ inline kernel_dims two_dimensional_grid_dims(const uword n_rows, const uword n_c
 
   return result;
   }
-
-
-
-//! @}

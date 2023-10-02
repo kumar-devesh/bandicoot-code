@@ -1,4 +1,4 @@
-// Copyright 2019 Ryan Curtin (http://www.ratml.org/)
+// Copyright 2023 Ryan Curtin (http://www.ratml.org/)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,11 @@ using namespace coot;
 template<typename eT>
 void test_zeros(const uword n_rows, const uword n_cols)
   {
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(n_rows, n_cols);
   x.zeros();
 
@@ -27,59 +32,105 @@ void test_zeros(const uword n_rows, const uword n_cols)
     {
     for (uword r = 0; r < n_rows; ++r)
       {
-      if (r == c)
-        {
-        REQUIRE( eT(x(r, c)) == Approx(eT(0)) );
-        }
-      else
-        {
-        REQUIRE( eT(x(r, c)) == eT(0) );
-        }
+      REQUIRE( eT(x(r, c)) == Approx(eT(0)).margin(1e-5) );
       }
     }
   }
 
 
-TEST_CASE("zeros_1")
+
+TEMPLATE_TEST_CASE("zeros_1", "[zeros]", float, double, u32, s32, u64, s64)
   {
-  test_zeros<double>(5, 5);
-  test_zeros<float>(5, 5);
-  test_zeros<u32>(5, 5);
-  test_zeros<s32>(5, 5);
-  test_zeros<u64>(5, 5);
-  test_zeros<s64>(5, 5);
+  test_zeros<TestType>(5, 5);
   }
 
 
 
-TEST_CASE("zeros_2")
+TEMPLATE_TEST_CASE("zeros_2", "[zeros]", float, double, u32, s32, u64, s64)
   {
-  test_zeros<double>(10, 50);
-  test_zeros<float>(10, 50);
-  test_zeros<u32>(10, 50);
-  test_zeros<s32>(10, 50);
-  test_zeros<u64>(10, 50);
-  test_zeros<s64>(10, 50);
+  test_zeros<TestType>(10, 50);
   }
 
 
 
-TEST_CASE("zeros_3")
+TEMPLATE_TEST_CASE("zeros_3", "[zeros]", float, double, u32, s32, u64, s64)
   {
-  test_zeros<double>(50, 10);
-  test_zeros<float>(50, 10);
-  test_zeros<u32>(50, 10);
-  test_zeros<s32>(50, 10);
-  test_zeros<u64>(50, 10);
-  test_zeros<s64>(50, 10);
+  test_zeros<TestType>(50, 10);
   }
 
-TEST_CASE("zeros_4")
+
+
+TEMPLATE_TEST_CASE("zeros_empty", "[zeros]", float, double, u32, s32, u64, s64)
   {
-  test_zeros<double>(100, 1);
-  test_zeros<float>(100, 1);
-  test_zeros<u32>(100, 1);
-  test_zeros<s32>(100, 1);
-  test_zeros<u64>(100, 1);
-  test_zeros<s64>(100, 1);
+  // This just checks that there is no crash.
+  test_zeros<TestType>(0, 0);
+  }
+
+
+
+TEMPLATE_TEST_CASE("zeros_standalone", "[zeros]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = zeros<Mat<eT>>(10, 10);
+
+  for (uword c = 0; c < x.n_cols; ++c)
+    {
+    for (uword r = 0; r < x.n_rows; ++r)
+      {
+      REQUIRE( eT(x(r, c)) == Approx(eT(0)).margin(1e-5) );
+      }
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("zeros_standalone_sizemat", "[zeros]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> y(10, 10);
+  Mat<eT> x = zeros<Mat<eT>>(size(y));
+
+  for (uword c = 0; c < x.n_cols; ++c)
+    {
+    for (uword r = 0; r < x.n_rows; ++r)
+      {
+      REQUIRE( eT(x(r, c)) == Approx(eT(0)).margin(1e-5) );
+      }
+    }
+  }
+
+
+
+TEMPLATE_TEST_CASE("zeros_standalone_row_col", "[zeros]", float, double, u32, s32, u64, s64)
+  {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Col<eT> x = zeros<Col<eT>>(100);
+  Row<eT> y = zeros<Row<eT>>(100);
+
+  REQUIRE( x.n_elem == 100 );
+  REQUIRE( y.n_elem == 100 );
+
+  for (uword i = 0; i < 100; ++i)
+    {
+    REQUIRE( eT(x[i]) == Approx(eT(0)).margin(1e-5) );
+    REQUIRE( eT(y[i]) == Approx(eT(0)).margin(1e-5) );
+    }
   }

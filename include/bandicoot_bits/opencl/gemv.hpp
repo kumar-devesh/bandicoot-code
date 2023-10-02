@@ -12,9 +12,6 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-//! \addtogroup gemv
-//! @{
-
 
 
 template<bool do_trans_A = false>
@@ -25,7 +22,19 @@ struct gemv
   static
   inline
   void
-  apply(dev_mem_t<eT> y, const dev_mem_t<eT> A, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<eT> x, const eT alpha, const eT beta)
+  apply(dev_mem_t<eT> y,
+        const uword y_offset,
+        const uword incy,
+        const dev_mem_t<eT> A,
+        const uword A_offset,
+        const uword A_n_rows,
+        const uword lda,
+        const uword A_n_cols,
+        const dev_mem_t<eT> x,
+        const uword x_offset,
+        const uword incx,
+        const eT alpha,
+        const eT beta)
     {
     coot_extra_debug_sigprint();
 
@@ -37,7 +46,19 @@ struct gemv
   static
   inline
   void
-  apply(dev_mem_t<float> y, const dev_mem_t<float> A, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<float> x, const float alpha, const float beta)
+  apply(dev_mem_t<float> y,
+        const uword y_offset,
+        const uword incy,
+        const dev_mem_t<float> A,
+        const uword A_offset,
+        const uword A_n_rows,
+        const uword lda,
+        const uword A_n_cols,
+        const dev_mem_t<float> x,
+        const uword x_offset,
+        const uword incx,
+        const float alpha,
+        const float beta)
     {
     coot_extra_debug_sigprint();
 
@@ -45,18 +66,44 @@ struct gemv
 
     const clblasTranspose transA = (do_trans_A) ? clblasTrans : clblasNoTrans;
 
+    // clBLAS takes parameters as `size_t`s
+
     const size_t M = size_t(A_n_rows);
     const size_t N = size_t(A_n_cols);
 
-    const size_t lda = size_t(A_n_rows);
-    const size_t inc = size_t(1);
+    const size_t cl_lda = size_t(lda);
+    const size_t cl_incx = size_t(incx);
+    const size_t cl_incy = size_t(incy);
+
+    const size_t cl_y_offset = size_t(y_offset);
+    const size_t cl_A_offset = size_t(A_offset);
+    const size_t cl_x_offset = size_t(x_offset);
 
     cl_command_queue queue = get_rt().cl_rt.get_cq();
 
     cl_int status = 0;
 
-    status |= clblasSgemv(clblasColumnMajor, transA, M, N, alpha, A.cl_mem_ptr, 0, lda, x.cl_mem_ptr, 0, inc, beta, y.cl_mem_ptr, 0, inc, 1, &queue, 0, NULL, NULL);
-    status |= clFlush(queue);
+    status |= coot_wrapper(clblasSgemv)(clblasColumnMajor,
+                                        transA,
+                                        M,
+                                        N,
+                                        alpha,
+                                        A.cl_mem_ptr,
+                                        cl_A_offset,
+                                        cl_lda,
+                                        x.cl_mem_ptr,
+                                        cl_x_offset,
+                                        cl_incx,
+                                        beta,
+                                        y.cl_mem_ptr,
+                                        cl_y_offset,
+                                        cl_incy,
+                                        1,
+                                        &queue,
+                                        0,
+                                        NULL,
+                                        NULL);
+    status |= coot_wrapper(clFlush)(queue);
 
     coot_check_cl_error(status, "coot::opencl::gemv(): eT = float");
     }
@@ -66,7 +113,19 @@ struct gemv
   static
   inline
   void
-  apply(dev_mem_t<double> y, const dev_mem_t<double> A, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<double> x, const double alpha, const double beta)
+  apply(dev_mem_t<double> y,
+        const uword y_offset,
+        const uword incy,
+        const dev_mem_t<double> A,
+        const uword A_offset,
+        const uword A_n_rows,
+        const uword lda,
+        const uword A_n_cols,
+        const dev_mem_t<double> x,
+        const uword x_offset,
+        const uword incx,
+        const double alpha,
+        const double beta)
     {
     coot_extra_debug_sigprint();
 
@@ -74,23 +133,45 @@ struct gemv
 
     const clblasTranspose transA = (do_trans_A) ? clblasTrans : clblasNoTrans;
 
+    // clBLAS takes parameters as `size_t`s
+
     const size_t M = size_t(A_n_rows);
     const size_t N = size_t(A_n_cols);
 
-    const size_t lda = size_t(A_n_rows);
-    const size_t inc = size_t(1);
+    const size_t cl_lda = size_t(lda);
+    const size_t cl_incx = size_t(incx);
+    const size_t cl_incy = size_t(incy);
+
+    const size_t cl_y_offset = size_t(y_offset);
+    const size_t cl_A_offset = size_t(A_offset);
+    const size_t cl_x_offset = size_t(x_offset);
 
     cl_command_queue queue = get_rt().cl_rt.get_cq();
 
     cl_int status = 0;
 
-    status |= clblasDgemv(clblasColumnMajor, transA, M, N, alpha, A.cl_mem_ptr, 0, lda, x.cl_mem_ptr, 0, inc, beta, y.cl_mem_ptr, 0, inc, 1, &queue, 0, NULL, NULL);
-    status |= clFlush(queue);
+    status |= coot_wrapper(clblasDgemv)(clblasColumnMajor,
+                                        transA,
+                                        M,
+                                        N,
+                                        alpha,
+                                        A.cl_mem_ptr,
+                                        cl_A_offset,
+                                        cl_lda,
+                                        x.cl_mem_ptr,
+                                        cl_x_offset,
+                                        cl_incx,
+                                        beta,
+                                        y.cl_mem_ptr,
+                                        cl_y_offset,
+                                        cl_incy,
+                                        1,
+                                        &queue,
+                                        0,
+                                        NULL,
+                                        NULL);
+    status |= coot_wrapper(clFlush)(queue);
 
     coot_check_cl_error(status, "coot::opencl::gemv(): eT = double");
     }
   };
-
-
-
-//! @}

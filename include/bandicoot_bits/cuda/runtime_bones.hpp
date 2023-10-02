@@ -1,10 +1,10 @@
 // Copyright 2019 Ryan Curtin (http://www.ratml.org/)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,9 +22,6 @@ struct runtime_t
 
   inline ~runtime_t();
 
-  template<typename eT, typename higher_eT1, typename higher_eT2>
-  inline std::string substitute_types(const std::string& source, const std::string& prefix);
-
   inline std::string unique_host_device_id() const;
 
   inline bool load_cached_kernels(const std::string& unique_host_device_id, const size_t kernel_size);
@@ -40,6 +37,9 @@ struct runtime_t
 
   template<typename eT1>
   inline const CUfunction& get_kernel(const oneway_real_kernel_id::enum_id num);
+
+  template<typename eT1>
+  inline const CUfunction& get_kernel(const oneway_integral_kernel_id::enum_id num);
 
   template<typename eT2, typename eT1>
   inline const CUfunction& get_kernel(const twoway_kernel_id::enum_id num);
@@ -57,14 +57,21 @@ struct runtime_t
 
   inline bool is_valid() const { return valid; }
 
+  inline void set_rng_seed(const u64 seed);
+
+  // all types are currently supported by CUDA
+  template<typename eT>
+  inline constexpr bool is_supported_type() { return true; }
+
   // use CURAND_ORDERING_PSEUDO_SEEDED with XORWOW / CURAND_ORDERING_PSEUDO_BEST
   // We use XORWOW for uniform distributions, and Philox for normal distributions.
-  coot_aligned curandGenerator_t xorwow_rand;
-  coot_aligned curandGenerator_t philox_rand;
+  coot_aligned curandGenerator_t  xorwow_rand;
+  coot_aligned curandGenerator_t  philox_rand;
 
-  coot_aligned cudaDeviceProp    dev_prop;
+  coot_aligned cudaDeviceProp     dev_prop;
 
-  coot_aligned cublasHandle_t    cublas_handle;
+  coot_aligned cublasHandle_t     cublas_handle;
+  coot_aligned cusolverDnHandle_t cusolver_handle;
 
   // TODO: is it necessary to have a lock() and unlock()?
   // since all CUdevice and CUcontext are are pointers, I don't think we need to specifically lock them
@@ -88,6 +95,7 @@ struct runtime_t
   coot_aligned std::vector<CUfunction>                                                                   zeroway_kernels;
   coot_aligned rt_common::kernels_t<std::vector<CUfunction>>                                             oneway_kernels;
   coot_aligned rt_common::kernels_t<std::vector<CUfunction>>                                             oneway_real_kernels;
+  coot_aligned rt_common::kernels_t<std::vector<CUfunction>>                                             oneway_integral_kernels;
   coot_aligned rt_common::kernels_t<rt_common::kernels_t<std::vector<CUfunction>>>                       twoway_kernels;
   coot_aligned rt_common::kernels_t<rt_common::kernels_t<rt_common::kernels_t<std::vector<CUfunction>>>> threeway_kernels;
 

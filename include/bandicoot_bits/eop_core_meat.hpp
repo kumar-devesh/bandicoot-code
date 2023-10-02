@@ -1,4 +1,7 @@
-// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
+// SPDX-License-Identifier: Apache-2.0
+// 
+// Copyright 2017-2023 Ryan Curtin (https://www.ratml.org)
+// Copyright 2017      Conrad Sanderson (https://conradsanderson.id.au)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +15,6 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-
-//! \addtogroup eop_core
-//! @{
 
 
 //
@@ -93,21 +93,27 @@ eop_core<eop_type>::apply(Mat<eT>& out, const eOp<T1, eop_type>& x)
   if (!force_conv_unwrap)
     {
     const no_conv_unwrap<typename SizeProxy<T1>::stored_type> U(x.m.Q);
-    const Mat<in_eT>& A = U.M;
 
-    dev_mem_t<in_eT> A_dev_mem = A.get_dev_mem(false);
+    dev_mem_t<in_eT> A_dev_mem = U.get_dev_mem(false);
 
-    coot_rt_t::eop_scalar(out_dev_mem, A_dev_mem, out.get_n_elem(), aux_in, aux_out, kernel_num);
+    coot_rt_t::eop_scalar(kernel_num, out_dev_mem, A_dev_mem,
+                          aux_in, aux_out,
+                          out.n_rows, out.n_cols,
+                          0, 0, out.get_n_rows(),
+                          U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
     }
   else
     {
     // We have to perform any conversion before this level.
     const unwrap<typename SizeProxy<T1>::stored_type> U(x.m.Q);
-    const Mat<typename T1::elem_type>& A = U.M;
 
-    dev_mem_t<typename T1::elem_type> A_dev_mem = A.get_dev_mem(false);
+    dev_mem_t<typename T1::elem_type> A_dev_mem = U.get_dev_mem(false);
 
-    coot_rt_t::eop_scalar(out_dev_mem, A_dev_mem, out.get_n_elem(), (typename T1::elem_type) aux_in, aux_out, kernel_num);
+    coot_rt_t::eop_scalar(kernel_num, out_dev_mem, A_dev_mem,
+                          (typename T1::elem_type) aux_in, aux_out,
+                          out.n_rows, out.n_cols,
+                          0, 0, out.n_rows,
+                          U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
     }
   }
 
@@ -124,31 +130,42 @@ eop_core<eop_type>::apply(Mat<eT>& out, const eOp<mtOp<eT, eOp<T2, eop_type>, mt
 
   typedef typename T2::elem_type in_eT;
 
-  in_eT aux_in  = X.m.Q.m.Q.aux;
+  in_eT aux_in  = X.m.Q.q.aux;
      eT aux_out = X.aux;
 
   // Pretend that we're doing the conversion after the operation.
   const twoway_kernel_id::enum_id kernel_num = eop_type::kernel_conv_post;
 
-  const unwrap<T2> U(X.m.Q.m.Q.m.Q);
-  const Mat<in_eT>& A = U.M;
+  const unwrap<T2> U(X.m.Q.q.m.Q);
 
   dev_mem_t<eT>    out_dev_mem = out.get_dev_mem(false);
-  dev_mem_t<in_eT>   A_dev_mem =   A.get_dev_mem(false);
+  dev_mem_t<in_eT>   A_dev_mem = U.get_dev_mem(false);
 
   // There are a couple exceptions of operations where we actually *can't* chain them together (because the kernels
   // themselves can't support it).
   if (!eop_type::is_chainable)
     {
-    Mat<in_eT> tmp(A.n_rows, A.n_cols);
-    coot_rt_t::eop_scalar(tmp.get_dev_mem(), A_dev_mem, tmp.get_n_elem(), aux_in, in_eT(0), kernel_num);
-    coot_rt_t::eop_scalar(out_dev_mem, tmp.get_dev_mem(), out.get_n_elem(), in_eT(0), aux_out, kernel_num);
+    Mat<in_eT> tmp(U.M.n_rows, U.M.n_cols);
+    coot_rt_t::eop_scalar(kernel_num, tmp.get_dev_mem(), A_dev_mem,
+                          aux_in, in_eT(0),
+                          tmp.n_rows, tmp.n_cols,
+                          0, 0, tmp.n_rows,
+                          U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
+    coot_rt_t::eop_scalar(kernel_num, out_dev_mem, tmp.get_dev_mem(),
+                          in_eT(0), aux_out,
+                          out.n_rows, out.n_cols,
+                          0, 0, out.n_rows,
+                          0, 0, tmp.n_rows);
 
     return;
     }
   else
     {
-    coot_rt_t::eop_scalar(out_dev_mem, A_dev_mem, out.get_n_elem(), aux_in, aux_out, kernel_num);
+    coot_rt_t::eop_scalar(kernel_num, out_dev_mem, A_dev_mem,
+                          aux_in, aux_out,
+                          out.n_rows, out.n_cols,
+                          0, 0, out.n_rows,
+                          U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
     }
   }
 
@@ -219,7 +236,3 @@ eop_core<eop_type>::apply_inplace_div(Mat<eT>& out, const eOp<T1, eop_type>& x)
 
   out /= tmp;
   }
-
-
-
-//! @}

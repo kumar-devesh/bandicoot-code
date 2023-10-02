@@ -13,8 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup cuda
-//! @{
 
 /**
  * Copy the given matrix `src` into `dest`, making `copies_per_col` copies of each column, and `copies_per_row` copies of each row.
@@ -43,7 +41,7 @@ repmat(const dev_mem_t<eT1> src, dev_mem_t<eT2> dest, const uword n_rows, const 
 
   const kernel_dims dims = two_dimensional_grid_dims(n_rows, n_cols);
 
-  CUresult result = cuLaunchKernel(
+  CUresult result = coot_wrapper(cuLaunchKernel)(
       kernel,
       dims.d[0], dims.d[1], dims.d[2],
       dims.d[3], dims.d[4], dims.d[5],
@@ -53,7 +51,3 @@ repmat(const dev_mem_t<eT1> src, dev_mem_t<eT2> dest, const uword n_rows, const 
 
   coot_check_cuda_error(result, "coot::cuda::repmat(): cuLaunchKernel() failed");
   }
-
-
-
-//! @}

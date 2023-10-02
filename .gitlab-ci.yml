@@ -23,25 +23,19 @@ test-cuda:
   stage: test-cuda
   needs: ["build-job"]
   script: |
-    cd tests
-    make clean && BACKEND=CUDA_BACKEND make -j2
-    export CUDA_VISIBLE_DEVICES=0
-    ./main
-    export CUDA_VISIBLE_DEVICES=1
-    ./main
-    export CUDA_VISIBLE_DEVICES=3
-    ./main
+    mkdir build/
+    cd build/
+    cmake -DFIND_CUDA=ON -DBUILD_TESTS=ON ../
+    make -j2
+    ./bandicoot_test
 
 test-opencl:
   tags: [gpu]
   stage: test-opencl
   needs: ["build-job"]
   script: |
-    cd tests
-    make clean && BACKEND=CL_BACKEND make -j2
-    export CUDA_VISIBLE_DEVICES=0
-    ./main
-    export CUDA_VISIBLE_DEVICES=1
-    ./main
-    export CUDA_VISIBLE_DEVICES=3
-    ./main
+    mkdir build/
+    cd build/
+    cmake -DFIND_CUDA=OFF -DFIND_OPENCL=ON -DBUILD_TESTS=ON ../
+    make -j2
+    ./bandicoot_test

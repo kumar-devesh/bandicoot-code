@@ -1,4 +1,8 @@
+// SPDX-License-Identifier: Apache-2.0
+// 
 // Copyright 2019 Ryan Curtin <ryan@ratml.org>
+// Copyright 2008-2023 Conrad Sanderson (https://conradsanderson.id.au)
+// Copyright 2008-2016 National ICT Australia (NICTA)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -64,12 +68,11 @@ inline void coot_rng::fill_randi(dev_mem_t<eT> dest, const uword n, const distr_
   {
   coot_extra_debug_sigprint();
 
-  int a;
-  int b;
+  int a = 0;
+  int b = 0;
 
   if (param.state == 0)
     {
-    a = 0;
     b = std::numeric_limits<int>::max();
     }
   else if (param.state == 1)
@@ -90,4 +93,94 @@ inline void coot_rng::fill_randi(dev_mem_t<eT> dest, const uword n, const distr_
   coot_debug_check( (a > b), "randi(): incorrect distribution parameters: a must be less than b" );
 
   coot_rt_t::fill_randi(dest, n, a, b);
+  }
+
+
+
+inline
+void
+coot_rng::set_seed(const u64 seed)
+  {
+  coot_rt_t::set_rng_seed(seed);
+  }
+
+
+
+inline
+void
+coot_rng::set_seed_random()
+  {
+  // This is borrowed from the Armadillo implementation.
+  u64 seed1 = u64(0);
+  u64 seed2 = u64(0);
+  u64 seed3 = u64(0);
+  u64 seed4 = u64(0);
+
+  bool have_seed = false;
+
+  try
+    {
+    std::random_device rd;
+
+    if(rd.entropy() > double(0))  { seed1 = static_cast<u64>( rd() ); }
+
+    if(seed1 != u64(0))  { have_seed = true; }
+    }
+  catch(...) {}
+
+
+  if(have_seed == false)
+    {
+    try
+      {
+      union
+        {
+        u64           a;
+        unsigned char b[sizeof(u64)];
+        } tmp;
+
+      tmp.a = u64(0);
+
+      std::ifstream f("/dev/urandom", std::ifstream::binary);
+
+      if(f.good())  { f.read((char*)(&(tmp.b[0])), sizeof(u64)); }
+
+      if(f.good())
+        {
+        seed2 = tmp.a;
+
+        if(seed2 != u64(0))  { have_seed = true; }
+        }
+      }
+    catch(...) {}
+    }
+  if(have_seed == false)
+    {
+    // get better-than-nothing seeds in case reading /dev/urandom failed
+
+    const std::chrono::system_clock::time_point tp_now = std::chrono::system_clock::now();
+
+    auto since_epoch_usec = std::chrono::duration_cast<std::chrono::microseconds>(tp_now.time_since_epoch()).count();
+
+    seed3 = static_cast<u64>( since_epoch_usec & 0xFFFF );
+
+    union
+      {
+      uword*        a;
+      unsigned char b[sizeof(uword*)];
+      } tmp;
+
+    tmp.a = (uword*)malloc(sizeof(uword));
+    if(tmp.a != nullptr)
+      {
+      for(size_t i=0; i<sizeof(uword*); ++i)
+        {
+        seed4 += u64(tmp.b[i]);
+        }
+
+      free(tmp.a);
+      }
+    }
+
+  coot_rng::set_seed(seed1 + seed2 + seed3 + seed4);
   }

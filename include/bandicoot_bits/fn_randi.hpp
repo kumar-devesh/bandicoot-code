@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// Copyright 2022 Marcus Edel (http://kurg.org)
+// Copyright 2022      Marcus Edel (http://kurg.org)
 // Copyright 2008-2016 Conrad Sanderson (http://conradsanderson.id.au)
 // Copyright 2008-2016 National ICT Australia (NICTA)
 //
@@ -58,4 +58,18 @@ randi(const uword n_elem, const distr_param& param = distr_param(), const typena
   const uword n_cols = (is_Row<T>::value) ? n_elem   : uword(1);
 
   return randi<T>(n_rows, n_cols, param);
+  }
+
+
+
+template<typename T>
+coot_warn_unused
+inline
+T
+randi(const SizeMat& s, const distr_param& param = distr_param(), const typename coot_Mat_Col_Row_only<T>::result* junk = nullptr)
+  {
+  coot_extra_debug_sigprint();
+  coot_ignore(junk);
+
+  return randi<T>(s.n_rows, s.n_cols, param);
   }

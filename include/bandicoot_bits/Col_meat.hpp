@@ -1,4 +1,8 @@
-// Copyright 2020 Ryan Curtin (http://www.ratml.org)
+// SPDX-License-Identifier: Apache-2.0
+// 
+// Copyright 2017-2023 Ryan Curtin (https://www.ratml.org)
+// Copyright 2008-2023 Conrad Sanderson (https://conradsanderson.id.au)
+// Copyright 2008-2016 National ICT Australia (NICTA)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,10 +15,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ------------------------------------------------------------------------
-
-
-//! \addtogroup Col
-//! @{
 
 
 
@@ -50,7 +50,111 @@ Col<eT>::Col(const uword in_rows, const uword in_cols)
   coot_extra_debug_sigprint();
 
   access::rw(Mat<eT>::vec_state) = 1;
+
   Mat<eT>::init(in_rows, in_cols);
+
+  Mat<eT>::zeros();  // fill with zeros by default
+  }
+
+
+
+template<typename eT>
+inline
+Col<eT>::Col(const SizeMat& s)
+  : Mat<eT>()
+  {
+  coot_extra_debug_sigprint();
+
+  access::rw(Mat<eT>::vec_state) = 1;
+
+  Mat<eT>::init(s.n_rows, s.n_cols);
+
+  Mat<eT>::zeros();  // fill with zeros by default
+  }
+
+
+
+template<typename eT>
+template<typename fill_type>
+inline
+Col<eT>::Col(const uword N, const fill::fill_class<fill_type>& f)
+  : Mat<eT>(N, 1)
+  {
+  coot_extra_debug_sigprint();
+  
+  access::rw(Mat<eT>::vec_state) = 1;
+  
+  Mat<eT>::fill(f);
+  }
+
+
+
+template<typename eT>
+template<typename fill_type>
+inline
+Col<eT>::Col(const uword in_rows, const uword in_cols, const fill::fill_class<fill_type>& f)
+  : Mat<eT>()
+  {
+  coot_extra_debug_sigprint();
+  
+  access::rw(Mat<eT>::vec_state) = 1;
+  
+  Mat<eT>::init(in_rows, in_cols);
+  
+  Mat<eT>::fill(f);
+  }
+
+
+
+template<typename eT>
+template<typename fill_type>
+inline
+Col<eT>::Col(const SizeMat& s, const fill::fill_class<fill_type>& f)
+  : Mat<eT>()
+  {
+  coot_extra_debug_sigprint();
+  
+  access::rw(Mat<eT>::vec_state) = 1;
+  
+  Mat<eT>::init(s.n_rows, s.n_cols);
+  
+  Mat<eT>::fill(f);
+  }
+
+
+
+template<typename eT>
+inline
+Col<eT>::Col(dev_mem_t<eT> aux_dev_mem, const uword N)
+  : Mat<eT>(aux_dev_mem, N, 1)
+  {
+  coot_extra_debug_sigprint();
+
+  access::rw(Mat<eT>::vec_state) = 1;
+  }
+
+
+
+template<typename eT>
+inline
+Col<eT>::Col(cl_mem aux_dev_mem, const uword N)
+  : Mat<eT>(aux_dev_mem, N, 1)
+  {
+  coot_extra_debug_sigprint();
+
+  access::rw(Mat<eT>::vec_state) = 1;
+  }
+
+
+
+template<typename eT>
+inline
+Col<eT>::Col(eT* aux_dev_mem, const uword N)
+  : Mat<eT>(aux_dev_mem, N, 1)
+  {
+  coot_extra_debug_sigprint();
+
+  access::rw(Mat<eT>::vec_state) = 1;
   }
 
 
@@ -63,7 +167,10 @@ Col<eT>::Col(const Col<eT>& X)
   coot_extra_debug_sigprint();
 
   access::rw(Mat<eT>::vec_state) = 1;
-  arrayops::copy(this->get_dev_mem(), X.get_dev_mem(), X.n_elem);
+  coot_rt_t::copy_mat(this->get_dev_mem(), X.get_dev_mem(),
+                      Mat<eT>::n_rows, 1,
+                      0, 0, Mat<eT>::n_rows,
+                      0, 0, X.n_rows);
   }
 
 
@@ -76,7 +183,10 @@ Col<eT>::operator=(const Col<eT>& X)
   coot_extra_debug_sigprint();
 
   Mat<eT>::init(X.n_rows, 1);
-  arrayops::copy(this->get_dev_mem(), X.get_dev_mem(), X.n_elem);
+  coot_rt_t::copy_mat(this->get_dev_mem(), X.get_dev_mem(),
+                      Mat<eT>::n_rows, 1,
+                      0, 0, Mat<eT>::n_rows,
+                      0, 0, X.n_rows);
 
   return *this;
   }
@@ -164,9 +274,17 @@ Col<eT>::operator=(const arma::Col<eT>& X)
   {
   coot_extra_debug_sigprint();
 
-  (*this).set_size(X.n_rows, X.n_cols);
+  #if defined(COOT_HAVE_ARMA)
+    {
+    (*this).set_size(X.n_rows, X.n_cols);
 
-  (*this).copy_into_dev_mem(X.memptr(), (*this).n_elem);
+    (*this).copy_into_dev_mem(X.memptr(), (*this).n_elem);
+    }
+  #else
+    {
+    coot_stop_logic_error("#include <armadillo> must be before #include <bandicoot>");
+    }
+  #endif
 
   return *this;
   }
@@ -179,17 +297,27 @@ Col<eT>::operator arma::Col<eT>() const
   {
   coot_extra_debug_sigprint();
 
-  arma::Col<eT> out(Mat<eT>::n_rows, 1);
+  #if defined(COOT_HAVE_ARMA)
+    {
+    arma::Col<eT> out(Mat<eT>::n_rows, 1);
 
-  (*this).copy_from_dev_mem(out.memptr(), (*this).n_elem);
+    (*this).copy_from_dev_mem(out.memptr(), (*this).n_elem);
 
-  return out;
+    return out;
+    }
+  #else
+    {
+    coot_stop_logic_error("#include <armadillo> must be before #include <bandicoot>");
+
+    return arma::Col<eT>();
+    }
+  #endif
   }
 
 
 
 template<typename eT>
-coot_inline
+inline
 const Op<Col<eT>, op_htrans>
 Col<eT>::t() const
   {
@@ -199,7 +327,7 @@ Col<eT>::t() const
 
 
 template<typename eT>
-coot_inline
+inline
 const Op<Col<eT>, op_htrans>
 Col<eT>::ht() const
   {
@@ -209,7 +337,7 @@ Col<eT>::ht() const
 
 
 template<typename eT>
-coot_inline
+inline
 const Op<Col<eT>, op_strans>
 Col<eT>::st() const
   {
@@ -282,8 +410,38 @@ Col<eT>::subvec(const uword in_row1, const uword in_row2) const
 
 
 
+template<typename eT>
+coot_inline
+subview_col<eT>
+Col<eT>::subvec(const uword start_row, const SizeMat& s)
+  {
+  coot_extra_debug_sigprint();
+
+  coot_debug_check( (s.n_cols != 1), "Col::subvec(): given size does not specify a column vector" );
+
+  coot_debug_check_bounds( ( (start_row >= Mat<eT>::n_rows) || ((start_row + s.n_rows) > Mat<eT>::n_rows) ), "Col::subvec(): size out of bounds" );
+
+  return subview_col<eT>(*this, 0, start_row, s.n_rows);
+  }
+
+
+
+template<typename eT>
+coot_inline
+const subview_col<eT>
+Col<eT>::subvec(const uword start_row, const SizeMat& s) const
+  {
+  coot_extra_debug_sigprint();
+
+  coot_debug_check( (s.n_cols != 1), "Col::subvec(): given size does not specify a column vector" );
+
+  coot_debug_check_bounds( ( (start_row >= Mat<eT>::n_rows) || ((start_row + s.n_rows) > Mat<eT>::n_rows) ), "Col::subvec(): size out of bounds" );
+
+  return subview_col<eT>(*this, 0, start_row, s.n_rows);
+  }
+
+
+
 #ifdef COOT_EXTRA_COL_MEAT
   #include COOT_INCFILE_WRAP(COOT_EXTRA_COL_MEAT)
 #endif
-
-//! @}

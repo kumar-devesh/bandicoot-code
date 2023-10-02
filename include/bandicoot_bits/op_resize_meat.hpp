@@ -1,10 +1,12 @@
-// Copyright 2022 Ryan Curtin (http://www.ratml.org/)
+// SPDX-License-Identifier: Apache-2.0
 // 
+// Copyright 2022 Ryan Curtin (http://www.ratml.org/)
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,6 +26,7 @@ op_resize::apply(Mat<out_eT>& out, const Op<T1, op_resize>& in)
   const uword new_n_cols = in.aux_uword_b;
 
   const unwrap<T1> U(in.m);
+  const extract_subview<typename unwrap<T1>::stored_type> E(U.M);
 
   if (U.is_alias(out) && std::is_same<out_eT, typename T1::elem_type>::value)
     {
@@ -31,7 +34,7 @@ op_resize::apply(Mat<out_eT>& out, const Op<T1, op_resize>& in)
     }
   else
     {
-    op_resize::apply_mat_noalias(out, U.M, new_n_rows, new_n_cols);
+    op_resize::apply_mat_noalias(out, E.M, new_n_rows, new_n_cols);
     }
   }
 
@@ -48,9 +51,10 @@ op_resize::apply(Mat<out_eT>& out, const Op<mtOp<out_eT, T1, mtop_conv_to>, op_r
   const uword new_n_cols = in.aux_uword_b;
 
   const unwrap<T1> U(in.m.q);
+  const extract_subview<typename unwrap<T1>::stored_type> E(U.M);
 
   // Aliases aren't possible if the types are different (which is the only way an mtOp will get made).
-  op_resize::apply_mat_noalias(out, U.M, new_n_rows, new_n_cols);
+  op_resize::apply_mat_noalias(out, E.M, new_n_rows, new_n_cols);
   }
 
 
@@ -102,4 +106,28 @@ op_resize::apply_mat_noalias(Mat<out_eT>& out, const Mat<in_eT>& A, const uword 
 
     out.submat(0, 0, end_row, end_col) = conv_to<Mat<out_eT>>::from(A.submat(0, 0, end_row, end_col));
     }
+  }
+
+
+
+template<typename T1>
+inline
+uword
+op_resize::compute_n_rows(const Op<T1, op_resize>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(in_n_rows);
+  coot_ignore(in_n_cols);
+  return op.aux_uword_a;
+  }
+
+
+
+template<typename T1>
+inline
+uword
+op_resize::compute_n_cols(const Op<T1, op_resize>& op, const uword in_n_rows, const uword in_n_cols)
+  {
+  coot_ignore(in_n_rows);
+  coot_ignore(in_n_cols);
+  return op.aux_uword_b;
   }

@@ -1,4 +1,8 @@
-// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
+// SPDX-License-Identifier: Apache-2.0
+// 
+// Copyright 2017-2023 Ryan Curtin (https://www.ratml.org)
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
+// Copyright 2008-2016 National ICT Australia (NICTA)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,16 +17,13 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup fn_elem
-//! @{
-
 
 //
 // square
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_square> >::result
 square(const T1& A)
   {
@@ -38,7 +39,7 @@ square(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_sqrt> >::result
 sqrt(const T1& A)
   {
@@ -53,7 +54,7 @@ sqrt(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_exp> >::result
 exp(const T1& A)
   {
@@ -68,7 +69,7 @@ exp(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_exp2> >::result
 exp2(const T1& A)
   {
@@ -83,7 +84,7 @@ exp2(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_exp10> >::result
 exp10(const T1& A)
   {
@@ -98,7 +99,7 @@ exp10(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_trunc_exp> >::result
 trunc_exp(const T1& A)
   {
@@ -113,7 +114,7 @@ trunc_exp(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_log> >::result
 log(const T1& A)
   {
@@ -129,7 +130,7 @@ log(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_log2> >::result
 log2(const T1& A)
   {
@@ -145,7 +146,7 @@ log2(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_log10> >::result
 log10(const T1& A)
   {
@@ -161,7 +162,7 @@ log10(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_trunc_log> >::result
 trunc_log(const T1& A)
   {
@@ -177,7 +178,7 @@ trunc_log(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_cos> >::result
 cos(const T1& A)
   {
@@ -193,7 +194,7 @@ cos(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_sin> >::result
 sin(const T1& A)
   {
@@ -209,7 +210,7 @@ sin(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_tan> >::result
 tan(const T1& A)
   {
@@ -225,7 +226,7 @@ tan(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_acos> >::result
 acos(const T1& A)
   {
@@ -241,7 +242,7 @@ acos(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_asin> >::result
 asin(const T1& A)
   {
@@ -257,7 +258,7 @@ asin(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_atan> >::result
 atan(const T1& A)
   {
@@ -273,7 +274,7 @@ atan(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_cosh> >::result
 cosh(const T1& A)
   {
@@ -289,7 +290,7 @@ cosh(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_sinh> >::result
 sinh(const T1& A)
   {
@@ -305,7 +306,7 @@ sinh(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_tanh> >::result
 tanh(const T1& A)
   {
@@ -321,7 +322,7 @@ tanh(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_acosh> >::result
 acosh(const T1& A)
   {
@@ -337,7 +338,7 @@ acosh(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_asinh> >::result
 asinh(const T1& A)
   {
@@ -353,7 +354,7 @@ asinh(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_atanh> >::result
 atanh(const T1& A)
   {
@@ -369,7 +370,7 @@ atanh(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_sinc> >::result
 sinc(const T1& A)
   {
@@ -385,7 +386,7 @@ sinc(const T1& A)
 
 template<typename T1, typename T2>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value && is_coot_type<T2>::value && is_real<typename T1::elem_type>::value && is_real<typename T2::elem_type>::value, const eGlue<T1, T2, eglue_atan2> >::result
 atan2(const T1& X, const T2& Y)
   {
@@ -401,7 +402,7 @@ atan2(const T1& X, const T2& Y)
 
 template<typename T1, typename T2>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value && is_coot_type<T2>::value && is_real<typename T1::elem_type>::value && is_real<typename T2::elem_type>::value, const eGlue<T1, T2, eglue_hypot> >::result
 hypot(const T1& X, const T2& Y)
   {
@@ -417,7 +418,7 @@ hypot(const T1& X, const T2& Y)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value && std::is_signed<typename T1::elem_type>::value, const eOp<T1, eop_abs> >::result
 abs(const T1& A)
   {
@@ -431,7 +432,7 @@ abs(const T1& A)
 // abs(unsigned)... nothing to do
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value && !std::is_signed<typename T1::elem_type>::value, const T1&>::result
 abs(const T1& A)
   {
@@ -445,7 +446,7 @@ abs(const T1& A)
 // abs(abs)... nothing to do
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, const eOp<T1, eop_abs>& >::result
 abs(const eOp<T1, eop_abs>& A)
   {
@@ -461,7 +462,7 @@ abs(const eOp<T1, eop_abs>& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, eOp<T1, eop_pow> >::result
 pow(const T1& A, const typename T1::elem_type exponent)
   {
@@ -478,7 +479,7 @@ pow(const T1& A, const typename T1::elem_type exponent)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, eOp<T1, eop_floor> >::result
 floor(const T1& A)
   {
@@ -494,7 +495,7 @@ floor(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, eOp<T1, eop_ceil> >::result
 ceil(const T1& A)
   {
@@ -510,7 +511,7 @@ ceil(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, eOp<T1, eop_round> >::result
 round(const T1& A)
   {
@@ -526,7 +527,7 @@ round(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, eOp<T1, eop_trunc> >::result
 trunc(const T1& A)
   {
@@ -542,7 +543,7 @@ trunc(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, eOp<T1, eop_sign> >::result
 sign(const T1& A)
   {
@@ -558,7 +559,7 @@ sign(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, eOp<T1, eop_erf> >::result
 erf(const T1& A)
   {
@@ -574,7 +575,7 @@ erf(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, eOp<T1, eop_erfc> >::result
 erfc(const T1& A)
   {
@@ -590,7 +591,7 @@ erfc(const T1& A)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 typename enable_if2< is_coot_type<T1>::value, eOp<T1, eop_lgamma> >::result
 lgamma(const T1& A)
   {
@@ -598,7 +599,3 @@ lgamma(const T1& A)
 
   return eOp<T1, eop_lgamma>(A);
   }
-
-
-
-//! @}

@@ -12,14 +12,21 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
+#include <armadillo>
 #include <bandicoot>
 #include "catch.hpp"
 
 using namespace coot;
 
-template<typename eT>
-void test_accu_small()
+TEMPLATE_TEST_CASE("accu_small", "[accu]", double, float, u32, s32, u64, s64)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(4, 4);
   for (uword i = 0; i < 16; ++i)
     x[i] = i + 1;
@@ -31,21 +38,15 @@ void test_accu_small()
 
 
 
-TEST_CASE("accu_small")
+TEMPLATE_TEST_CASE("accu_1", "[accu]", double, float, u32, s32, u64, s64)
   {
-  test_accu_small<double>();
-  test_accu_small<float>();
-  test_accu_small<u32>();
-  test_accu_small<s32>();
-  test_accu_small<u64>();
-  test_accu_small<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_accu_1()
-  {
   Mat<eT> x(80, 80);
   for (uword i = 0; i < 6400; ++i)
     x[i] = i + 1;
@@ -57,21 +58,15 @@ void test_accu_1()
 
 
 
-TEST_CASE("accu_1")
+TEMPLATE_TEST_CASE("accu_strange_size", "[accu]", double, float, u32, s32, u64, s64)
   {
-  test_accu_1<double>();
-  test_accu_1<float>();
-  test_accu_1<u32>();
-  test_accu_1<s32>();
-  test_accu_1<u64>();
-  test_accu_1<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_accu_strange_size()
-  {
   Col<eT> x(608);
 
   for(uword i = 0; i < 608; ++i)
@@ -84,21 +79,15 @@ void test_accu_strange_size()
 
 
 
-TEST_CASE("accu_strange_size")
+TEMPLATE_TEST_CASE("accu_large", "[accu]", double, float, u32, s32, u64, s64)
   {
-  test_accu_strange_size<double>();
-  test_accu_strange_size<float>();
-  test_accu_strange_size<u32>();
-  test_accu_strange_size<s32>();
-  test_accu_strange_size<u64>();
-  test_accu_strange_size<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_accu_large()
-  {
   arma::Col<eT> cpu_x = arma::conv_to<arma::Col<eT>>::from(arma::randu<arma::Col<double>>(100000) * 10.0);
   cpu_x.randu();
   Col<eT> x(cpu_x);
@@ -111,20 +100,15 @@ void test_accu_large()
 
 
 
-TEST_CASE("accu_large")
+TEMPLATE_TEST_CASE("accu_2", "[accu]", double, float)
   {
-  test_accu_large<double>();
-  test_accu_large<float>();
-  test_accu_large<u32>();
-  test_accu_large<s32>();
-  test_accu_large<u64>();
-  test_accu_large<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-template<typename eT>
-void test_accu_2()
-  {
   Mat<eT> x(10, 5);
   x.randu();
   x += eT(1);
@@ -137,16 +121,15 @@ void test_accu_2()
 
 
 
-TEST_CASE("accu_2")
+TEMPLATE_TEST_CASE("accu_subview_1", "[accu]", double, float, u32, s32, u64, s64)
   {
-  test_accu_2<double>();
-  test_accu_2<float>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-template<typename eT>
-void test_accu_subview_1()
-  {
   Mat<eT> x(5, 5);
   for (uword i = 0; i < 25; ++i)
     x[i] = i + 1;
@@ -160,16 +143,4 @@ void test_accu_subview_1()
   REQUIRE( sum2 == Approx(eT(145)) );
   REQUIRE( sum3 == Approx(eT(117)) );
   REQUIRE( sum4 == Approx(eT(7)) );
-  }
-
-
-
-TEST_CASE("accu_subview_1")
-  {
-  test_accu_subview_1<double>();
-  test_accu_subview_1<float>();
-  test_accu_subview_1<u32>();
-  test_accu_subview_1<s32>();
-  test_accu_subview_1<u64>();
-  test_accu_subview_1<s64>();
   }

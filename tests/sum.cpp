@@ -12,15 +12,21 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-#include <bandicoot>
 #include <armadillo>
+#include <bandicoot>
 #include "catch.hpp"
 
 using namespace coot;
 
-template<typename eT>
-void test_sum_colwise()
+TEMPLATE_TEST_CASE("sum_colwise_1", "[sum]", float, double, u32, s32, u64, s64)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
     {
@@ -42,21 +48,15 @@ void test_sum_colwise()
 
 
 
-TEST_CASE("sum_colwise_1")
+TEMPLATE_TEST_CASE("sum_colwise_2", "[sum]", float, double, u32, s32, u64, s64)
   {
-  test_sum_colwise<float>();
-  test_sum_colwise<double>();
-  test_sum_colwise<u32>();
-  test_sum_colwise<s32>();
-  test_sum_colwise<u64>();
-  test_sum_colwise<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_sum_colwise_2()
-  {
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
     {
@@ -77,21 +77,16 @@ void test_sum_colwise_2()
   }
 
 
-TEST_CASE("sum_colwise_2")
+
+TEMPLATE_TEST_CASE("sum_rowwise_1", "[sum]", float, double, u32, s32, u64, s64)
   {
-  test_sum_colwise_2<float>();
-  test_sum_colwise_2<double>();
-  test_sum_colwise_2<u32>();
-  test_sum_colwise_2<s32>();
-  test_sum_colwise_2<u64>();
-  test_sum_colwise_2<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_sum_rowwise()
-  {
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
     {
@@ -113,21 +108,15 @@ void test_sum_rowwise()
 
 
 
-TEST_CASE("sum_rowwise_1")
+TEMPLATE_TEST_CASE("sum_rowwise_2", "[sum]", float, double, u32, s32, u64, s64)
   {
-  test_sum_rowwise<float>();
-  test_sum_rowwise<double>();
-  test_sum_rowwise<u32>();
-  test_sum_rowwise<s32>();
-  test_sum_rowwise<u64>();
-  test_sum_rowwise<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_sum_rowwise_2()
-  {
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
     {
@@ -149,21 +138,15 @@ void test_sum_rowwise_2()
 
 
 
-TEST_CASE("sum_rowwise_2")
+TEMPLATE_TEST_CASE("subview_sum_colwise_1", "[sum]", float, double, u32, s32, u64, s64)
   {
-  test_sum_rowwise_2<float>();
-  test_sum_rowwise_2<double>();
-  test_sum_rowwise_2<u32>();
-  test_sum_rowwise_2<s32>();
-  test_sum_rowwise_2<u64>();
-  test_sum_rowwise_2<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_subview_sum_colwise()
-  {
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
     {
@@ -185,21 +168,15 @@ void test_subview_sum_colwise()
 
 
 
-TEST_CASE("subview_sum_colwise_1")
+TEMPLATE_TEST_CASE("subview_sum_colwise_2", "[sum]", float, double, u32, s32, u64, s64)
   {
-  test_subview_sum_colwise<float>();
-  test_subview_sum_colwise<double>();
-  test_subview_sum_colwise<u32>();
-  test_subview_sum_colwise<s32>();
-  test_subview_sum_colwise<u64>();
-  test_subview_sum_colwise<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_subview_sum_colwise_2()
-  {
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
     {
@@ -221,21 +198,15 @@ void test_subview_sum_colwise_2()
 
 
 
-TEST_CASE("subview_sum_colwise_2")
+TEMPLATE_TEST_CASE("subview_sum_colwise_full", "[sum]", float, double, u32, s32, u64, s64)
   {
-  test_subview_sum_colwise_2<float>();
-  test_subview_sum_colwise_2<double>();
-  test_subview_sum_colwise_2<u32>();
-  test_subview_sum_colwise_2<s32>();
-  test_subview_sum_colwise_2<u64>();
-  test_subview_sum_colwise_2<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_subview_sum_colwise_full()
-  {
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
     {
@@ -257,21 +228,15 @@ void test_subview_sum_colwise_full()
 
 
 
-TEST_CASE("subview_sum_colwise_3")
+TEMPLATE_TEST_CASE("subview_sum_rowwise_1", "[sum]", float, double, u32, s32, u64, s64)
   {
-  test_subview_sum_colwise_full<float>();
-  test_subview_sum_colwise_full<double>();
-  test_subview_sum_colwise_full<u32>();
-  test_subview_sum_colwise_full<s32>();
-  test_subview_sum_colwise_full<u64>();
-  test_subview_sum_colwise_full<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_subview_sum_rowwise()
-  {
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
     {
@@ -293,21 +258,15 @@ void test_subview_sum_rowwise()
 
 
 
-TEST_CASE("subview_sum_rowwise_1")
+TEMPLATE_TEST_CASE("subview_sum_rowwise_2", "[sum]", float, double, u32, s32, u64, s64)
   {
-  test_subview_sum_rowwise<float>();
-  test_subview_sum_rowwise<double>();
-  test_subview_sum_rowwise<u32>();
-  test_subview_sum_rowwise<s32>();
-  test_subview_sum_rowwise<u64>();
-  test_subview_sum_rowwise<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_subview_sum_rowwise_2()
-  {
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
     {
@@ -329,21 +288,15 @@ void test_subview_sum_rowwise_2()
 
 
 
-TEST_CASE("subview_sum_rowwise_2")
+TEMPLATE_TEST_CASE("subview_sum_rowwise_full", "[sum]", float, double, u32, s32, u64, s64)
   {
-  test_subview_sum_rowwise_2<float>();
-  test_subview_sum_rowwise_2<double>();
-  test_subview_sum_rowwise_2<u32>();
-  test_subview_sum_rowwise_2<s32>();
-  test_subview_sum_rowwise_2<u64>();
-  test_subview_sum_rowwise_2<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_subview_sum_rowwise_full()
-  {
   Mat<eT> x(10, 10);
   for (uword c = 0; c < 10; ++c)
     {
@@ -361,16 +314,4 @@ void test_subview_sum_rowwise_full()
     {
     REQUIRE( eT(s[r]) == Approx(eT(10 * r)) );
     }
-  }
-
-
-
-TEST_CASE("subview_sum_rowwise_3")
-  {
-  test_subview_sum_rowwise_full<float>();
-  test_subview_sum_rowwise_full<double>();
-  test_subview_sum_rowwise_full<u32>();
-  test_subview_sum_rowwise_full<s32>();
-  test_subview_sum_rowwise_full<u64>();
-  test_subview_sum_rowwise_full<s64>();
   }

@@ -12,32 +12,34 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
+#include <armadillo>
 #include <bandicoot>
 #include "catch.hpp"
 #include <typeinfo>
 
-#define TWOWAY_TEST_HELPER(TEST_NAME, ET1) \
-    TEST_NAME<ET1, u32>(); \
-    TEST_NAME<ET1, s32>(); \
-    TEST_NAME<ET1, u64>(); \
-    TEST_NAME<ET1, s64>(); \
-    TEST_NAME<ET1, float>(); \
-    TEST_NAME<ET1, double>();
-
-#define TWOWAY_TESTS(TEST_NAME) \
-    TWOWAY_TEST_HELPER(TEST_NAME, u32) \
-    TWOWAY_TEST_HELPER(TEST_NAME, s32) \
-    TWOWAY_TEST_HELPER(TEST_NAME, u64) \
-    TWOWAY_TEST_HELPER(TEST_NAME, s64) \
-    TWOWAY_TEST_HELPER(TEST_NAME, float) \
-    TWOWAY_TEST_HELPER(TEST_NAME, double)
-
 using namespace coot;
 
 // The simplest possible conv_to test.
-template<typename eT1, typename eT2>
-void test_conv_to_simple()
+TEMPLATE_TEST_CASE
+  (
+  "conv_to_simple",
+  "[conv_to]",
+  (std::pair<double, double>), (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, float>), (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, u32>), (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, s32>), (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, u64>), (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, s64>), (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
   {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x(5, 5);
   for (uword i = 0; i < 25; ++i)
     x[i] = i + 1;
@@ -50,17 +52,27 @@ void test_conv_to_simple()
 
 
 
-TEST_CASE("conv_to_simple")
-  {
-  TWOWAY_TESTS(test_conv_to_simple);
-  }
-
-
-
 // Really the operation is easy here, the test is more that it compiles.
-template<typename eT1, typename eT2>
-void test_conv_to_accu()
+TEMPLATE_TEST_CASE
+  (
+  "conv_to_accu",
+  "[conv_to]",
+  (std::pair<double, double>), (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, float>), (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, u32>), (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, s32>), (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, u64>), (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, s64>), (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
   {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x(5, 5);
   for (uword i = 0; i < 25; ++i)
     x[i] = i + 1;
@@ -68,13 +80,6 @@ void test_conv_to_accu()
   eT2 sum = accu(conv_to<Mat<eT2>>::from(x));
 
   REQUIRE(sum == Approx(eT2(325)) );
-  }
-
-
-
-TEST_CASE("conv_to_accu")
-  {
-  TWOWAY_TESTS(test_conv_to_simple);
   }
 
 
@@ -116,9 +121,26 @@ TEST_CASE("conv_to_chol")
 
 
 
-template<typename eT1, typename eT2>
-void test_conv_to_dot()
+TEMPLATE_TEST_CASE
+  (
+  "conv_to_dot",
+  "[conv_to]",
+  (std::pair<double, double>), (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, float>), (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, u32>), (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, s32>), (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, u64>), (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, s64>), (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
   {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Col<eT1> x(25);
   for (uword i = 0; i < 25; ++i)
     x[i] = i + 1;
@@ -136,23 +158,33 @@ void test_conv_to_dot()
 
 
 
-TEST_CASE("conv_to_dot")
+TEMPLATE_TEST_CASE
+  (
+  "conv_to_eop_scalar_plus",
+  "[conv_to]",
+  (std::pair<double, double>), (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, float>), (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, u32>), (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, s32>), (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, u64>), (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, s64>), (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
   {
-  TWOWAY_TESTS(test_conv_to_dot);
-  }
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
-
-template<typename eT1, typename eT2>
-void test_conv_to_eop_scalar_plus()
-  {
   Mat<eT1> x(5, 5);
   x.fill(eT1(3));
 
   Mat<eT2> y = conv_to<Mat<eT2>>::from(x) + eT2(1);
 
   for (uword r = 0; r < 5; ++r)
-    { 
+    {
     for (uword c = 0; c < 5; ++c)
       {
       REQUIRE( eT2(y(r, c)) == Approx(eT2(eT1(x(r, c)) + eT2(1))) );
@@ -162,16 +194,22 @@ void test_conv_to_eop_scalar_plus()
 
 
 
-TEST_CASE("conv_to_eop_scalar_plus")
+TEMPLATE_TEST_CASE
+  (
+  "conv_to_matmul",
+  "[conv_to]",
+  (std::pair<double, double>), (std::pair<double, float>),
+  (std::pair<float, float>), (std::pair<float, double>)
+  )
   {
-  TWOWAY_TESTS(test_conv_to_eop_scalar_plus);
-  }
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
-
-template<typename eT1, typename eT2>
-void test_conv_to_matmul()
-  {
   arma::Mat<eT1> cpu_x(20, 20, arma::fill::randu);
   arma::Mat<eT2> cpu_y(20, 20, arma::fill::randu);
   arma::Mat<eT1> cpu_z1 = cpu_x * arma::conv_to<arma::Mat<eT1>>::from(cpu_y.t());
@@ -194,19 +232,22 @@ void test_conv_to_matmul()
 
 
 
-TEST_CASE("conv_to_matmul")
+TEMPLATE_TEST_CASE
+  (
+  "conv_to_scalar_matmul",
+  "[conv_to]",
+  (std::pair<double, double>), (std::pair<double, float>),
+  (std::pair<float, float>), (std::pair<float, double>)
+  )
   {
-  test_conv_to_matmul<float, float>();
-  test_conv_to_matmul<float, double>();
-  test_conv_to_matmul<double, float>();
-  test_conv_to_matmul<double, double>();
-  }
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
-
-template<typename eT1, typename eT2>
-void test_conv_to_scalar_matmul()
-  {
   arma::Mat<eT1> cpu_x(20, 20, arma::fill::randu);
   arma::Mat<eT2> cpu_y(20, 20, arma::fill::randu);
   arma::Mat<eT1> cpu_z1 = -cpu_x * arma::conv_to<arma::Mat<eT1>>::from(cpu_y.t());
@@ -235,20 +276,23 @@ void test_conv_to_scalar_matmul()
 
 
 
-TEST_CASE("conv_to_scalar_matmul")
-  {
-  test_conv_to_scalar_matmul<float, float>();
-  test_conv_to_scalar_matmul<float, double>();
-  test_conv_to_scalar_matmul<double, float>();
-  test_conv_to_scalar_matmul<double, double>();
-  }
-
-
-
 // eT1 should be unsigned; eT2 should be signed
-template<typename eT1, typename eT2>
-void test_conv_to_outside_negation()
+TEMPLATE_TEST_CASE
+  (
+  "conv_to_outside_negation",
+  "[conv_to]",
+  (std::pair<u32, u32>), (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<u64, u64>), (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>)
+  )
   {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x(2, 2);
   x.fill(eT1(3));
 
@@ -268,24 +312,25 @@ void test_conv_to_outside_negation()
 
 
 
-TEST_CASE("conv_to_outside_negation")
-  {
-  test_conv_to_outside_negation<u32, s32>();
-  test_conv_to_outside_negation<u32, s64>();
-  test_conv_to_outside_negation<u32, float>();
-  test_conv_to_outside_negation<u32, double>();
-  test_conv_to_outside_negation<u64, s32>();
-  test_conv_to_outside_negation<u64, s64>();
-  test_conv_to_outside_negation<u64, float>();
-  test_conv_to_outside_negation<u64, double>();
-  }
-
-
-
 // eT1 should be signed; eT2 should be unsigned
-template<typename eT1, typename eT2>
-void test_conv_to_inside_negation()
+TEMPLATE_TEST_CASE
+  (
+  "conv_to_inside_negation",
+  "[conv_to]",
+  (std::pair<double, u32>), (std::pair<double, u64>),
+  (std::pair<float, u32>), (std::pair<float, u64>),
+  (std::pair<s32, u32>), (std::pair<s32, s64>),
+  (std::pair<s64, u32>), (std::pair<s64, u64>)
+  )
   {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x(2, 2);
   x.fill(eT1(-3));
 
@@ -305,24 +350,25 @@ void test_conv_to_inside_negation()
 
 
 
-TEST_CASE("conv_to_inside_negation")
-  {
-  test_conv_to_inside_negation<s32, u32>();
-  test_conv_to_inside_negation<s32, u64>();
-  test_conv_to_inside_negation<s64, u32>();
-  test_conv_to_inside_negation<s64, u64>();
-  test_conv_to_inside_negation<float, u32>();
-  test_conv_to_inside_negation<float, u64>();
-  test_conv_to_inside_negation<double, u32>();
-  test_conv_to_inside_negation<double, u64>();
-  }
-
-
-
 // eT1 should be integer; eT2 should be floating-point
-template<typename eT1, typename eT2>
-void test_conv_to_inside_scalar_mul()
+TEMPLATE_TEST_CASE
+  (
+  "conv_to_inside_scalar_mul",
+  "[conv_to]",
+  (std::pair<u32, double>), (std::pair<u32, float>),
+  (std::pair<s32, double>), (std::pair<s32, float>),
+  (std::pair<u64, double>), (std::pair<u64, float>),
+  (std::pair<s64, double>), (std::pair<s64, float>)
+  )
   {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x(2, 2);
   x.fill(eT1(3));
 
@@ -342,24 +388,23 @@ void test_conv_to_inside_scalar_mul()
 
 
 
-TEST_CASE("conv_to_inside_scalar_mul")
-  {
-  test_conv_to_inside_scalar_mul<u32, float>();
-  test_conv_to_inside_scalar_mul<s32, float>();
-  test_conv_to_inside_scalar_mul<u64, float>();
-  test_conv_to_inside_scalar_mul<s64, float>();
-  test_conv_to_inside_scalar_mul<u32, double>();
-  test_conv_to_inside_scalar_mul<s32, double>();
-  test_conv_to_inside_scalar_mul<u64, double>();
-  test_conv_to_inside_scalar_mul<s64, double>();
-  }
-
-
-
 // eT1 should be floating-point; eT2 should be integer
-template<typename eT1, typename eT2>
-void test_conv_to_outside_scalar_mul()
+TEMPLATE_TEST_CASE
+  (
+  "conv_to_outside_scalar_mul",
+  "[conv_to]",
+  (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>)
+  )
   {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x(2, 2);
   x.fill(eT1(-1.5));
 
@@ -379,25 +424,16 @@ void test_conv_to_outside_scalar_mul()
 
 
 
-TEST_CASE("conv_to_outside_scalar_mul")
-  {
-  test_conv_to_outside_scalar_mul<float, u32>();
-  test_conv_to_outside_scalar_mul<float, s32>();
-  test_conv_to_outside_scalar_mul<float, u64>();
-  test_conv_to_outside_scalar_mul<float, s64>();
-  test_conv_to_outside_scalar_mul<double, u32>();
-  test_conv_to_outside_scalar_mul<double, s32>();
-  test_conv_to_outside_scalar_mul<double, u64>();
-  test_conv_to_outside_scalar_mul<double, s64>();
-  }
-
-
-
 // Test eOps; make sure that conversions at the same time as an eOp give the
 // same results as doing it separately.
 template<typename out_eT, typename in_eT, typename eop_type>
 void test_eop_conv_to(const out_eT aux = out_eT(0))
   {
+  if (!coot_rt_t::is_supported_type<out_eT>() || !coot_rt_t::is_supported_type<in_eT>())
+    {
+    return;
+    }
+
   Mat<in_eT> x(3, 3);
   for (uword i = 0; i < 9; ++i)
     {
@@ -455,7 +491,7 @@ void test_eop_conv_to(const out_eT aux = out_eT(0))
 
 
 
-TEST_CASE("eop_conv_to")
+TEST_CASE("eop_conv_to", "[conv_to]")
   {
   TWOWAY_EOP_TESTS(test_eop_conv_to, eop_scalar_plus, 1);
   TWOWAY_EOP_TESTS(test_eop_conv_to, eop_neg, 0);
@@ -473,7 +509,7 @@ TEST_CASE("eop_conv_to")
 
 
 // We need to make sure that the conversion actually happens here.
-TEST_CASE("two_chained_conv_tos")
+TEST_CASE("two_chained_conv_tos", "[conv_to]")
   {
   Mat<s32> x(2, 2);
   x.fill(s32(-1));
@@ -491,7 +527,7 @@ TEST_CASE("two_chained_conv_tos")
 
 
 // Make sure that chaining together three conv_tos actually works too.
-TEST_CASE("three_chained_conv_tos")
+TEST_CASE("three_chained_conv_tos", "[conv_to]")
   {
   Mat<s32> x(2, 2);
   x.fill(s32(-1));
@@ -515,9 +551,26 @@ TEST_CASE("three_chained_conv_tos")
 // Since eOps can be merged with conv_to operations, make sure that we
 // can properly "double-merge" an eOp<conv_to<eOp<...>>> into just one eOp.
 // First, we'll do a simple test.
-template<typename out_eT, typename in_eT>
-void test_simple_double_merge_eop_conv_to()
+TEMPLATE_TEST_CASE
+  (
+  "simple_double_merge_eop_conv_to",
+  "[conv_to]",
+  (std::pair<double, double>), (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, float>), (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, u32>), (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, s32>), (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, u64>), (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, s64>), (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
   {
+  typedef typename TestType::first_type in_eT;
+  typedef typename TestType::second_type out_eT;
+
+  if (!coot_rt_t::is_supported_type<in_eT>() || !coot_rt_t::is_supported_type<out_eT>())
+    {
+    return;
+    }
+
   Mat<in_eT> x(3, 3);
   for (uword i = 0; i < 9; ++i)
     {
@@ -536,18 +589,16 @@ void test_simple_double_merge_eop_conv_to()
 
 
 
-TEST_CASE("simple_double_merge_eop_conv_to")
-  {
-  TWOWAY_TESTS(test_simple_double_merge_eop_conv_to);
-  }
-
-
-
 // Now, test every eop_type to make sure that the kernels are right.
 // (However, we have to hand-assemble the eOps and Ops.)
 template<typename out_eT, typename in_eT, typename eop_type>
 void test_double_merged_eop_conv_to(out_eT aux_val)
   {
+  if (!coot_rt_t::is_supported_type<in_eT>() || !coot_rt_t::is_supported_type<out_eT>())
+    {
+    return;
+    }
+
   out_eT aux_out = aux_val;
   in_eT  aux_in  = in_eT(aux_val);
 
@@ -583,7 +634,7 @@ void test_double_merged_eop_conv_to(out_eT aux_val)
 
 
 
-TEST_CASE("double_merged_eop_conv_to")
+TEST_CASE("double_merged_eop_conv_to", "[conv_to]")
   {
   TWOWAY_EOP_TESTS(test_eop_conv_to, eop_scalar_plus, 1);
   TWOWAY_EOP_TESTS(test_eop_conv_to, eop_neg, 0);
@@ -602,13 +653,14 @@ TEST_CASE("double_merged_eop_conv_to")
 
 // Test colwise/rowwise sums mixed with conv_to operations.
 // We can only do this test successfully with u32/u64s.
-TEST_CASE("colwise_sum_conv_to")
+TEST_CASE("colwise_sum_conv_to", "[conv_to]")
   {
   Mat<u32> x(3, 3);
-  x.fill(u32(-1));
+  x.fill(std::numeric_limits<u32>::max());
 
   // If the conversion happens *after* the sum, then the sums will overflow.
   // Otherwise, they won't overflow.
+  // Overflow is undefined behavior, so we have no guarantees on what will happen, but whatever does happen, it will still be a u32.
   Mat<u64> y1 = conv_to<Mat<u64>>::from(sum(x, 0));
   Mat<u64> y2 = sum(conv_to<Mat<u64>>::from(x), 0);
 
@@ -618,20 +670,21 @@ TEST_CASE("colwise_sum_conv_to")
   REQUIRE( y2.n_cols == 3 );
   for (uword i = 0; i < 3; ++i)
     {
-    REQUIRE( u64(y1[i]) == u64(u32(-3)) );
-    REQUIRE( u64(y2[i]) == u64(3 * u64(u32(-1))) );
+    REQUIRE( u64(y1[i]) <= u64(std::numeric_limits<u32>::max()) );
+    REQUIRE( u64(y2[i]) == u64(3 * u64(std::numeric_limits<u32>::max())) );
     }
   }
 
 
 
-TEST_CASE("rowwise_sum_conv_to")
+TEST_CASE("rowwise_sum_conv_to", "[conv_to]")
   {
   Mat<u32> x(3, 3);
-  x.fill(u32(-1));
+  x.fill(std::numeric_limits<u32>::max());
 
   // If the conversion happens *after* the sum, then the sums will overflow.
   // Otherwise, they won't overflow.
+  // Overflow is undefined behavior, so we have no guarantees on what will happen, but whatever does happen, it will still be a u32.
   Mat<u64> y1 = conv_to<Mat<u64>>::from(sum(x, 1));
   Mat<u64> y2 = sum(conv_to<Mat<u64>>::from(x), 1);
 
@@ -641,19 +694,21 @@ TEST_CASE("rowwise_sum_conv_to")
   REQUIRE( y2.n_cols == 1 );
   for (uword i = 0; i < 3; ++i)
     {
-    REQUIRE( u64(y1[i]) == u64(u32(-3)) );
-    REQUIRE( u64(y2[i]) == u64(3 * u64(u32(-1))) );
+    REQUIRE( u64(y1[i]) <= u64(std::numeric_limits<u32>::max()) );
+    REQUIRE( u64(y2[i]) == u64(3 * u64(std::numeric_limits<u32>::max())) );
     }
   }
 
 
-TEST_CASE("submat_colwise_sum_conv_to")
+
+TEST_CASE("submat_colwise_sum_conv_to", "[conv_to]")
   {
   Mat<u32> x(3, 3);
-  x.fill(u32(-1));
+  x.fill(std::numeric_limits<u32>::max());
 
   // If the conversion happens *after* the sum, then the sums will overflow.
   // Otherwise, they won't overflow.
+  // Overflow is undefined behavior, so we have no guarantees on what will happen, but whatever does happen, it will still be a u32.
   Mat<u64> y1 = conv_to<Mat<u64>>::from(sum(x.cols(0, 1), 0));
   Mat<u64> y2 = sum(conv_to<Mat<u64>>::from(x.cols(0, 1)), 0);
 
@@ -663,20 +718,21 @@ TEST_CASE("submat_colwise_sum_conv_to")
   REQUIRE( y2.n_cols == 2 );
   for (uword i = 0; i < 2; ++i)
     {
-    REQUIRE( u64(y1[i]) == u64(u32(-3)) );
-    REQUIRE( u64(y2[i]) == u64(3 * u64(u32(-1))) );
+    REQUIRE( u64(y1[i]) <= u64(std::numeric_limits<u32>::max()) );
+    REQUIRE( u64(y2[i]) == u64(3 * u64(std::numeric_limits<u32>::max())) );
     }
   }
 
 
 
-TEST_CASE("submat_rowwise_sum_conv_to")
+TEST_CASE("submat_rowwise_sum_conv_to", "[conv_to]")
   {
   Mat<u32> x(3, 3);
-  x.fill(u32(-1));
+  x.fill(std::numeric_limits<u32>::max());
 
   // If the conversion happens *after* the sum, then the sums will overflow.
   // Otherwise, they won't overflow.
+  // Overflow is undefined behavior, so we have no guarantees on what will happen, but whatever does happen, it will still be a u32.
   Mat<u64> y1 = conv_to<Mat<u64>>::from(sum(x.rows(0, 1), 1));
   Mat<u64> y2 = sum(conv_to<Mat<u64>>::from(x.rows(0, 1)), 1);
 
@@ -686,16 +742,33 @@ TEST_CASE("submat_rowwise_sum_conv_to")
   REQUIRE( y2.n_cols == 1 );
   for (uword i = 0; i < 2; ++i)
     {
-    REQUIRE( u64(y1[i]) == u64(u32(-3)) );
-    REQUIRE( u64(y2[i]) == u64(3 * u64(u32(-1))) );
+    REQUIRE( u64(y1[i]) <= u64(std::numeric_limits<u32>::max()) );
+    REQUIRE( u64(y2[i]) == u64(3 * u64(std::numeric_limits<u32>::max())) );
     }
   }
 
 
 // inplace_set/plus/minus/schur/div_mat
-template<typename eT2, typename eT1>
-void test_inplace_set_conv_to()
+TEMPLATE_TEST_CASE
+  (
+  "inplace_set_conv_to",
+  "[conv_to]",
+  (std::pair<double, double>), (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, float>), (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, u32>), (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, s32>), (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, u64>), (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, s64>), (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
   {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x(5, 3);
   x.fill(eT1(3));
 
@@ -715,16 +788,26 @@ void test_inplace_set_conv_to()
 
 
 
-TEST_CASE("inplace_set_conv_to")
+TEMPLATE_TEST_CASE
+  (
+  "inplace_plus_conv_to",
+  "[conv_to]",
+  (std::pair<double, double>), (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, float>), (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, u32>), (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, s32>), (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, u64>), (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, s64>), (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
   {
-  TWOWAY_TESTS(test_inplace_set_conv_to);
-  }
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
-
-template<typename eT2, typename eT1>
-void test_inplace_plus_conv_to()
-  {
   Mat<eT1> x(5, 3);
   x.fill(eT1(3));
 
@@ -743,16 +826,26 @@ void test_inplace_plus_conv_to()
 
 
 
-TEST_CASE("inplace_plus_conv_to")
+TEMPLATE_TEST_CASE
+  (
+  "inplace_minus_conv_to",
+  "[conv_to]",
+  (std::pair<double, double>), (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, float>), (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, u32>), (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, s32>), (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, u64>), (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, s64>), (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
   {
-  TWOWAY_TESTS(test_inplace_plus_conv_to);
-  }
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
-
-template<typename eT2, typename eT1>
-void test_inplace_minus_conv_to()
-  {
   Mat<eT1> x(5, 3);
   x.fill(eT1(1));
 
@@ -771,16 +864,26 @@ void test_inplace_minus_conv_to()
 
 
 
-TEST_CASE("inplace_minus_conv_to")
+TEMPLATE_TEST_CASE
+  (
+  "inplace_mul_conv_to",
+  "[conv_to]",
+  (std::pair<double, double>), (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, float>), (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, u32>), (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, s32>), (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, u64>), (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, s64>), (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
   {
-  TWOWAY_TESTS(test_inplace_minus_conv_to);
-  }
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
-
-template<typename eT2, typename eT1>
-void test_inplace_mul_conv_to()
-  {
   Mat<eT1> x(5, 3);
   x.fill(eT1(3));
 
@@ -799,16 +902,26 @@ void test_inplace_mul_conv_to()
 
 
 
-TEST_CASE("inplace_mul_conv_to")
+TEMPLATE_TEST_CASE
+  (
+  "inplace_div_conv_to",
+  "[conv_to]",
+  (std::pair<double, double>), (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, float>), (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, u32>), (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, s32>), (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, u64>), (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, s64>), (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
   {
-  TWOWAY_TESTS(test_inplace_mul_conv_to);
-  }
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
-
-template<typename eT2, typename eT1>
-void test_inplace_div_conv_to()
-  {
   Mat<eT1> x(5, 3);
   x.fill(eT1(2));
 
@@ -827,17 +940,27 @@ void test_inplace_div_conv_to()
 
 
 
-TEST_CASE("inplace_div_conv_to")
-  {
-  TWOWAY_TESTS(test_inplace_div_conv_to);
-  }
-
-
-
 // inplace_plus/minus/mul/div_array
-template<typename eT2, typename eT1>
-void test_inplace_plus_subview_conv_to()
+TEMPLATE_TEST_CASE
+  (
+  "inplace_plus_subview_conv_to",
+  "[conv_to]",
+  (std::pair<double, double>), (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, float>), (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, u32>), (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, s32>), (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, u64>), (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, s64>), (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
   {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
   Mat<eT1> x(5, 3);
   x.fill(eT1(1));
   Mat<eT2> y(6, 4);
@@ -863,16 +986,26 @@ void test_inplace_plus_subview_conv_to()
 
 
 
-TEST_CASE("inplace_plus_subview_conv_to")
+TEMPLATE_TEST_CASE
+  (
+  "inplace_minus_subview_conv_to",
+  "[conv_to]",
+  (std::pair<double, double>), (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, float>), (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, u32>), (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, s32>), (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, u64>), (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, s64>), (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
   {
-  TWOWAY_TESTS(test_inplace_plus_subview_conv_to)
-  }
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
-
-template<typename eT2, typename eT1>
-void test_inplace_minus_subview_conv_to()
-  {
   Mat<eT1> x(5, 3);
   x.fill(eT1(1));
   Mat<eT2> y(6, 4);
@@ -898,16 +1031,26 @@ void test_inplace_minus_subview_conv_to()
 
 
 
-TEST_CASE("inplace_minus_subview_conv_to")
+TEMPLATE_TEST_CASE
+  (
+  "inplace_mul_subview_conv_to",
+  "[conv_to]",
+  (std::pair<double, double>), (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, float>), (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, u32>), (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, s32>), (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, u64>), (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, s64>), (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
   {
-  TWOWAY_TESTS(test_inplace_minus_subview_conv_to)
-  }
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
-
-template<typename eT2, typename eT1>
-void test_inplace_mul_subview_conv_to()
-  {
   Mat<eT1> x(5, 3);
   x.fill(eT1(3));
   Mat<eT2> y(6, 4);
@@ -933,16 +1076,26 @@ void test_inplace_mul_subview_conv_to()
 
 
 
-TEST_CASE("inplace_mul_subview_conv_to")
+TEMPLATE_TEST_CASE
+  (
+  "inplace_div_subview_conv_to",
+  "[conv_to]",
+  (std::pair<double, double>), (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, float>), (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, u32>), (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, s32>), (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, u64>), (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, s64>), (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
   {
-  TWOWAY_TESTS(test_inplace_mul_subview_conv_to)
-  }
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
 
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
 
-
-template<typename eT2, typename eT1>
-void test_inplace_div_subview_conv_to()
-  {
   Mat<eT1> x(5, 3);
   x.fill(eT1(2));
   Mat<eT2> y(6, 4);
@@ -968,10 +1121,233 @@ void test_inplace_div_subview_conv_to()
 
 
 
-TEST_CASE("inplace_div_subview_conv_to")
+TEMPLATE_TEST_CASE
+  (
+  "from_arma_conv_to",
+  "[conv_to]",
+  (std::pair<double, double>), (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, float>), (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, u32>), (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, s32>), (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, u64>), (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, s64>), (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
   {
-  TWOWAY_TESTS(test_inplace_div_subview_conv_to)
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
+  arma::Mat<eT1> x = arma::randi<arma::Mat<eT1>>(10, 15, arma::distr_param(1, 10));
+  Mat<eT2> y = randi<Mat<eT2>>(6, 7, distr_param(20, 30));
+
+  y = conv_to<Mat<eT2>>::from(x);
+
+  arma::Mat<eT2> y_ref = arma::conv_to<arma::Mat<eT2>>::from(x);
+  arma::Mat<eT2> y_cpu(y);
+
+  REQUIRE( arma::approx_equal( y_cpu, y_ref, "absdiff", 1e-5 ) );
   }
 
 
 
+TEMPLATE_TEST_CASE
+  (
+  "from_arma_op_conv_to",
+  "[conv_to]",
+  (std::pair<double, double>), (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, float>), (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, u32>), (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, s32>), (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, u64>), (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, s64>), (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
+  {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
+  arma::Mat<eT1> x = arma::randi<arma::Mat<eT1>>(10, 15, arma::distr_param(1, 10));
+  Mat<eT2> y = randi<Mat<eT2>>(6, 7, distr_param(20, 30));
+
+  y = conv_to<Mat<eT2>>::from(3 * x + 4);
+
+  arma::Mat<eT2> y_ref = arma::conv_to<arma::Mat<eT2>>::from(3 * x + 4);
+  arma::Mat<eT2> y_cpu(y);
+
+  REQUIRE( arma::approx_equal( y_cpu, y_ref, "absdiff", 1e-5 ) );
+  }
+
+
+
+TEMPLATE_TEST_CASE
+  (
+  "from_arma_subview_conv_to",
+  "[conv_to]",
+  (std::pair<double, double>), (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, float>), (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, u32>), (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, s32>), (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, u64>), (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, s64>), (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
+  {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
+  arma::Mat<eT1> x = arma::randi<arma::Mat<eT1>>(10, 15, arma::distr_param(1, 10));
+  Mat<eT2> y = randi<Mat<eT2>>(6, 7, distr_param(20, 30));
+
+  y = conv_to<Mat<eT2>>::from(x.submat(2, 2, 7, 9));
+
+  arma::Mat<eT2> y_ref = arma::conv_to<arma::Mat<eT2>>::from(x.submat(2, 2, 7, 9));
+  arma::Mat<eT2> y_cpu(y);
+
+  REQUIRE( arma::approx_equal( y_cpu, y_ref, "absdiff", 1e-5 ) );
+  }
+
+
+
+TEMPLATE_TEST_CASE
+  (
+  "to_arma_conv_to",
+  "[conv_to]",
+  (std::pair<double, double>), (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, float>), (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, u32>), (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, s32>), (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, u64>), (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, s64>), (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
+  {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
+  Mat<eT1> x = randi<Mat<eT1>>(10, 15, distr_param(1, 10));
+  arma::Mat<eT2> y = arma::randi<arma::Mat<eT2>>(6, 7, arma::distr_param(20, 30));
+
+  y = conv_to<arma::Mat<eT2>>::from(x);
+
+  arma::Mat<eT1> x_cpu(x);
+  arma::Mat<eT2> y_ref = arma::conv_to<arma::Mat<eT2>>::from(x_cpu);
+
+  REQUIRE( arma::approx_equal( y, y_ref, "absdiff", 1e-5 ) );
+  }
+
+
+
+TEMPLATE_TEST_CASE
+  (
+  "to_arma_op_conv_to",
+  "[conv_to]",
+  (std::pair<double, double>), (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, float>), (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, u32>), (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, s32>), (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, u64>), (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, s64>), (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
+  {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
+  Mat<eT1> x = randi<Mat<eT1>>(10, 15, distr_param(1, 10));
+  arma::Mat<eT2> y = arma::randi<arma::Mat<eT2>>(6, 7, arma::distr_param(20, 30));
+
+  y = conv_to<arma::Mat<eT2>>::from(3 * x + 4);
+
+  Mat<eT1> x_op = 3 * x + 4;
+  arma::Mat<eT1> x_cpu(x_op);
+  arma::Mat<eT2> y_ref = arma::conv_to<arma::Mat<eT2>>::from(x_cpu);
+
+  REQUIRE( arma::approx_equal( y, y_ref, "absdiff", 1e-5 ) );
+  }
+
+
+
+TEMPLATE_TEST_CASE
+  (
+  "to_arma_subview_conv_to",
+  "[conv_to]",
+  (std::pair<double, double>), (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, float>), (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, u32>), (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, s32>), (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, u64>), (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, s64>), (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
+  {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
+  Mat<eT1> x = randi<Mat<eT1>>(10, 15, distr_param(1, 10));
+  arma::Mat<eT2> y = arma::randi<arma::Mat<eT2>>(6, 7, arma::distr_param(20, 30));
+
+  y = conv_to<arma::Mat<eT2>>::from(x.submat(5, 5, 9, 14));
+
+  Mat<eT1> x_sub = x.submat(5, 5, 9, 14);
+  arma::Mat<eT1> x_cpu(x_sub);
+  arma::Mat<eT2> y_ref = arma::conv_to<arma::Mat<eT2>>::from(x_cpu);
+
+  REQUIRE( arma::approx_equal( y, y_ref, "absdiff", 1e-5 ) );
+  }
+
+
+
+TEMPLATE_TEST_CASE
+  (
+  "arma_passthrough_conv_to",
+  "[conv_to]",
+  (std::pair<double, double>), (std::pair<double, float>), (std::pair<double, u32>), (std::pair<double, s32>), (std::pair<double, u64>), (std::pair<double, s64>),
+  (std::pair<float, float>), (std::pair<float, double>), (std::pair<float, u32>), (std::pair<float, s32>), (std::pair<float, u64>), (std::pair<float, s64>),
+  (std::pair<u32, u32>), (std::pair<u32, double>), (std::pair<u32, float>), (std::pair<u32, s32>), (std::pair<u32, u64>), (std::pair<u32, s64>),
+  (std::pair<s32, s32>), (std::pair<s32, double>), (std::pair<s32, float>), (std::pair<s32, u32>), (std::pair<s32, u64>), (std::pair<s32, s64>),
+  (std::pair<u64, u64>), (std::pair<u64, double>), (std::pair<u64, float>), (std::pair<u64, u32>), (std::pair<u64, s32>), (std::pair<u64, s64>),
+  (std::pair<s64, s64>), (std::pair<s64, double>), (std::pair<s64, float>), (std::pair<s64, u32>), (std::pair<s64, s32>), (std::pair<s64, u64>)
+  )
+  {
+  typedef typename TestType::first_type eT1;
+  typedef typename TestType::second_type eT2;
+
+  if (!coot_rt_t::is_supported_type<eT1>() || !coot_rt_t::is_supported_type<eT2>())
+    {
+    return;
+    }
+
+  arma::Mat<eT1> x = arma::randi<arma::Mat<eT1>>(10, 15, arma::distr_param(1, 10));
+  arma::Mat<eT2> y = arma::randi<arma::Mat<eT2>>(6, 7, arma::distr_param(20, 30));
+
+  y = conv_to<arma::Mat<eT2>>::from(x);
+
+  arma::Mat<eT1> x_cpu(x);
+  arma::Mat<eT2> y_ref = arma::conv_to<arma::Mat<eT2>>::from(x_cpu);
+
+  REQUIRE( arma::approx_equal( y, y_ref, "absdiff", 1e-5 ) );
+  }

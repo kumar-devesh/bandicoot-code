@@ -13,8 +13,69 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup opencl
-//! @{
+
+template<typename eT1, typename eT2>
+inline
+void
+max(dev_mem_t<eT2> dest,
+    const dev_mem_t<eT1> src,
+    const uword n_rows,
+    const uword n_cols,
+    const uword dim,
+    const bool post_conv_apply,
+    // subview arguments
+    const uword dest_offset,
+    const uword dest_mem_incr,
+    const uword src_row_offset,
+    const uword src_col_offset,
+    const uword src_M_n_rows)
+  {
+  coot_extra_debug_sigprint();
+
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::max(): OpenCL runtime not valid" );
+
+  runtime_t::cq_guard guard;
+
+  cl_kernel kernel;
+  if (dim == 0)
+    {
+    kernel = get_rt().cl_rt.get_kernel<eT2, eT1>(post_conv_apply ? twoway_kernel_id::max_colwise_conv_post : twoway_kernel_id::max_colwise_conv_pre);
+    }
+  else
+    {
+    kernel = get_rt().cl_rt.get_kernel<eT2, eT1>(post_conv_apply ? twoway_kernel_id::max_rowwise_conv_post : twoway_kernel_id::max_rowwise_conv_pre);
+    }
+
+  cl_int status = 0;
+
+  const uword src_offset = src_row_offset + src_col_offset * src_M_n_rows;
+
+  runtime_t::adapt_uword cl_dest_offset(dest_offset);
+  runtime_t::adapt_uword cl_src_offset(src_offset);
+  runtime_t::adapt_uword cl_n_rows(n_rows);
+  runtime_t::adapt_uword cl_n_cols(n_cols);
+  runtime_t::adapt_uword cl_dest_mem_incr(dest_mem_incr);
+  runtime_t::adapt_uword cl_src_M_n_rows(src_M_n_rows);
+
+  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem),        &(dest.cl_mem_ptr)   );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 1, cl_dest_offset.size,   cl_dest_offset.addr  );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 2, sizeof(cl_mem),        &(src.cl_mem_ptr)    );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 3, cl_src_offset.size,    cl_src_offset.addr   );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 4, cl_n_rows.size,        cl_n_rows.addr       );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 5, cl_n_cols.size,        cl_n_cols.addr       );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 6, cl_dest_mem_incr.size, cl_dest_mem_incr.addr);
+  status |= coot_wrapper(clSetKernelArg)(kernel, 7, cl_src_M_n_rows.size,  cl_src_M_n_rows.addr );
+
+  const size_t k1_work_dim       = 1;
+  const size_t k1_work_offset[1] = { 0                                    };
+  const size_t k1_work_size[1]   = { size_t((dim == 0) ? n_cols : n_rows) };
+
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, k1_work_dim, k1_work_offset, k1_work_size, NULL, 0, NULL, NULL);
+
+  coot_check_cl_error(status, "coot::opencl::max(): failed to run kernel");
+  }
+
+
 
 /**
  * Compute the maximum of all elements in `mem`.
@@ -23,100 +84,14 @@
 template<typename eT>
 inline
 eT
-max(dev_mem_t<eT> mem, const uword n_elem)
+max_vec(dev_mem_t<eT> mem, const uword n_elem)
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::max(): OpenCL runtime not valid" );
-
-  cl_int status = 0;
+  coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::max_vec(): OpenCL runtime not valid" );
 
   cl_kernel k = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::max);
   cl_kernel k_small = get_rt().cl_rt.get_kernel<eT>(oneway_kernel_id::max_small);
 
-  // Compute workgroup sizes.  We use CL_KERNEL_WORK_GROUP_SIZE as an upper bound, which
-  // depends on the compiled kernel.  I assume that the results for k will be identical to k_small.
-  size_t kernel_wg_size;
-  status = clGetKernelWorkGroupInfo(k, get_rt().cl_rt.get_device(), CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &kernel_wg_size, NULL);
-  coot_check_cl_error(status, "accu()");
-
-  const size_t k1_work_dim       = 1;
-  const size_t k1_work_offset    = 0;
-  const uword wavefront_size = get_rt().cl_rt.get_wavefront_size();
-
-  uword total_num_threads = std::ceil(n_elem / (2 * std::ceil(std::log2(n_elem))));
-  uword local_group_size = std::min(kernel_wg_size, total_num_threads);
-
-  // Create auxiliary memory.
-  const uword aux_size = std::ceil((total_num_threads + (local_group_size - 1)) / local_group_size);
-  Mat<eT> aux(aux_size, 1);
-  aux.zeros();
-  Mat<eT> aux2;
-  if (aux_size > 1)
-    {
-    const uword aux2_size = std::ceil((aux_size + (local_group_size - 1)) / local_group_size);
-    aux2.zeros(aux2_size, 1);
-    }
-
-  runtime_t::cq_guard guard;
-
-  dev_mem_t<eT> aux_mem = aux.get_dev_mem(false);
-  dev_mem_t<eT> aux_mem2 = aux2.get_dev_mem(false);
-
-  uword in_n_elem = n_elem;
-  Mat<eT>* out = &aux;
-
-  dev_mem_t<eT>* in_mem = &mem;
-  dev_mem_t<eT>* out_mem = &aux_mem;
-
-  do
-    {
-    runtime_t::adapt_uword dev_n_elem(in_n_elem);
-
-    // We need to round total_num_threads up to the next power of 2.  (The kernel assumes this.)
-    const uword pow2_group_size = (uword) std::pow(2.0f, std::ceil(std::log2((float) local_group_size)));
-    const uword pow2_total_num_threads = (total_num_threads % pow2_group_size == 0) ? total_num_threads : ((total_num_threads / pow2_group_size) + 1) * pow2_group_size;
-
-    // If the number of threads is less than the wavefront size, we need to use the small kernel.
-    cl_kernel* k_use = (pow2_group_size <= wavefront_size) ? &k_small : &k;
-
-    status |= clSetKernelArg(*k_use, 0, sizeof(cl_mem),               &(in_mem->cl_mem_ptr));
-    status |= clSetKernelArg(*k_use, 1, dev_n_elem.size,              dev_n_elem.addr);
-    status |= clSetKernelArg(*k_use, 2, sizeof(cl_mem),               &(out_mem->cl_mem_ptr));
-    status |= clSetKernelArg(*k_use, 3, sizeof(eT) * pow2_group_size, NULL);
-
-    status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), *k_use, k1_work_dim, &k1_work_offset, &pow2_total_num_threads, &pow2_group_size, 0, NULL, NULL);
-
-    coot_check_cl_error(status, "accu()");
-
-    if (total_num_threads <= local_group_size)
-      {
-      break;
-      }
-
-    // Set the input, number of elements, and auxiliary memory correctly for subsequent runs.
-    in_n_elem = out->n_elem;
-    if (in_mem == &mem)
-      {
-      in_mem = &aux_mem;
-      out_mem = &aux_mem2;
-      out = &aux2;
-      }
-    else
-      {
-      std::swap(in_mem, out_mem);
-      out = (out == &aux) ? &aux2 : &aux;
-      }
-
-    // Now, compute sizes for the next iteration.
-    total_num_threads = std::ceil(in_n_elem / (2 * std::ceil(std::log2(in_n_elem))));
-    local_group_size = std::min(kernel_wg_size, total_num_threads);
-
-    } while (true); // The loop terminates in the middle.
-
-  return eT((*out)[0]);
+  return generic_reduce<eT, eT>(mem, n_elem, "max_vec", k, k_small, std::make_tuple(/* no extra args */));
   }
-
-
-
-//! @}

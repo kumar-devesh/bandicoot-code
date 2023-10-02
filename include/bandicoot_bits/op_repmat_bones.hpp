@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// 
 // Copyright 2022 Ryan Curtin (http://www.ratml.org/)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +14,10 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
+
+
 class op_repmat
+  : public traits_op_default
   {
   public:
 
@@ -24,4 +29,7 @@ class op_repmat
   // Catch conversions directly before a repmat (we can combine these with the repmat operation).
   // (The other way around, with conversions directly after a repmat, is caught by mtOp handling.)
   template<typename out_eT, typename T1> inline static void apply(Mat<out_eT>& out, const Op<mtOp<out_eT, T1, mtop_conv_to>, op_repmat>& in);
+
+  template<typename T1> static inline uword compute_n_rows(const Op<T1, op_repmat>& op, const uword in_n_rows, const uword in_n_cols);
+  template<typename T1> static inline uword compute_n_cols(const Op<T1, op_repmat>& op, const uword in_n_rows, const uword in_n_cols);
   };

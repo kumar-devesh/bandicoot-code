@@ -83,10 +83,6 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
       coot_debug_warn("coot::cl_rt.init(): couldn't setup OpenCL kernels");
       return false;
       }
-    else
-      {
-
-      }
     }
 
 
@@ -94,11 +90,11 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
 
   // setup clBLAS
   coot_extra_debug_warn("coot::cl_rt.init(): begin clBLAS setup");
-  cl_int clblas_status = clblasSetup();
+  cl_int clblas_status = coot_wrapper(clblasSetup)();
   coot_extra_debug_warn("coot::cl_rt.init(): finished clBLAS setup");
-  
+
   if(clblas_status != CL_SUCCESS)  { coot_debug_warn("coot::cl_rt.init(): couldn't setup clBLAS"); return false; }
-  
+
   if(status == false)
     {
     internal_cleanup();
@@ -114,17 +110,22 @@ runtime_t::init(const bool manual_selection, const uword wanted_platform, const 
   // where num_rng_threads is the maximum kernel work group size for the randu kernel.
   // This means that we will effectively have one RNG per thread.
   cl_kernel rng_kernel = get_kernel<float>(oneway_kernel_id::inplace_xorwow_randu);
-  status = clGetKernelWorkGroupInfo(rng_kernel, dev_id, CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &num_rng_threads, NULL);
+  status = coot_wrapper(clGetKernelWorkGroupInfo)(rng_kernel, dev_id, CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &num_rng_threads, NULL);
   coot_check_cl_error(status, "coot::cl_rt.init()");
   size_t preferred_work_group_size_multiple;
-  status = clGetKernelWorkGroupInfo(rng_kernel, dev_id, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, sizeof(size_t), &preferred_work_group_size_multiple, NULL);
+  status = coot_wrapper(clGetKernelWorkGroupInfo)(rng_kernel, dev_id, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, sizeof(size_t), &preferred_work_group_size_multiple, NULL);
   coot_check_cl_error(status, "coot::cl_rt.init()");
   num_rng_threads *= preferred_work_group_size_multiple;
 
   xorwow32_state = acquire_memory<u32>(6 * num_rng_threads);
   init_xorwow_state<u32>(xorwow32_state, num_rng_threads);
-  xorwow64_state = acquire_memory<u64>(6 * num_rng_threads);
-  init_xorwow_state<u64>(xorwow64_state, num_rng_threads);
+
+  if (has_sizet64())
+    {
+    xorwow64_state = acquire_memory<u64>(6 * num_rng_threads);
+    init_xorwow_state<u64>(xorwow64_state, num_rng_threads);
+    }
+
   philox_state = acquire_memory<u32>(6 * num_rng_threads);
   init_philox_state(philox_state, num_rng_threads);
 
@@ -139,12 +140,8 @@ runtime_t::lock()
   {
   coot_extra_debug_sigprint();
 
-  #if defined(COOT_USE_CXX11)
-    {
-    coot_extra_debug_print("coot::cl_rt: calling mutex.lock()");
-    mutex.lock();
-    }
-  #endif
+  coot_extra_debug_print("coot::cl_rt: calling mutex.lock()");
+  mutex.lock();
   }
 
 
@@ -156,12 +153,8 @@ runtime_t::unlock()
   {
   coot_extra_debug_sigprint();
 
-  #if defined(COOT_USE_CXX11)
-    {
-    coot_extra_debug_print("coot::cl_rt: calling mutex.unlock()");
-    mutex.unlock();
-    }
-  #endif
+  coot_extra_debug_print("coot::cl_rt: calling mutex.unlock()");
+  mutex.unlock();
   }
 
 
@@ -172,9 +165,9 @@ runtime_t::internal_cleanup()
   {
   coot_extra_debug_sigprint();
 
-  if(cq != NULL)  { clFinish(cq); }
+  if(cq != NULL)  { coot_wrapper(clFinish)(cq); }
 
-  clblasTeardown();
+  coot_wrapper(clblasTeardown)();
 
   // TODO: clean up RNGs
 
@@ -184,8 +177,8 @@ runtime_t::internal_cleanup()
 
   //for(uword i=0; i<f_kernels_size; ++i)  { if(f_kernels.at(i) != NULL)  { clReleaseKernel(f_kernels.at(i)); } }
 
-  if(cq   != NULL)  { clReleaseCommandQueue(cq); cq   = NULL; }
-  if(ctxt != NULL)  { clReleaseContext(ctxt);    ctxt = NULL; }
+  if(cq   != NULL)  { coot_wrapper(clReleaseCommandQueue)(cq); cq   = NULL; }
+  if(ctxt != NULL)  { coot_wrapper(clReleaseContext)(ctxt);    ctxt = NULL; }
   }
 
 
@@ -201,7 +194,7 @@ runtime_t::search_devices(cl_platform_id& out_plt_id, cl_device_id& out_dev_id, 
   cl_int  status      = 0;
   cl_uint n_platforms = 0;
 
-  status = clGetPlatformIDs(0, NULL, &n_platforms);
+  status = coot_wrapper(clGetPlatformIDs)(0, NULL, &n_platforms);
 
   if((status != CL_SUCCESS) || (n_platforms == 0))
     {
@@ -211,7 +204,7 @@ runtime_t::search_devices(cl_platform_id& out_plt_id, cl_device_id& out_dev_id, 
 
   std::vector<cl_platform_id> platform_ids(n_platforms);
 
-  status = clGetPlatformIDs(n_platforms, &(platform_ids[0]), NULL);
+  status = coot_wrapper(clGetPlatformIDs)(n_platforms, &(platform_ids[0]), NULL);
 
   if(status != CL_SUCCESS)
     {
@@ -231,7 +224,7 @@ runtime_t::search_devices(cl_platform_id& out_plt_id, cl_device_id& out_dev_id, 
 
     cl_uint local_n_devices = 0;
 
-    status = clGetDeviceIDs(tmp_platform_id, CL_DEVICE_TYPE_ALL, 0, NULL, &local_n_devices);
+    status = coot_wrapper(clGetDeviceIDs)(tmp_platform_id, CL_DEVICE_TYPE_ALL, 0, NULL, &local_n_devices);
 
     if((status != CL_SUCCESS) || (local_n_devices == 0))
       {
@@ -244,7 +237,7 @@ runtime_t::search_devices(cl_platform_id& out_plt_id, cl_device_id& out_dev_id, 
     local_device_ids.resize(local_n_devices);
     local_device_pri.resize(local_n_devices);
 
-    status = clGetDeviceIDs(tmp_platform_id, CL_DEVICE_TYPE_ALL, local_n_devices, &(local_device_ids[0]), NULL);
+    status = coot_wrapper(clGetDeviceIDs)(tmp_platform_id, CL_DEVICE_TYPE_ALL, local_n_devices, &(local_device_ids[0]), NULL);
 
     // go through each device on this platform
     for(size_t local_device_count = 0; local_device_count < local_n_devices; ++local_device_count)
@@ -380,17 +373,55 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
   cl_uint dev_align       = 0;
 
   size_t dev_max_wg         = 0;
-  size_t dev_wavefront_size = 0;
+  size_t dev_subgroup_size  = 0;
 
+  bool has_subgroup_extension = false;
+  bool has_intel_subgroup_extension = false;
+  bool has_nv_device_attribute_query_extension = false;
+  bool dev_has_subgroups = false;
+  bool dev_must_synchronise_subgroups = true;
 
-  clGetDeviceInfo(in_dev_id, CL_DEVICE_VENDOR,              sizeof(dev_name1),           &dev_name1,   NULL);
-  clGetDeviceInfo(in_dev_id, CL_DEVICE_NAME,                sizeof(dev_name2),           &dev_name2,   NULL);
-  clGetDeviceInfo(in_dev_id, CL_DEVICE_VERSION,             sizeof(dev_name3),           &dev_name3,   NULL);
-  clGetDeviceInfo(in_dev_id, CL_DEVICE_TYPE,                sizeof(cl_device_type),      &dev_type,    NULL);
-  clGetDeviceInfo(in_dev_id, CL_DEVICE_DOUBLE_FP_CONFIG,    sizeof(cl_device_fp_config), &dev_fp64,    NULL);
-  clGetDeviceInfo(in_dev_id, CL_DEVICE_MAX_COMPUTE_UNITS,   sizeof(cl_uint),             &dev_n_units, NULL);
-  clGetDeviceInfo(in_dev_id, CL_DEVICE_MEM_BASE_ADDR_ALIGN, sizeof(cl_uint),             &dev_align,   NULL);
-  clGetDeviceInfo(in_dev_id, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(size_t),              &dev_max_wg,  NULL);
+  coot_wrapper(clGetDeviceInfo)(in_dev_id, CL_DEVICE_VENDOR,              sizeof(dev_name1),           &dev_name1,   NULL);
+  coot_wrapper(clGetDeviceInfo)(in_dev_id, CL_DEVICE_NAME,                sizeof(dev_name2),           &dev_name2,   NULL);
+  coot_wrapper(clGetDeviceInfo)(in_dev_id, CL_DEVICE_VERSION,             sizeof(dev_name3),           &dev_name3,   NULL);
+  coot_wrapper(clGetDeviceInfo)(in_dev_id, CL_DEVICE_TYPE,                sizeof(cl_device_type),      &dev_type,    NULL);
+  coot_wrapper(clGetDeviceInfo)(in_dev_id, CL_DEVICE_DOUBLE_FP_CONFIG,    sizeof(cl_device_fp_config), &dev_fp64,    NULL);
+  coot_wrapper(clGetDeviceInfo)(in_dev_id, CL_DEVICE_MAX_COMPUTE_UNITS,   sizeof(cl_uint),             &dev_n_units, NULL);
+  coot_wrapper(clGetDeviceInfo)(in_dev_id, CL_DEVICE_MEM_BASE_ADDR_ALIGN, sizeof(cl_uint),             &dev_align,   NULL);
+  coot_wrapper(clGetDeviceInfo)(in_dev_id, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(size_t),              &dev_max_wg,  NULL);
+
+  // search for extensions we care about
+  size_t dev_extension_size;
+  coot_wrapper(clGetDeviceInfo)(in_dev_id, CL_DEVICE_EXTENSIONS, 0, NULL, &dev_extension_size);
+  char* dev_extension_buffer = new char[dev_extension_size];
+  coot_wrapper(clGetDeviceInfo)(in_dev_id, CL_DEVICE_EXTENSIONS, dev_extension_size, dev_extension_buffer, NULL);
+  std::string dev_extension_str(dev_extension_buffer);
+  delete[] dev_extension_buffer;
+  size_t last_space = 0;
+  size_t next_space = dev_extension_str.find(' ');
+  do
+    {
+    const size_t actual_last_space = (last_space == 0) ? 0 : (last_space + 1);
+    std::string ext = dev_extension_str.substr(actual_last_space, (next_space - actual_last_space));
+
+    // This extension, if present, allows us to get the subgroup size when on
+    // OpenCL < 2.0 devices.
+    if (ext == "cl_khr_subgroups")
+      {
+      has_subgroup_extension = true;
+      }
+    else if (ext == "cl_intel_subgroups")
+      {
+      has_intel_subgroup_extension = true;
+      }
+    else if (ext == "cl_nv_device_attribute_query")
+      {
+      has_nv_device_attribute_query_extension = true;
+      }
+
+    last_space = next_space;
+    }
+  while ((next_space = dev_extension_str.find(' ', next_space + 1)) != std::string::npos);
 
   // contrary to the official OpenCL specification (OpenCL 1.2, sec 4.2 and sec 6.1.1).
   // certain OpenCL implementations use internal size_t which doesn't correspond to CL_DEVICE_ADDRESS_BITS
@@ -421,11 +452,11 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
 
   if(setup_queue(tmp_context, tmp_queue, in_plt_id, in_dev_id))
     {
-    tmp_program = clCreateProgramWithSource(tmp_context, 1, (const char **)&(tmp_program_src), NULL, &status);
+    tmp_program = coot_wrapper(clCreateProgramWithSource)(tmp_context, 1, (const char **)&(tmp_program_src), NULL, &status);
 
     if(status == CL_SUCCESS)
       {
-      status = clBuildProgram(tmp_program, 0, NULL, NULL, NULL, NULL);
+      status = coot_wrapper(clBuildProgram)(tmp_program, 0, NULL, NULL, NULL, NULL);
 
       // cout << "status: " << coot_cl_error::as_string(status) << endl;
 
@@ -438,32 +469,70 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
 
       if(status == CL_SUCCESS)
         {
-        tmp_kernel = clCreateKernel(tmp_program, "coot_interrogate", &status);
+        tmp_kernel = coot_wrapper(clCreateKernel)(tmp_program, "coot_interrogate", &status);
 
         if(status == CL_SUCCESS)
           {
-          // Extract what might be the warp or wavefront size.
-          // It seems possible this could be different per kernel, but we'll hope not.
-          status = clGetKernelWorkGroupInfo(tmp_kernel, in_dev_id, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, sizeof(size_t), &dev_wavefront_size, NULL);
+          tmp_dev_mem = coot_wrapper(clCreateBuffer)(tmp_context, CL_MEM_READ_WRITE, sizeof(cl_uint)*4, NULL, &status);
 
-          tmp_dev_mem = clCreateBuffer(tmp_context, CL_MEM_READ_WRITE, sizeof(cl_uint)*4, NULL, &status);
-
-          clSetKernelArg(tmp_kernel, 0, sizeof(cl_mem),  &tmp_dev_mem);
-          status = clEnqueueTask(tmp_queue, tmp_kernel, 0, NULL, NULL);  // TODO: replace with clEnqueueNDRangeKernel to avoid deprecation warnings
+          coot_wrapper(clSetKernelArg)(tmp_kernel, 0, sizeof(cl_mem),  &tmp_dev_mem);
+          status = coot_wrapper(clEnqueueTask)(tmp_queue, tmp_kernel, 0, NULL, NULL);  // TODO: replace with clEnqueueNDRangeKernel to avoid deprecation warnings
 
           if(status == CL_SUCCESS)
             {
-            clFinish(cq);
+            coot_wrapper(clFinish)(cq);
 
-            status = clEnqueueReadBuffer(tmp_queue, tmp_dev_mem, CL_TRUE, 0, sizeof(cl_uint)*4, tmp_cpu_mem, 0, NULL, NULL);
+            status = coot_wrapper(clEnqueueReadBuffer)(tmp_queue, tmp_dev_mem, CL_TRUE, 0, sizeof(cl_uint)*4, tmp_cpu_mem, 0, NULL, NULL);
 
             if(status == CL_SUCCESS)
               {
-              clFinish(cq);
+              coot_wrapper(clFinish)(cq);
 
               dev_sizet_width = tmp_cpu_mem[0];
               dev_ptr_width   = tmp_cpu_mem[1];
               dev_opencl_ver  = tmp_cpu_mem[2];
+
+              // Extract the subgroup size, if available.  Before OpenCL 2.0,
+              // subgroups were an extension.
+              if (tmp_cpu_mem[2] /* opencl_ver */ >= 210)
+                {
+                dev_has_subgroups = true;
+                }
+              else
+                {
+                dev_has_subgroups = has_subgroup_extension || has_intel_subgroup_extension;
+                }
+
+              if (dev_has_subgroups)
+                {
+                // It seems possible this could be different per kernel, but we'll hope not.
+                // We'll choose an input size that is larger than any reasonable subgroup size.
+                status = coot_sub_group_size(tmp_kernel, in_dev_id, 32768, dev_subgroup_size);
+
+                // It's not pointed out in the standards, but sometimes CL_INVALID_OPERATION will be returned if for some reason subgroups are not supported despite it being part of the standard.
+                // (I am looking at you, nvidia OpenCL driver.)
+                if (status == CL_INVALID_OPERATION || dev_subgroup_size == 0)
+                  {
+                  dev_has_subgroups = false;
+                  dev_subgroup_size = 0;
+                  status = CL_SUCCESS;
+
+                  // Now, on nvidia devices, there is still the concept of "warp", and the nvidia OpenCL Programming Guide,
+                  // in section 3.4.3, points out that warp-synchronous programming without barriers is okay so long as the
+                  // memory is marked volatile.
+                  //
+                  // So, if we are on an nvidia card, we will enable subgroups with subgroup size equal to the warp size.
+                  if (has_nv_device_attribute_query_extension == true)
+                    {
+                    status = coot_nv_warp_size(in_dev_id, dev_subgroup_size);
+                    if (status == CL_SUCCESS && dev_subgroup_size > 0)
+                      {
+                      dev_has_subgroups = true;
+                      dev_must_synchronise_subgroups = false;
+                      }
+                    }
+                  }
+                }
               }
             }
           }
@@ -476,37 +545,40 @@ runtime_t::interrogate_device(runtime_dev_info& out_info, cl_platform_id in_plt_
     coot_debug_warn(coot_cl_error::as_string(status));
     }
 
-  if(tmp_dev_mem != NULL)  { clReleaseMemObject   (tmp_dev_mem); }
-  if(tmp_kernel  != NULL)  { clReleaseKernel      (tmp_kernel ); }
-  if(tmp_program != NULL)  { clReleaseProgram     (tmp_program); }
-  if(tmp_queue   != NULL)  { clReleaseCommandQueue(tmp_queue);   }
-  if(tmp_context != NULL)  { clReleaseContext     (tmp_context); }
+  if(tmp_dev_mem != NULL)  { coot_wrapper(clReleaseMemObject   )(tmp_dev_mem); }
+  if(tmp_kernel  != NULL)  { coot_wrapper(clReleaseKernel      )(tmp_kernel ); }
+  if(tmp_program != NULL)  { coot_wrapper(clReleaseProgram     )(tmp_program); }
+  if(tmp_queue   != NULL)  { coot_wrapper(clReleaseCommandQueue)(tmp_queue);   }
+  if(tmp_context != NULL)  { coot_wrapper(clReleaseContext     )(tmp_context); }
 
   if(print_info)
     {
     get_cerr_stream().flush();
-    get_cerr_stream() << "name1:          " << dev_name1 << std::endl;
-    get_cerr_stream() << "name2:          " << dev_name2 << std::endl;
-    get_cerr_stream() << "name3:          " << dev_name3 << std::endl;
-    get_cerr_stream() << "is_gpu:         " << (dev_type == CL_DEVICE_TYPE_GPU)  << std::endl;
-    get_cerr_stream() << "fp64:           " << dev_fp64 << std::endl;
-    get_cerr_stream() << "sizet_width:    " << dev_sizet_width  << std::endl;
-    get_cerr_stream() << "ptr_width:      " << dev_ptr_width << std::endl;
-    get_cerr_stream() << "n_units:        " << dev_n_units << std::endl;
-    get_cerr_stream() << "opencl_ver:     " << dev_opencl_ver << std::endl;
-  //get_cerr_stream() << "align:          " << dev_align  << std::endl;
-    get_cerr_stream() << "max_wg:         " << dev_max_wg << std::endl;
-    get_cerr_stream() << "wavefront_size: " << dev_wavefront_size << std::endl;
+    get_cerr_stream() << "name1:                      " << dev_name1 << std::endl;
+    get_cerr_stream() << "name2:                      " << dev_name2 << std::endl;
+    get_cerr_stream() << "name3:                      " << dev_name3 << std::endl;
+    get_cerr_stream() << "is_gpu:                     " << (dev_type == CL_DEVICE_TYPE_GPU)  << std::endl;
+    get_cerr_stream() << "fp64:                       " << dev_fp64 << std::endl;
+    get_cerr_stream() << "sizet_width:                " << dev_sizet_width  << std::endl;
+    get_cerr_stream() << "ptr_width:                  " << dev_ptr_width << std::endl;
+    get_cerr_stream() << "n_units:                    " << dev_n_units << std::endl;
+    get_cerr_stream() << "opencl_ver:                 " << dev_opencl_ver << std::endl;
+  //get_cerr_stream() << "align:                      " << dev_align  << std::endl;
+    get_cerr_stream() << "max_wg:                     " << dev_max_wg << std::endl;
+    get_cerr_stream() << "subgroup_size:              " << dev_subgroup_size << std::endl;
+    get_cerr_stream() << "must_synchronise_subgroups: " << dev_must_synchronise_subgroups << std::endl;
     }
 
-  out_info.is_gpu         = (dev_type == CL_DEVICE_TYPE_GPU);
-  out_info.has_float64    = (dev_fp64 != 0);
-  out_info.has_sizet64    = (dev_sizet_width >= 8);
-  out_info.ptr_width      = uword(dev_ptr_width);
-  out_info.n_units        = uword(dev_n_units);
-  out_info.opencl_ver     = uword(dev_opencl_ver);
-  out_info.max_wg         = uword(dev_max_wg);
-  out_info.wavefront_size = uword(dev_wavefront_size);
+  out_info.is_gpu                     = (dev_type == CL_DEVICE_TYPE_GPU);
+  out_info.has_float64                = (dev_fp64 != 0);
+  out_info.has_sizet64                = (dev_sizet_width >= 8);
+  out_info.has_subgroups              = dev_has_subgroups;
+  out_info.must_synchronise_subgroups = dev_must_synchronise_subgroups;
+  out_info.ptr_width                  = uword(dev_ptr_width);
+  out_info.n_units                    = uword(dev_n_units);
+  out_info.opencl_ver                 = uword(dev_opencl_ver);
+  out_info.max_wg                     = uword(dev_max_wg);
+  out_info.subgroup_size              = uword(dev_subgroup_size);
 
   return (status == CL_SUCCESS);
   }
@@ -525,7 +597,7 @@ runtime_t::unique_host_device_id() const
   // Use the reported name and vendor ID of the device.  (This preserves a little bit of human readability.)
   char buffer[1025]; // hopefully way larger than necessary
   memset(buffer, 0, 1025);
-  cl_int status = clGetDeviceInfo(dev_id, CL_DEVICE_NAME, 1024, buffer, NULL);
+  cl_int status = coot_wrapper(clGetDeviceInfo)(dev_id, CL_DEVICE_NAME, 1024, buffer, NULL);
   if (status != CL_SUCCESS)
     {
     get_cerr_stream() << "unable to get device name" << std::endl;
@@ -544,7 +616,7 @@ runtime_t::unique_host_device_id() const
   oss << buffer2 << "_";
 
   cl_uint vendor_id;
-  status = clGetDeviceInfo(dev_id, CL_DEVICE_VENDOR_ID, sizeof(cl_uint), &vendor_id, NULL);
+  status = coot_wrapper(clGetDeviceInfo)(dev_id, CL_DEVICE_VENDOR_ID, sizeof(cl_uint), &vendor_id, NULL);
   if (status != CL_SUCCESS)
     {
     get_cerr_stream() << "unable to get device vendor ID" << std::endl;
@@ -553,7 +625,7 @@ runtime_t::unique_host_device_id() const
   oss << vendor_id << "_";
 
   // Get the OpenCL driver version that the device supports.
-  status = clGetDeviceInfo(dev_id, CL_DEVICE_VERSION, 1024, buffer, NULL);
+  status = coot_wrapper(clGetDeviceInfo)(dev_id, CL_DEVICE_VERSION, 1024, buffer, NULL);
   if (status != CL_SUCCESS)
     {
     get_cerr_stream() << "unable to get OpenCL version of device" << std::endl;
@@ -583,7 +655,7 @@ runtime_t::setup_queue(cl_context& out_context, cl_command_queue& out_queue, cl_
 
   cl_int status = 0;
 
-  out_context = clCreateContext(prop, 1, &in_dev_id, NULL, NULL, &status);
+  out_context = coot_wrapper(clCreateContext)(prop, 1, &in_dev_id, NULL, NULL, &status);
 
   if((status != CL_SUCCESS) || (out_context == NULL))
     {
@@ -595,7 +667,7 @@ runtime_t::setup_queue(cl_context& out_context, cl_command_queue& out_queue, cl_
   // NOTE: clCreateCommandQueue is replaced with clCreateCommandQueueWithProperties in OpenCL 2.0
   // NOTE: http://stackoverflow.com/questions/28500496/opencl-function-found-deprecated-by-visual-studio
 
-  out_queue = clCreateCommandQueue(out_context, in_dev_id, 0, &status);
+  out_queue = coot_wrapper(clCreateCommandQueue)(out_context, in_dev_id, 0, &status);
 
   if((status != CL_SUCCESS) || (out_queue == NULL))
     {
@@ -626,8 +698,7 @@ runtime_t::load_cached_kernels(const std::string& unique_host_device_id, const s
 
   cl_int binary_status, errcode_ret;
   runtime_t::program_wrapper prog_holder;  // program_wrapper will automatically call clReleaseProgram() when it goes out of scope
-  prog_holder.prog = clCreateProgramWithBinary(ctxt, 1, &dev_id, &kernel_size, (const unsigned char**) &kernel_buffer, &binary_status, &errcode_ret);
-  get_cerr_stream() << "errcode_ret " << errcode_ret << " binary-status " << binary_status << "\n";
+  prog_holder.prog = coot_wrapper(clCreateProgramWithBinary)(ctxt, 1, &dev_id, &kernel_size, (const unsigned char**) &kernel_buffer, &binary_status, &errcode_ret);
   if (errcode_ret != CL_SUCCESS)
     {
     coot_debug_warn(coot_cl_error::as_string(errcode_ret));
@@ -648,10 +719,12 @@ runtime_t::load_cached_kernels(const std::string& unique_host_device_id, const s
 
   std::vector<std::pair<std::string, cl_kernel*>> name_map;
   rt_common::init_zero_elem_kernel_map(zeroway_kernels, name_map, zeroway_kernel_id::get_names());
-  rt_common::init_one_elem_real_kernel_map(oneway_real_kernels, name_map, oneway_real_kernel_id::get_names(), "");
-  rt_common::init_one_elem_kernel_map(oneway_kernels, name_map, oneway_kernel_id::get_names(), "");
-  rt_common::init_two_elem_kernel_map(twoway_kernels, name_map, twoway_kernel_id::get_names(), "");
-  rt_common::init_three_elem_kernel_map(threeway_kernels, name_map, threeway_kernel_id::get_names(), "");
+  rt_common::init_one_elem_real_kernel_map(oneway_real_kernels, name_map, oneway_real_kernel_id::get_names(), "", has_float64());
+  rt_common::init_one_elem_integral_kernel_map(oneway_integral_kernels, name_map, oneway_integral_kernel_id::get_names(), "");
+  rt_common::init_one_elem_kernel_map(oneway_kernels, name_map, oneway_kernel_id::get_names(), "", has_float64());
+  rt_common::init_two_elem_kernel_map(twoway_kernels, name_map, twoway_kernel_id::get_names(), "", has_float64());
+  rt_common::init_three_elem_kernel_map(threeway_kernels, name_map, threeway_kernel_id::get_names(), "", has_float64());
+  rt_common::init_one_elem_real_kernel_map(magma_real_kernels, name_map, magma_real_kernel_id::get_names(), "", has_float64());
 
   return create_kernels(name_map, prog_holder, "");
   }
@@ -668,12 +741,14 @@ runtime_t::compile_kernels(const std::string& unique_host_id)
   std::vector<std::pair<std::string, cl_kernel*>> name_map;
   type_to_dev_string type_map;
   std::string source =
-      kernel_src::get_src_preamble() +
+      kernel_src::get_src_preamble(has_float64(), has_subgroups(), get_subgroup_size(), must_synchronise_subgroups()) +
       rt_common::get_zero_elem_kernel_src(zeroway_kernels, kernel_src::get_zeroway_source(), zeroway_kernel_id::get_names(), name_map, type_map) +
-      rt_common::get_one_elem_real_kernel_src(oneway_real_kernels, kernel_src::get_oneway_real_source(), oneway_real_kernel_id::get_names(), "", name_map, type_map) +
-      rt_common::get_one_elem_kernel_src(oneway_kernels, kernel_src::get_oneway_source(), oneway_kernel_id::get_names(), "", name_map, type_map) +
-      rt_common::get_two_elem_kernel_src(twoway_kernels, kernel_src::get_twoway_source(), twoway_kernel_id::get_names(), "", name_map, type_map) +
-      rt_common::get_three_elem_kernel_src(threeway_kernels, kernel_src::get_threeway_source(), threeway_kernel_id::get_names(), name_map, type_map) +
+      rt_common::get_one_elem_real_kernel_src(oneway_real_kernels, kernel_src::get_oneway_real_source(), oneway_real_kernel_id::get_names(), "", name_map, type_map, has_float64()) +
+      rt_common::get_one_elem_integral_kernel_src(oneway_integral_kernels, kernel_src::get_oneway_integral_source(), oneway_integral_kernel_id::get_names(), "", name_map, type_map) +
+      rt_common::get_one_elem_kernel_src(oneway_kernels, kernel_src::get_oneway_source(), oneway_kernel_id::get_names(), "", name_map, type_map, has_float64()) +
+      rt_common::get_two_elem_kernel_src(twoway_kernels, kernel_src::get_twoway_source(), twoway_kernel_id::get_names(), "", name_map, type_map, has_float64()) +
+      rt_common::get_three_elem_kernel_src(threeway_kernels, kernel_src::get_threeway_source(), threeway_kernel_id::get_names(), name_map, type_map, has_float64()) +
+      rt_common::get_one_elem_real_kernel_src(magma_real_kernels, kernel_src::get_magma_real_source(), magma_real_kernel_id::get_names(), "", name_map, type_map, has_float64()) +
       kernel_src::get_src_epilogue();
 
   cl_int status;
@@ -694,7 +769,7 @@ runtime_t::compile_kernels(const std::string& unique_host_id)
 
   const char* source_c_str = source.c_str();
 
-  prog_holder.prog = clCreateProgramWithSource(ctxt, 1, &source_c_str, NULL, &status);
+  prog_holder.prog = coot_wrapper(clCreateProgramWithSource)(ctxt, 1, &source_c_str, NULL, &status);
 
   if((status != CL_SUCCESS) || (prog_holder.prog == NULL))
     {
@@ -705,20 +780,6 @@ runtime_t::compile_kernels(const std::string& unique_host_id)
     }
 
   std::string build_options = ((sizeof(uword) >= 8) && dev_info.has_sizet64) ? std::string("-D UWORD=ulong") : std::string("-D UWORD=uint");
-
-  // Add the wavefront size to the build options.
-  std::ostringstream wavefront_size_options;
-  wavefront_size_options << " -D WAVEFRONT_SIZE=" << dev_info.wavefront_size;
-  wavefront_size_options << " -D WAVEFRONT_SIZE_NAME=";
-  if (dev_info.wavefront_size == 8 || dev_info.wavefront_size == 16 || dev_info.wavefront_size == 32 || dev_info.wavefront_size == 64 || dev_info.wavefront_size == 128)
-    {
-    wavefront_size_options << dev_info.wavefront_size;
-    }
-  else
-    {
-    wavefront_size_options << "other";
-    }
-  build_options += wavefront_size_options.str();
 
   // Now load the compiled kernels.
   bool create_kernel_status = create_kernels(name_map, prog_holder, build_options);
@@ -744,17 +805,17 @@ runtime_t::create_kernels(const std::vector<std::pair<std::string, cl_kernel*>>&
   {
 
   // We actually have to build the program first.  Ideally, if we are loading cached kernels, this step doesn't really do much.
-  cl_int status = clBuildProgram(prog_holder.prog, 0, NULL, build_options.c_str(), NULL, NULL);
+  cl_int status = coot_wrapper(clBuildProgram)(prog_holder.prog, 0, NULL, build_options.c_str(), NULL, NULL);
 
   if(status != CL_SUCCESS)
     {
     size_t len = 0;
 
     // Get the length of the error log and then allocate enough space for it.
-    clGetProgramBuildInfo(prog_holder.prog, dev_id, CL_PROGRAM_BUILD_LOG, 0, NULL, &len);
+    coot_wrapper(clGetProgramBuildInfo)(prog_holder.prog, dev_id, CL_PROGRAM_BUILD_LOG, 0, NULL, &len);
     char* buffer = new char[len];
 
-    clGetProgramBuildInfo(prog_holder.prog, dev_id, CL_PROGRAM_BUILD_LOG, len, buffer, NULL);
+    coot_wrapper(clGetProgramBuildInfo)(prog_holder.prog, dev_id, CL_PROGRAM_BUILD_LOG, len, buffer, NULL);
     coot_warn("coot::cl_rt.init(): couldn't build program; output from clGetProgramBuildInfo():");
     coot_warn(buffer);
     delete[] buffer;
@@ -764,7 +825,7 @@ runtime_t::create_kernels(const std::vector<std::pair<std::string, cl_kernel*>>&
 
   for (uword i = 0; i < name_map.size(); ++i)
     {
-    (*name_map.at(i).second) = clCreateKernel(prog_holder.prog, name_map.at(i).first.c_str(), &status);
+    (*name_map.at(i).second) = coot_wrapper(clCreateKernel)(prog_holder.prog, name_map.at(i).first.c_str(), &status);
 
     if((status != CL_SUCCESS) || (name_map.at(i).second == NULL))
       {
@@ -788,7 +849,7 @@ runtime_t::cache_kernels(const std::string& unique_host_device_id,
   // Get the actual binaries to serialize.
   cl_int status;
   size_t binary_size;
-  status = clGetProgramInfo(prog_holder.prog, CL_PROGRAM_BINARY_SIZES, sizeof(size_t), &binary_size, NULL);
+  status = coot_wrapper(clGetProgramInfo)(prog_holder.prog, CL_PROGRAM_BINARY_SIZES, sizeof(size_t), &binary_size, NULL);
   if (status != CL_SUCCESS)
     {
     coot_warn(std::string("coot::cl_rt.init(): clGetProgramInfo() call to get binary size failed with ") + coot_cl_error::as_string(status));
@@ -802,7 +863,7 @@ runtime_t::cache_kernels(const std::string& unique_host_device_id,
 
   // Now allocate something to hold the program.
   unsigned char* buffer = new unsigned char[binary_size];
-  status = clGetProgramInfo(prog_holder.prog, CL_PROGRAM_BINARIES, sizeof(size_t), &buffer, NULL);
+  status = coot_wrapper(clGetProgramInfo)(prog_holder.prog, CL_PROGRAM_BINARIES, sizeof(size_t), &buffer, NULL);
   if (status != CL_SUCCESS)
     {
     coot_warn(std::string("coot::cl_rt.init(): clGetProgramInfo() call to get binaries failed with ") + coot_cl_error::as_string(status));
@@ -836,9 +897,9 @@ runtime_t::get_max_wg() const
 
 inline
 uword
-runtime_t::get_wavefront_size() const
+runtime_t::get_subgroup_size() const
   {
-  return (valid) ? dev_info.wavefront_size : uword(0);
+  return dev_info.subgroup_size;
   }
 
 
@@ -870,6 +931,24 @@ runtime_t::has_float64() const
 
 
 
+inline
+bool
+runtime_t::has_subgroups() const
+  {
+  return dev_info.has_subgroups;
+  }
+
+
+
+inline
+bool
+runtime_t::must_synchronise_subgroups() const
+  {
+  return dev_info.must_synchronise_subgroups;
+  }
+
+
+
 template<typename eT>
 inline
 cl_mem
@@ -888,7 +967,7 @@ runtime_t::acquire_memory(const uword n_elem)
    );
 
   cl_int status = 0;
-  cl_mem result = clCreateBuffer(ctxt, CL_MEM_READ_WRITE, sizeof(eT)*(std::max)(uword(1), n_elem), NULL, &status);
+  cl_mem result = coot_wrapper(clCreateBuffer)(ctxt, CL_MEM_READ_WRITE, sizeof(eT)*(std::max)(uword(1), n_elem), NULL, &status);
 
   coot_check_bad_alloc( ((status != CL_SUCCESS) || (result == NULL)), "coot::cl_rt.acquire_memory(): not enough memory on device" );
 
@@ -905,7 +984,7 @@ runtime_t::release_memory(cl_mem dev_mem)
 
   coot_debug_check( (valid == false), "coot::cl_rt not valid" );
 
-  if(dev_mem)  { clReleaseMemObject(dev_mem); }
+  if(dev_mem)  { coot_wrapper(clReleaseMemObject)(dev_mem); }
   }
 
 
@@ -914,7 +993,7 @@ inline
 void
 runtime_t::synchronise()
   {
-  clFinish(get_cq());
+  coot_wrapper(clFinish)(get_cq());
   }
 
 
@@ -968,7 +1047,7 @@ runtime_t::create_extra_cq(cl_command_queue& out_queue)
 
   cl_int status = 0;
 
-  out_queue = clCreateCommandQueue((*this).ctxt, (*this).dev_id, 0, &status);
+  out_queue = coot_wrapper(clCreateCommandQueue)((*this).ctxt, (*this).dev_id, 0, &status);
 
   if((status != CL_SUCCESS) || (out_queue == NULL))
     {
@@ -989,7 +1068,12 @@ runtime_t::delete_extra_cq(cl_command_queue& in_queue)
 
   coot_debug_check( (valid == false), "coot::cl_rt not valid" );
 
-  if(in_queue != NULL)  { clReleaseCommandQueue(in_queue); in_queue = NULL; }
+  if(in_queue != NULL)
+    {
+    coot_wrapper(clFinish)(in_queue); // force all queued operations to finish
+    coot_wrapper(clReleaseCommandQueue)(in_queue);
+    in_queue = NULL;
+    }
   }
 
 
@@ -1023,6 +1107,16 @@ runtime_t::get_kernel(const oneway_real_kernel_id::enum_id num)
 
 
 
+template<typename eT>
+inline
+const cl_kernel&
+runtime_t::get_kernel(const oneway_integral_kernel_id::enum_id num)
+  {
+  return get_kernel<eT>(oneway_integral_kernels, num);
+  }
+
+
+
 template<typename eT1, typename eT2>
 inline
 const cl_kernel&
@@ -1043,6 +1137,16 @@ runtime_t::get_kernel(const threeway_kernel_id::enum_id num)
 
 
 
+template<typename eT>
+inline
+const cl_kernel&
+runtime_t::get_kernel(const magma_real_kernel_id::enum_id num)
+  {
+  return get_kernel<eT>(magma_real_kernels, num);
+  }
+
+
+
 template<typename eT1, typename... eTs, typename HeldType, typename EnumType>
 inline
 const cl_kernel&
@@ -1050,13 +1154,69 @@ runtime_t::get_kernel(const rt_common::kernels_t<HeldType>& k, const EnumType nu
   {
   coot_extra_debug_sigprint();
 
-       if(is_same_type<eT1, u32   >::yes) { return get_kernel<eTs...>(k.u32_kernels, num); }
-  else if(is_same_type<eT1, s32   >::yes) { return get_kernel<eTs...>(k.s32_kernels, num); }
-  else if(is_same_type<eT1, u64   >::yes) { return get_kernel<eTs...>(k.u64_kernels, num); }
-  else if(is_same_type<eT1, s64   >::yes) { return get_kernel<eTs...>(k.s64_kernels, num); }
-  else if(is_same_type<eT1, float >::yes) { return get_kernel<eTs...>(  k.f_kernels, num); }
-  else if(is_same_type<eT1, double>::yes) { return get_kernel<eTs...>(  k.d_kernels, num); }
-  else { coot_debug_check(true, "unsupported element type"); }
+  if(is_same_type<eT1, u32>::yes)
+    {
+    return get_kernel<eTs...>(k.u32_kernels, num);
+    }
+  else if(is_same_type<eT1, s32>::yes)
+    {
+    return get_kernel<eTs...>(k.s32_kernels, num);
+    }
+  else if(is_same_type<eT1, u64>::yes)
+    {
+    return get_kernel<eTs...>(k.u64_kernels, num);
+    }
+  else if(is_same_type<eT1, s64>::yes)
+    {
+    return get_kernel<eTs...>(k.s64_kernels, num);
+    }
+  else if(is_same_type<eT1, float>::yes)
+    {
+    return get_kernel<eTs...>(k.f_kernels, num);
+    }
+  else if(is_same_type<eT1, double>::yes)
+    {
+    coot_debug_check( has_float64() == false, "coot::cl_rt.get_kernel(): device does not support float64 (double) kernels; use a different element type (such as float)" );
+
+    return get_kernel<eTs...>(k.d_kernels, num);
+    }
+  else if(is_same_type<eT1, uword>::yes)
+    {
+    // only encountered if uword != u32 or u64; but we need to figure out how large a uword is
+    // (this can happen if, e.g., u32 == unsigned int and u64 == unsigned long long but uword == unsigned long)
+    if (sizeof(uword) == sizeof(u32))
+      {
+      return get_kernel<eTs...>(k.u32_kernels, num);
+      }
+    else if (sizeof(uword) == sizeof(u64))
+      {
+      return get_kernel<eTs...>(k.u64_kernels, num);
+      }
+    else
+      {
+      // hopefully nobody ever, ever, ever sees this
+      throw std::invalid_argument("coot::cl_rt.get_kernel(): unknown size for uword");
+      }
+    }
+  else if(is_same_type<eT1, sword>::yes)
+    {
+    // only encountered if sword != s32 or s64
+    if (sizeof(sword) == sizeof(s32))
+      {
+      return get_kernel<eTs...>(k.s32_kernels, num);
+      }
+    else if (sizeof(sword) == sizeof(s64))
+      {
+      return get_kernel<eTs...>(k.s64_kernels, num);
+      }
+    else
+      {
+      // hopefully nobody ever, ever, ever sees this
+      throw std::invalid_argument("coot::cl_rt.get_kernel(): unknown size for sword");
+      }
+    }
+
+  throw std::invalid_argument("coot::cl_rt.get_kernel(): unsupported element type");
   }
 
 
@@ -1068,13 +1228,69 @@ runtime_t::get_kernel(const rt_common::kernels_t<std::vector<cl_kernel>>& k, con
   {
   coot_extra_debug_sigprint();
 
-       if(is_same_type<eT, u32   >::yes) { return k.u32_kernels.at(num); }
-  else if(is_same_type<eT, s32   >::yes) { return k.s32_kernels.at(num); }
-  else if(is_same_type<eT, u64   >::yes) { return k.u64_kernels.at(num); }
-  else if(is_same_type<eT, s64   >::yes) { return k.s64_kernels.at(num); }
-  else if(is_same_type<eT, float >::yes) { return   k.f_kernels.at(num); }
-  else if(is_same_type<eT, double>::yes) { return   k.d_kernels.at(num); }
-  else { coot_debug_check(true, "unsupported element type"); }
+  if(is_same_type<eT, u32>::yes)
+    {
+    return k.u32_kernels.at(num);
+    }
+  else if(is_same_type<eT, s32>::yes)
+    {
+    return k.s32_kernels.at(num);
+    }
+  else if(is_same_type<eT, u64>::yes)
+    {
+    return k.u64_kernels.at(num);
+    }
+  else if(is_same_type<eT, s64>::yes)
+    {
+    return k.s64_kernels.at(num);
+    }
+  else if(is_same_type<eT, float>::yes)
+    {
+    return k.f_kernels.at(num);
+    }
+  else if(is_same_type<eT, double>::yes)
+    {
+    coot_debug_check( has_float64() == false, "coot::cl_rt.get_kernel(): device does not support float64 (double) kernels, use a different element type (such as float)" );
+
+    return k.d_kernels.at(num);
+    }
+  else if(is_same_type<eT, uword>::yes)
+    {
+    // only encountered if uword != u32 or u64; but we need to figure out how large a uword is
+    // (this can happen if, e.g., u32 == unsigned int and u64 == unsigned long long but uword == unsigned long)
+    if (sizeof(uword) == sizeof(u32))
+      {
+      return k.u32_kernels.at(num);
+      }
+    else if (sizeof(uword) == sizeof(u64))
+      {
+      return k.u64_kernels.at(num);
+      }
+    else
+      {
+      // hopefully nobody ever, ever, ever sees this
+      throw std::invalid_argument("coot::cl_rt.get_kernel(): unknown size for uword");
+      }
+    }
+  else if(is_same_type<eT, sword>::yes)
+    {
+    // only encountered if sword != s32 or s64
+    if (sizeof(sword) == sizeof(s32))
+      {
+      return k.s32_kernels.at(num);
+      }
+    else if (sizeof(sword) == sizeof(s64))
+      {
+      return k.s64_kernels.at(num);
+      }
+    else
+      {
+      // hopefully nobody ever, ever, ever sees this
+      throw std::invalid_argument("coot::cl_rt.get_kernel(): unknown size for sword");
+      }
+    }
+
+  throw std::invalid_argument("coot::cl_rt.get_kernel(): unsupported element type");
   }
 
 
@@ -1084,6 +1300,42 @@ inline
 cl_mem
 runtime_t::get_xorwow_state() const
   {
+  // It's possible that uword and sword may be different types altogether than
+  // u32/s32/u64/s64.  In this case, we need to find the width of them and call
+  // the appropriate overload.
+  if (is_same_type<eT, uword>::yes)
+    {
+    if (sizeof(uword) == sizeof(u32))
+      {
+      return get_xorwow_state<u32>();
+      }
+    else if (sizeof(uword) == sizeof(u64))
+      {
+      return get_xorwow_state<u64>();
+      }
+    else
+      {
+      // hopefully nobody ever, ever, ever sees this error
+      coot_stop_runtime_error("coot::cl_rt.get_xorwow_state(): unknown size for uword");
+      }
+    }
+  else if (is_same_type<eT, sword>::yes)
+    {
+    if (sizeof(sword) == sizeof(s32))
+      {
+      return get_xorwow_state<s32>();
+      }
+    else if (sizeof(sword) == sizeof(s64))
+      {
+      return get_xorwow_state<s64>();
+      }
+    else
+      {
+      // hopefully nobody ever, ever, ever sees this error
+      coot_stop_runtime_error("coot::cl_rt.get_xorwow_state(): unknown size for sword");
+      }
+    }
+
   std::ostringstream oss;
   oss << "coot::cl_rt.get_xorwow_state(): no RNG available for type " << typeid(eT).name();
   coot_stop_runtime_error(oss.str());
@@ -1119,6 +1371,20 @@ runtime_t::get_num_rng_threads() const
 
 
 
+inline
+void
+runtime_t::set_rng_seed(const u64 seed)
+  {
+  coot_extra_debug_sigprint();
+
+  // reset RNG memory with correct seed
+  init_xorwow_state<u32>(xorwow32_state, num_rng_threads, seed);
+  init_xorwow_state<u64>(xorwow64_state, num_rng_threads, seed);
+  init_philox_state(philox_state, num_rng_threads, seed);
+  }
+
+
+
 //
 // program_wrapper
 
@@ -1137,7 +1403,7 @@ runtime_t::program_wrapper::~program_wrapper()
   {
   coot_extra_debug_sigprint();
 
-  if(prog != NULL)  { clReleaseProgram(prog); }
+  if(prog != NULL)  { coot_wrapper(clReleaseProgram)(prog); }
   }
 
 
@@ -1158,7 +1424,7 @@ runtime_t::cq_guard::cq_guard()
   if(get_rt().cl_rt.is_valid())
     {
     coot_extra_debug_print("coot::cl_rt: calling clFinish()");
-    clFinish(get_rt().cl_rt.get_cq());  // force synchronisation
+    coot_wrapper(clFinish)(get_rt().cl_rt.get_cq());  // force synchronisation
 
     //coot_extra_debug_print("calling clFlush()");
     //clFlush(get_rt().cl_rt.get_cq());  // submit all enqueued commands
@@ -1175,7 +1441,7 @@ runtime_t::cq_guard::~cq_guard()
   if(get_rt().cl_rt.is_valid())
     {
     coot_extra_debug_print("coot::cl_rt: calling clFlush()");
-    clFlush(get_rt().cl_rt.get_cq());  // submit all enqueued commands
+    coot_wrapper(clFlush)(get_rt().cl_rt.get_cq());  // submit all enqueued commands
     }
 
   get_rt().cl_rt.unlock();

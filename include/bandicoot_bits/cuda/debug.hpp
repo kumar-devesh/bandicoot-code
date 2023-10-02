@@ -13,10 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup debug
-//! @{
-
-
 
 template<typename T1>
 coot_hot
@@ -99,7 +95,3 @@ coot_check_curand_error(const curandStatus_t error_code, const T1& x)
     coot_stop_runtime_error( x, cuda::error_as_string(error_code) );
     }
   }
-
-
-
-//! @}

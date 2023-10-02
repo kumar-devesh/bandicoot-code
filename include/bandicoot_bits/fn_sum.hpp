@@ -1,10 +1,14 @@
-// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
+// SPDX-License-Identifier: Apache-2.0
 // 
+// Copyright 2023      Ryan Curtin (http://www.ratml.org/)
+// Copyright 2008-2023 Conrad Sanderson (https://conradsanderson.id.au)
+// Copyright 2008-2016 National ICT Australia (NICTA)
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,13 +17,10 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup fn_sum
-//! @{
-
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 const Op<T1, op_sum>
 sum
   (
@@ -32,7 +33,7 @@ sum
   coot_extra_debug_sigprint();
   coot_ignore(junk1);
   coot_ignore(junk2);
-  
+
   return Op<T1, op_sum>(X, dim, 0);
   }
 
@@ -40,7 +41,7 @@ sum
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 const Op<T1, op_sum>
 sum
   (
@@ -51,7 +52,7 @@ sum
   {
   coot_extra_debug_sigprint();
   coot_ignore(junk);
-  
+
   return Op<T1, op_sum>(X, dim, 0);
   }
 
@@ -71,7 +72,7 @@ sum
   coot_extra_debug_sigprint();
   coot_ignore(junk1);
   coot_ignore(junk2);
-  
+
   return accu(X);
   }
 
@@ -85,7 +86,7 @@ sum(const Op<T1, op_sum>& in)
   {
   coot_extra_debug_sigprint();
   coot_extra_debug_print("sum(): two consecutive sum() calls detected");
-  
+
   return accu(in.m);
   }
 
@@ -93,12 +94,12 @@ sum(const Op<T1, op_sum>& in)
 
 template<typename T1>
 coot_warn_unused
-coot_inline
+inline
 const Op<Op<T1, op_sum>, op_sum>
 sum(const Op<T1, op_sum>& in, const uword dim)
   {
   coot_extra_debug_sigprint();
-  
+
   return Op<Op<T1, op_sum>, op_sum>(in, dim, 0);
   }
 
@@ -106,13 +107,9 @@ sum(const Op<T1, op_sum>& in, const uword dim)
 
 template<typename T>
 coot_warn_unused
-coot_inline
+inline
 const typename coot_scalar_only<T>::result &
 sum(const T& x)
   {
   return x;
   }
-
-
-
-//! @}

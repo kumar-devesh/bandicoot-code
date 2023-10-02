@@ -13,8 +13,6 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup opencl
-//! @{
 
 /**
  * Compute the trace of the matrix via OpenCL.
@@ -43,21 +41,17 @@ trace(dev_mem_t<eT> mem, const uword n_rows, const uword n_cols)
 
   cl_int status = 0;
 
-  status |= clSetKernelArg(kernel, 0, sizeof(cl_mem),  &(tmp_mem.cl_mem_ptr));
-  status |= clSetKernelArg(kernel, 1, sizeof(cl_mem),  &(mem.cl_mem_ptr)    );
-  status |= clSetKernelArg(kernel, 2, cl_n_rows.size,  cl_n_rows.addr       );
-  status |= clSetKernelArg(kernel, 3, N.size,          N.addr               );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 0, sizeof(cl_mem),  &(tmp_mem.cl_mem_ptr));
+  status |= coot_wrapper(clSetKernelArg)(kernel, 1, sizeof(cl_mem),  &(mem.cl_mem_ptr)    );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 2, cl_n_rows.size,  cl_n_rows.addr       );
+  status |= coot_wrapper(clSetKernelArg)(kernel, 3, N.size,          N.addr               );
 
   const size_t global_work_size[1] = { size_t(1) };
 
   coot_extra_debug_print("clEnqueueNDRangeKernel()");
-  status |= clEnqueueNDRangeKernel(get_rt().cl_rt.get_cq(), kernel, 1, NULL, global_work_size, NULL, 0, NULL, NULL);
+  status |= coot_wrapper(clEnqueueNDRangeKernel)(get_rt().cl_rt.get_cq(), kernel, 1, NULL, global_work_size, NULL, 0, NULL, NULL);
 
   coot_check_runtime_error( (status != 0), "coot::opencl::trace(): couldn't execute kernel" );
 
   return eT(tmp(0));
   }
-
-
-
-//! @}

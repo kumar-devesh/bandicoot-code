@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// 
 // Copyright 2019 Ryan Curtin <ryan@ratml.org>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,4 +25,10 @@ struct coot_rng
 
   template<typename eT>
   static inline void fill_randi(dev_mem_t<eT> dest, const uword n, const distr_param& param = distr_param());
+
+  // seed handling
+
+  static inline void set_seed(const u64 seed);
+
+  static inline void set_seed_random();
   };

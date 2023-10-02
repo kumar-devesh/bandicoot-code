@@ -21,10 +21,10 @@ using namespace coot;
 
 TEST_CASE("resize_simple", "[resize]")
   {
-  mat a(5, 5);
+  fmat a(5, 5);
   a.ones();
 
-  mat b = resize(a, 10, 10);
+  fmat b = resize(a, 10, 10);
 
   REQUIRE( b.n_rows == 10 );
   REQUIRE( b.n_cols == 10 );
@@ -35,11 +35,11 @@ TEST_CASE("resize_simple", "[resize]")
       {
       if (c >= 5 || r >= 5)
         {
-        REQUIRE( double(b(r, c)) == Approx(0.0) );
+        REQUIRE( float(b(r, c)) == Approx(0.0) );
         }
       else
         {
-        REQUIRE( double(b(r, c)) == Approx(1.0) );
+        REQUIRE( float(b(r, c)) == Approx(1.0) );
         }
       }
     }
@@ -49,10 +49,10 @@ TEST_CASE("resize_simple", "[resize]")
 
 TEST_CASE("resize_row_only", "[resize]")
   {
-  mat a(5, 5);
+  fmat a(5, 5);
   a.ones();
 
-  mat b = resize(a, 10, 5);
+  fmat b = resize(a, 10, 5);
 
   REQUIRE( b.n_rows == 10 );
   REQUIRE( b.n_cols == 5 );
@@ -63,11 +63,11 @@ TEST_CASE("resize_row_only", "[resize]")
       {
       if (r >= 5)
         {
-        REQUIRE( double(b(r, c)) == Approx(0.0) );
+        REQUIRE( float(b(r, c)) == Approx(0.0) );
         }
       else
         {
-        REQUIRE( double(b(r, c)) == Approx(1.0) );
+        REQUIRE( float(b(r, c)) == Approx(1.0) );
         }
       }
     }
@@ -77,10 +77,10 @@ TEST_CASE("resize_row_only", "[resize]")
 
 TEST_CASE("resize_col_only", "[resize]")
   {
-  mat a(5, 5);
+  fmat a(5, 5);
   a.ones();
 
-  mat b = resize(a, 5, 10);
+  fmat b = resize(a, 5, 10);
 
   REQUIRE( b.n_rows == 5);
   REQUIRE( b.n_cols == 10);
@@ -91,11 +91,11 @@ TEST_CASE("resize_col_only", "[resize]")
       {
       if (c >= 5)
         {
-        REQUIRE( double(b(r, c)) == Approx(0.0) );
+        REQUIRE( float(b(r, c)) == Approx(0.0) );
         }
       else
         {
-        REQUIRE( double(b(r, c)) == Approx(1.0) );
+        REQUIRE( float(b(r, c)) == Approx(1.0) );
         }
       }
     }
@@ -105,10 +105,10 @@ TEST_CASE("resize_col_only", "[resize]")
 
 TEST_CASE("resize_to_empty", "[resize]")
   {
-  mat a(5, 5);
+  fmat a(5, 5);
   a.ones();
 
-  mat b = resize(a, 0, 0);
+  fmat b = resize(a, 0, 0);
 
   REQUIRE( b.n_rows == 0 );
   REQUIRE( b.n_cols == 0 );
@@ -118,10 +118,10 @@ TEST_CASE("resize_to_empty", "[resize]")
 
 TEST_CASE("resize_to_same_size", "[resize]")
   {
-  mat a(5, 5);
+  fmat a(5, 5);
   a.ones();
 
-  mat b = resize(a, 5, 5);
+  fmat b = resize(a, 5, 5);
 
   REQUIRE( b.n_rows == 5 );
   REQUIRE( b.n_cols == 5 );
@@ -130,7 +130,7 @@ TEST_CASE("resize_to_same_size", "[resize]")
     {
     for (uword r = 0; r < 5; ++r)
       {
-      REQUIRE( double(b(r, c)) == double(a(r, c)) );
+      REQUIRE( float(b(r, c)) == float(a(r, c)) );
       }
     }
   }
@@ -139,10 +139,10 @@ TEST_CASE("resize_to_same_size", "[resize]")
 
 TEST_CASE("resize_to_zero_rows", "[resize]")
   {
-  mat a(5, 5);
+  fmat a(5, 5);
   a.ones();
 
-  mat b = resize(a, 0, 5);
+  fmat b = resize(a, 0, 5);
 
   REQUIRE( b.n_rows == 0 );
   REQUIRE( b.n_cols == 5 );
@@ -152,10 +152,10 @@ TEST_CASE("resize_to_zero_rows", "[resize]")
 
 TEST_CASE("resize_to_zero_cols", "[resize]")
   {
-  mat a(5, 5);
+  fmat a(5, 5);
   a.ones();
 
-  mat b = resize(a, 5, 0);
+  fmat b = resize(a, 5, 0);
 
   REQUIRE( b.n_rows == 5 );
   REQUIRE( b.n_cols == 0 );
@@ -165,16 +165,16 @@ TEST_CASE("resize_to_zero_cols", "[resize]")
 
 TEST_CASE("resize_from_empty", "[resize]")
   {
-  mat a;
+  fmat a;
 
-  mat b = resize(a, 5, 5);
+  fmat b = resize(a, 5, 5);
 
   REQUIRE( b.n_rows == 5 );
   REQUIRE( b.n_cols == 5 );
 
   for (uword i = 0; i < b.n_elem; ++i)
     {
-    REQUIRE( double(b[i]) == Approx(0.0) );
+    REQUIRE( float(b[i]) == Approx(0.0) );
     }
   }
 
@@ -182,17 +182,17 @@ TEST_CASE("resize_from_empty", "[resize]")
 
 TEST_CASE("resize_shrink", "[resize]")
   {
-  mat a(10, 10);
+  fmat a(10, 10);
   a.ones();
 
-  mat b = resize(a, 5, 5);
+  fmat b = resize(a, 5, 5);
 
   REQUIRE( b.n_rows == 5 );
   REQUIRE( b.n_cols == 5 );
 
   for (uword i = 0; i < b.n_elem; ++i)
     {
-    REQUIRE( double(b[i]) == Approx(1.0) );
+    REQUIRE( float(b[i]) == Approx(1.0) );
     }
   }
 
@@ -200,7 +200,7 @@ TEST_CASE("resize_shrink", "[resize]")
 
 TEST_CASE("resize_inplace_same_size", "[resize]")
   {
-  mat a(5, 5);
+  fmat a(5, 5);
   a.ones();
   a = resize(a, 5, 5);
 
@@ -209,7 +209,7 @@ TEST_CASE("resize_inplace_same_size", "[resize]")
 
   for (uword i = 0; i < a.n_elem; ++i)
     {
-    REQUIRE( double(a[i]) == Approx(1.0) );
+    REQUIRE( float(a[i]) == Approx(1.0) );
     }
   }
 
@@ -217,7 +217,7 @@ TEST_CASE("resize_inplace_same_size", "[resize]")
 
 TEST_CASE("resize_inplace_shrink", "[resize]")
   {
-  mat a(10, 10);
+  fmat a(10, 10);
   a.ones();
   a = resize(a, 5, 5);
 
@@ -226,7 +226,7 @@ TEST_CASE("resize_inplace_shrink", "[resize]")
 
   for (uword i = 0; i < a.n_elem; ++i)
     {
-    REQUIRE( double(a[i]) == Approx(1.0) );
+    REQUIRE( float(a[i]) == Approx(1.0) );
     }
   }
 
@@ -234,7 +234,7 @@ TEST_CASE("resize_inplace_shrink", "[resize]")
 
 TEST_CASE("resize_inplace", "[resize]")
   {
-  mat a(5, 5);
+  fmat a(5, 5);
   a.ones();
   a = resize(a, 10, 10);
 
@@ -247,11 +247,11 @@ TEST_CASE("resize_inplace", "[resize]")
       {
       if (c >= 5 || r >= 5)
         {
-        REQUIRE( double(a(r, c)) == Approx(0.0) );
+        REQUIRE( float(a(r, c)) == Approx(0.0) );
         }
       else
         {
-        REQUIRE( double(a(r, c)) == Approx(1.0) );
+        REQUIRE( float(a(r, c)) == Approx(1.0) );
         }
       }
     }
@@ -261,7 +261,7 @@ TEST_CASE("resize_inplace", "[resize]")
 
 TEST_CASE("resize_member_onedim", "[resize]")
   {
-  mat a(5, 5);
+  fmat a(5, 5);
   a.ones();
   a.resize(100);
 
@@ -270,12 +270,12 @@ TEST_CASE("resize_member_onedim", "[resize]")
 
   for (uword i = 0; i < 5; ++i)
     {
-    REQUIRE( double(a[i]) == Approx(1.0) );
+    REQUIRE( float(a[i]) == Approx(1.0) );
     }
 
   for (uword i = 6; i < a.n_elem; ++i)
     {
-    REQUIRE( double(a[i]) == Approx(0.0) );
+    REQUIRE( float(a[i]) == Approx(0.0) );
     }
   }
 
@@ -283,7 +283,7 @@ TEST_CASE("resize_member_onedim", "[resize]")
 
 TEST_CASE("resize_member_twodim", "[resize]")
   {
-  mat a(5, 5);
+  fmat a(5, 5);
   a.ones();
   a.resize(10, 10);
 
@@ -296,11 +296,11 @@ TEST_CASE("resize_member_twodim", "[resize]")
       {
       if (c >= 5 || r >= 5)
         {
-        REQUIRE( double(a(r, c)) == Approx(0.0) );
+        REQUIRE( float(a(r, c)) == Approx(0.0) );
         }
       else
         {
-        REQUIRE( double(a(r, c)) == Approx(1.0) );
+        REQUIRE( float(a(r, c)) == Approx(1.0) );
         }
       }
     }
@@ -310,10 +310,10 @@ TEST_CASE("resize_member_twodim", "[resize]")
 
 TEST_CASE("resize_before_conv_to", "[resize]")
   {
-  mat a(5, 5);
+  fmat a(5, 5);
   a.ones();
 
-  fmat b = conv_to<fmat>::from(resize(a, 10, 10));
+  imat b = conv_to<imat>::from(resize(a, 10, 10));
 
   REQUIRE( b.n_rows == 10 );
   REQUIRE( b.n_cols == 10 );
@@ -324,11 +324,11 @@ TEST_CASE("resize_before_conv_to", "[resize]")
       {
       if (c >= 5 || r >= 5)
         {
-        REQUIRE( double(b(r, c)) == Approx(0.0) );
+        REQUIRE( int(b(r, c)) == 0 );
         }
       else
         {
-        REQUIRE( double(b(r, c)) == Approx(1.0) );
+        REQUIRE( int(b(r, c)) == 1 );
         }
       }
     }
@@ -338,10 +338,10 @@ TEST_CASE("resize_before_conv_to", "[resize]")
 
 TEST_CASE("resize_after_conv_to", "[resize]")
   {
-  mat a(5, 5);
+  fmat a(5, 5);
   a.ones();
 
-  fmat b = resize(conv_to<fmat>::from(a), 10, 10);
+  imat b = resize(conv_to<imat>::from(a), 10, 10);
 
   REQUIRE( b.n_rows == 10 );
   REQUIRE( b.n_cols == 10 );
@@ -352,11 +352,11 @@ TEST_CASE("resize_after_conv_to", "[resize]")
       {
       if (c >= 5 || r >= 5)
         {
-        REQUIRE( double(b(r, c)) == Approx(0.0) );
+        REQUIRE( int(b(r, c)) == 0 );
         }
       else
         {
-        REQUIRE( double(b(r, c)) == Approx(1.0) );
+        REQUIRE( int(b(r, c)) == 1 );
         }
       }
     }

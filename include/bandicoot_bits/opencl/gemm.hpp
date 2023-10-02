@@ -55,8 +55,8 @@ struct gemm
 
     cl_int status = 0;
 
-    status |= clblasSgemm(clblasColumnMajor, transA, transB, M, N, K, alpha, A.cl_mem_ptr, 0, lda, B.cl_mem_ptr, 0, ldb, beta, C.cl_mem_ptr, 0, ldc, 1, &queue, 0, NULL, NULL);
-    status |= clFlush(queue);
+    status |= coot_wrapper(clblasSgemm)(clblasColumnMajor, transA, transB, M, N, K, alpha, A.cl_mem_ptr, 0, lda, B.cl_mem_ptr, 0, ldb, beta, C.cl_mem_ptr, 0, ldc, 1, &queue, 0, NULL, NULL);
+    status |= coot_wrapper(clFlush)(queue);
 
     coot_check_cl_error(status, "coot::opencl::gemm(): eT = float");
     }
@@ -87,8 +87,8 @@ struct gemm
 
     cl_int status = 0;
 
-    status |= clblasDgemm(clblasColumnMajor, transA, transB, M, N, K, alpha, A.cl_mem_ptr, 0, lda, B.cl_mem_ptr, 0, ldb, beta, C.cl_mem_ptr, 0, ldc, 1, &queue, 0, NULL, NULL);
-    status |= clFlush(queue);
+    status |= coot_wrapper(clblasDgemm)(clblasColumnMajor, transA, transB, M, N, K, alpha, A.cl_mem_ptr, 0, lda, B.cl_mem_ptr, 0, ldb, beta, C.cl_mem_ptr, 0, ldc, 1, &queue, 0, NULL, NULL);
+    status |= coot_wrapper(clFlush)(queue);
 
     coot_check_cl_error(status, "coot::opencl::gemm(): eT = double");
     }

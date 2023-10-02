@@ -13,8 +13,64 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup cuda
-//! @{
+
+template<typename eT1, typename eT2>
+inline
+void
+min(dev_mem_t<eT2> dest,
+    const dev_mem_t<eT1> src,
+    const uword n_rows,
+    const uword n_cols,
+    const uword dim,
+    const bool post_conv_apply,
+    // subview arguments
+    const uword dest_offset,
+    const uword dest_mem_incr,
+    const uword src_row_offset,
+    const uword src_col_offset,
+    const uword src_M_n_rows)
+  {
+  coot_extra_debug_sigprint();
+
+  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "coot::cuda::min(): cuda runtime not valid" );
+
+  CUfunction kernel;
+  if (dim == 0)
+    {
+    kernel = get_rt().cuda_rt.get_kernel<eT2, eT1>(post_conv_apply ? twoway_kernel_id::min_colwise_conv_post : twoway_kernel_id::min_colwise_conv_pre);
+    }
+  else
+    {
+    kernel = get_rt().cuda_rt.get_kernel<eT2, eT1>(post_conv_apply ? twoway_kernel_id::min_rowwise_conv_post : twoway_kernel_id::min_rowwise_conv_pre);
+    }
+
+  const uword src_offset = src_row_offset + src_col_offset * src_M_n_rows;
+
+  const eT2* dest_ptr = dest.cuda_mem_ptr + dest_offset;
+  const eT1*  src_ptr =  src.cuda_mem_ptr + src_offset;
+
+  const void* args[] = {
+      &dest_ptr,
+      &src_ptr,
+      (uword*) &n_rows,
+      (uword*) &n_cols,
+      (uword*) &dest_mem_incr,
+      (uword*) &src_M_n_rows };
+
+  const kernel_dims dims = one_dimensional_grid_dims((dim == 0) ? n_cols : n_rows);
+
+  CUresult result = coot_wrapper(cuLaunchKernel)(
+      kernel,
+      dims.d[0], dims.d[1], dims.d[2],
+      dims.d[3], dims.d[4], dims.d[5],
+      0, NULL,
+      (void**) args,
+      0);
+
+  coot_check_cuda_error(result, "coot::cuda::min(): cuLaunchKernel() failed");
+  }
+
+
 
 /**
  * Compute the minimum of all elements in `mem`.
@@ -23,85 +79,14 @@
 template<typename eT>
 inline
 eT
-min(dev_mem_t<eT> mem, const uword n_elem)
+min_vec(dev_mem_t<eT> mem, const uword n_elem)
   {
   coot_extra_debug_sigprint();
 
-  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "coot::cuda::min(): cuda runtime not valid" );
+  coot_debug_check( (get_rt().cuda_rt.is_valid() == false), "coot::cuda::min_vec(): cuda runtime not valid" );
 
   CUfunction k = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::min);
   CUfunction k_small = get_rt().cuda_rt.get_kernel<eT>(oneway_kernel_id::min_small);
 
-  // Compute grid size; ideally we want to use the maximum possible number of threads per block.
-  kernel_dims dims = one_dimensional_grid_dims(std::ceil(n_elem / (2 * std::ceil(std::log2(n_elem)))));
-
-  // Create auxiliary memory, with size equal to the number of blocks.
-  Mat<eT> aux(dims.d[0], 1);
-  dev_mem_t<eT> aux_mem = aux.get_dev_mem(false);
-  // Initialize this to the right size, if we will have a second run.
-  Mat<eT> aux2;
-  if (dims.d[0] > 1)
-    {
-    kernel_dims second_dims = one_dimensional_grid_dims(dims.d[0]);
-    aux2.zeros(second_dims.d[0], 1);
-    }
-  dev_mem_t<eT> aux_mem2 = aux2.get_dev_mem(false);
-  Mat<eT>* out = &aux;
-
-  dev_mem_t<eT>* in_mem = &mem;
-  dev_mem_t<eT>* out_mem = &aux_mem;
-
-  // Each outer iteration will reduce down to the number of blocks.
-  // So, we'll simply keep reducing until we only have one block left.
-  uword in_n_elem = n_elem;
-  do
-    {
-    // Ensure we always use a power of 2 for the number of threads.
-    const uword num_threads = (uword) std::pow(2.0f, std::ceil(std::log2((float) dims.d[3])));
-
-    const void* args[] = {
-        &(in_mem->cuda_mem_ptr),
-        (uword*) &in_n_elem,
-        &(out_mem->cuda_mem_ptr) };
-
-    CUresult result = cuLaunchKernel(
-        num_threads <= 32 ? k_small : k, // if we have fewer threads than a single warp, we can use a more optimized version of the kernel
-        dims.d[0], dims.d[1], dims.d[2],
-        num_threads, dims.d[4], dims.d[5],
-        2 * num_threads * sizeof(eT), // shared mem should have size equal to number of threads times 2
-        NULL,
-        (void**) args,
-        0);
-
-    coot_check_cuda_error(result, "coot::cuda::min(): cuLaunchKernel() failed");
-
-    if (dims.d[0] == 1)
-      {
-      // We are done.  Terminate.
-      break;
-      }
-
-    in_n_elem = out->n_elem;
-    if (in_mem == &mem)
-      {
-      in_mem = &aux_mem;
-      out_mem = &aux_mem2;
-      out = &aux2;
-      }
-    else
-      {
-      std::swap(in_mem, out_mem);
-      out = (out == &aux) ? &aux2 : &aux;
-      }
-
-    // Now compute sizes for the next iteration.
-    dims = one_dimensional_grid_dims(std::ceil(in_n_elem / (2 * std::ceil(std::log2(in_n_elem)))));
-
-    } while (true);
-
-  return eT((*out)[0]);
+  return generic_reduce<eT, eT>(mem, n_elem, "min_vec", k, k_small, std::make_tuple(/* no extra args */));
   }
-
-
-
-//! @}

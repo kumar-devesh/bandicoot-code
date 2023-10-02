@@ -1,10 +1,10 @@
 // Copyright 2021 Ryan Curtin (http://www.ratml.org/)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,13 +24,17 @@ COOT_FN(PREFIX,min_small)(const eT1* in_mem,
   UWORD i = blockIdx.x * (blockDim.x * 2) + threadIdx.x;
   const UWORD grid_size = blockDim.x * 2 * gridDim.x;
 
+  // Make sure all auxiliary memory is initialized to something that won't
+  // screw up the final reduce.
+  aux_mem[tid] = coot_type_max((eT1) 0);
+
   if (i < n_elem)
     {
     aux_mem[tid] = in_mem[i];
     }
   if (i + blockDim.x < n_elem)
     {
-    aux_mem[tid] = min(aux_mem[tid], in_mem[i]);
+    aux_mem[tid] = min(aux_mem[tid], in_mem[i + blockDim.x]);
     }
   i += grid_size;
 

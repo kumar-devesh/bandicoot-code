@@ -25,9 +25,9 @@ COOT_FN(PREFIX,accu_small)(__global const eT1* in_mem,
 
   aux_mem[tid] = 0;
 
-  while (i + get_global_size(0) < n_elem)
+  while (i + get_local_size(0) < n_elem)
     {
-    aux_mem[tid] += in_mem[i] + in_mem[i + get_global_size(0)];
+    aux_mem[tid] += in_mem[i] + in_mem[i + get_local_size(0)];
     i += grid_size;
     }
   if (i < n_elem)
@@ -37,6 +37,8 @@ COOT_FN(PREFIX,accu_small)(__global const eT1* in_mem,
 
   for (UWORD s = get_local_size(0) / 2; s > 0; s >>= 1)
     {
+    SUBGROUP_BARRIER(CLK_LOCAL_MEM_FENCE);
+
     if (tid < s)
       {
       aux_mem[tid] += aux_mem[tid + s];

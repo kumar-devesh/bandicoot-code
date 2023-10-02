@@ -1,0 +1,9 @@
+libdir=@CMAKE_INSTALL_FULL_LIBDIR@
+includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
+
+Name: bandicoot
+Description: Fast GPU-based C++ matrix library with syntax similar to MATLAB and Octave
+URL: http://coot.sourceforge.net
+Version: @COOT_VERSION_MAJOR@.@COOT_VERSION_MINOR@.@COOT_VERSION_PATCH@
+Cflags: -I${includedir}
+Libs: -L${libdir} -lbandicoot

@@ -1,10 +1,10 @@
 // Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,19 +14,23 @@
 
 __kernel
 void
-COOT_FN(PREFIX,sum_rowwise_conv_post)(__global eT2* out,
-                                      __global const eT1* A,
-                                      const UWORD A_n_rows,
-                                      const UWORD A_n_cols)
+COOT_FN(PREFIX,sum_rowwise_conv_post)(__global eT2* dest,
+                                      const UWORD dest_offset,
+                                      __global const eT1* src,
+                                      const UWORD src_offset,
+                                      const UWORD n_rows,
+                                      const UWORD n_cols,
+                                      const UWORD dest_mem_incr,
+                                      const UWORD src_M_n_rows)
   {
   const UWORD row = get_global_id(0);
-  if(row < A_n_rows)
+  if(row < n_rows)
     {
     eT1 acc = (eT1) (0);
-    for(UWORD i = 0; i < A_n_cols; ++i)
+    for(UWORD i = 0; i < n_cols; ++i)
       {
-      acc += A[i*A_n_rows + row];
+      acc += src[src_offset + (i * src_M_n_rows) + row];
       }
-    out[row] = (eT2) (acc);
+    dest[dest_offset + row * dest_mem_incr] = (eT2) (acc);
     }
   }

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+// 
 // Copyright 2020 Ryan Curtin (http://www.ratml.org
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,25 +24,29 @@ mtop_conv_to::apply(Mat<out_eT>& out, const mtOp<out_eT, T1, mtop_conv_to>& X)
   coot_extra_debug_sigprint();
 
   // Unwrap the inner operation fully.
-  const unwrap<T1> U(X.m.Q);
+  const unwrap<T1> U(X.q);
 
-  arrayops::copy(out.get_dev_mem(false), U.M.get_dev_mem(false), U.M.n_elem);
+  out.set_size(U.M.n_rows, U.M.n_cols);
+
+  coot_rt_t::copy_mat(out.get_dev_mem(false), U.get_dev_mem(false),
+                      out.n_rows, out.n_cols,
+                      0, 0, out.n_rows,
+                      U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
   }
 
 
 
-template<typename out_eT, typename in_eT>
+// TODO: this overload might only be applicable for ops that support conversions during the op
+// TODO: decide whether all ops should support conversions too internally
+template<typename out_eT, typename T1, typename op_type>
 inline
 void
-mtop_conv_to::apply(Mat<out_eT>& out, const mtOp<out_eT, subview<in_eT>, mtop_conv_to>& X)
+mtop_conv_to::apply(Mat<out_eT>& out, const mtOp<out_eT, Op<T1, op_type>, mtop_conv_to>& X)
   {
   coot_extra_debug_sigprint();
 
-  const subview<in_eT>& U(X.m.Q);
-
-  arrayops::copy_subview(out.get_dev_mem(false), U.m.get_dev_mem(false), U.aux_row1, U.aux_col1, U.m.n_rows, U.m.n_cols, U.n_rows, U.n_cols);
+  op_type::apply(out, X.q);
   }
-
 
 
 
@@ -51,8 +57,10 @@ mtop_conv_to::apply(Mat<out_eT>& out, const mtOp<out_eT, eOp<T1, eop_type>, mtop
   {
   coot_extra_debug_sigprint();
 
+  out.set_size(X.q.m.get_n_rows(), X.q.m.get_n_cols());
+
   // Apply the operation specifically into the different output type.
-  eop_type::apply(out, X.m.Q);
+  eop_type::apply(out, X.q);
   }
 
 
@@ -64,8 +72,10 @@ mtop_conv_to::apply(Mat<out_eT>& out, const mtOp<out_eT, eGlue<T1, T2, eglue_typ
   {
   coot_extra_debug_sigprint();
 
+  out.set_size(X.q.get_n_rows(), X.q.get_n_cols());
+
   // Apply the operation specifically into the different output type.
-  eglue_type::apply(out, X.m.Q);
+  eglue_type::apply(out, X.q);
   }
 
 
@@ -77,9 +87,14 @@ mtop_conv_to::apply_inplace_plus(Mat<out_eT>& out, const mtOp<out_eT, T1, mtop_c
   {
   coot_extra_debug_sigprint();
 
-  const unwrap<T1> U(X.m.Q);
+  const unwrap<T1> U(X.q);
 
-  arrayops::inplace_plus_array(out.get_dev_mem(false), U.M.get_dev_mem(false), U.M.n_elem);
+  coot_rt_t::eop_mat(threeway_kernel_id::equ_array_plus_array,
+                     out.get_dev_mem(false), out.get_dev_mem(false), U.get_dev_mem(false),
+                     out.n_rows, out.n_cols,
+                     0, 0, out.n_rows,
+                     0, 0, out.n_rows,
+                     U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
   }
 
 
@@ -91,9 +106,14 @@ mtop_conv_to::apply_inplace_minus(Mat<out_eT>& out, const mtOp<out_eT, T1, mtop_
   {
   coot_extra_debug_sigprint();
 
-  const unwrap<T1> U(X.m.Q);
+  const unwrap<T1> U(X.q);
 
-  arrayops::inplace_minus_array(out.get_dev_mem(false), U.M.get_dev_mem(false), U.M.n_elem);
+  coot_rt_t::eop_mat(threeway_kernel_id::equ_array_minus_array,
+                     out.get_dev_mem(false), out.get_dev_mem(false), U.get_dev_mem(false),
+                     out.n_rows, out.n_cols,
+                     0, 0, out.n_rows,
+                     0, 0, out.n_rows,
+                     U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
   }
 
 
@@ -106,7 +126,7 @@ mtop_conv_to::apply_inplace_times(Mat<out_eT>& out, const mtOp<out_eT, T1, mtop_
   coot_extra_debug_sigprint();
 
   // We have to actually perform the conversion here.
-  Mat<out_eT> converted(X.m.Q);
+  Mat<out_eT> converted(X.q);
   Mat<out_eT> tmp(out);
   tmp *= converted;
 
@@ -122,9 +142,14 @@ mtop_conv_to::apply_inplace_schur(Mat<out_eT>& out, const mtOp<out_eT, T1, mtop_
   {
   coot_extra_debug_sigprint();
 
-  const unwrap<T1> U(X.m.Q);
+  const unwrap<T1> U(X.q);
 
-  arrayops::inplace_mul_array(out.get_dev_mem(false), U.M.get_dev_mem(false), U.M.n_elem);
+  coot_rt_t::eop_mat(threeway_kernel_id::equ_array_mul_array,
+                     out.get_dev_mem(false), out.get_dev_mem(false), U.get_dev_mem(false),
+                     out.n_rows, out.n_cols,
+                     0, 0, out.n_rows,
+                     0, 0, out.n_rows,
+                     U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
   }
 
 
@@ -136,7 +161,34 @@ mtop_conv_to::apply_inplace_div(Mat<out_eT>& out, const mtOp<out_eT, T1, mtop_co
   {
   coot_extra_debug_sigprint();
 
-  const unwrap<T1> U(X.m.Q);
+  const unwrap<T1> U(X.q);
 
-  arrayops::inplace_div_array(out.get_dev_mem(false), U.M.get_dev_mem(false), U.M.n_elem);
+  coot_rt_t::eop_mat(threeway_kernel_id::equ_array_div_array,
+                     out.get_dev_mem(false), out.get_dev_mem(false), U.get_dev_mem(false),
+                     out.n_rows, out.n_cols,
+                     0, 0, out.n_rows,
+                     0, 0, out.n_rows,
+                     U.get_row_offset(), U.get_col_offset(), U.get_M_n_rows());
+  }
+
+
+
+template<typename out_eT, typename T1>
+inline
+uword
+mtop_conv_to::compute_n_rows(const mtOp<out_eT, T1, mtop_conv_to>& X, const uword in_n_rows, const uword in_n_cols)
+  {
+  // mtop_conv_to does not change the size of the input.
+  return in_n_rows;
+  }
+
+
+
+template<typename out_eT, typename T1>
+inline
+uword
+mtop_conv_to::compute_n_cols(const mtOp<out_eT, T1, mtop_conv_to>& X, const uword in_n_rows, const uword in_n_cols)
+  {
+  // mtop_conv_to does not change the size of the input.
+  return in_n_cols;
   }

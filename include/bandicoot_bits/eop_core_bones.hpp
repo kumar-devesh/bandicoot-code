@@ -1,10 +1,13 @@
-// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
+// SPDX-License-Identifier: Apache-2.0
 // 
+// Copyright 2017-2023 Ryan Curtin (https://www.ratml.org)
+// Copyright 2017      Conrad Sanderson (https://conradsanderson.id.au)
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,18 +16,14 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup eop_core
-//! @{
-
-
 
 template<typename eop_type>
 class eop_core
   {
   public:
-  
+
   // matrices
-  
+
   template<typename eT, typename T1> inline static void apply              (Mat<eT>& out, const eOp<T1, eop_type>& x);
 
   template<typename eT, typename T2> inline static void apply              (Mat<eT>& out, const eOp<mtOp<eT, eOp<T2, eop_type>, mtop_conv_to>, eop_type>& X);
@@ -33,10 +32,10 @@ class eop_core
   template<typename eT, typename T1> inline static void apply_inplace_minus(Mat<eT>& out, const eOp<T1, eop_type>& x);
   template<typename eT, typename T1> inline static void apply_inplace_schur(Mat<eT>& out, const eOp<T1, eop_type>& x);
   template<typename eT, typename T1> inline static void apply_inplace_div  (Mat<eT>& out, const eOp<T1, eop_type>& x);
-  
-  
+
+
   // cubes
-  
+
   // TODO
   };
 
@@ -418,6 +417,3 @@ struct get_default<eop_scalar_times> { template<typename eT> static inline eT va
 
 template<>
 struct get_default<eop_scalar_div_post> { template<typename eT> static inline eT val() { return eT(1); } };
-
-
-//! @}

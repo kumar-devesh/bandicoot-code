@@ -12,15 +12,21 @@
 // limitations under the License.
 // ------------------------------------------------------------------------
 
-#include <bandicoot>
 #include <armadillo>
+#include <bandicoot>
 #include "catch.hpp"
 
 using namespace coot;
 
-template<typename eT>
-void test_plus()
+TEMPLATE_TEST_CASE("two_mat_plus", "[mat_operators]", float, double, u32, s32, u64, s64)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(5, 5);
   x.fill(eT(0));
   Mat<eT> y(5, 5);
@@ -43,21 +49,15 @@ void test_plus()
 
 
 
-TEST_CASE("two_mat_plus")
+TEMPLATE_TEST_CASE("two_mat_minus", "[mat_operators]", float, double, u32, s32, u64, s64)
   {
-  test_plus<float>();
-  test_plus<double>();
-  test_plus<u32>();
-  test_plus<s32>();
-  test_plus<u64>();
-  test_plus<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_minus()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(10));
   Mat<eT> y(5, 5);
@@ -78,21 +78,15 @@ void test_minus()
 
 
 
-TEST_CASE("two_mat_minus")
+TEMPLATE_TEST_CASE("two_mat_mul", "[mat_operators]", float, double, u32, s32, u64, s64)
   {
-  test_minus<float>();
-  test_minus<double>();
-  test_minus<u32>();
-  test_minus<s32>();
-  test_minus<u64>();
-  test_minus<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_mul()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(1));
   Mat<eT> y(5, 5);
@@ -115,21 +109,15 @@ void test_mul()
 
 
 
-TEST_CASE("two_mat_mul")
+TEMPLATE_TEST_CASE("two_mat_div", "[mat_operators]", float, double, u32, s32, u64, s64)
   {
-  test_mul<float>();
-  test_mul<double>();
-  test_mul<u32>();
-  test_mul<s32>();
-  test_mul<u64>();
-  test_mul<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_div()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(10));
   Mat<eT> y(5, 5);
@@ -150,21 +138,15 @@ void test_div()
 
 
 
-TEST_CASE("two_mat_div")
+TEMPLATE_TEST_CASE("simple_mat_mul", "[mat_operators]", float, double)
   {
-  test_div<float>();
-  test_div<double>();
-  test_div<u32>();
-  test_div<s32>();
-  test_div<u64>();
-  test_div<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_simple_mul()
-  {
   Mat<eT> x(3, 3);
   Mat<eT> y(3, 3);
 
@@ -249,21 +231,15 @@ void test_simple_mul()
 
 
 
-TEST_CASE("simple_mat_mul")
+TEMPLATE_TEST_CASE("mat_copy", "[mat_operators]", float, double, u32, s32, u64, s64)
   {
-  test_simple_mul<float>();
-  test_simple_mul<double>();
-//  test_simple_mul<u32>();
-//  test_simple_mul<s32>();
-//  test_simple_mul<u64>();
-//  test_simple_mul<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_copy()
-{
   Mat<eT> x(10, 10);
   x.randu();
 
@@ -292,20 +268,15 @@ void test_copy()
 
 
 
-TEST_CASE("mat_copy")
+TEMPLATE_TEST_CASE("mat_copy_from_dev_mem", "[mat_operators]", float, double, u32, s32, u64, s64)
   {
-  test_copy<float>();
-  test_copy<double>();
-//  test_copy<u32>();
-//  test_copy<s32>();
-//  test_copy<u64>();
-//  test_copy<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-template<typename eT>
-void test_copy_from_dev_mem()
-  {
   Mat<eT> x(5, 5);
   for (uword i = 0; i < 25; ++i)
     {
@@ -326,21 +297,15 @@ void test_copy_from_dev_mem()
 
 
 
-TEST_CASE("mat_copy_from_dev_mem")
+TEMPLATE_TEST_CASE("mat_copy_into_dev_mem", "[mat_operators]", float, double, u32, s32, u64, s64)
   {
-  test_copy_from_dev_mem<float>();
-  test_copy_from_dev_mem<double>();
-  test_copy_from_dev_mem<u32>();
-  test_copy_from_dev_mem<s32>();
-  test_copy_from_dev_mem<u64>();
-  test_copy_from_dev_mem<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_copy_into_dev_mem()
-  {
   eT* cpu_mem = new eT[25];
 
   for (uword i = 0; i < 25; ++i)
@@ -361,21 +326,15 @@ void test_copy_into_dev_mem()
 
 
 
-TEST_CASE("mat_copy_to_dev_mem")
+TEMPLATE_TEST_CASE("mat_val_proxy_ops_1", "[mat_operators]", float, double, u32, s32, u64, s64)
   {
-  test_copy_into_dev_mem<float>();
-  test_copy_into_dev_mem<double>();
-  test_copy_into_dev_mem<u32>();
-  test_copy_into_dev_mem<s32>();
-  test_copy_into_dev_mem<u64>();
-  test_copy_into_dev_mem<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_val_proxy_ops()
-  {
   Mat<eT> x(8, 8);
   x.zeros();
 
@@ -429,21 +388,15 @@ void test_val_proxy_ops()
 
 
 
-TEST_CASE("mat_val_proxy_ops_1")
+TEMPLATE_TEST_CASE("mat_submat_insertion", "[mat_operators]", float, double, u32, s32, u64, s64)
   {
-  test_val_proxy_ops<double>();
-  test_val_proxy_ops<float>();
-  test_val_proxy_ops<u32>();
-  test_val_proxy_ops<s32>();
-  test_val_proxy_ops<u64>();
-  test_val_proxy_ops<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_submat_insertion()
-  {
   arma::Mat<eT> cpu_x = arma::randi<arma::Mat<eT>>(25, 30, arma::distr_param(1, 100));
   arma::Mat<eT> cpu_y = arma::randi<arma::Mat<eT>>(10, 15, arma::distr_param(100, 200));
 
@@ -464,21 +417,15 @@ void test_submat_insertion()
 
 
 
-TEST_CASE("submat_insertion_1")
+TEMPLATE_TEST_CASE("mat_submat_add", "[mat_operators]", float, double, u32, s32, u64, s64)
   {
-  test_submat_insertion<float>();
-  test_submat_insertion<double>();
-  test_submat_insertion<u32>();
-  test_submat_insertion<s32>();
-  test_submat_insertion<u64>();
-  test_submat_insertion<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_submat_add()
-  {
   arma::Mat<eT> cpu_x = arma::randi<arma::Mat<eT>>(25, 30, arma::distr_param(1, 100));
   arma::Mat<eT> cpu_y = arma::randi<arma::Mat<eT>>(10, 15, arma::distr_param(100, 200));
 
@@ -499,21 +446,15 @@ void test_submat_add()
 
 
 
-TEST_CASE("submat_add_1")
+TEMPLATE_TEST_CASE("mat_submat_minus", "[mat_operators]", float, double, u32, s32, u64, s64)
   {
-  test_submat_add<float>();
-  test_submat_add<double>();
-  test_submat_add<u32>();
-  test_submat_add<s32>();
-  test_submat_add<u64>();
-  test_submat_add<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_submat_minus()
-  {
   arma::Mat<eT> cpu_x = arma::randi<arma::Mat<eT>>(25, 30, arma::distr_param(1, 100));
   arma::Mat<eT> cpu_y = arma::randi<arma::Mat<eT>>(10, 15, arma::distr_param(100, 200));
 
@@ -534,21 +475,15 @@ void test_submat_minus()
 
 
 
-TEST_CASE("submat_minus_1")
+TEMPLATE_TEST_CASE("mat_submat_schur", "[mat_operators]", float, double, u32, s32, u64, s64)
   {
-  test_submat_minus<float>();
-  test_submat_minus<double>();
-  test_submat_minus<u32>();
-  test_submat_minus<s32>();
-  test_submat_minus<u64>();
-  test_submat_minus<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_submat_schur()
-  {
   arma::Mat<eT> cpu_x = arma::randi<arma::Mat<eT>>(25, 30, arma::distr_param(1, 100));
   arma::Mat<eT> cpu_y = arma::randi<arma::Mat<eT>>(10, 15, arma::distr_param(100, 200));
 
@@ -569,21 +504,15 @@ void test_submat_schur()
 
 
 
-TEST_CASE("submat_schur_1")
+TEMPLATE_TEST_CASE("mat_submat_div", "[mat_operators]", float, double, u32, s32, u64, s64)
   {
-  test_submat_schur<float>();
-  test_submat_schur<double>();
-  test_submat_schur<u32>();
-  test_submat_schur<s32>();
-  test_submat_schur<u64>();
-  test_submat_schur<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_submat_div()
-  {
   arma::Mat<eT> cpu_x = arma::randi<arma::Mat<eT>>(25, 30, arma::distr_param(1000, 2000));
   arma::Mat<eT> cpu_y = arma::randi<arma::Mat<eT>>(10, 15, arma::distr_param(10, 20));
 
@@ -604,21 +533,15 @@ void test_submat_div()
 
 
 
-TEST_CASE("submat_div_1")
+TEMPLATE_TEST_CASE("mat_submat_extract", "[mat_operators]", float, double, u32, s32, u64, s64)
   {
-  test_submat_div<float>();
-  test_submat_div<double>();
-  test_submat_div<u32>();
-  test_submat_div<s32>();
-  test_submat_div<u64>();
-  test_submat_div<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_submat_extract()
-  {
   arma::Mat<eT> cpu_x = arma::randi<arma::Mat<eT>>(25, 30, arma::distr_param(1, 100));
   arma::Mat<eT> cpu_y = arma::randi<arma::Mat<eT>>(10, 15, arma::distr_param(100, 200));
 
@@ -640,21 +563,15 @@ void test_submat_extract()
 
 
 
-TEST_CASE("submat_extract_1")
+TEMPLATE_TEST_CASE("mat_submat_fill", "[mat_operators]", float, double, u32, s32, u64, s64)
   {
-  test_submat_extract<float>();
-  test_submat_extract<double>();
-  test_submat_extract<u32>();
-  test_submat_extract<s32>();
-  test_submat_extract<u64>();
-  test_submat_extract<s64>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_submat_fill()
-  {
   arma::Mat<eT> x(20, 20);
   x.fill(eT(10));
 
@@ -674,16 +591,4 @@ void test_submat_fill()
         }
       }
     }
-  }
-
-
-
-TEST_CASE("submat_fill_1")
-  {
-  test_submat_fill<float>();
-  test_submat_fill<double>();
-  test_submat_fill<u32>();
-  test_submat_fill<s32>();
-  test_submat_fill<u64>();
-  test_submat_fill<s64>();
   }

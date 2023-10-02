@@ -1,20 +1,19 @@
-// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
+// SPDX-License-Identifier: Apache-2.0
 // 
+// Copyright 2008-2016 Conrad Sanderson (https://conradsanderson.id.au)
+// Copyright 2008-2016 National ICT Australia (NICTA)
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ------------------------------------------------------------------------
-
-
-//! \addtogroup restrictors
-//! @{
 
 
 
@@ -26,10 +25,8 @@ template<> struct coot_scalar_only<u16>    { typedef u16    result; };
 template<> struct coot_scalar_only<s16>    { typedef s16    result; };
 template<> struct coot_scalar_only<u32>    { typedef u32    result; };
 template<> struct coot_scalar_only<s32>    { typedef s32    result; };
-#if defined(COOT_USE_U64S64)
 template<> struct coot_scalar_only<u64>    { typedef u64    result; };
 template<> struct coot_scalar_only<s64>    { typedef s64    result; };
-#endif
 template<> struct coot_scalar_only<float>  { typedef float  result; };
 template<> struct coot_scalar_only<double> { typedef double result; };
 #if defined(COOT_ALLOW_LONG)
@@ -50,10 +47,8 @@ template<> struct coot_integral_only<u16> { typedef u16 result; };
 template<> struct coot_integral_only<s16> { typedef s16 result; };
 template<> struct coot_integral_only<u32> { typedef u32 result; };
 template<> struct coot_integral_only<s32> { typedef s32 result; };
-#if defined(COOT_USE_U64S64)
 template<> struct coot_integral_only<u64> { typedef u64 result; };
 template<> struct coot_integral_only<s64> { typedef s64 result; };
-#endif
 #if defined(COOT_ALLOW_LONG)
 template<> struct coot_integral_only<ulng_t> { typedef ulng_t result; };
 template<> struct coot_integral_only<slng_t> { typedef slng_t result; };
@@ -66,9 +61,7 @@ template<typename T> struct coot_unsigned_integral_only { };
 template<> struct coot_unsigned_integral_only<u8>     { typedef u8     result; };
 template<> struct coot_unsigned_integral_only<u16>    { typedef u16    result; };
 template<> struct coot_unsigned_integral_only<u32>    { typedef u32    result; };
-#if defined(COOT_USE_U64S64)
 template<> struct coot_unsigned_integral_only<u64>    { typedef u64    result; };
-#endif
 #if defined(COOT_ALLOW_LONG)
 template<> struct coot_unsigned_integral_only<ulng_t> { typedef ulng_t result; };
 #endif
@@ -80,9 +73,7 @@ template<typename T> struct coot_signed_integral_only { };
 template<> struct coot_signed_integral_only<s8>     { typedef s8     result; };
 template<> struct coot_signed_integral_only<s16>    { typedef s16    result; };
 template<> struct coot_signed_integral_only<s32>    { typedef s32    result; };
-#if defined(COOT_USE_U64S64)
 template<> struct coot_signed_integral_only<s64>    { typedef s64    result; };
-#endif
 #if defined(COOT_ALLOW_LONG)
 template<> struct coot_signed_integral_only<slng_t> { typedef slng_t result; };
 #endif
@@ -94,9 +85,7 @@ template<typename T> struct coot_signed_only { };
 template<> struct coot_signed_only<s8>     { typedef s8     result; };
 template<> struct coot_signed_only<s16>    { typedef s16    result; };
 template<> struct coot_signed_only<s32>    { typedef s32    result; };
-#if defined(COOT_USE_U64S64)
 template<> struct coot_signed_only<s64>    { typedef s64    result; };
-#endif
 template<> struct coot_signed_only<float>  { typedef float  result; };
 template<> struct coot_signed_only<double> { typedef double result; };
 #if defined(COOT_ALLOW_LONG)
@@ -170,7 +159,3 @@ template<>     struct enable_if<true> { typedef int result; };
 
 template<bool, typename result_type > struct enable_if2                    {                             };
 template<      typename result_type > struct enable_if2<true, result_type> { typedef result_type result; };
-
-
-
-//! @}

@@ -17,9 +17,15 @@
 
 using namespace coot;
 
-template<typename eT>
-void test_chol_1()
+TEMPLATE_TEST_CASE("chol_1", "[chol]", float, double)
   {
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
   Mat<eT> x(5, 5);
   x.zeros();
   for (uword i = 0; i < 5; ++i)
@@ -44,17 +50,15 @@ void test_chol_1()
 
 
 
-TEST_CASE("chol_1")
+TEMPLATE_TEST_CASE("chol_2", "[chol]", float, double)
   {
-  test_chol_1<double>();
-  test_chol_1<float>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_chol_2()
-  {
   Mat<eT> x(5, 5);
   x.fill(eT(1));
   for (uword i = 0; i < 5; ++i)
@@ -95,17 +99,15 @@ void test_chol_2()
 
 
 
-TEST_CASE("chol_2")
+TEMPLATE_TEST_CASE("chol_3", "[chol]", float, double)
   {
-  test_chol_2<double>();
-  test_chol_2<float>();
-  }
+  typedef TestType eT;
 
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
 
-
-template<typename eT>
-void test_chol_3()
-  {
   Mat<eT> x(50, 50);
   x.randu();
   // force symmetry
@@ -142,8 +144,74 @@ void test_chol_3()
 
 
 
-TEST_CASE("chol_3")
+TEMPLATE_TEST_CASE("chol_4", "[chol]", float, double)
   {
-  test_chol_3<double>();
-  test_chol_3<float>();
+  typedef TestType eT;
+
+  if (!coot_rt_t::is_supported_type<eT>())
+    {
+    return;
+    }
+
+  Mat<eT> x = randu<Mat<eT>>(50, 50);
+  Mat<eT> y = x.t() * x;
+  y.diag() += 3.0;
+
+  Mat<eT> z = chol(y);
+
+  REQUIRE( z.n_rows == y.n_rows );
+  REQUIRE( z.n_cols == y.n_cols );
+
+  // The lower triangular part should be zeros.
+  for (uword c = 0; c < 50; ++c)
+    {
+    for (uword r = c + 1; r < 50; ++r)
+      {
+      REQUIRE( eT(z(r, c)) == eT(0) );
+      }
+    }
+
+  // Now check that we can recompute the original matrix.
+  Mat<eT> w = z.t() * z;
+
+  for (uword c = 0; c < 50; ++c)
+    {
+    for (uword r = 0; r < 50; ++r)
+      {
+      REQUIRE( eT(w(r, c)) == Approx(eT(y(r, c))) );
+      }
+    }
+  }
+
+
+
+TEST_CASE("empty_chol", "[chol]")
+  {
+  fmat f;
+  fmat r;
+
+  bool success = chol(r, f);
+
+  REQUIRE( success == true );
+  REQUIRE( r.n_rows == 0 );
+  REQUIRE( r.n_cols == 0 );
+  }
+
+
+
+TEST_CASE("nonsquare_chol", "[chol]")
+  {
+  fmat f = randu<fmat>(30, 40);
+
+  // Disable cerr output for this test.
+  std::streambuf* orig_cerr_buf = std::cerr.rdbuf();
+  std::cerr.rdbuf(NULL);
+
+  fmat g;
+  bool result;
+  REQUIRE_THROWS( result = chol(g, f) );
+  REQUIRE_THROWS( g = chol(f) );
+
+  // Restore cerr output.
+  std::cerr.rdbuf(orig_cerr_buf);
   }

@@ -1,10 +1,13 @@
-// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
+// SPDX-License-Identifier: Apache-2.0
 // 
+// Copyright 2017-2023 Ryan Curtin (https://www.ratml.org)
+// Copyright 2017      Conrad Sanderson (http://conradsanderson.id.au)
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,24 +16,16 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup fn_accu
-//! @{
 
-
-template<typename T1>
+template<typename eT>
 coot_warn_unused
 inline
-typename T1::elem_type
-accu(const Base<typename T1::elem_type, T1>& X)
+eT
+accu(const Mat<eT>& A)
   {
   coot_extra_debug_sigprint();
 
-  typedef typename T1::elem_type eT;
-
-  const unwrap<T1>   U(X.get_ref());
-  const Mat<eT>& A = U.M;
-
-  if(A.n_elem == 0)  { return eT(0); }
+  if (A.n_elem == 0) { return eT(0); }
 
   return coot_rt_t::accu(A.get_dev_mem(false), A.n_elem);
   }
@@ -52,4 +47,14 @@ accu(const subview<eT>& S)
 
 
 
-//! @}
+template<typename T1>
+coot_warn_unused
+inline
+typename T1::elem_type
+accu(const Base<typename T1::elem_type, T1>& X)
+  {
+  coot_extra_debug_sigprint();
+
+  const unwrap<T1> U(X.get_ref());
+  return accu(U.M);
+  }

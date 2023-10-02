@@ -1,10 +1,13 @@
-// Copyright 2017 Conrad Sanderson (http://conradsanderson.id.au)
+// SPDX-License-Identifier: Apache-2.0
 // 
+// Copyright 2008-2023 Conrad Sanderson (https://conradsanderson.id.au)
+// Copyright 2008-2016 National ICT Australia (NICTA)
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,60 +16,60 @@
 // ------------------------------------------------------------------------
 
 
-//! \addtogroup coot_str
-//! @{
-
 
 namespace coot_str
   {
-  
-  #if ( defined(COOT_USE_CXX11) || defined(COOT_HAVE_SNPRINTF) )
+  class char_buffer
+    {
+    public:
     
-    #define coot_snprintf std::snprintf
+    static constexpr uword n_chars_prealloc = 1024;
     
-  #else
+    char* mem     = nullptr;
+    uword n_chars = 0;
     
-    // better-than-nothing emulation of C99 snprintf(),
-    // with correct return value and null-terminated output string.
-    // note that _snprintf() provided by MS is not a good substitute for snprintf()
+    char local_mem[n_chars_prealloc];
     
     inline
-    int
-    coot_snprintf(char* out, size_t size, const char* fmt, ...)
+    ~char_buffer()
       {
-      size_t i;
+      if(n_chars > n_chars_prealloc)  { std::free(mem); }
       
-      for(i=0; i<size; ++i)
-        {
-        out[i] = fmt[i];
-        if(fmt[i] == char(0))
-          break;
-        }
-      
-      if(size > 0)
-        out[size-1] = char(0);
-      
-      return int(i);
+      mem     = nullptr; 
+      n_chars = 0;
       }
     
-  #endif
+    inline
+    char_buffer()
+      {
+      mem     = &(local_mem[0]);
+      n_chars = n_chars_prealloc;
+      
+      if(n_chars > 0)  { mem[0] = char(0); }
+      }
+    
+    inline
+    void
+    set_size(const uword new_n_chars)
+      {
+      if(n_chars > n_chars_prealloc)  { std::free(mem); }
+      
+      mem     = (new_n_chars <= n_chars_prealloc) ? &(local_mem[0])  : (char*)std::malloc(new_n_chars);
+      n_chars = (new_n_chars <= n_chars_prealloc) ? n_chars_prealloc : new_n_chars;
+      
+      if(n_chars > 0)  { mem[0] = char(0); }
+      }
+    };
+  
   
   class format
     {
     public:
     
-    format(const char* in_fmt)
-      : A(in_fmt)
-      {
-      }
+    const std::string fmt;
     
-    format(const std::string& in_fmt)
-      : A(in_fmt)
-      {
-      }
-    
-    
-    const std::string A;
+    inline format(const char*        in_fmt) : fmt(in_fmt) { }
+    inline format(const std::string& in_fmt) : fmt(in_fmt) { }
     
     private:
     format();
@@ -79,14 +82,10 @@ namespace coot_str
     {
     public:
     
-    basic_format(const T1& in_A, const T2& in_B)
-      : A(in_A)
-      , B(in_B)
-      {
-      }
-    
     const T1& A;
     const T2& B;
+    
+    inline basic_format(const T1& in_A, const T2& in_B) : A(in_A) , B(in_B) { }
     
     private:
     basic_format();
@@ -119,47 +118,30 @@ namespace coot_str
   std::string
   str(const basic_format< format, T2>& X)
     {
-    char  local_buffer[1024];
-    char* buffer = local_buffer;
-    
-    int buffer_size   = 1024;
-    int required_size = buffer_size;
-    
-    bool using_local_buffer = true;
-    
     std::string out;
+    char_buffer buf;
     
-    do
+    bool status = false;
+    
+    while(status == false)
       {
-      if(using_local_buffer == false)
-        {
-        buffer = new char[buffer_size];
-        }
+      int required_size = (std::snprintf)(buf.mem, size_t(buf.n_chars), X.A.fmt.c_str(), X.B);
       
-      required_size = coot_snprintf(buffer, size_t(buffer_size), X.A.A.c_str(), X.B);
+      if(required_size < 0)  { break; }
       
-      if(required_size < buffer_size)
+      if(uword(required_size) >= buf.n_chars)
         {
-        if(required_size > 0)
-          {
-          out = buffer;
-          }
+        if(buf.n_chars > char_buffer::n_chars_prealloc)  { break; }
+        
+        buf.set_size(1 + uword(required_size));
         }
       else
         {
-        buffer_size *= 2;
+        status = true;
         }
       
-      if(using_local_buffer)
-        {
-        using_local_buffer = false;
-        }
-      else
-        {
-        delete[] buffer;
-        }
-      
-      } while( (required_size >= buffer_size) );
+      if(status)  { out = buf.mem; }
+      }
     
     return out;
     }
@@ -171,47 +153,30 @@ namespace coot_str
   std::string
   str(const basic_format< basic_format< format, T2>, T3>& X)
     {
-    char  local_buffer[1024];
-    char* buffer = local_buffer;
-    
-    int buffer_size   = 1024;
-    int required_size = buffer_size;
-    
-    bool using_local_buffer = true;
-    
+    char_buffer buf;
     std::string out;
     
-    do
+    bool status = false;
+    
+    while(status == false)
       {
-      if(using_local_buffer == false)
-        {
-        buffer = new char[buffer_size];
-        }
+      int required_size = (std::snprintf)(buf.mem, size_t(buf.n_chars), X.A.A.fmt.c_str(), X.A.B, X.B);
       
-      required_size = coot_snprintf(buffer, size_t(buffer_size), X.A.A.A.c_str(), X.A.B, X.B);
+      if(required_size < 0)  { break; }
       
-      if(required_size < buffer_size)
+      if(uword(required_size) >= buf.n_chars)
         {
-        if(required_size > 0)
-          {
-          out = buffer;
-          }
+        if(buf.n_chars > char_buffer::n_chars_prealloc)  { break; }
+        
+        buf.set_size(1 + uword(required_size));
         }
       else
         {
-        buffer_size *= 2;
+        status = true;
         }
       
-      if(using_local_buffer)
-        {
-        using_local_buffer = false;
-        }
-      else
-        {
-        delete[] buffer;
-        }
-      
-      } while( (required_size >= buffer_size) );
+      if(status)  { out = buf.mem; }
+      }
     
     return out;
     }
@@ -223,47 +188,30 @@ namespace coot_str
   std::string
   str(const basic_format< basic_format< basic_format< format, T2>, T3>, T4>& X)
     {
-    char  local_buffer[1024];
-    char* buffer = local_buffer;
-    
-    int buffer_size   = 1024;
-    int required_size = buffer_size;
-    
-    bool using_local_buffer = true;
-    
+    char_buffer buf;
     std::string out;
     
-    do
+    bool status = false;
+    
+    while(status == false)
       {
-      if(using_local_buffer == false)
-        {
-        buffer = new char[buffer_size];
-        }
+      int required_size = (std::snprintf)(buf.mem, size_t(buf.n_chars), X.A.A.A.fmt.c_str(), X.A.A.B, X.A.B, X.B);
       
-      required_size = coot_snprintf(buffer, size_t(buffer_size), X.A.A.A.A.c_str(), X.A.A.B, X.A.B, X.B);
+      if(required_size < 0)  { break; }
       
-      if(required_size < buffer_size)
+      if(uword(required_size) >= buf.n_chars)
         {
-        if(required_size > 0)
-          {
-          out = buffer;
-          }
+        if(buf.n_chars > char_buffer::n_chars_prealloc)  { break; }
+        
+        buf.set_size(1 + uword(required_size));
         }
       else
         {
-        buffer_size *= 2;
+        status = true;
         }
       
-      if(using_local_buffer)
-        {
-        using_local_buffer = false;
-        }
-      else
-        {
-        delete[] buffer;
-        }
-      
-      } while( (required_size >= buffer_size) );
+      if(status)  { out = buf.mem; }
+      }
     
     return out;
     }
@@ -275,47 +223,30 @@ namespace coot_str
   std::string
   str(const basic_format< basic_format< basic_format< basic_format< format, T2>, T3>, T4>, T5>& X)
     {
-    char  local_buffer[1024];
-    char* buffer = local_buffer;
-    
-    int buffer_size   = 1024;
-    int required_size = buffer_size;
-    
-    bool using_local_buffer = true;
-    
+    char_buffer buf;
     std::string out;
     
-    do
+    bool status = false;
+    
+    while(status == false)
       {
-      if(using_local_buffer == false)
-        {
-        buffer = new char[buffer_size];
-        }
+      int required_size = (std::snprintf)(buf.mem, size_t(buf.n_chars), X.A.A.A.A.fmt.c_str(), X.A.A.A.B, X.A.A.B, X.A.B, X.B);
       
-      required_size = coot_snprintf(buffer, size_t(buffer_size), X.A.A.A.A.A.c_str(), X.A.A.A.B, X.A.A.B, X.A.B, X.B);
+      if(required_size < 0)  { break; }
       
-      if(required_size < buffer_size)
+      if(uword(required_size) >= buf.n_chars)
         {
-        if(required_size > 0)
-          {
-          out = buffer;
-          }
+        if(buf.n_chars > char_buffer::n_chars_prealloc)  { break; }
+        
+        buf.set_size(1 + uword(required_size));
         }
       else
         {
-        buffer_size *= 2;
+        status = true;
         }
       
-      if(using_local_buffer)
-        {
-        using_local_buffer = false;
-        }
-      else
-        {
-        delete[] buffer;
-        }
-      
-      } while( (required_size >= buffer_size) );
+      if(status)  { out = buf.mem; }
+      }
     
     return out;
     }
@@ -327,47 +258,30 @@ namespace coot_str
   std::string
   str(const basic_format< basic_format< basic_format< basic_format< basic_format< format, T2>, T3>, T4>, T5>, T6>& X)
     {
-    char  local_buffer[1024];
-    char* buffer = local_buffer;
-    
-    int buffer_size   = 1024;
-    int required_size = buffer_size;
-    
-    bool using_local_buffer = true;
-    
+    char_buffer buf;
     std::string out;
     
-    do
+    bool status = false;
+    
+    while(status == false)
       {
-      if(using_local_buffer == false)
-        {
-        buffer = new char[buffer_size];
-        }
+      int required_size = (std::snprintf)(buf.mem, size_t(buf.n_chars), X.A.A.A.A.A.fmt.c_str(), X.A.A.A.A.B, X.A.A.A.B, X.A.A.B, X.A.B, X.B);
       
-      required_size = coot_snprintf(buffer, size_t(buffer_size), X.A.A.A.A.A.A.c_str(), X.A.A.A.A.B, X.A.A.A.B, X.A.A.B, X.A.B, X.B);
+      if(required_size < 0)  { break; }
       
-      if(required_size < buffer_size)
+      if(uword(required_size) >= buf.n_chars)
         {
-        if(required_size > 0)
-          {
-          out = buffer;
-          }
+        if(buf.n_chars > char_buffer::n_chars_prealloc)  { break; }
+        
+        buf.set_size(1 + uword(required_size));
         }
       else
         {
-        buffer_size *= 2;
+        status = true;
         }
       
-      if(using_local_buffer)
-        {
-        using_local_buffer = false;
-        }
-      else
-        {
-        delete[] buffer;
-        }
-      
-      } while( (required_size >= buffer_size) );
+      if(status)  { out = buf.mem; }
+      }
     
     return out;
     }
@@ -379,47 +293,30 @@ namespace coot_str
   std::string
   str(const basic_format< basic_format< basic_format< basic_format< basic_format< basic_format< format, T2>, T3>, T4>, T5>, T6>, T7>& X)
     {
-    char  local_buffer[1024];
-    char* buffer = local_buffer;
-    
-    int buffer_size   = 1024;
-    int required_size = buffer_size;
-    
-    bool using_local_buffer = true;
-    
+    char_buffer buf;
     std::string out;
     
-    do
+    bool status = false;
+    
+    while(status == false)
       {
-      if(using_local_buffer == false)
-        {
-        buffer = new char[buffer_size];
-        }
+      int required_size = (std::snprintf)(buf.mem, size_t(buf.n_chars), X.A.A.A.A.A.A.fmt.c_str(), X.A.A.A.A.A.B, X.A.A.A.A.B, X.A.A.A.B, X.A.A.B, X.A.B, X.B);
       
-      required_size = coot_snprintf(buffer, size_t(buffer_size), X.A.A.A.A.A.A.A.c_str(), X.A.A.A.A.A.B, X.A.A.A.A.B, X.A.A.A.B, X.A.A.B, X.A.B, X.B);
+      if(required_size < 0)  { break; }
       
-      if(required_size < buffer_size)
+      if(uword(required_size) >= buf.n_chars)
         {
-        if(required_size > 0)
-          {
-          out = buffer;
-          }
+        if(buf.n_chars > char_buffer::n_chars_prealloc)  { break; }
+        
+        buf.set_size(1 + uword(required_size));
         }
       else
         {
-        buffer_size *= 2;
+        status = true;
         }
       
-      if(using_local_buffer)
-        {
-        using_local_buffer = false;
-        }
-      else
-        {
-        delete[] buffer;
-        }
-      
-      } while( (required_size >= buffer_size) );
+      if(status)  { out = buf.mem; }
+      }
     
     return out;
     }
@@ -429,7 +326,7 @@ namespace coot_str
   template<typename T1>
   struct format_metaprog
     {
-    static const uword depth = 0;
+    static constexpr uword depth = 0;
     
     inline
     static  
@@ -446,7 +343,7 @@ namespace coot_str
   template<typename T1, typename T2>
   struct format_metaprog< basic_format<T1,T2> >
     {
-    static const uword depth = 1 + format_metaprog<T1>::depth;
+    static constexpr uword depth = 1 + format_metaprog<T1>::depth;
     
     inline
     static
@@ -498,7 +395,7 @@ namespace coot_str
   inline
   static
   const T1&
-  str_wrapper(const T1& x, const typename string_only<T1>::result* junk = 0)
+  str_wrapper(const T1& x, const typename string_only<T1>::result* junk = nullptr)
     {
     coot_ignore(junk);
     
@@ -511,7 +408,7 @@ namespace coot_str
   inline
   static
   const T1*
-  str_wrapper(const T1* x, const typename char_only<T1>::result* junk = 0)
+  str_wrapper(const T1* x, const typename char_only<T1>::result* junk = nullptr)
     {
     coot_ignore(junk);
     
@@ -524,7 +421,7 @@ namespace coot_str
   inline
   static
   std::string
-  str_wrapper(const T1& x, const typename basic_format_only<T1>::result* junk = 0)
+  str_wrapper(const T1& x, const typename basic_format_only<T1>::result* junk = nullptr)
     {
     coot_ignore(junk);
     
@@ -532,6 +429,3 @@ namespace coot_str
     }
   
   }
-
-
-//! @}
