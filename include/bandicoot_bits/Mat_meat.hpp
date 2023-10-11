@@ -203,7 +203,8 @@ Mat<eT>::copy_from_dev_mem(eT* dest_cpu_memptr, const uword N) const
 
   const uword n_elem_mod = (std::min)(n_elem, N);
 
-  coot_rt_t::copy_from_dev_mem(dest_cpu_memptr, dev_mem, n_elem_mod);
+  // Treat our device memory as a column vector.
+  coot_rt_t::copy_from_dev_mem(dest_cpu_memptr, dev_mem, n_elem_mod, 1, 0, 0, n_elem_mod);
   }
 
 

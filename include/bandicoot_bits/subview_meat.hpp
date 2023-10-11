@@ -297,6 +297,33 @@ subview<eT>::operator/= (const Base<eT, T1>& in)
 
 
 template<typename eT>
+inline
+subview<eT>::operator arma::Mat<eT> () const
+  {
+  coot_extra_debug_sigprint();
+
+  #if defined(COOT_HAVE_ARMA)
+    {
+    arma::Mat<eT> out(n_rows, n_cols);
+
+    coot_rt_t::copy_from_dev_mem(out.memptr(), m.get_dev_mem(false),
+                                 n_rows, n_cols,
+                                 aux_row1, aux_col1, m.n_rows);
+
+    return out;
+    }
+  #else
+    {
+    coot_stop_logic_error("#include <armadillo> must be before #include <bandicoot>");
+
+    return arma::Mat<eT>();
+    }
+  #endif
+  }
+
+
+
+template<typename eT>
 coot_inline
 diagview<eT>
 subview<eT>::diag(const sword in_id)

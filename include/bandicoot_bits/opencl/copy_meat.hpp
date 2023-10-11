@@ -17,16 +17,38 @@
 template<typename eT>
 inline
 void
-copy_from_dev_mem(eT* dest, const dev_mem_t<eT> src, const uword N)
+copy_from_dev_mem(eT* dest,
+                  const dev_mem_t<eT> src,
+                  const uword n_rows,
+                  const uword n_cols,
+                  const uword src_row_offset,
+                  const uword src_col_offset,
+                  const uword src_M_n_rows)
   {
   coot_extra_debug_sigprint();
 
   runtime_t::cq_guard guard;
 
+  const size_t buffer_origin[3] = { sizeof(eT) * src_row_offset, src_col_offset, 0 };
+  const size_t host_origin[3]   = { 0,                           0,              0 };
+  const size_t region[3]        = { sizeof(eT) * n_rows,         n_cols,         1 };
   // use a blocking call
-  const cl_int status = coot_wrapper(clEnqueueReadBuffer)(get_rt().cl_rt.get_cq(), src.cl_mem_ptr, CL_TRUE, 0, sizeof(eT) * N, dest, 0, NULL, NULL);
+  const cl_int status = coot_wrapper(clEnqueueReadBufferRect)(get_rt().cl_rt.get_cq(),
+                                                              src.cl_mem_ptr,
+                                                              CL_TRUE,
+                                                              buffer_origin,
+                                                              host_origin,
+                                                              region,
+                                                              sizeof(eT) * src_M_n_rows,
+                                                              0,
+                                                              sizeof(eT) * n_rows,
+                                                              0,
+                                                              dest,
+                                                              0,
+                                                              NULL,
+                                                              NULL);
 
-  coot_check_cl_error( (status != CL_SUCCESS), "Mat::copy_from_dev_mem(): couldn't access device memory" );
+  coot_check_cl_error(status, "Mat::copy_from_dev_mem(): couldn't access device memory" );
   }
 
 
@@ -43,7 +65,7 @@ copy_into_dev_mem(dev_mem_t<eT> dest, const eT* src, const uword N)
   // use a blocking call
   cl_int status = coot_wrapper(clEnqueueWriteBuffer)(get_rt().cl_rt.get_cq(), dest.cl_mem_ptr, CL_TRUE, 0, sizeof(eT)*N, src, 0, NULL, NULL);
 
-  coot_check_cl_error( (status != CL_SUCCESS), "Mat::write_dev_mem(): couldn't access device memory" );
+  coot_check_cl_error(status, "Mat::write_dev_mem(): couldn't access device memory" );
   }
 
 

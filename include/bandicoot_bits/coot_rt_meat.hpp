@@ -1307,14 +1307,22 @@ coot_rt_t::solve_square_fast(dev_mem_t<eT> A, const bool trans_A, dev_mem_t<eT> 
 template<typename eT>
 inline
 void
-coot_rt_t::copy_from_dev_mem(eT* dest, const dev_mem_t<eT> src, const uword N)
+coot_rt_t::copy_from_dev_mem(eT* dest,
+                             const dev_mem_t<eT> src,
+                             const uword n_rows,
+                             const uword n_cols,
+                             const uword src_row_offset,
+                             const uword src_col_offset,
+                             const uword src_M_n_rows)
   {
   coot_extra_debug_sigprint();
 
   if (get_rt().backend == CL_BACKEND)
     {
     #if defined(COOT_USE_OPENCL)
-    opencl::copy_from_dev_mem(dest, src, N);
+    opencl::copy_from_dev_mem(dest, src,
+                              n_rows, n_cols,
+                              src_row_offset, src_col_offset, src_M_n_rows);
     #else
     coot_stop_runtime_error("coot_rt::copy_from_dev_mem(): OpenCL backend not enabled");
     #endif
@@ -1322,7 +1330,9 @@ coot_rt_t::copy_from_dev_mem(eT* dest, const dev_mem_t<eT> src, const uword N)
   else if (get_rt().backend == CUDA_BACKEND)
     {
     #if defined(COOT_USE_CUDA)
-    cuda::copy_from_dev_mem(dest, src, N);
+    cuda::copy_from_dev_mem(dest, src,
+                            n_rows, n_cols,
+                            src_row_offset, src_col_offset, src_M_n_rows);
     #else
     coot_stop_runtime_error("coot_rt::copy_from_dev_mem(): CUDA backend not enabled");
     #endif
