@@ -22,19 +22,21 @@ struct gemv
   static
   inline
   void
-  apply(dev_mem_t<eT> y,
-        const uword y_offset,
-        const uword incy,
-        const dev_mem_t<eT> A,
-        const uword A_offset,
+  apply(dev_mem_t<eT> y_mem,
+        const dev_mem_t<eT> A_mem,
         const uword A_n_rows,
-        const uword lda,
         const uword A_n_cols,
-        const dev_mem_t<eT> x,
-        const uword x_offset,
-        const uword incx,
+        const dev_mem_t<eT> x_mem,
         const eT alpha,
-        const eT beta)
+        const eT beta,
+        // subview arguments
+        const uword y_offset,
+        const uword y_mem_incr,
+        const uword A_row_offset,
+        const uword A_col_offset,
+        const uword A_M_n_rows,
+        const uword x_offset,
+        const uword x_mem_incr)
     {
     coot_extra_debug_sigprint();
 
@@ -46,19 +48,21 @@ struct gemv
   static
   inline
   void
-  apply(dev_mem_t<float> y,
-        const uword y_offset,
-        const uword incy,
-        const dev_mem_t<float> A,
-        const uword A_offset,
+  apply(dev_mem_t<float> y_mem,
+        const dev_mem_t<float> A_mem,
         const uword A_n_rows,
-        const uword lda,
         const uword A_n_cols,
-        const dev_mem_t<float> x,
-        const uword x_offset,
-        const uword incx,
+        const dev_mem_t<float> x_mem,
         const float alpha,
-        const float beta)
+        const float beta,
+        // subview arguments
+        const uword y_offset,
+        const uword y_mem_incr,
+        const uword A_row_offset,
+        const uword A_col_offset,
+        const uword A_M_n_rows,
+        const uword x_offset,
+        const uword x_mem_incr)
     {
     coot_extra_debug_sigprint();
 
@@ -71,12 +75,12 @@ struct gemv
     const size_t M = size_t(A_n_rows);
     const size_t N = size_t(A_n_cols);
 
-    const size_t cl_lda = size_t(lda);
-    const size_t cl_incx = size_t(incx);
-    const size_t cl_incy = size_t(incy);
+    const size_t cl_lda = size_t(A_M_n_rows);
+    const size_t cl_incx = size_t(x_mem_incr);
+    const size_t cl_incy = size_t(y_mem_incr);
 
     const size_t cl_y_offset = size_t(y_offset);
-    const size_t cl_A_offset = size_t(A_offset);
+    const size_t cl_A_offset = size_t(A_row_offset + A_col_offset * A_M_n_rows);
     const size_t cl_x_offset = size_t(x_offset);
 
     cl_command_queue queue = get_rt().cl_rt.get_cq();
@@ -88,14 +92,14 @@ struct gemv
                                         M,
                                         N,
                                         alpha,
-                                        A.cl_mem_ptr,
+                                        A_mem.cl_mem_ptr,
                                         cl_A_offset,
                                         cl_lda,
-                                        x.cl_mem_ptr,
+                                        x_mem.cl_mem_ptr,
                                         cl_x_offset,
                                         cl_incx,
                                         beta,
-                                        y.cl_mem_ptr,
+                                        y_mem.cl_mem_ptr,
                                         cl_y_offset,
                                         cl_incy,
                                         1,
@@ -103,7 +107,6 @@ struct gemv
                                         0,
                                         NULL,
                                         NULL);
-    status |= coot_wrapper(clFlush)(queue);
 
     coot_check_cl_error(status, "coot::opencl::gemv(): eT = float");
     }
@@ -113,19 +116,21 @@ struct gemv
   static
   inline
   void
-  apply(dev_mem_t<double> y,
-        const uword y_offset,
-        const uword incy,
-        const dev_mem_t<double> A,
-        const uword A_offset,
+  apply(dev_mem_t<double> y_mem,
+        const dev_mem_t<double> A_mem,
         const uword A_n_rows,
-        const uword lda,
         const uword A_n_cols,
-        const dev_mem_t<double> x,
-        const uword x_offset,
-        const uword incx,
+        const dev_mem_t<double> x_mem,
         const double alpha,
-        const double beta)
+        const double beta,
+        // subview arguments
+        const uword y_offset,
+        const uword y_mem_incr,
+        const uword A_row_offset,
+        const uword A_col_offset,
+        const uword A_M_n_rows,
+        const uword x_offset,
+        const uword x_mem_incr)
     {
     coot_extra_debug_sigprint();
 
@@ -138,12 +143,12 @@ struct gemv
     const size_t M = size_t(A_n_rows);
     const size_t N = size_t(A_n_cols);
 
-    const size_t cl_lda = size_t(lda);
-    const size_t cl_incx = size_t(incx);
-    const size_t cl_incy = size_t(incy);
+    const size_t cl_lda = size_t(A_M_n_rows);
+    const size_t cl_incx = size_t(x_mem_incr);
+    const size_t cl_incy = size_t(y_mem_incr);
 
     const size_t cl_y_offset = size_t(y_offset);
-    const size_t cl_A_offset = size_t(A_offset);
+    const size_t cl_A_offset = size_t(A_row_offset + A_col_offset * A_M_n_rows);
     const size_t cl_x_offset = size_t(x_offset);
 
     cl_command_queue queue = get_rt().cl_rt.get_cq();
@@ -155,14 +160,14 @@ struct gemv
                                         M,
                                         N,
                                         alpha,
-                                        A.cl_mem_ptr,
+                                        A_mem.cl_mem_ptr,
                                         cl_A_offset,
                                         cl_lda,
-                                        x.cl_mem_ptr,
+                                        x_mem.cl_mem_ptr,
                                         cl_x_offset,
                                         cl_incx,
                                         beta,
-                                        y.cl_mem_ptr,
+                                        y_mem.cl_mem_ptr,
                                         cl_y_offset,
                                         cl_incy,
                                         1,
@@ -170,7 +175,6 @@ struct gemv
                                         0,
                                         NULL,
                                         NULL);
-    status |= coot_wrapper(clFlush)(queue);
 
     coot_check_cl_error(status, "coot::opencl::gemv(): eT = double");
     }

@@ -371,7 +371,10 @@ op_pinv::apply_direct_sym(Mat<eT>& out, Mat<eT>& in, const eT tol)
   // out = tmp * filtered_eigvecs.t()
   coot_rt_t::gemm<eT, false, true>(out.get_dev_mem(true), out.n_rows, out.n_cols,
                                    tmp.get_dev_mem(true), tmp.n_rows, tmp.n_cols,
-                                   filtered_eigvecs.get_dev_mem(true), (eT) 1.0, (eT) 0.0);
+                                   filtered_eigvecs.get_dev_mem(true), (eT) 1.0, (eT) 0.0,
+                                   0, 0, out.n_rows,
+                                   0, 0, tmp.n_rows,
+                                   0, 0, filtered_eigvecs.n_rows);
 
   return std::make_tuple(true, "");
   }
@@ -512,7 +515,10 @@ op_pinv::apply_direct_gen(Mat<eT>& out, Mat<eT>& in, const eT tol)
     out.set_size(filtered_U.n_rows, filtered_V.n_rows);
     coot_rt_t::gemm<eT, false, false>(out.get_dev_mem(true), out.n_rows, out.n_cols,
                                       filtered_U.get_dev_mem(true), filtered_U.n_rows, filtered_U.n_cols,
-                                      filtered_V.get_dev_mem(true), (eT) 1.0, (eT) 0.0);
+                                      filtered_V.get_dev_mem(true), (eT) 1.0, (eT) 0.0,
+                                      0, 0, out.n_rows,
+                                      0, 0, filtered_U.n_rows,
+                                      0, 0, filtered_V.n_rows);
     }
   else
     {
@@ -526,7 +532,10 @@ op_pinv::apply_direct_gen(Mat<eT>& out, Mat<eT>& in, const eT tol)
     out.set_size(tmp.n_rows, filtered_U.n_rows);
     coot_rt_t::gemm<eT, false, true>(out.get_dev_mem(true), out.n_rows, out.n_cols,
                                      tmp.get_dev_mem(true), tmp.n_rows, tmp.n_cols,
-                                     filtered_U.get_dev_mem(true), (eT) 1.0, (eT) 0.0);
+                                     filtered_U.get_dev_mem(true), (eT) 1.0, (eT) 0.0,
+                                     0, 0, out.n_rows,
+                                     0, 0, tmp.n_rows,
+                                     0, 0, filtered_U.n_rows);
     }
 
   return std::make_tuple(true, "");

@@ -22,7 +22,25 @@ struct gemm
   static
   inline
   void
-  apply(dev_mem_t<eT> C_mem, const uword C_n_rows, const uword C_n_cols, const dev_mem_t<eT> A_mem, const uword A_n_rows, const uword A_n_cols, const dev_mem_t<eT> B_mem, eT alpha, eT beta)
+  apply(dev_mem_t<eT> C_mem,
+        const uword C_n_rows,
+        const uword C_n_cols,
+        const dev_mem_t<eT> A_mem,
+        const uword A_n_rows,
+        const uword A_n_cols,
+        const dev_mem_t<eT> B_mem,
+        const eT alpha,
+        const eT beta,
+        // subview arguments
+        const uword C_row_offset,
+        const uword C_col_offset,
+        const uword C_M_n_rows,
+        const uword A_row_offset,
+        const uword A_col_offset,
+        const uword A_M_n_rows,
+        const uword B_row_offset,
+        const uword B_col_offset,
+        const uword B_M_n_rows)
     {
     coot_extra_debug_sigprint();
 
@@ -36,13 +54,13 @@ struct gemm
     const int N = int(C_n_cols);
     const int K = (do_trans_A) ? int(A_n_rows) : int(A_n_cols);
 
-    const int lda = (do_trans_A) ? K : M;
-    const int ldb = (do_trans_B) ? N : K;
-    const int ldc = int(C_n_rows);
+    const int lda = int(A_M_n_rows);
+    const int ldb = int(B_M_n_rows);
+    const int ldc = int(C_M_n_rows);
 
     cublasStatus_t result;
 
-    if (std::is_same<eT, float>::value)
+    if (is_same_type<eT, float>::value)
       {
       result = coot_wrapper(cublasSgemm)(get_rt().cuda_rt.cublas_handle,
                                          trans_a,
@@ -51,15 +69,15 @@ struct gemm
                                          N,
                                          K,
                                          (const float*) &alpha,
-                                         (const float*) A_mem.cuda_mem_ptr,
+                                         (const float*) (A_mem.cuda_mem_ptr + A_row_offset + A_col_offset * A_M_n_rows),
                                          lda,
-                                         (const float*) B_mem.cuda_mem_ptr,
+                                         (const float*) (B_mem.cuda_mem_ptr + B_row_offset + B_col_offset * B_M_n_rows),
                                          ldb,
                                          (const float*) &beta,
-                                         (float*) C_mem.cuda_mem_ptr,
+                                         (float*) (C_mem.cuda_mem_ptr + C_row_offset + C_col_offset * C_M_n_rows),
                                          ldc);
       }
-    else if (std::is_same<eT, double>::value)
+    else if (is_same_type<eT, double>::value)
       {
       result = coot_wrapper(cublasDgemm)(get_rt().cuda_rt.cublas_handle,
                                          trans_a,
@@ -68,12 +86,12 @@ struct gemm
                                          N,
                                          K,
                                          (const double*) &alpha,
-                                         (const double*) A_mem.cuda_mem_ptr,
+                                         (const double*) (A_mem.cuda_mem_ptr + A_row_offset + A_col_offset * A_M_n_rows),
                                          lda,
-                                         (const double*) B_mem.cuda_mem_ptr,
+                                         (const double*) (B_mem.cuda_mem_ptr + B_row_offset + B_col_offset * B_M_n_rows),
                                          ldb,
                                          (const double*) &beta,
-                                         (double*) C_mem.cuda_mem_ptr,
+                                         (double*) (C_mem.cuda_mem_ptr + C_row_offset + C_col_offset * C_M_n_rows),
                                          ldc);
       }
     else if (std::is_same<eT, std::complex<float>>::value)

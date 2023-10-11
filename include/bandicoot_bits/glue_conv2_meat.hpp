@@ -154,18 +154,19 @@ glue_conv2::apply_direct(Mat<eT>& out, const Mat<eT>& A_in, const Mat<eT>& B_in,
     for (uword i = 0; i < out_ref.n_cols; ++i)
       {
       coot_rt_t::gemv<eT, true>(out_ref.get_dev_mem(false),
-                                i * out_ref.n_rows + c,
-                                1,
                                 buffer.get_dev_mem(false),
-                                i * K.n_rows,
                                 K.n_elem, // this is the number of rows in each column
-                                buffer.n_rows, // this is the actual number of rows in `buffer`
                                 num_cols,
                                 K_mod.get_dev_mem(false),
-                                0,
-                                1,
                                 1.0,
-                                0.0);
+                                0.0,
+                                i * out_ref.n_rows + c,
+                                1,
+                                i * K.n_rows,
+                                0,
+                                buffer.n_rows, // this is the actual number of rows in `buffer`
+                                0,
+                                1);
       }
     }
 

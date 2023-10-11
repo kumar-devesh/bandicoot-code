@@ -22,19 +22,21 @@ struct gemv
   static
   inline
   void
-  apply(dev_mem_t<eT> y,
-        const uword y_offset,
-        const uword incy,
-        const dev_mem_t<eT> A,
-        const uword A_offset,
+  apply(dev_mem_t<eT> y_mem,
+        const dev_mem_t<eT> A_mem,
         const uword A_n_rows,
-        const uword lda,
         const uword A_n_cols,
-        const dev_mem_t<eT> x,
-        const uword x_offset,
-        const uword incx,
+        const dev_mem_t<eT> x_mem,
         const eT alpha,
-        const eT beta)
+        const eT beta,
+        // subview arguments
+        const uword y_offset,
+        const uword y_mem_incr,
+        const uword A_row_offset,
+        const uword A_col_offset,
+        const uword A_M_n_rows,
+        const uword x_offset,
+        const uword x_mem_incr)
     {
     coot_extra_debug_sigprint();
 
@@ -46,19 +48,21 @@ struct gemv
   static
   inline
   void
-  apply(dev_mem_t<float> y,
-        const uword y_offset,
-        const uword incy,
-        const dev_mem_t<float> A,
-        const uword A_offset,
+  apply(dev_mem_t<float> y_mem,
+        const dev_mem_t<float> A_mem,
         const uword A_n_rows,
-        const uword lda,
         const uword A_n_cols,
-        const dev_mem_t<float> x,
-        const uword x_offset,
-        const uword incx,
+        const dev_mem_t<float> x_mem,
         const float alpha,
-        const float beta)
+        const float beta,
+        // subview arguments
+        const uword y_offset,
+        const uword y_mem_incr,
+        const uword A_row_offset,
+        const uword A_col_offset,
+        const uword A_M_n_rows,
+        const uword x_offset,
+        const uword x_mem_incr)
     {
     coot_extra_debug_sigprint();
 
@@ -71,9 +75,9 @@ struct gemv
     const int M = int(A_n_rows);
     const int N = int(A_n_cols);
 
-    const int cuda_lda = int(lda);
-    const int cuda_incx = int(incx);
-    const int cuda_incy = int(incy);
+    const int cuda_lda = int(A_M_n_rows);
+    const int cuda_incx = int(x_mem_incr);
+    const int cuda_incy = int(y_mem_incr);
 
     cublasStatus_t result;
 
@@ -82,12 +86,12 @@ struct gemv
                                        M,
                                        N,
                                        (float*) &alpha,
-                                       A.cuda_mem_ptr + A_offset,
+                                       A_mem.cuda_mem_ptr + A_row_offset + A_col_offset * A_M_n_rows,
                                        cuda_lda,
-                                       x.cuda_mem_ptr + x_offset,
+                                       x_mem.cuda_mem_ptr + x_offset,
                                        cuda_incx,
                                        (float*) &beta,
-                                       y.cuda_mem_ptr + y_offset,
+                                       y_mem.cuda_mem_ptr + y_offset,
                                        cuda_incy);
 
     coot_check_cublas_error( result, "coot::cuda::gemv(): call to cublasSgemv() failed" );
@@ -98,19 +102,21 @@ struct gemv
   static
   inline
   void
-  apply(dev_mem_t<double> y,
-        const uword y_offset,
-        const uword incy,
-        const dev_mem_t<double> A,
-        const uword A_offset,
+  apply(dev_mem_t<double> y_mem,
+        const dev_mem_t<double> A_mem,
         const uword A_n_rows,
-        const uword lda,
         const uword A_n_cols,
-        const dev_mem_t<double> x,
-        const uword x_offset,
-        const uword incx,
+        const dev_mem_t<double> x_mem,
         const double alpha,
-        const double beta)
+        const double beta,
+        // subview arguments
+        const uword y_offset,
+        const uword y_mem_incr,
+        const uword A_row_offset,
+        const uword A_col_offset,
+        const uword A_M_n_rows,
+        const uword x_offset,
+        const uword x_mem_incr)
     {
     coot_extra_debug_sigprint();
 
@@ -123,9 +129,9 @@ struct gemv
     const int M = int(A_n_rows);
     const int N = int(A_n_cols);
 
-    const int cuda_lda = int(lda);
-    const int cuda_incx = int(incx);
-    const int cuda_incy = int(incy);
+    const int cuda_lda = int(A_M_n_rows);
+    const int cuda_incx = int(x_mem_incr);
+    const int cuda_incy = int(y_mem_incr);
 
     cublasStatus_t result;
 
@@ -134,14 +140,14 @@ struct gemv
                                        M,
                                        N,
                                        (double*) &alpha,
-                                       A.cuda_mem_ptr + A_offset,
+                                       A_mem.cuda_mem_ptr + A_row_offset + A_col_offset * A_M_n_rows,
                                        cuda_lda,
-                                       x.cuda_mem_ptr + x_offset,
+                                       x_mem.cuda_mem_ptr + x_offset,
                                        cuda_incx,
                                        (double*) &beta,
-                                       y.cuda_mem_ptr + y_offset,
+                                       y_mem.cuda_mem_ptr + y_offset,
                                        cuda_incy);
 
-    coot_check_cublas_error( result, "coot::cuda::gemv(): call to cublasSgemv() failed" );
+    coot_check_cublas_error( result, "coot::cuda::gemv(): call to cublasDgemv() failed" );
     }
   };

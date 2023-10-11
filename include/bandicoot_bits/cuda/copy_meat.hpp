@@ -17,11 +17,23 @@
 template<typename eT>
 inline
 void
-copy_from_dev_mem(eT* dest, const dev_mem_t<eT> src, const uword N)
+copy_from_dev_mem(eT* dest,
+                  const dev_mem_t<eT> src,
+                  const uword n_rows,
+                  const uword n_cols,
+                  const uword src_row_offset,
+                  const uword src_col_offset,
+                  const uword src_M_n_rows)
   {
   coot_extra_debug_sigprint();
 
-  cudaError_t error = coot_wrapper(cudaMemcpy)(dest, src.cuda_mem_ptr, N * sizeof(eT), cudaMemcpyDeviceToHost);
+  cudaError_t error = coot_wrapper(cudaMemcpy2D)(dest,
+                                                 sizeof(eT) * n_rows,
+                                                 (src.cuda_mem_ptr + src_row_offset + src_col_offset * src_M_n_rows),
+                                                 sizeof(eT) * src_M_n_rows,
+                                                 sizeof(eT) * n_rows,
+                                                 n_cols,
+                                                 cudaMemcpyDeviceToHost);
 
   coot_check_cuda_error(error, "Mat::copy_from_dev_mem(): couldn't access device memory");
   }
