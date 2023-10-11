@@ -127,12 +127,17 @@ On Windows sytems, the MinGW toolset or Visual Studio C++ 2019 (MSVC) can be use
 
 ### 5: Linux and macOS: Installation
 
-Bandicoot can be installed in several ways: either manually, via cmake, or using the 
+Bandicoot can be installed in several ways: either manually, via CMake, or using the
 [`bandicoot` Homebrew Formula](https://formulae.brew.sh/formula/bandicoot),
-with or without root access. The CMake-based installation is preferred.
+with or without root access.
+If using macOS, using [Homebrew](#5c-homebrew-installation) is the preferred option;
+otherwise, the [CMake-based](#5a-installation-via-cmake) installation is preferred.
+
 CMake can be downloaded from <https://www.cmake.org>
 or (preferably) installed using the package manager on your system;
-on macOS systems, CMake can be installed through MacPorts or Homebrew.
+on macOS systems, CMake can be installed through MacPorts or Homebrew,
+and on Ubuntu and other Debian-derived Linux distribution, the `apt` package
+manager can be used.
 
 Before installing Bandicoot, first install OpenBLAS and LAPACK,
 and the following dependencies for the backend(s) you would like to use:
@@ -141,22 +146,8 @@ and the following dependencies for the backend(s) you would like to use:
  * *CUDA*: the CUDA toolkit including CUDA, cudart, cuRand, cuBLAS, cuSolver
 
 For each of these dependencies, it is also necessary to install the corresponding development files for each library.
-For example, when installing the `libopenblas` package, also install the `libopenblas-dev` package.
 
-#### 5a: Installation via CMake
-
-The CMake-based installer detects which relevant libraries
-are installed on your system (e.g. OpenBLAS, LAPACK, OpenCL, CUDA, etc.)
-and correspondingly modifies Bandicoot's configuration.
-The installer also generates the Bandicoot runtime library,
-which is a wrapper for all the detected libraries. You 
-may need to install the dependencies of: 
- [`cmake`](https://cmake.org/),
- [`clBLAS`](https://github.com/clMathLibraries/clBLAS),
- [`lapack`](https://www.netlib.org/lapack/), and 
- [`openblas`](https://www.openblas.net/).
- We recommend using [`homebrew`](https://brew.sh/) on macOS 
- to install the dependencies with:
+On macOS, we recommend using [`homebrew`](https://brew.sh/) to install the dependencies:
 
 ```
 # Install homebrew
@@ -165,6 +156,28 @@ may need to install the dependencies of:
 # Install dependencies
 brew install cmake clblas openblas lapack
 ```
+
+If CUDA support is desired on macOS, it should be installed manually.
+
+On Ubuntu or Debian Linux (or other Debian derivatives), the dependencies can be
+installed via `apt`:
+
+```
+# If CUDA or OpenCL backends are not wanted, remove the corresponding packages
+# from the command below.
+sudo apt-get install cmake libopenblas-dev libclblas-dev nvidia-cuda-toolkit
+```
+
+Ensure also that your OpenCL or CUDA driver (or both) are working with the
+`clinfo` and/or `nvidia-smi` commands.
+
+#### 5a: Installation via CMake
+
+The CMake-based installer detects which relevant libraries
+are installed on your system (e.g. OpenBLAS, LAPACK, OpenCL, CUDA, etc.)
+and correspondingly modifies Bandicoot's configuration.
+The installer also generates the Bandicoot runtime library,
+which is a wrapper for all the detected libraries.
 
 Once the dependencies are available, please download a copy of the repository at the desired version by using:
 
@@ -250,8 +263,6 @@ and hence you will need to link your programs directly with OpenBLAS, LAPACK, CU
 see the [direct linking](https://coot.sourceforge.io/docs.html#direct_linking)
 section of the documentation for more details.
 
----
-
 #### 5c: Homebrew Installation
 
 If you prefer, you can directly install using the 
@@ -267,6 +278,8 @@ will automatically be installed and setup for use.
 # Install dependencies
 brew install bandicoot
 ```
+
+---
 
 ### 6: Linux and macOS: Compiling and Linking
 
