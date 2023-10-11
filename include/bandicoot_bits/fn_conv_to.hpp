@@ -178,8 +178,7 @@ struct conv_to
       typedef typename T1::elem_type eT;
 
       unwrap<T1> U(in);
-      extract_subview<typename unwrap<T1>::stored_type> E(U.M);
-      arma::Mat<eT> M(E.M);
+      arma::Mat<eT> M(U.M); // also works with subviews
 
       T2 out = arma::conv_to<T2>::from(M);
 

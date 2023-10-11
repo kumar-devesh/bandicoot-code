@@ -211,7 +211,13 @@ class coot_rt_t
   static inline std::tuple<bool, std::string> solve_square_fast(dev_mem_t<eT> A, const bool trans_A, dev_mem_t<eT> B, const uword n_rows, const uword n_cols);
 
   template<typename eT>
-  static inline void copy_from_dev_mem(eT* dest, const dev_mem_t<eT> src, const uword N);
+  static inline void copy_from_dev_mem(eT* dest,
+                                       const dev_mem_t<eT> src,
+                                       const uword n_rows,
+                                       const uword n_cols,
+                                       const uword src_row_offset,
+                                       const uword src_col_offset,
+                                       const uword src_M_n_rows);
 
   template<typename eT>
   static inline void copy_into_dev_mem(dev_mem_t<eT> dest, const eT* src, const uword N);

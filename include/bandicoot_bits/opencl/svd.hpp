@@ -74,7 +74,7 @@ svd(dev_mem_t<float> U,
   float* cpu_VT = cpu_s + std::min(n_rows, n_cols);
   float* cpu_work = cpu_VT + VT_size;
 
-  copy_from_dev_mem(cpu_A, A, n_rows * n_cols);
+  copy_from_dev_mem(cpu_A, A, n_rows, n_cols, 0, 0, n_rows);
 
   // Now actually compute the SVD.
   magma_sgesvd(job,
@@ -165,7 +165,7 @@ svd(dev_mem_t<double> U,
   double* cpu_VT = cpu_s + std::min(n_rows, n_cols);
   double* cpu_work = cpu_VT + VT_size;
 
-  copy_from_dev_mem(cpu_A, A, n_rows * n_cols);
+  copy_from_dev_mem(cpu_A, A, n_rows, n_cols, 0, 0, n_rows);
 
   // Now actually compute the SVD.
   magma_dgesvd(job,

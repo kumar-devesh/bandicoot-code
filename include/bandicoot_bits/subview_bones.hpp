@@ -65,6 +65,8 @@ class subview : public Base<eT, subview<eT> >
   template<typename T1> inline void operator-=(const Base<eT, T1>& x);
   template<typename T1> inline void operator%=(const Base<eT, T1>& x);
   template<typename T1> inline void operator/=(const Base<eT, T1>& x);
+  
+  inline explicit operator arma::Mat<eT> () const;
 
   template<typename eT1> inline static void       extract(Mat<eT1>& out, const subview& in);
   template<typename eT1> inline static void  plus_inplace(Mat<eT1>& out, const subview& in);

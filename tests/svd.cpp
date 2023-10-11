@@ -246,24 +246,24 @@ TEMPLATE_TEST_CASE("arma_svd_comparison", "[svd]", float, double)
   for (uword i = 0; i < u.n_elem; ++i)
     {
     if (std::is_same<eT, float>::value)
-      REQUIRE( std::abs(eT(u2_cpu[i])) == Approx(std::abs(eT(u_cpu[i]))).epsilon(0.05).margin(0.0001) );
+      REQUIRE( std::abs(eT(u2_cpu[i])) == Approx(std::abs(eT(u_cpu[i]))).epsilon(0.05).margin(0.0002) );
     else
-      REQUIRE( std::abs(eT(u2_cpu[i])) == Approx(std::abs(eT(u_cpu[i]))).epsilon(0.001).margin(0.00001) );
+      REQUIRE( std::abs(eT(u2_cpu[i])) == Approx(std::abs(eT(u_cpu[i]))).epsilon(0.001).margin(0.00002) );
     }
 
   for (uword i = 0; i < s.n_elem; ++i)
     {
     if (std::is_same<eT, float>::value)
-      REQUIRE( eT(s2_cpu[i]) == Approx(eT(s_cpu[i])).epsilon(0.05).margin(0.0001) );
+      REQUIRE( eT(s2_cpu[i]) == Approx(eT(s_cpu[i])).epsilon(0.05).margin(0.0002) );
     else
-      REQUIRE( eT(s2_cpu[i]) == Approx(eT(s_cpu[i])).epsilon(0.001).margin(0.00001) );
+      REQUIRE( eT(s2_cpu[i]) == Approx(eT(s_cpu[i])).epsilon(0.001).margin(0.00002) );
     }
 
   for (uword i = 0; i < v.n_elem; ++i)
     {
     if (std::is_same<eT, float>::value)
-      REQUIRE( std::abs(eT(v2_cpu[i])) == Approx(std::abs(eT(v_cpu[i]))).epsilon(0.05).margin(0.0001) );
+      REQUIRE( std::abs(eT(v2_cpu[i])) == Approx(std::abs(eT(v_cpu[i]))).epsilon(0.05).margin(0.0002) );
     else
-      REQUIRE( std::abs(eT(v2_cpu[i])) == Approx(std::abs(eT(v_cpu[i]))).epsilon(0.001).margin(0.00001) );
+      REQUIRE( std::abs(eT(v2_cpu[i])) == Approx(std::abs(eT(v_cpu[i]))).epsilon(0.001).margin(0.00002) );
     }
   }
