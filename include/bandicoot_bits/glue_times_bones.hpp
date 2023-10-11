@@ -78,14 +78,14 @@ class glue_times
   template<typename eT1, typename eT2, const bool do_trans_A, const bool do_trans_B>
   inline static uword mul_storage_cost(const Mat<eT1>& A, const Mat<eT2>& B);
 
-  template<typename out_eT, typename eT1, typename eT2, const bool do_trans_A, const bool do_trans_B, const bool do_scalar_times>
-  inline static void apply(Mat<out_eT>& out, const Mat<eT1>& A, const Mat<eT2>& B, const out_eT val);
+  template<typename out_eT, typename T1, typename T2, const bool do_trans_A, const bool do_trans_B, const bool do_scalar_times>
+  inline static void apply(Mat<out_eT>& out, const T1& A, const T2& B, const out_eT val);
 
-  template<typename out_eT, typename eT1, typename eT2, typename eT3, const bool do_trans_A, const bool do_trans_B, const bool do_trans_C, const bool do_scalar_times>
-  inline static void apply(Mat<out_eT>& out, const Mat<eT1>& A, const Mat<eT2>& B, const Mat<eT3>& C, const out_eT val);
+  template<typename out_eT, typename T1, typename T2, typename T3, const bool do_trans_A, const bool do_trans_B, const bool do_trans_C, const bool do_scalar_times>
+  inline static void apply(Mat<out_eT>& out, const T1& A, const T2& B, const T3& C, const out_eT val);
 
-  template<typename out_eT, typename eT1, typename eT2, typename eT3, typename eT4, const bool do_trans_A, const bool do_trans_B, const bool do_trans_C, const bool do_trans_D, const bool do_scalar_times>
-  inline static void apply(Mat<out_eT>& out, const Mat<eT1>& A, const Mat<eT2>& B, const Mat<eT3>& C, const Mat<eT4>& D, const out_eT val);
+  template<typename out_eT, typename T1, typename T2, typename T3, typename T4, const bool do_trans_A, const bool do_trans_B, const bool do_trans_C, const bool do_trans_D, const bool do_scalar_times>
+  inline static void apply(Mat<out_eT>& out, const T1& A, const T2& B, const T3& C, const T4& D, const out_eT val);
 
   // used by SizeProxy
 

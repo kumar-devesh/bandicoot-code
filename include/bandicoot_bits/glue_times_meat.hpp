@@ -42,8 +42,8 @@ glue_times_redirect<N>::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_times>& 
     glue_times::apply
       <
       out_eT,
-      typename T1::elem_type,
-      typename T2::elem_type,
+      T1,
+      T2,
       partial_unwrap<T1>::do_trans,
       partial_unwrap<T2>::do_trans,
       (partial_unwrap<T1>::do_times || partial_unwrap<T2>::do_times)
@@ -57,8 +57,8 @@ glue_times_redirect<N>::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_times>& 
     glue_times::apply
       <
       out_eT,
-      typename T1::elem_type,
-      typename T2::elem_type,
+      T1,
+      T2,
       partial_unwrap<T1>::do_trans,
       partial_unwrap<T2>::do_trans,
       (partial_unwrap<T1>::do_times || partial_unwrap<T2>::do_times)
@@ -94,8 +94,8 @@ glue_times_redirect<2>::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_times>& 
     glue_times::apply
       <
       out_eT,
-      typename T1::elem_type,
-      typename T2::elem_type,
+      typename partial_unwrap<T1>::stored_type,
+      typename partial_unwrap<T2>::stored_type,
       partial_unwrap<T1>::do_trans,
       partial_unwrap<T2>::do_trans,
       (partial_unwrap<T1>::do_times || partial_unwrap<T2>::do_times)
@@ -109,8 +109,8 @@ glue_times_redirect<2>::apply(Mat<out_eT>& out, const Glue<T1, T2, glue_times>& 
     glue_times::apply
       <
       out_eT,
-      typename T1::elem_type,
-      typename T2::elem_type,
+      typename partial_unwrap<T1>::stored_type,
+      typename partial_unwrap<T2>::stored_type,
       partial_unwrap<T1>::do_trans,
       partial_unwrap<T2>::do_trans,
       (partial_unwrap<T1>::do_times || partial_unwrap<T2>::do_times)
@@ -151,9 +151,9 @@ glue_times_redirect<3>::apply(Mat<out_eT>& out, const Glue<Glue<T1, T2, glue_tim
     glue_times::apply
       <
       out_eT,
-      typename T1::elem_type,
-      typename T2::elem_type,
-      typename T3::elem_type,
+      typename partial_unwrap<T1>::stored_type,
+      typename partial_unwrap<T2>::stored_type,
+      typename partial_unwrap<T3>::stored_type,
       partial_unwrap<T1>::do_trans,
       partial_unwrap<T2>::do_trans,
       partial_unwrap<T3>::do_trans,
@@ -168,9 +168,9 @@ glue_times_redirect<3>::apply(Mat<out_eT>& out, const Glue<Glue<T1, T2, glue_tim
     glue_times::apply
       <
       out_eT,
-      typename T1::elem_type,
-      typename T2::elem_type,
-      typename T3::elem_type,
+      typename partial_unwrap<T1>::stored_type,
+      typename partial_unwrap<T2>::stored_type,
+      typename partial_unwrap<T3>::stored_type,
       partial_unwrap<T1>::do_trans,
       partial_unwrap<T2>::do_trans,
       partial_unwrap<T3>::do_trans,
@@ -214,10 +214,10 @@ glue_times_redirect<4>::apply(Mat<out_eT>& out, const Glue<Glue<Glue<T1, T2, glu
     glue_times::apply
       <
       out_eT,
-      typename T1::elem_type,
-      typename T2::elem_type,
-      typename T3::elem_type,
-      typename T4::elem_type,
+      typename partial_unwrap<T1>::stored_type,
+      typename partial_unwrap<T2>::stored_type,
+      typename partial_unwrap<T3>::stored_type,
+      typename partial_unwrap<T4>::stored_type,
       partial_unwrap<T1>::do_trans,
       partial_unwrap<T2>::do_trans,
       partial_unwrap<T3>::do_trans,
@@ -233,10 +233,10 @@ glue_times_redirect<4>::apply(Mat<out_eT>& out, const Glue<Glue<Glue<T1, T2, glu
     glue_times::apply
       <
       out_eT,
-      typename T1::elem_type,
-      typename T2::elem_type,
-      typename T3::elem_type,
-      typename T4::elem_type,
+      typename partial_unwrap<T1>::stored_type,
+      typename partial_unwrap<T2>::stored_type,
+      typename partial_unwrap<T3>::stored_type,
+      typename partial_unwrap<T4>::stored_type,
       partial_unwrap<T1>::do_trans,
       partial_unwrap<T2>::do_trans,
       partial_unwrap<T3>::do_trans,
@@ -283,8 +283,8 @@ glue_times::mul_storage_cost(const Mat<eT1>& A, const Mat<eT2>& B)
 template
   <
   typename   out_eT,
-  typename   eT1,
-  typename   eT2,
+  typename   T1,
+  typename   T2,
   const bool do_trans_A,
   const bool do_trans_B,
   const bool use_alpha
@@ -294,12 +294,15 @@ void
 glue_times::apply
   (
         Mat<out_eT>& out,
-  const Mat<eT1>&    A,
-  const Mat<eT2>&    B,
+  const T1&          A, // Mat or subview
+  const T2&          B,
   const out_eT       alpha
   )
   {
   coot_extra_debug_sigprint();
+
+  typedef typename T1::elem_type eT1;
+  typedef typename T1::elem_type eT2;
 
   coot_debug_assert_trans_mul_size<do_trans_A, do_trans_B>(A.n_rows, A.n_cols, B.n_rows, B.n_cols, "matrix multiplication");
 
@@ -377,9 +380,9 @@ glue_times::apply
 template
   <
   typename   out_eT,
-  typename   eT1,
-  typename   eT2,
-  typename   eT3,
+  typename   T1,
+  typename   T2,
+  typename   T3,
   const bool do_trans_A,
   const bool do_trans_B,
   const bool do_trans_C,
@@ -390,32 +393,36 @@ void
 glue_times::apply
   (
         Mat<out_eT>& out,
-  const Mat<eT1>&    A,
-  const Mat<eT2>&    B,
-  const Mat<eT3>&    C,
+  const T1&          A, // Mat or subview
+  const T2&          B,
+  const T3&          C,
   const out_eT       alpha
   )
   {
   coot_extra_debug_sigprint();
 
+  typedef typename T1::elem_type eT1;
+  typedef typename T2::elem_type eT2;
+  typedef typename T3::elem_type eT3;
+
   Mat<out_eT> tmp;
 
   const uword storage_cost_AB = glue_times::mul_storage_cost<eT1, eT2, do_trans_A, do_trans_B>(A, B);
-  const uword storage_cost_BC = glue_times::mul_storage_cost<eT1, eT2, do_trans_B, do_trans_C>(B, C);
+  const uword storage_cost_BC = glue_times::mul_storage_cost<eT2, eT3, do_trans_B, do_trans_C>(B, C);
 
   if(storage_cost_AB <= storage_cost_BC)
     {
     // out = (A*B)*C
 
-    glue_times::apply<out_eT, eT1, eT2, do_trans_A, do_trans_B, use_alpha>(tmp, A,   B, alpha);
-    glue_times::apply<out_eT, eT1, eT2, false,      do_trans_C, false    >(out, tmp, C, out_eT(0));
+    glue_times::apply<out_eT, T1, T2, do_trans_A, do_trans_B, use_alpha>(tmp, A,   B, alpha);
+    glue_times::apply<out_eT, Mat<out_eT>, T3, false,      do_trans_C, false    >(out, tmp, C, out_eT(0));
     }
   else
     {
     // out = A*(B*C)
 
-    glue_times::apply<out_eT, eT1, eT2, do_trans_B, do_trans_C, use_alpha>(tmp, B, C,   alpha);
-    glue_times::apply<out_eT, eT1, eT2, do_trans_A, false,      false    >(out, A, tmp, out_eT(0));
+    glue_times::apply<out_eT, T2, T3, do_trans_B, do_trans_C, use_alpha>(tmp, B, C,   alpha);
+    glue_times::apply<out_eT, T1, Mat<out_eT>, do_trans_A, false,      false    >(out, A, tmp, out_eT(0));
     }
   }
 
@@ -424,10 +431,10 @@ glue_times::apply
 template
   <
   typename   out_eT,
-  typename   eT1,
-  typename   eT2,
-  typename   eT3,
-  typename   eT4,
+  typename   T1,
+  typename   T2,
+  typename   T3,
+  typename   T4,
   const bool do_trans_A,
   const bool do_trans_B,
   const bool do_trans_C,
@@ -439,16 +446,21 @@ void
 glue_times::apply
   (
         Mat<out_eT>& out,
-  const Mat<eT1>& A,
-  const Mat<eT2>& B,
-  const Mat<eT3>& C,
-  const Mat<eT4>& D,
-  const out_eT    alpha
+  const T1&          A, // Mat or subview
+  const T2&          B,
+  const T3&          C,
+  const T4&          D,
+  const out_eT       alpha
   )
   {
   coot_extra_debug_sigprint();
 
   Mat<out_eT> tmp;
+
+  typedef typename T1::elem_type eT1;
+  typedef typename T2::elem_type eT2;
+  typedef typename T3::elem_type eT3;
+  typedef typename T4::elem_type eT4;
 
   const uword storage_cost_AC = glue_times::mul_storage_cost<eT1, eT3, do_trans_A, do_trans_C>(A, C);
   const uword storage_cost_BD = glue_times::mul_storage_cost<eT2, eT4, do_trans_B, do_trans_D>(B, D);
@@ -457,17 +469,17 @@ glue_times::apply
     {
     // out = (A*B*C)*D
 
-    glue_times::apply<out_eT, eT1, eT2, eT3, do_trans_A, do_trans_B, do_trans_C, use_alpha>(tmp, A, B, C, alpha);
+    glue_times::apply<out_eT, T1, T2, T3, do_trans_A, do_trans_B, do_trans_C, use_alpha>(tmp, A, B, C, alpha);
 
-    glue_times::apply<out_eT, eT4, out_eT, false, do_trans_D, false>(out, tmp, D, out_eT(0));
+    glue_times::apply<out_eT, T4, Mat<out_eT>, false, do_trans_D, false>(out, tmp, D, out_eT(0));
     }
   else
     {
     // out = A*(B*C*D)
 
-    glue_times::apply<out_eT, eT2, eT3, eT4, do_trans_B, do_trans_C, do_trans_D, use_alpha>(tmp, B, C, D, alpha);
+    glue_times::apply<out_eT, T2, T3, T4, do_trans_B, do_trans_C, do_trans_D, use_alpha>(tmp, B, C, D, alpha);
 
-    glue_times::apply<out_eT, eT1, out_eT, do_trans_A, false, false>(out, A, tmp, out_eT(0));
+    glue_times::apply<out_eT, T1, Mat<out_eT>, do_trans_A, false, false>(out, A, tmp, out_eT(0));
     }
   }
 
