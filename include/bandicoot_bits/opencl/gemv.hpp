@@ -107,7 +107,6 @@ struct gemv
                                         0,
                                         NULL,
                                         NULL);
-    status |= coot_wrapper(clFlush)(queue);
 
     coot_check_cl_error(status, "coot::opencl::gemv(): eT = float");
     }
@@ -176,7 +175,6 @@ struct gemv
                                         0,
                                         NULL,
                                         NULL);
-    status |= coot_wrapper(clFlush)(queue);
 
     coot_check_cl_error(status, "coot::opencl::gemv(): eT = double");
     }
