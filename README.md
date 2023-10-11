@@ -166,10 +166,20 @@ cmake -DALLOW_OPENBLAS_MACOS=ON .
 ```
 
 Depending on your installation, OpenBLAS may masquerade as standard BLAS.
-To detect standard BLAS and LAPACK, use the `ALLOW_BLAS_LAPACK_MACOS1` option:
+To detect standard BLAS and LAPACK, use the `ALLOW_BLAS_LAPACK_MACOS` option:
 
 ```
 cmake -DALLOW_BLAS_LAPACK_MACOS=ON .
+```
+
+You may need to install the dependencies of: [`clBLAS`](https://github.com/clMathLibraries/clBLAS), [`lapack`](https://www.netlib.org/lapack/), and [`openblas`](https://www.openblas.net/). We recommend using [`homebrew`](https://brew.sh/) to install the dependency with:
+
+```
+# Install homebrew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install dependencies
+brew install clblas openblas lapack
 ```
 
 By default, CMake assumes that the Bandicoot runtime library and the corresponding header files
