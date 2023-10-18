@@ -53,10 +53,10 @@ namespace lapack
 
     #if defined(COOT_USE_FORTRAN_HIDDEN_ARGS)
       {
-      if     (    is_float<eT>::value) { coot_fortran(coot_strtri)(&uplo, &diag, &n,    (float*) A, &lda, info, 1); }
-      else if(   is_double<eT>::value) { coot_fortran(coot_dtrtri)(&uplo, &diag, &n,   (double*) A, &lda, info, 1); }
-      else if( is_cx_float<eT>::value) { coot_fortran(coot_ctrtri)(&uplo, &diag, &n, (blas_cxf*) A, &lda, info, 1); }
-      else if(is_cx_double<eT>::value) { coot_fortran(coot_ztrtri)(&uplo, &diag, &n, (blas_cxd*) A, &lda, info, 1); }
+      if     (    is_float<eT>::value) { coot_fortran(coot_strtri)(&uplo, &diag, &n,    (float*) A, &lda, info, 1, 1); }
+      else if(   is_double<eT>::value) { coot_fortran(coot_dtrtri)(&uplo, &diag, &n,   (double*) A, &lda, info, 1, 1); }
+      else if( is_cx_float<eT>::value) { coot_fortran(coot_ctrtri)(&uplo, &diag, &n, (blas_cxf*) A, &lda, info, 1, 1); }
+      else if(is_cx_double<eT>::value) { coot_fortran(coot_ztrtri)(&uplo, &diag, &n, (blas_cxd*) A, &lda, info, 1, 1); }
       }
     #else
       {
@@ -162,7 +162,7 @@ namespace lapack
 
     #if defined(COOT_USE_FORTRAN_HIDDEN_ARGS)
       {
-      if     (    is_float<eT>::value) { return coot_fortran(coot_slange)(&norm, &m, &n,    (float*) a, &lda   (float*) work, 1); }
+      if     (    is_float<eT>::value) { return coot_fortran(coot_slange)(&norm, &m, &n,    (float*) a, &lda,  (float*) work, 1); }
       else if(   is_double<eT>::value) { return coot_fortran(coot_dlange)(&norm, &m, &n,   (double*) a, &lda, (double*) work, 1); }
       else if( is_cx_float<eT>::value) { return coot_fortran(coot_clange)(&norm, &m, &n, (blas_cxf*) a, &lda,  (float*) work, 1); }
       else if(is_cx_double<eT>::value) { return coot_fortran(coot_zlange)(&norm, &m, &n, (blas_cxd*) a, &lda, (double*) work, 1); }
@@ -467,7 +467,7 @@ namespace lapack
     {
     coot_type_check((is_supported_blas_type<eT>::value == false));
 
-    #if defined(COOT_USE_HIDDEN_FORTRAN_ARGS)
+    #if defined(COOT_USE_FORTRAN_HIDDEN_ARGS)
       {
       if     (    is_float<eT>::value) { coot_fortran(coot_ssteqr)(&compz, &n,    (float*) D,    (float*) E,    (float*) Z, &ldz,    (float*) work, info, 1); }
       else if(   is_double<eT>::value) { coot_fortran(coot_dsteqr)(&compz, &n,   (double*) D,   (double*) E,   (double*) Z, &ldz,   (double*) work, info, 1); }
@@ -494,7 +494,7 @@ namespace lapack
     {
     coot_type_check((is_supported_real_blas_type<eT>::value == false));
 
-    #if defined(COOT_USE_HIDDEN_FORTRAN_ARGS)
+    #if defined(COOT_USE_FORTRAN_HIDDEN_ARGS)
       {
       if     ( is_float<eT>::value) { return coot_fortran(coot_slanst)(&norm, &n,  (float*) D,  (float*) E, 1); }
       else if(is_double<eT>::value) { return coot_fortran(coot_dlanst)(&norm, &n, (double*) D, (double*) E, 1); }
@@ -517,7 +517,7 @@ namespace lapack
     {
     coot_type_check((is_supported_real_blas_type<eT>::value == false));
 
-    #if defined(COOT_USE_HIDDEN_FORTRAN_ARGS)
+    #if defined(COOT_USE_FORTRAN_HIDDEN_ARGS)
       {
       if     ( is_float<eT>::value) { coot_fortran(coot_ssytrd)(&uplo, &n,  (float*) A, &lda,  (float*) D,  (float*) E,  (float*) tau,  (float*) work, &lwork, info, 1); }
       else if(is_double<eT>::value) { coot_fortran(coot_dsytrd)(&uplo, &n, (double*) A, &lda, (double*) D, (double*) E, (double*) tau, (double*) work, &lwork, info, 1); }
