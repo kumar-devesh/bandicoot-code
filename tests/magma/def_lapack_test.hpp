@@ -151,16 +151,12 @@ extern "C"
   void coot_fortran(coot_dort01)(const char* rowcol, const blas_int* m, const blas_int* n, const double* u, const blas_int* ldu, double* work, const blas_int* lwork, double* resid);
   #endif
 
-  // perform a series of row interchanges
-  void coot_fortran(coot_slaswp)(const blas_int* n, float*  A, const blas_int* lda, const blas_int* k1, const blas_int* k2, const blas_int* ipiv, const blas_int* incx);
-  void coot_fortran(coot_dlaswp)(const blas_int* n, double* A, const blas_int* lda, const blas_int* k1, const blas_int* k2, const blas_int* ipiv, const blas_int* incx);
-
   // QL factorisation of real matrix
-  void coot_fortran(coot_sgeqlf)(const blas_int* m, const blas_int* n, const float*  A, const blas_int* lda, const float*  tau, const float*  work, const blas_int* lwork, blas_int* info);
-  void coot_fortran(coot_dgeqlf)(const blas_int* m, const blas_int* n, const double* A, const blas_int* lda, const double* tau, const double* work, const blas_int* lwork, blas_int* info);
+  void coot_fortran(coot_sgeqlf)(const blas_int* m, const blas_int* n, float*  A, const blas_int* lda, float*  tau, float*  work, const blas_int* lwork, blas_int* info);
+  void coot_fortran(coot_dgeqlf)(const blas_int* m, const blas_int* n, double* A, const blas_int* lda, double* tau, double* work, const blas_int* lwork, blas_int* info);
 
   // multiply matrix C by orthogonal matrix Q, which came from gelqf
-  #if defined(COOT_USE_HIDDEN_FORTRAN_ARGS)
+  #if defined(COOT_USE_FORTRAN_HIDDEN_ARGS)
   void coot_fortran(coot_sormql)(const char* side, const char* trans, const blas_int* m, const blas_int* n, const blas_int* k, const float*  A, const blas_int* lda, const float*  tau, float*  C, const blas_int* ldc, float*  work, const blas_int* lwork, blas_int* info, blas_len side_len, blas_len trans_len);
   void coot_fortran(coot_dormql)(const char* side, const char* trans, const blas_int* m, const blas_int* n, const blas_int* k, const double* A, const blas_int* lda, const double* tau, double* C, const blas_int* ldc, double* work, const blas_int* lwork, blas_int* info, blas_len side_len, blas_len trans_len);
   #else
@@ -169,19 +165,29 @@ extern "C"
   #endif
 
   // check a decomposition of the form U S U^T
+  #if defined(COOT_USE_FORTRAN_HIDDEN_ARGS)
+  void coot_fortran(coot_ssyt21)(const blas_int* itype, const char* uplo, const blas_int* n, const blas_int* kband, const float*  A, const blas_int* lda, const float*  D, const float*  E, const float*  U, const blas_int* ldu, const float*  V, const blas_int* ldv, const float*  tau, float*  work, float*  result, blas_len uplo_len);
+  void coot_fortran(coot_dsyt21)(const blas_int* itype, const char* uplo, const blas_int* n, const blas_int* kband, const double* A, const blas_int* lda, const double* D, const double* E, const double* U, const blas_int* ldu, const double* V, const blas_int* ldv, const double* tau, double* work, double* result, blas_len uplo_len);
+  #else
   void coot_fortran(coot_ssyt21)(const blas_int* itype, const char* uplo, const blas_int* n, const blas_int* kband, const float*  A, const blas_int* lda, const float*  D, const float*  E, const float*  U, const blas_int* ldu, const float*  V, const blas_int* ldv, const float*  tau, float*  work, float*  result);
   void coot_fortran(coot_dsyt21)(const blas_int* itype, const char* uplo, const blas_int* n, const blas_int* kband, const double* A, const blas_int* lda, const double* D, const double* E, const double* U, const blas_int* ldu, const double* V, const blas_int* ldv, const double* tau, double* work, double* result);
+  #endif
 
   // check a decomposition of the form A U = U S
+  #if defined(COOT_USE_FORTRAN_HIDDEN_ARGS)
+  void coot_fortran(coot_ssyt22)(const blas_int* itype, const char* uplo, const blas_int* n, const blas_int* m, const blas_int* kband, const float*  A, const blas_int* lda, const float*  D, const float*  E, const float*  U, const blas_int* ldu, const float*  V, const blas_int* ldv, const float*  tau, float*  work, float*  result, blas_len uplo_len);
+  void coot_fortran(coot_dsyt22)(const blas_int* itype, const char* uplo, const blas_int* n, const blas_int* m, const blas_int* kband, const double* A, const blas_int* lda, const double* D, const double* E, const double* U, const blas_int* ldu, const double* V, const blas_int* ldv, const double* tau, double* work, double* result, blas_len uplo_len);
+  #else
   void coot_fortran(coot_ssyt22)(const blas_int* itype, const char* uplo, const blas_int* n, const blas_int* m, const blas_int* kband, const float*  A, const blas_int* lda, const float*  D, const float*  E, const float*  U, const blas_int* ldu, const float*  V, const blas_int* ldv, const float*  tau, float*  work, float*  result);
   void coot_fortran(coot_dsyt22)(const blas_int* itype, const char* uplo, const blas_int* n, const blas_int* m, const blas_int* kband, const double* A, const blas_int* lda, const double* D, const double* E, const double* U, const blas_int* ldu, const double* V, const blas_int* ldv, const double* tau, double* work, double* result);
+  #endif
 
   // SVD (real matrices)
   #if defined(COOT_USE_FORTRAN_HIDDEN_ARGS)
-  void coot_fortran(coot_sgesvd)(const char* jobu, const char* jobvt, const blas_int* m, const blas_int* n,   float*  a, const blas_int* lda, float*  s,   float*  u, const blas_int* ldu,   float*  vt, const blas_int* ldvt,   float*  work, blas_int* lwork,                blas_int* info, blas_len jobu_len, blas_len jobvt_len);
-  void coot_fortran(coot_dgesvd)(const char* jobu, const char* jobvt, const blas_int* m, const blas_int* n,   double* a, const blas_int* lda, double* s,   double* u, const blas_int* ldu,   double* vt, const blas_int* ldvt,   double* work, blas_int* lwork,                blas_int* info, blas_len jobu_len, blas_len jobvt_len);
-  void coot_fortran(coot_cgesvd)(const char* jobu, const char* jobvt, const blas_int* m, const blas_int* n, blas_cxf* a, const blas_int* lda, float*  s, blas_cxf* u, const blas_int* ldu, blas_cxf* vt, const blas_int* ldvt, blas_cxf* work, blas_int* lwork, float*  rwork, blas_int* info, blas_len jobu_len, blas_len jobvt_len);
-  void coot_fortran(coot_zgesvd)(const char* jobu, const char* jobvt, const blas_int* m, const blas_int* n, blas_cxd* a, const blas_int* lda, double* s, blas_cxd* u, const blas_int* ldu, blas_cxd* vt, const blas_int* ldvt, blas_cxd* work, blas_int* lwork, double* rwork, blas_int* info, blas_len jobu_len, blas_len jobvt_len);
+  void coot_fortran(coot_sgesvd)(const char* jobu, const char* jobvt, const blas_int* m, const blas_int* n,   float*  a, const blas_int* lda, float*  s,   float*  u, const blas_int* ldu,   float*  vt, const blas_int* ldvt,   float*  work, const blas_int* lwork,                blas_int* info, blas_len jobu_len, blas_len jobvt_len);
+  void coot_fortran(coot_dgesvd)(const char* jobu, const char* jobvt, const blas_int* m, const blas_int* n,   double* a, const blas_int* lda, double* s,   double* u, const blas_int* ldu,   double* vt, const blas_int* ldvt,   double* work, const blas_int* lwork,                blas_int* info, blas_len jobu_len, blas_len jobvt_len);
+  void coot_fortran(coot_cgesvd)(const char* jobu, const char* jobvt, const blas_int* m, const blas_int* n, blas_cxf* a, const blas_int* lda, float*  s, blas_cxf* u, const blas_int* ldu, blas_cxf* vt, const blas_int* ldvt, blas_cxf* work, const blas_int* lwork, float*  rwork, blas_int* info, blas_len jobu_len, blas_len jobvt_len);
+  void coot_fortran(coot_zgesvd)(const char* jobu, const char* jobvt, const blas_int* m, const blas_int* n, blas_cxd* a, const blas_int* lda, double* s, blas_cxd* u, const blas_int* ldu, blas_cxd* vt, const blas_int* ldvt, blas_cxd* work, const blas_int* lwork, double* rwork, blas_int* info, blas_len jobu_len, blas_len jobvt_len);
   #else
   void coot_fortran(coot_sgesvd)(const char* jobu, const char* jobvt, const blas_int* m, const blas_int* n,   float*  a, const blas_int* lda, float*  s,   float*  u, const blas_int* ldu,   float*  vt, const blas_int* ldvt,   float*  work, const blas_int* lwork,                blas_int* info);
   void coot_fortran(coot_dgesvd)(const char* jobu, const char* jobvt, const blas_int* m, const blas_int* n,   double* a, const blas_int* lda, double* s,   double* u, const blas_int* ldu,   double* vt, const blas_int* ldvt,   double* work, const blas_int* lwork,                blas_int* info);
@@ -191,28 +197,28 @@ extern "C"
 
   // symmetric 1-norm
   #if defined(COOT_USE_FORTRAN_HIDDEN_ARGS)
-  float  coot_fortran(coot_slansy)(const char* norm, const char* uplo, const blas_int* N,   float*  A, const blas_int* lda, float*  work, blas_len norm_len, blas_len uplo_len);
-  double coot_fortran(coot_dlansy)(const char* norm, const char* uplo, const blas_int* N,   double* A, const blas_int* lda, double* work, blas_len norm_len, blas_len uplo_len);
-  float  coot_fortran(coot_clansy)(const char* norm, const char* uplo, const blas_int* N, blas_cxf* A, const blas_int* lda, float*  work, blas_len norm_len, blas_len uplo_len);
-  double coot_fortran(coot_zlansy)(const char* norm, const char* uplo, const blas_int* N, blas_cxd* A, const blas_int* lda, double* work, blas_len norm_len, blas_len uplo_len);
+  float  coot_fortran(coot_slansy)(const char* norm, const char* uplo, const blas_int* N,   const float*  A, const blas_int* lda, float*  work, blas_len norm_len, blas_len uplo_len);
+  double coot_fortran(coot_dlansy)(const char* norm, const char* uplo, const blas_int* N,   const double* A, const blas_int* lda, double* work, blas_len norm_len, blas_len uplo_len);
+  float  coot_fortran(coot_clansy)(const char* norm, const char* uplo, const blas_int* N, const blas_cxf* A, const blas_int* lda, float*  work, blas_len norm_len, blas_len uplo_len);
+  double coot_fortran(coot_zlansy)(const char* norm, const char* uplo, const blas_int* N, const blas_cxd* A, const blas_int* lda, double* work, blas_len norm_len, blas_len uplo_len);
   #else
-  float  coot_fortran(coot_slansy)(const char* norm, const char* uplo, const blas_int* N,   float*  A, const blas_int* lda, float*  work);
-  double coot_fortran(coot_dlansy)(const char* norm, const char* uplo, const blas_int* N,   double* A, const blas_int* lda, double* work);
-  float  coot_fortran(coot_clansy)(const char* norm, const char* uplo, const blas_int* N, blas_cxf* A, const blas_int* lda, float*  work);
-  double coot_fortran(coot_zlansy)(const char* norm, const char* uplo, const blas_int* N, blas_cxd* A, const blas_int* lda, double* work);
+  float  coot_fortran(coot_slansy)(const char* norm, const char* uplo, const blas_int* N,   const float*  A, const blas_int* lda, float*  work);
+  double coot_fortran(coot_dlansy)(const char* norm, const char* uplo, const blas_int* N,  const double* A, const blas_int* lda, double* work);
+  float  coot_fortran(coot_clansy)(const char* norm, const char* uplo, const blas_int* N, const blas_cxf* A, const blas_int* lda, float*  work);
+  double coot_fortran(coot_zlansy)(const char* norm, const char* uplo, const blas_int* N, const blas_cxd* A, const blas_int* lda, double* work);
   #endif
 
   // solve linear equations using LU decomposition
   #if defined(COOT_USE_FORTRAN_HIDDEN_ARGS)
-  void coot_fortran(coot_sgetrs)(const char* trans, const blas_int* n, const blas_int* nrhs, float*    a, const blas_int* lda, const blas_int* ipiv, float*    b, const blas_int* ldb, blas_int* info, blas_len trans_len);
-  void coot_fortran(coot_dgetrs)(const char* trans, const blas_int* n, const blas_int* nrhs, double*   a, const blas_int* lda, const blas_int* ipiv, double*   b, const blas_int* ldb, blas_int* info, blas_len trans_len);
-  void coot_fortran(coot_cgetrs)(const char* trans, const blas_int* n, const blas_int* nrhs, blas_cxf* a, const blas_int* lda, const blas_int* ipiv, blas_cxf* b, const blas_int* ldb, blas_int* info, blas_len trans_len);
-  void coot_fortran(coot_zgetrs)(const char* trans, const blas_int* n, const blas_int* nrhs, blas_cxd* a, const blas_int* lda, const blas_int* ipiv, blas_cxd* b, const blas_int* ldb, blas_int* info, blas_len trans_len);
+  void coot_fortran(coot_sgetrs)(const char* trans, const blas_int* n, const blas_int* nrhs, const float*    a, const blas_int* lda, const blas_int* ipiv, float*    b, const blas_int* ldb, blas_int* info, blas_len trans_len);
+  void coot_fortran(coot_dgetrs)(const char* trans, const blas_int* n, const blas_int* nrhs, const double*   a, const blas_int* lda, const blas_int* ipiv, double*   b, const blas_int* ldb, blas_int* info, blas_len trans_len);
+  void coot_fortran(coot_cgetrs)(const char* trans, const blas_int* n, const blas_int* nrhs, const blas_cxf* a, const blas_int* lda, const blas_int* ipiv, blas_cxf* b, const blas_int* ldb, blas_int* info, blas_len trans_len);
+  void coot_fortran(coot_zgetrs)(const char* trans, const blas_int* n, const blas_int* nrhs, const blas_cxd* a, const blas_int* lda, const blas_int* ipiv, blas_cxd* b, const blas_int* ldb, blas_int* info, blas_len trans_len);
   #else
-  void coot_fortran(coot_sgetrs)(const char* trans, const blas_int* n, const blas_int* nrhs, float*    a, const blas_int* lda, const blas_int* ipiv, float*    b, const blas_int* ldb, blas_int* info);
-  void coot_fortran(coot_dgetrs)(const char* trans, const blas_int* n, const blas_int* nrhs, double*   a, const blas_int* lda, const blas_int* ipiv, double*   b, const blas_int* ldb, blas_int* info);
-  void coot_fortran(coot_cgetrs)(const char* trans, const blas_int* n, const blas_int* nrhs, blas_cxf* a, const blas_int* lda, const blas_int* ipiv, blas_cxf* b, const blas_int* ldb, blas_int* info);
-  void coot_fortran(coot_zgetrs)(const char* trans, const blas_int* n, const blas_int* nrhs, blas_cxd* a, const blas_int* lda, const blas_int* ipiv, blas_cxd* b, const blas_int* ldb, blas_int* info);
+  void coot_fortran(coot_sgetrs)(const char* trans, const blas_int* n, const blas_int* nrhs, const float*    a, const blas_int* lda, const blas_int* ipiv, float*    b, const blas_int* ldb, blas_int* info);
+  void coot_fortran(coot_dgetrs)(const char* trans, const blas_int* n, const blas_int* nrhs, const double*   a, const blas_int* lda, const blas_int* ipiv, double*   b, const blas_int* ldb, blas_int* info);
+  void coot_fortran(coot_cgetrs)(const char* trans, const blas_int* n, const blas_int* nrhs, const blas_cxf* a, const blas_int* lda, const blas_int* ipiv, blas_cxf* b, const blas_int* ldb, blas_int* info);
+  void coot_fortran(coot_zgetrs)(const char* trans, const blas_int* n, const blas_int* nrhs, const blas_cxd* a, const blas_int* lda, const blas_int* ipiv, blas_cxd* b, const blas_int* ldb, blas_int* info);
   #endif
 
   // generate a vector of random numbers
@@ -239,15 +245,6 @@ extern "C"
   #else
   void coot_fortran(coot_sormqr)(const char* side, const char* trans, const blas_int* m, const blas_int* n, const blas_int* k, const float*  A, const blas_int* lda, const float*  tau, float*  C, const blas_int* ldc, float*  work, const blas_int* lwork, blas_int* info);
   void coot_fortran(coot_dormqr)(const char* side, const char* trans, const blas_int* m, const blas_int* n, const blas_int* k, const double* A, const blas_int* lda, const double* tau, double* C, const blas_int* ldc, double* work, const blas_int* lwork, blas_int* info);
-  #endif
-
-  // overwrite matrix with gelqf-generated orthogonal matrix
-  #if defined(COOT_USE_FORTRAN_HIDDEN_ARGS)
-  void coot_fortran(coot_sormlq)(const char* side, const char* trans, const blas_int* m, const blas_int* n, const blas_int* k, const float*  A, const blas_int* lda, const float*  tau, float*  C, const blas_int* ldc, float*  work, const blas_int* lwork, blas_int* info, blas_len side_len, blas_len trans_len);
-  void coot_fortran(coot_dormlq)(const char* side, const char* trans, const blas_int* m, const blas_int* n, const blas_int* k, const double* A, const blas_int* lda, const double* tau, double* C, const blas_int* ldc, double* work, const blas_int* lwork, blas_int* info, blas_len side_len, blas_len trans_len);
-  #else
-  void coot_fortran(coot_sormlq)(const char* side, const char* trans, const blas_int* m, const blas_int* n, const blas_int* k, const float*  A, const blas_int* lda, const float*  tau, float*  C, const blas_int* ldc, float*  work, const blas_int* lwork, blas_int* info);
-  void coot_fortran(coot_dormlq)(const char* side, const char* trans, const blas_int* m, const blas_int* n, const blas_int* k, const double* A, const blas_int* lda, const double* tau, double* C, const blas_int* ldc, double* work, const blas_int* lwork, blas_int* info);
   #endif
 
   // overwrite matrix with gebrd-generated orthogonal matrix products

@@ -47,9 +47,11 @@
 //  (including negligence or otherwise) arising in any way out of the use
 //  of this software, even if advised of the possibility of such damage.
 
+#include <armadillo>
 #include <bandicoot>
 #include "../catch.hpp"
 #include "def_lapack_test.hpp"
+#include "translate_lapack_test.hpp"
 
 using namespace coot;
 
@@ -60,6 +62,11 @@ using namespace coot;
 TEST_CASE("magma_dsyevd_1", "[syevd]")
   {
   if (get_rt().backend != CL_BACKEND)
+    {
+    return;
+    }
+
+  if (!coot_rt_t::is_supported_type<double>())
     {
     return;
     }
@@ -75,10 +82,10 @@ TEST_CASE("magma_dsyevd_1", "[syevd]")
   double *w1, *w2, result[4]={0, 0, 0, 0}, eps, runused[1];
   magma_int_t *iwork, aux_iwork[1];
   magma_int_t N, Nfound, info, lwork, liwork, lda, ldda;
-  eps = coot_fortran(coot_dlamch)("E");
+  eps = lapack::lamch<double>('E');
 
-  double tol    = 30 * coot_fortran(coot_dlamch)("E");
-  double tolulp = 30 * coot_fortran(coot_dlamch)("P");
+  double tol    = 30 * lapack::lamch<double>('E');
+  double tolulp = 30 * lapack::lamch<double>('P');
 
   magma_queue_t queue = magma_queue_create();
 
@@ -118,8 +125,8 @@ TEST_CASE("magma_dsyevd_1", "[syevd]")
         REQUIRE( magma_dmalloc( &d_R,    N*ldda ) == MAGMA_SUCCESS );
 
         /* Clear eigenvalues, for |S-S_magma| check when fraction < 1. */
-        coot_fortran(coot_dlaset)( "F", &N, &ione, &d_zero, &d_zero, w1, &N );
-        coot_fortran(coot_dlaset)( "F", &N, &ione, &d_zero, &d_zero, w2, &N );
+        lapack::laset('F', N, ione, d_zero, d_zero, w1, N);
+        lapack::laset('F', N, ione, d_zero, d_zero, w2, N);
 
         /* Initialize the matrix */
         // We use a random symmetric matrix.
@@ -161,23 +168,23 @@ TEST_CASE("magma_dsyevd_1", "[syevd]")
           // e is unused since kband=0; tau is unused since itype=1
           if( Nfound == N )
             {
-            coot_fortran(coot_dsyt21)( &ione, lapack_uplo_const(uplos[iuplo]), &N, &izero,
-                                       h_A, &lda,
-                                       w1, runused,
-                                       h_R, &lda,
-                                       h_R, &lda,
-                                       unused, work,
-                                       &result[0] );
+            lapack_test::syt21(ione, lapack_uplo_const(uplos[iuplo])[0], N, izero,
+                               h_A, lda,
+                               w1, runused,
+                               h_R, lda,
+                               h_R, lda,
+                               unused, work,
+                               &result[0]);
             }
           else
             {
-            coot_fortran(coot_dsyt22)( &ione, lapack_uplo_const(uplos[iuplo]), &N, &Nfound, &izero,
-                                       h_A, &lda,
-                                       w1, runused,
-                                       h_R, &lda,
-                                       h_R, &lda,
-                                       unused, work,
-                                       &result[0] );
+            lapack_test::syt22(ione, lapack_uplo_const(uplos[iuplo])[0], N, Nfound, izero,
+                               h_A, lda,
+                               w1, runused,
+                               h_R, lda,
+                               h_R, lda,
+                               unused, work,
+                               &result[0]);
             }
           result[0] *= eps;
           result[1] *= eps;
@@ -189,11 +196,11 @@ TEST_CASE("magma_dsyevd_1", "[syevd]")
         /* =====================================================================
            Performs operation using LAPACK
            =================================================================== */
-        coot_fortran(coot_dsyevd)( lapack_vec_const(jobzs[ijob]), lapack_uplo_const(uplos[iuplo]),
-                                   &N, h_A, &lda, w2,
-                                   h_work, &lwork,
-                                   iwork, &liwork,
-                                   &info );
+        lapack::syevd(lapack_vec_const(jobzs[ijob])[0], lapack_uplo_const(uplos[iuplo])[0],
+                      N, h_A, lda, w2,
+                      h_work, lwork,
+                      iwork, liwork,
+                      &info);
         if (info != 0)
           {
           std::cerr << "LAPACK dsyevd returned error " << info << ": " << magma::error_as_string(info) << std::endl;
@@ -249,10 +256,10 @@ TEST_CASE("magma_ssyevd_1", "[syevd]")
   float *w1, *w2, result[4]={0, 0, 0, 0}, eps, runused[1];
   magma_int_t *iwork, aux_iwork[1];
   magma_int_t N, Nfound, info, lwork, liwork, lda, ldda;
-  eps = coot_fortran(coot_slamch)("E");
+  eps = lapack::lamch<float>('E');
 
-  float tol    = 30 * coot_fortran(coot_slamch)("E");
-  float tolulp = 30 * coot_fortran(coot_slamch)("P");
+  float tol    = 30 * lapack::lamch<float>('E');
+  float tolulp = 30 * lapack::lamch<float>('P');
 
   magma_queue_t queue = magma_queue_create();
 
@@ -292,8 +299,8 @@ TEST_CASE("magma_ssyevd_1", "[syevd]")
         REQUIRE( magma_smalloc( &d_R,    N*ldda ) == MAGMA_SUCCESS );
 
         /* Clear eigenvalues, for |S-S_magma| check when fraction < 1. */
-        coot_fortran(coot_slaset)( "F", &N, &ione, &s_zero, &s_zero, w1, &N );
-        coot_fortran(coot_slaset)( "F", &N, &ione, &s_zero, &s_zero, w2, &N );
+        lapack::laset('F', N, ione, s_zero, s_zero, w1, N);
+        lapack::laset('F', N, ione, s_zero, s_zero, w2, N);
 
         /* Initialize the matrix */
         // We use a random symmetric matrix.
@@ -335,23 +342,23 @@ TEST_CASE("magma_ssyevd_1", "[syevd]")
           // e is unused since kband=0; tau is unused since itype=1
           if( Nfound == N )
             {
-            coot_fortran(coot_ssyt21)( &ione, lapack_uplo_const(uplos[iuplo]), &N, &izero,
-                                       h_A, &lda,
-                                       w1, runused,
-                                       h_R, &lda,
-                                       h_R, &lda,
-                                       unused, work,
-                                       &result[0] );
+            lapack_test::syt21(ione, lapack_uplo_const(uplos[iuplo])[0], N, izero,
+                                h_A, lda,
+                                w1, runused,
+                                h_R, lda,
+                                h_R, lda,
+                                unused, work,
+                                &result[0]);
             }
           else
             {
-            coot_fortran(coot_ssyt22)( &ione, lapack_uplo_const(uplos[iuplo]), &N, &Nfound, &izero,
-                                       h_A, &lda,
-                                       w1, runused,
-                                       h_R, &lda,
-                                       h_R, &lda,
-                                       unused, work,
-                                       &result[0] );
+            lapack_test::syt22(ione, lapack_uplo_const(uplos[iuplo])[0], N, Nfound, izero,
+                               h_A, lda,
+                               w1, runused,
+                               h_R, lda,
+                               h_R, lda,
+                               unused, work,
+                               &result[0]);
             }
           result[0] *= eps;
           result[1] *= eps;
@@ -363,11 +370,11 @@ TEST_CASE("magma_ssyevd_1", "[syevd]")
         /* =====================================================================
            Performs operation using LAPACK
            =================================================================== */
-        coot_fortran(coot_ssyevd)( lapack_vec_const(jobzs[ijob]), lapack_uplo_const(uplos[iuplo]),
-                                   &N, h_A, &lda, w2,
-                                   h_work, &lwork,
-                                   iwork, &liwork,
-                                   &info );
+        lapack::syevd(lapack_vec_const(jobzs[ijob])[0], lapack_uplo_const(uplos[iuplo])[0],
+                      N, h_A, lda, w2,
+                      h_work, lwork,
+                      iwork, liwork,
+                      &info);
         if (info != 0)
           {
           std::cerr << "LAPACK ssyevd returned error " << info << ": " << magma::error_as_string(info) << std::endl;
@@ -377,9 +384,9 @@ TEST_CASE("magma_ssyevd_1", "[syevd]")
         float maxw=0, diff=0;
         for( int j=0; j < Nfound; j++ )
           {
-          maxw = std::max(maxw, fabs(w1[j]));
-          maxw = std::max(maxw, fabs(w2[j]));
-          diff = std::max(diff, fabs(w1[j] - w2[j]));
+          maxw = std::max(maxw, std::abs(w1[j]));
+          maxw = std::max(maxw, std::abs(w2[j]));
+          diff = std::max(diff, std::abs(w1[j] - w2[j]));
           }
         result[3] = diff / (N*maxw);
 

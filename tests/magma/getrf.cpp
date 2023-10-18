@@ -47,9 +47,11 @@
 //  (including negligence or otherwise) arising in any way out of the use
 //  of this software, even if advised of the possibility of such damage.
 
+#include <armadillo>
 #include <bandicoot>
 #include "../catch.hpp"
 #include "def_lapack_test.hpp"
+#include "translate_lapack_test.hpp"
 
 using namespace coot;
 
@@ -85,20 +87,20 @@ double get_residual_d
   b_alias = x_alias;
 
   // solve Ax = b
-  coot_fortran(coot_dgetrs)( "N", &n, (blas_int*) &ione, A, &lda, ipiv, x, &n, &info );
+  lapack_test::getrs('N', n, ione, A, lda, ipiv, x, n, &info);
   if (info != 0)
     {
     std::cerr << "LAPACK dgetrs() returned error " << info << ": " << magma::error_as_string(info) << std::endl;
     }
 
   // compute r = Ax - b, saved in b
-  coot_fortran(coot_dgemv)( "N", &m, &n, &c_one, A_orig, &lda, x, &ione, &c_neg_one, b, &ione );
+  blas::gemv('N', m, n, c_one, A_orig, lda, x, ione, c_neg_one, b, ione);
 
   // compute residual |Ax - b| / (n*|A|*|x|)
   double norm_x, norm_A, norm_r, work[1];
-  norm_A = coot_fortran(coot_dlange)( "F", &m, &n, A_orig, &lda, work );
-  norm_r = coot_fortran(coot_dlange)( "F", &n, (blas_int*) &ione, b, &n, work );
-  norm_x = coot_fortran(coot_dlange)( "F", &n, (blas_int*) &ione, x, &n, work );
+  norm_A = lapack::lange('F', m, n,    A_orig, lda, work);
+  norm_r = lapack::lange('F', n, ione, b,      n, work);
+  norm_x = lapack::lange('F', n, ione, x,      n, work);
 
   magma_free_cpu( x );
   magma_free_cpu( b );
@@ -135,20 +137,20 @@ float get_residual_s
   b_alias = x_alias;
 
   // solve Ax = b
-  coot_fortran(coot_sgetrs)( "N", &n, (blas_int*) &ione, A, &lda, ipiv, x, &n, &info );
+  lapack_test::getrs('N', n, ione, A, lda, ipiv, x, n, &info);
   if (info != 0)
     {
     std::cerr << "LAPACK sgetrs() returned error " << info << ": " << magma::error_as_string(info) << std::endl;
     }
 
   // compute r = Ax - b, saved in b
-  coot_fortran(coot_sgemv)( "N", &m, &n, &c_one, A_orig, &lda, x, &ione, &c_neg_one, b, &ione );
+  blas::gemv('N', m, n, c_one, A_orig, lda, x, ione, c_neg_one, b, ione);
 
   // compute residual |Ax - b| / (n*|A|*|x|)
   float norm_x, norm_A, norm_r, work[1];
-  norm_A = coot_fortran(coot_slange)( "F", &m, &n, A_orig, &lda, work );
-  norm_r = coot_fortran(coot_slange)( "F", &n, (blas_int*) &ione, b, &n, work );
-  norm_x = coot_fortran(coot_slange)( "F", &n, (blas_int*) &ione, x, &n, work );
+  norm_A = lapack::lange('F', m, n,    A_orig, lda, work);
+  norm_r = lapack::lange('F', n, ione, b,      n, work);
+  norm_x = lapack::lange('F', n, ione, x,      n, work);
 
   magma_free_cpu( x );
   magma_free_cpu( b );
@@ -185,20 +187,20 @@ double get_LU_error_d
   memset( U, 0, min_mn*N*sizeof(double) );
 
   // permute original matrix
-  coot_fortran(coot_dlaswp)( &N, A, &lda, &ione, &min_mn, ipiv, &ione);
+  lapack::laswp(N, A, lda, ione, min_mn, ipiv, ione);
 
   // copy LU to L and U, and set diagonal to 1
-  coot_fortran(coot_dlacpy)( MagmaLowerStr, &M, &min_mn, LU, &lda, L, &M      );
-  coot_fortran(coot_dlacpy)( MagmaUpperStr, &min_mn, &N, LU, &lda, U, &min_mn );
+  lapack::lacpy(MagmaLowerStr[0], M,      min_mn, LU, lda, L, M     );
+  lapack::lacpy(MagmaUpperStr[0], min_mn, N,      LU, lda, U, min_mn);
   for (j=0; j < min_mn; j++)
     {
     L[j+j*M] = (double) 1.0;
     }
 
-  matnorm = coot_fortran(coot_dlange)("f", &M, &N, A, &lda, work);
+  matnorm = lapack::lange('F', M, N, A, lda, work);
 
-  coot_fortran(coot_dgemm)("N", "N", &M, &N, &min_mn,
-                           &alpha, L, &M, U, &min_mn, &beta, LU, &lda);
+  blas::gemm('N', 'N', M, N, min_mn,
+             alpha, L, M, U, min_mn, beta, LU, lda);
 
   for( j = 0; j < N; j++ )
     {
@@ -207,7 +209,7 @@ double get_LU_error_d
       LU[i+j*lda] = (LU[i+j*lda] - A[i+j*lda]);
       }
     }
-  residual = coot_fortran(coot_dlange)("f", &M, &N, LU, &lda, work);
+  residual = lapack::lange('F', M, N, LU, lda, work);
 
   magma_free_cpu(L);
   magma_free_cpu(U);
@@ -239,20 +241,20 @@ float get_LU_error_s
   memset( U, 0, min_mn*N*sizeof(float) );
 
   // permute original matrix
-  coot_fortran(coot_slaswp)( &N, A, &lda, &ione, &min_mn, ipiv, &ione);
+  lapack::laswp(N, A, lda, ione, min_mn, ipiv, ione);
 
   // copy LU to L and U, and set diagonal to 1
-  coot_fortran(coot_slacpy)( MagmaLowerStr, &M, &min_mn, LU, &lda, L, &M      );
-  coot_fortran(coot_slacpy)( MagmaUpperStr, &min_mn, &N, LU, &lda, U, &min_mn );
+  lapack::lacpy(MagmaLowerStr[0], M,      min_mn, LU, lda, L, M     );
+  lapack::lacpy(MagmaUpperStr[0], min_mn, N,      LU, lda, U, min_mn);
   for (j=0; j < min_mn; j++)
     {
     L[j+j*M] = (float) 1.0;
     }
 
-  matnorm = coot_fortran(coot_slange)("f", &M, &N, A, &lda, work);
+  matnorm = lapack::lange('F', M, N, A, lda, work);
 
-  coot_fortran(coot_sgemm)("N", "N", &M, &N, &min_mn,
-                           &alpha, L, &M, U, &min_mn, &beta, LU, &lda);
+  blas::gemm('N', 'N', M, N, min_mn,
+             alpha, L, M, U, min_mn, beta, LU, lda);
 
   for( j = 0; j < N; j++ )
     {
@@ -261,7 +263,7 @@ float get_LU_error_s
       LU[i+j*lda] = (LU[i+j*lda] - A[i+j*lda]);
       }
     }
-  residual = coot_fortran(coot_slange)("f", &M, &N, LU, &lda, work);
+  residual = lapack::lange('F', M, N, LU, lda, work);
 
   magma_free_cpu(L);
   magma_free_cpu(U);
@@ -274,6 +276,11 @@ float get_LU_error_s
 TEST_CASE("magma_dgetrf", "[getrf]")
   {
   if (get_rt().backend != CL_BACKEND)
+    {
+    return;
+    }
+
+  if (!coot_rt_t::is_supported_type<double>())
     {
     return;
     }
@@ -307,7 +314,7 @@ TEST_CASE("magma_dgetrf", "[getrf]")
     arma::Mat<double> h_A_alias(h_A, lda, N, false, true);
     h_A_alias.randu();
     // Save an original copy.
-    coot_fortran(coot_dlacpy)( "A", &M, &N, h_A, &lda, h_A_orig, &lda );
+    lapack::lacpy('A', M, N, h_A, lda, h_A_orig, lda);
 
     magma_dsetmatrix( M, N, h_A, lda, d_A, 0, ldda, queue );
 
@@ -317,78 +324,6 @@ TEST_CASE("magma_dgetrf", "[getrf]")
       std::cerr << "magma_dgetrf_gpu() returned error " << info << ": " << magma::error_as_string(info) << std::endl;
       }
     REQUIRE( info == 0 );
-
-    magma_dgetmatrix( M, N, d_A, 0, ldda, h_A, lda, queue );
-    error = get_residual_d( M, N, h_A, h_A_orig, lda, ipiv );
-    REQUIRE( error < tol );
-
-    error = get_LU_error_d( M, N, h_A, h_A_orig, lda, ipiv );
-    REQUIRE( error < tol );
-
-    magma_free_cpu( ipiv );
-    magma_free_cpu( h_A );
-    magma_free( d_A );
-
-    }
-
-  magma_queue_destroy( queue );
-  }
-
-
-
-TEST_CASE("magma_dgetrf_nopiv", "[getrf]")
-  {
-  if (get_rt().backend != CL_BACKEND)
-    {
-    return;
-    }
-
-  double error;
-  double* h_A;
-  double* h_A_orig;
-  magmaDouble_ptr d_A;
-  magma_int_t     *ipiv;
-  magma_int_t M, N, n2, lda, ldda, info, min_mn;
-
-  // seems to need a much wider tolerance
-  double tol = 30000 * std::numeric_limits<double>::epsilon();
-
-  magma_queue_t queue = magma_queue_create();
-
-  for (int itest = 0; itest < 10; ++itest)
-    {
-    M = 128 * (itest + 1) + 64;
-    N = 128 * (itest + 1) + 64;
-    min_mn = std::min(M, N);
-    lda    = M;
-    n2     = lda*N;
-    ldda   = magma_roundup( M, 32 );  // multiple of 32 by default
-
-    REQUIRE( magma_imalloc_cpu( &ipiv,     min_mn   ) == MAGMA_SUCCESS );
-    REQUIRE( magma_dmalloc_cpu( &h_A,      n2       ) == MAGMA_SUCCESS );
-    REQUIRE( magma_dmalloc_cpu( &h_A_orig, n2       ) == MAGMA_SUCCESS );
-    REQUIRE( magma_dmalloc(     &d_A,      ldda * N ) == MAGMA_SUCCESS );
-
-    // The default test uses a random matrix, so we'll do the same here via Armadillo.
-    arma::Mat<double> h_A_alias(h_A, lda, N, false, true);
-    h_A_alias.randu();
-    // Save an original copy.
-    coot_fortran(coot_dlacpy)( "A", &M, &N, h_A, &lda, h_A_orig, &lda );
-
-    magma_dsetmatrix( M, N, h_A, lda, d_A, 0, ldda, queue );
-
-    magma_dgetrf_nopiv_gpu( M, N, d_A, 0, ldda, &info);
-    if (info != 0)
-      {
-      std::cerr << "magma_dgetrf_gpu() returned error " << info << ": " << magma::error_as_string(info) << std::endl;
-      }
-    REQUIRE( info == 0 );
-
-    // Set pivots to identity so we can use the same check functions.
-    for (magma_int_t i = 0; i < min_mn; ++i)
-      {
-      ipiv[i] = i + 1;
-      }
 
     magma_dgetmatrix( M, N, d_A, 0, ldda, h_A, lda, queue );
     error = get_residual_d( M, N, h_A, h_A_orig, lda, ipiv );
@@ -444,7 +379,7 @@ TEST_CASE("magma_sgetrf", "[getrf]")
     arma::Mat<float> h_A_alias(h_A, lda, N, false, true);
     h_A_alias.randu();
     // Save an original copy.
-    coot_fortran(coot_slacpy)( "A", &M, &N, h_A, &lda, h_A_orig, &lda );
+    lapack::lacpy('A', M, N, h_A, lda, h_A_orig, lda);
 
     magma_ssetmatrix( M, N, h_A, lda, d_A, 0, ldda, queue );
 
@@ -473,81 +408,14 @@ TEST_CASE("magma_sgetrf", "[getrf]")
 
 
 
-TEST_CASE("magma_sgetrf_nopiv", "[getrf]")
+TEST_CASE("magma_dgetrf_small", "[getrf]")
   {
   if (get_rt().backend != CL_BACKEND)
     {
     return;
     }
 
-  float error;
-  float* h_A;
-  float* h_A_orig;
-  magmaFloat_ptr d_A;
-  magma_int_t     *ipiv;
-  magma_int_t M, N, n2, lda, ldda, info, min_mn;
-
-  // seems to need a much wider tolerance
-  float tol = 30000 * std::numeric_limits<float>::epsilon();
-
-  magma_queue_t queue = magma_queue_create();
-
-  for (int itest = 0; itest < 10; ++itest)
-    {
-    M = 128 * (itest + 1) + 64;
-    N = 128 * (itest + 1) + 64;
-    min_mn = std::min(M, N);
-    lda    = M;
-    n2     = lda*N;
-    ldda   = magma_roundup( M, 32 );  // multiple of 32 by default
-
-    REQUIRE( magma_imalloc_cpu( &ipiv,     min_mn   ) == MAGMA_SUCCESS );
-    REQUIRE( magma_smalloc_cpu( &h_A,      n2       ) == MAGMA_SUCCESS );
-    REQUIRE( magma_smalloc_cpu( &h_A_orig, n2       ) == MAGMA_SUCCESS );
-    REQUIRE( magma_smalloc(     &d_A,      ldda * N ) == MAGMA_SUCCESS );
-
-    // The default test uses a random matrix, so we'll do the same here via Armadillo.
-    arma::Mat<float> h_A_alias(h_A, lda, N, false, true);
-    h_A_alias.randu();
-    // Save an original copy.
-    coot_fortran(coot_slacpy)( "A", &M, &N, h_A, &lda, h_A_orig, &lda );
-
-    magma_ssetmatrix( M, N, h_A, lda, d_A, 0, ldda, queue );
-
-    magma_sgetrf_nopiv_gpu( M, N, d_A, 0, ldda, &info);
-    if (info != 0)
-      {
-      std::cerr << "magma_sgetrf_gpu() returned error " << info << ": " << magma::error_as_string(info) << std::endl;
-      }
-    REQUIRE( info == 0 );
-
-    // Set pivots to identity so we can use the same check functions.
-    for (magma_int_t i = 0; i < min_mn; ++i)
-      {
-      ipiv[i] = i + 1;
-      }
-
-    magma_sgetmatrix( M, N, d_A, 0, ldda, h_A, lda, queue );
-    error = get_residual_s( M, N, h_A, h_A_orig, lda, ipiv );
-    REQUIRE( error < tol );
-
-    error = get_LU_error_s( M, N, h_A, h_A_orig, lda, ipiv );
-    REQUIRE( error < tol );
-
-    magma_free_cpu( ipiv );
-    magma_free_cpu( h_A );
-    magma_free( d_A );
-
-    }
-
-  magma_queue_destroy( queue );
-  }
-
-
-
-TEST_CASE("magma_dgetrf_small", "[getrf]")
-  {
-  if (get_rt().backend != CL_BACKEND)
+  if (!coot_rt_t::is_supported_type<double>())
     {
     return;
     }
@@ -581,7 +449,7 @@ TEST_CASE("magma_dgetrf_small", "[getrf]")
     arma::Mat<double> h_A_alias(h_A, lda, N, false, true);
     h_A_alias.randu();
     // Save an original copy.
-    coot_fortran(coot_dlacpy)( "A", &M, &N, h_A, &lda, h_A_orig, &lda );
+    lapack::lacpy('A', M, N, h_A, lda, h_A_orig, lda);
 
     magma_dsetmatrix( M, N, h_A, lda, d_A, 0, ldda, queue );
 
@@ -591,78 +459,6 @@ TEST_CASE("magma_dgetrf_small", "[getrf]")
       std::cerr << "magma_dgetrf_gpu() returned error " << info << ": " << magma::error_as_string(info) << std::endl;
       }
     REQUIRE( info == 0 );
-
-    magma_dgetmatrix( M, N, d_A, 0, ldda, h_A, lda, queue );
-    error = get_residual_d( M, N, h_A, h_A_orig, lda, ipiv );
-    REQUIRE( error < tol );
-
-    error = get_LU_error_d( M, N, h_A, h_A_orig, lda, ipiv );
-    REQUIRE( error < tol );
-
-    magma_free_cpu( ipiv );
-    magma_free_cpu( h_A );
-    magma_free( d_A );
-
-    }
-
-  magma_queue_destroy( queue );
-  }
-
-
-
-TEST_CASE("magma_dgetrf_nopiv_small", "[getrf]")
-  {
-  if (get_rt().backend != CL_BACKEND)
-    {
-    return;
-    }
-
-  double error;
-  double* h_A;
-  double* h_A_orig;
-  magmaDouble_ptr d_A;
-  magma_int_t     *ipiv;
-  magma_int_t M, N, n2, lda, ldda, info, min_mn;
-
-  // seems to need a much wider tolerance
-  double tol = 30000 * std::numeric_limits<double>::epsilon();
-
-  magma_queue_t queue = magma_queue_create();
-
-  for (int itest = 0; itest < 10; ++itest)
-    {
-    M = 4 * (itest + 1) + 4;
-    N = 4 * (itest + 1) + 4;
-    min_mn = std::min(M, N);
-    lda    = M;
-    n2     = lda*N;
-    ldda   = magma_roundup( M, 32 );  // multiple of 32 by default
-
-    REQUIRE( magma_imalloc_cpu( &ipiv,     min_mn   ) == MAGMA_SUCCESS );
-    REQUIRE( magma_dmalloc_cpu( &h_A,      n2       ) == MAGMA_SUCCESS );
-    REQUIRE( magma_dmalloc_cpu( &h_A_orig, n2       ) == MAGMA_SUCCESS );
-    REQUIRE( magma_dmalloc(     &d_A,      ldda * N ) == MAGMA_SUCCESS );
-
-    // The default test uses a random matrix, so we'll do the same here via Armadillo.
-    arma::Mat<double> h_A_alias(h_A, lda, N, false, true);
-    h_A_alias.randu();
-    // Save an original copy.
-    coot_fortran(coot_dlacpy)( "A", &M, &N, h_A, &lda, h_A_orig, &lda );
-
-    magma_dsetmatrix( M, N, h_A, lda, d_A, 0, ldda, queue );
-
-    magma_dgetrf_nopiv_gpu( M, N, d_A, 0, ldda, &info);
-    if (info != 0)
-      {
-      std::cerr << "magma_dgetrf_gpu() returned error " << info << ": " << magma::error_as_string(info) << std::endl;
-      }
-    REQUIRE( info == 0 );
-
-    // Set pivots to identity so we can use the same check functions.
-    for (magma_int_t i = 0; i < min_mn; ++i)
-      {
-      ipiv[i] = i + 1;
-      }
 
     magma_dgetmatrix( M, N, d_A, 0, ldda, h_A, lda, queue );
     error = get_residual_d( M, N, h_A, h_A_orig, lda, ipiv );
@@ -718,7 +514,7 @@ TEST_CASE("magma_sgetrf_small", "[getrf]")
     arma::Mat<float> h_A_alias(h_A, lda, N, false, true);
     h_A_alias.randu();
     // Save an original copy.
-    coot_fortran(coot_slacpy)( "A", &M, &N, h_A, &lda, h_A_orig, &lda );
+    lapack::lacpy('A', M, N, h_A, lda, h_A_orig, lda);
 
     magma_ssetmatrix( M, N, h_A, lda, d_A, 0, ldda, queue );
 
@@ -744,79 +540,6 @@ TEST_CASE("magma_sgetrf_small", "[getrf]")
 
   magma_queue_destroy( queue );
   }
-
-
-
-TEST_CASE("magma_sgetrf_nopiv_small", "[getrf]")
-  {
-  if (get_rt().backend != CL_BACKEND)
-    {
-    return;
-    }
-
-  float error;
-  float* h_A;
-  float* h_A_orig;
-  magmaFloat_ptr d_A;
-  magma_int_t     *ipiv;
-  magma_int_t M, N, n2, lda, ldda, info, min_mn;
-
-  // seems to need a much wider tolerance
-  float tol = 30000 * std::numeric_limits<float>::epsilon();
-
-  magma_queue_t queue = magma_queue_create();
-
-  for (int itest = 0; itest < 10; ++itest)
-    {
-    M = 4 * (itest + 1) + 4;
-    N = 4 * (itest + 1) + 4;
-    min_mn = std::min(M, N);
-    lda    = M;
-    n2     = lda*N;
-    ldda   = magma_roundup( M, 32 );  // multiple of 32 by default
-
-    REQUIRE( magma_imalloc_cpu( &ipiv,     min_mn   ) == MAGMA_SUCCESS );
-    REQUIRE( magma_smalloc_cpu( &h_A,      n2       ) == MAGMA_SUCCESS );
-    REQUIRE( magma_smalloc_cpu( &h_A_orig, n2       ) == MAGMA_SUCCESS );
-    REQUIRE( magma_smalloc(     &d_A,      ldda * N ) == MAGMA_SUCCESS );
-
-    // The default test uses a random matrix, so we'll do the same here via Armadillo.
-    arma::Mat<float> h_A_alias(h_A, lda, N, false, true);
-    h_A_alias.randu();
-    // Save an original copy.
-    coot_fortran(coot_slacpy)( "A", &M, &N, h_A, &lda, h_A_orig, &lda );
-
-    magma_ssetmatrix( M, N, h_A, lda, d_A, 0, ldda, queue );
-
-    magma_sgetrf_nopiv_gpu( M, N, d_A, 0, ldda, &info);
-    if (info != 0)
-      {
-      std::cerr << "magma_sgetrf_gpu() returned error " << info << ": " << magma::error_as_string(info) << std::endl;
-      }
-    REQUIRE( info == 0 );
-
-    // Set pivots to identity so we can use the same check functions.
-    for (magma_int_t i = 0; i < min_mn; ++i)
-      {
-      ipiv[i] = i + 1;
-      }
-
-    magma_sgetmatrix( M, N, d_A, 0, ldda, h_A, lda, queue );
-    error = get_residual_s( M, N, h_A, h_A_orig, lda, ipiv );
-    REQUIRE( error < tol );
-
-    error = get_LU_error_s( M, N, h_A, h_A_orig, lda, ipiv );
-    REQUIRE( error < tol );
-
-    magma_free_cpu( ipiv );
-    magma_free_cpu( h_A );
-    magma_free( d_A );
-
-    }
-
-  magma_queue_destroy( queue );
-  }
-
 
 
 

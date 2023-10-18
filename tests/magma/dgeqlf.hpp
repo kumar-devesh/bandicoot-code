@@ -191,15 +191,15 @@ magma_dgeqlf
          A(1:m-minmn+i+ib-1,n-minmn+i:n-minmn+i+ib-1) */
       rows = m - minmn + i + ib;
       cols = n - minmn + i;
-      coot_fortran(coot_dgeqlf)( &rows, &ib, A + cols * lda, &lda, tau+i, work, &lwork, &iinfo );
+      lapack_test::geqlf(rows, ib, A + cols * lda, lda, tau+i, work, lwork, &iinfo);
 
       if (cols > 0)
         {
         /* Form the triangular factor of the block reflector
            H = H(i+ib-1) . . . H(i+1) H(i) */
-        coot_fortran(coot_dlarft)( MagmaBackwardStr, MagmaColumnwiseStr,
-                                   &rows, &ib,
-                                   A + cols * lda, &lda, tau + i, work, &ib );
+        lapack::larft(MagmaBackwardStr[0], MagmaColumnwiseStr[0],
+                      rows, ib,
+                      A + cols * lda, lda, tau + i, work, ib);
 
         magma_dpanel_to_q( MagmaLower, ib, A + (rows-ib) + cols * lda, lda, work+ib*ib );
         magma_dsetmatrix( rows, ib,
@@ -251,7 +251,7 @@ magma_dgeqlf
   /* Use unblocked code to factor the last or only block */
   if (mu > 0 && nu > 0)
     {
-    coot_fortran(coot_dgeqlf)( &mu, &nu, A, &lda, tau, work, &lwork, &iinfo );
+    lapack_test::geqlf(mu, nu, A, lda, tau, work, lwork, &iinfo);
     }
 
   magma_queue_destroy( queues[0] );

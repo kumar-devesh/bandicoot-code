@@ -47,9 +47,11 @@
 //  (including negligence or otherwise) arising in any way out of the use
 //  of this software, even if advised of the possibility of such damage.
 
+#include <armadillo>
 #include <bandicoot>
 #include "../catch.hpp"
 #include "def_lapack_test.hpp"
+#include "translate_lapack_test.hpp"
 
 using namespace coot;
 
@@ -60,6 +62,11 @@ using namespace coot;
 TEST_CASE("magma_dorglq_1", "[orglq]")
   {
   if (get_rt().backend != CL_BACKEND)
+    {
+    return;
+    }
+
+  if (!coot_rt_t::is_supported_type<double>())
     {
     return;
     }
@@ -100,10 +107,9 @@ TEST_CASE("magma_dorglq_1", "[orglq]")
     arma::Mat<double> alias(hA, m, n, false, true);
     alias.randu();
 
-    const char uplo = 'A';
-    coot_fortran(coot_dlacpy)(&uplo, &m, &n, hA, &lda, hR, &lda);
+    lapack::lacpy('A', m, n, hA, lda, hR, lda);
 
-    Anorm = coot_fortran(coot_dlange)("f", &m, &n, hA, &lda, work );
+    Anorm = lapack::lange('F', m, n, hA, lda, work);
 
     /* ====================================================================
        Performs operation using MAGMA
@@ -116,7 +122,7 @@ TEST_CASE("magma_dorglq_1", "[orglq]")
       std::cerr << "magma_dgelqf_gpu returned error " << info << ": " << magma::error_as_string(info) << std::endl;
       }
     magma_dgetmatrix( m, n, dA, 0, ldda, hA, lda, queue );
-    coot_fortran(coot_dlacpy)(&uplo, &m, &n, hA, &lda, hR, &lda);
+    lapack::lacpy('A', m, n, hA, lda, hR, lda);
 
     magma_dorglq( m, n, k, hR, lda, tau, h_work, lwork, &info );
     if (info != 0)
@@ -124,15 +130,15 @@ TEST_CASE("magma_dorglq_1", "[orglq]")
       std::cerr << "magma_dorglq returned error " << info << ": " << magma::error_as_string(info) << std::endl;
       }
 
-    coot_fortran(coot_dorglq)(&m, &n, &k, hA, &lda, tau, h_work, &lwork, &info);
+    lapack_test::orglq(m, n, k, hA, lda, tau, h_work, lwork, &info);
     if (info != 0)
       {
       std::cerr << "dorglq returned error " << info << ": " << magma::error_as_string(info) << std::endl;
       }
 
     // compute relative error |R|/|A| := |Q_magma - Q_lapack|/|A|
-    coot_fortran(coot_daxpy)(&n2, &c_neg_one, hA, &ione, hR, &ione);
-    error = coot_fortran(coot_dlange)("f", &m, &n, hR, &lda, work) / Anorm;
+    blas::axpy(n2, c_neg_one, hA, ione, hR, ione);
+    error = lapack::lange('F', m, n, hR, lda, work) / Anorm;
 
     REQUIRE( error < tol );
 
@@ -192,10 +198,9 @@ TEST_CASE("magma_sorglq_1", "[orglq]")
     arma::Mat<float> alias(hA, m, n, false, true);
     alias.randu();
 
-    const char uplo = 'A';
-    coot_fortran(coot_slacpy)(&uplo, &m, &n, hA, &lda, hR, &lda);
+    lapack::lacpy('A', m, n, hA, lda, hR, lda);
 
-    Anorm = coot_fortran(coot_slange)("f", &m, &n, hA, &lda, work );
+    Anorm = lapack::lange('F', m, n, hA, lda, work);
 
     /* ====================================================================
        Performs operation using MAGMA
@@ -208,7 +213,7 @@ TEST_CASE("magma_sorglq_1", "[orglq]")
       std::cerr << "magma_sgelqf_gpu returned error " << info << ": " << magma::error_as_string(info) << std::endl;
       }
     magma_sgetmatrix( m, n, dA, 0, ldda, hA, lda, queue );
-    coot_fortran(coot_slacpy)(&uplo, &m, &n, hA, &lda, hR, &lda);
+    lapack::lacpy('A', m, n, hA, lda, hR, lda);
 
     magma_sorglq( m, n, k, hR, lda, tau, h_work, lwork, &info );
     if (info != 0)
@@ -216,15 +221,15 @@ TEST_CASE("magma_sorglq_1", "[orglq]")
       std::cerr << "magma_sorglq returned error " << info << ": " << magma::error_as_string(info) << std::endl;
       }
 
-    coot_fortran(coot_sorglq)(&m, &n, &k, hA, &lda, tau, h_work, &lwork, &info);
+    lapack_test::orglq(m, n, k, hA, lda, tau, h_work, lwork, &info);
     if (info != 0)
       {
       std::cerr << "sorglq returned error " << info << ": " << magma::error_as_string(info) << std::endl;
       }
 
     // compute relative error |R|/|A| := |Q_magma - Q_lapack|/|A|
-    coot_fortran(coot_saxpy)(&n2, &c_neg_one, hA, &ione, hR, &ione);
-    error = coot_fortran(coot_slange)("f", &m, &n, hR, &lda, work) / Anorm;
+    blas::axpy(n2, c_neg_one, hA, ione, hR, ione);
+    error = lapack::lange('F', m, n, hR, lda, work) / Anorm;
 
     REQUIRE( error < tol );
 

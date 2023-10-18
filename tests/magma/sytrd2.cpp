@@ -47,9 +47,11 @@
 //  (including negligence or otherwise) arising in any way out of the use
 //  of this software, even if advised of the possibility of such damage.
 
+#include <armadillo>
 #include <bandicoot>
 #include "../catch.hpp"
 #include "def_lapack_test.hpp"
+#include "translate_lapack_test.hpp"
 
 using namespace coot;
 
@@ -60,6 +62,11 @@ using namespace coot;
 TEST_CASE("magma_dsytrd2_1", "[sytrd2]")
   {
   if (get_rt().backend != CL_BACKEND)
+    {
+    return;
+    }
+
+  if (!coot_rt_t::is_supported_type<double>())
     {
     return;
     }
@@ -128,19 +135,19 @@ TEST_CASE("magma_dsytrd2_1", "[sytrd2]")
 
       magma_dgetmatrix( N, N, d_R, 0, ldda, h_R, lda, queue );
       magma_dgetmatrix( N, N, d_R, 0, ldda, h_Q, lda, queue );
-      coot_fortran(coot_dorgtr)( lapack_uplo_const(uplos[iuplo]), &N, h_Q, &lda, tau, h_work, &lwork, &info );
+      lapack_test::orgtr(lapack_uplo_const(uplos[iuplo])[0], N, h_Q, lda, tau, h_work, lwork, &info);
 
-      coot_fortran(coot_dsyt21)( &itwo, lapack_uplo_const(uplos[iuplo]), &N, &ione,
-                                 h_A, &lda, diag, offdiag,
-                                 h_Q, &lda, h_R, &lda,
-                                 tau, work,
-                                 &result[0] );
+      lapack_test::syt21(itwo, lapack_uplo_const(uplos[iuplo])[0], N, ione,
+                         h_A, lda, diag, offdiag,
+                         h_Q, lda, h_R, lda,
+                         tau, work,
+                         &result[0]);
 
-      coot_fortran(coot_dsyt21)( &ithree, lapack_uplo_const(uplos[iuplo]), &N, &ione,
-                                 h_A, &lda, diag, offdiag,
-                                 h_Q, &lda, h_R, &lda,
-                                 tau, work,
-                                 &result[1] );
+      lapack_test::syt21(ithree, lapack_uplo_const(uplos[iuplo])[0], N, ione,
+                         h_A, lda, diag, offdiag,
+                         h_Q, lda, h_R, lda,
+                         tau, work,
+                         &result[1]);
       result[0] *= eps;
       result[1] *= eps;
 
@@ -239,19 +246,19 @@ TEST_CASE("magma_ssytrd2_1", "[sytrd2]")
 
       magma_sgetmatrix( N, N, d_R, 0, ldda, h_R, lda, queue );
       magma_sgetmatrix( N, N, d_R, 0, ldda, h_Q, lda, queue );
-      coot_fortran(coot_sorgtr)( lapack_uplo_const(uplos[iuplo]), &N, h_Q, &lda, tau, h_work, &lwork, &info );
+      lapack_test::orgtr(lapack_uplo_const(uplos[iuplo])[0], N, h_Q, lda, tau, h_work, lwork, &info);
 
-      coot_fortran(coot_ssyt21)( &itwo, lapack_uplo_const(uplos[iuplo]), &N, &ione,
-                                 h_A, &lda, diag, offdiag,
-                                 h_Q, &lda, h_R, &lda,
-                                 tau, work,
-                                 &result[0] );
+      lapack_test::syt21(itwo, lapack_uplo_const(uplos[iuplo])[0], N, ione,
+                         h_A, lda, diag, offdiag,
+                         h_Q, lda, h_R, lda,
+                         tau, work,
+                         &result[0]);
 
-      coot_fortran(coot_ssyt21)( &ithree, lapack_uplo_const(uplos[iuplo]), &N, &ione,
-                                 h_A, &lda, diag, offdiag,
-                                 h_Q, &lda, h_R, &lda,
-                                 tau, work,
-                                 &result[1] );
+      lapack_test::syt21(ithree, lapack_uplo_const(uplos[iuplo])[0], N, ione,
+                         h_A, lda, diag, offdiag,
+                         h_Q, lda, h_R, lda,
+                         tau, work,
+                         &result[1]);
       result[0] *= eps;
       result[1] *= eps;
 

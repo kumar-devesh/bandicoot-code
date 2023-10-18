@@ -47,9 +47,11 @@
 //  (including negligence or otherwise) arising in any way out of the use
 //  of this software, even if advised of the possibility of such damage.
 
+#include <armadillo>
 #include <bandicoot>
 #include "../catch.hpp"
 #include "def_lapack_test.hpp"
+#include "translate_lapack_test.hpp"
 
 using namespace coot;
 
@@ -60,6 +62,11 @@ using namespace coot;
 TEST_CASE("magma_dormqr_1", "[ormqr]")
   {
   if (get_rt().backend != CL_BACKEND)
+    {
+    return;
+    }
+
+  if (!coot_rt_t::is_supported_type<double>())
     {
     return;
     }
@@ -109,8 +116,8 @@ TEST_CASE("magma_dormqr_1", "[ormqr]")
 
         // C is full, m x n
         size = ldc*n;
-        coot_fortran(coot_dlarnv)( &ione, ISEED, &size, C );
-        coot_fortran(coot_dlacpy)( "Full", &m, &n, C, &ldc, R, &ldc );
+        lapack_test::larnv(ione, ISEED, size, C);
+        lapack::lacpy('F', m, n, C, ldc, R, ldc);
 
         // A is mm x k.  Here we use uniform random values.
         arma::Mat<double> A_alias(A, lda, k, false, true);
@@ -138,9 +145,9 @@ TEST_CASE("magma_dormqr_1", "[ormqr]")
         /* =====================================================================
            Performs operation using LAPACK
            =================================================================== */
-        coot_fortran(coot_dormqr)( lapack_side_const( side[iside] ), lapack_trans_const( trans[itran] ),
-                          &m, &n, &k,
-                          A, &lda, tau, C, &ldc, W, &lwork_max, &info );
+        lapack_test::ormqr(lapack_side_const(side[iside])[0], lapack_trans_const(trans[itran])[0],
+                           m, n, k,
+                           A, lda, tau, C, ldc, W, lwork_max, &info);
         if (info != 0)
           {
           std::cerr << "dormqr() returned error code " << info << ": " << magma::error_as_string(info) << std::endl;
@@ -180,9 +187,9 @@ TEST_CASE("magma_dormqr_1", "[ormqr]")
            compute relative error |QC_magma - QC_lapack| / |QC_lapack|
            =================================================================== */
         size = ldc*n;
-        coot_fortran(coot_daxpy)( &size, &c_neg_one, C, &ione, R, &ione );
-        Cnorm = coot_fortran(coot_dlange)( "F", &m, &n, C, &ldc, work );
-        error = coot_fortran(coot_dlange)( "F", &m, &n, R, &ldc, work ) / (std::sqrt(m*n) * Cnorm);
+        blas::axpy(size, c_neg_one, C, ione, R, ione);
+        Cnorm = lapack::lange('F', m, n, C, ldc, work );
+        error = lapack::lange('F', m, n, R, ldc, work ) / (std::sqrt(m*n) * Cnorm);
 
         REQUIRE( error < tol );
 
@@ -252,8 +259,8 @@ TEST_CASE("magma_sormqr_1", "[ormqr]")
 
         // C is full, m x n
         size = ldc*n;
-        coot_fortran(coot_slarnv)( &ione, ISEED, &size, C );
-        coot_fortran(coot_slacpy)( "Full", &m, &n, C, &ldc, R, &ldc );
+        lapack_test::larnv(ione, ISEED, size, C);
+        lapack::lacpy('F', m, n, C, ldc, R, ldc);
 
         // A is mm x k.  Here we use uniform random values.
         arma::Mat<float> A_alias(A, lda, k, false, true);
@@ -281,9 +288,9 @@ TEST_CASE("magma_sormqr_1", "[ormqr]")
         /* =====================================================================
            Performs operation using LAPACK
            =================================================================== */
-        coot_fortran(coot_sormqr)( lapack_side_const( side[iside] ), lapack_trans_const( trans[itran] ),
-                          &m, &n, &k,
-                          A, &lda, tau, C, &ldc, W, &lwork_max, &info );
+        lapack_test::ormqr(lapack_side_const(side[iside])[0], lapack_trans_const(trans[itran])[0],
+                           m, n, k,
+                           A, lda, tau, C, ldc, W, lwork_max, &info);
         if (info != 0)
           {
           std::cerr << "sormqr() returned error code " << info << ": " << magma::error_as_string(info) << std::endl;
@@ -323,9 +330,9 @@ TEST_CASE("magma_sormqr_1", "[ormqr]")
            compute relative error |QC_magma - QC_lapack| / |QC_lapack|
            =================================================================== */
         size = ldc*n;
-        coot_fortran(coot_saxpy)( &size, &c_neg_one, C, &ione, R, &ione );
-        Cnorm = coot_fortran(coot_slange)( "F", &m, &n, C, &ldc, work );
-        error = coot_fortran(coot_slange)( "F", &m, &n, R, &ldc, work ) / (std::sqrt(m*n) * Cnorm);
+        blas::axpy(size, c_neg_one, C, ione, R, ione);
+        Cnorm = lapack::lange('F', m, n, C, ldc, work);
+        error = lapack::lange('F', m, n, R, ldc, work) / (std::sqrt(m*n) * Cnorm);
 
         REQUIRE( error < tol );
 
