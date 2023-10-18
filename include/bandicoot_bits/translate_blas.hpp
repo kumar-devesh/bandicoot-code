@@ -63,8 +63,8 @@ namespace blas
 
     #if defined(COOT_USE_FORTRAN_HIDDEN_ARGS)
       {
-      if     (    is_float<eT>::value) { coot_fortran(coot_sgemv)(&transA, &m, &n,    (const float*) &alpha,    (const float*) A, &lda,    (const float*) x, &incx,    (const float*) &beta, (blas_cxd*) y, &incy, 1); }
-      else if(   is_double<eT>::value) { coot_fortran(coot_dgemv)(&transA, &m, &n,   (const double*) &alpha,   (const double*) A, &lda,   (const double*) x, &incx,   (const double*) &beta, (blas_cxd*) y, &incy, 1); }
+      if     (    is_float<eT>::value) { coot_fortran(coot_sgemv)(&transA, &m, &n,    (const float*) &alpha,    (const float*) A, &lda,    (const float*) x, &incx,    (const float*) &beta,    (float*) y, &incy, 1); }
+      else if(   is_double<eT>::value) { coot_fortran(coot_dgemv)(&transA, &m, &n,   (const double*) &alpha,   (const double*) A, &lda,   (const double*) x, &incx,   (const double*) &beta,   (double*) y, &incy, 1); }
       else if( is_cx_float<eT>::value) { coot_fortran(coot_cgemv)(&transA, &m, &n, (const blas_cxf*) &alpha, (const blas_cxf*) A, &lda, (const blas_cxf*) x, &incx, (const blas_cxf*) &beta, (blas_cxf*) y, &incy, 1); }
       else if(is_cx_double<eT>::value) { coot_fortran(coot_zgemv)(&transA, &m, &n, (const blas_cxd*) &alpha, (const blas_cxd*) A, &lda, (const blas_cxd*) x, &incx, (const blas_cxd*) &beta, (blas_cxd*) y, &incy, 1); }
       }
