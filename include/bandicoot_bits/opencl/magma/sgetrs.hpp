@@ -164,7 +164,7 @@ magma_sgetrs_gpu
 
     magma_int_t inc = -1;
     magma_sgetmatrix( n, nrhs, dB, 0, lddb, work, n, queue );
-    coot_fortran(coot_slaswp)( &nrhs, work, &n, &i1, &i2, ipiv, &inc );
+    lapack::laswp(nrhs, work, n, i1, i2, ipiv, inc);
     //magmablas_slaswp( nrhs, dB, 0, lddb, i1, i2, ipiv, inc, queue );
     magma_ssetmatrix( n, nrhs, work, n, dB, 0, lddb, queue );
 

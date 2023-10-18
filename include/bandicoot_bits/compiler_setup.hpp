@@ -47,10 +47,18 @@
 
 #if defined(COOT_BLAS_UNDERSCORE)
   #define coot_fortran2_noprefix(function) function##_
-  #define coot_fortran2_prefix(function)   wrapper_##function##_
+  #define coot_fortran2_hidden_args_prefix(function)   wrapper_hidden_args_##function##_
+  #define coot_fortran2_no_hidden_args_prefix(function)   wrapper_##function##_
 #else
   #define coot_fortran2_noprefix(function) function
-  #define coot_fortran2_prefix(function)   wrapper_##function
+  #define coot_fortran2_hidden_args_prefix(function)   wrapper_hidden_args_##function##
+  #define coot_fortran2_no_hidden_args_prefix(function)   wrapper_##function
+#endif
+
+#if defined(COOT_USE_FORTRAN_HIDDEN_ARGS)
+  #define coot_fortran2_prefix(function) coot_fortran2_hidden_args_prefix(function)
+#else
+  #define coot_fortran2_prefix(function) coot_fortran2_no_hidden_args_prefix(function)
 #endif
 
 #if defined(COOT_USE_WRAPPER)
@@ -61,8 +69,8 @@
   #define coot_wrapper(function) function
 #endif
 
-#define coot_fortran_prefix(function)   coot_fortran2_prefix(function)
-#define coot_fortran_noprefix(function) coot_fortran2_noprefix(function)
+#define coot_fortran_prefix(function)             coot_fortran2_prefix(function)
+#define coot_fortran_noprefix(function)           coot_fortran2_noprefix(function)
 
 #undef  COOT_INCFILE_WRAP
 #define COOT_INCFILE_WRAP(x) <x>

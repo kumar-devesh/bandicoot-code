@@ -75,6 +75,13 @@
 // #define COOT_BLAS_LONG_LONG
 //// Uncomment the above line if your BLAS and LAPACK libraries use "long long" instead of "int"
 
+#define COOT_USE_FORTRAN_HIDDEN_ARGS
+//// Comment out the above line to call BLAS and LAPACK functions without using so-called "hidden" arguments.
+//// FORTRAN functions (compiled without a BIND(C) declaration) that have char arguments
+//// (like many BLAS and LAPACK functions) also have associated "hidden" arguments.
+//// For each char argument, the corresponding "hidden" argument specifies the number of characters.
+//// These "hidden" arguments are typically tacked onto the end of function definitions.
+
 #if !defined(COOT_USE_OPENMP)
 // #define COOT_USE_OPENMP
 //// Uncomment the above line to forcefully enable use of OpenMP for parallelisation.

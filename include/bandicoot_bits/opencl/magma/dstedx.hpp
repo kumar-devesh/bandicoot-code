@@ -186,14 +186,14 @@ magma_dstedx
 
   if (n < smlsiz)
     {
-    coot_fortran(coot_dsteqr)("I", &n, d, e, Z, &ldz, work, info);
+    lapack::steqr('I', n, d, e, Z, ldz, work, info);
     }
   else
     {
-    coot_fortran(coot_dlaset)("F", &n, &n, &d_zero, &d_one, Z, &ldz);
+    lapack::laset('F', n, n, d_zero, d_one, Z, ldz);
 
     //Scale.
-    orgnrm = coot_fortran(coot_dlanst)("M", &n, d, e);
+    orgnrm = lapack::lanst('M', n, d, e);
 
     if (orgnrm == 0)
       {
@@ -202,7 +202,7 @@ magma_dstedx
       return *info;
       }
 
-    eps = coot_fortran(coot_dlamch)( "E" );
+    eps = lapack::lamch<double>('E');
 
     if (alleig)
       {
@@ -235,10 +235,10 @@ magma_dstedx
         if (m > smlsiz)
           {
           // Scale
-          orgnrm = coot_fortran(coot_dlanst)("M", &m, &d[start], &e[start]);
-          coot_fortran(coot_dlascl)("G", &izero, &izero, &orgnrm, &d_one, &m, &ione, &d[start], &m, info);
+          orgnrm = lapack::lanst('M', m, &d[start], &e[start]);
+          lapack::lascl('G', izero, izero, orgnrm, d_one, m, ione, &d[start], m, info);
           magma_int_t mm = m-1;
-          coot_fortran(coot_dlascl)("G", &izero, &izero, &orgnrm, &d_one, &mm, &ione, &e[start], &mm, info);
+          lapack::lascl('G', izero, izero, orgnrm, d_one, mm, ione, &e[start], mm, info);
 
           magma_dlaex0( m, &d[start], &e[start], Z + start + start * ldz, ldz, work, iwork, dwork, dwork_offset, MagmaRangeAll, vl, vu, il, iu, info);
 
@@ -247,11 +247,11 @@ magma_dstedx
           }
 
           // Scale Back
-          coot_fortran(coot_dlascl)("G", &izero, &izero, &d_one, &orgnrm, &m, &ione, &d[start], &m, info);
+          lapack::lascl('G', izero, izero, d_one, orgnrm, m, ione, &d[start], m, info);
           }
         else
           {
-          coot_fortran(coot_dsteqr)( "I", &m, &d[start], &e[start], Z + start + start * ldz, &ldz, work, info);
+          lapack::steqr('I', m, &d[start], &e[start], Z + start + start * ldz, ldz, work, info);
           if (*info != 0)
             {
             *info = (start+1) *(n+1) + end;
@@ -285,7 +285,7 @@ magma_dstedx
             {
             d[k] = d[i-1];
             d[i-1] = p;
-            coot_fortran(coot_dswap)(&n, Z + (i-1) * ldz, &ione, Z + (k) * ldz, &ione);
+            blas::swap(n, Z + (i-1) * ldz, ione, Z + (k) * ldz, ione);
             }
           }
         }
@@ -293,9 +293,9 @@ magma_dstedx
     else
       {
       // Scale
-      coot_fortran(coot_dlascl)("G", &izero, &izero, &orgnrm, &d_one, &n, &ione, d, &n, info);
+      lapack::lascl('G', izero, izero, orgnrm, d_one, n, ione, d, n, info);
       magma_int_t nm = n-1;
-      coot_fortran(coot_dlascl)("G", &izero, &izero, &orgnrm, &d_one, &nm, &ione, e, &nm, info);
+      lapack::lascl('G', izero, izero, orgnrm, d_one, nm, ione, e, nm, info);
 
       magma_dlaex0( n, d, e, Z, ldz, work, iwork, dwork, dwork_offset, range, vl, vu, il, iu, info);
 
@@ -305,7 +305,7 @@ magma_dstedx
         }
 
       // Scale Back
-      coot_fortran(coot_dlascl)("G", &izero, &izero, &d_one, &orgnrm, &n, &ione, d, &n, info);
+      lapack::lascl('G', izero, izero, d_one, orgnrm, n, ione, d, n, info);
       }
     }
 

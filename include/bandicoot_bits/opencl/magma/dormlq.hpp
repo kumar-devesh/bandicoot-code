@@ -141,8 +141,8 @@ magma_dormlq
   if (nb >= k)
     {
     /* Use CPU code */
-    coot_fortran(coot_dormlq)( lapack_side_const(side), lapack_trans_const(trans),
-          &m, &n, &k, A, &lda, tau, C, &ldc, work, &lwork, &iinfo );
+    lapack::ormlq(lapack_side_const(side)[0], lapack_trans_const(trans)[0],
+                  m, n, k, A, lda, tau, C, ldc, work, lwork, &iinfo);
     }
   else
     {
@@ -230,8 +230,8 @@ magma_dormlq
       /* Form the triangular factor of the block reflector
          H = H(i) H(i + 1) . . . H(i + ib-1) */
       nq_i = nq - i;
-      coot_fortran(coot_dlarft)("F", "R", &nq_i, &ib,
-                       &A[i + i * lda], &lda, &tau[i], T, &ib);
+      lapack::larft('F', 'R', nq_i, ib,
+                    &A[i + i * lda], lda, &tau[i], T, ib);
 
       /* 1) set upper triangle of panel in A to identity,
          2) copy the panel from A to the GPU, and

@@ -236,9 +236,9 @@ magma_sgebrd
                       &A[i + i * lda], lda, queue );
     }
 
-  coot_fortran(coot_sgebrd)( &nrow, &ncol,
-                    &A[i + i * lda], &lda, d+i, e+i,
-                    tauq+i, taup+i, work, &lwork, &iinfo);
+  lapack::gebrd(nrow, ncol,
+                &A[i + i * lda], lda, d+i, e+i,
+                tauq+i, taup+i, work, lwork, &iinfo);
   work[0] = magma_smake_lwork( lwkopt );
 
   magma_free_cpu( work2 );

@@ -165,7 +165,7 @@ magma_dgetrs_gpu
     // The MAGMABLAS laswp() implementation does not support applying pivots in reverse order from ipiv, so we use CPU LAPACK instead.
     // TODO: fix MAGMABLAS laswp() implementation!
     magma_dgetmatrix( n, nrhs, dB, 0, lddb, work, n, queue );
-    coot_fortran(coot_dlaswp)( &nrhs, work, &n, &i1, &i2, ipiv, &inc );
+    lapack::laswp(nrhs, work, n, i1, i2, ipiv, inc);
     //magmablas_dlaswp( nrhs, dB, 0, lddb, i1, i2, ipiv, inc, queue );
     magma_dsetmatrix( n, nrhs, work, n, dB, 0, lddb, queue );
 

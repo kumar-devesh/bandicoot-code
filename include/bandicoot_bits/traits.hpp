@@ -564,56 +564,45 @@ struct is_real<double>
 
 
 template<typename T1>
-struct is_not_complex
+struct is_not_cx
   { static constexpr bool value = true; };
 
 template<typename eT>
-struct is_not_complex< std::complex<eT> >
+struct is_not_cx< std::complex<eT> >
   { static constexpr bool value = false; };
 
 
 
 template<typename T1>
-struct is_complex
+struct is_cx_float
   { static constexpr bool value = false; };
 
-// template<>
-template<typename eT>
-struct is_complex< std::complex<eT> >
+template<>
+struct is_cx_float< std::complex<float> >
   { static constexpr bool value = true; };
 
 
 
 template<typename T1>
-struct is_complex_float
+struct is_cx_double
   { static constexpr bool value = false; };
 
 template<>
-struct is_complex_float< std::complex<float> >
+struct is_cx_double< std::complex<double> >
   { static constexpr bool value = true; };
 
 
 
 template<typename T1>
-struct is_complex_double
+struct is_cx_strict
   { static constexpr bool value = false; };
 
 template<>
-struct is_complex_double< std::complex<double> >
-  { static constexpr bool value = true; };
-
-
-
-template<typename T1>
-struct is_complex_strict
-  { static constexpr bool value = false; };
-
-template<>
-struct is_complex_strict< std::complex<float> >
+struct is_cx_strict< std::complex<float> >
   { static constexpr bool value = true; };
 
 template<>
-struct is_complex_strict< std::complex<double> >
+struct is_cx_strict< std::complex<double> >
   { static constexpr bool value = true; };
 
 
@@ -699,6 +688,16 @@ struct is_supported_blas_type
     is_double<T1>::value ||
     is_supported_complex_float<T1>::value ||
     is_supported_complex_double<T1>::value;
+  };
+
+
+
+template<typename T1>
+struct is_supported_real_blas_type
+  {
+  static constexpr bool value = \
+    is_float<T1>::value ||
+    is_double<T1>::value;
   };
 
 

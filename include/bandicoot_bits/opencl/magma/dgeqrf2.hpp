@@ -173,10 +173,10 @@ magma_dgeqrf2_gpu
         }
 
       magma_queue_sync( queues[1] );  // wait to get work(i)
-      coot_fortran(coot_dgeqrf)( &rows, &ib, &work[i], &ldwork, &tau[i], hwork, &lhwork, info);
+      lapack::geqrf(rows, ib, &work[i], ldwork, &tau[i], hwork, lhwork, info);
       // Form the triangular factor of the block reflector in hwork
       // H = H(i) H(i+1) . . . H(i+ib-1)
-      coot_fortran(coot_dlarft)("F", "C", &rows, &ib, &work[i], &ldwork, &tau[i], hwork, &ib);
+      lapack::larft('F', 'C', rows, ib, &work[i], ldwork, &tau[i], hwork, ib);
 
       // set  the upper triangle of panel (V) to identity
       magma_dpanel_to_q( MagmaUpper, ib, &work[i], ldwork, hwork+ib*ib );
@@ -243,7 +243,7 @@ magma_dgeqrf2_gpu
     magma_dgetmatrix( rows, cols, dA, dA_offset + i + i * ldda, ldda, work, rows, queues[1] );
     // see comments for lwork above
     lhwork = lwork - rows*cols;
-    coot_fortran(coot_dgeqrf)( &rows, &cols, work, &rows, &tau[i], &work[rows * cols], &lhwork, info );
+    lapack::geqrf(rows, cols, work, rows, &tau[i], &work[rows * cols], lhwork, info);
     magma_dsetmatrix( rows, cols, work, rows, dA, dA_offset + i + i * ldda, ldda, queues[1] );
     }
 

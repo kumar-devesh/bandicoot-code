@@ -164,15 +164,15 @@ magma_sorgqr
     //                  A(kk, kk), &lda,
     //                  &tau[kk], work, &lwork, &iinfo );
 
-    coot_fortran(coot_slacpy)( "F", &m_kk, &k_kk, &A[kk + kk * lda], &lda, work_V, &m_kk);
-    coot_fortran(coot_slaset)( "F", &m_kk, &n_kk, &c_zero, &c_one, &A[kk + kk * lda], &lda );
+    lapack::lacpy('F', m_kk, k_kk, &A[kk + kk * lda], lda, work_V, m_kk);
+    lapack::laset('F', m_kk, n_kk, c_zero, c_one, &A[kk + kk * lda], lda);
 
-    coot_fortran(coot_slarft)( "F", "C",
-                               &m_kk, &k_kk,
-                               work_V, &m_kk, &tau[kk], work_T, &k_kk);
-    coot_fortran(coot_slarfb)( "L", "N", "F", "C",
-                               &m_kk, &n_kk, &k_kk,
-                               work_V, &m_kk, work_T, &k_kk, &A[kk + kk * lda], &lda, work, &n_kk );
+    lapack::larft('F', 'C',
+                  m_kk, k_kk,
+                  work_V, m_kk, &tau[kk], work_T, k_kk);
+    lapack::larfb('L', 'N', 'F', 'C',
+                  m_kk, n_kk, k_kk,
+                  work_V, m_kk, work_T, k_kk, &A[kk + kk * lda], lda, work, n_kk);
 
     if (kk > 0)
       {
@@ -197,7 +197,7 @@ magma_sorgqr
 
       // Send current panel to dV on the GPU
       mi = m - i;
-      coot_fortran(coot_slaset)( "U", &ib, &ib, &c_zero, &c_one, &A[i + i * lda], &lda );
+      lapack::laset('U', ib, ib, c_zero, c_one, &A[i + i * lda], lda);
       magma_ssetmatrix_async( mi, ib,
                               &A[i + i * lda], lda,
                               dV, dV_offset,   ldda, queue );

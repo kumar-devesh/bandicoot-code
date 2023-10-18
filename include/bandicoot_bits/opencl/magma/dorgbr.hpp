@@ -103,13 +103,13 @@ magma_dorgbr
         // magma_dorgqr takes dT instead of work
         // magma_dorgqr2 doesn't take work
         //magma_dorgqr2( m, n, k, A, lda, tau, work, -1, &iinfo );
-        coot_fortran(coot_dorgqr)( &m, &n, &k, A, &lda, tau, work, &ineg_one, &iinfo );
+        lapack::orgqr(m, n, k, A, lda, tau, work, ineg_one, &iinfo);
         }
       else if (m > 1)
         {
         //magma_dorgqr2( m-1, m-1, m-1, A(1,1), lda, tau, work, -1, &iinfo );
         magma_int_t m1 = m-1;
-        coot_fortran(coot_dorgqr)( &m1, &m1, &m1, &A[1 + 1 * lda], &lda, tau, work, &ineg_one, &iinfo );
+        lapack::orgqr(m1, m1, m1, &A[1 + 1 * lda], lda, tau, work, ineg_one, &iinfo);
         }
 
       lwkopt = work[0];

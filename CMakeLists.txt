@@ -598,7 +598,9 @@ message(STATUS "CMAKE_REQUIRED_INCLUDES   = ${CMAKE_REQUIRED_INCLUDES}"  )
 add_library(
   bandicoot
   ${PROJECT_SOURCE_DIR}/src/wrapper_blas.cpp
+  ${PROJECT_SOURCE_DIR}/src/wrapper_blas_hidden_args.cpp
   ${PROJECT_SOURCE_DIR}/src/wrapper_lapack.cpp
+  ${PROJECT_SOURCE_DIR}/src/wrapper_lapack_hidden_args.cpp
   ${PROJECT_SOURCE_DIR}/src/wrapper_opencl.cpp
   ${PROJECT_SOURCE_DIR}/src/wrapper_clblas.cpp
   ${PROJECT_SOURCE_DIR}/src/wrapper_cuda.cpp

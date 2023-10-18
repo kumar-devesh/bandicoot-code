@@ -98,19 +98,19 @@ magma_dlabrd_gpu
       m_i1 = m - (i+1);
       n_i1 = n - (i+1);
 
-      coot_fortran(coot_dgemv)("N", &m_i, &i, &c_neg_one,
-                               &A[i + (0) * lda], &lda,
-                               &Y[i + (0) * ldy], &ldy, &c_one,
-                               &A[i + (i) * lda], &ione );
+      blas::gemv('N', m_i, i, c_neg_one,
+                 &A[i + (0) * lda], lda,
+                 &Y[i + (0) * ldy], ldy, c_one,
+                 &A[i + (i) * lda], ione);
 
-      coot_fortran(coot_dgemv)("N", &m_i, &i, &c_neg_one,
-                               &X[i + (0) * ldx], &ldx,
-                               &A[0 + (i) * lda], &ione, &c_one,
-                               &A[i + (i) * lda], &ione );
+      blas::gemv('N', m_i, i, c_neg_one,
+                 &X[i + (0) * ldx], ldx,
+                 &A[0 + (i) * lda], ione, c_one,
+                 &A[i + (i) * lda], ione);
 
       /* Generate reflection Q(i) to annihilate A(i+1:m, i) */
       alpha = A[i + (i) * lda];
-      coot_fortran(coot_dlarfg)(&m_i, &alpha, &A[std::min(i+1, m-1) + (i) * lda], &ione, &tauq[i]);
+      lapack::larfg(m_i, &alpha, &A[std::min(i+1, m-1) + (i) * lda], ione, &tauq[i]);
       d[i] = alpha;
       if (i+1 < n)
         {
@@ -132,48 +132,48 @@ magma_dlabrd_gpu
                                 dY, dY_offset + i+1 + (i) * lddy, lddy,
                                 &Y[i+1 + (i) * ldy],  ldy, queue );
 
-        coot_fortran(coot_dgemv)("C", &m_i, &i, &c_one,
-                                 &A[i + (0) * lda], &lda,
-                                 &A[i + (i) * lda], &ione, &c_zero,
-                                 &Y[0 + (i) * ldy], &ione );
+        blas::gemv('C', m_i, i, c_one,
+                   &A[i + (0) * lda], lda,
+                   &A[i + (i) * lda], ione, c_zero,
+                   &Y[0 + (i) * ldy], ione);
 
-        coot_fortran(coot_dgemv)("N", &n_i1, &i, &c_neg_one,
-                                 &Y[i+1 + (0) * ldy], &ldy,
-                                 &Y[0 + (i) * ldy],   &ione, &c_zero,
-                                 work,     &ione );
-        coot_fortran(coot_dgemv)("C", &m_i, &i, &c_one,
-                                 &X[i + (0) * ldx], &ldx,
-                                 &A[i + (i) * lda], &ione, &c_zero,
-                                 &Y[0 + (i) * ldy], &ione );
+        blas::gemv('N', n_i1, i, c_neg_one,
+                   &Y[i+1 + (0) * ldy], ldy,
+                   &Y[0 + (i) * ldy],   ione, c_zero,
+                   work,                ione);
+        blas::gemv('C', m_i, i, c_one,
+                   &X[i + (0) * ldx], ldx,
+                   &A[i + (i) * lda], ione, c_zero,
+                   &Y[0 + (i) * ldy], ione);
 
         // 4. Sync to make sure the result is back ----------------
         magma_queue_sync( queue );
 
         if (i != 0)
           {
-          coot_fortran(coot_daxpy)(&n_i1, &c_one, work, &ione, &Y[i+1 + (i) * ldy], &ione);
+          blas::axpy(n_i1, c_one, work, ione, &Y[i+1 + (i) * ldy], ione);
           }
 
-        coot_fortran(coot_dgemv)("C", &i, &n_i1, &c_neg_one,
-                                 &A[0 + (i+1) * lda], &lda,
-                                 &Y[0 + (i) * ldy],   &ione, &c_one,
-                                 &Y[i+1 + (i) * ldy], &ione );
-        coot_fortran(coot_dscal)(&n_i1, &tauq[i], &Y[i+1 + (i) * ldy], &ione);
+        blas::gemv('C', i, n_i1, c_neg_one,
+                   &A[0 + (i+1) * lda], lda,
+                   &Y[0 + (i) * ldy],   ione, c_one,
+                   &Y[i+1 + (i) * ldy], ione);
+        blas::scal(n_i1, tauq[i], &Y[i+1 + (i) * ldy], ione);
 
         /* Update A[i + (i+1:n) * lda] */
-        coot_fortran(coot_dgemv)("N", &n_i1, &i1, &c_neg_one,
-                                 &Y[i+1 + (0) * ldy], &ldy,
-                                 &A[i + (0) * lda],   &lda, &c_one,
-                                 &A[i + (i+1) * lda], &lda );
+        blas::gemv('N', n_i1, i1, c_neg_one,
+                   &Y[i+1 + (0) * ldy], ldy,
+                   &A[i + (0) * lda],   lda, c_one,
+                   &A[i + (i+1) * lda], lda);
 
-        coot_fortran(coot_dgemv)("C", &i, &n_i1, &c_neg_one,
-                                 &A[0 + (i+1) * lda], &lda,
-                                 &X[i + (0) * ldx],   &ldx, &c_one,
-                                 &A[i + (i+1) * lda], &lda );
+        blas::gemv('C', i, n_i1, c_neg_one,
+                   &A[0 + (i+1) * lda], lda,
+                   &X[i + (0) * ldx],   ldx, c_one,
+                   &A[i + (i+1) * lda], lda);
 
         /* Generate reflection P(i) to annihilate A[i + (i+2:n) * lda] */
         alpha = A[i + (i+1) * lda];
-        coot_fortran(coot_dlarfg)(&n_i1, &alpha, &A[i + (std::min(i+2,n-1)) * lda], &lda, &taup[i]);
+        lapack::larfg(n_i1, &alpha, &A[i + (std::min(i+2,n-1)) * lda], lda, &taup[i]);
         e[i] = alpha;
         A[i + (i+1) * lda] = c_one;
 
@@ -196,32 +196,32 @@ magma_dlabrd_gpu
                                 dX, dX_offset + i+1 + (i) * lddx, lddx,
                                 &X[i+1 + (i) * ldx],  ldx, queue );
 
-        coot_fortran(coot_dgemv)("C", &n_i1, &i1, &c_one,
-                                 &Y[i+1 + (0) * ldy], &ldy,
-                                 &A[i + (i+1) * lda], &lda, &c_zero,
-                                 &X[0 + (i) * ldx],   &ione );
+        blas::gemv('C', n_i1, i1, c_one,
+                   &Y[i+1 + (0) * ldy], ldy,
+                   &A[i + (i+1) * lda], lda, c_zero,
+                   &X[0 + (i) * ldx],   ione);
 
-        coot_fortran(coot_dgemv)("N", &m_i1, &i1, &c_neg_one,
-                                 &A[i+1 + (0) * lda], &lda,
-                                 &X[0 + (i) * ldx],   &ione, &c_zero,
-                                 work,     &ione );
-        coot_fortran(coot_dgemv)("N", &i, &n_i1, &c_one,
-                                 &A[0 + (i+1) * lda], &lda,
-                                 &A[i + (i+1) * lda], &lda, &c_zero,
-                                 &X[0 + (i) * ldx],   &ione );
+        blas::gemv('N', m_i1, i1, c_neg_one,
+                   &A[i+1 + (0) * lda], lda,
+                   &X[0 + (i) * ldx],   ione, c_zero,
+                   work,                ione);
+        blas::gemv('N', i, n_i1, c_one,
+                   &A[0 + (i+1) * lda], lda,
+                   &A[i + (i+1) * lda], lda, c_zero,
+                   &X[0 + (i) * ldx],   ione);
 
         // 4. Sync to make sure the result is back ----------------
         magma_queue_sync( queue );
         if ((i+1) != 0)
           {
-          coot_fortran(coot_daxpy)( &m_i1, &c_one, work, &ione, &X[i+1 + (i) * ldx], &ione);
+          blas::axpy(m_i1, c_one, work, ione, &X[i+1 + (i) * ldx], ione);
           }
 
-        coot_fortran(coot_dgemv)("N", &m_i1, &i, &c_neg_one,
-                                 &X[i+1 + (0) * ldx], &ldx,
-                                 &X[0 + (i) * ldx],   &ione, &c_one,
-                                 &X[i+1 + (i) * ldx], &ione );
-        coot_fortran(coot_dscal)(&m_i1, &taup[i], &X[i+1 + (i) * ldx], &ione);
+        blas::gemv('N', m_i1, i, c_neg_one,
+                   &X[i+1 + (0) * ldx], ldx,
+                   &X[0 + (i) * ldx],   ione, c_one,
+                   &X[i+1 + (i) * ldx], ione);
+        blas::scal(m_i1, taup[i], &X[i+1 + (i) * ldx], ione);
         }
       }
     }
@@ -234,18 +234,18 @@ magma_dlabrd_gpu
         m_i1 = m - (i+1);
         n_i  = n - i;
         n_i1 = n - (i+1);
-        coot_fortran(coot_dgemv)("N", &n_i, &i, &c_neg_one,
-                                 &Y[i + (0) * ldy], &ldy,
-                                 &A[i + (0) * lda], &lda, &c_one,
-                                 &A[i + (i) * lda], &lda );
-        coot_fortran(coot_dgemv)("C", &i, &n_i, &c_neg_one,
-                                 &A[0 + (i) * lda], &lda,
-                                 &X[i + (0) * ldx], &ldx, &c_one,
-                                 &A[i + (i) * lda], &lda );
+        blas::gemv('N', n_i, i, c_neg_one,
+                   &Y[i + (0) * ldy], ldy,
+                   &A[i + (0) * lda], lda, c_one,
+                   &A[i + (i) * lda], lda);
+        blas::gemv('C', i, n_i, c_neg_one,
+                   &A[0 + (i) * lda], lda,
+                   &X[i + (0) * ldx], ldx, c_one,
+                   &A[i + (i) * lda], lda);
 
         /* Generate reflection P(i) to annihilate A(i, i+1:n) */
         alpha = A[i + (i) * lda];
-        coot_fortran(coot_dlarfg)( &n_i, &alpha, &A[i + (std::min(i+1,n-1)) * lda], &lda, &taup[i] );
+        lapack::larfg(n_i, &alpha, &A[i + (std::min(i+1,n-1)) * lda], lda, &taup[i]);
         d[i] = alpha;
         if (i+1 < m)
           {
@@ -270,47 +270,47 @@ magma_dlabrd_gpu
                                   dX, dX_offset + i+1 + (i) * lddx, lddx,
                                   &X[i+1 + (i) * ldx],  ldx, queue );
 
-          coot_fortran(coot_dgemv)("C", &n_i, &i, &c_one,
-                                   &Y[i + (0) * ldy], &ldy,
-                                   &A[i + (i) * lda], &lda, &c_zero,
-                                   &X[0 + (i) * ldx], &ione );
+          blas::gemv('C', n_i, i, c_one,
+                     &Y[i + (0) * ldy], ldy,
+                     &A[i + (i) * lda], lda, c_zero,
+                     &X[0 + (i) * ldx], ione);
 
-          coot_fortran(coot_dgemv)("N", &m_i1, &i, &c_neg_one,
-                                   &A[i+1 + (0) * lda], &lda,
-                                   &X[0 + (i) * ldx],   &ione, &c_zero,
-                                   work,     &ione );
+          blas::gemv('N', m_i1, i, c_neg_one,
+                     &A[i+1 + (0) * lda], lda,
+                     &X[0 + (i) * ldx],   ione, c_zero,
+                     work,                ione);
 
-          coot_fortran(coot_dgemv)("N", &i, &n_i, &c_one,
-                                   &A[0 + (i) * lda], &lda,
-                                   &A[i + (i) * lda], &lda, &c_zero,
-                                   &X[0 + (i) * ldx], &ione );
+          blas::gemv('N', i, n_i, c_one,
+                     &A[0 + (i) * lda], lda,
+                     &A[i + (i) * lda], lda, c_zero,
+                     &X[0 + (i) * ldx], ione);
 
           // 4. Sync to make sure the result is back ----------------
           magma_queue_sync( queue );
           if (i != 0)
             {
-            coot_fortran(coot_daxpy)( &m_i1, &c_one, work, &ione, &X[i+1 + (i) * ldx], &ione );
+            blas::axpy(m_i1, c_one, work, ione, &X[i+1 + (i) * ldx], ione);
             }
 
-          coot_fortran(coot_dgemv)("N", &m_i1, &i, &c_neg_one,
-                                   &X[i+1 + (0) * ldx], &ldx,
-                                   &X[0 + (i) * ldx],   &ione, &c_one,
-                                   &X[i+1 + (i) * ldx], &ione );
-          coot_fortran(coot_dscal)( &m_i1, &taup[i], &X[i+1 + (i) * ldx], &ione );
+          blas::gemv('N', m_i1, i, c_neg_one,
+                     &X[i+1 + (0) * ldx], ldx,
+                     &X[0 + (i) * ldx],   ione, c_one,
+                     &X[i+1 + (i) * ldx], ione);
+          blas::scal(m_i1, taup[i], &X[i+1 + (i) * ldx], ione);
 
           /* Update A[i+1:m + (i) * lda] */
-          coot_fortran(coot_dgemv)("N", &m_i1, &i, &c_neg_one,
-                                   &A[i+1 + (0) * lda], &lda,
-                                   &Y[i + (0) * ldy],   &ldy, &c_one,
-                                   &A[i+1 + (i) * lda], &ione );
-          coot_fortran(coot_dgemv)("N", &m_i1, &i1, &c_neg_one,
-                                   &X[i+1 + (0) * ldx], &ldx,
-                                   &A[0 + (i) * lda],   &ione, &c_one,
-                                   &A[i+1 + (i) * lda], &ione );
+          blas::gemv('N', m_i1, i, c_neg_one,
+                     &A[i+1 + (0) * lda], lda,
+                     &Y[i + (0) * ldy],   ldy, c_one,
+                     &A[i+1 + (i) * lda], ione);
+          blas::gemv('N', m_i1, i1, c_neg_one,
+                     &X[i+1 + (0) * ldx], ldx,
+                     &A[0 + (i) * lda],   ione, c_one,
+                     &A[i+1 + (i) * lda], ione);
 
           /* Generate reflection Q(i) to annihilate A[i+2:m + (i) * lda] */
           alpha = A[i+1 + (i) * lda];
-          coot_fortran(coot_dlarfg)( &m_i1, &alpha, &A[std::min(i+2, m-1) + (i) * lda], &ione, &tauq[i] );
+          lapack::larfg(m_i1, &alpha, &A[std::min(i+2, m-1) + (i) * lda], ione, &tauq[i]);
           e[i] = alpha;
           A[i+1 + (i) * lda] = c_one;
 
@@ -331,32 +331,32 @@ magma_dlabrd_gpu
                                   dY, dY_offset + i+1 + (i) * lddy, lddy,
                                   &Y[i+1 + (i) * ldy],  ldy, queue );
 
-          coot_fortran(coot_dgemv)("C", &m_i1, &i, &c_one,
-                         &A[i+1 + (0) * lda], &lda,
-                         &A[i+1 + (i) * lda], &ione, &c_zero,
-                         &Y[0 + (i) * ldy],   &ione );
-          coot_fortran(coot_dgemv)("N", &n_i1, &i, &c_neg_one,
-                         &Y[i+1 + (0) * ldy], &ldy,
-                         &Y[0 + (i) * ldy],   &ione, &c_zero,
-                         work,     &ione );
+          blas::gemv('C', m_i1, i, c_one,
+                     &A[i+1 + (0) * lda], lda,
+                     &A[i+1 + (i) * lda], ione, c_zero,
+                     &Y[0 + (i) * ldy],   ione);
+          blas::gemv('N', n_i1, i, c_neg_one,
+                     &Y[i+1 + (0) * ldy], ldy,
+                     &Y[0 + (i) * ldy],   ione, c_zero,
+                     work,                ione);
 
-          coot_fortran(coot_dgemv)("C", &m_i1, &i1, &c_one,
-                         &X[i+1 + (0) * ldx], &ldx,
-                         &A[i+1 + (i) * lda], &ione, &c_zero,
-                         &Y[0 + (i) * ldy],   &ione );
+          blas::gemv('C', m_i1, i1, c_one,
+                     &X[i+1 + (0) * ldx], ldx,
+                     &A[i+1 + (i) * lda], ione, c_zero,
+                     &Y[0 + (i) * ldy],   ione);
 
           // 4. Sync to make sure the result is back ----------------
           magma_queue_sync( queue );
           if (i != 0)
             {
-            coot_fortran(coot_daxpy)( &n_i1, &c_one, work, &ione, &Y[i+1 + (i) * ldy], &ione );
+            blas::axpy(n_i1, c_one, work, ione, &Y[i+1 + (i) * ldy], ione);
             }
 
-          coot_fortran(coot_dgemv)("C", &i1, &n_i1, &c_neg_one,
-                         &A[0 + (i+1) * lda], &lda,
-                         &Y[0 + (i) * ldy],   &ione, &c_one,
-                         &Y[i+1 + (i) * ldy], &ione );
-          coot_fortran(coot_dscal)( &n_i1, &tauq[i], &Y[i+1 + (i) * ldy], &ione );
+          blas::gemv('C', i1, n_i1, c_neg_one,
+                     &A[0 + (i+1) * lda], lda,
+                     &Y[0 + (i) * ldy],   ione, c_one,
+                     &Y[i+1 + (i) * ldy], ione);
+          blas::scal(n_i1, tauq[i], &Y[i+1 + (i) * ldy], ione);
         }
       }
     }

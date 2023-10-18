@@ -147,8 +147,8 @@ magma_dlaex0
       submat = iwork[i-1];
       matsiz = iwork[i] - iwork[i-1];
       }
-    coot_fortran(coot_dsteqr)("I", &matsiz, &d[submat], &e[submat],
-                              Q + submat + submat * ldq, &ldq, work, info);  // change to edc?
+    lapack::steqr('I', matsiz, &d[submat], &e[submat],
+                  Q + submat + submat * ldq, ldq, work, info); // change to edc?
     if (*info != 0)
       {
       *info = (submat+1)*(n+1) + submat + matsiz;
@@ -217,10 +217,10 @@ magma_dlaex0
     {
     j = iwork[indxq+i] - 1;
     work[i] = d[j];
-    coot_fortran(coot_dcopy)(&n, Q + j * ldq, &ione, &work[ n*(i+1) ], &ione);
+    blas::copy(n, Q + j * ldq, ione, &work[n * (i+1)], ione);
     }
-  coot_fortran(coot_dcopy)(&n, work, &ione, d, &ione);
-  coot_fortran(coot_dlacpy)( "A", &n, &n, &work[n], &n, Q, &ldq );
+  blas::copy(n, work, ione, d, ione);
+  lapack::lacpy('A', n, n, &work[n], n, Q, ldq);
 
   magma_queue_destroy( queue );
 

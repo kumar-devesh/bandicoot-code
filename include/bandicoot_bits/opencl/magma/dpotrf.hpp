@@ -114,7 +114,7 @@ magma_dpotrf_gpu
     {
     /* Use unblocked code. */
     magma_dgetmatrix( n, n, dA, 0, ldda, work, n, queues[0] );
-    coot_fortran(coot_dpotrf)( uplo_, &n, work, &n, info );
+    lapack::potrf(uplo_[0], n, work, n, info);
     magma_dsetmatrix( n, n, work, n, dA, 0, ldda, queues[0] );
     }
   else
@@ -154,7 +154,7 @@ magma_dpotrf_gpu
         // simultaneous with above dgemm, transfer diagonal block,
         // factor it on CPU, and test for positive definiteness
         magma_queue_sync( queues[0] );
-        coot_fortran(coot_dpotrf)( MagmaUpperStr, &jb, work, &jb, info );
+        lapack::potrf(MagmaUpperStr[0], jb, work, jb, info);
 
         magma_dsetmatrix_async( jb, jb,
                                 work,             jb,
@@ -209,7 +209,7 @@ magma_dpotrf_gpu
         // simultaneous with above dgemm, transfer diagonal block,
         // factor it on CPU, and test for positive definiteness
         magma_queue_sync( queues[0] );
-        coot_fortran(coot_dpotrf)( MagmaLowerStr, &jb, work, &jb, info );
+        lapack::potrf(MagmaLowerStr[0], jb, work, jb, info);
         magma_dsetmatrix_async( jb, jb,
                                 work,             jb,
                                 dA, j + j * ldda, ldda, queues[1] );

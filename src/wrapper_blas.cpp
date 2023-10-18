@@ -18,6 +18,10 @@
 #include "bandicoot_bits/config.hpp"
 
 #undef COOT_USE_WRAPPER
+#undef COOT_USE_FORTRAN_HIDDEN_ARGS
+
+// At this stage we have prototypes for BLAS functions; so, now make the wrapper functions;
+// in this version of the wrapper, we do not bother with FORTRAN hidden arguments.
 
 #include "bandicoot_bits/compiler_setup.hpp"
 #include "bandicoot_bits/include_opencl.hpp"
@@ -27,8 +31,6 @@
 namespace coot
   {
   #include "bandicoot_bits/def_blas.hpp"
-
-  // at this stage we have prototypes for BLAS functions; so, now make the wrapper functions
 
   extern "C"
     {
@@ -104,7 +106,7 @@ namespace coot
 
 
     //
-    // scalar multiply + add
+    // scalar multiply + add (no hidden arguments)
     //
 
 
@@ -138,7 +140,7 @@ namespace coot
 
 
     //
-    // scale vector by constant
+    // scale vector by constant (no hidden arguments)
     //
 
 
@@ -192,7 +194,7 @@ namespace coot
 
 
     //
-    // copy a vector X to Y
+    // copy a vector X to Y (no hidden arguments)
     //
 
 
@@ -226,7 +228,7 @@ namespace coot
 
 
     //
-    // interchange two vectors
+    // interchange two vectors (no hidden arguments)
     //
 
 
