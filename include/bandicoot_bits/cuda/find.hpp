@@ -27,6 +27,7 @@ find(dev_mem_t<uword>& out, uword& out_len, const dev_mem_t<eT> A, const uword n
   // If the vector is empty, don't do anything.
   if (n_elem == 0)
     {
+    out.cuda_mem_ptr = NULL;
     out_len = 0;
     return;
     }

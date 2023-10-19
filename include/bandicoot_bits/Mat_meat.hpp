@@ -233,6 +233,7 @@ Mat<eT>::Mat(const arma::Mat<eT>& X)
   , n_elem   (0)
   , vec_state(0)
   , mem_state(0)
+  , dev_mem({ NULL })
   {
   coot_extra_debug_sigprint_this(this);
 
@@ -488,6 +489,7 @@ Mat<eT>::Mat(const Mat<eT>& X)
   , n_elem   (0)
   , vec_state(0)
   , mem_state(0)
+  , dev_mem({ NULL })
   {
   coot_extra_debug_sigprint_this(this);
 
@@ -683,6 +685,7 @@ Mat<eT>::Mat(const subview<eT>& X)
   , n_elem   (0)
   , vec_state(0)
   , mem_state(0)
+  , dev_mem({ NULL })
   {
   coot_extra_debug_sigprint_this(this);
 
@@ -802,6 +805,7 @@ Mat<eT>::Mat(const diagview<eT>& X)
   , n_elem   (0)
   , vec_state(0)
   , mem_state(0)
+  , dev_mem({ NULL })
   {
   coot_extra_debug_sigprint_this(this);
 
@@ -913,6 +917,7 @@ Mat<eT>::Mat(const eOp<T1, eop_type>& X)
   , n_elem   (0)
   , vec_state(0)
   , mem_state(0)
+  , dev_mem({ NULL })
   {
   coot_extra_debug_sigprint_this(this);
 
@@ -1047,6 +1052,7 @@ Mat<eT>::Mat(const eGlue<T1, T2, eglue_type>& X)
   , n_elem   (0)
   , vec_state(0)
   , mem_state(0)
+  , dev_mem({ NULL })
   {
   coot_extra_debug_sigprint_this(this);
 
@@ -1187,6 +1193,7 @@ Mat<eT>::Mat(const mtOp<eT, T1, mtop_type>& X)
   , n_elem   (0)
   , vec_state(0)
   , mem_state(0)
+  , dev_mem({ NULL })
   {
   coot_extra_debug_sigprint_this(this);
 
@@ -1312,6 +1319,7 @@ Mat<eT>::Mat(const Op<T1, op_type>& X)
   , n_elem   (0)
   , vec_state(0)
   , mem_state(0)
+  , dev_mem({ NULL })
   {
   coot_extra_debug_sigprint_this(this);
 
@@ -1433,6 +1441,7 @@ Mat<eT>::Mat(const Glue<T1, T2, glue_type>& X)
   , n_elem   (0)
   , vec_state(0)
   , mem_state(0)
+  , dev_mem({ NULL })
   {
   coot_extra_debug_sigprint_this(this);
 
@@ -1560,6 +1569,7 @@ Mat<eT>::Mat(const mtGlue<eT, T1, T2, mtglue_type>& X)
   , n_elem   (0)
   , vec_state(0)
   , mem_state(0)
+  , dev_mem({ NULL })
   {
   coot_extra_debug_sigprint_this(this);
 
