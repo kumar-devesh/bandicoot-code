@@ -25,7 +25,7 @@ test-cuda:
   script: |
     mkdir build/
     cd build/
-    cmake -DFIND_CUDA=ON -DBUILD_TESTS=ON ../
+    cmake -DFIND_CUDA=ON -DFIND_OPENCL=OFF -DBUILD_TESTS=ON ../
     make -j2
     ./bandicoot_test
 
