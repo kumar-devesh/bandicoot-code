@@ -783,7 +783,7 @@ magma_dgesvd
           // Perform bidiagonal QR iteration, computing right
           // singular vectors of A in A if desired
           // Workspace: need     N [e] + 4*N [bdsqr work]
-          lapack::bdsqr('U', n, ncvt, izero, izero, s, &work[ie], A, lda, dummy, ione, dummy, ione, &work[lwork], info);
+          lapack::bdsqr('U', n, ncvt, izero, izero, s, &work[ie], A, lda, dummy, ione, dummy, ione, &work[iwork], info);
 
           // If right singular vectors desired in VT, copy them there
           if (want_vas)
