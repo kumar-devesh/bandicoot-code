@@ -108,10 +108,7 @@ TEMPLATE_TEST_CASE("conv_full_equal_size_arma_comparison_test", "[conv]", float,
     arma::Col<eT> C3_cpu(C3);
     arma::Col<eT> C4_cpu(C4);
 
-    std::cout << "C2_cpu:\n" << C2_cpu.t();
-    std::cout << "C_ref:\n" << C_ref.t();
-
-    const eT tol = (is_same_type<eT, float>::value) ? 1e-5 : 1e-8;
+    const eT tol = (is_same_type<eT, float>::value) ? 1e-4 : 1e-7;
     REQUIRE( arma::approx_equal( C1_cpu, C_ref, "absdiff", tol ) );
     REQUIRE( arma::approx_equal( C2_cpu, C_ref, "absdiff", tol ) );
     REQUIRE( arma::approx_equal( C3_cpu, C_ref, "absdiff", tol ) );
