@@ -90,7 +90,7 @@
 
 // #define COOT_USE_MKL_TYPES
 //// Uncomment the above line if you want to use Intel MKL types for complex numbers.
-//// You will need to include appropriate MKL headers before the Armadillo header.
+//// You will need to include appropriate MKL headers before the Bandicoot header.
 //// You may also need to enable or disable the following options:
 //// COOT_BLAS_LONG, COOT_BLAS_LONG_LONG, COOT_USE_FORTRAN_HIDDEN_ARGS
 
