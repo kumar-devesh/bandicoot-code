@@ -88,6 +88,12 @@
 //// For each char argument, the corresponding "hidden" argument specifies the number of characters.
 //// These "hidden" arguments are typically tacked onto the end of function definitions.
 
+// #define COOT_USE_MKL_TYPES
+//// Uncomment the above line if you want to use Intel MKL types for complex numbers.
+//// You will need to include appropriate MKL headers before the Armadillo header.
+//// You may also need to enable or disable the following options:
+//// COOT_BLAS_LONG, COOT_BLAS_LONG_LONG, COOT_USE_FORTRAN_HIDDEN_ARGS
+
 #if !defined(COOT_USE_OPENMP)
 // #define COOT_USE_OPENMP
 //// Uncomment the above line to forcefully enable use of OpenMP for parallelisation.
