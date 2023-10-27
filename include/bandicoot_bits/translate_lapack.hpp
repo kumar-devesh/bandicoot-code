@@ -19,7 +19,7 @@
 // This file contains wrappers for LAPACK functions.
 // These should be used preferentially to calling coot_fortran(coot_XXXXX),
 // because the compiler may need extra hidden arguments for FORTRAN calls.
-// (See the definition of COOT_FORTRAN_USE_HIDDEN_ARGS for more details.)
+// (See the definition of COOT_USE_FORTRAN_HIDDEN_ARGS for more details.)
 
 namespace lapack
   {
