@@ -142,7 +142,7 @@ magma_sormlq
     {
     /* Use CPU code */
     lapack::ormlq(lapack_side_const(side)[0], lapack_trans_const(trans)[0],
-                  m, n, k, A, lda, tau, C, lda, work, lwork, &iinfo);
+                  m, n, k, A, lda, tau, C, ldc, work, lwork, &iinfo);
     }
   else
     {
