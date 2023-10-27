@@ -404,8 +404,6 @@ if(FIND_CUDA)
 
     if(CUDA_FOUND)
       # We also need NVRTC and also libcuda itself, which the old FindCUDA package do not find.
-      message("CUDA libraries so far: ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES} ${CUDA_curand_LIBRARY} ${CUDA_cusolver_LIBRARY} ${CUDA_nvrtc_LIBRARY}")
-      message("CUDA toolkit root dir: ${CUDA_TOOLKIT_ROOT_DIR}")
       find_library(CUDA_cuda_LIBRARY cuda
           HINTS ${CUDA_TOOLKIT_ROOT_DIR} ${CUDA_TOOLKIT_ROOT_DIR}/lib ${CUDA_TOOLKIT_ROOT_DIR}/lib64)
       find_library(CUDA_nvrtc_LIBRARY nvrtc
