@@ -47,9 +47,11 @@
 //  (including negligence or otherwise) arising in any way out of the use
 //  of this software, even if advised of the possibility of such damage.
 
+#include <armadillo>
 #include <bandicoot>
 #include "../catch.hpp"
 #include "def_lapack_test.hpp"
+#include "translate_lapack_test.hpp"
 
 using namespace coot;
 
@@ -60,6 +62,11 @@ using namespace coot;
 TEST_CASE("magma_dorgqr2_1", "[orgqr2]")
   {
   if (get_rt().backend != CL_BACKEND)
+    {
+    return;
+    }
+
+  if (!coot_rt_t::is_supported_type<double>())
     {
     return;
     }
@@ -105,9 +112,9 @@ TEST_CASE("magma_dorgqr2_1", "[orgqr2]")
     // that.
     arma::Mat<double> hA_alias(hA, lda, n, false, true);
     hA_alias.randu();
-    coot_fortran(coot_dlacpy)( "F", &m, &n, hA, &lda, hR, &lda );
+    lapack::lacpy('F', m, n, hA, lda, hR, lda);
 
-    Anorm = coot_fortran(coot_dlange)("F", &m, &n, hA, &lda, work );
+    Anorm = lapack::lange('F', m, n, hA, lda, work);
 
     /* ====================================================================
        Performs operation using MAGMA
@@ -122,7 +129,7 @@ TEST_CASE("magma_dorgqr2_1", "[orgqr2]")
       }
     REQUIRE( info == 0 );
     magma_dgetmatrix( m, n, dA, 0, ldda, hA, lda, queue );
-    coot_fortran(coot_dlacpy)( "F", &m, &n, hA, &lda, hR, &lda );
+    lapack::lacpy('F', m, n, hA, lda, hR, lda);
     magma_dgetmatrix( nb, min_mn, dT, 0, nb, hT, nb, queue );  // for multi GPU
 
     magma_dorgqr2( m, n, k, hR, lda, tau, &info );
@@ -135,7 +142,7 @@ TEST_CASE("magma_dorgqr2_1", "[orgqr2]")
     /* =====================================================================
        Performs operation using LAPACK
        =================================================================== */
-    coot_fortran(coot_dorgqr)( &m, &n, &k, hA, &lda, tau, h_work, &lwork, &info );
+    lapack::orgqr(m, n, k, hA, lda, tau, h_work, lwork, &info);
     if (info != 0)
       {
       std::cerr << "coot_dorgqr returned error " << info << ": " << magma::error_as_string(info) << std::endl;
@@ -143,8 +150,8 @@ TEST_CASE("magma_dorgqr2_1", "[orgqr2]")
     REQUIRE( info == 0 );
 
     // compute relative error |R|/|A| := |Q_magma - Q_lapack|/|A|
-    coot_fortran(coot_daxpy)( &n2, &c_neg_one, hA, &ione, hR, &ione );
-    error = coot_fortran(coot_dlange)("F", &m, &n, hR, &lda, work) / Anorm;
+    blas::axpy(n2, c_neg_one, hA, ione, hR, ione);
+    error = lapack::lange('F', m, n, hR, lda, work) / Anorm;
 
     REQUIRE( error < tol );
 
@@ -212,9 +219,9 @@ TEST_CASE("magma_sorgqr2_1", "[orgqr2]")
     // that.
     arma::Mat<float> hA_alias(hA, lda, n, false, true);
     hA_alias.randu();
-    coot_fortran(coot_slacpy)( "F", &m, &n, hA, &lda, hR, &lda );
+    lapack::lacpy('F', m, n, hA, lda, hR, lda);
 
-    Anorm = coot_fortran(coot_slange)("F", &m, &n, hA, &lda, work );
+    Anorm = lapack::lange('F', m, n, hA, lda, work);
 
     /* ====================================================================
        Performs operation using MAGMA
@@ -229,7 +236,7 @@ TEST_CASE("magma_sorgqr2_1", "[orgqr2]")
       }
     REQUIRE( info == 0 );
     magma_sgetmatrix( m, n, dA, 0, ldda, hA, lda, queue );
-    coot_fortran(coot_slacpy)( "F", &m, &n, hA, &lda, hR, &lda );
+    lapack::lacpy('F', m, n, hA, lda, hR, lda);
     magma_sgetmatrix( nb, min_mn, dT, 0, nb, hT, nb, queue );  // for multi GPU
 
     magma_sorgqr2( m, n, k, hR, lda, tau, &info );
@@ -242,7 +249,7 @@ TEST_CASE("magma_sorgqr2_1", "[orgqr2]")
     /* =====================================================================
        Performs operation using LAPACK
        =================================================================== */
-    coot_fortran(coot_sorgqr)( &m, &n, &k, hA, &lda, tau, h_work, &lwork, &info );
+    lapack::orgqr(m, n, k, hA, lda, tau, h_work, lwork, &info);
     if (info != 0)
       {
       std::cerr << "coot_sorgqr returned error " << info << ": " << magma::error_as_string(info) << std::endl;
@@ -250,8 +257,8 @@ TEST_CASE("magma_sorgqr2_1", "[orgqr2]")
     REQUIRE( info == 0 );
 
     // compute relative error |R|/|A| := |Q_magma - Q_lapack|/|A|
-    coot_fortran(coot_saxpy)( &n2, &c_neg_one, hA, &ione, hR, &ione );
-    error = coot_fortran(coot_slange)("F", &m, &n, hR, &lda, work) / Anorm;
+    blas::axpy(n2, c_neg_one, hA, ione, hR, ione);
+    error = lapack::lange('F', m, n, hR, lda, work) / Anorm;
 
     REQUIRE( error < tol );
 

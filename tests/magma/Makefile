@@ -1,10 +1,7 @@
-#LIB_FLAGS = -lbandicoot
-#LIB_FLAGS = -lbandicoot -lOpenCL -lclBLAS -lnvrtc -lcudart -lcublas -lcuda
-LIB_FLAGS = -lOpenCL -lclBLAS -lnvrtc -lcudart -lcublas -lcuda -lcurand -lcusolver -llapack -lblas -larmadillo
+LIB_FLAGS = -lOpenCL -lclBLAS -llapack -lblas -larmadillo
 
-CXX_FLAGS = -std=c++11 -Wshadow -Wall -pedantic -O0 -I../../include/ -g -DCOOT_USE_U64S64
-BACKEND = CL_BACKEND
-#BACKEND = CUDA_BACKEND
+# NOTE: no wrapper in use!
+CXX_FLAGS = -std=c++11 -Wshadow -Wall -pedantic -O0 -I../../include/ -g -DCOOT_DEFAULT_BACKEND=CL_BACKEND -DCOOT_DONT_USE_CUDA -DCOOT_USE_OPENCL
 
 OBJECTS = $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 
@@ -12,8 +9,7 @@ OBJECTS = $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 LAPACKTEST_OBJECTS = $(patsubst %.f,%.fo,$(wildcard *.f))
 
 %.o: %.cpp $(DEPS)
-	$(CXX) $(CXX_FLAGS) -DCOOT_DEFAULT_BACKEND=$(BACKEND) -o $@ -c $<
-#	$(CXX) $(CXX_FLAGS) -o $@ -c $<
+	$(CXX) $(CXX_FLAGS) -o $@ -c $<
 
 %.fo: %.f $(DEPS)
 	$(FC) -o $@ -c $<

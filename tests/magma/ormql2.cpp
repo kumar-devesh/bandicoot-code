@@ -47,9 +47,11 @@
 //  (including negligence or otherwise) arising in any way out of the use
 //  of this software, even if advised of the possibility of such damage.
 
+#include <armadillo>
 #include <bandicoot>
 #include "../catch.hpp"
 #include "def_lapack_test.hpp"
+#include "translate_lapack_test.hpp"
 #include "sgeqlf.hpp"
 #include "dgeqlf.hpp"
 
@@ -62,6 +64,11 @@ using namespace coot;
 TEST_CASE("magma_dormql2_1", "[ormql2]")
   {
   if (get_rt().backend != CL_BACKEND)
+    {
+    return;
+    }
+
+  if (!coot_rt_t::is_supported_type<double>())
     {
     return;
     }
@@ -140,9 +147,9 @@ TEST_CASE("magma_dormql2_1", "[ormql2]")
 
         magma_dgetmatrix( m, n, dC, 0, ldc, R, ldc, queue );
 
-        coot_fortran(coot_dormql)( lapack_side_const( side[iside] ), lapack_trans_const( trans[itran] ),
-                                   &m, &n, &k,
-                                   A, &lda, tau, C, &ldc, hwork, &lwork_max, &info );
+        lapack_test::ormql(lapack_side_const(side[iside])[0], lapack_trans_const(trans[itran])[0],
+                           m, n, k,
+                           A, lda, tau, C, ldc, hwork, lwork_max, &info);
         if (info != 0)
           {
           std::cerr << "LAPACK dormql returned error " << info << ": " << magma::error_as_string( info ) << std::endl;
@@ -153,9 +160,9 @@ TEST_CASE("magma_dormql2_1", "[ormql2]")
            compute relative error |QC_magma - QC_lapack| / |QC_lapack|
            =================================================================== */
         size = ldc*n;
-        coot_fortran(coot_daxpy)( &size, &c_neg_one, C, &ione, R, &ione );
-        Cnorm = coot_fortran(coot_dlange)( "F", &m, &n, C, &ldc, work );
-        error = coot_fortran(coot_dlange)( "F", &m, &n, R, &ldc, work ) / (std::sqrt(m*n) * Cnorm);
+        blas::axpy(size, c_neg_one, C, ione, R, ione);
+        Cnorm = lapack::lange('F', m, n, C, ldc, work);
+        error = lapack::lange('F', m, n, R, ldc, work) / (std::sqrt(m*n) * Cnorm);
 
         REQUIRE (error < tol);
 
@@ -257,9 +264,9 @@ TEST_CASE("magma_sormql2_1", "[ormql2]")
 
         magma_sgetmatrix( m, n, dC, 0, ldc, R, ldc, queue );
 
-        coot_fortran(coot_sormql)( lapack_side_const( side[iside] ), lapack_trans_const( trans[itran] ),
-                                   &m, &n, &k,
-                                   A, &lda, tau, C, &ldc, hwork, &lwork_max, &info );
+        lapack_test::ormql(lapack_side_const(side[iside])[0], lapack_trans_const(trans[itran])[0],
+                           m, n, k,
+                           A, lda, tau, C, ldc, hwork, lwork_max, &info);
         if (info != 0)
           {
           std::cerr << "LAPACK sormql returned error " << info << ": " << magma::error_as_string( info ) << std::endl;
@@ -270,9 +277,9 @@ TEST_CASE("magma_sormql2_1", "[ormql2]")
            compute relative error |QC_magma - QC_lapack| / |QC_lapack|
            =================================================================== */
         size = ldc*n;
-        coot_fortran(coot_saxpy)( &size, &c_neg_one, C, &ione, R, &ione );
-        Cnorm = coot_fortran(coot_slange)( "F", &m, &n, C, &ldc, work );
-        error = coot_fortran(coot_slange)( "F", &m, &n, R, &ldc, work ) / (std::sqrt(m*n) * Cnorm);
+        blas::axpy(size, c_neg_one, C, ione, R, ione);
+        Cnorm = lapack::lange('F', m, n, C, ldc, work);
+        error = lapack::lange('F', m, n, R, ldc, work) / (std::sqrt(m*n) * Cnorm);
 
         REQUIRE (error < tol);
 

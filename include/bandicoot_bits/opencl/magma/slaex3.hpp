@@ -296,7 +296,7 @@ magma_slaex3
         {
         // Prepare the INDXQ sorting permutation.
         magma_int_t nk = n - k;
-        coot_fortran(coot_slamrg)( &k, &nk, d, &ione, &ineg_one, indxq);
+        lapack::lamrg(k, nk, d, ione, ineg_one, indxq);
 
         // compute the lower and upper bound of the non-deflated eigenvectors
         if (valeig)
@@ -334,11 +334,11 @@ magma_slaex3
       else if (k != 1)
         {
         // Compute updated W.
-        coot_fortran(coot_scopy)( &ik, &w[ibegin], &ione, &s[ibegin], &ione);
+        blas::copy(ik, &w[ibegin], ione, &s[ibegin], ione);
 
         // Initialize W(I) = Q(I,I)
         tmp = ldq + 1;
-        coot_fortran(coot_scopy)( &ik, Q + ibegin + ibegin * ldq, &tmp, &w[ibegin], &ione);
+        blas::copy(ik, Q + ibegin + ibegin * ldq, tmp, &w[ibegin], ione);
 
         for (j = 0; j < k; ++j)
           {
@@ -407,14 +407,14 @@ magma_slaex3
 
   for (i = 0; i < k; ++i)
     {
-    dlamda[i] = coot_fortran(coot_slamc3)(&dlamda[i], &dlamda[i]) - dlamda[i];
+    dlamda[i] = lapack::lamc3(&dlamda[i], &dlamda[i]) - dlamda[i];
     }
 
   for (j = 0; j < k; ++j)
     {
     magma_int_t tmpp = j+1;
     magma_int_t iinfo = 0;
-    coot_fortran(coot_slaed4)(&k, &tmpp, dlamda, w, Q + j * ldq, &rho, &d[j], &iinfo);
+    lapack::laed4(k, tmpp, dlamda, w, Q + j * ldq, rho, &d[j], &iinfo);
     // If the zero finder fails, the computation is terminated.
     if (iinfo != 0)
       {
@@ -429,7 +429,7 @@ magma_slaex3
 
   // Prepare the INDXQ sorting permutation.
   magma_int_t nk = n - k;
-  coot_fortran(coot_slamrg)( &k, &nk, d, &ione, &ineg_one, indxq);
+  lapack::lamrg(k, nk, d, ione, ineg_one, indxq);
 
   // compute the lower and upper bound of the non-deflated eigenvectors
   if (valeig)
@@ -463,11 +463,11 @@ magma_slaex3
   else if (k != 1)
     {
     // Compute updated W.
-    coot_fortran(coot_scopy)( &k, w, &ione, s, &ione);
+    blas::copy(k, w, ione, s, ione);
 
     // Initialize W(I) = Q(I,I)
     tmp = ldq + 1;
-    coot_fortran(coot_scopy)( &k, Q, &tmp, w, &ione);
+    blas::copy(k, Q, tmp, w, ione);
 
     for (j = 0; j < k; ++j)
       {
@@ -511,9 +511,9 @@ magma_slaex3
       {
       if (rk < magma_get_slaed3_k())
         {
-        coot_fortran(coot_slacpy)("A", &n23, &rk, Q + ctot[0] + (iil-1) * ldq, &ldq, s, &n23);
-        coot_fortran(coot_sgemm)("N", "N", &n2, &rk, &n23, &d_one, &Q2[iq2], &n2,
-                                 s, &n23, &d_zero, Q + n1 + (iil-1) * ldq, &ldq );
+        lapack::lacpy('A', n23, rk, Q + ctot[0] + (iil-1) * ldq, ldq, s, n23);
+        blas::gemm('N', 'N', n2, rk, n23, d_one, &Q2[iq2], n2,
+                   s, n23, d_zero, Q + n1 + (iil-1) * ldq, ldq);
         }
       else
         {
@@ -527,16 +527,16 @@ magma_slaex3
       }
     else
       {
-      coot_fortran(coot_slaset)("A", &n2, &rk, &d_zero, &d_zero, Q + n1 + (iil-1) * ldq, &ldq);
+      lapack::laset('A', n2, rk, d_zero, d_zero, Q + n1 + (iil-1) * ldq, ldq);
       }
 
     if ( n12 != 0 )
       {
       if (rk < magma_get_slaed3_k())
         {
-        coot_fortran(coot_slacpy)("A", &n12, &rk, Q + (iil-1) * ldq, &ldq, s, &n12);
-        coot_fortran(coot_sgemm)("N", "N", &n1, &rk, &n12, &d_one, Q2, &n1,
-                                 s, &n12, &d_zero, Q + (iil-1) * ldq, &ldq);
+        lapack::lacpy('A', n12, rk, Q + (iil-1) * ldq, ldq, s, n12);
+        blas::gemm('N', 'N', n1, rk, n12, d_one, Q2, n1,
+                   s, n12, d_zero, Q + (iil-1) * ldq, ldq);
         }
       else
         {
@@ -550,7 +550,7 @@ magma_slaex3
       }
     else
       {
-      coot_fortran(coot_slaset)("A", &n1, &rk, &d_zero, &d_zero, Q + (iil-1) * ldq, &ldq);
+      lapack::laset('A', n1, rk, d_zero, d_zero, Q + (iil-1) * ldq, ldq);
       }
     }
 

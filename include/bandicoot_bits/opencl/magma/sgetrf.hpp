@@ -137,7 +137,7 @@ magma_sgetrf_gpu
       return *info;
       }
     magma_sgetmatrix( m, n, dA, dA_offset, ldda, work, m, queues[0] );
-    coot_fortran(coot_sgetrf)( &m, &n, work, &m, ipiv, info );
+    lapack::getrf(m, n, work, m, ipiv, info);
     magma_ssetmatrix( m, n, work, m, dA, dA_offset, ldda, queues[0] );
     magma_free_cpu( work );  work=NULL;
 
@@ -211,7 +211,7 @@ magma_sgetrf_gpu
 
       // do the cpu part
       magma_queue_sync( queues[0] );  // wait to get work
-      coot_fortran(coot_sgetrf)( &rows, &nb, work, &ldwork, ipiv+j, &iinfo );
+      lapack::getrf(rows, nb, work, ldwork, ipiv + j, &iinfo);
       if ( *info == 0 && iinfo > 0 )
         {
         *info = iinfo + j;
@@ -265,7 +265,7 @@ magma_sgetrf_gpu
       magma_sgetmatrix( rows, jb, dAP, 0, maxm, work, ldwork, queues[1] );
 
       // do the cpu part
-      coot_fortran(coot_sgetrf)( &rows, &jb, work, &ldwork, ipiv+j, &iinfo );
+      lapack::getrf(rows, jb, work, ldwork, ipiv + j, &iinfo);
       if ( *info == 0 && iinfo > 0 )
           *info = iinfo + j;
 

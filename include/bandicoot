@@ -271,6 +271,8 @@ namespace coot
   // definitions for LAPACK and BLAS functions
   #include "bandicoot_bits/def_blas.hpp"
   #include "bandicoot_bits/def_lapack.hpp"
+  #include "bandicoot_bits/translate_blas.hpp"
+  #include "bandicoot_bits/translate_lapack.hpp"
 
   //
   // runtime

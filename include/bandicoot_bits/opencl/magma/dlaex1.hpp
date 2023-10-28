@@ -145,15 +145,15 @@ magma_dlaex1
 
   //  Form the z-vector which consists of the last row of Q_1 and the
   //  first row of Q_2.
-  coot_fortran(coot_dcopy)( &cutpnt, Q + (cutpnt-1), &ldq, &work[iz], &ione);
+  blas::copy(cutpnt, Q + (cutpnt-1), ldq, &work[iz], ione);
   tmp = n-cutpnt;
-  coot_fortran(coot_dcopy)( &tmp, Q + (cutpnt) + (cutpnt) * ldq, &ldq, &work[iz+cutpnt], &ione);
+  blas::copy(tmp, Q + (cutpnt) + (cutpnt) * ldq, ldq, &work[iz+cutpnt], ione);
 
   //  Deflate eigenvalues.
-  coot_fortran(coot_dlaed2)(&k, &n, &cutpnt, d, Q, &ldq, indxq, &rho, &work[iz],
-                            &work[idlmda], &work[iw], &work[iq2],
-                            &iwork[indx], &iwork[indxc], &iwork[indxp],
-                            &iwork[coltyp], info);
+  lapack::laed2(&k, n, cutpnt, d, Q, ldq, indxq, &rho, &work[iz],
+                &work[idlmda], &work[iw], &work[iq2],
+                &iwork[indx], &iwork[indxc], &iwork[indxp],
+                &iwork[coltyp], info);
 
   if ( *info != 0 )
     {

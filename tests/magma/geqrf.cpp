@@ -47,9 +47,11 @@
 //  (including negligence or otherwise) arising in any way out of the use
 //  of this software, even if advised of the possibility of such damage.
 
+#include <armadillo>
 #include <bandicoot>
 #include "../catch.hpp"
 #include "def_lapack_test.hpp"
+#include "translate_lapack_test.hpp"
 
 using namespace coot;
 
@@ -60,6 +62,11 @@ using namespace coot;
 TEST_CASE("magma_dgeqrf_1", "[geqrf]")
   {
   if (get_rt().backend != CL_BACKEND)
+    {
+    return;
+    }
+
+  if (!coot_rt_t::is_supported_type<double>())
     {
     return;
     }
@@ -87,7 +94,7 @@ TEST_CASE("magma_dgeqrf_1", "[geqrf]")
 
     // query for workspace size
     lwork = -1;
-    coot_fortran(coot_dgeqrf)( &M, &N, unused, &M, unused, tmp, &lwork, &info );
+    lapack::geqrf(M, N, unused, M, unused, tmp, lwork, &info);
     lwork = (magma_int_t) tmp[0];
     lwork = std::max( lwork, N*nb );
 
@@ -100,7 +107,7 @@ TEST_CASE("magma_dgeqrf_1", "[geqrf]")
     // Initialize to uniform random matrix.
     arma::Mat<double> h_A_alias(h_A, lda, N, false, true);
     h_A_alias.randu();
-    coot_fortran(coot_dlacpy)( "F", &M, &N, h_A, &lda, h_R, &lda );
+    lapack::lacpy('F', M, N, h_A, lda, h_R, lda);
 
     /* ====================================================================
        Performs operation using MAGMA
@@ -125,27 +132,27 @@ TEST_CASE("magma_dgeqrf_1", "[geqrf]")
     REQUIRE( magma_dmalloc_cpu( &work, min_mn ) == MAGMA_SUCCESS );
 
     // generate M by K matrix Q, where K = min(M,N)
-    coot_fortran(coot_dlacpy)( "L", &M, &min_mn, h_R, &lda, Q, &ldq );
-    coot_fortran(coot_dorgqr)( &M, &min_mn, &min_mn, Q, &ldq, tau, h_work, &lwork, &info );
+    lapack::lacpy('L', M, min_mn, h_R, lda, Q, ldq);
+    lapack::orgqr(M, min_mn, min_mn, Q, ldq, tau, h_work, lwork, &info);
     REQUIRE( info == 0 );
 
     // copy K by N matrix R
-    coot_fortran(coot_dlaset)( "L", &min_mn, &N, &c_zero, &c_zero, R, &ldr );
-    coot_fortran(coot_dlacpy)( "U", &min_mn, &N, h_R, &lda,        R, &ldr );
+    lapack::laset('L', min_mn, N, c_zero, c_zero, R, ldr);
+    lapack::lacpy('U', min_mn, N, h_R, lda,       R, ldr);
 
     // error = || R - Q^H*A || / (N * ||A||)
-    coot_fortran(coot_dgemm)( "C", "N", &min_mn, &N, &M,
-                              &c_neg_one, Q, &ldq, h_A, &lda, &c_one, R, &ldr );
-    Anorm = coot_fortran(coot_dlange)( "1", &M,      &N, h_A, &lda, work );
-    error = coot_fortran(coot_dlange)( "1", &min_mn, &N, R,   &ldr, work );
+    blas::gemm('C', 'N', min_mn, N, M,
+               c_neg_one, Q, ldq, h_A, lda, c_one, R, ldr);
+    Anorm = lapack::lange('1', M,      N, h_A, lda, work);
+    error = lapack::lange('1', min_mn, N, R,   ldr, work);
     if ( N > 0 && Anorm > 0 )
       error /= (N*Anorm);
 
     // set R = I (K by K identity), then R = I - Q^H*Q
     // error = || I - Q^H*Q || / N
-    coot_fortran(coot_dlaset)( "U", &min_mn, &min_mn, &c_zero, &c_one, R, &ldr );
-    coot_fortran(coot_dsyrk)( "U", "C", &min_mn, &M, &d_neg_one, Q, &ldq, &d_one, R, &ldr );
-    error2 = coot_fortran(coot_dlansy)( "1", "U", &min_mn, R, &ldr, work );
+    lapack::laset('U', min_mn, min_mn, c_zero, c_one, R, ldr);
+    blas::syrk('U', 'C', min_mn, M, d_neg_one, Q, ldq, d_one, R, ldr);
+    error2 = lapack_test::lansy('1', 'U', min_mn, R, ldr, work);
     if ( N > 0 )
       error2 /= N;
 
@@ -168,6 +175,11 @@ TEST_CASE("magma_dgeqrf_1", "[geqrf]")
 TEST_CASE("magma_dgeqrf2_1", "[geqrf]")
   {
   if (get_rt().backend != CL_BACKEND)
+    {
+    return;
+    }
+
+  if (!coot_rt_t::is_supported_type<double>())
     {
     return;
     }
@@ -197,7 +209,7 @@ TEST_CASE("magma_dgeqrf2_1", "[geqrf]")
     ldda   = magma_roundup( M, 32 );  // multiple of 32 by default
 
     lwork = -1;
-    coot_fortran(coot_dgeqrf)(&M, &N, unused, &M, unused, tmp, &lwork, &info);
+    lapack::geqrf(M, N, unused, M, unused, tmp, lwork, &info);
     lwork = (magma_int_t) tmp[0];
 
     REQUIRE( magma_dmalloc_cpu( &tau,    min_mn ) == MAGMA_SUCCESS );
@@ -210,7 +222,7 @@ TEST_CASE("magma_dgeqrf2_1", "[geqrf]")
     arma::mat h_A_alias(h_A, lda, N, false, true);
     h_A_alias.randu();
     // Copy that matrix to h_R and then d_A.
-    coot_fortran(coot_dlacpy)( "A", &M, &N, h_A, &lda, h_R, &lda );
+    lapack::lacpy('A', M, N, h_A, lda, h_R, lda);
     magma_dsetmatrix( M, N, h_R, lda, d_A, 0, ldda, queue );
 
     // LAPACK complaint arguments
@@ -239,28 +251,28 @@ TEST_CASE("magma_dgeqrf2_1", "[geqrf]")
     REQUIRE( magma_dmalloc_cpu( &work, min_mn ) == MAGMA_SUCCESS );
 
     // generate M by K matrix Q, where K = min(M,N)
-    coot_fortran(coot_dlacpy)("L", &M, &min_mn, h_R, &lda, Q, &ldq);
-    coot_fortran(coot_dorgqr)(&M, &min_mn, &min_mn, Q, &ldq, tau, h_work, &lwork, &info);
+    lapack::lacpy('L', M, min_mn, h_R, lda, Q, ldq);
+    lapack::orgqr(M, min_mn, min_mn, Q, ldq, tau, h_work, lwork, &info);
     REQUIRE( info == 0 );
 
     // copy K by N matrix R
-    coot_fortran(coot_dlaset)("L", &min_mn, &N, &c_zero, &c_zero, R, &ldr);
-    coot_fortran(coot_dlacpy)("U", &min_mn, &N, h_R, &lda, R, &ldr);
+    lapack::laset('L', min_mn, N, c_zero, c_zero, R, ldr);
+    lapack::lacpy('U', min_mn, N, h_R, lda, R, ldr);
 
     // error = || R - Q^H*A || / (N * ||A||)
-    coot_fortran(coot_dgemm)("C", "N", &min_mn, &N, &M,
-                   &c_neg_one, Q, &ldq, h_A, &lda, &c_one, R, &ldr );
+    blas::gemm('C', 'N', min_mn, N, M,
+               c_neg_one, Q, ldq, h_A, lda, c_one, R, ldr);
     arma::mat hA_alias(h_A, M, N, false, true);
-    Anorm = coot_fortran(coot_dlange)( "1", &M,      &N, h_A, &lda, work );
-    error = coot_fortran(coot_dlange)( "1", &min_mn, &N, R,   &ldr, work );
+    Anorm = lapack::lange('1', M,      N, h_A, lda, work);
+    error = lapack::lange('1', min_mn, N, R,   ldr, work);
     if ( N > 0 && Anorm > 0 )
       error /= (N*Anorm);
 
     // set R = I (K by K identity), then R = I - Q^H*Q
     // error = || I - Q^H*Q || / N
-    coot_fortran(coot_dlaset)("U", &min_mn, &min_mn, &c_zero, &c_one, R, &ldr);
-    coot_fortran(coot_dsyrk)("U", "C", &min_mn, &M, &d_neg_one, Q, &ldq, &d_one, R, &ldr);
-    error2 = coot_fortran(coot_dlansy)("1", "U", &min_mn, R, &ldr, work);
+    lapack::laset('U', min_mn, min_mn, c_zero, c_one, R, ldr);
+    blas::syrk('U', 'C', min_mn, M, d_neg_one, Q, ldq, d_one, R, ldr);
+    error2 = lapack_test::lansy('1', 'U', min_mn, R, ldr, work);
     if ( N > 0 )
       error2 /= N;
 
@@ -313,7 +325,7 @@ TEST_CASE("magma_sgeqrf_1", "[geqrf]")
 
     // query for workspace size
     lwork = -1;
-    coot_fortran(coot_sgeqrf)( &M, &N, unused, &M, unused, tmp, &lwork, &info );
+    lapack::geqrf(M, N, unused, M, unused, tmp, lwork, &info);
     lwork = (magma_int_t) tmp[0];
     lwork = std::max( lwork, N*nb );
 
@@ -326,7 +338,7 @@ TEST_CASE("magma_sgeqrf_1", "[geqrf]")
     // Initialize to uniform random matrix.
     arma::Mat<float> h_A_alias(h_A, lda, N, false, true);
     h_A_alias.randu();
-    coot_fortran(coot_slacpy)( "F", &M, &N, h_A, &lda, h_R, &lda );
+    lapack::lacpy('F', M, N, h_A, lda, h_R, lda);
 
     /* ====================================================================
        Performs operation using MAGMA
@@ -351,27 +363,27 @@ TEST_CASE("magma_sgeqrf_1", "[geqrf]")
     REQUIRE( magma_smalloc_cpu( &work, min_mn ) == MAGMA_SUCCESS );
 
     // generate M by K matrix Q, where K = min(M,N)
-    coot_fortran(coot_slacpy)( "L", &M, &min_mn, h_R, &lda, Q, &ldq );
-    coot_fortran(coot_sorgqr)( &M, &min_mn, &min_mn, Q, &ldq, tau, h_work, &lwork, &info );
+    lapack::lacpy('L', M, min_mn, h_R, lda, Q, ldq);
+    lapack::orgqr(M, min_mn, min_mn, Q, ldq, tau, h_work, lwork, &info);
     REQUIRE( info == 0 );
 
     // copy K by N matrix R
-    coot_fortran(coot_slaset)( "L", &min_mn, &N, &c_zero, &c_zero, R, &ldr );
-    coot_fortran(coot_slacpy)( "U", &min_mn, &N, h_R, &lda,        R, &ldr );
+    lapack::laset('L', min_mn, N, c_zero, c_zero, R, ldr);
+    lapack::lacpy('U', min_mn, N, h_R, lda,       R, ldr);
 
     // error = || R - Q^H*A || / (N * ||A||)
-    coot_fortran(coot_sgemm)( "C", "N", &min_mn, &N, &M,
-                              &c_neg_one, Q, &ldq, h_A, &lda, &c_one, R, &ldr );
-    Anorm = coot_fortran(coot_slange)( "1", &M,      &N, h_A, &lda, work );
-    error = coot_fortran(coot_slange)( "1", &min_mn, &N, R,   &ldr, work );
+    blas::gemm('C', 'N', min_mn, N, M,
+               c_neg_one, Q, ldq, h_A, lda, c_one, R, ldr);
+    Anorm = lapack::lange('1', M,      N, h_A, lda, work);
+    error = lapack::lange('1', min_mn, N, R,   ldr, work);
     if ( N > 0 && Anorm > 0 )
       error /= (N*Anorm);
 
     // set R = I (K by K identity), then R = I - Q^H*Q
     // error = || I - Q^H*Q || / N
-    coot_fortran(coot_slaset)( "U", &min_mn, &min_mn, &c_zero, &c_one, R, &ldr );
-    coot_fortran(coot_ssyrk)( "U", "C", &min_mn, &M, &d_neg_one, Q, &ldq, &d_one, R, &ldr );
-    error2 = coot_fortran(coot_slansy)( "1", "U", &min_mn, R, &ldr, work );
+    lapack::laset('U', min_mn, min_mn, c_zero, c_one, R, ldr);
+    blas::syrk('U', 'C', min_mn, M, d_neg_one, Q, ldq, d_one, R, ldr);
+    error2 = lapack_test::lansy('1', 'U', min_mn, R, ldr, work);
     if ( N > 0 )
       error2 /= N;
 
@@ -423,7 +435,7 @@ TEST_CASE("magma_sgeqrf2_1", "[geqrf]")
     ldda   = magma_roundup( M, 32 );  // multiple of 32 by default
 
     lwork = -1;
-    coot_fortran(coot_sgeqrf)(&M, &N, unused, &M, unused, tmp, &lwork, &info);
+    lapack::geqrf(M, N, unused, M, unused, tmp, lwork, &info);
     lwork = (magma_int_t) tmp[0];
 
     REQUIRE( magma_smalloc_cpu( &tau,    min_mn ) == MAGMA_SUCCESS );
@@ -436,7 +448,7 @@ TEST_CASE("magma_sgeqrf2_1", "[geqrf]")
     arma::Mat<float> h_A_alias(h_A, lda, N, false, true);
     h_A_alias.randu();
     // Copy that matrix to h_R and then d_A.
-    coot_fortran(coot_slacpy)( "A", &M, &N, h_A, &lda, h_R, &lda );
+    lapack::lacpy('A', M, N, h_A, lda, h_R, lda);
     magma_ssetmatrix( M, N, h_R, lda, d_A, 0, ldda, queue );
 
     // LAPACK complaint arguments
@@ -465,28 +477,28 @@ TEST_CASE("magma_sgeqrf2_1", "[geqrf]")
     REQUIRE( magma_smalloc_cpu( &work, min_mn ) == MAGMA_SUCCESS );
 
     // generate M by K matrix Q, where K = min(M,N)
-    coot_fortran(coot_slacpy)("L", &M, &min_mn, h_R, &lda, Q, &ldq);
-    coot_fortran(coot_sorgqr)(&M, &min_mn, &min_mn, Q, &ldq, tau, h_work, &lwork, &info);
+    lapack::lacpy('L', M, min_mn, h_R, lda, Q, ldq);
+    lapack::orgqr(M, min_mn, min_mn, Q, ldq, tau, h_work, lwork, &info);
     REQUIRE( info == 0 );
 
     // copy K by N matrix R
-    coot_fortran(coot_slaset)("L", &min_mn, &N, &c_zero, &c_zero, R, &ldr);
-    coot_fortran(coot_slacpy)("U", &min_mn, &N, h_R, &lda, R, &ldr);
+    lapack::laset('L', min_mn, N, c_zero, c_zero, R, ldr);
+    lapack::lacpy('U', min_mn, N, h_R, lda, R, ldr);
 
     // error = || R - Q^H*A || / (N * ||A||)
-    coot_fortran(coot_sgemm)("C", "N", &min_mn, &N, &M,
-                   &c_neg_one, Q, &ldq, h_A, &lda, &c_one, R, &ldr );
+    blas::gemm('C', 'N', min_mn, N, M,
+               c_neg_one, Q, ldq, h_A, lda, c_one, R, ldr);
     arma::Mat<float> hA_alias(h_A, M, N, false, true);
-    Anorm = coot_fortran(coot_slange)( "1", &M,      &N, h_A, &lda, work );
-    error = coot_fortran(coot_slange)( "1", &min_mn, &N, R,   &ldr, work );
+    Anorm = lapack::lange('1', M,      N, h_A, lda, work);
+    error = lapack::lange('1', min_mn, N, R,   ldr, work);
     if ( N > 0 && Anorm > 0 )
       error /= (N*Anorm);
 
     // set R = I (K by K identity), then R = I - Q^H*Q
     // error = || I - Q^H*Q || / N
-    coot_fortran(coot_slaset)("U", &min_mn, &min_mn, &c_zero, &c_one, R, &ldr);
-    coot_fortran(coot_ssyrk)("U", "C", &min_mn, &M, &d_neg_one, Q, &ldq, &d_one, R, &ldr);
-    error2 = coot_fortran(coot_slansy)("1", "U", &min_mn, R, &ldr, work);
+    lapack::laset('U', min_mn, min_mn, c_zero, c_one, R, ldr);
+    blas::syrk('U', 'C', min_mn, M, d_neg_one, Q, ldq, d_one, R, ldr);
+    error2 = lapack_test::lansy('1', 'U', min_mn, R, ldr, work);
     if ( N > 0 )
       error2 /= N;
 

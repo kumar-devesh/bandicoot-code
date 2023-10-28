@@ -301,9 +301,6 @@ glue_times::apply
   {
   coot_extra_debug_sigprint();
 
-  typedef typename T1::elem_type eT1;
-  typedef typename T1::elem_type eT2;
-
   coot_debug_assert_trans_mul_size<do_trans_A, do_trans_B>(A.n_rows, A.n_cols, B.n_rows, B.n_cols, "matrix multiplication");
 
   const uword final_n_rows = (do_trans_A == false) ? A.n_rows : A.n_cols;

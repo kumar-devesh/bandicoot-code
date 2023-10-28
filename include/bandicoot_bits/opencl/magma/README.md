@@ -39,9 +39,13 @@ In general a series of changes are needed:
    it's tedious...
 
  * All LAPACK calls, like `lapackf77_dgesvd(...)` must be replaced with
-   `coot_fortran(coot_dgesvd)(...)`.  If, at compile time, you find that
+   `lapack::gesvd(...)`.  If, at compile time, you find that
    particular CPU LAPACK function doesn't exist, add it to
-   `bandicoot_bits/def_lapack.hpp` or `bandicoot_bits/def_blas.hpp`.
+   `bandicoot_bits/translate_lapack.hpp` (or `bandicoot_bits/translate_blas.hpp`
+   for BLAS functions), as well as `bandicoot_bits/def_lapack.hpp` (or
+   `bandicoot_bits/def_blas.hpp` for BLAS functions).  Note that the `lapack::`
+   and `blas::` provided functions don't take pointers for input arguments and
+   so the calls may need to be adjusted somewhat.
 
  * Replace anything that creates a `magma_queue_t` and populates it with the
    simpler call `magma_queue_t queue = magma_queue_create()` (or similar).

@@ -212,7 +212,7 @@ magma_dsytrd2_gpu
     magma_dgetmatrix( kk, kk, dA, dA_offset, ldda, A, lda, queue );
 
     /* Use CPU code to reduce the last or only block */
-    coot_fortran(coot_dsytrd)( uplo_, &kk, A, &lda, d, e, tau, work, &lwork, &iinfo );
+    lapack::sytrd(uplo_[0], kk, A, lda, d, e, tau, work, lwork, &iinfo);
 
     magma_dsetmatrix( kk, kk, A, lda, dA, dA_offset, ldda, queue );
     }
@@ -254,8 +254,8 @@ magma_dsytrd2_gpu
     magma_dgetmatrix( n-i, n-i, dA, dA_offset + i + i * ldda, ldda, A + i + i * lda, lda, queue );
 
     i_n = n-i;
-    coot_fortran(coot_dsytrd)( uplo_, &i_n, A + i + i * lda, &lda, &d[i], &e[i],
-                               &tau[i], work, &lwork, &iinfo );
+    lapack::sytrd(uplo_[0], i_n, A + i + i * lda, lda, &d[i], &e[i],
+                  &tau[i], work, lwork, &iinfo);
 
     magma_dsetmatrix( n-i, n-i, A + i + i * lda, lda, dA, dA_offset + i + i * ldda, ldda, queue );
     }

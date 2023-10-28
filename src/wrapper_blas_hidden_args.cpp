@@ -18,10 +18,11 @@
 #include "bandicoot_bits/config.hpp"
 
 #undef COOT_USE_WRAPPER
-#undef COOT_USE_FORTRAN_HIDDEN_ARGS
+#define COOT_USE_FORTRAN_HIDDEN_ARGS
 
 // At this stage we have prototypes for BLAS functions; so, now make the wrapper functions;
-// in this version of the wrapper, we do not bother with FORTRAN hidden arguments.
+// in this version of the wrapper, all functions with const char* arguments must
+// also have blas_len arguments indicating the length of the string.
 
 #include "bandicoot_bits/compiler_setup.hpp"
 #include "bandicoot_bits/include_opencl.hpp"
@@ -43,30 +44,30 @@ namespace coot
 
 
 
-    void coot_fortran_prefix(coot_sgemm)(const char* transA, const char* transB, const blas_int* m, const blas_int* n, const blas_int* k, const float*  alpha, const float*  A, const blas_int* ldA, const float*  B, const blas_int* ldB, const float*  beta, float*  C, const blas_int* ldC)
+    void coot_fortran_prefix(coot_sgemm)(const char* transA, const char* transB, const blas_int* m, const blas_int* n, const blas_int* k, const float*  alpha, const float*  A, const blas_int* ldA, const float*  B, const blas_int* ldB, const float*  beta, float*  C, const blas_int* ldC, blas_len transA_len, blas_len transB_len)
       {
-      coot_fortran_noprefix(coot_sgemm)(transA, transB, m, n, k, alpha, A, ldA, B, ldB, beta, C, ldC);
+      coot_fortran_noprefix(coot_sgemm)(transA, transB, m, n, k, alpha, A, ldA, B, ldB, beta, C, ldC, transA_len, transB_len);
       }
 
 
 
-    void coot_fortran_prefix(coot_dgemm)(const char* transA, const char* transB, const blas_int* m, const blas_int* n, const blas_int* k, const double* alpha, const double* A, const blas_int* ldA, const double* B, const blas_int* ldB, const double* beta, double* C, const blas_int* ldC)
+    void coot_fortran_prefix(coot_dgemm)(const char* transA, const char* transB, const blas_int* m, const blas_int* n, const blas_int* k, const double* alpha, const double* A, const blas_int* ldA, const double* B, const blas_int* ldB, const double* beta, double* C, const blas_int* ldC, blas_len transA_len, blas_len transB_len)
       {
-      coot_fortran_noprefix(coot_dgemm)(transA, transB, m, n, k, alpha, A, ldA, B, ldB, beta, C, ldC);
+      coot_fortran_noprefix(coot_dgemm)(transA, transB, m, n, k, alpha, A, ldA, B, ldB, beta, C, ldC, transA_len, transB_len);
       }
 
 
 
-    void coot_fortran_prefix(coot_cgemm)(const char* transA, const char* transB, const blas_int* m, const blas_int* n, const blas_int* k, const void*   alpha, const void*   A, const blas_int* ldA, const void*   B, const blas_int* ldB, const void*   beta, void*   C, const blas_int* ldC)
+    void coot_fortran_prefix(coot_cgemm)(const char* transA, const char* transB, const blas_int* m, const blas_int* n, const blas_int* k, const void*   alpha, const void*   A, const blas_int* ldA, const void*   B, const blas_int* ldB, const void*   beta, void*   C, const blas_int* ldC, blas_len transA_len, blas_len transB_len)
       {
-      coot_fortran_noprefix(coot_cgemm)(transA, transB, m, n, k, alpha, A, ldA, B, ldB, beta, C, ldC);
+      coot_fortran_noprefix(coot_cgemm)(transA, transB, m, n, k, alpha, A, ldA, B, ldB, beta, C, ldC, transA_len, transB_len);
       }
 
 
 
-    void coot_fortran_prefix(coot_zgemm)(const char* transA, const char* transB, const blas_int* m, const blas_int* n, const blas_int* k, const void*   alpha, const void*   A, const blas_int* ldA, const void*   B, const blas_int* ldB, const void*   beta, void*   C, const blas_int* ldC)
+    void coot_fortran_prefix(coot_zgemm)(const char* transA, const char* transB, const blas_int* m, const blas_int* n, const blas_int* k, const void*   alpha, const void*   A, const blas_int* ldA, const void*   B, const blas_int* ldB, const void*   beta, void*   C, const blas_int* ldC, blas_len transA_len, blas_len transB_len)
       {
-      coot_fortran_noprefix(coot_zgemm)(transA, transB, m, n, k, alpha, A, ldA, B, ldB, beta, C, ldC);
+      coot_fortran_noprefix(coot_zgemm)(transA, transB, m, n, k, alpha, A, ldA, B, ldB, beta, C, ldC, transA_len, transB_len);
       }
 
 
@@ -77,30 +78,30 @@ namespace coot
 
 
 
-    void coot_fortran_prefix(coot_sgemv)(const char* transA, const blas_int* m, const blas_int* n, const float*  alpha, const float*  A, const blas_int* ldA, const float*  x, const blas_int* incx, const float*  beta, float*  y, const blas_int* incy)
+    void coot_fortran_prefix(coot_sgemv)(const char* transA, const blas_int* m, const blas_int* n, const float*  alpha, const float*  A, const blas_int* ldA, const float*  x, const blas_int* incx, const float*  beta, float*  y, const blas_int* incy, blas_len transA_len)
       {
-      coot_fortran_noprefix(coot_sgemv)(transA, m, n, alpha, A, ldA, x, incx, beta, y, incy);
+      coot_fortran_noprefix(coot_sgemv)(transA, m, n, alpha, A, ldA, x, incx, beta, y, incy, transA_len);
       }
 
 
 
-    void coot_fortran_prefix(coot_dgemv)(const char* transA, const blas_int* m, const blas_int* n, const double* alpha, const double* A, const blas_int* ldA, const double* x, const blas_int* incx, const double* beta, double* y, const blas_int* incy)
+    void coot_fortran_prefix(coot_dgemv)(const char* transA, const blas_int* m, const blas_int* n, const double* alpha, const double* A, const blas_int* ldA, const double* x, const blas_int* incx, const double* beta, double* y, const blas_int* incy, blas_len transA_len)
       {
-      coot_fortran_noprefix(coot_dgemv)(transA, m, n, alpha, A, ldA, x, incx, beta, y, incy);
+      coot_fortran_noprefix(coot_dgemv)(transA, m, n, alpha, A, ldA, x, incx, beta, y, incy, transA_len);
       }
 
 
 
-    void coot_fortran_prefix(coot_cgemv)(const char* transA, const blas_int* m, const blas_int* n, const void*   alpha, const void*   A, const blas_int* ldA, const void*   x, const blas_int* incx, const void*   beta, void*   y, const blas_int* incy)
+    void coot_fortran_prefix(coot_cgemv)(const char* transA, const blas_int* m, const blas_int* n, const void*   alpha, const void*   A, const blas_int* ldA, const void*   x, const blas_int* incx, const void*   beta, void*   y, const blas_int* incy, blas_len transA_len)
       {
-      coot_fortran_noprefix(coot_cgemv)(transA, m, n, alpha, A, ldA, x, incx, beta, y, incy);
+      coot_fortran_noprefix(coot_cgemv)(transA, m, n, alpha, A, ldA, x, incx, beta, y, incy, transA_len);
       }
 
 
 
-    void coot_fortran_prefix(coot_zgemv)(const char* transA, const blas_int* m, const blas_int* n, const void*   alpha, const void*   A, const blas_int* ldA, const void*   x, const blas_int* incx, const void*   beta, void*   y, const blas_int* incy)
+    void coot_fortran_prefix(coot_zgemv)(const char* transA, const blas_int* m, const blas_int* n, const void*   alpha, const void*   A, const blas_int* ldA, const void*   x, const blas_int* incx, const void*   beta, void*   y, const blas_int* incy, blas_len transA_len)
       {
-      coot_fortran_noprefix(coot_zgemv)(transA, m, n, alpha, A, ldA, x, incx, beta, y, incy);
+      coot_fortran_noprefix(coot_zgemv)(transA, m, n, alpha, A, ldA, x, incx, beta, y, incy, transA_len);
       }
 
 
@@ -179,16 +180,16 @@ namespace coot
 
 
 
-    void coot_fortran_prefix(coot_ssyrk)(const char* uplo, const char* transA, const blas_int* n, const blas_int* k, const  float* alpha, const  float* A, const blas_int* ldA, const  float* beta,  float* C, const blas_int* ldC)
+    void coot_fortran_prefix(coot_ssyrk)(const char* uplo, const char* transA, const blas_int* n, const blas_int* k, const  float* alpha, const  float* A, const blas_int* ldA, const  float* beta,  float* C, const blas_int* ldC, blas_len uplo_len, blas_len transA_len)
       {
-      coot_fortran_noprefix(coot_ssyrk)(uplo, transA, n, k, alpha, A, ldA, beta, C, ldC);
+      coot_fortran_noprefix(coot_ssyrk)(uplo, transA, n, k, alpha, A, ldA, beta, C, ldC, uplo_len, transA_len);
       }
 
 
 
-    void coot_fortran_prefix(coot_dsyrk)(const char* uplo, const char* transA, const blas_int* n, const blas_int* k, const double* alpha, const double* A, const blas_int* ldA, const double* beta, double* C, const blas_int* ldC)
+    void coot_fortran_prefix(coot_dsyrk)(const char* uplo, const char* transA, const blas_int* n, const blas_int* k, const double* alpha, const double* A, const blas_int* ldA, const double* beta, double* C, const blas_int* ldC, blas_len uplo_len, blas_len transA_len)
       {
-      coot_fortran_noprefix(coot_dsyrk)(uplo, transA, n, k, alpha, A, ldA, beta, C, ldC);
+      coot_fortran_noprefix(coot_dsyrk)(uplo, transA, n, k, alpha, A, ldA, beta, C, ldC, uplo_len, transA_len);
       }
 
 

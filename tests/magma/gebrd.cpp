@@ -50,6 +50,7 @@
 #include <bandicoot>
 #include "../catch.hpp"
 #include "def_lapack_test.hpp"
+#include "translate_lapack_test.hpp"
 
 using namespace coot;
 
@@ -60,6 +61,11 @@ using namespace coot;
 TEST_CASE("magma_dgebrd_1", "[gebrd]")
   {
   if (get_rt().backend != CL_BACKEND)
+    {
+    return;
+    }
+
+  if (!coot_rt_t::is_supported_type<double>())
     {
     return;
     }
@@ -97,8 +103,8 @@ TEST_CASE("magma_dgebrd_1", "[gebrd]")
 
     /* Initialize the matrices */
     magma_int_t ISEED[4] = {0,0,0,1};
-    coot_fortran(coot_dlarnv)( &ione, ISEED, &n2, h_A );
-    coot_fortran(coot_dlacpy)( "A", &M, &N, h_A, &lda, h_Q, &lda );
+    lapack_test::larnv(ione, ISEED, n2, h_A);
+    lapack::lacpy('A', M, N, h_A, lda, h_Q, lda);
 
     /* ====================================================================
        Performs operation using MAGMA
@@ -124,16 +130,16 @@ TEST_CASE("magma_dgebrd_1", "[gebrd]")
     REQUIRE( magma_malloc_cpu( (void**) &h_PT,       (lda*N     ) * sizeof(double) ) == MAGMA_SUCCESS );
     REQUIRE( magma_malloc_cpu( (void**) &h_work_err, (lwork_err ) * sizeof(double) ) == MAGMA_SUCCESS );
 
-    coot_fortran(coot_dlacpy)( "A", &M, &N, h_Q, &lda, h_PT, &lda );
+    lapack::lacpy('A', M, N, h_Q, lda, h_PT, lda);
 
     // generate Q & P'
-    coot_fortran(coot_dorgbr)( "Q", &M, &minmn, &N, h_Q, &lda, tauq, h_work_err, &lwork_err, &info );
+    lapack_test::orgbr('Q', M, minmn, N, h_Q, lda, tauq, h_work_err, lwork_err, &info);
     if (info != 0)
       {
       std::cerr << "lapackf77_dorgbr #1 returned error " << info << ": " << magma::error_as_string( magma_int_t(info) ) << std::endl;
       }
     REQUIRE( info == 0 );
-    coot_fortran(coot_dorgbr)( "P", &minmn, &N, &M, h_PT, &lda, taup, h_work_err, &lwork_err, &info );
+    lapack_test::orgbr('P', minmn, N, M, h_PT, lda, taup, h_work_err, lwork_err, &info);
     if (info != 0)
       {
       std::cerr << "lapackf77_dorgbr #2 returned error " << info << ": " << magma::error_as_string( magma_int_t(info) ) << std::endl;
@@ -143,9 +149,9 @@ TEST_CASE("magma_dgebrd_1", "[gebrd]")
     // Test 1:  Check the decomposition A := Q * B * PT
     //      2:  Check the orthogonality of Q
     //      3:  Check the orthogonality of PT
-    coot_fortran(coot_dbdt01)(&M, &N, &ione, h_A, &lda, h_Q, &lda, diag, offdiag, h_PT, &lda, h_work_err, &result[0]);
-    coot_fortran(coot_dort01)("C", &M, &minmn, h_Q, &lda, h_work_err, &lwork_err, &result[1]);
-    coot_fortran(coot_dort01)("R", &minmn, &N, h_PT, &lda, h_work_err, &lwork_err, &result[2]);
+    lapack_test::bdt01(M, N, ione, h_A, lda, h_Q, lda, diag, offdiag, h_PT, lda, h_work_err, &result[0]);
+    lapack_test::ort01('C', M, minmn, h_Q, lda, h_work_err, lwork_err, &result[1]);
+    lapack_test::ort01('R', minmn, N, h_PT, lda, h_work_err, lwork_err, &result[2]);
 
     magma_free_cpu( h_PT );
     magma_free_cpu( h_work_err );
@@ -207,8 +213,8 @@ TEST_CASE("magma_sgebrd_1", "[gebrd]")
 
     /* Initialize the matrices */
     magma_int_t ISEED[4] = {0,0,0,1};
-    coot_fortran(coot_slarnv)( &ione, ISEED, &n2, h_A );
-    coot_fortran(coot_slacpy)( "A", &M, &N, h_A, &lda, h_Q, &lda );
+    lapack_test::larnv(ione, ISEED, n2, h_A);
+    lapack::lacpy('A', M, N, h_A, lda, h_Q, lda);
 
     /* ====================================================================
        Performs operation using MAGMA
@@ -234,16 +240,16 @@ TEST_CASE("magma_sgebrd_1", "[gebrd]")
     REQUIRE( magma_malloc_cpu( (void**) &h_PT,       (lda*N     ) * sizeof(float) ) == MAGMA_SUCCESS );
     REQUIRE( magma_malloc_cpu( (void**) &h_work_err, (lwork_err ) * sizeof(float) ) == MAGMA_SUCCESS );
 
-    coot_fortran(coot_slacpy)( "A", &M, &N, h_Q, &lda, h_PT, &lda );
+    lapack::lacpy('A', M, N, h_Q, lda, h_PT, lda);
 
     // generate Q & P'
-    coot_fortran(coot_sorgbr)( "Q", &M, &minmn, &N, h_Q, &lda, tauq, h_work_err, &lwork_err, &info );
+    lapack_test::orgbr('Q', M, minmn, N, h_Q, lda, tauq, h_work_err, lwork_err, &info);
     if (info != 0)
       {
       std::cerr << "lapackf77_sorgbr #1 returned error " << info << ": " << magma::error_as_string( magma_int_t(info) ) << std::endl;
       }
     REQUIRE( info == 0 );
-    coot_fortran(coot_sorgbr)( "P", &minmn, &N, &M, h_PT, &lda, taup, h_work_err, &lwork_err, &info );
+    lapack_test::orgbr('P', minmn, N, M, h_PT, lda, taup, h_work_err, lwork_err, &info);
     if (info != 0)
       {
       std::cerr << "lapackf77_sorgbr #2 returned error " << info << ": " << magma::error_as_string( magma_int_t(info) ) << std::endl;
@@ -253,9 +259,9 @@ TEST_CASE("magma_sgebrd_1", "[gebrd]")
     // Test 1:  Check the decomposition A := Q * B * PT
     //      2:  Check the orthogonality of Q
     //      3:  Check the orthogonality of PT
-    coot_fortran(coot_sbdt01)(&M, &N, &ione, h_A, &lda, h_Q, &lda, diag, offdiag, h_PT, &lda, h_work_err, &result[0]);
-    coot_fortran(coot_sort01)("C", &M, &minmn, h_Q, &lda, h_work_err, &lwork_err, &result[1]);
-    coot_fortran(coot_sort01)("R", &minmn, &N, h_PT, &lda, h_work_err, &lwork_err, &result[2]);
+    lapack_test::bdt01(M, N, ione, h_A, lda, h_Q, lda, diag, offdiag, h_PT, lda, h_work_err, &result[0]);
+    lapack_test::ort01('C', M, minmn, h_Q, lda, h_work_err, lwork_err, &result[1]);
+    lapack_test::ort01('R', minmn, N, h_PT, lda, h_work_err, lwork_err, &result[2]);
 
     magma_free_cpu( h_PT );
     magma_free_cpu( h_work_err );

@@ -174,10 +174,10 @@ magma_ssyevd_gpu
     float *A;
     magma_smalloc_cpu( &A, lda*n );
     magma_sgetmatrix( n, n, dA, dA_offset, ldda, A, lda, queue );
-    coot_fortran(coot_ssyevd)( lapack_vec_const(jobz), lapack_uplo_const(uplo),
-                               &n, A, &lda,
-                               w, work, &lwork,
-                               iwork, &liwork, info );
+    lapack::syevd(lapack_vec_const(jobz)[0], lapack_uplo_const(uplo)[0],
+                  n, A, lda,
+                  w, work, lwork,
+                  iwork, liwork, info);
     magma_ssetmatrix( n, n, A, lda, dA, dA_offset, ldda, queue );
     magma_free_cpu( A );
     magma_queue_destroy( queue );
@@ -202,8 +202,8 @@ magma_ssyevd_gpu
     }
 
   /* Get machine constants. */
-  safmin = coot_fortran(coot_slamch)("S");
-  eps    = coot_fortran(coot_slamch)("P");
+  safmin = lapack::lamch<float>('S');
+  eps    = lapack::lamch<float>('P');
   smlnum = safmin / eps;
   bignum = 1. / smlnum;
   rmin = std::sqrt( smlnum );
@@ -249,7 +249,7 @@ magma_ssyevd_gpu
      transformations represented as Householder vectors in A. */
   if (! wantz)
     {
-    coot_fortran(coot_ssterf)( &n, w, &work[inde], info );
+    lapack::sterf(n, w, &work[inde], info);
     }
   else
     {
@@ -269,7 +269,7 @@ magma_ssyevd_gpu
   if (iscale == 1)
     {
     d__1 = 1. / sigma;
-    coot_fortran(coot_sscal)( &n, &d__1, w, &ione );
+    blas::scal(n, d__1, w, ione);
     }
 
   work[0]  = magma_smake_lwork( lwmin );

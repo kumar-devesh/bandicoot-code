@@ -47,9 +47,11 @@
 //  (including negligence or otherwise) arising in any way out of the use
 //  of this software, even if advised of the possibility of such damage.
 
+#include <armadillo>
 #include <bandicoot>
 #include "../catch.hpp"
 #include "def_lapack_test.hpp"
+#include "translate_lapack_test.hpp"
 
 using namespace coot;
 
@@ -310,18 +312,18 @@ check_dgesvd(magma_vec_t jobu,
   if (U != NULL && VT != NULL)
     {
     // since KD=0 (3rd arg), E is not referenced so pass unused (9th arg)
-    coot_fortran(coot_dbdt01)( &m, &n, &izero, A, &lda,
-                               U, &ldu, S, unused, VT, &ldv,
-                               work_err,
-                               &result[0] );
+    lapack_test::bdt01(m, n, izero, A, lda,
+                       U, ldu, S, unused, VT, ldv,
+                       work_err,
+                       &result[0]);
     }
   if ( U != NULL )
     {
-    coot_fortran(coot_dort01)( "C", &m,  &n_u, U,  &ldu, work_err, &lwork_err, &result[1] );
+    lapack_test::ort01('C', m, n_u, U, ldu, work_err, lwork_err, &result[1]);
     }
   if ( VT != NULL )
     {
-    coot_fortran(coot_dort01)( "R", &m_vt, &n, VT, &ldv, work_err, &lwork_err, &result[2] );
+    lapack_test::ort01('R', m_vt, n, VT, ldv, work_err, lwork_err, &result[2]);
     }
 
   result[0] *= eps;
@@ -352,6 +354,11 @@ check_dgesvd(magma_vec_t jobu,
 TEST_CASE("magma_dgesvd_1", "[gesvd]")
   {
   if (get_rt().backend != CL_BACKEND)
+    {
+    return;
+    }
+
+  if (!coot_rt_t::is_supported_type<double>())
     {
     return;
     }
@@ -423,12 +430,12 @@ TEST_CASE("magma_dgesvd_1", "[gesvd]")
           REQUIRE( info == 0 );
           query_magma = (magma_int_t) dummy[0];
 
-          coot_fortran(coot_dgesvd)( lapack_vec_const(jobu), lapack_vec_const(jobv), &M, &N,
-                                     unused, &lda, runused,
-                                     unused, &ldu,
-                                     unused, &ldv,
-                                     dummy, &ineg_one,
-                                     &info );
+          lapack_test::gesvd(lapack_vec_const(jobu)[0], lapack_vec_const(jobv)[0], M, N,
+                             unused, lda, runused,
+                             unused, ldu,
+                             unused, ldv,
+                             dummy, ineg_one, NULL /* not used for non-complex */,
+                             &info);
           REQUIRE( info == 0 );
           query_lapack = (magma_int_t) dummy[0];
 
@@ -486,7 +493,7 @@ TEST_CASE("magma_dgesvd_1", "[gesvd]")
           /* Initialize the matrix (random uniform) */
           arma::Mat<double> hA_alias(hA, lda, N, false, true);
           hA_alias.randu();
-          coot_fortran(coot_dlacpy)( MagmaFullStr, &M, &N, hA, &lda, hR, &lda );
+          lapack::lacpy(MagmaFullStr[0], M, N, hA, lda, hR, lda);
 
           magma_dgesvd( jobu, jobv, M, N,
                         hR, lda, S, U, ldu, VT, ldv, hwork, lwork_magma,
@@ -511,10 +518,10 @@ TEST_CASE("magma_dgesvd_1", "[gesvd]")
 
           check_dgesvd( jobu, jobv, M, N, hA, lda, S, U, ldu, VT, ldv, result );
 
-          coot_fortran(coot_dlacpy)( MagmaFullStr, &M, &N, hA, &lda, hR, &lda );
-          coot_fortran(coot_dgesvd)( lapack_vec_const(jobu), lapack_vec_const(jobv), &M, &N,
-                                     hR, &lda, Sref, U, &ldu, VT, &ldv, hwork, &lwork_lapack,
-                                     &info);
+          lapack::lacpy(MagmaFullStr[0], M, N, hA, lda, hR, lda);
+          lapack_test::gesvd(lapack_vec_const(jobu)[0], lapack_vec_const(jobv)[0], M, N,
+                             hR, lda, Sref, U, ldu, VT, ldv, hwork, lwork_lapack, NULL /* not used for non-complex */,
+                             &info);
           if ( svd_work == MagmaSVD_min_1 )
             {
             if (info != -13)
@@ -534,9 +541,9 @@ TEST_CASE("magma_dgesvd_1", "[gesvd]")
 
           check_dgesvd( jobu, jobv, M, N, hA, lda, Sref, U, ldu, VT, ldv, result_lapack );
 
-          coot_fortran(coot_daxpy)( &min_mn, &d_neg_one, S, &ione, Sref, &ione );
-          result[4]  = coot_fortran(coot_dlange)( "F", &min_mn, &ione, Sref, &min_mn, work );
-          result[4] /= coot_fortran(coot_dlange)( "F", &min_mn, &ione, S,    &min_mn, work );
+          blas::axpy(min_mn, d_neg_one, S, ione, Sref, ione);
+          result[4]  = lapack::lange('F', min_mn, ione, Sref, min_mn, work);
+          result[4] /= lapack::lange('F', min_mn, ione, S,    min_mn, work);
 
           // Some of the tests may not have been done depending on jobu and
           // jobv; that is indicated with `-1`.
@@ -613,18 +620,18 @@ check_sgesvd(magma_vec_t jobu,
   if (U != NULL && VT != NULL)
     {
     // since KD=0 (3rd arg), E is not referenced so pass unused (9th arg)
-    coot_fortran(coot_sbdt01)( &m, &n, &izero, A, &lda,
-                               U, &ldu, S, unused, VT, &ldv,
-                               work_err,
-                               &result[0] );
+    lapack_test::bdt01(m, n, izero, A, lda,
+                       U, ldu, S, unused, VT, ldv,
+                       work_err,
+                       &result[0]);
     }
   if ( U != NULL )
     {
-    coot_fortran(coot_sort01)( "C", &m,  &n_u, U,  &ldu, work_err, &lwork_err, &result[1] );
+    lapack_test::ort01('C', m, n_u, U, ldu, work_err, lwork_err, &result[1]);
     }
   if ( VT != NULL )
     {
-    coot_fortran(coot_sort01)( "R", &m_vt, &n, VT, &ldv, work_err, &lwork_err, &result[2] );
+    lapack_test::ort01('R', m_vt, n, VT, ldv, work_err, lwork_err, &result[2]);
     }
 
   result[0] *= eps;
@@ -726,12 +733,12 @@ TEST_CASE("magma_sgesvd_1", "[gesvd]")
           REQUIRE( info == 0 );
           query_magma = (magma_int_t) dummy[0];
 
-          coot_fortran(coot_sgesvd)( lapack_vec_const(jobu), lapack_vec_const(jobv), &M, &N,
-                                     unused, &lda, runused,
-                                     unused, &ldu,
-                                     unused, &ldv,
-                                     dummy, &ineg_one,
-                                     &info );
+          lapack_test::gesvd(lapack_vec_const(jobu)[0], lapack_vec_const(jobv)[0], M, N,
+                             unused, lda, runused,
+                             unused, ldu,
+                             unused, ldv,
+                             dummy, ineg_one, NULL /* not used for non-complex */,
+                             &info);
           REQUIRE( info == 0 );
           query_lapack = (magma_int_t) dummy[0];
 
@@ -789,7 +796,7 @@ TEST_CASE("magma_sgesvd_1", "[gesvd]")
           /* Initialize the matrix (random uniform) */
           arma::Mat<float> hA_alias(hA, lda, N, false, true);
           hA_alias.randu();
-          coot_fortran(coot_slacpy)( MagmaFullStr, &M, &N, hA, &lda, hR, &lda );
+          lapack::lacpy(MagmaFullStr[0], M, N, hA, lda, hR, lda);
 
           magma_sgesvd( jobu, jobv, M, N,
                         hR, lda, S, U, ldu, VT, ldv, hwork, lwork_magma,
@@ -814,10 +821,10 @@ TEST_CASE("magma_sgesvd_1", "[gesvd]")
 
           check_sgesvd( jobu, jobv, M, N, hA, lda, S, U, ldu, VT, ldv, result );
 
-          coot_fortran(coot_slacpy)( MagmaFullStr, &M, &N, hA, &lda, hR, &lda );
-          coot_fortran(coot_sgesvd)( lapack_vec_const(jobu), lapack_vec_const(jobv), &M, &N,
-                                     hR, &lda, Sref, U, &ldu, VT, &ldv, hwork, &lwork_lapack,
-                                     &info);
+          lapack::lacpy(MagmaFullStr[0], M, N, hA, lda, hR, lda);
+          lapack_test::gesvd(lapack_vec_const(jobu)[0], lapack_vec_const(jobv)[0], M, N,
+                             hR, lda, Sref, U, ldu, VT, ldv, hwork, lwork_lapack, NULL /* not used for non-complex */,
+                             &info);
           if ( svd_work == MagmaSVD_min_1 )
             {
             if (info != -13)
@@ -837,9 +844,9 @@ TEST_CASE("magma_sgesvd_1", "[gesvd]")
 
           check_sgesvd( jobu, jobv, M, N, hA, lda, Sref, U, ldu, VT, ldv, result_lapack );
 
-          coot_fortran(coot_saxpy)( &min_mn, &d_neg_one, S, &ione, Sref, &ione );
-          result[4]  = coot_fortran(coot_slange)( "F", &min_mn, &ione, Sref, &min_mn, work );
-          result[4] /= coot_fortran(coot_slange)( "F", &min_mn, &ione, S,    &min_mn, work );
+          blas::axpy(min_mn, d_neg_one, S, ione, Sref, ione);
+          result[4]  = lapack::lange('F', min_mn, ione, Sref, min_mn, work);
+          result[4] /= lapack::lange('F', min_mn, ione, S,    min_mn, work);
 
           // Some of the tests may not have been done depending on jobu and
           // jobv; that is indicated with `-1`.

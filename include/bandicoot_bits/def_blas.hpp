@@ -18,6 +18,15 @@
 
 
 
+#if defined(COOT_BLAS_NOEXCEPT)
+  #undef  COOT_NOEXCEPT
+  #define COOT_NOEXCEPT noexcept
+#else
+  #undef  COOT_NOEXCEPT
+  #define COOT_NOEXCEPT
+#endif
+
+
 #if !defined(COOT_BLAS_CAPITALS)
 
   #define coot_sgemm sgemm
@@ -95,42 +104,63 @@
 extern "C"
   {
   // matrix-matrix multiplication
-  void coot_fortran(coot_sgemm)(const char* transA, const char* transB, const blas_int* m, const blas_int* n, const blas_int* k, const float*  alpha, const float*  A, const blas_int* ldA, const float*  B, const blas_int* ldB, const float*  beta, float*  C, const blas_int* ldC);
-  void coot_fortran(coot_dgemm)(const char* transA, const char* transB, const blas_int* m, const blas_int* n, const blas_int* k, const double* alpha, const double* A, const blas_int* ldA, const double* B, const blas_int* ldB, const double* beta, double* C, const blas_int* ldC);
-  void coot_fortran(coot_cgemm)(const char* transA, const char* transB, const blas_int* m, const blas_int* n, const blas_int* k, const void*   alpha, const void*   A, const blas_int* ldA, const void*   B, const blas_int* ldB, const void*   beta, void*   C, const blas_int* ldC);
-  void coot_fortran(coot_zgemm)(const char* transA, const char* transB, const blas_int* m, const blas_int* n, const blas_int* k, const void*   alpha, const void*   A, const blas_int* ldA, const void*   B, const blas_int* ldB, const void*   beta, void*   C, const blas_int* ldC);
+  #if defined(COOT_USE_FORTRAN_HIDDEN_ARGS)
+  void coot_fortran(coot_sgemm)(const char* transA, const char* transB, const blas_int* m, const blas_int* n, const blas_int* k, const float*     alpha, const float*   A, const blas_int* ldA, const float*    B, const blas_int* ldB, const float*    beta, float*    C, const blas_int* ldC, blas_len transA_len, blas_len transB_len) COOT_NOEXCEPT;
+  void coot_fortran(coot_dgemm)(const char* transA, const char* transB, const blas_int* m, const blas_int* n, const blas_int* k, const double*   alpha, const double*   A, const blas_int* ldA, const double*   B, const blas_int* ldB, const double*   beta, double*   C, const blas_int* ldC, blas_len transA_len, blas_len transB_len) COOT_NOEXCEPT;
+  void coot_fortran(coot_cgemm)(const char* transA, const char* transB, const blas_int* m, const blas_int* n, const blas_int* k, const blas_cxf* alpha, const blas_cxf* A, const blas_int* ldA, const blas_cxf* B, const blas_int* ldB, const blas_cxf* beta, blas_cxf* C, const blas_int* ldC, blas_len transA_len, blas_len transB_len) COOT_NOEXCEPT;
+  void coot_fortran(coot_zgemm)(const char* transA, const char* transB, const blas_int* m, const blas_int* n, const blas_int* k, const blas_cxd* alpha, const blas_cxd* A, const blas_int* ldA, const blas_cxd* B, const blas_int* ldB, const blas_cxd* beta, blas_cxd* C, const blas_int* ldC, blas_len transA_len, blas_len transB_len) COOT_NOEXCEPT;
+  #else
+  void coot_fortran(coot_sgemm)(const char* transA, const char* transB, const blas_int* m, const blas_int* n, const blas_int* k, const float*    alpha, const float*    A, const blas_int* ldA, const float*    B, const blas_int* ldB, const float*    beta, float*    C, const blas_int* ldC) COOT_NOEXCEPT;
+  void coot_fortran(coot_dgemm)(const char* transA, const char* transB, const blas_int* m, const blas_int* n, const blas_int* k, const double*   alpha, const double*   A, const blas_int* ldA, const double*   B, const blas_int* ldB, const double*   beta, double*   C, const blas_int* ldC) COOT_NOEXCEPT;
+  void coot_fortran(coot_cgemm)(const char* transA, const char* transB, const blas_int* m, const blas_int* n, const blas_int* k, const blas_cxf* alpha, const blas_cxf* A, const blas_int* ldA, const blas_cxf* B, const blas_int* ldB, const blas_cxf* beta, blas_cxf* C, const blas_int* ldC) COOT_NOEXCEPT;
+  void coot_fortran(coot_zgemm)(const char* transA, const char* transB, const blas_int* m, const blas_int* n, const blas_int* k, const blas_cxd* alpha, const blas_cxd* A, const blas_int* ldA, const blas_cxd* B, const blas_int* ldB, const blas_cxd* beta, blas_cxd* C, const blas_int* ldC) COOT_NOEXCEPT;
+  #endif
 
   // matrix-vector multiplication
-  void coot_fortran(coot_sgemv)(const char* transA, const blas_int* m, const blas_int* n, const float*  alpha, const float*  A, const blas_int* ldA, const float*  x, const blas_int* incx, const float*  beta, float*  y, const blas_int* incy);
-  void coot_fortran(coot_dgemv)(const char* transA, const blas_int* m, const blas_int* n, const double* alpha, const double* A, const blas_int* ldA, const double* x, const blas_int* incx, const double* beta, double* y, const blas_int* incy);
-  void coot_fortran(coot_cgemv)(const char* transA, const blas_int* m, const blas_int* n, const void*   alpha, const void*   A, const blas_int* ldA, const void*   x, const blas_int* incx, const void*   beta, void*   y, const blas_int* incy);
-  void coot_fortran(coot_zgemv)(const char* transA, const blas_int* m, const blas_int* n, const void*   alpha, const void*   A, const blas_int* ldA, const void*   x, const blas_int* incx, const void*   beta, void*   y, const blas_int* incy);
+  #if defined(COOT_USE_FORTRAN_HIDDEN_ARGS)
+  void coot_fortran(coot_sgemv)(const char* transA, const blas_int* m, const blas_int* n, const float*    alpha, const float*    A, const blas_int* ldA, const float*    x, const blas_int* incx, const float*    beta, float*    y, const blas_int* incy, blas_len transA_len) COOT_NOEXCEPT;
+  void coot_fortran(coot_dgemv)(const char* transA, const blas_int* m, const blas_int* n, const double*   alpha, const double*   A, const blas_int* ldA, const double*   x, const blas_int* incx, const double*   beta, double*   y, const blas_int* incy, blas_len transA_len) COOT_NOEXCEPT;
+  void coot_fortran(coot_cgemv)(const char* transA, const blas_int* m, const blas_int* n, const blas_cxf* alpha, const blas_cxf* A, const blas_int* ldA, const blas_cxf* x, const blas_int* incx, const blas_cxf* beta, blas_cxf* y, const blas_int* incy, blas_len transA_len) COOT_NOEXCEPT;
+  void coot_fortran(coot_zgemv)(const char* transA, const blas_int* m, const blas_int* n, const blas_cxd* alpha, const blas_cxd* A, const blas_int* ldA, const blas_cxd* x, const blas_int* incx, const blas_cxd* beta, blas_cxd* y, const blas_int* incy, blas_len transA_len) COOT_NOEXCEPT;
+  #else
+  void coot_fortran(coot_sgemv)(const char* transA, const blas_int* m, const blas_int* n, const float*    alpha, const float*    A, const blas_int* ldA, const float*    x, const blas_int* incx, const float*    beta, float*    y, const blas_int* incy) COOT_NOEXCEPT;
+  void coot_fortran(coot_dgemv)(const char* transA, const blas_int* m, const blas_int* n, const double*   alpha, const double*   A, const blas_int* ldA, const double*   x, const blas_int* incx, const double*   beta, double*   y, const blas_int* incy) COOT_NOEXCEPT;
+  void coot_fortran(coot_cgemv)(const char* transA, const blas_int* m, const blas_int* n, const blas_cxf* alpha, const blas_cxf* A, const blas_int* ldA, const blas_cxf* x, const blas_int* incx, const blas_cxf* beta, blas_cxf* y, const blas_int* incy) COOT_NOEXCEPT;
+  void coot_fortran(coot_zgemv)(const char* transA, const blas_int* m, const blas_int* n, const blas_cxd* alpha, const blas_cxd* A, const blas_int* ldA, const blas_cxd* x, const blas_int* incx, const blas_cxd* beta, blas_cxd* y, const blas_int* incy) COOT_NOEXCEPT;
+  #endif
 
   // scalar multiply + add
-  void coot_fortran(coot_saxpy)(const blas_int* m, const float*  da, const float*  dx, const blas_int* incx, float*  dy, const blas_int* incy);
-  void coot_fortran(coot_daxpy)(const blas_int* m, const double* da, const double* dx, const blas_int* incx, double* dy, const blas_int* incy);
-  void coot_fortran(coot_caxpy)(const blas_int* m, const void*   da, const void*   dx, const blas_int* incx, void*   dy, const blas_int* incy);
-  void coot_fortran(coot_zaxpy)(const blas_int* m, const void*   da, const void*   dx, const blas_int* incx, void*   dy, const blas_int* incy);
+  void coot_fortran(coot_saxpy)(const blas_int* m, const float*    da, const float*    dx, const blas_int* incx, float*    dy, const blas_int* incy) COOT_NOEXCEPT;
+  void coot_fortran(coot_daxpy)(const blas_int* m, const double*   da, const double*   dx, const blas_int* incx, double*   dy, const blas_int* incy) COOT_NOEXCEPT;
+  void coot_fortran(coot_caxpy)(const blas_int* m, const blas_cxf* da, const blas_cxf* dx, const blas_int* incx, blas_cxf* dy, const blas_int* incy) COOT_NOEXCEPT;
+  void coot_fortran(coot_zaxpy)(const blas_int* m, const blas_cxd* da, const blas_cxd* dx, const blas_int* incx, blas_cxd* dy, const blas_int* incy) COOT_NOEXCEPT;
 
   // scale vector by constant
-  void coot_fortran(coot_sscal)(const blas_int* n, const float*  da, float*  dx, const blas_int* incx);
-  void coot_fortran(coot_dscal)(const blas_int* n, const double* da, double* dx, const blas_int* incx);
-  void coot_fortran(coot_cscal)(const blas_int* n, const void*   da, void*   dx, const blas_int* incx);
-  void coot_fortran(coot_zscal)(const blas_int* n, const void*   da, void*   dx, const blas_int* incx);
+  void coot_fortran(coot_sscal)(const blas_int* n, const float*    da, float*    dx, const blas_int* incx) COOT_NOEXCEPT;
+  void coot_fortran(coot_dscal)(const blas_int* n, const double*   da, double*   dx, const blas_int* incx) COOT_NOEXCEPT;
+  void coot_fortran(coot_cscal)(const blas_int* n, const blas_cxf* da, blas_cxf* dx, const blas_int* incx) COOT_NOEXCEPT;
+  void coot_fortran(coot_zscal)(const blas_int* n, const blas_cxd* da, blas_cxd* dx, const blas_int* incx) COOT_NOEXCEPT;
 
   // symmetric rank-k a*A*A' + b*C
-  void coot_fortran(coot_ssyrk)(const char* uplo, const char* transA, const blas_int* n, const blas_int* k, const  float* alpha, const  float* A, const blas_int* ldA, const  float* beta,  float* C, const blas_int* ldC);
-  void coot_fortran(coot_dsyrk)(const char* uplo, const char* transA, const blas_int* n, const blas_int* k, const double* alpha, const double* A, const blas_int* ldA, const double* beta, double* C, const blas_int* ldC);
+  #if defined(COOT_USE_FORTRAN_HIDDEN_ARGS)
+  void coot_fortran(coot_ssyrk)(const char* uplo, const char* transA, const blas_int* n, const blas_int* k, const  float* alpha, const  float* A, const blas_int* ldA, const  float* beta,  float* C, const blas_int* ldC, blas_len uplo_len, blas_len transA_len) COOT_NOEXCEPT;
+  void coot_fortran(coot_dsyrk)(const char* uplo, const char* transA, const blas_int* n, const blas_int* k, const double* alpha, const double* A, const blas_int* ldA, const double* beta, double* C, const blas_int* ldC, blas_len uplo_len, blas_len transA_len) COOT_NOEXCEPT;
+  #else
+  void coot_fortran(coot_ssyrk)(const char* uplo, const char* transA, const blas_int* n, const blas_int* k, const  float* alpha, const  float* A, const blas_int* ldA, const  float* beta,  float* C, const blas_int* ldC) COOT_NOEXCEPT;
+  void coot_fortran(coot_dsyrk)(const char* uplo, const char* transA, const blas_int* n, const blas_int* k, const double* alpha, const double* A, const blas_int* ldA, const double* beta, double* C, const blas_int* ldC) COOT_NOEXCEPT;
+  #endif
 
   // copy a vector X to Y
-  void coot_fortran(coot_scopy)(const blas_int* n, const float*  X, const blas_int* incx, float*  Y, const blas_int* incy);
-  void coot_fortran(coot_dcopy)(const blas_int* n, const double* X, const blas_int* incx, double* Y, const blas_int* incy);
-  void coot_fortran(coot_ccopy)(const blas_int* n, const void*   X, const blas_int* incx, void*   Y, const blas_int* incy);
-  void coot_fortran(coot_zcopy)(const blas_int* n, const void*   X, const blas_int* incx, void*   Y, const blas_int* incy);
+  void coot_fortran(coot_scopy)(const blas_int* n, const float*    X, const blas_int* incx, float*    Y, const blas_int* incy) COOT_NOEXCEPT;
+  void coot_fortran(coot_dcopy)(const blas_int* n, const double*   X, const blas_int* incx, double*   Y, const blas_int* incy) COOT_NOEXCEPT;
+  void coot_fortran(coot_ccopy)(const blas_int* n, const blas_cxf* X, const blas_int* incx, blas_cxf* Y, const blas_int* incy) COOT_NOEXCEPT;
+  void coot_fortran(coot_zcopy)(const blas_int* n, const blas_cxd* X, const blas_int* incx, blas_cxd* Y, const blas_int* incy) COOT_NOEXCEPT;
 
   // interchange two vectors
-  void coot_fortran(coot_sswap)(const blas_int* n, float*  dx, const blas_int* incx, float*  dy, const blas_int* incy);
-  void coot_fortran(coot_dswap)(const blas_int* n, double* dx, const blas_int* incx, double* dy, const blas_int* incy);
-  void coot_fortran(coot_cswap)(const blas_int* n, void*   dx, const blas_int* incx, void*   dy, const blas_int* incy);
-  void coot_fortran(coot_zswap)(const blas_int* n, void*   dx, const blas_int* incx, void*   dy, const blas_int* incy);
+  void coot_fortran(coot_sswap)(const blas_int* n, float*    dx, const blas_int* incx, float*    dy, const blas_int* incy) COOT_NOEXCEPT;
+  void coot_fortran(coot_dswap)(const blas_int* n, double*   dx, const blas_int* incx, double*   dy, const blas_int* incy) COOT_NOEXCEPT;
+  void coot_fortran(coot_cswap)(const blas_int* n, blas_cxf* dx, const blas_int* incx, blas_cxf* dy, const blas_int* incy) COOT_NOEXCEPT;
+  void coot_fortran(coot_zswap)(const blas_int* n, blas_cxd* dx, const blas_int* incx, blas_cxd* dy, const blas_int* incy) COOT_NOEXCEPT;
   }
+
+#undef COOT_NOEXCEPT

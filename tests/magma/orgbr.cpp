@@ -47,9 +47,11 @@
 //  (including negligence or otherwise) arising in any way out of the use
 //  of this software, even if advised of the possibility of such damage.
 
+#include <armadillo>
 #include <bandicoot>
 #include "../catch.hpp"
 #include "def_lapack_test.hpp"
+#include "translate_lapack_test.hpp"
 
 using namespace coot;
 
@@ -60,6 +62,11 @@ using namespace coot;
 TEST_CASE("magma_dorgbr_1", "[orgbr]")
   {
   if (get_rt().backend != CL_BACKEND)
+    {
+    return;
+    }
+
+  if (!coot_rt_t::is_supported_type<double>())
     {
     return;
     }
@@ -104,9 +111,9 @@ TEST_CASE("magma_dorgbr_1", "[orgbr]")
       // By default a random uniform matrix is used.
       arma::Mat<double> hA_alias(hA, lda, n, false, true);
       hA_alias.randu();
-      coot_fortran(coot_dlacpy)( "A", &m, &n, hA, &lda, hR, &lda );
+      lapack::lacpy('A', m, n, hA, lda, hR, lda);
 
-      Anorm = coot_fortran(coot_dlange)("F", &m, &n, hA, &lda, work );
+      Anorm = lapack::lange('F', m, n, hA, lda, work );
 
       /* ====================================================================
          Performs operation using MAGMA
@@ -118,7 +125,7 @@ TEST_CASE("magma_dorgbr_1", "[orgbr]")
         std::cerr << "magma_dgelqf() returned error " << info << ": " << magma::error_as_string(info) << std::endl;
         }
       REQUIRE( info == 0 );
-      coot_fortran(coot_dlacpy)( "A", &m, &n, hA, &lda, hR, &lda );
+      lapack::lacpy('A', m, n, hA, lda, hR, lda);
 
       if (vect == MagmaQ)
         {
@@ -139,11 +146,11 @@ TEST_CASE("magma_dorgbr_1", "[orgbr]")
          =================================================================== */
       if (vect == MagmaQ)
         {
-        coot_fortran(coot_dorgbr)( "Q", &m, &n, &k, hA, &lda, tauq, h_work, &lwork, &info );
+        lapack_test::orgbr('Q', m, n, k, hA, lda, tauq, h_work, lwork, &info);
         }
       else
         {
-        coot_fortran(coot_dorgbr)( "P", &m, &n, &k, hA, &lda, taup, h_work, &lwork, &info );
+        lapack_test::orgbr('P', m, n, k, hA, lda, taup, h_work, lwork, &info);
         }
 
       if (info != 0)
@@ -153,8 +160,8 @@ TEST_CASE("magma_dorgbr_1", "[orgbr]")
       REQUIRE( info == 0 );
 
       // compute relative error |R|/|A| := |Q_magma - Q_lapack|/|A|
-      coot_fortran(coot_daxpy)( &n2, &c_neg_one, hA, &ione, hR, &ione );
-      error = coot_fortran(coot_dlange)("F", &m, &n, hR, &lda, work) / Anorm;
+      blas::axpy(n2, c_neg_one, hA, ione, hR, ione);
+      error = lapack::lange('F', m, n, hR, lda, work) / Anorm;
 
       REQUIRE( error < tol );
 
@@ -219,9 +226,9 @@ TEST_CASE("magma_sorgbr_1", "[orgbr]")
       // By default a random uniform matrix is used.
       arma::Mat<float> hA_alias(hA, lda, n, false, true);
       hA_alias.randu();
-      coot_fortran(coot_slacpy)( "A", &m, &n, hA, &lda, hR, &lda );
+      lapack::lacpy('A', m, n, hA, lda, hR, lda);
 
-      Anorm = coot_fortran(coot_slange)("F", &m, &n, hA, &lda, work );
+      Anorm = lapack::lange('F', m, n, hA, lda, work);
 
       /* ====================================================================
          Performs operation using MAGMA
@@ -233,7 +240,7 @@ TEST_CASE("magma_sorgbr_1", "[orgbr]")
         std::cerr << "magma_sgelqf() returned error " << info << ": " << magma::error_as_string(info) << std::endl;
         }
       REQUIRE( info == 0 );
-      coot_fortran(coot_slacpy)( "A", &m, &n, hA, &lda, hR, &lda );
+      lapack::lacpy('A', m, n, hA, lda, hR, lda);
 
       if (vect == MagmaQ)
         {
@@ -254,11 +261,11 @@ TEST_CASE("magma_sorgbr_1", "[orgbr]")
          =================================================================== */
       if (vect == MagmaQ)
         {
-        coot_fortran(coot_sorgbr)( "Q", &m, &n, &k, hA, &lda, tauq, h_work, &lwork, &info );
+        lapack_test::orgbr('Q', m, n, k, hA, lda, tauq, h_work, lwork, &info);
         }
       else
         {
-        coot_fortran(coot_sorgbr)( "P", &m, &n, &k, hA, &lda, taup, h_work, &lwork, &info );
+        lapack_test::orgbr('P', m, n, k, hA, lda, taup, h_work, lwork, &info);
         }
 
       if (info != 0)
@@ -268,8 +275,8 @@ TEST_CASE("magma_sorgbr_1", "[orgbr]")
       REQUIRE( info == 0 );
 
       // compute relative error |R|/|A| := |Q_magma - Q_lapack|/|A|
-      coot_fortran(coot_saxpy)( &n2, &c_neg_one, hA, &ione, hR, &ione );
-      error = coot_fortran(coot_slange)("F", &m, &n, hR, &lda, work) / Anorm;
+      blas::axpy(n2, c_neg_one, hA, ione, hR, ione);
+      error = lapack::lange('F', m, n, hR, lda, work) / Anorm;
 
       REQUIRE( error < tol );
 

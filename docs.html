@@ -7623,6 +7623,137 @@ Set the backend that Bandicoot will use.  This is only necessary if multiple bac
   </tr>
   <tr>
     <td style="vertical-align: top;">
+<code>COOT_BLAS_LONG</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+Use "long" instead of "int" when calling BLAS and LAPACK functions.
+Only relevant when using OpenCL backend.
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+<code>COOT_BLAS_LONG_LONG</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+Use "long&nbsp;long" instead of "int" when calling BLAS and LAPACK functions.
+Only relevant when using OpenCL backend.
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+<code>COOT_USE_FORTRAN_HIDDEN_ARGS</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+Use so-called "hidden arguments" when calling BLAS and LAPACK functions.  Enabled by default.
+See Fortran <a href="https://gcc.gnu.org/onlinedocs/gfortran/Argument-passing-conventions.html">argument passing conventions</a> for more details.
+Only relevant when using OpenCL backend.
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+<code>COOT_DONT_USE_FORTRAN_HIDDEN_ARGS</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+Disable use of so-called "hidden arguments" when calling BLAS and LAPACK functions.
+May be necessary when using Bandicoot in conjunction with broken MKL headers (eg. if you have <code>#include "mkl_lapack.h"</code> in your code).
+Only relevant when using OpenCL backend.
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+<code>COOT_USE_MKL_TYPES</code>
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+If using the OpenCL backend with LAPACK and BLAS, use Intel MKL types for complex numbers.
+You will need to include appropriate MKL headers before the Bandicoot header.
+You may also need to enable one or more of the following options:
+<code>COOT_BLAS_LONG</code>, <code>COOT_BLAS_LONG_LONG</code>, <code>COOT_DONT_USE_FORTRAN_HIDDEN_ARGS</code>.
+Only relevant when using OpenCL backend.
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+    <td style="vertical-align: top;">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top;">
 <code>COOT_USE_OPENMP</code>
     </td>
     <td style="vertical-align: top;">

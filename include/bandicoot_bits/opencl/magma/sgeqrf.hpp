@@ -92,7 +92,7 @@ ssplit_diag_block_invert
     cola[i] = c_one;
     }
 
-  coot_fortran(coot_strtri)( MagmaUpperStr, MagmaNonUnitStr, &ib, work, &ib, &info );
+  lapack::trtri(MagmaUpperStr[0], MagmaNonUnitStr[0], ib, work, ib, &info);
   }
 
 
@@ -215,13 +215,13 @@ magma_sgeqrf_gpu
         }
 
       magma_queue_sync( queues[1] );  // wait to get work(i)
-      coot_fortran(coot_sgeqrf)( &rows, &ib, work, &ldwork, &tau[i], hwork, &lhwork, info );
+      lapack::geqrf(rows, ib, work, ldwork, &tau[i], hwork, lhwork, info);
 
       // Form the triangular factor of the block reflector in hwork
       // H = H(i) H(i+1) . . . H(i+ib-1)
-      coot_fortran(coot_slarft)( MagmaForwardStr, MagmaColumnwiseStr,
-                                 &rows, &ib,
-                                 work, &ldwork, &tau[i], hwork, &ib );
+      lapack::larft(MagmaForwardStr[0], MagmaColumnwiseStr[0],
+                    rows, ib,
+                    work, ldwork, &tau[i], hwork, ib);
 
       // wait for previous trailing matrix update (above) to finish with R
       magma_queue_sync( queues[0] );
@@ -286,7 +286,7 @@ magma_sgeqrf_gpu
     magma_sgetmatrix( rows, cols, dA, dA_offset + i + i * ldda, ldda, work, rows, queues[1] );
     // see comments for lwork above
     lhwork = lwork - rows*cols;
-    coot_fortran(coot_sgeqrf)( &rows, &cols, work, &rows, &tau[i], &work[rows*cols], &lhwork, info );
+    lapack::geqrf(rows, cols, work, rows, &tau[i], &work[rows*cols], lhwork, info);
 
     magma_ssetmatrix( rows, cols, work, rows, dA, dA_offset + i + i * ldda, ldda, queues[1] );
     }
@@ -363,7 +363,7 @@ magma_sgeqrf
   if (nb <= 1 || 4*nb >= std::min(m,n) )
     {
     /* Use CPU code. */
-    coot_fortran(coot_sgeqrf)( &m, &n, A, &lda, tau, work, &lwork, info );
+    lapack::geqrf(m, n, A, lda, tau, work, lwork, info);
     return *info;
     }
 
@@ -440,12 +440,12 @@ magma_sgeqrf
         }
 
       magma_int_t rows = m-i;
-      coot_fortran(coot_sgeqrf)( &rows, &ib, &A[i + i * lda], &lda, tau+i, work, &lwork, info );
+      lapack::geqrf(rows, ib, &A[i + i * lda], lda, tau+i, work, lwork, info);
 
       /* Form the triangular factor of the block reflector
          H = H(i) H(i+1) . . . H(i+ib-1) */
-      coot_fortran(coot_slarft)( MagmaForwardStr, MagmaColumnwiseStr,
-                                 &rows, &ib, &A[i + i * lda], &lda, tau+i, work, &ib );
+      lapack::larft(MagmaForwardStr[0], MagmaColumnwiseStr[0],
+                    rows, ib, &A[i + i * lda], lda, tau+i, work, ib);
 
       magma_spanel_to_q( MagmaUpper, ib, &A[i + i * lda], lda, work+ib*ib );
 
@@ -502,7 +502,7 @@ magma_sgeqrf
       magma_sgetmatrix( m, ib, dA, i * ldda, ldda, &A[i * lda], lda, queues[1] );
       }
     magma_int_t rows = m-i;
-    coot_fortran(coot_sgeqrf)( &rows, &ib, &A[i + i * lda], &lda, tau+i, work, &lwork, info );
+    lapack::geqrf(rows, ib, &A[i + i * lda], lda, tau+i, work, lwork, info);
     }
 
   magma_queue_sync( queues[0] );

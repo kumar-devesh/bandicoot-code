@@ -192,10 +192,10 @@ magma_dgesvd
       magma_int_t lwork_dorgbr_q_nn = magma_int_t( dummy[0] );
 
       // magma_dorgqr2 does not take workspace; use LAPACK's for compatability
-      coot_fortran(coot_dorgqr)( &m, &m, &n, unused, &m, unused, dummy, &ineg_one, &ierr );
+      lapack::orgqr(m, m, n, unused, m, unused, dummy, ineg_one, &ierr);
       magma_int_t lwork_dorgqr_mm = magma_int_t( dummy[0] );
 
-      coot_fortran(coot_dorgqr)( &m, &n, &n, unused, &m, unused, dummy, &ineg_one, &ierr );
+      lapack::orgqr(m, n, n, unused, m, unused, dummy, ineg_one, &ierr);
       magma_int_t lwork_dorgqr_mn = magma_int_t( dummy[0] );
 
       // missing from LAPACK, since it occurs only in slow paths
@@ -714,22 +714,22 @@ magma_dgesvd
       }
 
     // Get machine constants
-    eps = coot_fortran(coot_dlamch)( "P" );
-    smlnum = std::sqrt(coot_fortran(coot_dlamch)("S")) / eps;
+    eps = lapack::lamch<double>('P');
+    smlnum = std::sqrt(lapack::lamch<double>('S')) / eps;
     bignum = 1. / smlnum;
 
     // Scale A if max element outside range [SMLNUM,BIGNUM]
-    anrm = coot_fortran(coot_dlange)( "M", &m, &n, A, &lda, dummy );
+    anrm = lapack::lange('M', m, n, A, lda, dummy);
     iscl = 0;
     if (anrm > 0. && anrm < smlnum)
       {
       iscl = 1;
-      coot_fortran(coot_dlascl)( "G", &izero, &izero, &anrm, &smlnum, &m, &n, A, &lda, &ierr );
+      lapack::lascl('G', izero, izero, anrm, smlnum, m, n, A, lda, &ierr);
       }
     else if (anrm > bignum)
       {
       iscl = 1;
-      coot_fortran(coot_dlascl)( "G", &izero, &izero, &anrm, &bignum, &m, &n, A, &lda, &ierr );
+      lapack::lascl('G', izero, izero, anrm, bignum, m, n, A, lda, &ierr);
       }
 
     m_1 = m - 1;
@@ -756,7 +756,7 @@ magma_dgesvd
           magma_dgeqrf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
 
           // Zero out below R
-          coot_fortran(coot_dlaset)( "L", &n_1, &n_1, &c_zero, &c_zero, &A[1], &lda );
+          lapack::laset('L', n_1, n_1, c_zero, c_zero, &A[1], lda);
           ie    = 1;
           itauq = ie    + n;
           itaup = itauq + n;
@@ -783,12 +783,12 @@ magma_dgesvd
           // Perform bidiagonal QR iteration, computing right
           // singular vectors of A in A if desired
           // Workspace: need     N [e] + 4*N [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &n, &ncvt, &izero, &izero, s, &work[ie], A, &lda, dummy, &ione, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', n, ncvt, izero, izero, s, &work[ie], A, lda, dummy, ione, dummy, ione, &work[iwork], info);
 
           // If right singular vectors desired in VT, copy them there
           if (want_vas)
             {
-            coot_fortran(coot_dlacpy)( "F", &n, &n, A,  &lda, VT, &ldvt );
+            lapack::lacpy('F', n, n, A, lda, VT, ldvt);
             }
           }
         else if (want_uo && want_vn)
@@ -831,8 +831,8 @@ magma_dgesvd
             magma_dgeqrf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
 
             // Copy R to WORK(IR) and zero out below it
-            coot_fortran(coot_dlacpy)( "U", &n, &n, A, &lda, &work[ir], &ldwrkr );
-            coot_fortran(coot_dlaset)( "L", &n_1, &n_1, &c_zero, &c_zero, &work[ir+1], &ldwrkr );
+            lapack::lacpy('U', n, n, A, lda, &work[ir], ldwrkr);
+            lapack::laset('L', n_1, n_1, c_zero, c_zero, &work[ir+1], ldwrkr);
 
             // Generate Q in A
             // Workspace: need   N*N [R] + N [tau] + N    [orgqr work]
@@ -861,7 +861,7 @@ magma_dgesvd
             // Perform bidiagonal QR iteration, computing left
             // singular vectors of R in WORK(IR)
             // Workspace: need   N*N [R] + N [e] + 4*N [bdsqr work]
-            coot_fortran(coot_dbdsqr)( "U", &n, &izero, &n, &izero, s, &work[ie], dummy, &ione, &work[ir], &ldwrkr, dummy, &ione, &work[iwork], info );
+            lapack::bdsqr('U', n, izero, n, izero, s, &work[ie], dummy, ione, &work[ir], ldwrkr, dummy, ione, &work[iwork], info);
             iu = ie + n;
 
             // Multiply Q in A by left singular vectors of R in
@@ -873,11 +873,11 @@ magma_dgesvd
             for (i = 1; i <= m; i += ldwrku)
               {
               ib = std::min( m - i + 1, ldwrku );
-              coot_fortran(coot_dgemm)( "N", "N", &ib, &n, &n,
-                             &c_one,  &A[i-1], &lda,
-                                      &work[ir], &ldwrkr,
-                             &c_zero, &work[iu], &ldwrku );
-              coot_fortran(coot_dlacpy)( "F", &ib, &n, &work[iu], &ldwrku, &A[i-1], &lda );
+              blas::gemm('N', 'N', ib, n, n,
+                         c_one,  &A[i-1],   lda,
+                                 &work[ir], ldwrkr,
+                         c_zero, &work[iu], ldwrku );
+              lapack::lacpy('F', ib, n, &work[iu], ldwrku, &A[i-1], lda);
               }
             }
           else
@@ -903,7 +903,7 @@ magma_dgesvd
             // Perform bidiagonal QR iteration, computing left
             // singular vectors of A in A
             // Workspace: need     N [e] + 4*N [bdsqr work]
-            coot_fortran(coot_dbdsqr)( "U", &n, &izero, &m, &izero, s, &work[ie], dummy, &ione, A, &lda, dummy, &ione, &work[iwork], info );
+            lapack::bdsqr('U', n, izero, m, izero, s, &work[ie], dummy, ione, A, lda, dummy, ione, &work[iwork], info);
             }
           }
         else if (want_uo && want_vas)
@@ -946,10 +946,10 @@ magma_dgesvd
             magma_dgeqrf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
 
             // Copy R to VT, zeroing out below it
-            coot_fortran(coot_dlacpy)( "U", &n, &n, A,  &lda, VT, &ldvt );
+            lapack::lacpy('U', n, n, A, lda, VT, ldvt);
             if (n > 1)
               {
-              coot_fortran(coot_dlaset)( "L", &n_1, &n_1, &c_zero, &c_zero, &VT[1], &ldvt );
+              lapack::laset('L', n_1, n_1, c_zero, c_zero, &VT[1], ldvt);
               }
 
             // Generate Q in A
@@ -968,7 +968,7 @@ magma_dgesvd
             // Workspace: prefer N*N [R] + 3*N [e, tauq, taup] + 2*N*NB [gebrd work]
             lwork2 = lwork - iwork + 1;
             magma_dgebrd(      n,  n, VT,  ldvt, s, &work[ie], &work[itauq], &work[itaup], &work[iwork],  lwork2, &ierr );
-            coot_fortran(coot_dlacpy)( "L", &n, &n, VT, &ldvt, &work[ir], &ldwrkr );
+            lapack::lacpy('L', n, n, VT, ldvt, &work[ir], ldwrkr);
 
             // Generate left vectors bidiagonalizing R in WORK(IR)
             // Workspace: need   N*N [R] + 3*N [e, tauq, taup] + N    [orgbr work]
@@ -987,7 +987,7 @@ magma_dgesvd
             // singular vectors of R in WORK(IR) and computing right
             // singular vectors of R in VT
             // Workspace: need   N*N [R] + N [e] + 4*N [bdsqr work]
-            coot_fortran(coot_dbdsqr)( "U", &n, &n, &n, &izero, s, &work[ie], VT, &ldvt, &work[ir], &ldwrkr, dummy, &ione, &work[iwork], info );
+            lapack::bdsqr('U', n, n, n, izero, s, &work[ie], VT, ldvt, &work[ir], ldwrkr, dummy, ione, &work[iwork], info);
             iu = ie + n;
 
             // Multiply Q in A by left singular vectors of R in
@@ -999,11 +999,11 @@ magma_dgesvd
             for (i = 1; i <= m; i += ldwrku)
               {
               ib = std::min( m - i + 1, ldwrku );
-              coot_fortran(coot_dgemm)( "N", "N", &ib, &n, &n,
-                                        &c_one,  &A[i-1], &lda,
-                                                 &work[ir], &ldwrkr,
-                                        &c_zero, &work[iu], &ldwrku );
-              coot_fortran(coot_dlacpy)( "F", &ib, &n, &work[iu], &ldwrku, &A[i-1], &lda );
+              blas::gemm('N', 'N', ib, n, n,
+                         c_one,  &A[i-1],   lda,
+                                 &work[ir], ldwrkr,
+                         c_zero, &work[iu], ldwrku);
+              lapack::lacpy('F', ib, n, &work[iu], ldwrku, &A[i-1], lda);
               }
             }
           else
@@ -1019,10 +1019,10 @@ magma_dgesvd
             magma_dgeqrf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
 
             // Copy R to VT, zeroing out below it
-            coot_fortran(coot_dlacpy)( "U", &n, &n, A,  &lda, VT, &ldvt );
+            lapack::lacpy('U', n, n, A, lda, VT, ldvt);
             if (n > 1)
               {
-              coot_fortran(coot_dlaset)( "L", &n_1, &n_1, &c_zero, &c_zero, &VT[1], &ldvt );
+              lapack::laset('L', n_1, n_1, c_zero, c_zero, &VT[1], ldvt);
               }
 
             // Generate Q in A
@@ -1059,7 +1059,7 @@ magma_dgesvd
             // singular vectors of A in A and computing right
             // singular vectors of A in VT
             // Workspace: need     N [e] + 4*N [bdsqr work]
-            coot_fortran(coot_dbdsqr)( "U", &n, &n, &m, &izero, s, &work[ie], VT, &ldvt, A, &lda, dummy, &ione, &work[iwork], info );
+            lapack::bdsqr('U', n, n, m, izero, s, &work[ie], VT, ldvt, A, lda, dummy, ione, &work[iwork], info);
           }
         }
       else if (want_us && want_vn)
@@ -1091,8 +1091,8 @@ magma_dgesvd
           magma_dgeqrf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
 
           // Copy R to WORK(IR), zeroing out below it
-          coot_fortran(coot_dlacpy)( "U", &n, &n, A, &lda, &work[ir], &ldwrkr );
-          coot_fortran(coot_dlaset)( "L", &n_1, &n_1, &c_zero, &c_zero, &work[ir+1], &ldwrkr );
+          lapack::lacpy('U', n, n, A, lda, &work[ir], ldwrkr);
+          lapack::laset('L', n_1, n_1, c_zero, c_zero, &work[ir+1], ldwrkr);
 
           // Generate Q in A
           // Workspace: need   N*N [R] + N [tau] + N    [orgqr work]
@@ -1121,15 +1121,15 @@ magma_dgesvd
           // Perform bidiagonal QR iteration, computing left
           // singular vectors of R in WORK(IR)
           // Workspace: need   N*N [R] + N [e] + 4*N [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &n, &izero, &n, &izero, s, &work[ie], dummy, &ione, &work[ir], &ldwrkr, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', n, izero, n, izero, s, &work[ie], dummy, ione, &work[ir], ldwrkr, dummy, ione, &work[iwork], info);
 
           // Multiply Q in A by left singular vectors of R in
           // WORK(IR), storing result in U
           // Workspace: need   N*N [R]
-          coot_fortran(coot_dgemm)( "N", "N", &m, &n, &n,
-                                    &c_one,  A, &lda,
-                                             &work[ir], &ldwrkr,
-                                    &c_zero, U, &ldu );
+          blas::gemm('N', 'N', m, n, n,
+                     c_one,  A,         lda,
+                             &work[ir], ldwrkr,
+                     c_zero, U,         ldu);
           }
         else
           {
@@ -1142,7 +1142,7 @@ magma_dgesvd
           // Workspace: prefer N [tau] + N*NB [geqrf work]
           lwork2 = lwork - iwork + 1;
           magma_dgeqrf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "L", &m, &n, A, &lda, U, &ldu );
+          lapack::lacpy('L', m, n, A, lda, U, ldu);
 
           // Generate Q in U
           // Workspace: need   N [tau] + N    [orgqr work]
@@ -1156,7 +1156,7 @@ magma_dgesvd
           iwork = itaup + n;
 
           // Zero out below R in A
-          coot_fortran(coot_dlaset)( "L", &n_1, &n_1, &c_zero, &c_zero, &A[1], &lda );
+          lapack::laset('L', n_1, n_1, c_zero, c_zero, &A[1], lda);
 
           // Bidiagonalize R in A
           // Workspace: need   3*N [e, tauq, taup] + N      [gebrd work]
@@ -1174,7 +1174,7 @@ magma_dgesvd
           // Perform bidiagonal QR iteration, computing left
           // singular vectors of A in U
           // Workspace: need     N [e] + 4*N [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &n, &izero, &m, &izero, s, &work[ie], dummy, &ione, U, &ldu, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', n, izero, m, izero, s, &work[ie], dummy, ione, U, ldu, dummy, ione, &work[iwork], info);
           }
         }
       else if (want_us && want_vo)
@@ -1218,8 +1218,8 @@ magma_dgesvd
           magma_dgeqrf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
 
           // Copy R to WORK(IU), zeroing out below it
-          coot_fortran(coot_dlacpy)( "U", &n, &n, A, &lda, &work[iu], &ldwrku );
-          coot_fortran(coot_dlaset)( "L", &n_1, &n_1, &c_zero, &c_zero, &work[iu+1], &ldwrku );
+          lapack::lacpy('U', n, n, A, lda, &work[iu], ldwrku);
+          lapack::laset('L', n_1, n_1, c_zero, c_zero, &work[iu+1], ldwrku);
 
           // Generate Q in A
           // Workspace: need   2*N*N [U,R] + N [tau] + N    [orgqr work]
@@ -1238,7 +1238,7 @@ magma_dgesvd
           // Workspace: prefer 2*N*N [U,R] + 3*N [e, tauq, taup] + 2*N*NB [gebrd work]
           lwork2 = lwork - iwork + 1;
           magma_dgebrd(      n,  n, &work[iu],  ldwrku, s, &work[ie], &work[itauq], &work[itaup], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "U", &n, &n, &work[iu], &ldwrku, &work[ir], &ldwrkr );
+          lapack::lacpy('U', n, n, &work[iu], ldwrku, &work[ir], ldwrkr);
 
           // Generate left bidiagonalizing vectors in WORK(IU)
           // Workspace: need   2*N*N [U,R] + 3*N [e, tauq, taup] + N    [orgbr work]
@@ -1257,19 +1257,19 @@ magma_dgesvd
           // singular vectors of R in WORK(IU) and computing
           // right singular vectors of R in WORK(IR)
           // Workspace: need   2*N*N [U,R] + N [e] + 4*N [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &n, &n, &n, &izero, s, &work[ie], &work[ir], &ldwrkr, &work[iu], &ldwrku, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', n, n, n, izero, s, &work[ie], &work[ir], ldwrkr, &work[iu], ldwrku, dummy, ione, &work[iwork], info);
 
           // Multiply Q in A by left singular vectors of R in
           // WORK(IU), storing result in U
           // Workspace: need   2*N*N [U,R]
-          coot_fortran(coot_dgemm)( "N", "N", &m, &n, &n,
-                                    &c_one,  A, &lda,
-                                             &work[iu], &ldwrku,
-                                    &c_zero, U, &ldu );
+          blas::gemm('N', 'N', m, n, n,
+                     c_one,  A,         lda,
+                             &work[iu], ldwrku,
+                     c_zero, U,         ldu);
 
           // Copy right singular vectors of R to A
           // Workspace: need   2*N*N [U,R]
-          coot_fortran(coot_dlacpy)( "F", &n, &n, &work[ir], &ldwrkr, A, &lda );
+          lapack::lacpy('F', n, n, &work[ir], ldwrkr, A, lda);
           }
         else
           {
@@ -1282,7 +1282,7 @@ magma_dgesvd
           // Workspace: prefer N [tau] + N*NB [geqrf work]
           lwork2 = lwork - iwork + 1;
           magma_dgeqrf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "L", &m, &n, A, &lda, U, &ldu );
+          lapack::lacpy('L', m, n, A, lda, U, ldu);
 
           // Generate Q in U
           // Workspace: need   N [tau] + N    [orgqr work]
@@ -1296,7 +1296,7 @@ magma_dgesvd
           iwork = itaup + n;
 
           // Zero out below R in A
-          coot_fortran(coot_dlaset)( "L", &n_1, &n_1, &c_zero, &c_zero, &A[1], &lda );
+          lapack::laset('L', n_1, n_1, c_zero, c_zero, &A[1], lda);
 
           // Bidiagonalize R in A
           // Workspace: need   3*N [e, tauq, taup] + N      [gebrd work]
@@ -1321,7 +1321,7 @@ magma_dgesvd
           // singular vectors of A in U and computing right
           // singular vectors of A in A
           // Workspace: need     N [e] + 4*N [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &n, &n, &m, &izero, s, &work[ie], A, &lda, U, &ldu, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', n, n, m, izero, s, &work[ie], A, lda, U, ldu, dummy, ione, &work[iwork], info);
           }
         }
       else if (want_us && want_vas)
@@ -1353,8 +1353,8 @@ magma_dgesvd
           magma_dgeqrf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
 
           // Copy R to WORK(IU), zeroing out below it
-          coot_fortran(coot_dlacpy)( "U", &n, &n, A, &lda, &work[iu], &ldwrku );
-          coot_fortran(coot_dlaset)( "L", &n_1, &n_1, &c_zero, &c_zero, &work[iu+1], &ldwrku );
+          lapack::lacpy('U', n, n, A, lda, &work[iu], ldwrku);
+          lapack::laset('L', n_1, n_1, c_zero, c_zero, &work[iu+1], ldwrku);
 
           // Generate Q in A
           // Workspace: need   N*N [U] + N [tau] + N    [orgqr work]
@@ -1372,7 +1372,7 @@ magma_dgesvd
           // Workspace: prefer N*N [U] + 3*N [e, tauq, taup] + 2*N*NB [gebrd work]
           lwork2 = lwork - iwork + 1;
           magma_dgebrd(      n,  n, &work[iu],  ldwrku, s, &work[ie], &work[itauq], &work[itaup], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "U", &n, &n, &work[iu], &ldwrku, VT, &ldvt );
+          lapack::lacpy('U', n, n, &work[iu], ldwrku, VT, ldvt);
 
           // Generate left bidiagonalizing vectors in WORK(IU)
           // Workspace: need   N*N [U] + 3*N [e, tauq, taup] + N    [orgbr work]
@@ -1391,15 +1391,15 @@ magma_dgesvd
           // singular vectors of R in WORK(IU) and computing
           // right singular vectors of R in VT
           // Workspace: need   N*N [U] + N [e] + 4*N [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &n, &n, &n, &izero, s, &work[ie], VT, &ldvt, &work[iu], &ldwrku, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', n, n, n, izero, s, &work[ie], VT, ldvt, &work[iu], ldwrku, dummy, ione, &work[iwork], info);
 
           // Multiply Q in A by left singular vectors of R in
           // WORK(IU), storing result in U
           // Workspace: need   N*N [U]
-          coot_fortran(coot_dgemm)( "N", "N", &m, &n, &n,
-                                    &c_one,  A, &lda,
-                                             &work[iu], &ldwrku,
-                                    &c_zero, U, &ldu );
+          blas::gemm('N', 'N', m, n, n,
+                     c_one,  A,         lda,
+                             &work[iu], ldwrku,
+                     c_zero, U,         ldu);
           }
         else
           {
@@ -1412,7 +1412,7 @@ magma_dgesvd
           // Workspace: prefer N [tau] + N*NB [geqrf work]
           lwork2 = lwork - iwork + 1;
           magma_dgeqrf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "L", &m, &n, A, &lda, U, &ldu );
+          lapack::lacpy('L', m, n, A, lda, U, ldu);
 
           // Generate Q in U
           // Workspace: need   N [tau] + N    [orgqr work]
@@ -1421,10 +1421,10 @@ magma_dgesvd
           magma_dorgqr2(     m,  n,  n, U,  ldu, &work[itau], &ierr );
 
           // Copy R to VT, zeroing out below it
-          coot_fortran(coot_dlacpy)( "U", &n, &n, A,  &lda, VT, &ldvt );
+          lapack::lacpy('U', n, n, A, lda, VT, ldvt);
           if (n > 1)
             {
-            coot_fortran(coot_dlaset)( "L", &n_1, &n_1, &c_zero, &c_zero, &VT[1], &ldvt );
+            lapack::laset('L', n_1, n_1, c_zero, c_zero, &VT[1], ldvt);
             }
           ie    = itau;
           itauq = ie    + n;
@@ -1454,7 +1454,7 @@ magma_dgesvd
           // singular vectors of A in U and computing right
           // singular vectors of A in VT
           // Workspace: need     N [e] + 4*N [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &n, &n, &m, &izero, s, &work[ie], VT, &ldvt, U, &ldu, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', n, n, m, izero, s, &work[ie], VT, ldvt, U, ldu, dummy, ione, &work[iwork], info);
           }
         }
       else if (want_ua && want_vn)
@@ -1484,11 +1484,11 @@ magma_dgesvd
           // Workspace: prefer N*N [R] + N [tau] + N*NB [geqrf work]
           lwork2 = lwork - iwork + 1;
           magma_dgeqrf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "L", &m, &n, A, &lda, U, &ldu );
+          lapack::lacpy('L', m, n, A, lda, U, ldu);
 
           // Copy R to WORK(IR), zeroing out below it
-          coot_fortran(coot_dlacpy)( "U", &n, &n, A, &lda, &work[ir], &ldwrkr );
-          coot_fortran(coot_dlaset)( "L", &n_1, &n_1, &c_zero, &c_zero, &work[ir+1], &ldwrkr );
+          lapack::lacpy('U', n, n, A, lda, &work[ir], ldwrkr);
+          lapack::laset('L', n_1, n_1, c_zero, c_zero, &work[ir+1], ldwrkr);
 
           // Generate Q in U
           // Workspace: need   N*N [R] + N [tau] + M    [orgqr work]
@@ -1517,18 +1517,18 @@ magma_dgesvd
           // Perform bidiagonal QR iteration, computing left
           // singular vectors of R in WORK(IR)
           // Workspace: need   N*N [R] + N [e] + 4*N [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &n, &izero, &n, &izero, s, &work[ie], dummy, &ione, &work[ir], &ldwrkr, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', n, izero, n, izero, s, &work[ie], dummy, ione, &work[ir], ldwrkr, dummy, ione, &work[iwork], info);
 
           // Multiply Q in U by left singular vectors of R in
           // WORK(IR), storing result in A
           // Workspace: need   N*N [R]
-          coot_fortran(coot_dgemm)( "N", "N", &m, &n, &n,
-                                    &c_one,  U, &ldu,
-                                             &work[ir], &ldwrkr,
-                                    &c_zero, A, &lda );
+          blas::gemm('N', 'N', m, n, n,
+                     c_one,  U,         ldu,
+                             &work[ir], ldwrkr,
+                     c_zero, A,         lda);
 
           // Copy left singular vectors of A from A to U
-          coot_fortran(coot_dlacpy)( "F", &m, &n, A, &lda, U, &ldu );
+          lapack::lacpy('F', m, n, A, lda, U, ldu);
           }
         else
           {
@@ -1541,7 +1541,7 @@ magma_dgesvd
           // Workspace: prefer N [tau] + N*NB [geqrf work]
           lwork2 = lwork - iwork + 1;
           magma_dgeqrf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "L", &m, &n, A, &lda, U, &ldu );
+          lapack::lacpy('L', m, n, A, lda, U, ldu);
 
           // Generate Q in U
           // Workspace: need   N [tau] + M    [orgqr work]
@@ -1555,7 +1555,7 @@ magma_dgesvd
           iwork = itaup + n;
 
           // Zero out below R in A
-          coot_fortran(coot_dlaset)( "L", &n_1, &n_1, &c_zero, &c_zero, &A[1], &lda );
+          lapack::laset('L', n_1, n_1, c_zero, c_zero, &A[1], lda);
 
           // Bidiagonalize R in A
           // Workspace: need   3*N [e, tauq, taup] + N      [gebrd work]
@@ -1573,7 +1573,7 @@ magma_dgesvd
           // Perform bidiagonal QR iteration, computing left
           // singular vectors of A in U
           // Workspace: need     N [e] + 4*N [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &n, &izero, &m, &izero, s, &work[ie], dummy, &ione, U, &ldu, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', n, izero, m, izero, s, &work[ie], dummy, ione, U, ldu, dummy, ione, &work[iwork], info);
           }
         }
       else if (want_ua && want_vo)
@@ -1615,7 +1615,7 @@ magma_dgesvd
           // Workspace: prefer 2*N*N [U,R] + N [tau] + N*NB [geqrf work]
           lwork2 = lwork - iwork + 1;
           magma_dgeqrf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "L", &m, &n, A, &lda, U, &ldu );
+          lapack::lacpy('L', m, n, A, lda, U, ldu);
 
           // Generate Q in U
           // Workspace: need   2*N*N [U,R] + N [tau] + M    [orgqr work]
@@ -1624,8 +1624,8 @@ magma_dgesvd
           magma_dorgqr2(     m,  m,  n, U,  ldu, &work[itau], &ierr );
 
           // Copy R to WORK(IU), zeroing out below it
-          coot_fortran(coot_dlacpy)( "U", &n, &n, A, &lda, &work[iu], &ldwrku );
-          coot_fortran(coot_dlaset)( "L", &n_1, &n_1, &c_zero, &c_zero, &work[iu+1], &ldwrku );
+          lapack::lacpy('U', n, n, A, lda, &work[iu], ldwrku);
+          lapack::laset('L', n_1, n_1, c_zero, c_zero, &work[iu+1], ldwrku);
           ie    = itau;
           itauq = ie    + n;
           itaup = itauq + n;
@@ -1637,7 +1637,7 @@ magma_dgesvd
           // Workspace: prefer 2*N*N [U,R] + 3*N [e, tauq, taup] + 2*N*NB [gebrd work]
           lwork2 = lwork - iwork + 1;
           magma_dgebrd(      n,  n, &work[iu],  ldwrku, s, &work[ie], &work[itauq], &work[itaup], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "U", &n, &n, &work[iu], &ldwrku, &work[ir], &ldwrkr );
+          lapack::lacpy('U', n, n, &work[iu], ldwrku, &work[ir], ldwrkr);
 
           // Generate left bidiagonalizing vectors in WORK(IU)
           // Workspace: need   2*N*N [U,R] + 3*N [e, tauq, taup] + N    [orgbr work]
@@ -1656,21 +1656,21 @@ magma_dgesvd
           // singular vectors of R in WORK(IU) and computing
           // right singular vectors of R in WORK(IR)
           // Workspace: need   2*N*N [U,R] + N [e] + 4*N [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &n, &n, &n, &izero, s, &work[ie], &work[ir], &ldwrkr, &work[iu], &ldwrku, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', n, n, n, izero, s, &work[ie], &work[ir], ldwrkr, &work[iu], ldwrku, dummy, ione, &work[iwork], info);
 
           // Multiply Q in U by left singular vectors of R in
           // WORK(IU), storing result in A
           // Workspace: need   N*N [U]
-          coot_fortran(coot_dgemm)( "N", "N", &m, &n, &n,
-                                    &c_one,  U, &ldu,
-                                             &work[iu], &ldwrku,
-                                    &c_zero, A, &lda );
+          blas::gemm('N', 'N', m, n, n,
+                     c_one,  U,         ldu,
+                             &work[iu], ldwrku,
+                     c_zero, A,         lda);
 
           // Copy left singular vectors of A from A to U
-          coot_fortran(coot_dlacpy)( "F", &m, &n, A, &lda, U, &ldu );
+          lapack::lacpy('F', m, n, A, lda, U, ldu);
 
           // Copy right singular vectors of R from WORK(IR) to A
-          coot_fortran(coot_dlacpy)( "F", &n, &n, &work[ir], &ldwrkr, A, &lda );
+          lapack::lacpy('F', n, n, &work[ir], ldwrkr, A, lda);
           }
         else
           {
@@ -1683,7 +1683,7 @@ magma_dgesvd
           // Workspace: prefer N [tau] + N*NB [geqrf work]
           lwork2 = lwork - iwork + 1;
           magma_dgeqrf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "L", &m, &n, A, &lda, U, &ldu );
+          lapack::lacpy('L', m, n, A, lda, U, ldu);
 
           // Generate Q in U
           // Workspace: need   N [tau] + M    [orgqr work]
@@ -1697,7 +1697,7 @@ magma_dgesvd
           iwork = itaup + n;
 
           // Zero out below R in A
-          coot_fortran(coot_dlaset)( "L", &n_1, &n_1, &c_zero, &c_zero, &A[1], &lda );
+          lapack::laset('L', n_1, n_1, c_zero, c_zero, &A[1], lda);
 
           // Bidiagonalize R in A
           // Workspace: need   3*N [e, tauq, taup] + N      [gebrd work]
@@ -1722,7 +1722,7 @@ magma_dgesvd
           // singular vectors of A in U and computing right
           // singular vectors of A in A
           // Workspace: need     N [e] + 4*N [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &n, &n, &m, &izero, s, &work[ie], A, &lda, U, &ldu, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', n, n, m, izero, s, &work[ie], A, lda, U, ldu, dummy, ione, &work[iwork], info);
           }
         }
       else if (want_ua && want_vas)
@@ -1752,7 +1752,7 @@ magma_dgesvd
           // Workspace: prefer N*N [U] + N [tau] + N*NB [geqrf work]
           lwork2 = lwork - iwork + 1;
           magma_dgeqrf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "L", &m, &n, A, &lda, U, &ldu );
+          lapack::lacpy('L', m, n, A, lda, U, ldu);
 
           // Generate Q in U
           // Workspace: need   N*N [U] + N [tau] + M    [orgqr work]
@@ -1761,8 +1761,8 @@ magma_dgesvd
           magma_dorgqr2(     m,  m,  n, U,  ldu, &work[itau], &ierr );
 
           // Copy R to WORK(IU), zeroing out below it
-          coot_fortran(coot_dlacpy)( "U", &n, &n, A, &lda, &work[iu], &ldwrku );
-          coot_fortran(coot_dlaset)( "L", &n_1, &n_1, &c_zero, &c_zero, &work[iu+1], &ldwrku );
+          lapack::lacpy('U', n, n, A, lda, &work[iu], ldwrku);
+          lapack::laset('L', n_1, n_1, c_zero, c_zero, &work[iu+1], ldwrku);
           ie    = itau;
           itauq = ie    + n;
           itaup = itauq + n;
@@ -1773,7 +1773,7 @@ magma_dgesvd
           // Workspace: prefer N*N [U] + 3*N [e, tauq, taup] + 2*N*NB [gebrd work]
           lwork2 = lwork - iwork + 1;
           magma_dgebrd(      n,  n, &work[iu],  ldwrku, s, &work[ie], &work[itauq], &work[itaup], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "U", &n, &n, &work[iu], &ldwrku, VT, &ldvt );
+          lapack::lacpy('U', n, n, &work[iu], ldwrku, VT, ldvt);
 
           // Generate left bidiagonalizing vectors in WORK(IU)
           // Workspace: need   N*N [U] + 3*N [e, tauq, taup] + N    [orgbr work]
@@ -1792,18 +1792,18 @@ magma_dgesvd
           // singular vectors of R in WORK(IU) and computing
           // right singular vectors of R in VT
           // Workspace: need   N*N [U] + N [e] + 4*N [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &n, &n, &n, &izero, s, &work[ie], VT, &ldvt, &work[iu], &ldwrku, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', n, n, n, izero, s, &work[ie], VT, ldvt, &work[iu], ldwrku, dummy, ione, &work[iwork], info);
 
           // Multiply Q in U by left singular vectors of R in
           // WORK(IU), storing result in A
           // Workspace: need   N*N [U]
-          coot_fortran(coot_dgemm)( "N", "N", &m, &n, &n,
-                                    &c_one,  U, &ldu,
-                                             &work[iu], &ldwrku,
-                                    &c_zero, A, &lda );
+          blas::gemm('N', 'N', m, n, n,
+                     c_one,  U,         ldu,
+                             &work[iu], ldwrku,
+                     c_zero, A,         lda);
 
           // Copy left singular vectors of A from A to U
-          coot_fortran(coot_dlacpy)( "F", &m, &n, A, &lda, U, &ldu );
+          lapack::lacpy('F', m, n, A, lda, U, ldu);
           }
         else
           {
@@ -1816,7 +1816,7 @@ magma_dgesvd
           // Workspace: prefer N [tau] + N*NB [geqrf work]
           lwork2 = lwork - iwork + 1;
           magma_dgeqrf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "L", &m, &n, A, &lda, U, &ldu );
+          lapack::lacpy('L', m, n, A, lda, U, ldu);
 
           // Generate Q in U
           // Workspace: need   N [tau] + M    [orgqr work]
@@ -1825,10 +1825,10 @@ magma_dgesvd
           magma_dorgqr2(     m,  m,  n, U,  ldu, &work[itau], &ierr );
 
           // Copy R from A to VT, zeroing out below it
-          coot_fortran(coot_dlacpy)( "U", &n, &n, A,  &lda, VT, &ldvt );
+          lapack::lacpy('U', n, n, A, lda, VT, ldvt);
           if (n > 1)
             {
-            coot_fortran(coot_dlaset)( "L", &n_1, &n_1, &c_zero, &c_zero, &VT[1], &ldvt );
+            lapack::laset('L', n_1, n_1, c_zero, c_zero, &VT[1], ldvt);
             }
           ie    = itau;
           itauq = ie    + n;
@@ -1858,7 +1858,7 @@ magma_dgesvd
           // singular vectors of A in U and computing right
           // singular vectors of A in VT
           // Workspace: need     N [e] + 4*N [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &n, &n, &m, &izero, s, &work[ie], VT, &ldvt, U, &ldu, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', n, n, m, izero, s, &work[ie], VT, ldvt, U, ldu, dummy, ione, &work[iwork], info);
           }
         }
       }
@@ -1885,7 +1885,7 @@ magma_dgesvd
         // and generate left bidiagonalizing vectors in U
         // Workspace: need     3*N [e, tauq, taup] + NCU    [orgbr work]
         // Workspace: prefer   3*N [e, tauq, taup] + NCU*NB [orgbr work]
-        coot_fortran(coot_dlacpy)( "L", &m, &n, A, &lda, U, &ldu );
+        lapack::lacpy('L', m, n, A, lda, U, ldu);
         if (want_us)
           {
           ncu = n;
@@ -1904,7 +1904,7 @@ magma_dgesvd
         // VT and generate right bidiagonalizing vectors in VT
         // Workspace: need     3*N [e, tauq, taup] + N    [orgbr work]
         // Workspace: prefer   3*N [e, tauq, taup] + N*NB [orgbr work]
-        coot_fortran(coot_dlacpy)( "U", &n, &n, A,  &lda, VT, &ldvt );
+        lapack::lacpy('U', n, n, A, lda, VT, ldvt);
         lwork2 = lwork - iwork + 1;
         magma_dorgbr( MagmaP,   n,  n,  n, VT,  ldvt, &work[itaup], &work[iwork],  lwork2, &ierr );
         }
@@ -1950,7 +1950,7 @@ magma_dgesvd
         // left singular vectors in U and computing right singular
         // vectors in VT
         // Workspace: need       N [e] + 4*N [bdsqr work]
-        coot_fortran(coot_dbdsqr)( "U", &n, &ncvt, &nru, &izero, s, &work[ie], VT, &ldvt, U, &ldu, dummy, &ione, &work[iwork], info );
+        lapack::bdsqr('U', n, ncvt, nru, izero, s, &work[ie], VT, ldvt, U, ldu, dummy, ione, &work[iwork], info);
         }
       else if (! want_uo && want_vo)
         {
@@ -1958,7 +1958,7 @@ magma_dgesvd
         // left singular vectors in U and computing right singular
         // vectors in A
         // Workspace: need       N [e] + 4*N [bdsqr work]
-        coot_fortran(coot_dbdsqr)( "U", &n, &ncvt, &nru, &izero, s, &work[ie], A, &lda, U, &ldu, dummy, &ione, &work[iwork], info );
+        lapack::bdsqr('U', n, ncvt, nru, izero, s, &work[ie], A, lda, U, ldu, dummy, ione, &work[iwork], info);
         }
       else
         {
@@ -1966,7 +1966,7 @@ magma_dgesvd
         // left singular vectors in A and computing right singular
         // vectors in VT
         // Workspace: need       N [e] + 4*N [bdsqr work]
-        coot_fortran(coot_dbdsqr)( "U", &n, &ncvt, &nru, &izero, s, &work[ie], VT, &ldvt, A, &lda, dummy, &ione, &work[iwork], info );
+        lapack::bdsqr('U', n, ncvt, nru, izero, s, &work[ie], VT, ldvt, A, lda, dummy, ione, &work[iwork], info);
         }
       }
     }
@@ -1992,7 +1992,7 @@ magma_dgesvd
         magma_dgelqf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
 
         // Zero out above L
-        coot_fortran(coot_dlaset)( "U", &m_1, &m_1, &c_zero, &c_zero, &A[1 * lda], &lda );
+        lapack::laset('U', m_1, m_1, c_zero, c_zero, &A[1 * lda], lda);
         ie    = 1;
         itauq = ie + m;
         itaup = itauq + m;
@@ -2022,12 +2022,12 @@ magma_dgesvd
         // Perform bidiagonal QR iteration, computing left singular
         // vectors of A in A if desired
         // Workspace: need     M [e] + 4*M [bdsqr work]
-        coot_fortran(coot_dbdsqr)( "U", &m, &izero, &nru, &izero, s, &work[ie], dummy, &ione, A, &lda, dummy, &ione, &work[iwork], info );
+        lapack::bdsqr('U', m, izero, nru, izero, s, &work[ie], dummy, ione, A, lda, dummy, ione, &work[iwork], info);
 
         // If left singular vectors desired in U, copy them there
         if (want_uas)
           {
-          coot_fortran(coot_dlacpy)( "F", &m, &m, A, &lda, U, &ldu );
+          lapack::lacpy('F', m, m, A, lda, U, ldu);
           }
         }
       else if (want_vo && want_un)
@@ -2073,8 +2073,8 @@ magma_dgesvd
           magma_dgelqf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
 
           // Copy L to WORK(IR) and zero out above it
-          coot_fortran(coot_dlacpy)( "L", &m, &m, A, &lda, &work[ir], &ldwrkr );
-          coot_fortran(coot_dlaset)( "U", &m_1, &m_1, &c_zero, &c_zero, &work[ir+ldwrkr], &ldwrkr );
+          lapack::lacpy('L', m, m, A, lda, &work[ir], ldwrkr);
+          lapack::laset('U', m_1, m_1, c_zero, c_zero, &work[ir+ldwrkr], ldwrkr);
 
           // Generate Q in A
           // Workspace: need   M*M [R] + M [tau] + M    [orglq work]
@@ -2102,7 +2102,7 @@ magma_dgesvd
           // Perform bidiagonal QR iteration, computing right
           // singular vectors of L in WORK(IR)
           // Workspace: need   M*M [R] + M [e] + 4*M [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &m, &m, &izero, &izero, s, &work[ie], &work[ir], &ldwrkr, dummy, &ione, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', m, m, izero, izero, s, &work[ie], &work[ir], ldwrkr, dummy, ione, dummy, ione, &work[iwork], info);
           iu = ie + m;
 
           // Multiply right singular vectors of L in WORK(IR) by Q
@@ -2114,11 +2114,11 @@ magma_dgesvd
           for (i = 1; i <= n; i += chunk)
             {
             ib = std::min( n - i + 1, chunk );
-            coot_fortran(coot_dgemm)( "N", "N", &m, &ib, &m,
-                                      &c_one,  &work[ir], &ldwrkr,
-                                               &A[(i-1) * lda], &lda,
-                                      &c_zero, &work[iu], &ldwrku );
-            coot_fortran(coot_dlacpy)( "F", &m, &ib, &work[iu], &ldwrku, &A[(i-1) * lda], &lda );
+            blas::gemm('N', 'N', m, ib, m,
+                       c_one,  &work[ir],       ldwrkr,
+                               &A[(i-1) * lda], lda,
+                       c_zero, &work[iu],       ldwrku);
+            lapack::lacpy('F', m, ib, &work[iu], ldwrku, &A[(i-1) * lda], lda);
             }
           }
         else
@@ -2145,7 +2145,7 @@ magma_dgesvd
           // Perform bidiagonal QR iteration, computing right
           // singular vectors of A in A
           // Workspace: need     M [e] + 4*M [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "L", &m, &n, &izero, &izero, s, &work[ie], A, &lda, dummy, &ione, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('L', m, n, izero, izero, s, &work[ie], A, lda, dummy, ione, dummy, ione, &work[iwork], info);
           }
         }
       else if (want_vo && want_uas)
@@ -2191,8 +2191,8 @@ magma_dgesvd
           magma_dgelqf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
 
           // Copy L to U, zeroing about above it
-          coot_fortran(coot_dlacpy)( "L", &m, &m, A, &lda, U, &ldu );
-          coot_fortran(coot_dlaset)( "U", &m_1, &m_1, &c_zero, &c_zero, &U[1 * ldu], &ldu );
+          lapack::lacpy('L', m, m, A, lda, U, ldu);
+          lapack::laset('U', m_1, m_1, c_zero, c_zero, &U[1 * ldu], ldu);
 
           // Generate Q in A
           // Workspace: need   M*M [R] + M [tau] + M    [orglq work]
@@ -2209,7 +2209,7 @@ magma_dgesvd
           // Workspace: prefer M*M [R] + 3*M [e, tauq, taup] + 2*M*NB [gebrd work]
           lwork2 = lwork - iwork + 1;
           magma_dgebrd(      m,  m, U,  ldu, s, &work[ie], &work[itauq], &work[itaup], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "U", &m, &m, U, &ldu, &work[ir], &ldwrkr );
+          lapack::lacpy('U', m, m, U, ldu, &work[ir], ldwrkr);
 
           // Generate right vectors bidiagonalizing L in WORK(IR)
           // Workspace: need   M*M [R] + 3*M [e, tauq, taup] + M    [orgbr work]
@@ -2228,7 +2228,7 @@ magma_dgesvd
           // singular vectors of L in U, and computing right
           // singular vectors of L in WORK(IR)
           // Workspace: need   M*M [R] + M [e] + 4*M [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &m, &m, &m, &izero, s, &work[ie], &work[ir], &ldwrkr, U, &ldu, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', m, m, m, izero, s, &work[ie], &work[ir], ldwrkr, U, ldu, dummy, ione, &work[iwork], info);
           iu = ie + m;
 
           // Multiply right singular vectors of L in WORK(IR) by Q
@@ -2240,11 +2240,11 @@ magma_dgesvd
           for (i = 1; i <= n; i += chunk)
             {
             ib = std::min( n - i + 1, chunk );
-            coot_fortran(coot_dgemm)( "N", "N", &m, &ib, &m,
-                                      &c_one,  &work[ir], &ldwrkr,
-                                               &A[(i-1) * lda], &lda,
-                                      &c_zero, &work[iu], &ldwrku );
-            coot_fortran(coot_dlacpy)( "F", &m, &ib, &work[iu], &ldwrku, &A[(i-1) * lda], &lda );
+            blas::gemm('N', 'N', m, ib, m,
+                       c_one,  &work[ir],       ldwrkr,
+                               &A[(i-1) * lda], lda,
+                       c_zero, &work[iu],       ldwrku);
+            lapack::lacpy('F', m, ib, &work[iu], ldwrku, &A[(i-1) * lda], lda);
             }
           }
         else
@@ -2260,8 +2260,8 @@ magma_dgesvd
           magma_dgelqf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
 
           // Copy L to U, zeroing out above it
-          coot_fortran(coot_dlacpy)( "L", &m, &m, A, &lda, U, &ldu );
-          coot_fortran(coot_dlaset)( "U", &m_1, &m_1, &c_zero, &c_zero, &U[1 * ldu], &ldu );
+          lapack::lacpy('L', m, m, A, lda, U, ldu);
+          lapack::laset('U', m_1, m_1, c_zero, c_zero, &U[1 * ldu], ldu);
 
           // Generate Q in A
           // Workspace: need   M [tau] + M    [orglq work]
@@ -2296,7 +2296,7 @@ magma_dgesvd
           // singular vectors of A in U and computing right
           // singular vectors of A in A
           // Workspace: need     M [e] + 4*M [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &m, &n, &m, &izero, s, &work[ie], A, &lda, U, &ldu, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', m, n, m, izero, s, &work[ie], A, lda, U, ldu, dummy, ione, &work[iwork], info);
           }
         }
       else if (want_vs && want_un)
@@ -2328,8 +2328,8 @@ magma_dgesvd
           magma_dgelqf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
 
           // Copy L to WORK(IR), zeroing out above it
-          coot_fortran(coot_dlacpy)( "L", &m, &m, A, &lda, &work[ir], &ldwrkr );
-          coot_fortran(coot_dlaset)( "U", &m_1, &m_1, &c_zero, &c_zero, &work[ir+ldwrkr], &ldwrkr );
+          lapack::lacpy('L', m, m, A, lda, &work[ir], ldwrkr);
+          lapack::laset('U', m_1, m_1, c_zero, c_zero, &work[ir+ldwrkr], ldwrkr);
 
           // Generate Q in A
           // Workspace: need   M*M [R] + M [tau] + M    [orglq work]
@@ -2358,15 +2358,15 @@ magma_dgesvd
           // Perform bidiagonal QR iteration, computing right
           // singular vectors of L in WORK(IR)
           // Workspace: need   M*M [R] + M [e] + 4*M [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &m, &m, &izero, &izero, s, &work[ie], &work[ir], &ldwrkr, dummy, &ione, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', m, m, izero, izero, s, &work[ie], &work[ir], ldwrkr, dummy, ione, dummy, ione, &work[iwork], info);
 
           // Multiply right singular vectors of L in WORK(IR) by
           // Q in A, storing result in VT
           // Workspace: need   M*M [R]
-          coot_fortran(coot_dgemm)( "N", "N", &m, &n, &m,
-                                    &c_one,  &work[ir], &ldwrkr,
-                                             A,  &lda,
-                                    &c_zero, VT, &ldvt );
+          blas::gemm('N', 'N', m, n, m,
+                     c_one,  &work[ir], ldwrkr,
+                             A,         lda,
+                     c_zero, VT,        ldvt);
           }
         else
           {
@@ -2381,7 +2381,7 @@ magma_dgesvd
           magma_dgelqf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
 
           // Copy result to VT
-          coot_fortran(coot_dlacpy)( "U", &m, &n, A,  &lda, VT, &ldvt );
+          lapack::lacpy('U', m, n, A, lda, VT, ldvt);
 
           // Generate Q in VT
           // Workspace: need   M [tau] + M    [orglq work]
@@ -2394,7 +2394,7 @@ magma_dgesvd
           iwork = itaup + m;
 
           // Zero out above L in A
-          coot_fortran(coot_dlaset)( "U", &m_1, &m_1, &c_zero, &c_zero, &A[1 * lda], &lda );
+          lapack::laset('U', m_1, m_1, c_zero, c_zero, &A[1 * lda], lda);
 
           // Bidiagonalize L in A
           // Workspace: need   3*M [e, tauq, taup] + M      [gebrd work]
@@ -2412,7 +2412,7 @@ magma_dgesvd
           // Perform bidiagonal QR iteration, computing right
           // singular vectors of A in VT
           // Workspace: need     M [e] + 4*M [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &m, &n, &izero, &izero, s, &work[ie], VT, &ldvt, dummy, &ione, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', m, n, izero, izero, s, &work[ie], VT, ldvt, dummy, ione, dummy, ione, &work[iwork], info);
           }
         }
       else if (want_vs && want_uo)
@@ -2456,8 +2456,8 @@ magma_dgesvd
           magma_dgelqf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
 
           // Copy L to WORK(IU), zeroing out below it
-          coot_fortran(coot_dlacpy)( "L", &m, &m, A, &lda, &work[iu], &ldwrku );
-          coot_fortran(coot_dlaset)( "U", &m_1, &m_1, &c_zero, &c_zero, &work[iu+ldwrku], &ldwrku );
+          lapack::lacpy('L', m, m, A, lda, &work[iu], ldwrku);
+          lapack::laset('U', m_1, m_1, c_zero, c_zero, &work[iu+ldwrku], ldwrku);
 
           // Generate Q in A
           // Workspace: need   2*M*M [U,R] + M [tau] + M    [orglq work]
@@ -2475,7 +2475,7 @@ magma_dgesvd
           // Workspace: prefer 2*M*M [U,R] + 3*M [e, tauq, taup] + 2*M*NB [gebrd work]
           lwork2 = lwork - iwork + 1;
           magma_dgebrd(      m,  m, &work[iu],  ldwrku, s, &work[ie], &work[itauq], &work[itaup], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "L", &m, &m, &work[iu], &ldwrku, &work[ir], &ldwrkr );
+          lapack::lacpy('L', m, m, &work[iu], ldwrku, &work[ir], ldwrkr);
 
           // Generate right bidiagonalizing vectors in WORK(IU)
           // Workspace: need   2*M*M [U,R] + 3*M [e, tauq, taup] + M    [orgbr work]
@@ -2494,19 +2494,19 @@ magma_dgesvd
           // singular vectors of L in WORK(IR) and computing
           // right singular vectors of L in WORK(IU)
           // Workspace: need   2*M*M [U,R] + M [e] + 4*M [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &m, &m, &m, &izero, s, &work[ie], &work[iu], &ldwrku, &work[ir], &ldwrkr, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', m, m, m, izero, s, &work[ie], &work[iu], ldwrku, &work[ir], ldwrkr, dummy, ione, &work[iwork], info);
 
           // Multiply right singular vectors of L in WORK(IU) by
           // Q in A, storing result in VT
           // Workspace: need   2*M*M [U,R]
-          coot_fortran(coot_dgemm)( "N", "N", &m, &n, &m,
-                                    &c_one,  &work[iu], &ldwrku,
-                                             A,  &lda,
-                                    &c_zero, VT, &ldvt );
+          blas::gemm('N', 'N', m, n, m,
+                     c_one,  &work[iu], ldwrku,
+                             A,         lda,
+                     c_zero, VT,        ldvt);
 
           // Copy left singular vectors of L to A
           // Workspace: need   2*M*M [U,R]
-          coot_fortran(coot_dlacpy)( "F", &m, &m, &work[ir], &ldwrkr, A, &lda );
+          lapack::lacpy('F', m, m, &work[ir], ldwrkr, A, lda);
           }
         else
           {
@@ -2519,7 +2519,7 @@ magma_dgesvd
           // Workspace: prefer M [tau] + M*NB [gelqf work]
           lwork2 = lwork - iwork + 1;
           magma_dgelqf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "U", &m, &n, A,  &lda, VT, &ldvt );
+          lapack::lacpy('U', m, n, A, lda, VT, ldvt);
 
           // Generate Q in VT
           // Workspace: need   M [tau] + M    [orglq work]
@@ -2532,7 +2532,7 @@ magma_dgesvd
           iwork = itaup + m;
 
           // Zero out above L in A
-          coot_fortran(coot_dlaset)( "U", &m_1, &m_1, &c_zero, &c_zero, &A[1 * lda], &lda );
+          lapack::laset('U', m_1, m_1, c_zero, c_zero, &A[1 * lda], lda);
 
           // Bidiagonalize L in A
           // Workspace: need   3*M [e, tauq, taup] + M      [gebrd work]
@@ -2557,7 +2557,7 @@ magma_dgesvd
           // singular vectors of A in A and computing right
           // singular vectors of A in VT
           // Workspace: need     M [e] + 4*M [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &m, &n, &m, &izero, s, &work[ie], VT, &ldvt, A, &lda, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', m, n, m, izero, s, &work[ie], VT, ldvt, A, lda, dummy, ione, &work[iwork], info);
           }
         }
       else if (want_vs && want_uas)
@@ -2589,8 +2589,8 @@ magma_dgesvd
           magma_dgelqf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
 
           // Copy L to WORK(IU), zeroing out above it
-          coot_fortran(coot_dlacpy)( "L", &m, &m, A, &lda, &work[iu], &ldwrku );
-          coot_fortran(coot_dlaset)( "U", &m_1, &m_1, &c_zero, &c_zero, &work[iu+ldwrku], &ldwrku );
+          lapack::lacpy('L', m, m, A, lda, &work[iu], ldwrku);
+          lapack::laset('U', m_1, m_1, c_zero, c_zero, &work[iu+ldwrku], ldwrku);
 
           // Generate Q in A
           // Workspace: need   M*M [U] + M [tau] + M    [orglq work]
@@ -2607,7 +2607,7 @@ magma_dgesvd
           // Workspace: prefer M*M [U] + 3*M [e, tauq, taup] + 2*M*NB [gebrd work]
           lwork2 = lwork - iwork + 1;
           magma_dgebrd(      m,  m, &work[iu],  ldwrku, s, &work[ie], &work[itauq], &work[itaup], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "L", &m, &m, &work[iu], &ldwrku, U, &ldu );
+          lapack::lacpy('L', m, m, &work[iu], ldwrku, U, ldu);
 
           // Generate right bidiagonalizing vectors in WORK(IU)
           // Workspace: need   M*M [U] + 3*M [e, tauq, taup] + M    [orgbr work]
@@ -2626,15 +2626,15 @@ magma_dgesvd
           // singular vectors of L in U and computing right
           // singular vectors of L in WORK(IU)
           // Workspace: need   M*M [U] + M [e] + 4*M [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &m, &m, &m, &izero, s, &work[ie], &work[iu], &ldwrku, U, &ldu, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', m, m, m, izero, s, &work[ie], &work[iu], ldwrku, U, ldu, dummy, ione, &work[iwork], info);
 
           // Multiply right singular vectors of L in WORK(IU) by
           // Q in A, storing result in VT
           // Workspace: need   M*M [U]
-          coot_fortran(coot_dgemm)( "N", "N", &m, &n, &m,
-                                    &c_one,  &work[iu], &ldwrku,
-                                             A,  &lda,
-                                    &c_zero, VT, &ldvt );
+          blas::gemm('N', 'N', m, n, m,
+                     c_one,  &work[iu], ldwrku,
+                             A,         lda,
+                     c_zero, VT,        ldvt);
           }
         else
           {
@@ -2647,7 +2647,7 @@ magma_dgesvd
           // Workspace: prefer M [tau] + M*NB [gelqf work]
           lwork2 = lwork - iwork + 1;
           magma_dgelqf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "U", &m, &n, A,  &lda, VT, &ldvt );
+          lapack::lacpy('U', m, n, A, lda, VT, ldvt);
 
           // Generate Q in VT
           // Workspace: need   M [tau] + M    [orglq work]
@@ -2656,8 +2656,8 @@ magma_dgesvd
           magma_dorglq(      m,  n,  m, VT,  ldvt, &work[itau], &work[iwork],  lwork2, &ierr );
 
           // Copy L to U, zeroing out above it
-          coot_fortran(coot_dlacpy)( "L", &m, &m, A, &lda, U, &ldu );
-          coot_fortran(coot_dlaset)( "U", &m_1, &m_1, &c_zero, &c_zero, &U[1 * ldu], &ldu );
+          lapack::lacpy('L', m, m, A, lda, U, ldu);
+          lapack::laset('U', m_1, m_1, c_zero, c_zero, &U[1 * ldu], ldu);
           ie    = itau;
           itauq = ie + m;
           itaup = itauq + m;
@@ -2686,7 +2686,7 @@ magma_dgesvd
           // singular vectors of A in U and computing right
           // singular vectors of A in VT
           // Workspace: need     M [e] + 4*M [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &m, &n, &m, &izero, s, &work[ie], VT, &ldvt, U, &ldu, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', m, n, m, izero, s, &work[ie], VT, ldvt, U, ldu, dummy, ione, &work[iwork], info);
           }
         }
       else if (want_va && want_un)
@@ -2716,11 +2716,11 @@ magma_dgesvd
           // Workspace: prefer M*M [R] + M [tau] + M*NB [gelqf work]
           lwork2 = lwork - iwork + 1;
           magma_dgelqf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "U", &m, &n, A,  &lda, VT, &ldvt );
+          lapack::lacpy('U', m, n, A, lda, VT, ldvt);
 
           // Copy L to WORK(IR), zeroing out above it
-          coot_fortran(coot_dlacpy)( "L", &m, &m, A, &lda, &work[ir], &ldwrkr );
-          coot_fortran(coot_dlaset)( "U", &m_1, &m_1, &c_zero, &c_zero, &work[ir+ldwrkr], &ldwrkr );
+          lapack::lacpy('L', m, m, A, lda, &work[ir], ldwrkr);
+          lapack::laset('U', m_1, m_1, c_zero, c_zero, &work[ir+ldwrkr], ldwrkr);
 
           // Generate Q in VT
           // Workspace: need   M*M [R] + M [tau] + N    [orglq work]
@@ -2748,18 +2748,18 @@ magma_dgesvd
           // Perform bidiagonal QR iteration, computing right
           // singular vectors of L in WORK(IR)
           // Workspace: need   M*M [R] + M [e] + 4*M [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &m, &m, &izero, &izero, s, &work[ie], &work[ir], &ldwrkr, dummy, &ione, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', m, m, izero, izero, s, &work[ie], &work[ir], ldwrkr, dummy, ione, dummy, ione, &work[iwork], info);
 
           // Multiply right singular vectors of L in WORK(IR) by
           // Q in VT, storing result in A
           // Workspace: need   M*M [R]
-          coot_fortran(coot_dgemm)( "N", "N", &m, &n, &m,
-                                    &c_one,  &work[ir], &ldwrkr,
-                                             VT, &ldvt,
-                                    &c_zero, A, &lda );
+          blas::gemm('N', 'N', m, n, m,
+                     c_one,  &work[ir], ldwrkr,
+                             VT,        ldvt,
+                     c_zero, A,         lda);
 
           // Copy right singular vectors of A from A to VT
-          coot_fortran(coot_dlacpy)( "F", &m, &n, A,  &lda, VT, &ldvt );
+          lapack::lacpy('F', m, n, A, lda, VT, ldvt);
           }
         else
           {
@@ -2772,7 +2772,7 @@ magma_dgesvd
           // Workspace: prefer M [tau] + M*NB [gelqf work]
           lwork2 = lwork - iwork + 1;
           magma_dgelqf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "U", &m, &n, A,  &lda, VT, &ldvt );
+          lapack::lacpy('U', m, n, A, lda, VT, ldvt);
 
           // Generate Q in VT
           // Workspace: need   M [tau] + N    [orglq work]
@@ -2785,7 +2785,7 @@ magma_dgesvd
           iwork = itaup + m;
 
           // Zero out above L in A
-          coot_fortran(coot_dlaset)( "U", &m_1, &m_1, &c_zero, &c_zero, &A[1 * lda], &lda );
+          lapack::laset('U', m_1, m_1, c_zero, c_zero, &A[1 * lda], lda);
 
           // Bidiagonalize L in A
           // Workspace: need   3*M [e, tauq, taup] + M      [gebrd work]
@@ -2803,7 +2803,7 @@ magma_dgesvd
           // Perform bidiagonal QR iteration, computing right
           // singular vectors of A in VT
           // Workspace: need     M [e] + 4*M [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &m, &n, &izero, &izero, s, &work[ie], VT, &ldvt, dummy, &ione, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', m, n, izero, izero, s, &work[ie], VT, ldvt, dummy, ione, dummy, ione, &work[iwork], info);
           }
         }
       else if (want_va && want_uo)
@@ -2845,7 +2845,7 @@ magma_dgesvd
           // Workspace: prefer 2*M*M [U,R] + M [tau] + M*NB [gelqf work]
           lwork2 = lwork - iwork + 1;
           magma_dgelqf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "U", &m, &n, A,  &lda, VT, &ldvt );
+          lapack::lacpy('U', m, n, A, lda, VT, ldvt);
 
           // Generate Q in VT
           // Workspace: need   2*M*M [U,R] + M [tau] + N    [orglq work]
@@ -2854,8 +2854,8 @@ magma_dgesvd
           magma_dorglq(      n,  n,  m, VT,  ldvt, &work[itau], &work[iwork],  lwork2, &ierr );
 
           // Copy L to WORK(IU), zeroing out above it
-          coot_fortran(coot_dlacpy)( "L", &m, &m, A, &lda, &work[iu], &ldwrku );
-          coot_fortran(coot_dlaset)( "U", &m_1, &m_1, &c_zero, &c_zero, &work[iu+ldwrku], &ldwrku );
+          lapack::lacpy('L', m, m, A, lda, &work[iu], ldwrku);
+          lapack::laset('U', m_1, m_1, c_zero, c_zero, &work[iu+ldwrku], ldwrku);
           ie    = itau;
           itauq = ie + m;
           itaup = itauq + m;
@@ -2866,7 +2866,7 @@ magma_dgesvd
           // Workspace: prefer 2*M*M [U,R] + 3*M [e, tauq, taup] + 2*M*NB [gebrd work]
           lwork2 = lwork - iwork + 1;
           magma_dgebrd(      m,  m, &work[iu],  ldwrku, s, &work[ie], &work[itauq], &work[itaup], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "L", &m, &m, &work[iu], &ldwrku, &work[ir], &ldwrkr );
+          lapack::lacpy('L', m, m, &work[iu], ldwrku, &work[ir], ldwrkr);
 
           // Generate right bidiagonalizing vectors in WORK(IU)
           // Workspace: need   2*M*M [U,R] + 3*M [e, tauq, taup] + M    [orgbr work]
@@ -2885,21 +2885,21 @@ magma_dgesvd
           // singular vectors of L in WORK(IR) and computing
           // right singular vectors of L in WORK(IU)
           // Workspace: need   2*M*M [U,R] + M [e] + 4*M [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &m, &m, &m, &izero, s, &work[ie], &work[iu], &ldwrku, &work[ir], &ldwrkr, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', m, m, m, izero, s, &work[ie], &work[iu], ldwrku, &work[ir], ldwrkr, dummy, ione, &work[iwork], info);
 
           // Multiply right singular vectors of L in WORK(IU) by
           // Q in VT, storing result in A
           // Workspace: need   M*M [U]
-          coot_fortran(coot_dgemm)( "N", "N", &m, &n, &m,
-                                    &c_one,  &work[iu], &ldwrku,
-                                             VT, &ldvt,
-                                    &c_zero, A, &lda );
+          blas::gemm('N', 'N', m, n, m,
+                     c_one,  &work[iu], ldwrku,
+                             VT,        ldvt,
+                     c_zero, A,         lda);
 
           // Copy right singular vectors of A from A to VT
-          coot_fortran(coot_dlacpy)( "F", &m, &n, A,  &lda, VT, &ldvt );
+          lapack::lacpy('F', m, n, A, lda, VT, ldvt);
 
           // Copy left singular vectors of A from WORK(IR) to A
-          coot_fortran(coot_dlacpy)( "F", &m, &m, &work[ir], &ldwrkr, A, &lda );
+          lapack::lacpy('F', m, m, &work[ir], ldwrkr, A, lda);
           }
         else
           {
@@ -2912,7 +2912,7 @@ magma_dgesvd
           // Workspace: prefer M [tau] + M*NB [gelqf work]
           lwork2 = lwork - iwork + 1;
           magma_dgelqf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "U", &m, &n, A,  &lda, VT, &ldvt );
+          lapack::lacpy('U', m, n, A, lda, VT, ldvt);
 
           // Generate Q in VT
           // Workspace: need   M [tau] + N    [orglq work]
@@ -2925,7 +2925,7 @@ magma_dgesvd
           iwork = itaup + m;
 
           // Zero out above L in A
-          coot_fortran(coot_dlaset)( "U", &m_1, &m_1, &c_zero, &c_zero, &A[1 * lda], &lda );
+          lapack::laset('U', m_1, m_1, c_zero, c_zero, &A[1 * lda], lda);
 
           // Bidiagonalize L in A
           // Workspace: need   3*M [e, tauq, taup] + M      [gebrd work]
@@ -2950,7 +2950,7 @@ magma_dgesvd
           // singular vectors of A in A and computing right
           // singular vectors of A in VT
           // Workspace: need     M [e] + 4*M [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &m, &n, &m, &izero, s, &work[ie], VT, &ldvt, A, &lda, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', m, n, m, izero, s, &work[ie], VT, ldvt, A, lda, dummy, ione, &work[iwork], info);
           }
         }
       else if (want_va && want_uas)
@@ -2980,7 +2980,7 @@ magma_dgesvd
           // Workspace: prefer M*M [U] + M [tau] + M*NB [gelqf work]
           lwork2 = lwork - iwork + 1;
           magma_dgelqf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "U", &m, &n, A,  &lda, VT, &ldvt );
+          lapack::lacpy('U', m, n, A, lda, VT, ldvt);
 
           // Generate Q in VT
           // Workspace: need   M*M [U] + M [tau] + N    [orglq work]
@@ -2989,8 +2989,8 @@ magma_dgesvd
           magma_dorglq(      n,  n,  m, VT,  ldvt, &work[itau], &work[iwork],  lwork2, &ierr );
 
           // Copy L to WORK(IU), zeroing out above it
-          coot_fortran(coot_dlacpy)( "L", &m, &m, A, &lda, &work[iu], &ldwrku );
-          coot_fortran(coot_dlaset)( "U", &m_1, &m_1, &c_zero, &c_zero, &work[iu+ldwrku], &ldwrku );
+          lapack::lacpy('L', m, m, A, lda, &work[iu], ldwrku);
+          lapack::laset('U', m_1, m_1, c_zero, c_zero, &work[iu+ldwrku], ldwrku);
           ie    = itau;
           itauq = ie + m;
           itaup = itauq + m;
@@ -3001,7 +3001,7 @@ magma_dgesvd
           // Workspace: prefer M*M [U] + 3*M [e, tauq, taup] + 2*M*NB [gebrd work]
           lwork2 = lwork - iwork + 1;
           magma_dgebrd(      m,  m, &work[iu],  ldwrku, s, &work[ie], &work[itauq], &work[itaup], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "L", &m, &m, &work[iu], &ldwrku, U, &ldu );
+          lapack::lacpy('L', m, m, &work[iu], ldwrku, U, ldu);
 
           // Generate right bidiagonalizing vectors in WORK(IU)
           // Workspace: need   M*M [U] + 3*M [e, tauq, taup] + M    [orgbr work]
@@ -3020,18 +3020,18 @@ magma_dgesvd
           // singular vectors of L in U and computing right
           // singular vectors of L in WORK(IU)
           // Workspace: need   M*M [U] + M [e] + 4*M [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &m, &m, &m, &izero, s, &work[ie], &work[iu], &ldwrku, U, &ldu, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', m, m, m, izero, s, &work[ie], &work[iu], ldwrku, U, ldu, dummy, ione, &work[iwork], info);
 
           // Multiply right singular vectors of L in WORK(IU) by
           // Q in VT, storing result in A
           // Workspace: need   M*M [U]
-          coot_fortran(coot_dgemm)( "N", "N", &m, &n, &m,
-                                    &c_one,  &work[iu], &ldwrku,
-                                             VT, &ldvt,
-                                    &c_zero, A, &lda );
+          blas::gemm('N', 'N', m, n, m,
+                     c_one,  &work[iu], ldwrku,
+                             VT,        ldvt,
+                     c_zero, A,         lda);
 
           // Copy right singular vectors of A from A to VT
-          coot_fortran(coot_dlacpy)( "F", &m, &n, A,  &lda, VT, &ldvt );
+          lapack::lacpy('F', m, n, A, lda, VT, ldvt);
           }
         else
           {
@@ -3044,7 +3044,7 @@ magma_dgesvd
           // Workspace: prefer M [tau] + M*NB [gelqf work]
           lwork2 = lwork - iwork + 1;
           magma_dgelqf(      m,  n, A,  lda, &work[itau], &work[iwork],  lwork2, &ierr );
-          coot_fortran(coot_dlacpy)( "U", &m, &n, A,  &lda, VT, &ldvt );
+          lapack::lacpy('U', m, n, A, lda, VT, ldvt);
 
           // Generate Q in VT
           // Workspace: need   M [tau] + N    [orglq work]
@@ -3053,8 +3053,8 @@ magma_dgesvd
           magma_dorglq(      n,  n,  m, VT,  ldvt, &work[itau], &work[iwork],  lwork2, &ierr );
 
           // Copy L to U, zeroing out above it
-          coot_fortran(coot_dlacpy)( "L", &m, &m, A, &lda, U, &ldu );
-          coot_fortran(coot_dlaset)( "U", &m_1, &m_1, &c_zero, &c_zero, &U[1 * ldu], &ldu );
+          lapack::lacpy('L', m, m, A, lda, U, ldu);
+          lapack::laset('U', m_1, m_1, c_zero, c_zero, &U[1 * ldu], ldu);
           ie    = itau;
           itauq = ie + m;
           itaup = itauq + m;
@@ -3083,7 +3083,7 @@ magma_dgesvd
           // singular vectors of A in U and computing right
           // singular vectors of A in VT
           // Workspace: need     M [e] + 4*M [bdsqr work]
-          coot_fortran(coot_dbdsqr)( "U", &m, &n, &m, &izero, s, &work[ie], VT, &ldvt, U, &ldu, dummy, &ione, &work[iwork], info );
+          lapack::bdsqr('U', m, n, m, izero, s, &work[ie], VT, ldvt, U, ldu, dummy, ione, &work[iwork], info);
           }
         }
       }
@@ -3109,7 +3109,7 @@ magma_dgesvd
         // and generate left bidiagonalizing vectors in U
         // Workspace: need     3*M [e, tauq, taup] + M    [orgbr work]
         // Workspace: prefer   3*M [e, tauq, taup] + M*NB [orgbr work]
-        coot_fortran(coot_dlacpy)( "L", &m, &m, A, &lda, U, &ldu );
+        lapack::lacpy('L', m, m, A, lda, U, ldu);
         lwork2 = lwork - iwork + 1;
         magma_dorgbr( MagmaQ,   m,  m,  n, U,  ldu, &work[itauq], &work[iwork],  lwork2, &ierr );
         }
@@ -3119,7 +3119,7 @@ magma_dgesvd
         // VT and generate right bidiagonalizing vectors in VT
         // Workspace: need     3*M [e, tauq, taup] + NRVT     [orgbr work]
         // Workspace: prefer   3*M [e, tauq, taup] + NRVT*NB  [orgbr work]
-        coot_fortran(coot_dlacpy)( "U", &m, &n, A,  &lda, VT, &ldvt );
+        lapack::lacpy('U', m, n, A, lda, VT, ldvt);
         if (want_va)
           {
           nrvt = n;
@@ -3174,7 +3174,7 @@ magma_dgesvd
         // left singular vectors in U and computing right singular
         // vectors in VT
         // Workspace: need       M [e] + 4*M [bdsqr work]
-        coot_fortran(coot_dbdsqr)( "L", &m, &ncvt, &nru, &izero, s, &work[ie], VT, &ldvt, U, &ldu, dummy, &ione, &work[iwork], info );
+        lapack::bdsqr('L', m, ncvt, nru, izero, s, &work[ie], VT, ldvt, U, ldu, dummy, ione, &work[iwork], info);
         }
       else if (!want_uo && want_vo)
         {
@@ -3182,7 +3182,7 @@ magma_dgesvd
         // left singular vectors in U and computing right singular
         // vectors in A
         // Workspace: need       M [e] + 4*M [bdsqr work]
-        coot_fortran(coot_dbdsqr)( "L", &m, &ncvt, &nru, &izero, s, &work[ie], A, &lda, U, &ldu, dummy, &ione, &work[iwork], info );
+        lapack::bdsqr('L', m, ncvt, nru, izero, s, &work[ie], A, lda, U, ldu, dummy, ione, &work[iwork], info);
         }
       else
         {
@@ -3190,7 +3190,7 @@ magma_dgesvd
         // left singular vectors in A and computing right singular
         // vectors in VT
         // Workspace: need       M [e] + 4*M [bdsqr work]
-        coot_fortran(coot_dbdsqr)( "L", &m, &ncvt, &nru, &izero, s, &work[ie], VT, &ldvt, A, &lda, dummy, &ione, &work[iwork], info );
+        lapack::bdsqr('L', m, ncvt, nru, izero, s, &work[ie], VT, ldvt, A, lda, dummy, ione, &work[iwork], info);
         }
       }
     }
@@ -3221,21 +3221,21 @@ magma_dgesvd
     {
     if (anrm > bignum)
       {
-      coot_fortran(coot_dlascl)( "G", &izero, &izero, &bignum, &anrm, &minmn, &ione, s, &minmn, &ierr );
+      lapack::lascl('G', izero, izero, bignum, anrm, minmn, ione, s, minmn, &ierr);
       }
     if (*info != 0 && anrm > bignum)
       {
       m_1 = minmn - 1;
-      coot_fortran(coot_dlascl)( "G", &izero, &izero, &bignum, &anrm, &m_1, &ione, &work[2], &minmn, &ierr );
+      lapack::lascl('G', izero, izero, bignum, anrm, m_1, ione, &work[2], minmn, &ierr);
       }
     if (anrm < smlnum)
       {
-      coot_fortran(coot_dlascl)( "G", &izero, &izero, &smlnum, &anrm, &minmn, &ione, s, &minmn, &ierr );
+      lapack::lascl('G', izero, izero, smlnum, anrm, minmn, ione, s, minmn, &ierr);
       }
     if (*info != 0 && anrm < smlnum)
       {
       m_1 = minmn - 1;
-      coot_fortran(coot_dlascl)( "G", &izero, &izero, &smlnum, &anrm, &m_1, &ione, &work[2], &minmn, &ierr );
+      lapack::lascl('G', izero, izero, smlnum, anrm, m_1, ione, &work[2], minmn, &ierr);
       }
     }
 

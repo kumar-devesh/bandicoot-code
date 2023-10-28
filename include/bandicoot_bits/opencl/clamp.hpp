@@ -34,6 +34,11 @@ clamp(dev_mem_t<eT2> dest,
   {
   coot_extra_debug_sigprint();
 
+  if (n_rows == 0 || n_cols == 0)
+    {
+    return;
+    }
+
   coot_debug_check( (get_rt().cl_rt.is_valid() == false), "coot::opencl::clamp(): OpenCL runtime not valid" );
 
   runtime_t::cq_guard guard;

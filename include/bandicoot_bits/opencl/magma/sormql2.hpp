@@ -221,8 +221,7 @@ magma_sormql2_gpu
     /* Form the triangular factor of the block reflector
        H = H(i+ib-1) . . . H(i+1) H(i) */
     nq_i = nq - k + i + ib - 1;
-    coot_fortran(coot_slarft)( "B", "C", &nq_i, &ib,
-                               wA + 1 + i * ldwa, &ldwa, &tau[i], T, &ib );
+    lapack::larft('B', 'C', nq_i, ib, wA + 1 + i * ldwa, ldwa, &tau[i], T, ib);
 
     if (left)
       {

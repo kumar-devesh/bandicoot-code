@@ -403,10 +403,13 @@ if(FIND_CUDA)
     find_package(CUDA)
 
     if(CUDA_FOUND)
-      # We also need NVRTC, which the old FindCUDA package does not find.
-      find_library(CUDA_nvrtc_LIBRARY nvrtc ${CUDA_TOOLKIT_ROOT_DIR})
+      # We also need NVRTC and also libcuda itself, which the old FindCUDA package do not find.
+      find_library(CUDA_cuda_LIBRARY cuda
+          HINTS ${CUDA_TOOLKIT_ROOT_DIR} ${CUDA_TOOLKIT_ROOT_DIR}/lib ${CUDA_TOOLKIT_ROOT_DIR}/lib64)
+      find_library(CUDA_nvrtc_LIBRARY nvrtc
+          HINTS ${CUDA_TOOLKIT_ROOT_DIR} ${CUDA_TOOLKIT_ROOT_DIR}/lib ${CUDA_TOOLKIT_ROOT_DIR}/lib64)
 
-      set(CUDA_LIBS ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES} ${CUDA_curand_LIBRARY} ${CUDA_cusolver_LIBRARY} ${CUDA_nvrtc_LIBRARY})
+      set(CUDA_LIBS ${CUDA_LIBRARIES} ${CUDA_CUBLAS_LIBRARIES} ${CUDA_curand_LIBRARY} ${CUDA_cusolver_LIBRARY} ${CUDA_nvrtc_LIBRARY} ${CUDA_cuda_LIBRARY})
     endif()
   else()
     # Use newer FindCUDAToolkit module.
@@ -598,7 +601,9 @@ message(STATUS "CMAKE_REQUIRED_INCLUDES   = ${CMAKE_REQUIRED_INCLUDES}"  )
 add_library(
   bandicoot
   ${PROJECT_SOURCE_DIR}/src/wrapper_blas.cpp
+  ${PROJECT_SOURCE_DIR}/src/wrapper_blas_hidden_args.cpp
   ${PROJECT_SOURCE_DIR}/src/wrapper_lapack.cpp
+  ${PROJECT_SOURCE_DIR}/src/wrapper_lapack_hidden_args.cpp
   ${PROJECT_SOURCE_DIR}/src/wrapper_opencl.cpp
   ${PROJECT_SOURCE_DIR}/src/wrapper_clblas.cpp
   ${PROJECT_SOURCE_DIR}/src/wrapper_cuda.cpp

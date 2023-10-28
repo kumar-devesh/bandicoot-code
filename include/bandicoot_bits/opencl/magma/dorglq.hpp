@@ -178,7 +178,7 @@ magma_dorglq
       }
 
     // Send current panel of V (block row) to the GPU
-    coot_fortran(coot_dlaset)("L", &ib, &ib, &c_zero, &c_one, &A[i + i * lda], &lda);
+    lapack::laset('L', ib, ib, c_zero, c_one, &A[i + i * lda], lda);
     // TODO: having this _async was causing numerical errors. Why?
     magma_dsetmatrix( ib, n-i,
                       &A[i + i * lda], lda,
@@ -187,8 +187,8 @@ magma_dorglq
     // Form the triangular factor of the block reflector
     // H = H(i) H(i+1) . . . H(i+ib-1)
     n_i = n - i;
-    coot_fortran(coot_dlarft)("F", "R", &n_i, &ib,
-                              &A[i + i * lda], &lda, &tau[i], work, &nb );
+    lapack::larft('F', 'R', n_i, ib,
+                  &A[i + i * lda], lda, &tau[i], work, nb);
     magma_dsetmatrix_async( ib, ib,
                             work, nb,
                             dT, dT_offset,   nb, queue );

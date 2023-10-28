@@ -47,9 +47,11 @@
 //  (including negligence or otherwise) arising in any way out of the use
 //  of this software, even if advised of the possibility of such damage.
 
+#include <armadillo>
 #include <bandicoot>
 #include "../catch.hpp"
 #include "def_lapack_test.hpp"
+#include "translate_lapack_test.hpp"
 
 using namespace coot;
 
@@ -82,6 +84,11 @@ lapack_storev_const( magma_storev_t magma_const )
 TEST_CASE("magma_dlarfb_1", "[larfb]")
   {
   if (get_rt().backend != CL_BACKEND)
+    {
+    return;
+    }
+
+  if (!coot_rt_t::is_supported_type<double>())
     {
     return;
     }
@@ -159,11 +166,11 @@ TEST_CASE("magma_dlarfb_1", "[larfb]")
               {
               if ( direct[idir] == MagmaForward )
                 {
-                coot_fortran(coot_dlaset)("U", &K, &K, &c_zero, &c_one, V, &ldv );
+                lapack::laset('U', K, K, c_zero, c_one, V, ldv);
                 }
               else
                 {
-                coot_fortran(coot_dlaset)("L", &K, &K, &c_zero, &c_one, &V[(ldv-K)], &ldv );
+                lapack::laset('L', K, K, c_zero, c_one, &V[(ldv-K)], ldv);
                 }
               }
             else
@@ -172,11 +179,11 @@ TEST_CASE("magma_dlarfb_1", "[larfb]")
               std::swap( ldv, nv );
               if ( direct[idir] == MagmaForward )
                 {
-                coot_fortran(coot_dlaset)("L", &K, &K, &c_zero, &c_one, V, &ldv );
+                lapack::laset('L', K, K, c_zero, c_one, V, ldv);
                 }
               else
                 {
-                coot_fortran(coot_dlaset)("U", &K, &K, &c_zero, &c_one, &V[(nv-K)*ldv], &ldv );
+                lapack::laset('U', K, K, c_zero, c_one, &V[(nv-K)*ldv], ldv);
                 }
               }
 
@@ -186,21 +193,21 @@ TEST_CASE("magma_dlarfb_1", "[larfb]")
             T_alias.randu();
             if ( direct[idir] == MagmaForward )
               {
-              coot_fortran(coot_dlaset)("L", &k1, &k1, &c_zero, &c_zero, &T[1], &ldt );
+              lapack::laset('L', k1, k1, c_zero, c_zero, &T[1], ldt);
               }
             else
               {
-              coot_fortran(coot_dlaset)("U", &k1, &k1, &c_zero, &c_zero, &T[1*ldt], &ldt );
+              lapack::laset('U', k1, k1, c_zero, c_zero, &T[1*ldt], ldt);
               }
 
             magma_dsetmatrix( M,   N,  C, ldc, dC, 0, ldc, queue );
             magma_dsetmatrix( ldv, nv, V, ldv, dV, 0, ldv, queue );
             magma_dsetmatrix( K,   K,  T, ldt, dT, 0, ldt, queue );
 
-            coot_fortran(coot_dlarfb)( lapack_side_const( side[iside] ), lapack_trans_const( trans[itran] ),
-                              lapack_direct_const( direct[idir] ), lapack_storev_const( storev[istor] ),
-                              &M, &N, &K,
-                              V, &ldv, T, &ldt, C, &ldc, W, &ldw );
+            lapack::larfb(lapack_side_const(side[iside])[0], lapack_trans_const(trans[itran])[0],
+                          lapack_direct_const(direct[idir])[0], lapack_storev_const(storev[istor])[0],
+                          M, N, K,
+                          V, ldv, T, ldt, C, ldc, W, ldw);
 
             magma_dlarfb_gpu( side[iside], trans[itran], direct[idir], storev[istor],
                               M, N, K,
@@ -210,9 +217,9 @@ TEST_CASE("magma_dlarfb_1", "[larfb]")
 
             // compute relative error |HC_magma - HC_lapack| / |HC_lapack|
             magma_int_t size = ldc*N;
-            coot_fortran(coot_daxpy)( &size, &c_neg_one, C, &ione, R, &ione );
-            Cnorm = coot_fortran(coot_dlange)( "F", &M, &N, C, &ldc, work );
-            error = coot_fortran(coot_dlange)( "F", &M, &N, R, &ldc, work ) / Cnorm;
+            blas::axpy(size, c_neg_one, C, ione, R, ione);
+            Cnorm = lapack::lange('F', M, N, C, ldc, work);
+            error = lapack::lange('F', M, N, R, ldc, work) / Cnorm;
 
             REQUIRE( error < tol );
 
@@ -318,11 +325,11 @@ TEST_CASE("magma_slarfb_1", "[larfb]")
               {
               if ( direct[idir] == MagmaForward )
                 {
-                coot_fortran(coot_slaset)("U", &K, &K, &c_zero, &c_one, V, &ldv );
+                lapack::laset('U', K, K, c_zero, c_one, V, ldv);
                 }
               else
                 {
-                coot_fortran(coot_slaset)("L", &K, &K, &c_zero, &c_one, &V[(ldv-K)], &ldv );
+                lapack::laset('L', K, K, c_zero, c_one, &V[(ldv-K)], ldv);
                 }
               }
             else
@@ -331,11 +338,11 @@ TEST_CASE("magma_slarfb_1", "[larfb]")
               std::swap( ldv, nv );
               if ( direct[idir] == MagmaForward )
                 {
-                coot_fortran(coot_slaset)("L", &K, &K, &c_zero, &c_one, V, &ldv );
+                lapack::laset('L', K, K, c_zero, c_one, V, ldv);
                 }
               else
                 {
-                coot_fortran(coot_slaset)("U", &K, &K, &c_zero, &c_one, &V[(nv-K)*ldv], &ldv );
+                lapack::laset('U', K, K, c_zero, c_one, &V[(nv-K)*ldv], ldv);
                 }
               }
 
@@ -345,21 +352,21 @@ TEST_CASE("magma_slarfb_1", "[larfb]")
             T_alias.randu();
             if ( direct[idir] == MagmaForward )
               {
-              coot_fortran(coot_slaset)("L", &k1, &k1, &c_zero, &c_zero, &T[1], &ldt );
+              lapack::laset('L', k1, k1, c_zero, c_zero, &T[1], ldt);
               }
             else
               {
-              coot_fortran(coot_slaset)("U", &k1, &k1, &c_zero, &c_zero, &T[1*ldt], &ldt );
+              lapack::laset('U', k1, k1, c_zero, c_zero, &T[1*ldt], ldt);
               }
 
             magma_ssetmatrix( M,   N,  C, ldc, dC, 0, ldc, queue );
             magma_ssetmatrix( ldv, nv, V, ldv, dV, 0, ldv, queue );
             magma_ssetmatrix( K,   K,  T, ldt, dT, 0, ldt, queue );
 
-            coot_fortran(coot_slarfb)( lapack_side_const( side[iside] ), lapack_trans_const( trans[itran] ),
-                              lapack_direct_const( direct[idir] ), lapack_storev_const( storev[istor] ),
-                              &M, &N, &K,
-                              V, &ldv, T, &ldt, C, &ldc, W, &ldw );
+            lapack::larfb(lapack_side_const(side[iside])[0], lapack_trans_const(trans[itran])[0],
+                          lapack_direct_const(direct[idir])[0], lapack_storev_const(storev[istor])[0],
+                          M, N, K,
+                          V, ldv, T, ldt, C, ldc, W, ldw);
 
             magma_slarfb_gpu( side[iside], trans[itran], direct[idir], storev[istor],
                               M, N, K,
@@ -369,9 +376,9 @@ TEST_CASE("magma_slarfb_1", "[larfb]")
 
             // compute relative error |HC_magma - HC_lapack| / |HC_lapack|
             magma_int_t size = ldc*N;
-            coot_fortran(coot_saxpy)( &size, &c_neg_one, C, &ione, R, &ione );
-            Cnorm = coot_fortran(coot_slange)( "F", &M, &N, C, &ldc, work );
-            error = coot_fortran(coot_slange)( "F", &M, &N, R, &ldc, work ) / Cnorm;
+            blas::axpy(size, c_neg_one, C, ione, R, ione);
+            Cnorm = lapack::lange('F', M, N, C, ldc, work);
+            error = lapack::lange('F', M, N, R, ldc, work) / Cnorm;
 
             REQUIRE( error < tol );
 
